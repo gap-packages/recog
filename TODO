@@ -1,0 +1,33 @@
+Do soonish:
+
+Soonest:
+
+
+Sooner:
+
+Soon:
+
+========================================================================
+
+Future: 
+
+Think whether the changing of gensN after creation might hurt other
+places than LowerLeftPGroup.
+
+SLPforElement methods without evaluation --> like in SiftAsWord ???
+
+========================================================================
+
+to talk ???:
+
+  Convention: SLPforElement guarantees that a returned slp does the job
+    ==> \in is easier, does not have to evaluate the slp
+    ==> in StabChain code we divide up labels
+    ==> in Hom code we divide up preimage of the image, go to kernel
+    ==> doable everywhere (in fact done everywhere)
+
+  FindKernelFastNormalClosure always?
+
+
+========================================================================
+

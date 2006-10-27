@@ -1,0 +1,80 @@
+\makelabel{recogbase:Title page}{}
+\makelabel{recogbase:Copyright}{}
+\makelabel{recogbase:Table of contents}{}
+\makelabel{recogbase:Introduction}{1}
+\makelabel{recogbase:Philosophy}{1.1}
+\makelabel{recogbase:Overview over this manual}{1.2}
+\makelabel{recogbase:Installation of the recogbase-Package}{2}
+\makelabel{recogbase:Method Selection}{3}
+\makelabel{recogbase:What are methods?}{3.1}
+\makelabel{recogbase:How methods are called}{3.2}
+\makelabel{recogbase:Group Recognition}{4}
+\makelabel{recogbase:The recursive procedure}{4.1}
+\makelabel{recogbase:Recognition info records}{4.2}
+\makelabel{recogbase:Methods to find homomorphisms}{4.3}
+\makelabel{recogbase:Conventions for the recognition of permutation groups}{4.4}
+\makelabel{recogbase:Conventions for the recognition of matrix groups}{4.5}
+\makelabel{recogbase:Conventions for the recognition of black box groups}{4.6}
+\makelabel{recogbase:After successfull recognition}{5}
+\makelabel{recogbase:Functions and methods for recognition info records}{5.1}
+\makelabel{recogbase:Bibliography}{Bib}
+\makelabel{recogbase:References}{Bib}
+\makelabel{recogbase:Index}{Ind}
+\makelabel{recogbase:recogbase}{2}
+\makelabel{recogbase:AddMethod}{3.1.1}
+\makelabel{recogbase:CallMethods}{3.2.1}
+\makelabel{recogbase:RecogniseGeneric}{4.1.1}
+\makelabel{recogbase:RecognizeGeneric}{4.1.1}
+\makelabel{recogbase:RecognisePermGroup}{4.1.2}
+\makelabel{recogbase:RecognizePermGroup}{4.1.2}
+\makelabel{recogbase:RecogniseMatrixGroup}{4.1.3}
+\makelabel{recogbase:RecognizeMatrixGroup}{4.1.3}
+\makelabel{recogbase:RecogniseBBGroup}{4.1.4}
+\makelabel{recogbase:RecognizeBBGroup}{4.1.4}
+\makelabel{recogbase:RecogniseGroup}{4.1.5}
+\makelabel{recogbase:RecognizeGroup}{4.1.5}
+\makelabel{recogbase:FindHomDbPerm}{4.1.6}
+\makelabel{recogbase:FindHomMethodsPerm}{4.1.7}
+\makelabel{recogbase:SLPforElementFuncsPerm}{4.1.8}
+\makelabel{recogbase:FindHomDbMatrix}{4.1.9}
+\makelabel{recogbase:FindHomMethodsMatrix}{4.1.10}
+\makelabel{recogbase:SLPforElementFuncsMatrix}{4.1.11}
+\makelabel{recogbase:FindHomDbBB}{4.1.12}
+\makelabel{recogbase:FindHomMethodsBB}{4.1.13}
+\makelabel{recogbase:SLPforElementFuncsBB}{4.1.14}
+\makelabel{recogbase:RecognitionInfoFamily}{4.2.1}
+\makelabel{recogbase:IsRecognitionInfo}{4.2.2}
+\makelabel{recogbase:IsLeaf}{4.2.3}
+\makelabel{recogbase:DoNotRecurse}{4.2.4}
+\makelabel{recogbase:IsReady}{4.2.5}
+\makelabel{recogbase:group}{4.2.6}
+\makelabel{recogbase:homom}{4.2.7}
+\makelabel{recogbase:nicegens}{4.2.8}
+\makelabel{recogbase:pregensfac}{4.2.9}
+\makelabel{recogbase:factor}{4.2.10}
+\makelabel{recogbase:kernel}{4.2.11}
+\makelabel{recogbase:parent}{4.2.12}
+\makelabel{recogbase:fhmethsel}{4.2.13}
+\makelabel{recogbase:slpforelement}{4.2.14}
+\makelabel{recogbase:SLPforElement}{4.2.15}
+\makelabel{recogbase:presentation}{4.2.16}
+\makelabel{recogbase:methodsforfactor}{4.2.17}
+\makelabel{recogbase:calcnicegens}{4.2.18}
+\makelabel{recogbase:CalcNiceGensGeneric}{4.2.19}
+\makelabel{recogbase:CalcNiceGensHomNode}{4.2.20}
+\makelabel{recogbase:CalcNiceGens}{4.2.21}
+\makelabel{recogbase:slptonice}{4.2.22}
+\makelabel{recogbase:gensN}{4.2.23}
+\makelabel{recogbase:findgensNmeth}{4.2.24}
+\makelabel{recogbase:FindKernelRandom}{4.2.25}
+\makelabel{recogbase:FindKernelDoNothing}{4.2.26}
+\makelabel{recogbase:FindKernelFastNormalClosure}{4.2.27}
+\makelabel{recogbase:gensNslp}{4.2.28}
+\makelabel{recogbase:immediateverification}{4.2.29}
+\makelabel{recogbase:forkernel}{4.2.30}
+\makelabel{recogbase:forfactor}{4.2.31}
+\makelabel{recogbase:FindHomomorphism}{4.3.1}
+\makelabel{recogbase:SLPforElementGeneric}{4.3.2}
+\makelabel{recogbase:SLPforNiceGens}{5.1.1}
+\makelabel{recogbase:Size}{5.1.2}
+\makelabel{recogbase:DisplayCompositionFactors}{5.1.3}

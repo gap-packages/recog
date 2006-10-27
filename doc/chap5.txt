@@ -1,0 +1,51 @@
+  
+  [1m[4m[31m5. After successfull recognition[0m
+  
+  This chapter explains, what one can do with recognition info records after a
+  successfull recognition (and possibly verification).
+  
+  Of  course,  one can inspect the whole tree of recognition info records just
+  by looking at the stored attribute values. Moreover, constructive membership
+  tests  can  be  performed using the function [1m[34mSLPforElement[0m ([1m4.2-15[0m), thereby
+  writing  an  arbitrary  element  in  terms of the nice generators, which are
+  stored  in  the  attribute  [1m[34mnicegens[0m  ([1m4.2-8[0m). If [22m[32mfail[0m is returned, then the
+  element  in question does not lie in the recognised group or the recognition
+  made an error.
+  
+  
+  [1m[4m[31m5.1 Functions and methods for recognition info records[0m
+  
+  If  you  need  an  element  explicitly  written  in  terms  of  the original
+  generators, you can use the following function:
+  
+  [1m[4m[31m5.1-1 SLPforNiceGens[0m
+  
+  [1m[34m> SLPforNiceGens( [0m[22m[34mri[0m[1m[34m ) _____________________________________________[0mfunction
+  [1mReturns:[0m  an SLP expressing the nice generators in the original ones
+  
+  This  function  assembles  a  possibly  quite  large  straight  line program
+  expressing  the  nice  generators in terms of the original ones by using the
+  locally stored information in the recognition tree recursively.
+  
+  You  can  concatenate straight line programs in the nice generators with the
+  result  of  this  function  to  explicitly  write an element in terms of the
+  original generators.
+  
+  [1m[4m[31m5.1-2 Size[0m
+  
+  [1m[34m> Size( [0m[22m[34mri[0m[1m[34m ) _________________________________________________________[0mmethod
+  [1mReturns:[0m  the size of the recognised group
+  
+  This  method  calculates the size of the recognised group by multiplying the
+  size of the factor and the kernel recursively. It is assumed that leaf nodes
+  know already or can calculate the size of their group.
+  
+  [1m[4m[31m5.1-3 DisplayCompositionFactors[0m
+  
+  [1m[34m> DisplayCompositionFactors( [0m[22m[34mri[0m[1m[34m ) __________________________________[0mfunction
+  [1mReturns:[0m  nothing
+  
+  This   function  displays  a  composition  series  by  using  the  recursive
+  recognition  tree.  It  only works, if the usual operation [1m[34mCompositionSeries[0m
+  ([1mReference: CompositionSeries[0m) works for all leaves.
+  

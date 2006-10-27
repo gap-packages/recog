@@ -1,0 +1,65 @@
+  
+  
+  [1m[4m[31mIndex[0m
+  
+  [1m[34mAddMethod[0m  3.1-1
+  [1m[34mcalcnicegens[0m  4.2-18
+  [1m[34mCalcNiceGens[0m  4.2-21
+  [1m[34mCalcNiceGensGeneric[0m  4.2-19
+  [1m[34mCalcNiceGensHomNode[0m  4.2-20
+  [1m[34mCallMethods[0m  3.2-1
+  [1m[34mDisplayCompositionFactors[0m  5.1-3
+  [1m[34mDoNotRecurse[0m  4.2-4
+  [1m[34mfactor[0m  4.2-10
+  [1m[34mfhmethsel[0m  4.2-13
+  [1m[34mfindgensNmeth[0m  4.2-24
+  [1m[34mFindHomDbBB[0m  4.1-12
+  [1m[34mFindHomDbMatrix[0m  4.1-9
+  [1m[34mFindHomDbPerm[0m  4.1-6
+  [1m[34mFindHomMethodsBB[0m  4.1-13
+  [1m[34mFindHomMethodsMatrix[0m  4.1-10
+  [1m[34mFindHomMethodsPerm[0m  4.1-7
+  [1m[34mFindHomomorphism[0m  4.3-1
+  [1m[34mFindKernelDoNothing[0m  4.2-26
+  [1m[34mFindKernelFastNormalClosure[0m  4.2-27
+  [1m[34mFindKernelRandom[0m  4.2-25
+  [1m[34mforfactor[0m  4.2-31
+  [1m[34mforkernel[0m  4.2-30
+  [1m[34mgensN[0m  4.2-23
+  [1m[34mgensNslp[0m  4.2-28
+  [1m[34mgroup[0m  4.2-6
+  [1m[34mhomom[0m  4.2-7
+  [1m[34mimmediateverification[0m  4.2-29
+  [1m[34mIsLeaf[0m  4.2-3
+  [1m[34mIsReady[0m  4.2-5
+  [1m[34mIsRecognitionInfo[0m  4.2-2
+  [1m[34mkernel[0m  4.2-11
+  [1m[34mmethodsforfactor[0m  4.2-17
+  [1m[34mnicegens[0m  4.2-8
+  [1m[34mparent[0m  4.2-12
+  [1m[34mpregensfac[0m  4.2-9
+  [1m[34mpresentation[0m  4.2-16
+  [1mrecogbase[0m  2.
+  [1m[34mRecogniseBBGroup[0m  4.1-4
+  [1m[34mRecogniseGeneric[0m  4.1-1
+  [1m[34mRecogniseGroup[0m  4.1-5
+  [1m[34mRecogniseMatrixGroup[0m  4.1-3
+  [1m[34mRecognisePermGroup[0m  4.1-2
+  [1m[34mRecognitionInfoFamily[0m  4.2-1
+  [1m[34mRecognizeBBGroup[0m  4.1-4
+  [1m[34mRecognizeGeneric[0m  4.1-1
+  [1m[34mRecognizeGroup[0m  4.1-5
+  [1m[34mRecognizeMatrixGroup[0m  4.1-3
+  [1m[34mRecognizePermGroup[0m  4.1-2
+  [1m[34mSize[0m  5.1-2
+  [1m[34mslpforelement[0m  4.2-14
+  [1m[34mSLPforElement[0m  4.2-15
+  [1m[34mSLPforElementFuncsBB[0m  4.1-14
+  [1m[34mSLPforElementFuncsMatrix[0m  4.1-11
+  [1m[34mSLPforElementFuncsPerm[0m  4.1-8
+  [1m[34mSLPforElementGeneric[0m  4.3-2
+  [1m[34mSLPforNiceGens[0m  5.1-1
+  [1m[34mslptonice[0m  4.2-22
+  
+  
+  -------------------------------------------------------
