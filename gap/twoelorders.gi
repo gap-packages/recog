@@ -4379,8 +4379,12 @@ FindHomMethodsProjective.TwoLargeElOrders := function(ri,G)
                   return SLCR.FindHom(ri,G,name[2],name[3]);
               fi;
           else
-              namecat := Concatenation(name[1],String(name[2]),
-                                       "(",String(name[3]),")");
+              if Length(name) = 3 then
+                  namecat := Concatenation(name[1],String(name[2]),
+                                           "(",String(name[3]),")");
+              else
+                  namecat := name[1];
+              fi;
               res := LookupHintForSimple(ri,G,namecat);
           fi;
           if res = true then return true; fi;
