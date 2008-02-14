@@ -2,19 +2,19 @@
 
 afterrecog.xml          recogbase package documentation
                                                                Max Neunhoeffer
-                                                                   Ákos Seress
+                                                                   Ãkos Seress
 
-         Copyright (C) 2005-2006, Lehrstuhl D für Mathematik, RWTH-Aachen
+         Copyright (C) 2005-2008 by the authors.
 
-This chapter shows what one can do after a successfull recognition.
+This chapter shows what one can do after a successful recognition.
 
 -->
 
 <Chapter Label="afterrecog">
-<Heading>After successfull recognition</Heading>
+<Heading>After successful recognition</Heading>
 
 This chapter explains, what one can do with recognition info records
-after a successfull recognition (and possibly verification).<P/>
+after a successful recognition (and possibly verification).<P/>
 
 Of course, one can inspect the whole tree of recognition info records
 just by looking at the stored attribute values. Moreover, constructive

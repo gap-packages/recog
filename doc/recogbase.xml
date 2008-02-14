@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!DOCTYPE Book SYSTEM "gapdoc.dtd">
 
@@ -6,9 +6,9 @@
 
   recogbase.xml          recogbase package documentation                
                                                                 Max Neunhoeffer
-                                                                and Ákos Seress
+                                                                and Ãkos Seress
 
-  Copyright (C) 2005-2006, Lehrstuhl D für Mathematik, RWTH-Aachen
+  Copyright (C) 2005-2008 by the authors.
 
 -->
 
@@ -20,18 +20,14 @@
     <Version>
       <#Include SYSTEM "../VERSION">
     </Version>
-    <Author>Max Neunhöffer
-<Address>
-Lehrstuhl D für Mathematik,
-RWTH Aachen,
-Templergraben 64,
-52062 Aachen,
-Germany
-</Address>
-    <Email>max.neunhoeffer@math.rwth-aachen.de</Email>
-    <Homepage>http://www.math.rwth-aachen.de/&tilde;Max.Neunhoeffer</Homepage>
+    <Author>Max Neunhoeffer
+    <Address>School of Mathematics and Statistics, Mathematical
+        Institute, North Haugh, St Andrews,
+        Fife, KY16 9SS, Scotland, UK</Address>
+    <Email>neunhoef@mcs.st-and.ac.uk</Email>
+    <Homepage>http://www-groups.mcs.st-and.ac.uk/~neunhoef/</Homepage>
     </Author>
-    <Author>Ákos Seress
+    <Author>Ãkos Seress
 <Address>
 Department of Mathematics,
 The Ohio State University,
@@ -42,13 +38,13 @@ Columbus, OH 43210 USA
     <Homepage>http://www.math.ohio-state.edu/people/display/display.php?ID=302
     </Homepage>
     </Author>
-    <Date>October 2006</Date>
+    <Date>February 2008</Date>
 
 <Copyright>
-  &copyright; 2005-2006 by Max Neunhöffer and Ákos Seress<P/>
+  &copyright; 2005-2008 by Max NeunhÃ¶ffer and Ãkos Seress<P/>
 
   This package may be distributed under the terms and conditions of the
-  GNU Public License Version 2.
+  GNU Public License Version 3 or (at your option) any later version.
 </Copyright>
 
 </TitlePage>
