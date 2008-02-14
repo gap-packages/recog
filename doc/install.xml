@@ -22,9 +22,9 @@ loaded by &GAP; when it is installed. You must load the package with
 <C>LoadPackage("recogbase");</C> before its functions become available.<P/>
 
 Usually, this package is only usable if you also install the
-<Package>recog</Package> containing all the implemented recognition
-methods. Since the <Package>recog</Package> then automatically loads
-the <Package>recogbase</Package> the only has to load both packages
+<Package>recog</Package> package containing all the implemented recognition
+methods. Since the <Package>recog</Package> package then automatically loads
+the <Package>recogbase</Package> one only has to load both packages
 with <C>LoadPackage("recog");</C>.<P/>
 
 Please, send us an e-mail if you have any questions, remarks,

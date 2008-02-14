@@ -18,7 +18,7 @@ lots of different methods are available to fulfill a certain task, but
 in which it is not possible in the beginning to decide, which one to use.
 Therefore this setup regulates, rather than just which method to choose,
 in which order the various methods are tried. The methods themselves
-return, whether they were successful and if not, whether it is sensible
+return whether they were successful and, if not, whether it is sensible
 to try them again at a later stage.<P/>
 
 The design is intentionally kept as simple as possible and at the same

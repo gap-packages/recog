@@ -17,7 +17,18 @@ behind the package.
 <Section Label="philosophy">
 <Heading>Philosophy</Heading>
 
-This package is about group recognition. To be written further.
+This package is about group recognition. It provides a generic
+framework to implement methods of group recognition, regardless of
+what computational representation is used. This means, that the code
+in this package is useful at least for permutation groups, matrix
+groups, projective groups and for the context of black box groups.
+The setup is described in <Cite Key="IssacRecog"/>. <P/>
+
+The framework allows to build composition trees and handles the builtup 
+and usage of these trees in a generic way. It also contains a
+method selection (described in Chapter <Ref Chap="methsel"/>) that allows 
+install recognition methods in a convenient way and that automatically
+tries to try the different available methods in a sensible order.
 </Section>
 
 <Section Label="overview">
@@ -32,9 +43,9 @@ for finding a homomorphism (or an isomorphism) we use another generic
 procedure, the <Q>method selection</Q> which is not to be confused with
 the &GAP; method selection. Our own method selection is described in detail
 in Chapter <Ref Chap="methsel"/>, because it is interesting in its own 
-right and might be useful in other circumstances.<P/>
-
-<E>More text on other chapters to be written.</E><P/>
+right and might be useful in other circumstances. Finally, in Chapter
+<Ref Chap="afterrecog"/> we describe, what one can do with a completed
+recognition tree.
 
 </Section>
 

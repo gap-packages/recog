@@ -30,7 +30,6 @@ BindGlobal( "RECOG", rec() );
 # Some properties and attributes of the recognition infos:
 DeclareFilter( "IsLeaf" );
 DeclareFilter( "IsReady" );
-DeclareFilter( "DoNotRecurse" );
 DeclareAttribute( "group", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "homom", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "nicegens", IsRecognitionInfo, "mutable" );

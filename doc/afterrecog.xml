@@ -45,6 +45,18 @@ generators, you can use the following function:
 </ManSection>
 
 <ManSection>
+<Meth Name="\in" Arg="x, ri"/>
+<Returns><C>true</C> or <C>false</C></Returns>
+<Description>
+    This method tests, whether the element <A>x</A> lies in the group
+    recognised by the recognition info record <A>ri</A>. Note that
+    this is only a convenience method, in fact <Ref
+        Func="SLPforElement"/> is used and the resulting straight line
+    program is thrown away.
+</Description>
+</ManSection>
+
+<ManSection>
 <Meth Name="Size" Arg="ri"/>
 <Returns>the size of the recognised group</Returns>
 <Description>

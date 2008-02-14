@@ -14,9 +14,12 @@ This chapter covers the recursive, generic recognition procedure.
 <Heading>Group Recognition</Heading>
 
 This chapter describes a generic framework for group recognition.
-The basic problem is, we want to solve the word problem: given any
+The basic problem is, we want to solve the constructive membership
+problem: given any
 <M>g \in G</M>, <M>G = \langle X \rangle</M>, write a straight line
-program (SLP) from <M>X</M> to <M>g</M>. This is usually done by constructing
+program (SLP) from <M>X</M> to <M>g</M>, for <M>g \notin G</M> (in the 
+situation that <M>G</M> is naturally embedded into some bigger group),
+the algorithm should fail. This is usually done by constructing
 some nice generators (and then writing an SLP from the nice generators
 to <M>g</M> and concatenating with an SLP from <M>X</M> to the nice
 generators). Often, for efficiency reasons, we will just store the
@@ -24,18 +27,22 @@ nice generators and then only be interested in the SLP from those
 to <M>g</M>. The framework presented here deals with exactly this
 process.<P/>
 
-The generic framework was designed having three situations in mind:
-permutation groups, matrix groups, and black box groups. Although the
+The generic framework was designed having four situations in mind:
+permutation groups, matrix groups, projective groups 
+and black box groups. Although the
 methods used are quite different for those three cases, there is a common
 pattern in the procedure of recognition. Namely, first we have to find
-a homomorphism, solve the word problem recursively in image and kernel,
+a homomorphism, solve the constructive membership problem
+recursively in image and kernel,
 then put it together. The recursion ends in groups where we can solve
-the word problem directly. The general framework reflects this idea and
+the constructive membership problem directly. 
+The general framework reflects this idea and
 separates it from the rest of the recognition methods.<P/>
 
-Solution of the word problem comes in two stages: first a <Q>recognition
+Solution of the constructive membership problem comes 
+in two stages: first a <Q>recognition
 phase</Q> and then a <Q>verification phase</Q>. The recognition
-phase usually consists of randomized algorithms with certain error
+phase usually consists of randomised algorithms with certain error
 or failure probabilities. The result is some kind of <Q>recognition 
 information</Q> that will describe the group already very well, but which 
 is not yet proven to be correct. However, one can already write arbitrary
@@ -48,10 +55,13 @@ the verification phase will be much more expensive than the recognition phase.
 
 In the following sections, we describe the generic framework. We begin
 with a technical description of the recursive procedure and describe then
-the way methods to find homomorphism have to be implemented. After that
-we conclude this chapter with three sections on some generic conventions
-for the recognition of permutation groups, matrix groups, and black box
-groups respectively.
+the way methods to find homomorphism have to be implemented. Finally,
+we have four sections in which we collect conventions for the
+recognition of different types of groups.<P/>
+
+No actual recognition methods are implemented in this package. See the
+<Package>recog</Package> package for an implementation and
+description of them.
 
 <Section Label="techrecog">
     <Heading>The recursive procedure</Heading>
@@ -71,7 +81,7 @@ This database will be different according to the type of group in
 question.<P/>
 
 To describe the algorithm executed by <Ref Func="RecogniseGeneric"/>
-we first summarize it in steps:
+we first summarise it in steps:
 
 <Enum>
 <Item>Create a new, empty recognition info record.</Item>
@@ -193,6 +203,22 @@ matrix groups, which is stored in the global variable
 </ManSection>
 
 <ManSection>
+<Func Name="RecogniseProjectiveGroup" Arg="H"/>
+<Func Name="RecognizeProjectiveGroup" Arg="H"/>
+<Returns><C>fail</C> for failure or a recognition info record.</Returns>
+<Description>
+<A>H</A> must be a &GAP; matrix group object. Since as of now no
+actual projective groups are implemented in the &GAP; library we use
+matrix groups instead. The recognition will however view the group as
+the projective group, i.e. the matrix group modulo its scalar
+matrices. This function calls
+<Ref Func="RecogniseGeneric"/> with the method database used for
+projective groups, which is stored in the global variable
+<Ref Var="FindHomDbProjective"/>, and no prior knowledge.
+</Description>
+</ManSection>
+
+<ManSection>
 <Func Name="RecogniseBBGroup" Arg="H"/>
 <Func Name="RecognizeBBGroup" Arg="H"/>
 <Returns><C>fail</C> for failure or a recognition info record.</Returns>
@@ -213,6 +239,9 @@ black box groups, which is stored in the global variable
     dispatches to one of the three previous functions 
     <Ref Func="RecognisePermGroup"/>, <Ref Func="RecogniseMatrixGroup"/>, or
     <Ref Func="RecogniseBBGroup"/>, according to the type of the group <A>H</A>.
+    Note that since currently there is no implementation of projective
+    groups in the &GAP; library, one cannot recognise a matrix group
+    <A>H</A> as a projective group using this function.
 </Description>
 </ManSection>
 
@@ -278,6 +307,39 @@ black box groups, which is stored in the global variable
     This global record holds the functions that are methods for writing group
     elements as straight line programs (SLPs) in terms of the generators
     after successful matrix group recognition. We collect them all in this
+    record such that we do not use up too many global variable names.
+</Description>
+</ManSection>
+
+<ManSection>
+<Var Name="FindHomDbProjective"/>
+<Description>
+    This list contains the methods for finding homomorphisms
+    for projective group recognition that are stored in the record
+    <Ref Var="FindHomMethodsProjective"/>. As described in Section <Ref
+    Sect="whataremethods"/> each method is described by a record. The list
+    is always sorted with respect to decreasing ranks. The order in this
+    list tells in which order the methods should be applied. Use <Ref
+    Func="AddMethod"/> to add methods to this database.
+</Description>
+</ManSection>
+
+<ManSection>
+<Var Name="FindHomMethodsProjective"/>
+<Description>
+    In this global record the functions that are methods for finding 
+    homomorphisms for projective group recognition are stored. We collect
+    them all in this record such that we do not use up too many global
+    variable names.
+</Description> 
+</ManSection>
+
+<ManSection>
+<Var Name="SLPforElementFuncsProjective"/>
+<Description>
+    This global record holds the functions that are methods for writing group
+    elements as straight line programs (SLPs) in terms of the generators
+    after successful projective group recognition. We collect them all in this
     record such that we do not use up too many global variable names.
 </Description>
 </ManSection>
@@ -353,16 +415,6 @@ by a find homomorphism method to indicate a leaf.
 </ManSection>
 
 <ManSection>
-<Filt Name="DoNotRecurse" Type="Flag"/>
-<Description>
-    This flag can be set by a find homomorphism method to indicate that the
-    generic recursive procedure should not recurse further down, even if
-    the corresponding node is not a leaf. It is then the responsibility of 
-    the find homomorphism method to complete the tree below.
-</Description>
-</ManSection>
-
-<ManSection>
 <Filt Name="IsReady" Type="Flag"/>
 <Description>
 This flag indicates during the recognition procedure, whether a node in 
@@ -371,7 +423,8 @@ debugging purposes during the recognition. However, if the recognition
 fails somewhere in a leaf, this flag is not set and all nodes above will
 also not have this flag set. In this way one can see whether the recognition
 failed and where the problem was. If a find homomorphism method
-uses <Ref Filt="DoNotRecurse"/> to avoid further recursion it acquires
+uses <C>donotrecurse</C> (see <Ref Subsect="componentsri"/>)
+to avoid further recursion it acquires
 thereby responsibility to set the <Ref Filt="IsReady"/> flag in the
 corresponding subtree upon completion.
 </Description>
@@ -525,7 +578,7 @@ elements that are generated from them remember, how they were acquired.
 <ManSection>
 <Attr Name="methodsforfactor" Arg="ri"/>
 <Description>
-    This attribute is initialized at the beginning of the recursive
+    This attribute is initialised at the beginning of the recursive
     recognition function with the database of find homomorphism methods
     that was used to recognise the group corresponding to the
     recognition info record <A>ri</A>. If the found homomorphism
@@ -576,8 +629,8 @@ homomorphism method up to the recursive recognition function:
     of the original generators of this node. In that case, this straight
     line program is executed with <A>origgens</A> as inputs and the
     result is returned. Otherwise, <A>origgens</A> is returned as is.
-    Therefore a leaf node just has to to nothing if the nice generators
-    are equal to the original generators and just can store the right
+    Therefore a leaf node just has to do nothing if the nice generators
+    are equal to the original generators, or can simply store the right
     straight line program into the attribute <Ref Attr="slptonice"/> to
     fulfill its duties.
 </Description>
@@ -627,7 +680,7 @@ about the kernel:
 <Attr Name="gensN" Arg="ri"/>
 <Description>
     The value of this mutable attribute is a list of generators of the kernel
-    of the homomorphism found at the node <A>ri</A>. It is initialized
+    of the homomorphism found at the node <A>ri</A>. It is initialised
     as an empty list when the recursive recognition function starts.
     Successful find homomorphism methods may append generators of the
     kernel to this list if they happen to stumble on them. After successful
@@ -786,22 +839,95 @@ kernel of the found homomorphism:
 </Description>
 </ManSection>
 
+<ManSection>
+<Attr Name="isone" Arg="ri"/>
+<Description>
+This attribute returns a function that tests, whether or not an
+element of the group is equal to the identity or not. Usually this is
+just the operation <Ref Oper="IsOne" BookName="Ref"/> but for projective
+groups it is a special function returning <C>true</C> for scalar matrices. In
+generic code, one should always use the result of this attribute to
+compare an element to the identity such that the code works also for
+projective groups. Find homomorphism methods usually do not have to
+set this attribute.
+</Description>
+</ManSection>
+
+<ManSection>
+<Attr Name="isequal" Arg="ri"/>
+<Description>
+This attribute returns a function that compares two elements of the
+group being recognised.  Usually this is
+just the operation <Ref Oper="EQ" BookName="Ref"/> but for projective
+groups it is a special function checking for equality up to a scalar
+factor. In
+generic code, one should always use the result of this attribute to
+compare two elements such that the code works also for
+projective groups. Find homomorphism methods usually do not have to
+set this attribute.
+</Description>
+</ManSection>
+
+<Subsection Label="componentsri">
+<Heading>Other components of recognition info records</Heading>
+
+    In this subsection we describe a few more components of
+    recognition info records that can be queried or set by find
+    homomorphism methods. Not all of these components are bound in all
+    cases. See the individual descriptions about the conventions.
+    Remember to use the <C>!.</C> notation to access these components
+    of a recognition info record.
+
+<List>
+    <Mark><C>donotrecurse</C></Mark>
+<Item>
+    This component can be set to <C>true</C> 
+    by a find homomorphism method to indicate that the
+    generic recursive procedure should not recurse further down, even if
+    the corresponding node is not a leaf. It is then the responsibility of 
+    the find homomorphism method to complete the tree below.
+</Item>
+
+<Mark><C>leavegensNuntouched</C></Mark>
+<Item>If this component is bound to <C>true</C> by a find homomorphism
+    method or a find kernel generators method, the generic mechanism
+    to remove duplicates and identities in the generator for the
+    kernel is not used. This is important if your methods rely on the
+    generating set of the kernel being exactly as it was when found.
+</Item>
+
+<!-- the following are currently not officially documented:
+
+<Mark><C>genswithmem</C></Mark>
+<Item>Contains the generators with memory.</Item>
+
+<Mark><C>groupmem</C></Mark>
+<Item>Contains the group with memory.</Item>
+
+-->
+
+</List>
+
+</Subsection>
+
 </Section>
 
 <Section Label="findhomo">
     <Heading>Methods to find homomorphisms</Heading>
 
-A <Q>find homomorphism method</Q> has the objective to find, given a
-group <M>G</M>, either a homomorphism from <M>G</M> onto a group, or 
-an isomorphism, or to fail. <P/>
+A <Q>find homomorphism method</Q> has the objective to, given a
+group <M>G</M>, either find a homomorphism from <M>G</M> onto a group, or 
+to find an isomorphism, or to solve the constructive membership
+problem directly for <M>G</M>, or to fail. <P/>
 In case a homomorphism is found, it has to report that homomorphism
 back to the calling recursive recognition function together with as
 much information about the kernel as possible.<P/>
 
 If a find homomorphism method determines that the node is a leaf in the
-recognition tree, then it has to ensure, that
-arbitrary elements can be written in terms of the nice generators of <M>G</M>
-(solving the word problem). It does so by returning a function together
+recognition tree (by solving the constructive membership problem
+directly), then it has to ensure, that
+arbitrary elements can be written in terms of the nice generators of <M>G</M>.
+It does so by returning a function together
 with possible extra data, that can perform this job.<P/>
 Of course, the find homomorphism method also has to report, how
 the nice generators were acquired in terms of the original generators.<P/>
@@ -853,8 +979,9 @@ A successful find homomorphism method has the following duties:
     <C>SetFilterObj(ri,IsLeaf);</C> thereby setting the <Ref Filt="IsLeaf"/>
     flag. <P/>
     If the method for some reason chooses to finish the tree
-    below the current node on its own, it can set the flag <Ref
-    Filt="DoNotRecurse"/> to indicate that no further action is required
+    below the current node on its own, it can set the component
+    <C>donotrecurse</C> to <C>true</C> (see <Ref
+    Subsect="componentsri"/>) to indicate that no further action is required
     by the generic recognition function. The method is then responsible 
     for correctly setting the <Ref Filt="IsLeaf"/> and <Ref Filt="IsReady"/>
     flags in the whole subtree. <P/>
@@ -865,7 +992,8 @@ A successful find homomorphism method has the following duties:
 <Item>
     If a find homomorphism method has
     produced a leaf in the recognition tree or has set the
-    <Ref Filt="DoNotRecurse"/> flag, then it has to set the attribute
+    <C>donotrecurse</C> component to <C>true</C> (see
+    <Ref Subsect="componentsri"/>), then it has to set the attribute
     <Ref Attr="slpforelement"/> to a function like 
     <Ref Func="SLPforElementGeneric"/> that can write an arbitrary element
     in <A>G</A> as a straight line program in the nice generators of <A>G</A>.
@@ -904,11 +1032,11 @@ A successful find homomorphism method has the following duties:
     to the attribute value of <Ref Attr="gensN"/> and secondly by 
     leaving or changing the attribute <Ref Attr="findgensNmeth"/> to 
     a record describing the method that should be used (for details
-    see <Ref Attr="findgensNmeth"/>.
+    see <Ref Attr="findgensNmeth"/>).
     If one does not change the default value,
     the recursive recognition function will generate
     20 random elements in <A>G</A> and produce random generators of the
-    kernel by dividing up a preimage of an image under the homomorphism.
+    kernel by dividing by a preimage of an image under the homomorphism.
     Note that generators in <Ref Attr="gensN"/> have to have a
     memory attached to them that stores, how they were acquired from the
     generators of <A>G</A>.
@@ -926,7 +1054,8 @@ A successful find homomorphism method has the following duties:
     interesting to transport information that is relevant for the
     recognition of the kernel or factor and was acquired during the recognition
     of <A>G</A> itself.<P/> A special role is played by the component
-    <C>hints</C>, which can hold a list of records describing find
+    <C>hints</C> in both of the above records, 
+    which can hold a list of records describing find
     homomorphism methods that shall be tried first when recognising the
     kernel or factor. <P/>
     In addition, a find homomorphism method might set the attribute
@@ -970,14 +1099,21 @@ of the nice generators of the current node.
 <Section Label="convperm">
     <Heading>Conventions for the recognition of permutation groups</Heading>
 
-None so far.
+No conventions so far.
 </Section>
 
 <Section Label="convmat">
     <Heading>Conventions for the recognition of matrix groups</Heading>
 
-First we want to remark that we are considering only the case of matrix
-groups over finite fields.<P/>
+We are considering only the case of matrix groups over finite fields.<P/>
+
+No conventions so far.
+</Section>
+
+<Section Label="convproj">
+    <Heading>Conventions for the recognition of projective groups</Heading>
+
+We are considering only the case of projective groups over finite fields.<P/>
 
 No conventions so far.
 </Section>

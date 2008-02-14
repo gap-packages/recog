@@ -220,7 +220,8 @@ InstallGlobalFunction( RecogniseGeneric,
     fi;
 
     # Handle the leaf case:
-    if IsLeaf(ri) or DoNotRecurse(ri) then   
+    if IsLeaf(ri) or 
+       (IsBound(ri!.donotrecurse) and ri!.donotrecurse) then   
         # Handle the case that nobody set nice generators:
         if not(Hasnicegens(ri)) then
             if Hasslptonice(ri) then
