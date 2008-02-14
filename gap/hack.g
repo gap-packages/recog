@@ -12,6 +12,8 @@
 
 # Here I collect some hacks that are necessary with the current GAP,
 # they should be removed some day:
+# 14.2.2008: with nowadays gap4dev this should already no longer be
+#            necessary!
 
 InstallMethod( ExtractSubMatrix, "hack: for a compressed GF2 matrix",
   [ IsGF2MatrixRep, IsList, IsList ],
@@ -37,7 +39,7 @@ InstallMethod( ExtractSubMatrix, "hack: for a compressed 8bit matrix",
     return n;
   end );
 
-InstallMethod( ExtractSubMatrix, "hack: for lists of compressed vectors",
+InstallOtherMethod( ExtractSubMatrix, "hack: for lists of compressed vectors",
   [ IsList, IsList, IsList ],
   function( m, poss1, poss2 )
     local i,n;
@@ -51,7 +53,7 @@ InstallMethod( ExtractSubMatrix, "hack: for lists of compressed vectors",
     return n;
   end );
 
-InstallMethod( MutableCopyMat, "for a compressed GF2 matrix",
+InstallOtherMethod( MutableCopyMat, "for a compressed GF2 matrix",
   [ IsList and IsGF2MatrixRep ],
   function(m)
     local n;
@@ -60,7 +62,7 @@ InstallMethod( MutableCopyMat, "for a compressed GF2 matrix",
     return n;
   end );
 
-InstallMethod( MutableCopyMat, "for a compressed 8bit matrix",
+InstallOtherMethod( MutableCopyMat, "for a compressed 8bit matrix",
   [ IsList and Is8BitMatrixRep ],
   function(m)
     local n;
