@@ -30,7 +30,7 @@ process.<P/>
 The generic framework was designed having four situations in mind:
 permutation groups, matrix groups, projective groups 
 and black box groups. Although the
-methods used are quite different for those three cases, there is a common
+methods used are quite different for those four cases, there is a common
 pattern in the procedure of recognition. Namely, first we have to find
 a homomorphism, solve the constructive membership problem
 recursively in image and kernel,
@@ -727,7 +727,8 @@ find kernel methods.
     written as a straight line program in the generators. Then the straight
     line program is executed with the original generators thereby producing
     elements in the same coset. The quotients are then elements of the
-    kernel.
+    kernel. The kernel elements created are stored in the attribute
+    <Ref Attr="gensN"/>.
 </Description>
 </ManSection>
 
