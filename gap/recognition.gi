@@ -161,7 +161,7 @@ InstallGlobalFunction( RecogniseGroup,
 InstallGlobalFunction( RecogniseGeneric,
   function(arg)
     # Assume all the generators have no memory!
-    local H,N,depth,done,i,knowledge,l,ll,methgensN,methoddb,
+    local H,N,depth,done,i,knowledge,l,ll,methgensN,methoddb,allmethods,
           proj1,proj2,ri,rifac,riker,s,x,y,z,succ,counter;
 
     # Look after arguments:
@@ -209,8 +209,9 @@ InstallGlobalFunction( RecogniseGeneric,
 
     # Find a possible homomorphism (or recognise this group as leaf)
     if IsBound(knowledge.hints) and Length(knowledge.hints) > 0 then
-        Setfhmethsel(ri,CallMethods(Concatenation(knowledge.hints,methoddb),
-                                10,ri,H));
+        allmethods := Concatenation(knowledge.hints,methoddb);
+        Sort(allmethods,function(a,b) return a.rank > b.rank; end);
+        Setfhmethsel(ri,CallMethods( allmethods, 10, ri, H));
     else
         Setfhmethsel(ri,CallMethods( methoddb, 10, ri, H ));
     fi;
