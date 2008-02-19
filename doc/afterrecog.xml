@@ -66,6 +66,10 @@ gap> ResultOfStraightLineProgram(slp,nicegens(ri));
 (1,12)(2,5,9,11,10,3,4)(7,8)(13,14,16,15,17)]]>
 </Log>
 
+Note that this example only works by using also the
+<Package>recog</Package> package which contains the necessary recognition
+methods.
+
 <Section>
     <Heading>Functions and methods for recognition info records</Heading>
 
