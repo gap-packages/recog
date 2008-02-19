@@ -2,10 +2,11 @@
 ##
 ##  init.g                recog package                   
 ##                                                        Max Neunhoeffer
-##                                                            ¡kos Seress
+##                                                            √Åkos Seress
 ##                                                                 et al.
 ##
-##  Copyright 2005-2006 Lehrstuhl D f¸r Mathematik, RWTH Aachen
+##  Copyright 2005-2008 by the authors.
+##  This file is free software, see license information at the end.
 ##
 ##  Reading the declaration part of the recog package.
 ##

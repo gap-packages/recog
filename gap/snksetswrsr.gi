@@ -1,13 +1,15 @@
 #############################################################################
 ##
-##  snksetswrsr.g      recog package
+##  snksetswrsr.g      
+##                                recog package
 ##                                                            Maska Law
 ##                                                 &  Alice C. Niemeyer
 ##                                                       & 'Akos Seress
 ##
 ##
-##  Copyright (C)  2005,  School of Mathematics and Statistics,
-##                        The University of Western Australia.
+##  Copyright (C) 2006-2008 by the authors.
+##                             The University of Western Australia.
+##  This file is free software, see license information at the end.
 ##
 ##
 ##  This file provides code for recognising whether a permutation group 
@@ -488,4 +490,19 @@ FindHomMethodsPerm.SnkSetswrSr :=
 
     return true;
   end;
+
+##
+##  This program is free software: you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License
+##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
 

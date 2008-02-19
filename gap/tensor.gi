@@ -1,10 +1,12 @@
 #############################################################################
 ##
-##  tensor.gi          recog package
+##  tensor.gi          
+##                                recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
 ##
-##  Copyright 2005-2006 Lehrstuhl D für Mathematik, RWTH Aachen
+##  Copyright 2005-2008 by the authors.
+##  This file is free software, see license information at the end.
 ##
 ##  A collection of find homomorphism methods for tensor product 
 ##  decompositions of matrix groups.
@@ -495,7 +497,7 @@ end;
 #   SetgensN(ri,gensNbig);
 #   SetgensNslp(ri,SLPOfElms(GeneratorsOfGroup(N)));
 #   SetFilterObj(ri,IsReady);
-#   SetFilterObj(ri,DoNotRecurse);
+#   ri!.donotrecurse := true;
 #   Setcalcnicegens(ri,CalcNiceGensTensor);
 #   Setslpforelement(ri,SLPforElementTensor);
 #   SetFilterObj(ri,IsTensorNode);
@@ -553,3 +555,18 @@ end;
 #AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.TensorDecomposable,
 #           550, "TensorDecomposable",
 #           "tries to find a tensor decomposition" );
+##
+##  This program is free software: you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+##
+##  You should have received a copy of the GNU General Public License
+##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
+
