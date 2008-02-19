@@ -495,14 +495,14 @@ end;
 #  forfactor(ri).blocksize := ri!.blocksize;
 #  Add(forfactor(ri).hints,
 #      rec( method := FindHomMethodsProjective.BalTreeForBlocks,
-#           rank := 2000, stamp := "BalTreeForBlocks" ),1);
+#           rank := 2000, stamp := "BalTreeForBlocks" ));
 #
 #  # Inform authorities that the kernel can be recognised easily:
 #  forkernel(ri).subdim := subdim;
 #  forkernel(ri).blocksize := ri!.blocksize;
 #  Add(forkernel(ri).hints,
 #      rec( method := FindHomMethodsProjective.BalTreeForBlocksProjKernel, 
-#           rank := 2000, stamp := "BalTreeForBlocksProjKernel" ),1);
+#           rank := 2000, stamp := "BalTreeForBlocksProjKernel" ));
 #
 #  # Verify the kernel immediately after its recognition:
 #  Setimmediateverification(ri,true);
@@ -566,7 +566,7 @@ end;
 #  forfactor(ri).blocksize := ri!.blocksize;
 #  Add(forfactor(ri).hints, 
 #      rec(method := FindHomMethodsProjective.BalTreeForBlocks,
-#                               rank := 2000, stamp := "BalTreeForBlocks"),1);
+#                               rank := 2000, stamp := "BalTreeForBlocks"));
 #
 #  return true;
 #end;

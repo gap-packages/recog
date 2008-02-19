@@ -77,7 +77,7 @@ FindHomMethodsProjective.Derived :=
         forfactor(ri).generatorskronecker := kro;
         Add( forfactor(ri).hints,
              rec( method := FindHomMethodsProjective.KroneckerProduct, 
-                  rank := 2000, stamp := "KroneckerProduct" ), 1 );
+                  rank := 4000, stamp := "KroneckerProduct" ) );
         # This is an isomorphism:
         findgensNmeth(ri).method := FindKernelDoNothing;
         return true;

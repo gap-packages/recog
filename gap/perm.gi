@@ -183,11 +183,11 @@ FindHomMethodsPerm.Imprimitive :=
     Setimmediateverification(ri,true);
     forkernel(ri).blocks := blocks;
     Add(forkernel(ri).hints,rec(method := FindHomMethodsPerm.PcgsForBlocks,
-                                rank := 2000,
-                                stamp := "PcgsHinted"),1);
+                                rank := 400,
+                                stamp := "PcgsHinted"));
     Add(forkernel(ri).hints,rec(method := FindHomMethodsPerm.BalTreeForBlocks,
-                                rank := 2000,
-                                stamp := "BalTreeForBlocks"),2);
+                                rank := 200,
+                                stamp := "BalTreeForBlocks"));
     findgensNmeth(ri).args[1] := Length(blocks)+20;
     return true;
   end;
@@ -231,13 +231,13 @@ FindHomMethodsPerm.BalTreeForBlocks := function(ri,G)
       n := Length(upperhalf);
       forfactor(ri).blocks := List([1..n],i->[(i-1)*l+1..i*l]);
       Add(forfactor(ri).hints,rec(method := FindHomMethodsPerm.BalTreeForBlocks,
-                                  rank := 2000,
+                                  rank := 200,
                                   stamp := "BalTreeForBlocks"),1);
   fi;
   if cut > 1 then
       forkernel(ri).blocks := lowerhalf;
       Add(forkernel(ri).hints,rec(method := FindHomMethodsPerm.BalTreeForBlocks,
-                                  rank := 2000,
+                                  rank := 200,
                                   stamp := "BalTreeForBlocks"),1);
   fi;
   return true;
@@ -407,7 +407,7 @@ FindHomMethodsPerm.Pcgs :=
 # The following commands install the above methods into the database:
 
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.TrivialPermGroup,
-          110, "TrivialPermGroup",
+          300, "TrivialPermGroup",
           "just go through generators and compare to the identity");
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.ThrowAwayFixedPoints, 
           100, "ThrowAwayFixedPoints",

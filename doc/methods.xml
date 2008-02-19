@@ -1,0 +1,77 @@
+<!-- 
+
+   methods.xml            recog package documentation
+                                                               Max Neunhoeffer
+                                                                   Ákos Seress
+                                                                        et al.
+
+         Copyright (C) 2005-2008, by the authors.
+
+This is the chapter of the documentation describing the methods.
+
+-->
+
+<Chapter Label="methods">
+<Heading>Methods for recognition</Heading>
+<Index><Package>recog</Package></Index>
+
+<Section Label="permmethods">
+<Heading>Methods for permutation groups</Heading>
+
+The following tables gives an overview over the installed methods and their
+rank (higher rank means higher priority, the method is tried earlier, see
+Chapter <Ref Chap="method selection" BookName="recogbase"/>.
+
+<Table Align="|l|l|l|">
+<Caption>Permutation group find homomorphism methods</Caption>
+<HorLine/>
+<Row>
+<Item>300</Item>
+<Item><C>TrivialPermGroup</C></Item>
+<Item><Ref Subsect="TrivialPermGroup"/></Item>
+</Row>
+<HorLine/>
+<Row>
+<Item>100</Item>
+<Item><C>ThrowAwayFixedPoints</C></Item>
+<Item><Ref Subsect="ThrowAwayFixedPoints"/></Item>
+</Row>
+<HorLine/>
+</Table>
+
+<Subsection Label="TrivialPermGroup">
+<Heading><C>TrivialPermGroup</C></Heading>
+
+This method is successful if and only if all generators of the permutation 
+group <A>G</A> are equal to the identity. Otherwise it returns
+<K>false</K> indicating that it will never succeed. This method
+is only installed to handle the trivial case such that we do not have to
+take this case into account in the other methods.
+
+</Subsection>
+
+<Subsection Label="ThrowAwayFixedPoints">
+<Heading><C>ThrowAwayFixedPoints</C></Heading>
+
+</Subsection>
+
+</Section>
+
+<Section Label="matrixmethods">
+<Heading>Methods for matrix groups</Heading>
+
+</Section>
+
+<Section Label="projmethods">
+<Heading>Methods for projective groups</Heading>
+
+</Section>
+
+<Section Label="bbmethods">
+<Heading>Methods for black box groups</Heading>
+
+</Section>
+
+<!-- ############################################################ -->
+
+</Chapter>

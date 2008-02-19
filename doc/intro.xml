@@ -2,10 +2,10 @@
 
   intro.xml            recog package documentation
                                                              Max Neunhoeffer
-                                                                 ¡kos Seress
+                                                                 √Åkos Seress
                                                                       et al.
 
-         Copyright (C) 2005-2006, Lehrstuhl D f¸r Mathematik, RWTH-Aachen
+         Copyright (C) 2005-2008, by the authors.
 
 This chapter gives a short introduction and explains the philosophy
 behind the package.
@@ -33,7 +33,7 @@ also described in that chapter. For the choice of the right method
 for finding a homomorphism (or an isomorphism) we use another generic
 procedure, the <Q>method selection</Q> which is not to be confused with
 the &GAP; method selection. Our own method selection is described in detail
-in Chapter <Ref Chap="methsel" BookName="recogbase"/>, because it is 
+in Chapter <Ref Chap="method selection" BookName="recogbase"/>, because it is 
 interesting in its own 
 right and might be useful in other circumstances.<P/>
 

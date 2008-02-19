@@ -169,7 +169,7 @@ end;
 # The method installations:
 
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.TrivialProjectiveGroup,
-  1400, "TrivialProjectiveGroup",
+  3000, "TrivialProjectiveGroup",
         "check if all generators are scalar multiples of the identity matrix" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.ProjDeterminant,
   1300, "ProjDeterminant",

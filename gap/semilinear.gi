@@ -152,7 +152,7 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
   findgensNmeth(ri).args[1] := 5;
   Add(forkernel(ri).hints,
       rec( method := FindHomMethodsProjective.BiggerScalarsOnly, rank := 2000,
-           stamp := "BiggerScalarsOnly" ),1);
+           stamp := "BiggerScalarsOnly" ));
   forkernel(ri).degsplittingfield := MTX.DegreeSplittingField(m)
                                    / DegreeOverPrimeField(f);
 
@@ -170,8 +170,8 @@ FindHomMethodsProjective.BiggerScalarsOnly := function(ri,G)
   Sethomom(ri,hom);
 
   Add(forfactor(ri).hints,
-      rec( method := FindHomMethodsProjective.StabilizerChain, rank := 2000,
-           stamp := "StabilizerChain" ),1);
+      rec( method := FindHomMethodsProjective.StabilizerChain, rank := 4000,
+           stamp := "StabilizerChain" ));
 
   findgensNmeth(ri).method := FindKernelDoNothing;
   

@@ -86,7 +86,7 @@ FindHomMethodsMatrix.DiagonalMatrices := function(ri, G)
 
   # Hint to the factor:
   Add(forfactor(ri).hints,rec( method := FindHomMethodsMatrix.Scalar,
-                               rank := 2000, stamp := "Scalar" ),1);
+                               rank := 4000, stamp := "Scalar" ),1);
 
   return true;
 end;
@@ -392,7 +392,7 @@ FindHomMethodsMatrix.ReducibleIso := function(ri,G)
   forfactor(ri).blocks := bc.blocks;
   Add(forfactor(ri).hints,
       rec(method := FindHomMethodsMatrix.BlockLowerTriangular,
-          rank := 2000,stamp := "BlockLowerTriangular"));
+          rank := 4000,stamp := "BlockLowerTriangular"));
 
   return true;
 end;
@@ -981,7 +981,7 @@ FindHomMethodsMatrix.LookAtOrders := function(ri,G)
 end;
 
 AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.TrivialMatrixGroup,
-  1200, "TrivialMatrixGroup",
+  3100, "TrivialMatrixGroup",
         "check whether all generators are equal to the identity matrix" );
 AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.DiagonalMatrices,
   1100, "DiagonalMatrices",
