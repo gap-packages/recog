@@ -1,0 +1,270 @@
+<Subsection Label="ThrowAwayFixedPoints">
+<Heading><C>ThrowAwayFixedPoints</C></Heading>
+
+This method defines a homomorphism of a permutation group 
+<A>G</A> to the action on the moved points of <A>G</A> if 
+<A>G</A> does not have too many moved points. In the current setup, the 
+homomorphism is defined if the number <M>k<\M> of moved
+points is at most <M>1/3</M> of the largest moved point of <A>G</A>, 
+or  <M>k<\M> is at most half of the number of points on which 
+<A>G</A> is stored internally by &GAP;. The method returns 
+<K>false</K> if it does not define a homomorphism indicating that it will 
+never succeed.
+
+</Subsection>
+
+
+<Subsection Label="Pcgs">
+<Heading><C>Pcgs</C></Heading>
+
+This is the &GAP; library function to compute a stabilizer chain 
+for a solvable permutation group. 
+If the method is successful then 
+the calling node becomes a leaf node in the recursive scheme. 
+If the input group is not solvable then the method returns <K>false</K>.
+
+</Subsection>
+
+
+<Subsection Label="VeryFewPoints">
+<Heading><C>VeryFewPoints</C></Heading>
+
+If a permutation group acts only on a few points (the current limit is 
+at most 10 points) then a stabilizer chain is computed by the 
+randomized &GAP; library function for that purpose. 
+If the method is successful then 
+the calling node becomes a leaf node in the recursive scheme. 
+If the input group acts on more than 10 points then the 
+method returns <K>false</K>.
+
+</Subsection>
+
+<Subsection Label="NonTransitive">
+<Heading><C>Nontransitive</C></Heading>
+
+If a permutation group <A>G</A> acts nontransitively then this method 
+computes a homomorphism to the action of <A>G</A> on the orbit of the 
+largest moved point. If <A>G</A> is transitive then the 
+method returns <K>false</K>.
+
+</Subsection>
+
+<Subsection Label="Giant">
+<Heading><C>Giant</C></Heading>
+
+The method tries to determine whether the input group <A>G</A> is 
+a giant (that is, <M>A_n</M> or <M>S_n</M> in its natural action on 
+<M>n</M> points). The output is either a data structure <M>D</M> containing 
+nice generators for <A>G</A> and a procedure to write an SLP for arbitrary 
+elements of <A>G</A> from the nice generators; or <K>false</K> if
+<A>G</A> is not transitive; or <K>fail</K>, in the case that no 
+evidence was found that <A>G</A> is a giant, or evidence was found, but 
+the construction of <M>D</M> was unsuccessful. 
+If the method constructs <M>D</M> then the calling node becomes a leaf. 
+
+</Subsection>
+
+<Subsection Label="Imprimitive">
+<Heading><C>Imprimitive</C></Heading>
+
+If the input group is not known to be transitive then this method 
+returns <K>NotApplicable</K>. If the input group is known to be transitive
+and primitive then the method returns <K>false</K>; otherwise, the method
+tries to compute a nontrivial block system. If successful then a 
+homomorphism to the action on the blocks is defined; otherwise, 
+the method returns <K>false</K>.
+
+If the method is successful then it also gives a hint for the children of 
+the node by determining whether the kernel of the action on the 
+block system is solvable. If the answer is yes then the default value 20 
+for the number of random generators in the kernel construction is increased
+by the number of blocks.
+
+</Subsection>
+
+<Subsection Label="SnkSetswrSr">
+<Heading><C>SnkSetswrSr</C></Heading>
+
+This method tries to determine whether the input group <A>G</A> is acting 
+primitively on $<M>N</M> points, and  
+is isomorphic to a large subgroup of <M>H \wr S_r</M> where <M>H</M> is 
+<M>S_n</M> acting on <M>k</M>-sets and <M>N = \binom(n,k)^r</M> 
+and <M>kr > 1</M>. "Large" means that <A>G</A> contains a subgroup 
+isomorphic to <M>A_n^r</M>. If <A>G</A> is imprimitive then the output is 
+<K>false</K>. If <A>G</A> is primitive then 
+the output is either a homomorphism into the 
+natural imprimitive action of <A>G</A> on <M>nr</M> points with 
+<M>r</M> blocks of size <M>n</M>, or <K>fail</K>.
+
+</Subsection>
+
+<Subsection Label="StabChain">
+<Heading><C>StabChain</C></Heading>
+
+This is the randomized &GAP; library function for computing a stabilizer 
+chain. The method selection process ensures that this function is called
+only with small-base inputs, where the method works efficiently.
+
+</Subsection>
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<Subsection Label="TrivialMatrixGroup">
+<Heading><C>TrivialMatrixGroup</C></Heading>
+
+This method is successful if and only if all generators of a matrix group 
+<A>G</A> are equal to the identity. Otherwise, it returns <K>false</K>.
+
+</Subsection>
+
+<Subsection Label="DiagonalMatrices">
+<Heading><C>DiagonalMatrices</C></Heading>
+
+This method is successful if and only if all generators of a matrix group 
+<A>G</A> are diagonal matrices. Otherwise, it returns <K>false</K>.
+
+</Subsection>
+
+<Subsection Label="ReducibleIso">
+<Heading><C>ReducibleIso</C></Heading>
+
+This method determines whether a matrix group <A>G</A> acts irreducibly. 
+If yes, then it returns <K>false</K>. If <A>G</A> acts reducibly then 
+a composition series of the underlying module is computed and a base 
+change is performed to write <A>G</A> in a block lower triangular form. 
+Also, the method passes a hint to the image group that it is in 
+block lower triangular form, so the image immediately can make 
+recursive calls for the actions on the diagonal blocks, and then to the 
+lower <M>p</M>-part. 
+
+</Subsection>
+
+<Subsection Label="GoProjective">
+<Heading><C>GoProjective</C></Heading>
+
+This method defines a homomorphism from a matrix group <A>G</A> 
+into the projective group <A>G</A> modulo scalar matrices. In fact, since
+projective groups in &GAP; are represented as matrix groups, the 
+homomorphism is the identity mapping and the only difference is that in 
+the image the projective group methods can be applied.
+The bulk of the work in matrix recognition is done in the projective group 
+setting. 
+
+</Subsection>
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<Subsection Label="TrivialProjectiveGroup">
+<Heading><C>TrivialProjectiveGroup</C></Heading>
+
+This method is successful if and only if all generators of a projective group 
+<A>G</A> are equal to the identity (that is, in the matrix representation 
+of <A>G</A>, all matrices are scalars). Otherwise, it returns <K>false</K>.
+
+</Subsection>
+
+<Subsection Label="ProjDeterminant">
+<Heading><C>ProjDeterminant</C></Heading>
+
+The method defines a homomorphism from a projective group <A>G \le 
+PGL(d,q)</A> to the cylice group <M>GF(q)^*/D</M>, where <M>D</M> is the set 
+of <M>d</M>th powers in <M>GF(q)^*</M>. The image of a group 
+element <M>g \in G</M> is the determinant of a matrix representative of 
+<M>g</M>, modulo <M>D</M>. 
+
+</Subsection>
+
+<Subsection Label="ReducibleIso">
+<Heading><C>ReducibleIso</C></Heading>
+
+This method is analogous to the matrix group method with the same name.
+
+</Subsection>
+
+<Subsection Label="NotAbsolutelyIrred">
+<Heading><C>NotAbsolutelyIrred</C></Heading>
+
+If an irreducible projective group <A>G</A> acts absolutely irreducibly 
+then this method returns <K>false</K>. If <A>G</A> is not absolutely 
+irreducible then a homomorphism into a smaller dimensional representation 
+over an extension field is defined.
+
+</Subsection>
+
+<Subsection Label="Subfield">
+<Heading><C>Subfield</C></Heading>
+
+"write over a smaller field with same degree" 
+
+</Subsection>
+
+<Subsection Label="Derived">
+<Heading><C>Derived</C></Heading>
+
+"restrict to derived subgroup"
+
+</Subsection>
+
+<Subsection Label="LowIndex">
+<Heading><C>LowIndex</C></Heading>
+
+This method is designed for the handling of the Aschbacher class C2
+(stabilizer of a decomposition of the underlying vector space), but may 
+succeed on other types of input as well. Given <A>G \le PGL(d,q)</A>,
+the output is either the permutation action of <A>G</A> on a short 
+orbit of subspaces or <K>fail</K>. In the current setup, "short orbit" 
+is defined to have length at most <M>4d</M>. 
+
+</Subsection>
+
+<Subsection Label="C6">
+<Heading><C>C6</C></Heading>
+
+This method is designed for the handling of the Aschbacher class C6 
+(normalizer of an extraspecial group). If the input <A>G \le PGL(d,q)</A>
+does not satisfy <M>d=r^n</M> and <M>r|q-1</M> for some prime <M>r</M> 
+and integer <M>n</M> then the method 
+returns <K>false</K>. Otherwise, it returns either a homomorphism of
+<A>G</A> into <M>Sp(2n,r)</M>, or a homomorphism into the C2 permutation 
+action of <A>G</A> on a decomposition of <M>GF(q)^d</M>, or <K>fail</K>.
+
+</Subsection>
+
+<Subsection Label="TensorDecomposable">
+<Heading><C>TensorDecomposable</C></Heading>
+
+"find a tensor decomposition"
+
+</Subsection>
+
+<Subsection Label="TwoLargeElOrders">
+<Heading><C>TwoLargeElOrders</C></Heading>
+
+In the case when the input group <A>G \le PGL(d,p^e)</A> is suspected to be 
+simple but not alternating, this method takes the two 
+largest element orders from a sample of pseudorandom elements of 
+<A>G</A>. From these element orders, it tries to determine whether <A>G</A> 
+is of Lie type or sporadic, and the characteristic of <A>G</A> if it is of 
+Lie type . In the case when <A>G</A> is of Lie type of characteristic 
+different from <M>p</M> or <A>G</A> is sporadic, the method also provides
+a short list for the possible isomorphism type of $G$. 
+
+</Subsection>
+
+<Subsection Label="StabilizerChain">
+<Heading><C>StabilizerChain</C></Heading>
+
+"last resort: compute a stabilizer chain (projectively)"
+
+</Subsection>
+
+
+<Subsection Label="">
+<Heading><C></C></Heading>
+
+</Subsection>
+
+<Subsection Label="">
+<Heading><C></C></Heading>
+
+</Subsection>

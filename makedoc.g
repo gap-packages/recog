@@ -17,7 +17,8 @@
 ##
 #############################################################################
 
-RequirePackage("GAPDoc");
+LoadPackage("GAPDoc");
+LoadPackage("recogbase");
 
 MakeGAPDocDoc("doc", "recog", [], "recog");
 
