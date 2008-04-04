@@ -40,6 +40,7 @@ FindHomMethodsProjective.Derived :=
     if MTX.IsIrreducible(ri!.derived_mtx) then
         if not(MTX.IsAbsolutelyIrreducible(ri!.derived_mtx)) then
             # FIXME: Check for field automorphisms:
+            return false;
             Error("not yet done");
         fi;
         return false;
