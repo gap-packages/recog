@@ -251,7 +251,8 @@ InstallGlobalFunction( RecogniseGeneric,
 
         if IsMatrixGroup(Image(homom(ri))) then
             Info(InfoRecog,1,"Going to the factor (depth=",depth,", try=",
-              counter,", dim=",DimensionOfMatrixGroup(Image(homom(ri))),").");
+              counter,", dim=",DimensionOfMatrixGroup(Image(homom(ri))),
+              ", field=",Size(FieldOfMatrixGroup(Image(homom(ri)))),").");
         else
             Info(InfoRecog,1,"Going to the factor (depth=",depth,", try=",
               counter,").");
@@ -264,7 +265,8 @@ InstallGlobalFunction( RecogniseGeneric,
 
         if IsMatrixGroup(H) then
             Info(InfoRecog,1,"Back from factor (depth=",depth,", dim=",
-                 DimensionOfMatrixGroup(H),").");
+                 DimensionOfMatrixGroup(H),", field=",
+                 Size(FieldOfMatrixGroup(H)),").");
         else
             Info(InfoRecog,1,"Back from factor (depth=",depth,").");
         fi;
