@@ -178,6 +178,10 @@ FindHomMethodsProjective.BiggerScalarsOnly := function(ri,G)
   return true;
 end;
 
+FindHomMethodsProjective.C3C5 := function(ri,G)
+  # We assume that G acts absolutely irreducibly and see what we can
+  # do by computing a normal subgroup of the derived subgroup.
+
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU General Public License as published by

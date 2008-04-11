@@ -185,9 +185,13 @@ AddMethod( FindHomDbProjective, FindHomMethodsProjective.NotAbsolutelyIrred,
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.Subfield,
   1000, "Subfield",
         "write over a smaller field with same degree" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.Derived,
-   900, "Derived",
-        "restrict to derived subgroup" );
+AddMethod( FindHomDbProjective, FindHomMethodsProjective.C3C5,
+  900, "C3C5",
+        "compute a normal subgroup of derived and resolve C3 and C5" );
+#AddMethod( FindHomDbProjective, FindHomMethodsProjective.Derived,
+#   900, "Derived",
+#        "restrict to derived subgroup" );
+# Superseded by C3C5.
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.LowIndex,
    800, "LowIndex",
         "find an (imprimitive) action on subspaces" );
