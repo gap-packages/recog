@@ -15,7 +15,6 @@
 # Permutations:
 ReadPackage("recog","gap/recoggiant.gi");
 ReadPackage("recog","gap/snksetswrsr.gi");
-ReadPackage("recog","gap/perm.gi");
 
 # Up to now there is not much here:
 ReadPackage("recog","gap/blackbox.gi");
@@ -35,6 +34,7 @@ ReadPackage("recog","gap/twoelorders.gi");
 ReadPackage("recog","gap/c3c5.gi");
 
 # All the method installations are now here:
+ReadPackage("recog","gap/perm.gi");
 ReadPackage("recog","gap/matrix.gi");
 ReadPackage("recog","gap/projective.gi");
 

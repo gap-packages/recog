@@ -26,3 +26,4 @@ ReadPackage("recog","tst/ProjC6.g");
 ReadPackage("recog","tst/MatC6.g");
 ReadPackage("recog","tst/ProjTensor.g");
 ReadPackage("recog","tst/MatC3.g");
+ReadPackage("recog","tst/MatC3_2.g");

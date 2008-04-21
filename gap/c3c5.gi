@@ -94,7 +94,8 @@ RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
   # Since the module is irreducible i will not run over the length of bas
   # now we can write down the new action over the bigger field immediately:
 # FIXME: this will later go:
-ConvertToMatrixRep(bas,q^d);
+# was: ConvertToMatrixRep(bas,q^d);  but this seems to be a bug!!!
+ConvertToMatrixRep(bas,q);
   newgens := [];
   inforec := rec( bas := bas, basi := bas^-1, FF := GF(F,d), d := d,
                   qd := q^d );
@@ -398,6 +399,130 @@ RECOG.HomCommutator := function(data,el)
   return ExtractSubMatrix(y,[1],[1]);
 end;
 
+RECOG.DecomposeNilpotent := function(data,el)
+  # Assume to have data.primesfactor, data.primeskernel which are
+  # disjoint sets of primes such that the order of el is a product of
+  # prime powers using only primes from these two sets. The order of
+  # el is computed with the function data.orderfunc.
+  local a,b,f,fac,ker,o,p,r;
+  o := data.orderfunc(el);
+  if o = 1 then
+      return [el,el,0,0];
+  fi;
+  f := Factors(o);
+  fac := [];
+  ker := [];
+  for p in f do
+      if p in data.primesfactor then
+          Add(fac,p);
+      elif p in data.primeskernel then
+          Add(ker,p);
+      else
+          return fail;
+      fi;
+  od;
+  a := Product(fac);
+  b := Product(ker);
+  # Now a and b are coprime
+  r := Gcdex(a,b);
+  if r.gcd <> 1 then Error("Absolutely impossible!"); fi;
+  # now r.coeff1 * a + r.coeff2 * b = 1
+  # that is, el = el^(r.coeff1 * a) * el^(r.coeff2 * b)
+  # and el^(r.coeff1*a) has order not divisible by a prime in primesfactor
+  # and el^(r.coeff2*b) has order not divisible by a prime in primeskernel
+  # and the two commute,
+  # that is we have found the components in the direct sum decomposition
+  return [el^(r.coeff1*a),el^(r.coeff2*b),r.coeff1*a,r.coeff2*b];
+end;
+
+RECOG.HomForNilpotent := function(data,el)
+  local decomp;
+  decomp := RECOG.DecomposeNilpotent(data,el);
+  if decomp = fail then
+      return fail;
+  else
+      return decomp[2];
+  fi;
+end;
+  
+RECOG.ProjectiveOrder := function(el)
+  return ProjectiveOrder(el)[1];
+end;
+
+RECOG.CalcNiceGensKnownNilpotent := function(ri,origgens)
+  local a,b;
+  a := List([1..Length(ri!.waytonice)],i->origgens[i]^ri!.waytonice[i][2]);
+  b := List([1..Length(ri!.waytonice)],i->origgens[i]^ri!.waytonice[i][1]);
+  return Concatenation(CalcNiceGens(factor(ri),a),CalcNiceGens(kernel(ri),b));
+end;
+
+FindHomMethodsProjective.KnownNilpotent := function(ri,G)
+  # Hint to this method if you know G to be nilpotent or call it directly
+  # if you find out so. Note that it will return false if G is a p-group
+  # for some prime p. Make sure that the !.projective component is set
+  # correctly such that we can set the right Order method.
+  local H,cut,data,gens,gens2,gensfac,gensker,gensm,hom,orderfunc,ords,primes;
+  gens := GeneratorsOfGroup(G);
+  gensm := GeneratorsWithMemory(gens);
+  if ri!.projective then
+      orderfunc := RECOG.ProjectiveOrder;
+  else
+      orderfunc := Order;
+  fi;
+  if IsBound(ri!.primes) then    # this is a message from ourselves from above!
+      primes := ri!.primes;
+  else
+      ords := List(gens,orderfunc);
+      primes := Union(List(ords,o->Set(Factors(o))));
+      RemoveSet(primes,1);    # in case there were identities!
+  fi;
+  if Length(primes) < 2 then return false; fi;   # not our beer
+  cut := QuoInt(Length(primes),2);
+  data := rec( primesfactor := primes{[1..cut]}, 
+               primeskernel := primes{[cut+1..Length(primes)]},
+               orderfunc := orderfunc );
+  gens2 := List(gensm,x->RECOG.DecomposeNilpotent(data,x));
+  gensfac := List(gens2,x->StripMemory(x[2]));
+  gensker := List(gens2,x->x[1]);
+  ri!.waytonice := List(gens2,x->x{[3,4]});
+  H := GroupWithGenerators(gensfac);
+  hom := GroupHomByFuncWithData(G,H,RECOG.HomForNilpotent,data);
+  Sethomom(ri,hom);
+  forfactor(ri).primes := primes{[1..cut]};
+  forkernel(ri).primes := primes{[cut+1..Length(primes)]};
+  Add(forfactor(ri).hints,
+      rec( method := FindHomMethodsProjective.KnownNilpotent, rank := 4000,
+           stamp := "KnownNilpotent" ));
+  Add(forkernel(ri).hints,
+      rec( method := FindHomMethodsProjective.KnownNilpotent, rank := 4000,
+           stamp := "KnownNilpotent" ));
+  Append(gensN(ri),gensker);
+  findgensNmeth(ri).method := FindKernelDoNothing;  # kernel already known
+  ri!.leavegensNuntouched := true;
+  Setcalcnicegens(ri,RECOG.CalcNiceGensKnownNilpotent);
+  return true;
+end;
+
+FindHomMethodsProjective.FewGensAbelian := function(ri,G)
+  # If the number of generators is less than or equal to 20, then check
+  # abelian and if so, hint to KnownNilpotent to write it as a direct
+  # product of Sylow subgroups
+  local gens,i,j,l;
+  gens := GeneratorsOfGroup(G);
+  l := Length(gens);
+  if l > 200 then return false; fi;
+  for i in [1..l-1] do
+      for j in [i+1..l] do
+          if not(ri!.isequal(gens[i]*gens[j],gens[j]*gens[i])) then
+              return false;
+          fi;
+      od;
+  od;
+  # We call KnownNilpotent:
+  return FindHomMethodsProjective.KnownNilpotent(ri,G);
+end;
+
+
 FindHomMethodsProjective.C3C5 := function(ri,G)
   # We assume that G acts absolutely irreducibly and that the matrix group
   # G cannot be realised over a smaller field. However, it might still be
@@ -405,7 +530,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
   # the derived subgroup...
   local H,HH,Hgens,a,b,basis,c,cc,cgen,collf,coms,conjgensG,cyc,deg,dim,
         f,g,gens,gensim,hom,homcomp,homs,homsimg,i,j,kro,m,newgens,nr,o,
-        pf,pos,pr,pr2,q,r,scalar,subdim,x,noncent;
+        pf,pos,pr,pr2,q,r,scalar,subdim,x;
 
   f := FieldOfMatrixGroup(G);
   if not(IsBound(ri!.meataxemodule)) then
@@ -428,31 +553,35 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
   # Let N to be the normaliser of Group(coms) in G, N is a normal subgroup
   # of G which is contained in G'.
   gens := GeneratorsOfGroup(G);
-  noncent := fail;
-  if scalar then    # we highly suspect that G' is scalar, let's make sure:
+  if scalar then    # we highly suspect that G' is scalar, in this case,
+                    # we want to find a non-scalar element such that the
+                    # commutators with all generators are scalar, this
+                    # gives us a reduction, regardless whether G' is in
+                    # fact scalar or not!
       Info( InfoRecog, 2, "Suspect that G' is scalar, checking..." );
-      for i in [1..Length(gens)] do
-          for j in [i+1..Length(gens)] do
+      i := 1;
+      while RECOG.IsScalarMat(gens[i]) <> false do i := i + 1; od;
+      # It cannot happen that all matrices are scalar, because then
+      # we would not be absolutely irreducible!
+      # Now gens[i] is not central, since then the action would not
+      # be absolutely irreducible!
+      j := 1;
+      while j <= Length(gens) do
+          if j <> i then
               x := Comm(gens[i],gens[j]);
-              Add(coms,x);
-              if noncent = fail and not(IsOne(x[1][1])) then
-                  noncent := gens[i];
-              fi;
-              if RECOG.IsScalarMat(x) = false then 
-                  scalar := false; 
+              if RECOG.IsScalarMat(x) = false then
+                  Add(coms,x);
+                  scalar := false;
                   Info( InfoRecog, 2, "NO! G' is not scalar after all!" );
                   break;
               fi;
-          od;
-          if not(scalar) then break; fi;
+          fi;
+          j := j + 1;
       od;
       if scalar then   # otherwise fall through and go on
-          if noncent = fail then
-              Info( InfoRecog, 1, "G is abelian, was it really irreducible?");
-              return false;
-          fi;
-          Info( InfoRecog, 1, "G' is scalar, we find a hom by commutators." );
-          r := rec( x := noncent );
+          # gens[i] is not central but all Comm(gens[i],gens[j]) are.
+          Info( InfoRecog, 1, "We found a homomorphism by commutators." );
+          r := rec( x := gens[i] );
           gensim := List(gens,x->RECOG.HomCommutator(r,x));
           H := GroupWithGenerators(gensim);
           hom := GroupHomByFuncWithData(G,H,RECOG.HomCommutator,r);
@@ -466,7 +595,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
   # of the group generated by coms:
   pr2 := ProductReplacer(GeneratorsOfGroup(G),rec(noaccu := true));
   pr := ProductReplacer(coms,rec(normalin := pr2));
-  nr := Maximum(10,QuoInt(dim*Log2Int(Size(f))+Log2Int(dim),10));
+  nr := Minimum(Maximum(5,QuoInt(dim*Log2Int(Size(f)),20)),40);
   Info( InfoRecog, 2, "C3C5: computing ",nr," generators for N...");
   Hgens := ShallowCopy(coms);
   for i in [1..nr] do
@@ -590,7 +719,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
           fi;
           homs := MTX.Homomorphisms(collf[1][1],m);
           basis := Concatenation(homs);
-          ConvertToMatrixRep(basis);
+          ConvertToMatrixRep(basis,Size(f));
           subdim := MTX.Dimension(collf[1][1]);
           r := rec(t := basis, ti := basis^-1, 
                    blocksize := MTX.Dimension(collf[1][1]));
@@ -627,7 +756,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
       homsimg := BasisVectors(Basis(VectorSpace(f,Concatenation(homs))));
       homcomp := MutableCopyMat(homsimg);
       # FIXME: This will go:
-      ConvertToMatrixRep(homcomp);
+      ConvertToMatrixRep(homcomp,Size(f));
       TriangulizeMat(homcomp);
       o := Orb(G,homcomp,OnSubspacesByCanonicalBasis,rec(storenumbers := true));
       Enumerate(o);

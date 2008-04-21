@@ -412,6 +412,9 @@ AddMethod(FindHomDbPerm, FindHomMethodsPerm.TrivialPermGroup,
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.ThrowAwayFixedPoints, 
           100, "ThrowAwayFixedPoints",
           "try to find a huge amount of (possible internal) fixed points");
+AddMethod(FindHomDbPerm, FindHomMethodsProjective.FewGensAbelian,
+          99, "FewGensAbelian",
+     "if very few generators, check IsAbelian and if yes, do KnownNilpotent");
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.Pcgs,
           97, "Pcgs",
           "use a Pcgs to calculate a StabChain" );

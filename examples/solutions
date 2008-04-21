@@ -8,23 +8,24 @@ Example 3:
   Lots of small subspaces, lots of A5s
 
 Example 4:
-  -
+  Contains eventually a classical SL(4,57).
 
 Example 5:
-  -
+  Contains eventually a classical orthogonal group.
 
 Example 6:
-  -
+  Problems with matrices over field GF(2^16).
 
 Example 7:
-  -
+  Comes from something in GL(10,3^10). Currently not feasible due to 
+  proper matrices.
 
 Example 8:
   HS in a 21-dimension irreducible rep over GF(25), "augmented" to dimension
   98 by conjugating it around in GL(98,25).
 
 Example 9:
-  -
+  MeatAxe-Problems over GF(61^2) and many generators!
 
 Example 10:
   -

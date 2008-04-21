@@ -986,6 +986,9 @@ AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.TrivialMatrixGroup,
 AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.DiagonalMatrices,
   1100, "DiagonalMatrices",
         "check whether all generators are multiples of the identity" );
+AddMethod( FindHomDbMatrix, FindHomMethodsProjective.FewGensAbelian,
+  1050, "FewGensAbelian",
+     "if very few generators, check IsAbelian and if yes, do KnownNilpotent");
 AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.ReducibleIso,
   1000, "ReducibleIso",
         "use the MeatAxe to find invariant subspaces" );
