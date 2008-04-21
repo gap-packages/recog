@@ -86,6 +86,8 @@ DeclareGlobalVariable( "FindHomDbBB" );
 
 # Our global functions for the main recursion:
 
+DeclareGlobalFunction( "EmptyRecognitionInfoRecord" );
+
 DeclareGlobalFunction( "RecognisePermGroup" );
 DeclareSynonym("RecognizePermGroup", RecognisePermGroup);
 DeclareGlobalFunction( "RecogniseMatrixGroup" );

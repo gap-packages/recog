@@ -158,6 +158,33 @@ InstallGlobalFunction( RecogniseGroup,
     #       objects here!
   end);
 
+InstallGlobalFunction( EmptyRecognitionInfoRecord,
+  function(r,H,projective)
+    local ri;
+    ri := ShallowCopy(r);
+    Objectify( RecognitionInfoType, ri );
+    ri!.nrgensH := Length(GeneratorsOfGroup(H));
+    Setgroup(ri,H);
+    Setslpforelement(ri,SLPforElementGeneric);
+    SetgensN(ri,[]);       # this will grow over time
+    Setimmediateverification(ri,false);
+    Setforkernel(ri,rec(hints := []));   
+          # this is eventually handed down to the kernel
+    Setforfactor(ri,rec(hints := []));   
+          # this is eventually handed down to the factor
+    if projective then
+        Setisone(ri,IsOneProjective);
+        Setisequal(ri,IsEqualProjective);
+    else
+        Setisone(ri,IsOne);
+        Setisequal(ri,\=);
+    fi;
+    ri!.projective := projective;
+    SetfindgensNmeth(ri,rec(method := FindKernelRandom, args := [20]));
+    return ri;
+  end );
+    
+    
 InstallGlobalFunction( RecogniseGeneric,
   function(arg)
     # Assume all the generators have no memory!
@@ -181,31 +208,14 @@ InstallGlobalFunction( RecogniseGeneric,
     fi;
 
     # Set up the record and the group object:
-    ri := ShallowCopy(knowledge);
-    Objectify( RecognitionInfoType, ri );
-    ri!.depth := depth;
-    ri!.nrgensH := Length(GeneratorsOfGroup(H));
-    Setgroup(ri,H);
-    Setcalcnicegens(ri,CalcNiceGensGeneric);
-    Setslpforelement(ri,SLPforElementGeneric);
-    Setmethodsforfactor(ri,methoddb);
-    SetgensN(ri,[]);       # this will grow over time
-    SetfindgensNmeth(ri,rec(method := FindKernelRandom, args := [20]));
-    Setimmediateverification(ri,false);
-    Setforkernel(ri,rec(hints := []));   
-          # this is eventually handed down to the kernel
-    Setforfactor(ri,rec(hints := []));   
-          # this is eventually handed down to the factor
-    # Do some extra stuff for projective groups:
     if IsIdenticalObj( methoddb, FindHomDbProjective ) then
-        Setisone(ri,IsOneProjective);
-        Setisequal(ri,IsEqualProjective);
-        ri!.projective := true;
+        ri := EmptyRecognitionInfoRecord(knowledge,H,true);
     else
-        Setisone(ri,IsOne);
-        Setisequal(ri,\=);
-        ri!.projective := false;
+        ri := EmptyRecognitionInfoRecord(knowledge,H,false);
     fi;
+    ri!.depth := depth;
+    # was here earlier: Setcalcnicegens(ri,CalcNiceGensGeneric);
+    Setmethodsforfactor(ri,methoddb);
 
     # Find a possible homomorphism (or recognise this group as leaf)
     if IsBound(knowledge.hints) and Length(knowledge.hints) > 0 then
@@ -223,6 +233,10 @@ InstallGlobalFunction( RecogniseGeneric,
     # Handle the leaf case:
     if IsLeaf(ri) or 
        (IsBound(ri!.donotrecurse) and ri!.donotrecurse) then   
+        # If nobody has set how we produce preimages of the nicegens:
+        if not(Hascalcnicegens(ri)) then
+            Setcalcnicegens(ri,CalcNiceGensGeneric);
+        fi;
         # Handle the case that nobody set nice generators:
         if not(Hasnicegens(ri)) then
             if Hasslptonice(ri) then
@@ -279,7 +293,6 @@ InstallGlobalFunction( RecogniseGeneric,
         # Now we want to have preimages of the new generators in the factor:
         Info(InfoRecog,1,"Calculating preimages of nice generators.");
         Setpregensfac( ri, CalcNiceGens(rifac,GeneratorsOfGroup(H)));
-        Setcalcnicegens(ri,CalcNiceGensHomNode);
 
         ri!.genswithmem := GeneratorsWithMemory(
             Concatenation(GeneratorsOfGroup(H),pregensfac(ri)));
@@ -291,6 +304,11 @@ InstallGlobalFunction( RecogniseGeneric,
         succ := CallFuncList(methgensN.method,
                              Concatenation([ri],methgensN.args));
     until succ;
+
+    # If nobody has set how we produce preimages of the nicegens:
+    if not(Hascalcnicegens(ri)) then
+        Setcalcnicegens(ri,CalcNiceGensHomNode);
+    fi;
 
     # Do a little bit of preparation for the generators of N:
     l := gensN(ri);
