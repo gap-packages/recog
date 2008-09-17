@@ -615,7 +615,7 @@ InstallOtherMethod( \in, "for a group element and a recognition info record",
     if slp = fail then
         return false;
     else
-        gens := GeneratorsOfGroup(group(ri));
+        gens := nicegens(ri);
         if IsObjWithMemory(gens[1]) then
             gens := StripMemory(gens);
         fi;
@@ -682,6 +682,16 @@ BindGlobal( "SLPforNiceGens", function(ri)
   return s;
 end );
 
+InstallGlobalFunction( "GetCompositionTreeNode",
+  function( ri, what )
+    local r,c;
+    r := ri;
+    for c in what do
+      if c in "fF" then r := factor(r); 
+      elif c in "kK" then r := kernel(r); fi;
+    od;
+    return r;
+  end );
   
 # Testing:
 
