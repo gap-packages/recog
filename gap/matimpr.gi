@@ -145,7 +145,7 @@ RECOG.SmallHomomorphicImageProjectiveGroup := function ( grp )
       return false;   # go out all the way without success
     end;
     
-    Info(InfoRecog,1,"Trying 10 first elements...");
+    Info(InfoRecog,1,"LowIndex: Trying 10 first elements...");
     for i in [1..10] do   # this is just heuristics!
         gens := [PseudoRandom(grp)];
         hm := GModuleByMats(gens,fld);

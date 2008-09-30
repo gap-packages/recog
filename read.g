@@ -32,6 +32,7 @@ ReadPackage("recog","gap/twoelorders.gi");
 #ReadPackage("recog","gap/semilinear.gi");
 #ReadPackage("recog","gap/subfield.gi");
 ReadPackage("recog","gap/c3c5.gi");
+ReadPackage("recog","gap/d247.gi");
 
 # All the method installations are now here:
 ReadPackage("recog","gap/perm.gi");

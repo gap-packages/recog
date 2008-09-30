@@ -195,15 +195,18 @@ AddMethod( FindHomDbProjective, FindHomMethodsProjective.C3C5,
 #   900, "Derived",
 #        "restrict to derived subgroup" );
 # Superseded by C3C5.
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.LowIndex,
-   800, "LowIndex",
-        "find an (imprimitive) action on subspaces" );
+AddMethod( FindHomDbProjective, FindHomMethodsProjective.D247,
+   850, "D247",
+        "play games to find a normal subgroup" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.C6,
-   700, "C6",
+   800, "C6",
         "find either an (imprimitive) action or a symplectic one" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.TensorDecomposable,
-   600, "Tensor",
+   700, "Tensor",
         "find a tensor decomposition" );
+AddMethod( FindHomDbProjective, FindHomMethodsProjective.LowIndex,
+   600, "LowIndex",
+        "find an (imprimitive) action on subspaces" );
 # By now we suspect it to be a simple group
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.TwoLargeElOrders,
    500, "TwoLargeElOrders",
