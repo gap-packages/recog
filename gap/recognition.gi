@@ -181,6 +181,7 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     fi;
     ri!.projective := projective;
     SetfindgensNmeth(ri,rec(method := FindKernelRandom, args := [20]));
+    ri!.pr := ProductReplacer(GeneratorsOfGroup(H));
     return ri;
   end );
     
@@ -297,6 +298,7 @@ InstallGlobalFunction( RecogniseGeneric,
         ri!.genswithmem := GeneratorsWithMemory(
             Concatenation(GeneratorsOfGroup(H),pregensfac(ri)));
         ri!.groupmem := Group(ri!.genswithmem{[1..ri!.nrgensH]});
+        ri!.prmem := ProductReplacer(ri!.genswithmem);
 
         # Now create the kernel generators with the stored method:
         Info(InfoRecog,2,"Creating kernel elements.");
