@@ -180,7 +180,8 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
         Setisequal(ri,\=);
     fi;
     ri!.projective := projective;
-    SetfindgensNmeth(ri,rec(method := FindKernelRandom, args := [20]));
+    SetfindgensNmeth(ri,rec(method := FindKernelFastNormalClosure, 
+                            args := [3,3]));
     ri!.pr := ProductReplacer(GeneratorsOfGroup(H));
     return ri;
   end );
@@ -380,7 +381,7 @@ InstallGlobalFunction( RecogniseGeneric,
             od;
             if InfoLevel(InfoRecog) >= 1 then Print("\n"); fi;
             if not(done) then
-                succ := FindKernelRandom(ri,20);
+                succ := FindKernelFastNormalClosure(ri,5,5);
                 Info(InfoRecog,1,"Have now ",Length(gensN(ri)),
                      " generators for kernel, recognising...");
                 if succ = false then
@@ -507,7 +508,7 @@ InstallGlobalFunction( FindKernelRandom,
   end );
 
 InstallGlobalFunction( FindKernelDoNothing,
-  function(ri,n)
+  function(ri,n1,n2)
     return true;
   end );
 
@@ -572,15 +573,15 @@ end );
 
 InstallGlobalFunction( FindKernelFastNormalClosure,
   # Used in the generic recursive routine.
-  function(ri,n)
+  function(ri,n1,n2)
     local succ;
 
-    succ := FindKernelRandom(ri,n);
+    succ := FindKernelRandom(ri,n1);
     if succ = false then
         return false;
     fi;
 
-    SetgensN(ri,FastNormalClosure(ri!.groupmem(ri),gensN(ri),n));
+    SetgensN(ri,FastNormalClosure(ri!.groupmem,gensN(ri),n2));
 
     return true;
   end);
