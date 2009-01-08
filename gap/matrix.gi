@@ -230,7 +230,8 @@ FindHomMethodsMatrix.BlockScalar := function(ri,G)
            stamp := "BlockScalar" ),1);
 
   # the kernel is the first few blocks (can be only one!):
-  findgensNmeth(ri).args[1] := 20 + middle - 1;
+  findgensNmeth(ri).args[1] := 3 + middle - 1;
+  findgensNmeth(ri).args[2] := 5;
   forkernel(ri).blocks := ri!.blocks{[1..middle-1]};
   Add(forkernel(ri).hints,
       rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000,
@@ -451,7 +452,8 @@ FindHomMethodsMatrix.BlockDiagonal := function(ri,G)
   Setmethodsforfactor(ri,FindHomDbProjective);
 
   # the kernel:
-  findgensNmeth(ri).args[1] := Length(ri!.blocks)+20;
+  findgensNmeth(ri).args[1] := Length(ri!.blocks)+3;
+  findgensNmeth(ri).args[2] := 5;
   # In the projective case we have to do a trick: We use an isomorphism
   # to a matrix group by multiplying things such that the last block
   # becomes an identity matrix:
@@ -703,7 +705,8 @@ FindHomMethodsMatrix.GoProjective := function(ri,G)
 
   # the kernel:
   q := Size(FieldOfMatrixGroup(G));
-  findgensNmeth(ri).args[1] := Length(Factors(q-1))+20;
+  findgensNmeth(ri).args[1] := Length(Factors(q-1))+5;
+  findgensNmeth(ri).args[2] := 0;
   return true;
 end;
   

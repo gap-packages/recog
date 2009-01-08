@@ -723,14 +723,16 @@ FindHomMethodsProjective.C6 := function(ri,G)
             rec(method := FindHomMethodsMatrix.DoBaseChangeForBlocks, 
                 rank := 2000, stamp := "DoBaseChangeForBlocks"),1);
         Setimmediateverification(ri,true);
-        findgensNmeth(ri).args[1] := re.basis.blocks.ell + 20;
+        findgensNmeth(ri).args[1] := re.basis.blocks.ell + 3;
+        findgensNmeth(ri).args[2] := 5;
         Setmethodsforfactor(ri,FindHomDbPerm);
     else
         Info(InfoRecog,1,"Found homomorphism.");
         hom := GroupHomByFuncWithData(G,GroupWithGenerators(re.igens),
                  RECOG.HomFuncrewriteones, 
                  rec(r := re.r,n := re.n,q := re.q,data := re.basis.basis));
-        findgensNmeth(ri).args[1] := 20 + re.n;
+        findgensNmeth(ri).args[1] := 3 + re.n;
+        findgensNmeth(ri).args[2] := 5;
         Setimmediateverification(ri,true);
     fi;
     Sethomom(ri,hom);

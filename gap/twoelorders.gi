@@ -1582,7 +1582,7 @@ RECOG.TableOfTwoLargestGroupElementOrders :=
   [9949,4975,["l",2,9949]],[9967,4984,["l",2,9967]],
   [9973,4987,["l",2,9973]] ];
 
-# This is the same than above, however the fourth position now holds
+# This is the same as above, however the fourth position now holds
 # the minimum degree this group occurs:
 
 RECOG.TableOfTwoLargestGroupElementOrdersWithDegreeBound := 

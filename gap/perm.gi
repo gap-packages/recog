@@ -188,7 +188,8 @@ FindHomMethodsPerm.Imprimitive :=
     Add(forkernel(ri).hints,rec(method := FindHomMethodsPerm.BalTreeForBlocks,
                                 rank := 200,
                                 stamp := "BalTreeForBlocks"));
-    findgensNmeth(ri).args[1] := Length(blocks)+20;
+    findgensNmeth(ri).args[1] := Length(blocks)+3;
+    findgensNmeth(ri).args[2] := 5;
     return true;
   end;
 
@@ -225,7 +226,8 @@ FindHomMethodsPerm.BalTreeForBlocks := function(ri,G)
   hom := ActionHomomorphism(G,o);
   Sethomom(ri,hom);
   Setimmediateverification(ri,true);
-  findgensNmeth(ri).args[1] := 20+cut;
+  findgensNmeth(ri).args[1] := 3+cut;
+  findgensNmeth(ri).args[2] := 5;
   if nrblocks - cut > 1 then
       l := Length(upperhalf[1]);
       n := Length(upperhalf);

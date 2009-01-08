@@ -39,7 +39,7 @@ TensorProductOfMatrixGroup := function(G,H)
  return GroupWithGenerators(gens);
 end;
 
-BindGlobal( "WreathProductOfMatrixGroupTensor", function( M, P )
+WreathProductOfMatrixGroupTensor := function( M, P )
     local   m,  d,  id,  gens,  b,  ran,  raN,  mat,  gen,  G;
 
     # FIXME: Still needs completing.
@@ -69,6 +69,6 @@ BindGlobal( "WreathProductOfMatrixGroupTensor", function( M, P )
         SetName( G, Concatenation( Name( M ), " wr ", Name( P ) ) );
     fi;
     return G;
-end );
+end;
 
 

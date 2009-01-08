@@ -260,7 +260,8 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
                   rec(method:=FindHomMethodsProjective.DoBaseChangeForBlocks, 
                             rank := 2000, stamp := "DoBaseChangeForBlocks"),1);
                       Setimmediateverification(ri,true);
-                      findgensNmeth(ri).args[1] := Length(orb)+20;
+                      findgensNmeth(ri).args[1] := Length(orb)+3;
+                      findgensNmeth(ri).args[2] := 5;
                       Info(InfoRecog,1,"Found block system with ",
                            Length(orb)," blocks.");
                   else
@@ -379,7 +380,8 @@ FindHomMethodsProjective.LowIndex := function(ri,G)
               rec(method := FindHomMethodsProjective.DoBaseChangeForBlocks, 
                   rank := 2000, stamp := "DoBaseChangeForBlocks"),1);
           Setimmediateverification(ri,true);
-          findgensNmeth(ri).args[1] := Length(res.orb)+20;
+          findgensNmeth(ri).args[1] := Length(res.orb)+3;
+          findgensNmeth(ri).args[2] := 5;
       fi;
 
       # we are done, report the hom:

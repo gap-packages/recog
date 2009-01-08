@@ -148,8 +148,10 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
   forfactor(ri).isabsolutelyirred := true;
 
   # There might be a kernel, because we have more scalars over the bigger
-  # field, so go for it, however, fewer generators should suffice:
+  # field, so go for it, however, some more generators might be in order,
+  # Normal closure however is unnecessary.
   findgensNmeth(ri).args[1] := 5;
+  findgensNmeth(ri).args[2] := 0;
   Add(forkernel(ri).hints,
       rec( method := FindHomMethodsProjective.BiggerScalarsOnly, rank := 2000,
            stamp := "BiggerScalarsOnly" ));

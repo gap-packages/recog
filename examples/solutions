@@ -57,7 +57,7 @@ Challenge 3:
 Challenge 4:
   Two largest projective orders: 780, 390 ???
   This seems to be D7, found by doing involution trick twice.
-  - 
+  --> Yes! Size is 615019392000000000000
 
 Challenge 5:
   This seems to be 2^(1+6).Sp(6,2) extraspecial.

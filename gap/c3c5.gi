@@ -156,7 +156,8 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
 
   # There might be a kernel, because we have more scalars over the bigger
   # field, so go for it, however, fewer generators should suffice:
-  findgensNmeth(ri).args[1] := 5;
+  # Also, doing normal closure will not help!
+  findgensNmeth(ri).args := [5,0];
   Add(forkernel(ri).hints,
       rec( method := FindHomMethodsProjective.BiggerScalarsOnly, rank := 2000,
            stamp := "BiggerScalarsOnly" ));

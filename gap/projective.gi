@@ -77,7 +77,8 @@ FindHomMethodsProjective.BlocksModScalars := function(ri,G)
   fi; # Otherwise the factor is to be recognised projectively as usual
 
   # the kernel is the first few blocks:
-  findgensNmeth(ri).args[1] := 20 + middle - 1;
+  findgensNmeth(ri).args[1] := 5 + middle - 1;
+  findgensNmeth(ri).args[2] := 5 + middle - 1;
   # The following is already be set, but make it explicit here:
   forkernel(ri).blocks := ri!.blocks{[1..middle-1]};
   Add(forkernel(ri).hints,

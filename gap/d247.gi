@@ -154,12 +154,13 @@ FindHomMethodsProjective.D247 := function(ri,G)
     ngens := FastNormalClosure(G,[x],4);
     m := GModuleByMats(ngens,f);
     if MTX.IsIrreducible(m) then
+        # FIXME: Check dimensions first!
         # we want to look for D7 here, using the same trick again:
         count := 0;
         n := GroupWithGenerators(ngens);
         pr := ProductReplacer(ngens);
         y := RECOG.InvolutionJumper(pr,RECOG.ProjectiveOrder,x,200,false);
-        if y = fail then Error(1); return fail; fi;
+        if y = fail then return fail; fi;
         for i in [1..3] do
             z := RECOG.InvolutionJumper(pr,RECOG.ProjectiveOrder,y,200,false);
             if z <> fail then y := z; fi;
@@ -278,6 +279,11 @@ ConvertToMatrixRep(homcomp,Size(f));
       res := CheckNormalClosure(x);
       if res in [true,false] then return res; fi;
       x := RECOG.InvolutionJumper(ri!.pr,RECOG.ProjectiveOrder,x,100,true);
+      if x = fail then 
+          Print("\n");
+          Info(InfoRecog,1,"Involution Jumper failed, giving up!");
+          return fail; 
+      fi;
   od;
   res := CheckNormalClosure(x);
   if res in [true,false] then return res; fi;
