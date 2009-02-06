@@ -28,6 +28,34 @@ RECOG.InvolutionSearcher := function(pr,ord,tol)
   return fail;
 end;
 
+RECOG.CentralisingElementOfInvolution := function(pr,ord,x)
+  # x an involution in G
+  local o,r,y,z;
+  r := Next(pr);
+  y := x^r;
+  # Now x and y generate a dihedral group
+  if x=y then return r; fi;
+  z := x*y;
+  o := ord(z);
+  if IsEvenInt(o) then
+      return z^(o/2);
+  else
+      return z^((o+1)/2)*r^(-1);
+  fi;
+end;
+
+RECOG.InvolutionCentraliser := function(pr,ord,x,nr)
+  # x an involution in G
+  local i,l,y;
+  l := [];
+  for i in [1..nr] do   # find 20 generators of the centraliser
+      y := RECOG.CentralisingElementOfInvolution(pr,ord,x);
+      AddSet(l,y);
+  od;
+  return l;
+end;
+
+
 RECOG.InvolutionJumper := function(pr,ord,x,tol,withodd)
   # x an involution in a group g, for which the product replacer pr produces
   # random elements, withodd is true or false, it switches the odd case on or
