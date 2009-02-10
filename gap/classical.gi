@@ -220,14 +220,14 @@ InstallGlobalFunction( IsPpdElement, function( F, m, d, p, a )
         ## and hence we know <m> is a large ppd-element
         islarge := true;
         return [e, islarge];
-    end if;
+    fi;
 
  
     ## Now we know (e+1) divides pm.ppds and (e+1) has to be
     ## a prime since all ppds are at least (e+1)
     if not IsPrimeInt (e+1) then
          return false;
-    end if;
+    fi;
 
     g := PowerMod( g, e+1, c );
     ## so g := g^(e+1) in F[x]/<c>

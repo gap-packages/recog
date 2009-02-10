@@ -14,6 +14,8 @@
 DeclareInfoClass( "InfoClassical" );
 SetInfoLevel(InfoClassical,1);
 
+DeclareGlobalFunction( "IsPpdElement" );
+DeclareGlobalFunction( "IsPpdElementD2" );
 DeclareGlobalFunction( "RecogniseClassical" );
 
 ##
