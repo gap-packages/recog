@@ -64,48 +64,49 @@ BindGlobal( "ClassicalMethDb", [] );
 ##
 #F  PPDPartPDM1( <d>, <p> ) . . . . . . . . compute the ppd part in <p>^<d>-1
 ##
+## Phi will be the product of all primitive prime divisors counting 
+## multiplicities of p^d-1 and Psi will be p^d-1/Phi.
+##
 PPDPartPDM1B := function( d, p )
-    local   n,  q,  i,  m,  x,  y;
+    local   Phi,  q,  i,  a,  Psi,  y;
 
     # compute the (repeated) gcd with p^d-1
-    n := p^d - 1;
-    x := 1;
+    Psi := 1;
+    Phi := p^d - 1;
     q := 1;
     for i  in [ 1 .. d-1 ]  do
         q := q * p;
         if d mod i = 0  then
             repeat
-                m := GcdInt( n, q-1 );
-                n := n / m;
-                x := x * m;
-            until m = 1;
+                a := GcdInt( Phi, q-1 );
+                Phi := Phi / a;
+                Psi := Psi * a;
+            until a = 1;
         fi;
     od;
 
-    # compute the possible gcd with <d>+1
-    y := 1;
-    if IsPrimeInt(d+1) and (n mod (d+1)) = 0 and (n mod (d+1)^2) <> 0  then
-        y := d+1;
-        n := n / (d+1);
-    fi;
-
-    # and return
-    return rec( ppd := y,  lppd := n,  quo := x );
-
+    ## and return as ppds the product of all ppds and as
+    ## noppds the quotient p^d-1/ppds
+    return rec( noppds := Psi, ppds := Phi );
 end;
+
 
 
 #############################################################################
 ##
 #F  PPDIrreducibleFactor( <R>, <f>, <d>, <q> )  . . . .  large factors of <f>
 ##
+##  Let <R> be a ring and <f> a polynomial of degree <d>.
+##  This function returns false if <f> does not have an irreducible
+##  factor of degree > d/2 and it returns the irreducible factor if it does.
+
 PPDIrreducibleFactor := function ( R, f, d, q )
     local  px,  pow,  i,  cyc,  gcd,  a;
 
     # handle trivial case
-    if Degree(f) <= 2  then
-        return false;
-    fi;
+    #if Degree(f) <= 2  then
+    #    return false;
+    #fi;
 
     # compute the deriviative
     a := Derivative( f );
@@ -155,8 +156,29 @@ end;
 ##
 #F  IsPpdElement( <F>, <m>, <d>, <p>, <a> )
 ##
-IsPpdElement := function( F, m, d, p, a )
-    local   c,  R,  pm,  g;
+##  This function takes as input:
+##
+##  <F>  field
+##  <m>  a matrix or a characteristic polynomial
+##  <d>  degree of <m>
+##  <p>  a prime power
+##  <a>  an integer
+##
+##  It tests whether <m> has order divisible by a primitive prime divisor of
+##  p^(e*a)-1 for some e with d/2 < e <= d and returns false if this is not
+##  the case. If it is the case it returns a list with two entries,
+##  the first being e and the second being a boolean islarge, where
+##  islarge is true if the order of <m> is divisible by a large ppd of
+##  p^(e*a)-1 and false otherwise.
+##
+##  Note that if q = p^a with p a prime then a call to
+##  IsPpdElement( <F>, <m>, <d>, <q>, 1 ) will test whether m is a
+##  ppd(d, q; e) element for some e > d/2 and a call to
+##  IsPpdElement( <F>, <m>, <d>, <p>, <a> ) will test whether m is a
+##  basic ppd(d, q; e) element for some e > d/2.
+##
+InstallGlobalFunction( IsPpdElement, function( F, m, d, p, a )
+    local   c, e,  R,  pm,  g, islarge;
 
     # compute the characteristic polynomial
     if IsMatrix(m)  then
@@ -174,34 +196,54 @@ IsPpdElement := function( F, m, d, p, a )
         return false;
     fi;
 
-    # find the ppd and lppd parts
-    pm := PPDPartPDM1B( Degree(c)*a, p );
+    e  := Degree(c);
+    ## find the noppds and ppds parts
+    pm := PPDPartPDM1B( e*a, p );
+    ## pm contains two fields, noppds and ppds.
+    ## ppds is the product of all ppds of p^(ae)-1
+    ## and noppds is p^(ae)-1/ppds.
 
-    # get rid of the non-ppd part
-    g := PowerMod( Indeterminate(F), pm.quo, c );
+    ## get rid of the non-ppd part
+    ## g will be x^noppds in F[x]/<c>
+    g := PowerMod( Indeterminate(F), pm.noppds, c );
 
-    # if it is one there is no ppd involved
-    if IsOne(g)  then
+    ## if g is one there is no ppd involved
+    if IsOne(g) then
         return false;
     fi;
 
-    
-    # check if there is a non-large ppd involved
-    # pm.ppd is the prime
-    if 1 < pm.ppd  then
-        g := PowerMod( g, pm.ppd, c );
-        if IsOne(g)  then
-	  return [ Degree(c), false ];
-        else
-	  return [ Degree(c), true ];
-        fi;
-    elif 1 < pm.lppd  then
-      return [ Degree(c), true ];
+    ## now we know that <m> is a ppd-element
+
+    ## bug fix 31.Aug.2007 ACN
+    if pm.ppds mod (e+1) <> 0 then
+        ## we know that all primes dividing pm.ppds are large
+        ## and hence we know <m> is a large ppd-element
+        islarge := true;
+        return [e, islarge];
+    end if;
+
+ 
+    ## Now we know (e+1) divides pm.ppds and (e+1) has to be
+    ## a prime since all ppds are at least (e+1)
+    if not IsPrimeInt (e+1) then
+         return false;
+    end if;
+
+    g := PowerMod( g, e+1, c );
+    ## so g := g^(e+1) in F[x]/<c>
+    if IsOne(g)  then
+        ## (e+1) is the only ppd dividing |<m>| and only once
+        islarge := false;
+        return [ e, islarge ];
     else
-      Error( "should not happen" );
+        ## Either another ppd also divides |<m>| and this one is large or
+        ## (e+1)^2 divides |<m>| and hence still large
+        islarge := true;
+        return [ e, islarge  ];
     fi;
 
-end;
+
+end );
 
 
 #############################################################################
@@ -231,10 +273,32 @@ end;
 
 #############################################################################
 ##
-#F  IsPpdElementD2( <F>, <m>, <d>, <p>, <a> )
+#F  IsPpdElementD2( <F>, <m>, <e>, <p>, <a> )
 ##
-IsPpdElementD2 := function( F, m, d, p, a )
-    local   c,  R,  pm,  g;
+##  This function takes as input:
+##
+##  <F>  field
+##  <m>  a matrix or a characteristic polynomial
+##  <d>  degree of <m>
+##  <p>  a prime power
+##  <a>  an integer
+##
+##  It tests whether <m> has order divisible by a primitive prime divisor
+##  of p^(e*a)-1 for e = d/2 and returns false if this is not
+##  the case. If it is the case it returns a list with three entries,
+##  the first being e=d/2; the second being a boolean islarge, where
+##  islarge is true if the order of <m> is divisible by a large ppd of
+##  p^(e*a)-1 and false otherwise; and the third is noppds (the first
+##  return value of PPDPartPDM1B).
+##
+##  Note that if q = p^a then a call to
+##  IsPpdElement( <F>, <m>, <d>, <q>, 1 ) will test whether m is a
+##  ppd(d, q; e) element for e = d/2 and a call to
+##  IsPpdElement( <F>, <m>, <d>, <p>, <a> ) will test whether m is a
+##   basic ppd(d, q; e) element for e = d/2.
+##
+InstallGlobalFunction( IsPpdElementD2, function( F, m, e, p, a )
+    local   c,  R,  pm,  g, islarge;
 
     # compute the characteristic polynomial
     if IsMatrix(m)  then
@@ -244,39 +308,56 @@ IsPpdElementD2 := function( F, m, d, p, a )
     fi;
 
     # try to find a large factor
-    c := PPDIrreducibleFactorD2(  c, d, p^a );
+    c := PPDIrreducibleFactorD2(  c, e, p^a );
 
     # return if we failed to find one
     if c = false  then
         return false;
     fi;
 
-    # find the ppd and lppd parts
+    ## find the nonppds and ppds parts
     pm := PPDPartPDM1B( Degree(c)*a, p );
+    ## pm contains two fields, noppds and ppds.
+    ## ppds is the product of all ppds of p^(ad/2)-1
+    ## and noppds is p^(ad/2)-1/ppds.
+
 
     # get rid of the non-ppd part
-    g := PowerMod( Indeterminate(F), pm.quo, c );
+    g := PowerMod( Indeterminate(F), pm.Psi, c );
 
     # if it is one there is no ppd involved
-    if g = g^0  then
+    if IsOne(g)  then
         return false;
     fi;
+    # now we know that g is a ppd-d/2-element
 
-    # check if there is a non-large ppd involved
-    if 1 < pm.ppd  then
-        g := PowerMod( g, pm.ppd, c );
-        if g = g^0  then
-            return [ Degree(c), false, pm.ppd ];
-        else
-            return [ Degree(c), true, pm.ppd ];
-        fi;
-    elif 1 < pm.lppd  then
-        return [ Degree(c), true, pm.lppd ];
+    # compute the possible gcd with <e>+1
+    e   := Degree(c);
+    if pm.ppds mod (e+1) <> 0 then
+	# we know that all primes dividing pm.ppds are large
+        # and hence we know g is a large ppd-element
+        islarge := true;
+        return [ e, islarge, pm.noppds ];
+    fi;
+ 
+    # Now we know (e+1) divides pm.ppds and (e+1) has to be 
+    # a prime since all ppds are at least (e+1)
+    if not IsPrimeInt(e+1) then
+	return false;
+    fi;
+    g := PowerMod( g, e+1, c );
+    if IsOne(g)  then
+        # (e+1) is the only ppd dividing |<m>| and only once
+        islarge := false;
+        return [ e, islarge, pm.noppds ];
     else
-        Error( "should not happen" );
+        # Either another ppd divides m and this one is large or
+        # (e+1)^2 divides |<m>| and hence still large
+        islarge := true;
+        return [ Degree(c), islarge, pm.noppds ];
     fi;
 
-end;
+end);
 
 ###
 ## Test whether n is a power of the prime p
