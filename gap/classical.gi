@@ -9,6 +9,53 @@
 ##
 ##  The classical groups recognition.
 ##
+##  $Id: classical.gi,v 1.9 2006/10/06 14:03:25 gap Exp $
+##
+##
+##  This file contains  an implementation  of the recognition  algorithms for
+##  classical groups by Niemeyer and Praeger.  A description  of them  can be 
+##  found in 
+##  
+##  [1] Alice C. Niemeyer and  Cheryl E. Praeger 
+##      "A Recognition Algorithm for Classical Groups over Finite Fields",
+##      Proc. London Math. Soc (3) 77, 1998, 117-169.
+## 
+##  [2] Alice C. Niemeyer and  Cheryl E. Praeger 
+##      "Implementing a Recognition Algorithm for Classical Groups"
+##      "Groups and Computation II", Amer. Math. Soc. DIMACS Series 28, 1997.
+##
+##  [3] Alice C. Niemeyer and  Cheryl E. Praeger 
+##      "A Recognition Algorithm for Non-Generic Classical Groups over
+##       Finite Fields", J. Austral. Math. Soc. (Series A)67 , 223-253, 1999.
+##
+##  This implementation uses some algorithms described elsewhere:
+## 
+##  [4] Frank Celler and C.R. Leedham-Green
+##      "Calculating the order of an invertible matrix",
+##      "Groups and Computation II", Amer. Math. Soc. DIMACS Series 28, 1997.
+##
+##  [5] Frank Celler and C.R. Leedham-Green
+##      "A non-constructive recognition algorithm for the special linear
+##      and other classical groups"
+##      "Groups and Computation II", Amer. Math. Soc. DIMACS Series 28, 1997.
+##
+##    In this implementation we use the irreducibility test of the algorithm
+##    described in [5], which can often avoid an application  of the Meataxe
+##    algorithm.
+##
+##  [6] Frank Celler and Charles R. Leedham-Green and Scott H. Murray 
+##      and Alice C. Niemeyer and E.A. O'Brien
+##      "Generating random elements of a finite group"
+##      Comm. Algebra 23,  4931--4948 (1995)
+##
+##  For an overview see also
+##
+##  [7] Cheryl E. Praeger, 
+##      "Primitive prime divisor elements in finite classical groups",
+##       Proc. of Groups St. Andrews 1997 in Bath II, 
+##       Eds: C.M. Campbell, E.F. Robertson, N. Ruskuc and G.C. Smith, 
+##       London Math. Soc. Lecture Note Series 261, 605--623.
+##
 #############################################################################
 
 BindGlobal( "ClassicalMethDb", [] );
@@ -323,9 +370,11 @@ end;
           v2 * phi * v3 = 0*v1[1] or
           v4 * phi * v3 <> 0 * v1[1] do
         v3 := FindVec();
+    Info( InfoRecog, 1, ".");
     od;
     v3 := v3/(v2*phi*v3);
 
+    Info( InfoRecog, 1, "found all\n");
     return [v1, v2, v3, v4];
 
 end;
@@ -972,9 +1021,16 @@ RECOG.TestRandomElement := function (recognise, grp)
                 return fail;
             fi;
             kf := recognise.kf;
-            o1 := Order( kf[1] );
-            o2 := Order( kf[2] );
+            o1 := ProjectiveOrder( kf[1] )[1];
+            o2 := ProjectiveOrder( kf[2] )[1];
             Info(InfoClassical,2,o1, " ", o2, "\n");
+            ### ACN March 2007 needed Projective order
+            ### and test that orders are bigger than 2 or 4
+            if  q mod 2 = 0 and (o1 <= 2 or o2 <= 2) then 
+	        return fail;
+            elif q mod 2 <> 0 and (o1 <= 4 or o2 <= 4) then
+	        return fail;
+            fi;
             if ( (q+1) mod o1 = 0 and (q+1) mod o2 = 0) then 
                 Add( recognise.plusminus, [1,1] );
             fi;
@@ -1855,7 +1911,9 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
              return false;
         fi;
     elif d = 8 and  q =  5 then 
-        if not HasElementsMultipleOf( recognise.orders, [7,13])  then
+        #ACN Feb 07: added fix - need also elements of order a mult of 3
+        #            these are missing in the paper [3]
+        if not HasElementsMultipleOf( recognise.orders, [7,13,3])  then
             return fail; 
         fi;
     elif d = 8 and (q = 4 or q > 5) then 
@@ -2051,12 +2109,15 @@ RECOG.NonGenericOrthogonalMinus := function(recognise, grp)
     elif d = 4 and q >=  4 then
          # TODO check this in Magma
         ppd := IsPpdElement( recognise.field, recognise.cpol, d, q, 1 );
-        if ppd = false or ppd[1] <> 4 then return fail; fi;
+        if ppd = false or ppd[1] <> 4  or ppd[2] <> true then return fail; fi;
         # found a ppd( 4, q; 4)-element
         g := recognise.g;
         for h in GeneratorsOfGroup(grp) do
-            if Comm(h,g) <> One(grp) or Comm(Comm(h,g),g) <> One(grp) then
+# ACN May 2007
+            if Comm(h,g) <> One(grp) then
+                if Comm(Comm(h,g),g) <> One(grp) then
                         return CheckFlag();
+                fi;
             fi;
         od;
         Info(InfoClassical, 2, "grp contained in O-(2,", q,  "^2)\n" );
