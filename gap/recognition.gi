@@ -50,6 +50,9 @@ InstallMethod( ViewObj, "for recognition infos", [IsRecognitionInfo],
         elif IsString(ms) then
             Print(ms);
         fi;
+        if IsBound(ri!.comment) then
+            Print(ri!.comment);
+        fi;
     fi;
     if HasSize(ri) then
         Print(" Size=",Size(ri));
@@ -723,6 +726,42 @@ RECOG.TestGroup := function(g,proj,size)
   return ri;
 end;
 
+RECOG.TestRecognitionNode := function(ri,stop,recurse)
+  local err, grp, x, slp, y, ef, ek, i;
+  err := 0;
+  grp := group(ri);
+  for i in [1..100] do
+      x := PseudoRandom(grp);
+      slp := SLPforElement(ri,x);
+      if slp <> fail then
+          y := ResultOfStraightLineProgram(slp,nicegens(ri));
+      fi;
+      if slp <> fail and not(ri!.isone(x/y)) then
+          if stop then Error("Error found, look at x, slp and y"); fi;
+          err := err + 1;
+          Print("X\c");
+      else
+          Print(".\c");
+      fi;
+  od;
+  Print("\n");
+  if err > 0 and recurse then
+      if IsLeaf(ri) then
+          return rec(err := err, badnode := ri);
+      fi;
+      ef := RECOG.TestRecognitionNode(factor(ri),stop,recurse);
+      if IsRecord(ef) then return ef; fi;
+      if kernel(ri) <> fail then
+          ek := RECOG.TestRecognitionNode(kernel(ri),stop,recurse);
+          if IsRecord(ek) then return ek; fi;
+      fi;
+      return rec( err := err, badnode := ri, factorkernelok := true );
+  fi;
+  return err;
+end;
+
+
+      
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU General Public License as published by
