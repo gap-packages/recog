@@ -170,10 +170,25 @@ RECOG.DirectFactorsAction := function(data,el)
   return PermList(res);
 end;
 
+RECOG.IsPower := function(d)
+  local f, e, g, l, dd;
+  # Intended for small d
+  f := Collected(Factors(d));
+  e := List(f,x->x[2]);
+  g := Gcd(e);
+  d := DivisorsInt(g);
+  d := d{[2..Length(d)]};
+  l := EmptyPlist(Length(d));
+  for dd in d do
+    Add(l,[Product(f,x->x[1]^(x[2]/dd)),dd]);
+  od;
+  return l;
+end;
+
 FindHomMethodsProjective.D247 := function(ri,G)
   # We try to produce an element of a normal subgroup by playing 
   # tricks.
-  local CheckNormalClosure,f,i,res,x;
+  local CheckNormalClosure,f,i,res,x,ispower;
 
   CheckNormalClosure := function(x)
     # This is called with an element that we hope lies in a normal subgroup.
@@ -182,7 +197,10 @@ FindHomMethodsProjective.D247 := function(ri,G)
     ngens := FastNormalClosure(G,[x],4);
     m := GModuleByMats(ngens,f);
     if MTX.IsIrreducible(m) then
-        # FIXME: Check dimensions first!
+        if not(ispower) then 
+            Info(InfoRecog,2,"Dimension is no power!");
+            return fail; 
+        fi;
         # we want to look for D7 here, using the same trick again:
         count := 0;
         n := GroupWithGenerators(ngens);
@@ -213,6 +231,7 @@ FindHomMethodsProjective.D247 := function(ri,G)
                         Setmethodsforfactor(ri,FindHomDbPerm);
                         Info(InfoRecog,1,"D247: Success, found D7 with action",
                              " on ",mult," direct factors.");
+                        ri!.comment := "_D7TensorInduced";
                         return true;
                     else
                         Info(InfoRecog,1,"D247: Did not find direct factors!");
@@ -270,6 +289,7 @@ FindHomMethodsProjective.D247 := function(ri,G)
                   rank := 4000, stamp := "KroneckerProduct" ) );
         # This is an isomorphism:
         findgensNmeth(ri).method := FindKernelDoNothing;
+        ri!.comment := "_D4TensorDec";
         return true;
     fi;
     Info(InfoRecog,1,"Using action on the set of homogeneous components",
@@ -290,12 +310,16 @@ ConvertToMatrixRep(homcomp,Size(f));
     a := OrbActionHomomorphism(G,o);
     Sethomom(ri,a);
     Setmethodsforfactor(ri,FindHomDbPerm);
-
+    ri!.comment := "_D2Imprimitive";
+    Setimmediateverification(ri,true);
+    findgensNmeth(ri).args[1] := Length(o)+6;
+    findgensNmeth(ri).args[2] := 4;
     return true;
   end;   
 
   Print("D247: Trying the involution jumper 9 times...\n");
   f := FieldOfMatrixGroup(G);
+  ispower := Length(RECOG.IsPower(DimensionOfMatrixGroup(G))) > 0;
   x := RECOG.InvolutionSearcher(ri!.pr,RECOG.ProjectiveOrder,100);
   if x = fail then
       Info(InfoRecog,1,"Did not find an involution! Giving up.");
