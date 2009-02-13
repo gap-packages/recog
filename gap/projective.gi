@@ -43,7 +43,18 @@ FindHomMethodsProjective.BlocksModScalars := function(ri,G)
   # used as a hint by FindHomMethodsMatrix.BlockDiagonal!
   local H,data,hom,middle,newgens,nrblocks,topblock;
   nrblocks := Length(ri!.blocks);  # this is always >= 1
-  if nrblocks = 1 then   # in this case the block is not everything!
+  if ForAll(ri!.blocks,b->Length(b)=1) then
+      # All blocks are projectively trivial, so nothing to do here:
+      SetSize(ri,1);
+      Setslpforelement(ri,SLPforElementFuncsProjective.TrivialProjectiveGroup);
+      Setslptonice( ri, StraightLineProgramNC([[[1,0]]],
+                                              Length(GeneratorsOfGroup(G))));
+      SetFilterObj(ri,IsLeaf);
+      ri!.comment := "_BlocksDim=1";
+      return true;
+  fi;
+      
+  if nrblocks = 1 then   # in this case the block is everything!
       # no hints for the factor, will run into diagonal and notice scalar
       data := rec(poss := ri!.blocks[1]);
       newgens := List(GeneratorsOfGroup(G),x->RECOG.HomToDiagonalBlock(data,x));
@@ -79,7 +90,7 @@ FindHomMethodsProjective.BlocksModScalars := function(ri,G)
   # the kernel is the first few blocks:
   findgensNmeth(ri).args[1] := 5 + middle - 1;
   findgensNmeth(ri).args[2] := 5 + middle - 1;
-  # The following is already be set, but make it explicit here:
+  # The following is already set, but make it explicit here:
   forkernel(ri).blocks := ri!.blocks{[1..middle-1]};
   Add(forkernel(ri).hints,
       rec( method := FindHomMethodsProjective.BlocksModScalars, rank := 2000,
