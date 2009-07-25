@@ -213,6 +213,9 @@ AddMethod( FindHomDbProjective, FindHomMethodsProjective.C3C5,
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.C6,
    850, "C6",
         "find either an (imprimitive) action or a symplectic one" );
+AddMethod( FindHomDbProjective, FindHomMethodsProjective.FindEvenNormal,
+   825, "FindEvenNormal",
+        "find either D2 or D4 by finding reducible normal subgroup" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.D247,
    800, "D247",
         "play games to find a normal subgroup" );

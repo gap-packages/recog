@@ -203,7 +203,7 @@ RECOG.SortOutReducibleNormalSubgroup :=
             # This should have been caught by using projective orders.
             return false;
         fi;
-        Info(InfoRecog,2,"Restriction to normal subgroup is homogeneous.");
+        Info(InfoRecog,2,"D247:Restriction to normal subgroup is homogeneous.");
         if not(MTX.IsAbsolutelyIrreducible(collf[1][1])) then
             Error("Is this really possible??? G acts absolutely irred!");
             return false;
@@ -242,7 +242,7 @@ RECOG.SortOutReducibleNormalSubgroup :=
         ri!.comment := "_D4TensorDec";
         return true;
     fi;
-    Info(InfoRecog,2,"Using action on the set of homogeneous components",
+    Info(InfoRecog,2,"D247:Using action on the set of homogeneous components",
            " (",Length(collf)," elements)...");
     # Now find a homogeneous component to act on it:
     homs := MTX.Homomorphisms(collf[1][1],m);
@@ -254,7 +254,7 @@ ConvertToMatrixRep(homcomp,Size(f));
     o := Orb(G,homcomp,OnSubspacesByCanonicalBasis,rec(storenumbers := true));
     Enumerate(o,QuoInt(DimensionOfMatrixGroup(G),Length(homcomp)));
     if not(IsClosed(o)) then
-        Info(InfoRecog,2,"Obviously did not get normal subgroup!");
+        Info(InfoRecog,2,"D247:Obviously did not get normal subgroup!");
         return fail;
     fi;
     a := OrbActionHomomorphism(G,o);
@@ -265,6 +265,50 @@ ConvertToMatrixRep(homcomp,Size(f));
     findgensNmeth(ri).args[1] := Length(o)+6;
     findgensNmeth(ri).args[2] := 4;
     return true;
+  end;
+
+RECOG.SortOutReducibleSecondNormalSubgroup :=
+  function(ri,G,nngens,mm)
+    # nngens generators for a proper normal subgroup of a proper
+    # irreducible normal subgroup, mm a reducible MeatAxe module with
+    # generators nngens.
+    # This function takes care of the cases to construct a reduction 
+    # if we have a D7 case.
+    # Only call this with absolutely irreducible G!
+    # Only call this if we already know that G is not C3!
+    # Only call this if the upper normal subgroup was still irreducible!
+
+    local H,collf,dim,hom,mult,orb,subdim;
+
+    collf := MTX.CollectedFactors(mm);
+    if Length(collf) = 1 then
+        subdim := MTX.Dimension(collf[1][1]);
+        dim := MTX.Dimension(mm);
+        mult := First([1..20],i->subdim^i = dim);
+        if mult <> fail then
+            orb := RECOG.DirectFactorsFinder(GeneratorsOfGroup(G),
+                                             nngens,mult,ri!.isequal);
+            if orb <> fail then
+                H := GroupWithGenerators(orb[2]);
+                hom := GroupHomByFuncWithData(G,H,
+                           RECOG.DirectFactorsAction,
+                           rec( o := orb[1], eq := ri!.isequal) );
+                Sethomom(ri,hom);
+                Setmethodsforfactor(ri,FindHomDbPerm);
+                Info(InfoRecog,2,"D247: Success, found D7 with action",
+                     " on ",mult," direct factors.");
+                ri!.comment := "_D7TensorInduced";
+                return true;
+            else
+                Info(InfoRecog,2,"D247: Did not find direct factors!");
+            fi;
+        else
+            Info(InfoRecog,2,"D247: Submodule dimension no root!");
+        fi;
+    else
+        Info(InfoRecog,2,"D247: Restriction not homogeneous!");
+    fi;
+    return fail;
   end;
 
 FindHomMethodsProjective.D247 := function(ri,G)
@@ -296,34 +340,7 @@ FindHomMethodsProjective.D247 := function(ri,G)
         nngens := FastNormalClosure(n,[y],2);
         mm := GModuleByMats(nngens,f);
         if not(MTX.IsIrreducible(mm)) then
-            collf := MTX.CollectedFactors(mm);
-            if Length(collf) = 1 then
-                subdim := MTX.Dimension(collf[1][1]);
-                dim := MTX.Dimension(mm);
-                mult := First([1..20],i->subdim^i = dim);
-                if mult <> fail then
-                    orb := RECOG.DirectFactorsFinder(GeneratorsOfGroup(G),
-                                                     nngens,mult,ri!.isequal);
-                    if orb <> fail then
-                        H := GroupWithGenerators(orb[2]);
-                        hom := GroupHomByFuncWithData(G,H,
-                                   RECOG.DirectFactorsAction,
-                                   rec( o := orb[1], eq := ri!.isequal) );
-                        Sethomom(ri,hom);
-                        Setmethodsforfactor(ri,FindHomDbPerm);
-                        Info(InfoRecog,1,"D247: Success, found D7 with action",
-                             " on ",mult," direct factors.");
-                        ri!.comment := "_D7TensorInduced";
-                        return true;
-                    else
-                        Info(InfoRecog,1,"D247: Did not find direct factors!");
-                    fi;
-                else
-                    Info(InfoRecog,1,"D247: Submodule dimension no root!");
-                fi;
-            else
-                Info(InfoRecog,1,"D247: Restriction not homogeneous!");
-            fi;
+            return RECOG.SortOutReducibleSecondNormalSubgroup(ri,G,nngens,mm);
         fi;
         return fail;
     fi;

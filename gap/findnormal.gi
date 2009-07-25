@@ -329,3 +329,29 @@ InstallMethod( FindEvenNormalSubgroup, "for a group object and a record",
   return res;
 end );
 
+FindHomMethodsProjective.FindEvenNormal := function(ri,G)
+  local r,rr,f,m,mm;
+  r := FindEvenNormalSubgroup(G,rec( Projective := true ));
+  if r.success then
+      f := FieldOfMatrixGroup(G);
+      m := GModuleByMats(r.Ngens,f);
+      if not(MTX.IsIrreducible(m)) then
+          Info(InfoRecog,1,"Found reducible proper normal subgroup!");
+          return RECOG.SortOutReducibleNormalSubgroup(ri,G,r.Ngens,m);
+      else
+          Info(InfoRecog,1,"Found irreducible proper normal subgroup!");
+          rr := FindEvenNormalSubgroup(Group(r.Ngens),
+                       rec( Projective:=true, DoBlindDescent := true ));
+          if rr.success then
+              mm := GModuleByMats(rr.Ngens,f);
+              if not(MTX.IsIrreducible(mm)) then
+                  return RECOG.SortOutReducibleSecondNormalSubgroup(ri,G,
+                                    rr.Ngens,mm);
+              fi;
+              Info(InfoRecog,1,"Second normal subgroup was not reducible.");
+          fi;
+      fi;
+  fi;
+  return fail;
+end;
+
