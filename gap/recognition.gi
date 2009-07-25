@@ -359,7 +359,7 @@ InstallGlobalFunction( RecogniseGeneric,
         done := true;
         if IsReady(riker) and immediateverification(ri) then
             # Do an immediate verification:
-            Info(InfoRecog,1,"Doing immediate verification.");
+            Info(InfoRecog,2,"Doing immediate verification.");
             i := 1;
             for i in [1..5] do
                 x := PseudoRandom( ri!.groupmem );
@@ -380,7 +380,6 @@ InstallGlobalFunction( RecogniseGeneric,
                     Info(InfoRecog,1,
                          "Alarm: Found unexpected kernel element! (depth=",
                          depth,")");
-                    Error(12345);
                 fi;
             od;
             if InfoLevel(InfoRecog) >= 1 then Print("\n"); fi;
