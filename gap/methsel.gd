@@ -14,7 +14,7 @@
 # Our own method selection code:
 
 DeclareInfoClass( "InfoMethSel" );
-SetInfoLevel(InfoMethSel,2);
+SetInfoLevel(InfoMethSel,1);
 DeclareGlobalFunction( "AddMethod" );
 DeclareGlobalVariable( "NotApplicable" );
 DeclareGlobalFunction( "CallMethods" );

@@ -100,7 +100,7 @@ DeclareGlobalFunction( "RecogniseGroup" );
 DeclareSynonym("RecognizeGroup", RecogniseGroup);
 DeclareGlobalFunction( "RecogniseGeneric" );
 DeclareSynonym("RecognizeGeneric", RecogniseGeneric);
-
+DeclareGlobalFunction( "PrintTreePos" );
 
 # Helper functions for the generic part:
 

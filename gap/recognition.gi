@@ -129,32 +129,32 @@ InstallValue( FindHomDbBB, [] );
 
 InstallGlobalFunction( RecognisePermGroup,
   function(G)
-    return RecogniseGeneric(G,FindHomDbPerm,0);
+    return RecogniseGeneric(G,FindHomDbPerm,"");
   end);
 
 InstallGlobalFunction( RecogniseMatrixGroup,
   function(G)
-    return RecogniseGeneric(G,FindHomDbMatrix,0);
+    return RecogniseGeneric(G,FindHomDbMatrix,"");
   end);
 
 InstallGlobalFunction( RecogniseProjectiveGroup,
   function(G)
-    return RecogniseGeneric(G,FindHomDbProjective,0);
+    return RecogniseGeneric(G,FindHomDbProjective,"");
   end);
 
 InstallGlobalFunction( RecogniseBBGroup,
   function(G)
-    return RecogniseGeneric(G,FindHomDbBB,0);
+    return RecogniseGeneric(G,FindHomDbBB,"");
   end);
 
 InstallGlobalFunction( RecogniseGroup,
   function(G)
     if IsPermGroup(G) then
-        return RecogniseGeneric(G,FindHomDbPerm,0);
+        return RecogniseGeneric(G,FindHomDbPerm,"");
     elif IsMatrixGroup(G) then
-        return RecogniseGeneric(G,FindHomDbMatrix,0);
+        return RecogniseGeneric(G,FindHomDbMatrix,"");
     else
-        return RecogniseGeneric(G,FindHomDbBB,0);
+        return RecogniseGeneric(G,FindHomDbBB,"");
     fi;
     # Note: one cannot use "RecogniseGroup" to recognise projective groups 
     #       as of now since "Projective groups" do not yet exist as GAP 
@@ -189,6 +189,21 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     return ri;
   end );
     
+InstallGlobalFunction( PrintTreePos,
+  function(mark,depth,H)
+    if InfoLevel(InfoRecog) = 1 then
+        if IsMatrixGroup(H) then
+            Print(mark," dim=",String(DimensionOfMatrixGroup(H),4),
+                  " field=",Size(FieldOfMatrixGroup(H))," ",
+                  String(Length(depth),2)," ",depth,"   \r");
+        elif IsPermGroup(H) then
+            Print(mark," pts=",String(LargestMovedPoint(H),6)," ",
+                  String(Length(depth),2)," ",depth,"   \r");
+        else
+            Print(mark," ",String(Length(depth),2)," ",depth,"   \r");
+        fi;
+    fi;
+  end );
     
 InstallGlobalFunction( RecogniseGeneric,
   function(arg)
@@ -206,7 +221,8 @@ InstallGlobalFunction( RecogniseGeneric,
         knowledge := rec();
     fi;
 
-    Info(InfoRecog,3,"Recognising: ",H);
+    PrintTreePos("E",depth,H);
+    Info(InfoRecog,4,"Recognising: ",H);
 
     if Length(GeneratorsOfGroup(H)) = 0 then
         H := Group([One(H)]);
@@ -218,7 +234,8 @@ InstallGlobalFunction( RecogniseGeneric,
     else
         ri := EmptyRecognitionInfoRecord(knowledge,H,false);
     fi;
-    ri!.depth := depth;
+    ri!.depth := Length(depth);
+    ri!.depthst := depth;
     # was here earlier: Setcalcnicegens(ri,CalcNiceGensGeneric);
     Setmethodsforfactor(ri,methoddb);
 
@@ -232,6 +249,7 @@ InstallGlobalFunction( RecogniseGeneric,
     fi;
     if fhmethsel(ri).result = fail then
         SetFilterObj(ri,IsLeaf);
+        if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
         return ri;
     fi;
 
@@ -253,6 +271,7 @@ InstallGlobalFunction( RecogniseGeneric,
         fi;
         # these two were set correctly by FindHomomorphism
         if IsLeaf(ri) then SetFilterObj(ri,IsReady); fi;
+        if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
         return ri;
     fi;
 
@@ -265,38 +284,45 @@ InstallGlobalFunction( RecogniseGeneric,
         counter := counter + 1;
         if counter > 10 then
             Info(InfoRecog,1,"Giving up desperately...");
+            if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
             return ri;
         fi;
 
         if IsMatrixGroup(Image(homom(ri))) then
-            Info(InfoRecog,1,"Going to the factor (depth=",depth,", try=",
+            Info(InfoRecog,2,"Going to the factor (depth=",
+              Length(depth),", try=",
               counter,", dim=",DimensionOfMatrixGroup(Image(homom(ri))),
               ", field=",Size(FieldOfMatrixGroup(Image(homom(ri)))),").");
         else
-            Info(InfoRecog,1,"Going to the factor (depth=",depth,", try=",
+            Info(InfoRecog,2,"Going to the factor (depth=",
+              Length(depth),", try=",
               counter,").");
         fi;
+        Add(depth,'F');
         rifac := RecogniseGeneric( 
                   Group(List(GeneratorsOfGroup(H), x->ImageElm(homom(ri),x))), 
-                  methodsforfactor(ri), depth+1, forfactor(ri) );
+                  methodsforfactor(ri), depth, forfactor(ri) );
+        Remove(depth);
+        PrintTreePos("F",depth,H);
         Setfactor(ri,rifac);
         Setparent(rifac,ri);
 
         if IsMatrixGroup(H) then
-            Info(InfoRecog,1,"Back from factor (depth=",depth,", dim=",
-                 DimensionOfMatrixGroup(H),", field=",
+            Info(InfoRecog,2,"Back from factor (depth=",Length(depth),
+                 ", dim=",DimensionOfMatrixGroup(H),", field=",
                  Size(FieldOfMatrixGroup(H)),").");
         else
-            Info(InfoRecog,1,"Back from factor (depth=",depth,").");
+            Info(InfoRecog,2,"Back from factor (depth=",Length(depth),").");
         fi;
 
         if not(IsReady(rifac)) then
             # the recognition of the factor failed, also give up here:
+            if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
             return ri;
         fi;
 
         # Now we want to have preimages of the new generators in the factor:
-        Info(InfoRecog,1,"Calculating preimages of nice generators.");
+        Info(InfoRecog,2,"Calculating preimages of nice generators.");
         Setpregensfac( ri, CalcNiceGens(rifac,GeneratorsOfGroup(H)));
 
         ri!.genswithmem := GeneratorsWithMemory(
@@ -335,15 +361,16 @@ InstallGlobalFunction( RecogniseGeneric,
     if Length(gensN(ri)) = 0 then
         # We found out that N is the trivial group!
         # In this case we do nothing, kernel is fail indicating this.
-        Info(InfoRecog,1,"Found trivial kernel (depth=",depth,").");
+        Info(InfoRecog,2,"Found trivial kernel (depth=",Length(depth),").");
         Setkernel(ri,fail);
         # We have to learn from the factor, what our nice generators are:
         Setnicegens(ri,pregensfac(ri));
         SetFilterObj(ri,IsReady);
+        if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
         return ri;
     fi;
 
-    Info(InfoRecog,1,"Going to the kernel (depth=",depth,").");
+    Info(InfoRecog,2,"Going to the kernel (depth=",Length(depth),").");
     repeat
         # Now we go on as usual:
         SetgensNslp(ri,SLPOfElms(gensN(ri)));
@@ -351,10 +378,13 @@ InstallGlobalFunction( RecogniseGeneric,
         # of the nice generators behind the homomorphism!
         N := Group(StripMemory(gensN(ri)));
         
-        riker := RecogniseGeneric( N, methoddb, depth+1, forkernel(ri) );
+        Add(depth,'K');
+        riker := RecogniseGeneric( N, methoddb, depth, forkernel(ri) );
+        Remove(depth);
+        PrintTreePos("K",depth,H);
         Setkernel(ri,riker);
         Setparent(riker,ri);
-        Info(InfoRecog,1,"Back from kernel (depth=",depth,").");
+        Info(InfoRecog,2,"Back from kernel (depth=",Length(depth),").");
 
         done := true;
         if IsReady(riker) and immediateverification(ri) then
@@ -372,20 +402,20 @@ InstallGlobalFunction( RecogniseGeneric,
                    ri!.genswithmem{[ri!.nrgensH+1..Length(ri!.genswithmem)]});
                 z := x*y^-1;
                 s := SLPforElement(riker,z!.el);
-                if InfoLevel(InfoRecog) >= 1 then Print(".\c"); fi;
+                if InfoLevel(InfoRecog) >= 2 then Print(".\c"); fi;
                 if s = fail then
                     # We missed something!
                     done := false;
                     Add(gensN(ri),z);
-                    Info(InfoRecog,1,
+                    Info(InfoRecog,2,
                          "Alarm: Found unexpected kernel element! (depth=",
-                         depth,")");
+                         Length(depth),")");
                 fi;
             od;
-            if InfoLevel(InfoRecog) >= 1 then Print("\n"); fi;
+            if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;
             if not(done) then
                 succ := FindKernelFastNormalClosure(ri,5,5);
-                Info(InfoRecog,1,"Have now ",Length(gensN(ri)),
+                Info(InfoRecog,2,"Have now ",Length(gensN(ri)),
                      " generators for kernel, recognising...");
                 if succ = false then
                     Error("Very bad: factor was wrongly recognised and we ",
@@ -405,6 +435,7 @@ InstallGlobalFunction( RecogniseGeneric,
         #ri!.proj2 := StraightLineProgramNC([ll],Length(nicegens(ri)));
         SetFilterObj(ri,IsReady);
     fi;
+    if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
     return ri;
   end);
 
@@ -488,7 +519,7 @@ InstallGlobalFunction( SLPforElementGeneric,
 InstallGlobalFunction( FindKernelRandom,
   function(ri,n)
     local i,l,rifac,s,x,y;
-    Info(InfoRecog,1,"Creating ",n," random generators for kernel.");
+    Info(InfoRecog,2,"Creating ",n," random generators for kernel.");
     l := gensN(ri);
     rifac := factor(ri);
     for i in [1..n] do
@@ -500,11 +531,11 @@ InstallGlobalFunction( FindKernelRandom,
         y := ResultOfStraightLineProgram(s,
                  ri!.genswithmem{[ri!.nrgensH+1..Length(ri!.genswithmem)]});
         Add(l,x^-1*y);
-        if InfoLevel(InfoRecog) >= 1 then
+        if InfoLevel(InfoRecog) >= 2 then
             Print(".\c");
         fi;
     od;
-    if InfoLevel(InfoRecog) >= 1 then
+    if InfoLevel(InfoRecog) >= 2 then
         Print("\n");
     fi;
     return true;
