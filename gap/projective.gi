@@ -111,9 +111,9 @@ FindHomMethodsProjective.StabilizerChain := function(ri,G)
   f := FieldOfMatrixGroup(G);
   q := Size(f);
   opt := rec( Projective := true );
-  if q^(d-1) > 100000 then
-      opt.TryShortOrbit := 5;
-  fi;
+  #if q^(d-1) > 100000 then
+  #    opt.TryShortOrbit := 5;
+  #fi;
   Gm := GroupWithMemory(G);
   S := StabilizerChain(Gm,opt);
   SetSize(ri,Size(S));
