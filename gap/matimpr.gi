@@ -155,9 +155,9 @@ RECOG.SmallHomomorphicImageProjectiveGroup := function ( grp )
                 return ans;
             fi;
         fi;
-        if InfoLevel(InfoRecog) >= 1 then Print(".\c"); fi;
+        if InfoLevel(InfoRecog) >= 2 then Print(".\c"); fi;
     od;
-    if InfoLevel(InfoRecog) >= 1 then Print("\n"); fi;
+    if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;
 
     return fail;
 end;
