@@ -27,7 +27,7 @@ function(arg)
     vars.V := 0;
     repeat    # label SEMISTD
         els[1] := PseudoRandom(G);
-        vars.A := Order(els[1]);
+        vars.A := RECOG.ProjectiveOrder(els[1]);
         vars.V := vars.V + 1;
         if vars.V > 1000 then
             return fail;  # a timeout
@@ -49,7 +49,7 @@ function(arg)
         els[4] := PseudoRandom(G);
         els[3] := els[3]^els[4];
         els[5] := els[2]*els[3];
-        vars.D := Order(els[5]);
+        vars.D := RECOG.ProjectiveOrder(els[5]);
         if not(vars.D in [5, 6, 8, 10, 11, 15, 20]) then
             return fail;
         fi;
@@ -71,7 +71,7 @@ function(arg)
     
     repeat    # label START
         els[1] := PseudoRandom(G);
-        vars.A := Order(els[1]);
+        vars.A := RECOG.ProjectiveOrder(els[1]);
         vars.V := vars.V + 1;
         if vars.V > 1000 then
             return fail;  # a timeout
@@ -99,7 +99,7 @@ function(arg)
         els[4] := PseudoRandom(G);
         els[3] := els[3]^els[4];
         els[5] := els[2]*els[3];
-        vars.D := Order(els[5]);
+        vars.D := RECOG.ProjectiveOrder(els[5]);
         
         if not(vars.D in [2, 3, 4, 5, 6, 8, 11]) then
             return fail;
@@ -111,7 +111,7 @@ function(arg)
     els[8] := els[5]*els[6];
     els[9] := els[8]*els[7];
     
-    vars.E := Order(els[9]);
+    vars.E := RECOG.ProjectiveOrder(els[9]);
     
     if vars.E = 3 then
         els[10] := els[3]^-1;
@@ -138,7 +138,7 @@ function(arg)
     vars.V := 0;
     repeat    # label SEMISTD
         els[1] := PseudoRandom(G);
-        vars.A := Order(els[1]);
+        vars.A := RECOG.ProjectiveOrder(els[1]);
         vars.V := vars.V + 1;
         if vars.V > 1000 then
             return fail;  # a timeout
@@ -169,7 +169,7 @@ function(arg)
         els[4] := PseudoRandom(G);
         els[5] := els[3]^els[4];
         els[6] := els[3]*els[5];
-        vars.D := Order(els[6]);
+        vars.D := RECOG.ProjectiveOrder(els[6]);
         if not(vars.D in [1, 2, 3, 4, 5, 6]) then
             return fail;
         fi;
@@ -186,7 +186,7 @@ function(arg)
         els[8] := PseudoRandom(G);
         els[7] := els[7]^els[8];
         els[9] := els[2]*els[7];
-        vars.F := Order(els[9]);
+        vars.F := RECOG.ProjectiveOrder(els[9]);
         
         if not(vars.F in [2, 3, 5, 6, 8, 10, 11]) then
             return fail;
@@ -211,7 +211,7 @@ function(arg)
     
     repeat    # label START
         els[1] := PseudoRandom(G);
-        vars.A := Order(els[1]);
+        vars.A := RECOG.ProjectiveOrder(els[1]);
         vars.V := vars.V + 1;
         if vars.V > 1000 then
             return fail;  # a timeout
@@ -234,7 +234,7 @@ function(arg)
         els[4] := PseudoRandom(G);
         els[3] := els[3]^els[4];
         els[5] := els[2]*els[3];
-        vars.D := Order(els[5]);
+        vars.D := RECOG.ProjectiveOrder(els[5]);
         if not(vars.D in [2, 3, 4, 5, 6, 7, 8, 11]) then
             return fail;
         fi;
@@ -244,7 +244,7 @@ function(arg)
         
         els[6] := els[5]*els[3];
         els[7] := els[5]*els[6];
-        vars.E := Order(els[7]);
+        vars.E := RECOG.ProjectiveOrder(els[7]);
         
         if vars.E <> 11 then
             continue;    # was jmp to CONJ
@@ -273,7 +273,7 @@ function(arg)
     vars.X := 0;
     repeat    # label SEMISTD
         els[1] := PseudoRandom(G);
-        vars.A := Order(els[1]);
+        vars.A := RECOG.ProjectiveOrder(els[1]);
         vars.V := vars.V + 1;
         if vars.V > 1000 then
             return fail;  # a timeout
@@ -319,7 +319,7 @@ function(arg)
         fi;
         
         els[5] := els[2]*els[4];
-        vars.D := Order(els[5]);
+        vars.D := RECOG.ProjectiveOrder(els[5]);
         if vars.D in [1, 2, 3, 4, 5] then
             # Probably a 2A element
             vars.F := 0;
@@ -327,7 +327,7 @@ function(arg)
         fi;
         
         els[6] := els[3]*els[4];
-        vars.E := Order(els[6]);
+        vars.E := RECOG.ProjectiveOrder(els[6]);
         if vars.E in [6, 12] then
             # Probably a 3A element
             vars.G := 0;
@@ -346,7 +346,7 @@ function(arg)
         els[7] := PseudoRandom(G);
         els[3] := els[3]^els[7];
         els[8] := els[2]*els[3];
-        vars.D := Order(els[8]);
+        vars.D := RECOG.ProjectiveOrder(els[8]);
         if not(vars.D in [2, 3, 5, 6, 7, 8, 10, 12, 15]) then
             return fail;
         fi;
@@ -358,7 +358,7 @@ function(arg)
         els[9] := els[8]*els[3];
         els[10] := els[8]*els[9];
         
-        vars.E := Order(els[10]);
+        vars.E := RECOG.ProjectiveOrder(els[10]);
         
         if not(vars.E in [10, 12, 15]) then
             return fail;
@@ -388,7 +388,7 @@ function(arg)
     vars.V := 0;
     repeat    # label SEMISTD
         els[1] := PseudoRandom(G);
-        vars.A := Order(els[1]);
+        vars.A := RECOG.ProjectiveOrder(els[1]);
         vars.V := vars.V + 1;
         if vars.V > 1000 then
             return fail;  # a timeout
@@ -430,7 +430,7 @@ function(arg)
         els[4] := PseudoRandom(G);
         els[3] := els[3]^els[4];
         els[5] := els[2]*els[3];
-        vars.D := Order(els[5]);
+        vars.D := RECOG.ProjectiveOrder(els[5]);
         if not(vars.D in [4,5,6,7,8,9,10,11,12,14,15,18,20,22,23,24]) then
             return fail;
         fi;
@@ -461,7 +461,7 @@ function(arg)
     
     repeat    # label SEMISTD
         els[1] := PseudoRandom(G);
-        vars.A := Order(els[1]);
+        vars.A := RECOG.ProjectiveOrder(els[1]);
         vars.V := vars.V + 1;
         if vars.V > 1000 then
             return fail;  # a timeout
@@ -504,7 +504,7 @@ function(arg)
             els[4] := PseudoRandom(G);
             els[3] := els[3]^els[4];
             els[5] := els[2]*els[3];
-            vars.D := Order(els[5]);
+            vars.D := RECOG.ProjectiveOrder(els[5]);
             if not(vars.D in [4,5,6,7,8,9,10,11,12,14,15,16,18,20,23,24,
                               28,30]) then
                 return fail;
@@ -548,7 +548,7 @@ function(arg)
             if vars.Z = 0 then
                 els[6] := els[5]*els[3];
                 
-                vars.E := Order(els[6]);
+                vars.E := RECOG.ProjectiveOrder(els[6]);
                 
                 if not(vars.E in [9, 15]) then
                     return fail;
@@ -584,7 +584,7 @@ function(arg)
     vars.V := 0;
     repeat    # label SEMISTD
         els[1] := PseudoRandom(G);
-        vars.A := Order(els[1]);
+        vars.A := RECOG.ProjectiveOrder(els[1]);
         vars.V := vars.V + 1;
         if vars.V > 1000 then
             return fail;  # a timeout
@@ -618,7 +618,7 @@ function(arg)
         els[4] := PseudoRandom(G);
         els[3] := els[3]^els[4];
         els[5] := els[2]*els[3];
-        vars.D := Order(els[5]);
+        vars.D := RECOG.ProjectiveOrder(els[5]);
         if not(vars.D in [2,6,7,8,9,10,11,12,14,15,18,20,
                       21,22,24,25,28,30,31,33,37,40,42,67]) then
             return fail;
@@ -630,7 +630,7 @@ function(arg)
         els[6] := els[5]*els[3];
         els[7] := els[5]*els[5];
         els[8] := els[7]*els[6];
-        vars.E := Order(els[8]);
+        vars.E := RECOG.ProjectiveOrder(els[8]);
         if vars.E <> 67 then
             continue;    # was jmp to CONJUGATE
         fi;
@@ -641,6 +641,9 @@ end;
 
 SLPForElementGenSift := function(ri,x)
   local s,y;
+  GenSift.HasOrderIn := SiftHasOrderInByProjOrder;
+  GenSift.IsOne := IsOneProjective;
+  GenSift.IsEq := IsEqualProjective;
   repeat
       y := GeneralizedSift(ri!.siftrec,x^-1,1/100);
   until y[Length(y)] <> fail;
