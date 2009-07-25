@@ -1,0 +1,263 @@
+
+randomsubproduct:=function(list)
+local len, product, i, eps;
+
+len:=Length(list);
+product:=One(list[1]);
+for i in [1..len] do
+    eps:=Random([0,1]);
+    product:=product*(list[i]^eps);
+od;
+return product;
+end;
+
+
+
+olustur:=function(q)
+local g,gens,gensg,mat,c1,c2,i,x,tensorgens,g1,g2,y;
+g:=GL(2,q);
+gensg:=GeneratorsOfGroup(g);
+gens:=[ ];
+for i in [1..5] do 
+     for x in gensg do
+          mat:=IdentityMat(10,GF(q));
+                   mat[2*i-1][2*i-1]:=x[1][1];
+                   mat[2*i-1][2*i]:=x[1][2];
+                   mat[2*i][2*i-1]:=x[2][1];
+                   mat[2*i][2*i]:=x[2][2];
+          Add(gens,mat);
+      od;
+od;
+c1:=IdentityMat(10,GF(q));
+c1[1][1]:=0*Z(q);
+c1[2][2]:=0*Z(q);
+c1[3][3]:=0*Z(q);
+c1[4][4]:=0*Z(q);
+c1[1][3]:=Z(q)^0;
+c1[2][4]:=Z(q)^0;
+c1[3][1]:=Z(q)^0;
+c1[4][2]:=Z(q)^0;
+c2:=NullMat(10,10,GF(q));
+for i in [1..8] do
+     c2[i][i+2]:=Z(q)^0;
+od;
+c2[9][1]:=Z(q)^0;
+c2[10][2]:=Z(q)^0;
+tensorgens:=[];
+for x in gens do 
+     Add(tensorgens,KroneckerProduct(x,IdentityMat(3,GF(q))));
+od;
+Add(tensorgens,KroneckerProduct(c1,IdentityMat(3,GF(q))));
+Add(tensorgens,KroneckerProduct(c2,IdentityMat(3,GF(q))));
+g2:=SL(3,q);
+for y in GeneratorsOfGroup(g2) do
+     Add(tensorgens,KroneckerProduct(IdentityMat(10,GF(q)),y));
+od;
+g1:=Group(tensorgens);
+return g1;
+end;
+
+create:=function(q)
+local g,gens,gensg,mat,c1,c2,i,x,tensorgens,G;
+g:=GL(2,q);
+gensg:=GeneratorsOfGroup(g);
+gens:=[ ];
+for i in [1..5] do 
+     for x in gensg do
+          mat:=IdentityMat(10,GF(q));
+                   mat[2*i-1][2*i-1]:=x[1][1];
+                   mat[2*i-1][2*i]:=x[1][2];
+                   mat[2*i][2*i-1]:=x[2][1];
+                   mat[2*i][2*i]:=x[2][2];
+          Add(gens,mat);
+      od;
+od;
+c1:=IdentityMat(10,GF(q));
+c1[1][1]:=0*Z(q);
+c1[2][2]:=0*Z(q);
+c1[3][3]:=0*Z(q);
+c1[4][4]:=0*Z(q);
+c1[1][3]:=Z(q)^0;
+c1[2][4]:=Z(q)^0;
+c1[3][1]:=Z(q)^0;
+c1[4][2]:=Z(q)^0;
+c2:=NullMat(10,10,GF(q));
+for i in [1..8] do
+     c2[i][i+2]:=Z(q)^0;
+od;
+c2[9][1]:=Z(q)^0;
+c2[10][2]:=Z(q)^0;
+tensorgens:=[];
+for x in gens do 
+     Add(tensorgens,KroneckerProduct(x,IdentityMat(10,GF(q))));
+     Add(tensorgens,KroneckerProduct(IdentityMat(10,GF(q)),x));
+od;
+#Add(tensorgens,KroneckerProduct(c1,c1));
+Add(tensorgens,KroneckerProduct(c2,IdentityMat(10,GF(q))));
+Add(tensorgens,KroneckerProduct(IdentityMat(10,GF(q)),c2));
+G:=Group(tensorgens);
+return G;
+end;
+
+
+separate:=function(g,N)
+local r, ready, s, t, order, factor, f1, f2, len, cl, cl2, i, count, divisors, x;
+ready:=false;
+count:=0;
+repeat 
+   r:=PseudoRandom(g);
+   order:=ProjectiveOrder(r)[1];
+   factor:=Collected(Factors(order));
+   len:=Length(factor);
+   if len >1 then 
+      f1:=(factor[len][1])^(factor[len][2]);
+      f2:=(factor[len-1][1])^(factor[len-1][2]);
+      s:=r^(order/f1);
+      t:=r^(order/f2);
+      cl:=[s];
+      for i in [1..10] do 
+        Add(cl,s^PseudoRandom(g));
+      od;
+      if ForAll (cl,x->Comm(x,t)=One(x)) then 
+         cl2:=[t];
+         for i in [1..10] do 
+            Add(cl2,t^PseudoRandom(g));
+         od;
+         for i in [1..10] do
+           Add(cl,randomsubproduct(cl)^PseudoRandom(g));
+           Add(cl2,randomsubproduct(cl2)^PseudoRandom(g));
+         od;
+         if ForAll (cl,x->ForAll(cl2,y->Comm(x,y)=One(x))) then
+            ready:=true;
+         fi;
+       fi;
+   fi;
+   count:=count+1;
+until ready or count>N;
+if ready then 
+   for i in [1..2] do
+       r:=PseudoRandom(g);
+       divisors:=DivisorsInt(ProjectiveOrder(r)[1]);
+       for x in divisors do 
+           if CheckAnswer(r^x,cl) then 
+              Add(cl2,r^x);
+           elif CheckAnswer(r^x,cl2) then
+              Add(cl,r^x);
+           fi;
+       od;
+   od;
+   for i in [1..10] do
+       Add(cl,randomsubproduct(cl)^PseudoRandom(g));
+       Add(cl2,randomsubproduct(cl2)^PseudoRandom(g));
+   od;
+   return [Group(cl),Group(cl2)];
+else 
+   return fail;
+fi;
+end;
+
+
+NextStep := function ( g, a )
+
+	 local b, c,g1;
+
+	 b := ProjectiveOrder(g)[1]/a;
+         if b=1 then return fail; fi;
+
+	 if Gcd( b, a ) = 1 then
+	    c := b^-1 mod a;
+Print("b=",b,"  c=",c,"\n");
+            return g^(b*c);
+	 		
+         fi;
+
+	 return fail;
+
+end;
+
+
+CheckAnswer := function( x, Bgens )
+
+	    local y;
+
+	    if x = fail then return false; fi;	    
+	    if Length(Bgens) = 0 then return true; fi;
+	    for y in Bgens do
+	    	if Comm( x, y ) <> Bgens[1]^0 then
+		   return false;
+                fi;
+	    od;
+
+	    return true;
+
+end;
+
+
+TensorDecompose := function( G, g, Agens, Bgens, N)
+
+
+	local  h, a, b, i, B, hs, ans, order;
+
+	    		
+	B := Group( Bgens );
+	a := ProjectiveOrder(g)[1];
+        Print( "aoriginal=",a,"\n");
+        hs := [];
+	for i in [ 1 .. N ] do
+	    h := PseudoRandom( B );
+            order:=ProjectiveOrder(g*h)[1];
+            Add( hs, [h, order ] );
+	    a := Gcd( a, order);
+	od;
+        Print( " a = ", a, "\n" );
+	i := 1;
+        repeat 
+              h := PseudoRandom(B);
+	      a := Gcd( a, ProjectiveOrder( g*h )[1] );
+	      ans := NextStep ( g * h, a);
+#             if ans<>fail then Error(); fi;
+	      if CheckAnswer( ans, Bgens ) then
+		   Print( "i = ", i, "\n" );
+                   if CheckAnswer( g*ans^(-1), Agens) then
+                       return [ans, g*ans^(-1)];
+                   fi;
+	      fi;
+	      i := i + 1;
+        until  i > 1000 * N;
+
+#		h :=  First( hs, i -> Gcd( a, i[2]/a) = 1);
+
+end;
+
+
+writeeuclid:=function(g,r,Agens,Bgens)
+local order,factor,euclid,i,a,parts,b,c,x;
+order:=ProjectiveOrder(r)[1];
+factor:=Collected(Factors(order));
+euclid:=[];
+parts:=[];
+     for i in [1..Length(factor)] do
+           euclid[i]:=order/(factor[i][1])^(factor[i][2]);
+           x:=r^euclid[i];
+           if CheckAnswer(x,Bgens) then
+                       parts[i]:=[x,x^0];
+           elif CheckAnswer(x,Agens) then
+                       parts[i]:=[x^0,x];
+           else 
+                       parts[i]:=TensorDecompose(g,x,Agens,Bgens,100);
+           fi;     
+     od;
+a:=GcdRepresentation(euclid);
+b:=1;
+c:=1;
+      for i in [1..Length(factor)] do
+            b:=b*((parts[i][1])^a[i]);
+            c:=c*((parts[i][2])^a[i]);
+      od;
+      if r=b*c then
+            return [b,c];
+      else
+            return fail;
+      fi;
+end;
+
