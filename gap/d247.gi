@@ -185,6 +185,88 @@ RECOG.IsPower := function(d)
   return l;
 end;
 
+RECOG.SortOutReducibleNormalSubgroup :=
+  function(ri,G,ngens,m)
+    # ngens generators for a proper normal subgroup, m a reducible
+    # MeatAxe module with generators ngens.
+    # This function takes care of the cases to construct a reduction.
+    # Only call this with absolutely irreducible G!
+    # Only call this if we already know that G is not C3!
+
+    local H,a,basis,collf,conjgensG,f,hom,homcomp,homs,homsimg,kro,o,r,subdim;
+
+    f := FieldOfMatrixGroup(G);
+    collf := MTX.CollectedFactors(m);
+    if Length(collf) = 1 then    # only one homogeneous component!
+        if MTX.Dimension(collf[1][1]) = 1 then
+            Error("This should never have happened (345), tell Max.");
+            # This should have been caught by using projective orders.
+            return false;
+        fi;
+        Info(InfoRecog,2,"Restriction to normal subgroup is homogeneous.");
+        if not(MTX.IsAbsolutelyIrreducible(collf[1][1])) then
+            Error("Is this really possible??? G acts absolutely irred!");
+            return false;
+        fi;
+        homs := MTX.Homomorphisms(collf[1][1],m);
+        basis := Concatenation(homs);
+# FIXME: This will go:
+        ConvertToMatrixRep(basis,Size(f));
+        subdim := MTX.Dimension(collf[1][1]);
+        r := rec(t := basis, ti := basis^-1, 
+                 blocksize := MTX.Dimension(collf[1][1]));
+        # Note that we already checked for semilinear, so we know that
+        # the irreducible N-submodule is absolutely irreducible!
+        # Now we believe to have a tensor decomposition:
+        conjgensG := List(GeneratorsOfGroup(G),x->r.t * x * r.ti);
+        kro := List(conjgensG,g->RECOG.IsKroneckerProduct(g,r.blocksize));
+        if not(ForAll(kro,k->k[1] = true)) then
+            Info(InfoRecog,1,"VERY, VERY, STRANGE!");
+            Info(InfoRecog,1,"False alarm, was not a tensor decomposition.");
+            Error("This should never have happened (346), tell Max.");
+            return false;
+        fi;
+    
+        H := GroupWithGenerators(conjgensG);
+        hom := GroupHomByFuncWithData(G,H,RECOG.HomDoBaseChange,r);
+        Sethomom(ri,hom);
+    
+        # Hand down information:
+        forfactor(ri).blocksize := r.blocksize;
+        forfactor(ri).generatorskronecker := kro;
+        Add( forfactor(ri).hints,
+             rec( method := FindHomMethodsProjective.KroneckerProduct, 
+                  rank := 4000, stamp := "KroneckerProduct" ) );
+        # This is an isomorphism:
+        findgensNmeth(ri).method := FindKernelDoNothing;
+        ri!.comment := "_D4TensorDec";
+        return true;
+    fi;
+    Info(InfoRecog,2,"Using action on the set of homogeneous components",
+           " (",Length(collf)," elements)...");
+    # Now find a homogeneous component to act on it:
+    homs := MTX.Homomorphisms(collf[1][1],m);
+    homsimg := BasisVectors(Basis(VectorSpace(f,Concatenation(homs))));
+    homcomp := MutableCopyMat(homsimg);
+# FIXME: This will go:
+ConvertToMatrixRep(homcomp,Size(f));
+    TriangulizeMat(homcomp);
+    o := Orb(G,homcomp,OnSubspacesByCanonicalBasis,rec(storenumbers := true));
+    Enumerate(o,QuoInt(DimensionOfMatrixGroup(G),Length(homcomp)));
+    if not(IsClosed(o)) then
+        Info(InfoRecog,2,"Obviously did not get normal subgroup!");
+        return fail;
+    fi;
+    a := OrbActionHomomorphism(G,o);
+    Sethomom(ri,a);
+    Setmethodsforfactor(ri,FindHomDbPerm);
+    ri!.comment := "_D2Imprimitive";
+    Setimmediateverification(ri,true);
+    findgensNmeth(ri).args[1] := Length(o)+6;
+    findgensNmeth(ri).args[2] := 4;
+    return true;
+  end;
+
 FindHomMethodsProjective.D247 := function(ri,G)
   # We try to produce an element of a normal subgroup by playing 
   # tricks.
@@ -247,74 +329,7 @@ FindHomMethodsProjective.D247 := function(ri,G)
     fi;
     Print("\n");
     Info(InfoRecog,1,"D247: Seem to have found something!");
-    collf := MTX.CollectedFactors(m);
-    if Length(collf) = 1 then    # only one homogeneous component!
-        if MTX.Dimension(collf[1][1]) = 1 then
-            Error("This should never have happened (345), tell Max.");
-            # This should have been caught by using projective orders.
-            return false;
-        fi;
-        Info(InfoRecog,1,"Restriction to H is homogeneous.");
-        if not(MTX.IsAbsolutelyIrreducible(collf[1][1])) then
-            Error("Is this really possible??? G acts absolutely irred!");
-            return false;
-        fi;
-        homs := MTX.Homomorphisms(collf[1][1],m);
-        basis := Concatenation(homs);
-        ConvertToMatrixRep(basis,Size(f));
-        subdim := MTX.Dimension(collf[1][1]);
-        r := rec(t := basis, ti := basis^-1, 
-                 blocksize := MTX.Dimension(collf[1][1]));
-        # Note that we already checked for semilinear, so we know that
-        # the irreducible N-submodule is absolutely irreducible!
-        # Now we believe to have a tensor decomposition:
-        conjgensG := List(GeneratorsOfGroup(G),x->r.t * x * r.ti);
-        kro := List(conjgensG,g->RECOG.IsKroneckerProduct(g,r.blocksize));
-        if not(ForAll(kro,k->k[1] = true)) then
-            Info(InfoRecog,1,"VERY, VERY, STRANGE!");
-            Info(InfoRecog,1,"False alarm, was not a tensor decomposition.");
-            Error("This should never have happened (346), tell Max.");
-            return false;
-        fi;
-    
-        H := GroupWithGenerators(conjgensG);
-        hom := GroupHomByFuncWithData(G,H,RECOG.HomDoBaseChange,r);
-        Sethomom(ri,hom);
-    
-        # Hand down information:
-        forfactor(ri).blocksize := r.blocksize;
-        forfactor(ri).generatorskronecker := kro;
-        Add( forfactor(ri).hints,
-             rec( method := FindHomMethodsProjective.KroneckerProduct, 
-                  rank := 4000, stamp := "KroneckerProduct" ) );
-        # This is an isomorphism:
-        findgensNmeth(ri).method := FindKernelDoNothing;
-        ri!.comment := "_D4TensorDec";
-        return true;
-    fi;
-    Info(InfoRecog,1,"Using action on the set of homogeneous components",
-           " (",Length(collf)," elements)...");
-    # Now find a homogeneous component to act on it:
-    homs := MTX.Homomorphisms(collf[1][1],m);
-    homsimg := BasisVectors(Basis(VectorSpace(f,Concatenation(homs))));
-    homcomp := MutableCopyMat(homsimg);
-# FIXME: This will go:
-ConvertToMatrixRep(homcomp,Size(f));
-    TriangulizeMat(homcomp);
-    o := Orb(G,homcomp,OnSubspacesByCanonicalBasis,rec(storenumbers := true));
-    Enumerate(o,QuoInt(DimensionOfMatrixGroup(G),Length(homcomp)));
-    if not(IsClosed(o)) then
-        Info(InfoRecog,1,"Obviously did not get normal subgroup!");
-        return fail;
-    fi;
-    a := OrbActionHomomorphism(G,o);
-    Sethomom(ri,a);
-    Setmethodsforfactor(ri,FindHomDbPerm);
-    ri!.comment := "_D2Imprimitive";
-    Setimmediateverification(ri,true);
-    findgensNmeth(ri).args[1] := Length(o)+6;
-    findgensNmeth(ri).args[2] := 4;
-    return true;
+    return RECOG.SortOutReducibleNormalSubgroup(ri,G,ngens,m);
   end;   
 
   Print("D247: Trying the involution jumper 9 times...\n");
