@@ -23,6 +23,8 @@ InstallValue( FINDNORMALOPTS, rec(
   NrStepsGiveUpForInvCent := 64,
   # Number of random elements to use for GuessProperness:
   NrElsGuessProperness := 20,
+  # Number of random elements of G to look at orders:
+  NrElsLookAtOrders := 5,
   # Function to determine the order of an element:
   Order := Order,
   # Function to determine equality:
@@ -317,10 +319,13 @@ InstallMethod( FindEvenNormalSubgroup, "for a group object and a record",
   fi;
 
   # Some more preparations:
-  ggens := GeneratorsOfGroup(g);
+  ggens := EmptyPlist(opt.NrElsLookAtOrders);
+  for i in [1..opt.NrElsLookAtOrders] do
+      Add(ggens,Next(opt.pr));
+  od;
   ggenso := List(ggens,opt.Order);
 
-  res := LookAtInvolutions(ggens,opt.pr,opt.invols);
+  res := LookAtInvolutions(GeneratorsOfGroup(g),opt.pr,opt.invols);
   if IsRecord(res) and res.success then
       Info(InfoFindEvenNormal,1,"FindEvenNormalSubgroup:  SUCCESS!");
   else
@@ -331,7 +336,8 @@ end );
 
 FindHomMethodsProjective.FindEvenNormal := function(ri,G)
   local r,rr,f,m,mm;
-  r := FindEvenNormalSubgroup(G,rec( Projective := true ));
+  r := FindEvenNormalSubgroup(G,
+          rec( Projective := true, DoBlindDescent := true));
   if r.success then
       f := FieldOfMatrixGroup(G);
       m := GModuleByMats(r.Ngens,f);
