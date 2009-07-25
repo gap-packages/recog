@@ -20,6 +20,7 @@ ReadPackage("recog","gap/snksetswrsr.gi");
 ReadPackage("recog","gap/blackbox.gi");
 
 # Matrices/Projective:
+ReadPackage("recog","gap/findnormal.gi");
 ReadPackage("recog","gap/matimpr.gi");
 ReadPackage("recog","gap/c6.gi");
 ReadPackage("recog","gap/tensor.gi");

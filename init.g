@@ -20,3 +20,4 @@ ReadPackage("recog","gap/tensor.gd");
 ReadPackage("recog","gap/forms.gd");
 ReadPackage("recog","gap/classical.gd");
 ReadPackage("recog","gap/twoelorders.gd");
+ReadPackage("recog","gap/findnormal.gd");
