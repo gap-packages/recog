@@ -331,7 +331,6 @@ InstallGlobalFunction( RecogniseGeneric,
         ri!.prmem := ProductReplacer(ri!.genswithmem);
 
         # Now create the kernel generators with the stored method:
-        Info(InfoRecog,2,"Creating kernel elements.");
         methgensN := findgensNmeth(ri);
         succ := CallFuncList(methgensN.method,
                              Concatenation([ri],methgensN.args));
