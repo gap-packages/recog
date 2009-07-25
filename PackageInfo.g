@@ -49,6 +49,16 @@ Persons := [
     Place         := "Lewisburg",
     Institution   := "Bucknell University"
   ),
+  rec(
+    LastName      := "Celler",
+    FirstNames    := "Frank",
+    IsAuthor      := true,
+    IsMaintainer  := false,
+    Email         := "frank@celler.de",
+    WWWHome       := "http://www.celler.de/",
+    Place         := "Aachen",
+    Institution   := "Lehrstuhl D fuer Mathematik, RWTH Aachen",
+  ),
   rec( 
     LastName      := "Law",
     FirstNames    := "Maska",
@@ -67,20 +77,36 @@ Persons := [
     Institution   := "University of Western Australia"
   ),
   rec( 
+    LastName      := "Linton",
+    FirstNames    := "Steve",
+    IsAuthor      := true,
+    IsMaintainer  := false,
+    Email         := "sal@cs.st-andrews.ac.uk",
+    WWWHome       := "http://www-circa.mcs.st-and.ac.uk/~sal/",
+    PostalAddress := Concatenation( [
+                       "School of Computer Science\n",
+                       "Jack Cole Building\n",
+                       "North Haugh\n",
+                       "St Andrews, Fife KY16 9SX\n",
+                       "Scotland, UK" ] ),
+    Place         := "St Andrews",
+    Institution   := "University of St Andrews"
+  ),
+  rec( 
     LastName      := "Neunhoeffer",
     FirstNames    := "Max",
     IsAuthor      := true,
     IsMaintainer  := true,
-    Email         := "max.neunhoeffer@math.rwth-aachen.de",
-    WWWHome       := "http://www.math.rwth-aachen.de/~Max.Neunhoeffer",
+    Email         := "neunhoef@mcs.st-and.ac.uk",
+    WWWHome       := "http://www-groups.mcs.st-and.ac.uk/~neunhoef",
     PostalAddress := Concatenation( [
-                       "Max Neunhoeffer\n",
-                       "Lehrstuhl D fuer Mathematik, RWTH Aachen\n",
-                       "Templergraben 64\n",
-                       "52056 Aachen\n",
-                       "Germany" ] ),
-    Place         := "Aachen",
-    Institution   := "RWTH Aachen"
+                       "School of Mathematics and Statistics\n",
+                       "Mathematical Institute\n",
+                       "North Haugh\n",
+                       "St Andrews, Fife KY16 9SS\n",
+                       "Scotland, UK" ] ),
+    Place         := "St Andrews",
+    Institution   := "University of St Andrews"
   ),
   rec( 
     LastName      := "Niemeyer",
@@ -98,6 +124,22 @@ Persons := [
                        "Western Australia" ] ),
     Place         := "Perth",
     Institution   := "University of Western Australia"
+  ),
+  rec(
+    LastName      := "Roney-Dougal",
+    FirstNames    := "Colva M.",
+    IsAuthor      := true,
+    IsMaintainer  := false,
+    Email         := "colva@mcs.st-and.ac.uk",
+    WWWHome       := "http://www-groups.mcs.st-and.ac.uk/~colva",
+    PostalAddress := Concatenation( [
+                       "School of Mathematics and Statistics\n",
+                       "Mathematical Institute\n",
+                       "North Haugh\n",
+                       "St Andrews, Fife KY16 9SS\n",
+                       "Scotland, UK" ] ),
+    Place         := "St Andrews",
+    Institution   := "University of St Andrews"
   ),
   rec( 
     LastName      := "Seress",

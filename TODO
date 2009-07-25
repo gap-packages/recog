@@ -1,10 +1,6 @@
 Do soonish:
 
 example12 no longer seems to work, why?
-FindProperNormalSubgroup...
-ProjDet: more than one nice gen???
-Add Frank Celler, Mark Stather as authors
-See how Akos' students are handled in this way...
 Cleanup tensor.gd  (still needed) and tensor.gi
 Cleanup matrix.gi (e.g. remove det code)
 
@@ -32,8 +28,6 @@ Sooner:
  - SGS Matrix verification
 
 Soon:
- - Involution centralizer method?
- - Play with tensor induced
  - MinBlocks from Steve?
  - Lowindex using derived subgroup?
  - Do something if LowIndex stumbles on non-Absolute irreducible restriction
