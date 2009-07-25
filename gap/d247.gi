@@ -100,7 +100,7 @@ RECOG.DirectFactorsFinder := function(gens,facgens,k,eq)
               i := i + 1;
           od;
           if i > 4 then
-              Info(InfoRecog,1,"D247: did not find non-commuting elements.");
+              Info(InfoRecog,2,"D247: did not find non-commuting elements.");
               return fail;
           fi;
       else
@@ -136,8 +136,7 @@ RECOG.DirectFactorsFinder := function(gens,facgens,k,eq)
   od;
 
   if Length(o) < k then 
-      Info(InfoRecog,1,
-           "Strange, found less direct factors than expected!");
+      Info(InfoRecog,1,"Strange, found less direct factors than expected!");
       return fail;
   fi;
 
@@ -344,34 +343,34 @@ FindHomMethodsProjective.D247 := function(ri,G)
         fi;
         return fail;
     fi;
-    Print("\n");
-    Info(InfoRecog,1,"D247: Seem to have found something!");
+    if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;
+    Info(InfoRecog,2,"D247: Seem to have found something!");
     return RECOG.SortOutReducibleNormalSubgroup(ri,G,ngens,m);
   end;   
 
-  Print("D247: Trying the involution jumper 9 times...\n");
+  Info(InfoRecog,2,"D247: Trying the involution jumper 9 times...");
   f := FieldOfMatrixGroup(G);
   ispower := Length(RECOG.IsPower(DimensionOfMatrixGroup(G))) > 0;
   x := RECOG.InvolutionSearcher(ri!.pr,RECOG.ProjectiveOrder,100);
   if x = fail then
-      Info(InfoRecog,1,"Did not find an involution! Giving up.");
+      Info(InfoRecog,2,"Did not find an involution! Giving up.");
       return fail;
   fi;
 
   for i in [1..9] do
-      Print(".\c");
+      if InfoLevel(InfoRecog) >= 2 then Print(".\c"); fi;
       res := CheckNormalClosure(x);
       if res in [true,false] then return res; fi;
       x := RECOG.InvolutionJumper(ri!.pr,RECOG.ProjectiveOrder,x,100,true);
       if x = fail then 
-          Print("\n");
-          Info(InfoRecog,1,"Involution Jumper failed, giving up!");
+          if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;
+          Info(InfoRecog,2,"Involution Jumper failed, giving up!");
           return fail; 
       fi;
   od;
   res := CheckNormalClosure(x);
   if res in [true,false] then return res; fi;
-  Print("\n");
+  if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;
   Info(InfoRecog,2,"D247: Did not find normal subgroup, giving up.");
   return fail;
 end;

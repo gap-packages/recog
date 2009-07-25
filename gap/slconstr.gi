@@ -2425,10 +2425,10 @@ SLCR.FindHom := function(ri,G,d,q)
   p := p[1];
   GM := GroupWithMemory(G);
   repeat
-      Info(InfoRecog,1,"Trying constructive recognition...");
+      Info(InfoRecog,2,"Trying constructive recognition...");
       data := SLCR.SLDataStructure(GM,p,e,d);
   until data <> fail;
-  Info(InfoRecog,1,"Constructive recognition: success!");
+  Info(InfoRecog,2,"Constructive recognition: success!");
   genlist := List(data.gens,x->x[1]);
   data.slpnice := SLPOfElms(genlist);
   # Now clean out the memory everywhere in data:

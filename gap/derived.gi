@@ -34,7 +34,7 @@ FindHomMethodsProjective.Derived :=
       ri!.derived_mtx := GModuleByMats(GeneratorsOfGroup(ri!.derived),f);
     fi;
     if ForAll(GeneratorsOfGroup(ri!.derived),IsOneProjective) then
-        Info(InfoRecog,1,"Derived subgroup is trivial.");
+        Info(InfoRecog,2,"Derived subgroup is trivial.");
         return false;
     fi;
     if MTX.IsIrreducible(ri!.derived_mtx) then
@@ -51,7 +51,7 @@ FindHomMethodsProjective.Derived :=
             Error("This should never have happened (2), tell Max.");
             # This should have been caught by the triviality test above.
         fi;
-        Info(InfoRecog,1,"Restriction to derived subgroup is homogeneous.");
+        Info(InfoRecog,2,"Restriction to derived subgroup is homogeneous.");
         homs := MTX.Homomorphisms(collf[1][1],ri!.derived_mtx);
         basis := Concatenation(homs);
         ConvertToMatrixRep(basis);
@@ -83,7 +83,7 @@ FindHomMethodsProjective.Derived :=
         findgensNmeth(ri).method := FindKernelDoNothing;
         return true;
     fi;
-    Info(InfoRecog,1,"Using action on the set of homogeneous components",
+    Info(InfoRecog,2,"Using action on the set of homogeneous components",
          " (",Length(collf)," elements)...");
     # Now find a homogeneous component to act on it:
     homs := MTX.Homomorphisms(collf[1][1],ri!.derived_mtx);

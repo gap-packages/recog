@@ -131,7 +131,7 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
       return false;
   fi;
 
-  Info(InfoRecog,1,"Rewriting generators over larger field with smaller",
+  Info(InfoRecog,2,"Rewriting generators over larger field with smaller",
        " degree, factor=",MTX.DegreeSplittingField(m));
 
   r := RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder(m);

@@ -63,7 +63,7 @@ ClassicalForms_ScalarMultipleFrobenius := function( F, M )
     # check: $\forall_i: \bar c_{d-i}c_0=c_i\lambda^i$
     if ForAny([1..Length(I)-1],x->l[x]<>a^QuoInt(I[x],i0)) then
         Info( InfoClassical, 1, 
-         "characteristic polynomial does not reveal scalar\n" );
+              "characteristic polynomial does not reveal scalar" );
       return false;
     fi;
 
@@ -71,7 +71,7 @@ ClassicalForms_ScalarMultipleFrobenius := function( F, M )
     a:=NthRoot(F,a,(qq+1)*i0);
     if a=fail then
         Info( InfoClassical, 1, 
-        "characteristic polynomial does not reveal scalar\n" );
+              "characteristic polynomial does not reveal scalar" );
       return false;
     fi;
     return [i0,a];
@@ -166,14 +166,15 @@ ClassicalForms_ScalarMultipleDual := function( F, M )
     # check: $\forall_i: c_{d-i}c_0=c_i\lambda^i
     if ForAny([1..Length(I)-1],x->(l[x]<>a^QuoInt(I[x],i0))) then
         Info( InfoClassical, 1, 
-          "characteristic polynomial does not reveal scalar\n" );
+              "characteristic polynomial does not reveal scalar" );
       return false;
     fi;
 
     # compute a square root of <alpha>
     a:=NthRoot(F,a,2*i0);
     if a=fail then
-        Info( InfoClassical, 1,"characteristic polynomial does not reveal scalar\n" );
+        Info( InfoClassical, 1,
+              "characteristic polynomial does not reveal scalar" );
       return false;
     fi;
     return [i0,a];
@@ -452,7 +453,7 @@ ClassicalForms_InvariantFormDual := function( module, dmodule )
     elif 1 < Length(hom)  then
         Error( "module acts absolutely irreducibly but two forms found" );
     fi;
-    Info( InfoClassical, 1, "found homomorphism between V and V^*\n" );
+    Info( InfoClassical, 1, "found homomorphism between V and V^*" );
 
     # make sure that the forms commute with the generators of <module>
     scalars  := [];
@@ -467,7 +468,7 @@ ClassicalForms_InvariantFormDual := function( module, dmodule )
         a := m[1][1];
         if m <> a*identity  then
             Info(InfoClassical, 1, 
-                "form is not invariant under all generators\n" );
+                "form is not invariant under all generators" );
             return false;
         fi;
 	    a := NthRoot(field,a,2);
@@ -476,7 +477,7 @@ ClassicalForms_InvariantFormDual := function( module, dmodule )
 
     # check the type of form
     if TransposedMat(form) = -form  then
-        Info(InfoClassical, 1, "form is symplectic\n" );
+        Info(InfoClassical, 1, "form is symplectic" );
         if Characteristic(field) = 2  then
             quad := ClassicalForms_QuadraticForm2(
                 field, form, MTX.Generators(module), scalars );
@@ -493,7 +494,7 @@ ClassicalForms_InvariantFormDual := function( module, dmodule )
             return [ "symplectic", form, scalars ];
         fi;
     elif TransposedMat(form) = form  then
-        Info(InfoClassical, 1, "form is symmetric\n" );
+        Info(InfoClassical, 1, "form is symmetric" );
         quad := ClassicalForms_QuadraticForm( field, form );
         if MTX.Dimension(module) mod 2 = 1  then
             return [ "orthogonalcircle", form, scalars, quad ];
@@ -506,7 +507,7 @@ ClassicalForms_InvariantFormDual := function( module, dmodule )
             fi;
         fi;
     else
-        Info( InfoClassical, 1,"unknown form\n" );
+        Info( InfoClassical, 1,"unknown form" );
         return [ "unknown", "dual", form, scalars ];
     fi;
 end;
@@ -570,7 +571,7 @@ ClassicalForms_InvariantFormFrobenius := function( module, fmodule )
     elif 1 < Length(hom)  then
         Error( "module acts absolutely irreducibly but two form found" );
     fi;
-    Info( InfoClassical, 1,"found homomorphism between V and (V^*)^frob\n" );
+    Info( InfoClassical, 1,"found homomorphism between V and (V^*)^frob" );
 
     # invariant form might return a scalar multiple of our form
     field    := MTX.Field(module);
@@ -596,7 +597,7 @@ ClassicalForms_InvariantFormFrobenius := function( module, fmodule )
         a := m[1][1];
         if m <> a*identity  then
             Info(InfoClassical, 1, 
-                 "form is not invariant under all generators\n" );
+                 "form is not invariant under all generators" );
             return false;
         fi;
         a:=NthRoot(field,a,qq+1);
@@ -607,7 +608,7 @@ ClassicalForms_InvariantFormFrobenius := function( module, fmodule )
     for i  in [ 1 .. Length(form) ]  do
         for j  in [ 1 .. Length(form) ]  do
             if form[i][j]^qq <> form[j][i]  then
-                Info(InfoClassical, 1, "unknown form\n" );
+                Info(InfoClassical, 1, "unknown form" );
                 return [ "unknown", "frobenius", form, scalars ];
             fi;
         od;
@@ -772,7 +773,7 @@ InstallGlobalFunction(ClassicalForms, function( arg )
 
     # <grp> must act absolutely irreducibly
     if not MTX.IsAbsolutelyIrreducible(module)  then	
-        Info( InfoClassical, 1,  "grp not absolutely irreducible\n" );
+        Info( InfoClassical, 1,  "grp not absolutely irreducible" );
         Add( forms.invariantforms, [ "unknown" ] );
         return forms;
     fi;

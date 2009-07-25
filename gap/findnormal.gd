@@ -13,7 +13,7 @@
 #############################################################################
 
 DeclareInfoClass("InfoFindEvenNormal");
-SetInfoLevel(InfoFindEvenNormal,3);
+SetInfoLevel(InfoFindEvenNormal,0);
 
 DeclareGlobalVariable("FINDNORMALOPTS");
 

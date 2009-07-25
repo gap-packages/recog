@@ -327,13 +327,14 @@ FindHomMethodsProjective.TensorDecomposable := function(ri,G)
   # Now assume a tensor factorization exists:
   #Gm := GroupWithMemory(G);???
   N := RECOG.FindTensorKernel(G,true);
-  Info(InfoRecog,1,"TensorDecomposable: I seem to have found a normal subgroup...");
+  Info(InfoRecog,2,
+       "TensorDecomposable: I seem to have found a normal subgroup...");
   r := RECOG.FindTensorDecomposition(G,N);
   if r = fail then
       return fail;
   fi;
   if IsBound(r.orbit) then
-      Info(InfoRecog,1,"Did not find tensor decomposition but orbit.");
+      Info(InfoRecog,2,"Did not find tensor decomposition but orbit.");
       # We did not find a tensor decomposition, but a relatively short orbit:
       hom := ActionHomomorphism(G,r.orbit,OnSubspacesByCanonicalBasis,
                                 "surjective");
@@ -342,7 +343,8 @@ FindHomMethodsProjective.TensorDecomposable := function(ri,G)
       return true;
   fi;
   
-  Info(InfoRecog,1,"TensorDecomposable: I seem to have found a tensor decomposition.");
+  Info(InfoRecog,2,
+       "TensorDecomposable: I seem to have found a tensor decomposition.");
 
   # Now we believe to have a tensor decomposition:
   conjgensG := List(GeneratorsOfGroup(G),x->r.t * x * r.ti);
@@ -420,7 +422,7 @@ end;
 #   Nsmall := GroupWithGenerators(gensNsmall);
 # 
 #   # Now try to recognise the small matrix group:
-#   Info(InfoRecog,1,"Going to the kernel...");
+#   Info(InfoRecog,2,"Going to the kernel...");
 #   riker := RecogniseGeneric(Nsmall,FindHomDbMatrix,ri!.depth+1);
 #   if not(IsReady(riker)) then
 #       return fail;
@@ -474,7 +476,7 @@ end;
 #                             FindHomDbMatrix,ri!.depth+1);
 # 
 #   if not(IsReady(rifac)) then
-#       Info(InfoRecog,1,"Failed to recognise collapsed group, giving up.");
+#       Info(InfoRecog,2,"Failed to recognise collapsed group, giving up.");
 #       return fail;
 #   fi;
 # 

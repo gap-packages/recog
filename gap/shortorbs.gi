@@ -229,7 +229,7 @@ RECOG.ShortOrbitsInterestingVectors := function(g)
       od;
       Add(v,vv);
   od;
-  Info(InfoRecog,2,"Have eigenspaces.");
+  Info(InfoRecog,3,"Have eigenspaces.");
   # Now collect a list of all those spaces together with all possible intersects
   w := [];
   for i in [1..Length(l)] do
@@ -259,7 +259,7 @@ RECOG.ShortOrbitsInterestingVectors := function(g)
   end;
   Sort(w,sortfun);
   wb := List(w,ww->Basis(ww[1])[1]);
-  Info(InfoRecog,2,"Have ",Length(wb)," vectors for possibly short orbits.");
+  Info(InfoRecog,3,"Have ",Length(wb)," vectors for possibly short orbits.");
   return wb;
 end;
 
@@ -300,7 +300,7 @@ FindHomMethodsMatrix.ShortOrbits := function(ri,g)
   repeat
       found := RECOG.MyOrbitWork(o[i],limit);
       if Length(o[i].orbit) = 1 then
-          Info(InfoRecog,2,"Orbit Number ",i," has length 1.");
+          Info(InfoRecog,3,"Orbit Number ",i," has length 1.");
           found := false;
           # Now throw away this orbit:
           ThrowAwayOrbit(i);
@@ -309,15 +309,15 @@ FindHomMethodsMatrix.ShortOrbits := function(ri,g)
           i := i + 1;
       fi;
       if i > nrorbs then
-        Info(InfoRecog,2,"Done ",nrorbs," orbit(s) to limit ",limit,".");
+        Info(InfoRecog,3,"Done ",nrorbs," orbit(s) to limit ",limit,".");
         limit := limit * 2;
         if limit > RECOG.ShortOrbitsOrbLimit then
-            Info(InfoRecog,2,"Limit reached, giving up.");
+            Info(InfoRecog,3,"Limit reached, giving up.");
             return fail;
         fi;
         i := 1;
         if nrorbs < i then
-            Info(InfoRecog,2,"No orbits left, giving up.");
+            Info(InfoRecog,3,"No orbits left, giving up.");
             return fail;
         fi;
         if nrorbs > 1 then
@@ -325,7 +325,7 @@ FindHomMethodsMatrix.ShortOrbits := function(ri,g)
         fi;
       fi;
   until found;
-  Info(InfoRecog,2,
+  Info(InfoRecog,3,
        "Found orbit of length ",Length(o[i].orbit)," (#",i,").");
 
   o := o[i];    # the others are no longer needed
@@ -334,7 +334,7 @@ FindHomMethodsMatrix.ShortOrbits := function(ri,g)
   imggrp := Group(imgperms);
   data := rec( source := g, range := imggrp, orb := o );
   hom := GroupHomByFuncWithData(g,imggrp,RECOG.ShortOrbitsHomFunc, data);
-  Info(InfoRecog,2,"Finished building homomorphism.");
+  Info(InfoRecog,3,"Finished building homomorphism.");
 
   Sethomom(ri,hom);
   Setmethodsforfactor(ri,FindHomDbPerm);

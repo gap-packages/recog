@@ -431,31 +431,31 @@ end;
 #        return IdentityMat(d, GF(q));
 #    fi;
     
-    Info( InfoClassical, 2, "finding v1\n");
+    Info( InfoClassical, 2, "finding v1");
     v1 := FindVec();
-    Info( InfoClassical, 2, "finding v4\n");
+    Info( InfoClassical, 2, "finding v4");
     v4 := FindVec();
     while v1 * phi * v4 = 0 * v1[1] do
         v4 := FindVec();
     od;
     v4 := -v4/(v1*phi*v4);
-    Info( InfoClassical, 2, "finding v2\n");
+    Info( InfoClassical, 2, "finding v2");
     v2 := FindVec();
     while v1 * phi * v2 <> 0 * v1[1] or 
           v4 * phi * v2 <> 0 * v1[1] do
         v2 := FindVec();
     od;
-    Info( InfoClassical, 2, "finding v3\n");
+    Info( InfoClassical, 2, "finding v3");
     v3 := FindVec();
     while v1 * phi * v3 <> 0 * v1[1] or 
           v2 * phi * v3 = 0*v1[1] or
           v4 * phi * v3 <> 0 * v1[1] do
         v3 := FindVec();
-    Info( InfoRecog, 1, ".");
+    Info( InfoClassical, 1, ".");
     od;
     v3 := v3/(v2*phi*v3);
 
-    Info( InfoRecog, 1, "found all\n");
+    Info( InfoClassical, 1, "found all");
     return [v1, v2, v3, v4];
 
 end;
@@ -484,7 +484,7 @@ end;
 #        return IdentityMat(d, GF(q));
 #    fi;
     
-    Info( InfoClassical, 2, "finding v1\n");
+    Info( InfoClassical, 2, "finding v1");
     v1 := FindVec();
     v3 := FindVec();
     while (v1+v3) * qf * (v1+v3) = 0 * v1[1] do
@@ -498,7 +498,7 @@ end;
         v2 := FindVec();
     od;
     
-    Info( InfoClassical, 2, "finding v4\n");
+    Info( InfoClassical, 2, "finding v4");
     v4 := FindVec();
     while (v1+v4) * qf * (v1+v4) <> 0 * v1[1] or
           (v2+v4) * qf * (v2+v4) = 0 * v1[1] or
@@ -803,7 +803,7 @@ RECOG.IsNotMathieu := function( recognise, grp )
     fi;
 
    if not [d, q]  in [ [5, 3], [6,3], [11, 2] ] then
-       Info( InfoClassical, 2, "G' is not a Mathieu group;\n");
+       Info( InfoClassical, 2, "G' is not a Mathieu group;");
        recognise.isNotMathieu := true;
        return false;
    fi;
@@ -811,13 +811,13 @@ RECOG.IsNotMathieu := function( recognise, grp )
    if d  in [5, 6] then
        ord := Order(g);
        if (ord mod 121=0 or (d=5 and ord=13) or (d=6 and ord=7)) then
-          Info( InfoClassical, 2, "G' is not a Mathieu group;\n");
+          Info( InfoClassical, 2, "G' is not a Mathieu group;");
           recognise.isNotMathieu := true; 
           return false;
        fi;
    else
        if ForAny([6,7,8,9],m-> m in E) then
-          Info( InfoClassical, 2, "G' is not a Mathieu group;\n");
+          Info( InfoClassical, 2, "G' is not a Mathieu group;");
            recognise.isNotMathieu := true; 
            return false;
        fi;
@@ -1071,7 +1071,7 @@ RECOG.TestRandomElement := function (recognise, grp)
             else 
                 bc := FindBaseC2 (d, q, recognise.QuadraticForm);
                 Info(InfoClassical,2,
-                     "Computed base change matrix for char 2\n");
+                     "Computed base change matrix for char 2");
                 bc := bc^-1;
                 recognise.bc := bc;
             fi;
@@ -1104,7 +1104,7 @@ RECOG.TestRandomElement := function (recognise, grp)
             kf := recognise.kf;
             o1 := ProjectiveOrder( kf[1] )[1];
             o2 := ProjectiveOrder( kf[2] )[1];
-            Info(InfoClassical,2,o1, " ", o2, "\n");
+            Info(InfoClassical,2,o1, " ", o2);
             ### ACN March 2007 needed Projective order
             ### and test that orders are bigger than 2 or 4
             if  q mod 2 = 0 and (o1 <= 2 or o2 <= 2) then 
@@ -1328,12 +1328,12 @@ RECOG.IsSLContained := function( recognise, grp )
     if "linear" in recognise.ClassicalForms then
         recognise.IsSLContained := true;
         Info(InfoClassical,2,"The group contains SL(", recognise.d, ", ",
-        recognise.q, ");");
+             recognise.q, ");");
         return true;
     else
         recognise.IsSLContained := false;
         Info(InfoClassical,2,"The group does not contain SL(", 
-        recognise.d, ", ", recognise.q, ");");
+             recognise.d, ", ", recognise.q, ");");
         return false;
     fi;
 
@@ -1381,12 +1381,12 @@ RECOG.IsSpContained := function( recognise, grp )
         recognise.IsSpContained := true;
         recognise.isNotExt := true;
         Info(InfoClassical,2,"The group contains Sp(", recognise.d, ", ",
-        recognise.q, ");");
+             recognise.q, ");");
         return true;
     else
         recognise.IsSpContained := false;
         Info(InfoClassical,2,"The group does not contain Sp(", 
-        recognise.d, ", ", recognise.q, ");");
+             recognise.d, ", ", recognise.q, ");");
         return false;
     fi;
 end;
@@ -1439,12 +1439,12 @@ RECOG.IsSUContained := function( recognise, grp )
     if "unitary" in recognise.ClassicalForms then
         recognise.IsSUContained := true;
         Info(InfoClassical,2,"The group contains SU(", recognise.d, ", ",
-        recognise.q, ");");
+             recognise.q, ");");
         return true;
     else
         recognise.IsSUContained := false;
         Info(InfoClassical,2,"The group does not contain SU(", 
-        recognise.d, ", ", recognise.q, ");");
+             recognise.d, ", ", recognise.q, ");");
         return false;
     fi;
 end;
@@ -1495,7 +1495,7 @@ RECOG.IsSOContained := function( recognise, grp )
         recognise.isNotExt := true;
         recognise.IsSOContained := true;
         Info(InfoClassical,2,"The group contains SO^o(", recognise.d, ", ",
-        recognise.q, ");");
+             recognise.q, ");");
         return true;
 
     elif "orthogonalplus" in recognise.ClassicalForms then
@@ -1504,7 +1504,7 @@ RECOG.IsSOContained := function( recognise, grp )
         recognise.isNotExt := true;
         recognise.IsSOContained := true;
         Info(InfoClassical,2,"The group contains SO+(", recognise.d, ", ",
-        recognise.q, ");");
+             recognise.q, ");");
         return true;
 
     elif "orthogonalminus" in recognise.ClassicalForms then
@@ -1513,12 +1513,12 @@ RECOG.IsSOContained := function( recognise, grp )
         recognise.isNotExt := true;
         recognise.IsSOContained := true;
         Info(InfoClassical,2,"The group contains SO-(", recognise.d, ", ",
-        recognise.q, ");");
+             recognise.q, ");");
         return true;
     else
         recognise.IsSOContained := false;
         Info(InfoClassical,2,"The group does not contain SO(", 
-        recognise.d, ", ", recognise.q, ");");
+             recognise.d, ", ", recognise.q, ");");
         return false;
     fi;
 end;
@@ -1569,7 +1569,7 @@ RECOG.NonGenericLinear := function( recognise, grp )
         fi;
         Info(InfoClassical,2,"The group is not generic");
         Info(InfoClassical,2,"and contains SL(", recognise.d, ", ",
-        recognise.q, ");");
+             recognise.q, ");");
         recognise.IsSLContained := true;
         return true;
     end;
@@ -1619,7 +1619,7 @@ RECOG.NonGenericSymplectic := function(recognise, grp)
         fi;
         Info(InfoClassical,2,"The group is not generic");
         Info(InfoClassical,2,"and contains Sp(", recognise.d, ", ",
-        recognise.q, ");");
+             recognise.q, ");");
         recognise.IsSpContained := true;
         return true;
     end;
@@ -1724,7 +1724,7 @@ RECOG.NonGenericUnitary := function(recognise, grp)
             return fail;
         fi;
          Info(InfoClassical,2,"group contains SU(", 
-          recognise.d, ", ", recognise.q, ");");
+              recognise.d, ", ", recognise.q, ");");
         recognise.isSpContained := true;
 
         recognise.IsSUContained := true;
@@ -1832,8 +1832,8 @@ RECOG.NonGenericUnitary := function(recognise, grp)
             if PositionProperty( GeneratorsOfGroup(grp), 
                 h-> (Comm(h,recognise.g^3) <> One(grp))) <> fail then
                 Info( InfoClassical,2, 
-            "Cube of element of order div by 6 is not central" );
-                 recognise.hasSpecialEle := true;
+                      "Cube of element of order div by 6 is not central" );
+                      recognise.hasSpecialEle := true;
                 return CheckFlag();
              fi;
         else return CheckFlag();
@@ -1847,9 +1847,9 @@ RECOG.NonGenericUnitary := function(recognise, grp)
             if PositionProperty( GeneratorsOfGroup(grp), 
             h-> (Comm(h,recognise.g) <> One(grp))) <> fail then
                 Info( InfoClassical,2, 
-                "The element of order 5 is not central" );
-                 recognise.hasSpecialEle := true;
-                 return CheckFlag();
+                      "The element of order 5 is not central" );
+                recognise.hasSpecialEle := true;
+                return CheckFlag();
             fi;
         else return CheckFlag();
         fi;
@@ -1861,9 +1861,9 @@ RECOG.NonGenericUnitary := function(recognise, grp)
             if Order(recognise.g) mod 8 <> 0 then return fail; fi;
             g := recognise.g^(Order(recognise.g)/2);
             if PositionProperty( GeneratorsOfGroup(grp), 
-                h-> (Comm(h,g) <> One(grp))) <> fail then
+                                 h-> (Comm(h,g) <> One(grp))) <> fail then
                 Info( InfoClassical,2, 
-                "involution in cyclic subgroup  of order 8 is not central" );
+                  "involution in cyclic subgroup  of order 8 is not central" );
                 recognise.hasSpecialEle := true;
                 return CheckFlag();
              fi;
@@ -1922,7 +1922,7 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
             return fail;
         fi;
         Info(InfoClassical,2,"group contains SO+(", 
-        recognise.d, ", ", recognise.q, ");");
+             recognise.d, ", ", recognise.q, ");");
 
         recognise.IsSOContained := true;
         return true;
@@ -2030,7 +2030,7 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
         gp1 := Group(recognise.sq1);
         gp2 := Group(recognise.sq2);
         Info(InfoClassical,2,"Group projects to group of order ",
-        Size(gp1/recognise.scalars), "x", Size(gp2/recognise.scalars),"\n");
+             Size(gp1/recognise.scalars), "x", Size(gp2/recognise.scalars));
         if Size(gp1/recognise.scalars) mod 6 = 0 and
            Size(gp2/recognise.scalars) mod 6 = 0 then
                 return CheckFlag();
@@ -2047,7 +2047,7 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
         gp1 := Group(recognise.sq1);
         gp2 := Group(recognise.sq2);
         Info(InfoClassical,2,"Group projects to group of order ",
-        Size(gp1/recognise.scalars), "x", Size(gp2/recognise.scalars),"\n");
+             Size(gp1/recognise.scalars), "x", Size(gp2/recognise.scalars));
         if Size(gp1/recognise.scalars) mod 12 = 0 and
            Size(gp2/recognise.scalars) mod 12 = 0 then
                 return CheckFlag();
@@ -2068,7 +2068,7 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
         gp1 := Group(recognise.sq1);
         gp2 := Group(recognise.sq2);
         Info(InfoClassical,2,"Group projects to group of order ",
-        Size(gp1/recognise.scalars), "x", Size(gp2/recognise.scalars),"\n");
+             Size(gp1/recognise.scalars), "x", Size(gp2/recognise.scalars));
         if Size(gp1/recognise.scalars) mod 3 = 0 and
            Size(gp2/recognise.scalars) mod 3 = 0 then
                 return CheckFlag();
@@ -2094,7 +2094,7 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
         gp1 := Group(recognise.sq1);
         gp2 := Group(recognise.sq2);
         Info(InfoClassical,2,"Group projects to group of order ",
-        Size(gp1/recognise.scalars), "x", Size(gp2/recognise.scalars),"\n");
+             Size(gp1/recognise.scalars), "x", Size(gp2/recognise.scalars));
         if Size(gp1/recognise.scalars) mod 168 = 0 and
            Size(gp2/recognise.scalars) mod 168 = 0 then
                 return CheckFlag();
@@ -2109,7 +2109,7 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
         fi;
     else
         Info(InfoClassical, 2,
-           "NonGenericO+: d and q must have  been be generic");  
+             "NonGenericO+: d and q must have  been be generic");  
         return false;
     fi;
      
@@ -2132,7 +2132,7 @@ RECOG.NonGenericOrthogonalMinus := function(recognise, grp)
             return fail;
         fi;
         Info(InfoClassical,2,"group contains SO-(", 
-        recognise.d, ", ", recognise.q, ");");
+             recognise.d, ", ", recognise.q, ");");
         recognise.IsSOContained := true;
         return true;
     end;
@@ -2201,12 +2201,12 @@ RECOG.NonGenericOrthogonalMinus := function(recognise, grp)
                 fi;
             fi;
         od;
-        Info(InfoClassical, 2, "grp contained in O-(2,", q,  "^2)\n" );
+        Info(InfoClassical, 2, "grp contained in O-(2,", q,  "^2)" );
         recognise.isNotExt := false;
         recognise.isSOContained := false;
         return false;
     else
-      Info(InfoClassical, 2, "NonGenericO-: d and q must be generic\n" );
+      Info(InfoClassical, 2, "NonGenericO-: d and q must be generic" );
         return false;
     fi;
 
@@ -2233,7 +2233,7 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
             return fail;
         fi;
         Info(InfoClassical,2,"group contains SOo(", 
-        recognise.d, ", ", recognise.q, ");");
+             recognise.d, ", ", recognise.q, ");");
         recognise.IsSOContained := true;
         return true;
     end;
@@ -2335,7 +2335,7 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
             return fail; 
         fi; 
     else
-       Info(InfoClassical, 2, "NonGenericOo: d and q must be generic\n" );
+       Info(InfoClassical, 2, "NonGenericOo: d and q must be generic" );
         return false;
     fi;
 

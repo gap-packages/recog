@@ -136,7 +136,7 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
       return false;
   fi;
 
-  Info(InfoRecog,1,"Rewriting generators over larger field with smaller",
+  Info(InfoRecog,2,"Rewriting generators over larger field with smaller",
        " degree, factor=",MTX.DegreeSplittingField(m));
 
   r := RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder(m);
@@ -369,7 +369,7 @@ FindHomMethodsProjective.Subfield :=
     pf := PrimeField(f);
     b := RECOG.BaseChangeForSmallestPossibleField(G,ri!.meataxemodule,f);
     if b <> fail then
-        Info(InfoRecog,1,"Conjugating group from GL(",dim,",",f,
+        Info(InfoRecog,2,"Conjugating group from GL(",dim,",",f,
              ") into GL(",dim,",",b.field,").");
         # Do base change isomorphism:
         H := GroupWithGenerators(b.newgens);
@@ -559,7 +559,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
                     # commutators with all generators are scalar, this
                     # gives us a reduction, regardless whether G' is in
                     # fact scalar or not!
-      Info( InfoRecog, 2, "Suspect that G' is scalar, checking..." );
+      Info( InfoRecog, 3, "Suspect that G' is scalar, checking..." );
       i := 1;
       while RECOG.IsScalarMat(gens[i]) <> false do i := i + 1; od;
       # It cannot happen that all matrices are scalar, because then
@@ -573,7 +573,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
               if RECOG.IsScalarMat(x) = false then
                   Add(coms,x);
                   scalar := false;
-                  Info( InfoRecog, 2, "NO! G' is not scalar after all!" );
+                  Info( InfoRecog, 3, "NO! G' is not scalar after all!" );
                   break;
               fi;
           fi;
@@ -581,7 +581,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
       od;
       if scalar then   # otherwise fall through and go on
           # gens[i] is not central but all Comm(gens[i],gens[j]) are.
-          Info( InfoRecog, 1, "We found a homomorphism by commutators." );
+          Info( InfoRecog, 2, "We found a homomorphism by commutators." );
           r := rec( x := gens[i] );
           gensim := List(gens,x->RECOG.HomCommutator(r,x));
           H := GroupWithGenerators(gensim);
@@ -597,7 +597,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
   pr2 := ProductReplacer(GeneratorsOfGroup(G),rec(noaccu := true));
   pr := ProductReplacer(coms,rec(normalin := pr2));
   nr := Minimum(Maximum(5,QuoInt(dim*Log2Int(Size(f)),20)),40);
-  Info( InfoRecog, 2, "C3C5: computing ",nr," generators for N...");
+  Info( InfoRecog, 3, "C3C5: computing ",nr," generators for N...");
   Hgens := ShallowCopy(coms);
   for i in [1..nr] do
       Add(Hgens,Next(pr));
@@ -623,13 +623,13 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
       if not(IsPrimeField(f)) then
           b := RECOG.BaseChangeForSmallestPossibleField(H,m,f);
           if b <> fail then   # Yes! N is realisable!
-                Info(InfoRecog,1,"Can conjugate H subgroup from GL(",dim,
+                Info(InfoRecog,2,"Can conjugate H subgroup from GL(",dim,
                      ",",f,") into GL(",dim,",",b.field,").");
                 # Now do base change for generators of G:
               newgens := List(gens,x->b.t*x*b.ti);
               r := RECOG.ScalarsToMultiplyIntoSmallerField(newgens,f);
               if r <> fail then   # Yes again! This works!
-                  Info(InfoRecog,1,"Conjugating group from GL(",dim,",",f,
+                  Info(InfoRecog,2,"Conjugating group from GL(",dim,",",f,
                        ") into GL(",dim,",",r.field,").");
             
                   # Set up an isomorphism:
@@ -645,14 +645,14 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
           fi;
       fi;
       # We now know that G is not C5!
-      Info(InfoRecog,1,"G is not C5 (subfield).");
+      Info(InfoRecog,2,"G is not C5 (subfield).");
 
       # Check whether m is not absolutely irreducible, then G is C3,
       # otherwise not!
       if MTX.IsAbsolutelyIrreducible(m) then
           # We fail, G is neither C3 nor C5, and we do not find a way
           # for any reduction using H:
-          Info(InfoRecog,1,"G is not C3 (semilinear).");
+          Info(InfoRecog,2,"G is not C3 (semilinear).");
           return false;
       fi;
 
@@ -683,7 +683,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
           fi;
           Add(gensim,cyc^cc[pos]);
       od;
-      Info( InfoRecog, 1, "G is C3, found action as field auts of size ",
+      Info( InfoRecog, 2, "G is C3, found action as field auts of size ",
             deg,".");
       HH := GroupWithGenerators(gensim);
       hom := GroupHomByFuncWithData(G,HH,RECOG.HomActionFieldAuto,
@@ -713,7 +713,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
               # This should have been caught by the scalar test above.
               return false;
           fi;
-          Info(InfoRecog,1,"Restriction to H is homogeneous.");
+          Info(InfoRecog,2,"Restriction to H is homogeneous.");
           if not(MTX.IsAbsolutelyIrreducible(collf[1][1])) then
               Error("Is this really possible??? G acts absolutely irred!");
               return false;
@@ -750,7 +750,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
           findgensNmeth(ri).method := FindKernelDoNothing;
           return true;
       fi;
-      Info(InfoRecog,1,"Using action on the set of homogeneous components",
+      Info(InfoRecog,2,"Using action on the set of homogeneous components",
            " (",Length(collf)," elements)...");
       # Now find a homogeneous component to act on it:
       homs := MTX.Homomorphisms(collf[1][1],m);

@@ -43,7 +43,7 @@ FindHomMethodsMatrix.DiagonalMatrices := function(ri, G)
 
   d := DimensionOfMatrixGroup(G);
   if d = 1 then
-      Info(InfoRecog,1,"Found dimension 1, going to Scalars method");
+      Info(InfoRecog,2,"Found dimension 1, going to Scalars method");
       return FindHomMethodsMatrix.Scalar(ri,G);
   fi;
 
@@ -102,7 +102,7 @@ end;
 #  local H,d,dets,gens,hom;
 #  d := DimensionOfMatrixGroup(G);
 #  if d = 1 then
-#      Info(InfoRecog,1,"Found dimension 1, going to Scalar method");
+#      Info(InfoRecog,2,"Found dimension 1, going to Scalar method");
 #      return FindHomMethodsMatrix.Scalar(ri,G);
 #  fi;
 #
@@ -379,7 +379,7 @@ FindHomMethodsMatrix.ReducibleIso := function(ri,G)
   compseries := MTX.BasesCompositionSeries(m);
   bc := RECOG.FindAdjustedBasis(compseries);
 
-  Info(InfoRecog,1,"Found composition series with block sizes ",
+  Info(InfoRecog,2,"Found composition series with block sizes ",
        List(bc.blocks,Length)," (dim=",DimensionOfMatrixGroup(G),")");
 
   # Do the base change:
@@ -732,16 +732,16 @@ end;
 #  o := Orbit(G,w,OnRight);
 #  hom := ActionHomomorphism(G,o,OnRight);
 #
-#  Info(InfoRecog,1,"Found orbit of length ",Length(o),".");
+#  Info(InfoRecog,2,"Found orbit of length ",Length(o),".");
 #  if Length(o) >= d then
 #      l := Minimum(Length(o),3*d);
 #      r := RankMat(o{[1..l]});
 #      if r = d then
 #          # We proved that it is an isomorphism:
 #          findgensNmeth(ri).method := FindKernelDoNothing;
-#          Info(InfoRecog,1,"Spans rowspace ==> found isomorphism.");
+#          Info(InfoRecog,2,"Spans rowspace ==> found isomorphism.");
 #      else 
-#          Info(InfoRecog,2,"Rank of o{[1..3*d]} is ",r,".");
+#          Info(InfoRecog,3,"Rank of o{[1..3*d]} is ",r,".");
 #      fi;
 #  fi;
 #
@@ -911,7 +911,7 @@ FindHomMethodsMatrix.LookAtOrders := function(ri,G)
       x := PseudoRandom(G);
       o := Order(x);
       AddSet(ordersseen,o);
-      Info(InfoRecog,2,"Found order: ",String(o,3)," (element #",i,")");
+      Info(InfoRecog,3,"Found order: ",String(o,3)," (element #",i,")");
       l := Filtered(l,i->o in SporadicsElementOrders[i]);
       if l = [] then
           LastRecognisedSporadic := fail;
@@ -930,7 +930,7 @@ FindHomMethodsMatrix.LookAtOrders := function(ri,G)
           for k in [1..Length(SporadicsElementOrders[jj])] do
               if not(SporadicsElementOrders[jj][k] in ordersseen) and
                  (1-SporadicsProbabilities[jj][k])^i < limit then
-                  Info(InfoRecog,2,"Have thrown out ",SporadicsNames[jj],
+                  Info(InfoRecog,3,"Have thrown out ",SporadicsNames[jj],
                        " (did not see order ",
                        SporadicsElementOrders[jj][k],")");
                   raus := true;
@@ -943,7 +943,7 @@ FindHomMethodsMatrix.LookAtOrders := function(ri,G)
                  and (1-Sum(SporadicsProbabilities[jj]{killers}))^i < 10^-5 then
                   raus := true;
                   break;
-                  Info(InfoRecog,2,"Have thrown out ",SporadicsNames[jj],
+                  Info(InfoRecog,3,"Have thrown out ",SporadicsNames[jj],
                        " (did not see orders in ",
                        SporadicsElementOrders[jj]{killers},")");
               fi;
@@ -960,27 +960,27 @@ FindHomMethodsMatrix.LookAtOrders := function(ri,G)
           return false;
       fi;
       if Length(l) = 1 and i > 80 then
-          Info(InfoRecog,1,"I guess that this is the sporadic simple ",
+          Info(InfoRecog,2,"I guess that this is the sporadic simple ",
                "group ",SporadicsNames[l[1]],".");
           res := LookupHintForSimple(ri,G,SporadicsNames[l[1]]);
           if res = true then return res; fi;
           if IsBound(SporadicsWorkers[l[1]]) then
-              Info(InfoRecog,1,"Calling its installed worker...");
+              Info(InfoRecog,2,"Calling its installed worker...");
               return SporadicsWorkers[l[1]](SporadicsNames[l[1]],
                                             SporadicsSizes[l[1]],ri,G);
           fi;
-          Info(InfoRecog,1,"However, I cannot verify this.");
+          Info(InfoRecog,2,"However, I cannot verify this.");
           LastRecognisedSporadic := SporadicsNames[l[1]];
           return false;
       fi;
       if Length(l) < 6 then
-          Info(InfoRecog,2,"Possible sporadics left: ",
+          Info(InfoRecog,3,"Possible sporadics left: ",
                SporadicsNames{l});
       else
-          Info(InfoRecog,2,"Possible sporadics left: ",Length(l));
+          Info(InfoRecog,3,"Possible sporadics left: ",Length(l));
       fi;
   od;
-  Info(InfoRecog,1,"Giving up, still possible Sporadics: ",
+  Info(InfoRecog,2,"Giving up, still possible Sporadics: ",
        SporadicsNames{l});
   LastRecognisedSporadic := fail;
   return false;

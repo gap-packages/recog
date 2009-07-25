@@ -667,7 +667,7 @@ FindHomMethodsProjective.Subfield :=
     pf := PrimeField(f);
     b := SUBFIELD.BaseChangeForSmallestPossibleField(G,ri!.meataxemodule,f);
     if b <> fail then
-        Info(InfoRecog,1,"Conjugating group from GL(",dim,",",f,
+        Info(InfoRecog,2,"Conjugating group from GL(",dim,",",f,
              ") into GL(",dim,",",b.field,").");
         # Do base change isomorphism:
         H := GroupWithGenerators(b.newgens);
@@ -679,27 +679,27 @@ FindHomMethodsProjective.Subfield :=
     fi;
 
     # Now look at the derived subgroup:
-    Info(InfoRecog,1,"Computing derived subgroup...");
+    Info(InfoRecog,2,"Computing derived subgroup...");
     Gprime := RECOG.DerivedSubgroupMonteCarlo(G);
     mo := GModuleByMats(GeneratorsOfGroup(Gprime),f);
     if not(MTX.IsIrreducible(mo)) then
         # Handle reducible case
         ri!.derived := Gprime;
         ri!.derived_mtx := mo;
-        Info(InfoRecog,1,"Reducible derived subgroup, we give up here, ",
+        Info(InfoRecog,2,"Reducible derived subgroup, we give up here, ",
              "others will continue this...");
         return false;    # the derived subgroup method will follow!
     else
         # Try with derived subgroup:
         b := SUBFIELD.BaseChangeForSmallestPossibleField(Gprime,mo,f);
         if b = fail then return false; fi;    # not our case
-        Info(InfoRecog,1,"Can conjugate derived subgroup from GL(",dim,
+        Info(InfoRecog,2,"Can conjugate derived subgroup from GL(",dim,
              ",",f,") into GL(",dim,",",b.field,").");
         # Now do base change for generators of G:
         newgens := List(GeneratorsOfGroup(G),x->b.t*x*b.ti);
         r := SUBFIELD.ScalarsToMultiplyIntoSmallerField(newgens,f);
         if r = fail then return false; fi;
-        Info(InfoRecog,1,"Conjugating group from GL(",dim,",",f,
+        Info(InfoRecog,2,"Conjugating group from GL(",dim,",",f,
              ") into GL(",dim,",",r.field,").");
 
         # Set up an isomorphism:

@@ -92,7 +92,7 @@ RECOG.CommonDiagonal2:=function(r,n,q,rad)
     local xxx,newq,es,nicebasis,blocksizes,i,mat,sum,newblocksizes,newnicebasis,
           x,y,size;
 
-    Info(InfoRecog,2,"C6: enter new diagonalization");
+    Info(InfoRecog,3,"C6: enter new diagonalization");
     xxx:=Runtime();
 
     if r=2 and (q mod 4) =3 then 
@@ -134,7 +134,7 @@ RECOG.CommonDiagonal2:=function(r,n,q,rad)
       fi;
     od;
 
-    Info(InfoRecog,2,Runtime()-xxx,"exit new diagonalization");
+    Info(InfoRecog,3,Runtime()-xxx,"exit new diagonalization");
 
     return nicebasis;
 end;
@@ -147,7 +147,7 @@ end;
 RECOG.RadBasis:=function(r,n,q,rad)
     local s, i, nicebasis, niceinv, diagrad,  action, blocks, f, xxx, xxy;
 
-    Info(InfoRecog,2,"Reached Radbasis");
+    Info(InfoRecog,3,"Reached Radbasis");
     if Length(rad)=0 then 
        return [ [],[],[],[] ]; 
     fi;
@@ -182,7 +182,7 @@ fi;
     blocks := ShallowCopy(nicebasis);
     SortParallel( action, blocks, f );
 
-    Info(InfoRecog,2,"Radbasis end");
+    Info(InfoRecog,3,"Radbasis end");
 
     return rec( ell := Length(s) , blocks := blocks ); 
 
@@ -196,7 +196,7 @@ RECOG.basis2:=function(r,n,q,g)
           posb,newq;
 
     xxx:=Runtime();
-    Info(InfoRecog,2,"enter basis2");
+    Info(InfoRecog,3,"enter basis2");
 
     #need a field where characteristic polynomials split into linear factors
     if r=2 and (q mod 4) = 3 then 
@@ -290,7 +290,7 @@ RECOG.basis2:=function(r,n,q,g)
       fi; # posa > 0
     until posa=0;
 
-    Info(InfoRecog,2,"exit basis2");
+    Info(InfoRecog,3,"exit basis2");
 
     if Length(rad) > 0 then
         return rec( basis := rec(), blocks := RECOG.RadBasis(r,n,q,rad) );
@@ -406,7 +406,7 @@ end;
 RECOG.commondiagonal:=function(q,rad)
     local xxx, int, es, int2, vs, nicebasis, i, j, k;
 
-    Info(InfoRecog,2,"enter diagonalization");
+    Info(InfoRecog,3,"enter diagonalization");
 
     int:=Eigenspaces(GF(q^2),rad[1]);
     for i in [2..Length(rad)] do
@@ -425,7 +425,7 @@ RECOG.commondiagonal:=function(q,rad)
     nicebasis:=Concatenation(List(int,x->GeneratorsOfVectorSpace(x)));
     MakeImmutable(nicebasis);
 
-    Info(InfoRecog,2,"exit diagonalization");
+    Info(InfoRecog,3,"exit diagonalization");
     return nicebasis;
 end;
 
@@ -435,7 +435,7 @@ RECOG.basis:=function(r,n,q,g)
     a,b,spa,i,j,k,len,gens,list,list2,spb,ainv,binv,powers,posa,rad,
           radoutput;
 
-    Info(InfoRecog,2,"enter basis");
+    Info(InfoRecog,3,"enter basis");
 
 
     list:=[]; #this will contain the generators for the nonsingular part
@@ -508,7 +508,7 @@ RECOG.basis:=function(r,n,q,g)
 
     radoutput := RECOG.RadBasis(r,n,q,rad);
 
-    Info(InfoRecog,2,"exit basis");
+    Info(InfoRecog,3,"exit basis");
 
     return rec(sympl:=list,es:=list2,nicebasis:=radoutput[1],
        niceinv:=radoutput[2], vs:=radoutput[3], rad:=radoutput[4]);
@@ -683,7 +683,7 @@ RECOG.New2RecogniseC6 := function(grp)
     ## first find a non-central element of the <r>-core of <grp>
     b := RECOG.BlindDescent(r,n,grp,100);
     if b = fail then return fail; fi;
-    Info(InfoRecog,1,"Finished blind descent");
+    Info(InfoRecog,3,"Finished blind descent");
 
     u := b[1];
 
@@ -693,10 +693,10 @@ RECOG.New2RecogniseC6 := function(grp)
     grpbasis := RECOG.basis2(r,n,q,rgrp);
 
     ## construct image of <grp> in classical group 
-    Info(InfoRecog,2,"enter image computation");
+    Info(InfoRecog,3,"enter image computation");
     igens := List(GeneratorsOfGroup(grp), 
                x->RECOG.rewriteones(r,n,q,grpbasis.basis,grpbasis.blocks,x)); 
-    Info(InfoRecog,2,"exit image computation");
+    Info(InfoRecog,3,"exit image computation");
     if Position(igens,fail) = fail then 
         return rec( igens := igens, basis := grpbasis, 
                     r := r, n := n, q := q );
@@ -712,7 +712,7 @@ FindHomMethodsProjective.C6 := function(ri,G)
     if re = fail or re = false then return re; fi;
 
     if re.basis.basis = rec() then
-        Info(InfoRecog,1,"Found block system.");
+        Info(InfoRecog,2,"C6: Found block system.");
         hom := GroupHomByFuncWithData(G,GroupWithGenerators(re.igens),
                  RECOG.HomFuncActionOnBlocks, 
                  rec(r := re.r,n := re.n,q := re.q,blks := re.basis.blocks));
@@ -727,7 +727,7 @@ FindHomMethodsProjective.C6 := function(ri,G)
         findgensNmeth(ri).args[2] := 5;
         Setmethodsforfactor(ri,FindHomDbPerm);
     else
-        Info(InfoRecog,1,"Found homomorphism.");
+        Info(InfoRecog,2,"C6: Found homomorphism.");
         hom := GroupHomByFuncWithData(G,GroupWithGenerators(re.igens),
                  RECOG.HomFuncrewriteones, 
                  rec(r := re.r,n := re.n,q := re.q,data := re.basis.basis));

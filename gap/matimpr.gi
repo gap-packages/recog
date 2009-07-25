@@ -77,12 +77,12 @@ RECOG.IndexMaxSub := function( hm, grp, d )
                    rec(storenumbers := true, hashlen := NextPrimeInt(8*d)));
         Enumerate(orb,4*d);
         if not(IsClosed(orb)) then
-            Info(InfoRecog,1,"Did not find nice orbit.");
+            Info(InfoRecog,2,"Did not find nice orbit.");
             if lastsub = fail then return fail; fi;
             return rec( orb := lastorb,
                         hom := OrbActionHomomorphism(grp,lastorb) );
         fi;
-        Info(InfoRecog,1,"Found orbit of length ",Length(orb),
+        Info(InfoRecog,2,"Found orbit of length ",Length(orb),
              " of subspaces of dimension ",Length(orb[1]),".");
         subdim := Length(orb[1]);
         if subdim * Length(orb) = d or    # have block system!
@@ -92,7 +92,7 @@ RECOG.IndexMaxSub := function( hm, grp, d )
                     hom := OrbActionHomomorphism(grp,orb));
         fi;
         # we try intersecting the subspaces in the orbit:
-        Info(InfoRecog,1,"Calculating intersections...");
+        Info(InfoRecog,2,"Calculating intersections...");
         f := FieldOfMatrixGroup(grp);
         sp := VectorSpace(f,orb[1]);
         dim := Dimension(sp);
@@ -104,9 +104,9 @@ RECOG.IndexMaxSub := function( hm, grp, d )
                 dim := dimnew;
             fi;
         od;
-        Info(InfoRecog,1,"Got subspace of dimension ",Dimension(sp));
+        Info(InfoRecog,2,"Got subspace of dimension ",Dimension(sp));
         if dim = Length(sub) then   # we got nothing new
-            Info(InfoRecog,1,"That we already knew, giving up.");
+            Info(InfoRecog,2,"That we already knew, giving up.");
             return
                 rec(orb := orb,
                     hom := OrbActionHomomorphism(grp,orb));
@@ -145,7 +145,7 @@ RECOG.SmallHomomorphicImageProjectiveGroup := function ( grp )
       return false;   # go out all the way without success
     end;
     
-    Info(InfoRecog,1,"LowIndex: Trying 10 first elements...");
+    Info(InfoRecog,2,"LowIndex: Trying 10 first elements...");
     for i in [1..10] do   # this is just heuristics!
         gens := [PseudoRandom(grp)];
         hm := GModuleByMats(gens,fld);
@@ -179,7 +179,7 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
   local bas,d,fld,gens,hm,hom,i,numberrandgens,orb,orblenlimit,s,
         tries,triesinner,triesinnerlimit,trieslimit,x,y;
 
-  Info(InfoRecog,1,"Got hint for group, trying LowIndex...");
+  Info(InfoRecog,2,"Got hint for group, trying LowIndex...");
 
   fld := FieldOfMatrixGroup(G);
   d := DimensionOfMatrixGroup(G);
@@ -197,7 +197,7 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
   triesinnerlimit := RECOG.ParseNumber(hint.triesforgens,d,"1d");
   trieslimit := RECOG.ParseNumber(hint.tries,d,10);
   orblenlimit := RECOG.ParseNumber(hint.orblenlimit,d,"4d");
-  Info(InfoRecog,2,"Using numberrandgens=",numberrandgens,
+  Info(InfoRecog,3,"Using numberrandgens=",numberrandgens,
        " triesinnerlimit=",triesinnerlimit," trieslimit=",trieslimit,
        " orblenlimit=",orblenlimit);
   
@@ -241,7 +241,7 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
           TriangulizeMat(s);
           # FIXME: this will be unnecessary:
           ConvertToMatrixRep(s);
-          Info(InfoRecog,1,"Found invariant subspace of dimension ",
+          Info(InfoRecog,2,"Found invariant subspace of dimension ",
                Length(s),", enumerating orbit...");
           if not IsBound(hint.subspacedims) or 
              Length(s) in hint.subspacedims then
@@ -262,10 +262,10 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
                       Setimmediateverification(ri,true);
                       findgensNmeth(ri).args[1] := Length(orb)+3;
                       findgensNmeth(ri).args[2] := 5;
-                      Info(InfoRecog,1,"Found block system with ",
+                      Info(InfoRecog,2,"Found block system with ",
                            Length(orb)," blocks.");
                   else
-                      Info(InfoRecog,1,"Found orbit of length ",
+                      Info(InfoRecog,2,"Found orbit of length ",
                            Length(orb)," - not a block system.");
                   fi;
                   Sethomom(ri,hom);
@@ -273,7 +273,7 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
                   return true;
               fi;
           else
-              Info(InfoRecog,1,"Subspace dimension not as expected, ",
+              Info(InfoRecog,2,"Subspace dimension not as expected, ",
                    "not enumerating orbit.");
           fi;
       fi;
@@ -368,10 +368,10 @@ FindHomMethodsProjective.LowIndex := function(ri,G)
       res := res[1];
       # Now distinguish between a block system and just an orbit:
       if Length(res.orb) * Length(res.orb[1]) <> DimensionOfMatrixGroup(G) then
-          Info(InfoRecog,1,"Found orbit of length ",Length(res.orb),
+          Info(InfoRecog,2,"Found orbit of length ",Length(res.orb),
                " - not a block system.");
       else
-          Info(InfoRecog,1,"Found block system with ",Length(res.orb),
+          Info(InfoRecog,2,"Found block system with ",Length(res.orb),
                " blocks.");
           # A block system: We do a base change isomorphism:
           forkernel(ri).t := Concatenation(res.orb);

@@ -4319,7 +4319,7 @@ RECOG.MakePSL2Hint := function( name, G )
   d := DimensionOfMatrixGroup(G);
   defchar := Factors(name[3])[1];
   if p = defchar then return fail; fi;
-  Info(InfoRecog,1,"Making hint for group ",name,"...");
+  Info(InfoRecog,2,"Making hint for group ",name,"...");
   # we are in cross characteristic.
   # to be made better...
   return rec( elordersstart := [defchar], numberrandgens := 1, tries := 10,
@@ -4335,7 +4335,7 @@ FindHomMethodsProjective.TwoLargeElOrders := function(ri,G)
   # A cheat: 16 is theoretically OK for up to degree 5000,
   # for smaller degrees, our 4 here is also OK.
   nr := 4 * LogInt(3*d,2) * LogInt(2/epsilon,2);
-  Info(InfoRecog,1,"Looking at the projective orders of ",nr,
+  Info(InfoRecog,2,"Looking at the projective orders of ",nr,
        " random elements...");
   max := [0,0];
   ri!.projelorders := [];
@@ -4345,8 +4345,8 @@ FindHomMethodsProjective.TwoLargeElOrders := function(ri,G)
       # FIXME: Changed
       #if o > 3*d then
       if o > 10000 then   # we would not know about such orders anyway...
-          #Info(InfoRecog,1,"Saw large projective order ",o," > 3*",d,
-          Info(InfoRecog,1,"Saw large projective order ",o," > 10000,",
+          #Info(InfoRecog,2,"Saw large projective order ",o," > 3*",d,
+          Info(InfoRecog,2,"Saw large projective order ",o," > 10000,",
                " giving up.");
           return false;
       fi;
@@ -4357,18 +4357,18 @@ FindHomMethodsProjective.TwoLargeElOrders := function(ri,G)
           max[2] := o;
       fi;
   od;
-  Info(InfoRecog,1,"Two largest projective orders found: ",max,"."); 
+  Info(InfoRecog,2,"Two largest projective orders found: ",max,"."); 
   tab := RECOG.TableOfTwoLargestGroupElementOrdersWithDegreeBound;
   p := PositionSorted(tab,max);
   if p > Length(tab) or tab[p]{[1..2]} <> max then
-      Info(InfoRecog,1,"Those orders are not in table, giving up.");
+      Info(InfoRecog,2,"Those orders are not in table, giving up.");
       return false;
   fi;
   # Try all possibilities:
   while p <= Length(tab) and tab[p]{[1..2]} = max do
       if tab[p][4] <= d then   # ruled out by degree bound
           name := tab[p][3];
-          Info(InfoRecog,1,"Trying ",name);
+          Info(InfoRecog,2,"Trying ",name);
           if name[1] = "l" then  # Handle PSL specially
               if name[2] = 2 then
                   hint := RECOG.MakePSL2Hint(name,G);
@@ -4391,11 +4391,11 @@ FindHomMethodsProjective.TwoLargeElOrders := function(ri,G)
           fi;
           if res = true then return true; fi;
       else
-          Info(InfoRecog,1,"Cannot be ",tab[p][3]," in degree ",d,".");
+          Info(InfoRecog,2,"Cannot be ",tab[p][3]," in degree ",d,".");
       fi;
       p := p + 1;
   od;
-  Info(InfoRecog,1,"Did not succeed with hints, giving up...");
+  Info(InfoRecog,2,"Did not succeed with hints, giving up...");
   return fail;
 end;
 
