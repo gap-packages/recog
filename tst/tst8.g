@@ -1,4 +1,5 @@
 # Test for Pcgs:
+LoadPackage("recog");
 Print("Test: S4^10\n");
 g := DirectProduct(SymmetricGroup(4),SymmetricGroup(4));
 g := DirectProduct(g,g);

@@ -146,6 +146,8 @@ FindHomMethodsProjective.ProjDeterminant := function(ri,G)
                                 rec(c := c, z := z, gcd := gcd));
   Sethomom(ri,hom);
   Setmethodsforfactor(ri,FindHomDbPerm);
+  findgensNmeth(ri).args[1] := 8;
+  findgensNmeth(ri).args[2] := 5;
   Setimmediateverification(ri,true);
   return true;
 end;

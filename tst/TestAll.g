@@ -1,4 +1,5 @@
 # All systematic tests:
+LoadPackage("recog");
 ReadPackage("recog","tst/tst1.g");
 ReadPackage("recog","tst/tst2.g");
 ReadPackage("recog","tst/tst3.g");
