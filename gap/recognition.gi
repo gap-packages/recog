@@ -380,6 +380,7 @@ InstallGlobalFunction( RecogniseGeneric,
                     Info(InfoRecog,1,
                          "Alarm: Found unexpected kernel element! (depth=",
                          depth,")");
+                    Error(12345);
                 fi;
             od;
             if InfoLevel(InfoRecog) >= 1 then Print("\n"); fi;
@@ -702,27 +703,41 @@ InstallGlobalFunction( "GetCompositionTreeNode",
 # Testing:
 
 RECOG.TestGroup := function(g,proj,size)
-  local l,r,ri,s,x;
-  r := Runtime();
-  if proj then
-      ri := RecogniseProjectiveGroup(g);
-  else
-      ri := RecogniseGroup(g);
-  fi;
-  Print("Time for recognition: ",Runtime()-r,"\n");
-  if Size(ri) <> size then
-      Error("Alarm: Size not correct!\n");
-      return ri;
-  fi;
+  local l,r,ri,s,x,count;
+  count := 0;
+  repeat
+      count := count + 1;
+      r := Runtime();
+      if proj then
+          ri := RecogniseProjectiveGroup(g);
+      else
+          ri := RecogniseGroup(g);
+      fi;
+      Print("Time for recognition: ",Runtime()-r,"\n");
+      if Size(ri) <> size then
+          Print("ALARM: set count to -1 to skip test!\n");
+          Error("Alarm: Size not correct!\n");
+          if count = -1 then return fail; fi;
+      else
+          count := 3;   # worked!
+      fi;
+  until count >= 3;
   View(ri);
   Print("\n");
+  count := 0;
   l := CalcNiceGens(ri,GeneratorsOfGroup(g));
-  x := PseudoRandom(g);
-  s := SLPforElement(ri,x);
-  if s = fail or not(isequal(ri)(ResultOfStraightLineProgram(s,l),x)) then
-      Error("Alarm: SLPforElement did not work!\n");
-      return ri;
-  fi;
+  repeat
+      count := count + 1;
+      Print(".\c");
+      x := PseudoRandom(g);
+      s := SLPforElement(ri,x);
+      if s = fail or not(isequal(ri)(ResultOfStraightLineProgram(s,l),x)) then
+          Print("ALARM: set count to -1 to skip test!\n");
+          Error("Alarm: SLPforElement did not work!\n");
+          if count = -1 then return fail; fi;
+      fi;
+  until count >= 30;
+  Print("\n");
   return ri;
 end;
 
