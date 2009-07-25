@@ -203,6 +203,8 @@ FindHomMethodsMatrix.BlockScalar := function(ri,G)
       if nrblocks = 1 then     # no kernel:
           findgensNmeth(ri).method := FindKernelDoNothing;
       else   # exactly two blocks:
+          findgensNmeth(ri).args[1] := 7;
+          findgensNmeth(ri).args[2] := 5;
           forkernel(ri).blocks := ri!.blocks{[1]};
           # We have to go to BlockScalar with 1 block because the one block 
           # is only a part of the whole matrix:
@@ -231,7 +233,7 @@ FindHomMethodsMatrix.BlockScalar := function(ri,G)
            stamp := "BlockScalar" ),1);
 
   # the kernel is the first few blocks (can be only one!):
-  findgensNmeth(ri).args[1] := 3 + middle - 1;
+  findgensNmeth(ri).args[1] := 3 + nrblocks;
   findgensNmeth(ri).args[2] := 5;
   forkernel(ri).blocks := ri!.blocks{[1..middle-1]};
   Add(forkernel(ri).hints,
