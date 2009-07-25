@@ -750,7 +750,7 @@ RECOG.TestRecognitionNode := function(ri,stop,recurse)
       if slp <> fail then
           y := ResultOfStraightLineProgram(slp,nicegens(ri));
       fi;
-      if slp <> fail and not(ri!.isone(x/y)) then
+      if slp = fail or not(ri!.isone(x/y)) then
           if stop then Error("Error found, look at x, slp and y"); fi;
           err := err + 1;
           Print("X\c");
