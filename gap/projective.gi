@@ -207,12 +207,12 @@ AddMethod( FindHomDbProjective, FindHomMethodsProjective.C3C5,
 #   900, "Derived",
 #        "restrict to derived subgroup" );
 # Superseded by C3C5.
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.D247,
-   850, "D247",
-        "play games to find a normal subgroup" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.C6,
-   800, "C6",
+   850, "C6",
         "find either an (imprimitive) action or a symplectic one" );
+AddMethod( FindHomDbProjective, FindHomMethodsProjective.D247,
+   800, "D247",
+        "play games to find a normal subgroup" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.TensorDecomposable,
    700, "Tensor",
         "find a tensor decomposition" );

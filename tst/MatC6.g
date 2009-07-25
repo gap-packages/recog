@@ -229,5 +229,5 @@ x := PseudoRandom(GL(27,5^2));
 gens := List(gens,y->y^x);
 g := GroupWithGenerators(gens);
 Print("Testing MatC6:\n");
-RECOG.TestGroup(g,false,80225312993280);
+ri := RECOG.TestGroup(g,false,80225312993280);
 Print("\n");

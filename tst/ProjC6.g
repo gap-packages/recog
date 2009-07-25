@@ -6,5 +6,5 @@ x := PseudoRandom(GL(25,3^4));
 gens := List(GeneratorsOfGroup(h[1]),y->y^x);
 g := GroupWithGenerators(gens);
 Print("Testing ProjC6:\n");
-RECOG.TestGroup(g,true,5850000000);
+ri := RECOG.TestGroup(g,true,5850000000);
 Print("\n");

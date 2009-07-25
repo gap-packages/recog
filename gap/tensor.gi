@@ -327,7 +327,7 @@ FindHomMethodsProjective.TensorDecomposable := function(ri,G)
   # Now assume a tensor factorization exists:
   #Gm := GroupWithMemory(G);???
   N := RECOG.FindTensorKernel(G,true);
-  Info(InfoRecog,1,"I seem to have found a normal subgroup...");
+  Info(InfoRecog,1,"TensorDecomposable: I seem to have found a normal subgroup...");
   r := RECOG.FindTensorDecomposition(G,N);
   if r = fail then
       return fail;
@@ -342,7 +342,7 @@ FindHomMethodsProjective.TensorDecomposable := function(ri,G)
       return true;
   fi;
   
-  Info(InfoRecog,1,"I seem to have found a tensor decomposition.");
+  Info(InfoRecog,1,"TensorDecomposable: I seem to have found a tensor decomposition.");
 
   # Now we believe to have a tensor decomposition:
   conjgensG := List(GeneratorsOfGroup(G),x->r.t * x * r.ti);
