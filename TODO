@@ -1,5 +1,8 @@
 Do soonish:
 
+Put Eamonn and Gunter as authors
+Investigate MatC6 errors
+Print error found and where!
 example12 no longer seems to work, why?
 Cleanup tensor.gd  (still needed) and tensor.gi
 Cleanup matrix.gi (e.g. remove det code)

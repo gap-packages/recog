@@ -154,8 +154,8 @@ RECOG.RadBasis:=function(r,n,q,rad)
 
     nicebasis := RECOG.CommonDiagonal2(r,n,q,rad);
     niceinv := nicebasis^(-1);
-    Print("checking diagonalization:  ",
-        Collected(List(rad,x->IsDiagonalMat(nicebasis*x*niceinv))), "\n");
+    Info(InfoRecog,3,"checking diagonalization:  ",
+         Collected(List(rad,x->IsDiagonalMat(nicebasis*x*niceinv))));
     diagrad:=List(rad,x->DiagonalOfMat(nicebasis*x*niceinv));
 
     #write each vector in diagrad as scalar times a vector over GF(r)
