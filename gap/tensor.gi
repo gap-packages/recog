@@ -128,6 +128,12 @@ RECOG.FindTensorDecomposition := function(G,N)
   # homsimg is a basis of an N-homogenous component.
   # We move that one around with G to find a basis of the natural module:
   # By Clifford's theorem this is a block system:
+  if d mod Length(homsimg) <> 0 then
+      # Not a homogeneous component, obviously we did not find
+      # a normal subgroup for some reason!
+      return fail;
+  fi;
+
   h := [ShallowCopy(homsimg)];
   b := MutableCopyMat(homsimg);
   TriangulizeMat(b);
@@ -149,6 +155,7 @@ RECOG.FindTensorDecomposition := function(G,N)
   h := Concatenation(h);
   ConvertToMatrixRep(h);
 
+Error();
   if i > Length(l) then    # by Clifford this should never happen, but still...
       if Length(l) = 1 then
           return fail;
