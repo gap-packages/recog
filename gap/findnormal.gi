@@ -89,7 +89,7 @@ InstallMethod( FindEvenNormalSubgroup, "for a group object and a record",
     FindNonCentralInvolution := function(gens,pr,invols)
       local count,o,x;
       if pr = false then
-          pr := ProductReplacer(gens);
+          pr := ProductReplacer(gens, rec( scramblefactor := 3 ) );
       fi;
       # Find a non-central involution:
       count := 0;
@@ -237,7 +237,7 @@ InstallMethod( FindEvenNormalSubgroup, "for a group object and a record",
           r := TestElement(blind);
           if r <> fail then return r; fi;
       fi;
-      prc := ProductReplacer(centgens);
+      prc := ProductReplacer(centgens,rec( scramblefactor := 3 ) );
       return LookAtInvolutions(centgens,prc,centinvols);
     end;
 
@@ -276,10 +276,8 @@ InstallMethod( FindEvenNormalSubgroup, "for a group object and a record",
                   return rec( success := false,
                      msg := "No central involution found normal subgroup" );
               else
-                  # FIXME: Use proper random elements from StabChain!
-                  pr := ProductReplacer(invols);
                   for i in [1..20] do
-                      y := Next(pr);
+                      y := Random(S);
                       if not(opt.IsOne(y)) then
                           r := TestElement(y);
                           if r <> fail then return r; fi;
