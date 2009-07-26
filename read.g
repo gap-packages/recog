@@ -18,6 +18,7 @@ ReadPackage("recog","gap/snksetswrsr.gi");
 
 # Up to now there is not much here:
 ReadPackage("recog","gap/blackbox.gi");
+ReadPackage("recog","gap/recogSnAnBB.gi");
 
 # Matrices/Projective:
 ReadPackage("recog","gap/findnormal.gi");

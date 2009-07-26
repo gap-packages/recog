@@ -3,6 +3,7 @@ Do soonish:
 example12 no longer seems to work, why?
 Cleanup tensor.gd  (still needed) and tensor.gi
 Cleanup matrix.gi (e.g. remove det code)
+Native quick genss method?
 
 
 Soonest:
@@ -37,6 +38,14 @@ Soon:
  - do more C9 cases by collecting hints
  - do more C9 cases
  - do more C9 cases
+
+
+Talk with Akos:
+
+ - new stuff with two largest element orders
+ - separate?
+ - bug in BB alternating
+ - do we want to do BB alternating???
 
 ========================================================================
 

@@ -326,8 +326,123 @@ SporadicsWorkers[18] := SporadicsWorkerGenSift;  # Co3
 SporadicsWorkers[19] := SporadicsWorkerGenSift;  # Co2
 LastRecognisedSporadic := fail;
 
-FindHomMethodsProjective.LookAtOrders := function(ri,G)
-  local i,j,jj,k,killers,l,limit,o,ordersseen,pp,raus,res,x;
+RECOG.DegreeAlternating := function (orders)
+    local   degs,  prims,  m,  f,  n;
+    degs := []; 
+    prims := [];
+    for m in orders do 
+        if m > 1 then
+            f := Collected(Factors(m));
+            Sort(f);
+            n := Sum(f, x->x[1]^x[2]);
+            if f[1][1] = 2 then n := n+2; fi;
+            AddSet(degs,n);
+            UniteSet(prims,Set(f,x->x[1]));
+        fi; 
+    od;
+    return [degs, prims];
+end;    #  DegreeAlternating
+
+RECOG.RecognizeAlternating := function (orders)
+    local   tmp,  degs,  prims,  mindeg,  p1,  p2,  i;
+   tmp := RECOG.DegreeAlternating (orders);
+   degs := tmp[1];
+   prims := tmp[2];
+   if Length(degs) = 0 then 
+       return "Unknown"; 
+   fi;
+   mindeg := Maximum (degs);  # minimal possible degree
+   
+   p1 := PrevPrimeInt (mindeg + 1);
+   p2 := PrevPrimeInt (p1);
+   if not p1 in prims or not p2 in prims then
+       return 0;
+   fi;
+   if mindeg mod 2 = 1 then
+       if not (mindeg in orders and  mindeg - 2 in orders) then 
+           return 0;
+       fi;
+   else
+       if not mindeg - 1 in orders then 
+           return 0;
+       fi;
+   fi;
+  
+   for i in [3..Minimum (QuoInt(mindeg,2) - 1, 6)] do
+       if IsPrime (i) and IsPrime (mindeg - i) then
+           if not i * (mindeg - i) in orders then
+               return 0;
+           fi;
+       elif IsPrime (i) and IsPrime (mindeg - i -1) then
+           if not i * (mindeg - i - 1) in orders then
+               return 0;
+           fi;
+       fi;
+   od;
+   return  mindeg;
+end;   # RecognizeAlternating
+
+SLPforElementFuncsProjective.Alternating := function(ri,x)
+  local y,slp;
+  RecSnAnIsOne := IsOneProjective;
+  RecSnAnEq := IsEqualProjective;
+  y := FindImageAn(ri!.recogSnAnDeg,x,
+                   ri!.recogSnAnRec[2][1], ri!.recogSnAnRec[2][2],
+                   ri!.recogSnAnRec[3][1], ri!.recogSnAnRec[3][2]);
+  RecSnAnIsOne := IsOne;
+  RecSnAnEq := EQ;
+  if y = fail then return fail; fi;
+  slp := SLPforAn(ri!.recogSnAnDeg,y);
+  return slp;
+end;
+
+FindHomMethodsProjective.AlternatingBBByOrders := function(ri,G)
+  local Gm,RecSnAnEq,RecSnAnIsOne,deg,limit,ordersseen,r;
+  if IsBound(ri!.projordersseen) then
+      ordersseen := ri!.projordersseen;
+  else
+      ordersseen := [];
+  fi;
+  limit := QuoInt(3*DimensionOfMatrixGroup(G),2);
+  while Length(ordersseen) <= limit do
+      Add(ordersseen,RECOG.ProjectiveOrder(PseudoRandom(G)));
+      if Length(ordersseen) mod 20 = 0 or
+         Length(ordersseen) = limit then
+          deg := RECOG.RecognizeAlternating(ordersseen);
+          Info(InfoRecog,2,ordersseen);
+          if deg > 0 then  # we strongly suspect Alt(deg):
+              # Switch blackbox recognition to projective:
+              Info(InfoRecog,2,"Suspect alternating group of degree ",deg,
+                   "...");
+              RecSnAnIsOne := IsOneProjective;
+              RecSnAnEq := IsEqualProjective;
+              Gm := GroupWithMemory(G);
+              r := RecogniseSnAn(deg,Gm,1/100);
+              RecSnAnIsOne := IsOne;
+              RecSnAnEq := EQ;
+              if r = fail or r[1] <> "An" then 
+                  Info(InfoRecog,2,"Did not find generators.");
+                  continue; 
+              fi;
+              Info(InfoRecog,2,"Found Alt(",deg,")!");
+              ri!.recogSnAnRec := r;
+              ri!.recogSnAnDeg := deg;
+              SetSize(ri,Factorial(deg)/2);
+              Setslpforelement(ri,SLPforElementFuncsProjective.Alternating);
+              Setslptonice(ri,SLPOfElms(Reversed(r[2])));
+              ForgetMemory(r[2]);
+              ForgetMemory(r[3][1]);
+              SetFilterObj(ri,IsLeaf);
+              return true;
+          fi;
+      fi;
+  od;
+  return fail;
+end;
+
+FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
+  local LastRecognisedSporadic,i,j,jj,k,killers,l,limit,o,ordersseen,
+        pp,raus,res,x;
   l := [1..26];
   pp := 0*[1..26];
   ordersseen := [];
@@ -339,6 +454,12 @@ FindHomMethodsProjective.LookAtOrders := function(ri,G)
       l := Filtered(l,i->o in SporadicsElementOrders[i]);
       if l = [] then
           LastRecognisedSporadic := fail;
+          Info(InfoRecog,2,"Ruled out all sporadic groups.");
+          if not(IsBound(ri!.projordersseen)) then
+              ri!.projordersseen := ordersseen;
+          else
+              Append(ri!.projordersseen,ordersseen);
+          fi;
           return false;
       fi;
       # Throw out improbable ones:
@@ -381,6 +502,12 @@ FindHomMethodsProjective.LookAtOrders := function(ri,G)
       od;
       if l = [] then
           LastRecognisedSporadic := fail;
+          Info(InfoRecog,2,"Ruled out all sporadic groups.");
+          if not(IsBound(ri!.projordersseen)) then
+              ri!.projordersseen := ordersseen;
+          else
+              Append(ri!.projordersseen,ordersseen);
+          fi;
           return false;
       fi;
       if Length(l) = 1 and i > 80 then
@@ -395,6 +522,11 @@ FindHomMethodsProjective.LookAtOrders := function(ri,G)
           fi;
           Info(InfoRecog,2,"However, I cannot verify this.");
           LastRecognisedSporadic := SporadicsNames[l[1]];
+          if not(IsBound(ri!.projordersseen)) then
+              ri!.projordersseen := ordersseen;
+          else
+              Append(ri!.projordersseen,ordersseen);
+          fi;
           return false;
       fi;
       if Length(l) < 6 then
@@ -407,9 +539,48 @@ FindHomMethodsProjective.LookAtOrders := function(ri,G)
   Info(InfoRecog,2,"Giving up, still possible Sporadics: ",
        SporadicsNames{l});
   LastRecognisedSporadic := fail;
+  if not(IsBound(ri!.projordersseen)) then
+      ri!.projordersseen := ordersseen;
+  else
+      Append(ri!.projordersseen,ordersseen);
+  fi;
   return false;
 end;
 
+RECOG.MakeAlternatingMatrixReps := function(deg,f,tens)
+  local a,b,gens,gens2,i,m,ogens,r;
+  a := AlternatingGroup(deg);
+  gens := List(GeneratorsOfGroup(a),x->PermutationMat(x,deg,f));
+  ogens := ShallowCopy(gens);
+  for i in [1..tens] do
+      gens2 := [];
+      for i in [1..Length(gens)] do
+          Add(gens2,KroneckerProduct(gens[i],ogens[i]));
+      od;
+      gens := gens2;
+  od;
+  m := GModuleByMats(gens,f);
+  r := MTX.CollectedFactors(m);
+  return List(r,x->x[1].generators);
+end;
+  
+RECOG.MakeSymmetricMatrixReps := function(deg,f,tens)
+  local a,b,gens,gens2,i,m,ogens,r;
+  a := SymmetricGroup(deg);
+  gens := List(GeneratorsOfGroup(a),x->PermutationMat(x,deg,f));
+  ogens := ShallowCopy(gens);
+  for i in [1..tens] do
+      gens2 := [];
+      for i in [1..Length(gens)] do
+          Add(gens2,KroneckerProduct(gens[i],ogens[i]));
+      od;
+      gens := gens2;
+  od;
+  m := GModuleByMats(gens,f);
+  r := MTX.CollectedFactors(m);
+  return List(r,x->x[1].generators);
+end;
+  
 # The method installations:
 
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.TrivialProjectiveGroup,
@@ -455,9 +626,13 @@ AddMethod( FindHomDbProjective, FindHomMethodsProjective.LowIndex,
    600, "LowIndex",
         "find an (imprimitive) action on subspaces" );
 # By now we suspect it to be a simple group
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.LookAtOrders,
-   550, "LookAtOrders",
-        "generate a few random elements, calculate LCM of proj. orders" );
+AddMethod( FindHomDbProjective, FindHomMethodsProjective.SporadicsByOrders,
+   550, "SporadicsByOrders",
+        "generate a few random elements and compute the proj. orders" );
+# Disabled because it has a bug and is not fast enough:
+#AddMethod( FindHomDbProjective, FindHomMethodsProjective.AlternatingBBByOrders,
+#   530, "AlternatingBBByOrders",
+#        "generate a few random elements and compute the proj. orders" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.TwoLargeElOrders,
    500, "TwoLargeElOrders",
         "look at two large element orders" );

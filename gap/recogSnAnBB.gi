@@ -25,6 +25,9 @@
 DeclareInfoClass( "InfoRecSnAn" );
 SetInfoLevel( InfoRecSnAn, 3 );
 
+# The following are used for comparisons:
+RecSnAnIsOne := IsOne;
+RecSnAnEq := EQ;
 
 ## is <r,s> in S_n
 
@@ -34,7 +37,7 @@ SatisfiesSnPresentation := function( n, r, s )
 
     Info( InfoRecSnAn, 1, "calling Satisfies Sn Presentation");
 
-    if (r * s)^(n-1) <> r^0 then
+    if not(RecSnAnIsOne((r * s)^(n-1))) then
         Info( InfoRecSnAn, 1, "does not satisfy presentation -1");
         return false;
     fi;
@@ -43,7 +46,7 @@ SatisfiesSnPresentation := function( n, r, s )
     t := r;
     while j <= n/2 do
         t := t * r;
-        if Comm(s,t)^2 <> r^0 then
+        if not(RecSnAnIsOne(Comm(s,t)^2)) then
             Info( InfoRecSnAn, 1, "does not satisfy presentation");
             return false;
         fi;
@@ -64,14 +67,14 @@ SatisfiesAnPresentation := function( n, s, t )
 
     Info( InfoRecSnAn, 1, "calling Satisfies An Presentation");
 
-    if s^(n-2) <> s^0 or t^3 <> t^0 then
+    if not(RecSnAnIsOne(s^(n-2))) or not(RecSnAnIsOne(t^3)) then
         Info( InfoRecSnAn, 1, "does not satisfy presentation-1");
         return false;
     fi;
 
     if n mod 2 <> 0 then
         # we already know r^(n-2) = s^3 = 1
-        if (s * t)^n <> s^0 then
+        if not(RecSnAnIsOne((s * t)^n)) then
             Info( InfoRecSnAn, 1, "does not satisfy presentation");
             return false;
         fi;
@@ -79,7 +82,7 @@ SatisfiesAnPresentation := function( n, s, t )
         r := s^0;
         while j <= (n-3)/2  do
             r := r * s;
-            if (t *(t^r))^2 <> s^0 then
+            if not(RecSnAnIsOne((t *(t^r))^2)) then
                 Info( InfoRecSnAn, 1, "does not satisfy presentation");
                 return false;
             fi;
@@ -87,7 +90,8 @@ SatisfiesAnPresentation := function( n, s, t )
         od;
         return true;
     else
-        if (s*t)^(n-1) <> s^0 or Comm(t,s)^2 <> s^0 then
+        if not(RecSnAnIsOne((s*t)^(n-1))) or 
+           not(RecSnAnIsOne(Comm(t,s)^2)) then
             Info( InfoRecSnAn, 1, "does not satisfy presentation");
             return false;
         fi;
@@ -139,7 +143,8 @@ NiceGeneratorsSnAn := function ( n, grp, N )
         # use this random element to check the transpositions
         for a in g2 do 
             x := a * a^t;
-            if x<>l and x^2<>l and x^3<>l then
+            if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and 
+               not(RecSnAnIsOne(x^3)) then
                 # a is not a transposition
                 Info( InfoRecSnAn, 2, "a is not a transposition");
                 RemoveElmList(g2,Position(g2,a));
@@ -150,7 +155,8 @@ NiceGeneratorsSnAn := function ( n, grp, N )
         # use this random element to check the 3-cycle
         for a in g4 do 
             x := a * a^t;
-            if x<>l and x^2<>l and x^3<>l and x^5<>l then
+            if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and 
+               not(RecSnAnIsOne(x^3)) and not(RecSnAnIsOne(x^5)) then
                 # a is not a 3-cycle
                 Info( InfoRecSnAn, 2, "a is not a 3-cycle");
                 RemoveElmList(g4,Position(g4,a));
@@ -158,7 +164,7 @@ NiceGeneratorsSnAn := function ( n, grp, N )
             fi;
         od;
 
-        if t<>l and t^n = l then
+        if not(RecSnAnIsOne(t)) and RecSnAnIsOne(t^n) then
             # we hope we found an n-cycle
             AddStack(g1,t);
             elfound[1] := true;
@@ -170,14 +176,14 @@ NiceGeneratorsSnAn := function ( n, grp, N )
         fi;
 
         b := t^(n-2-delta);
-        if b<>l and b^2=l then
+        if not(RecSnAnIsOne(b)) and RecSnAnIsOne(b^2) then
             # we hope we found a 2(n-2)-cycle
             AddStack(g2,b);
             elfound[2] := true;
             Info( InfoRecSnAn, 2, "found transposition");
         fi;
 
-        if delta = 1 and t<>l  and t^(n-1)=l then
+        if delta = 1 and not(RecSnAnIsOne(t))  and RecSnAnIsOne(t^(n-1)) then
             # we hope we found an n or (n-1)-cycle
             AddStack(g3,t);
             elfound[3] := true;
@@ -185,7 +191,7 @@ NiceGeneratorsSnAn := function ( n, grp, N )
         fi;
 
         b := t^(n-k);
-        if b<>l and b^3=l then
+        if not(RecSnAnIsOne(b)) and RecSnAnIsOne(b^3) then
             # we hope we found a 3(n-k)-element
             AddStack(g4,b);
             elfound[4] := true;
@@ -204,7 +210,8 @@ NiceGeneratorsSnAn := function ( n, grp, N )
                     # use this opportunity again to check that 
                     # a really is a transposition
                     x := a*h;
-                    if x<>l and x^2<>l and x^3<>l then 
+                    if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and 
+                       not(RecSnAnIsOne(x^3)) then 
                         # a is not a transposition
                         Info(InfoRecSnAn,2,"a is not a transposition");
                         RemoveElmList(g2,Position(g2,a));
@@ -213,7 +220,8 @@ NiceGeneratorsSnAn := function ( n, grp, N )
                     else
                         for b in g1 do 
                           y := Comm(h, h^b);
-                          if y<>l and y^2<>l and y^3=l then
+                          if not(RecSnAnIsOne(y)) and
+                             not(RecSnAnIsOne(y^2)) and RecSnAnIsOne(y^3) then
 		            Info(InfoRecSnAn,1,"found good transposition");
                             if SatisfiesSnPresentation( n, b, h ) then
                               Info( InfoRecSnAn, 1, 
@@ -240,7 +248,8 @@ NiceGeneratorsSnAn := function ( n, grp, N )
                     # use this opportunity again to check that 
                     # a really is a 3-cycle
                     x := a * c;
-                    if x<>l and x^2<>l and x^3<>l and x^5<>l then
+                    if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and 
+                       not(RecSnAnIsOne(x^3)) and not(RecSnAnIsOne(x^5)) then
                         # a is not a 3-cycle
                         Info( InfoRecSnAn, 2, "a is not a 3-cycle");
                         RemoveElmList(g4,Position(g4,a));
@@ -248,25 +257,25 @@ NiceGeneratorsSnAn := function ( n, grp, N )
                         i := 0;
                     else
                         for b in g3 do  # choose an n- or (n-1)-cycle
-                          if Comm(c,c^b)<>l  then
+                          if not(RecSnAnIsOne(Comm(c,c^b)))  then
                             # hope: supp (c) = {1,2,k}
                             t := c*c^b;
-                            if t^2 = t then
+                            if RecSnAnEq(t^2,t) then
                                 # k = 3
                                 x := c^(b^2); 
                                 y := c^x;
-                                if Comm(y, y^(b^2))=l then
+                                if RecSnAnIsOne(Comm(y, y^(b^2))) then
                                     # y\lambda = (1,5,2)
                                     h := c^2;
                                 else
                                     # y\lambda = (1,2,4)
                                     h := c;
                                 fi;
-                            elif Comm(c, c^(b^2))=l then
+                            elif RecSnAnIsOne(Comm(c, c^(b^2))) then
                                 # 5 <= k <= n -2
                                 x := c^b;
                                 y := c^x;
-                                if Comm(y,y^b)=l then 
+                                if RecSnAnIsOne(Comm(y,y^b)) then 
                                     # y = (1,3,k) hence c = (1,2,k)
                                     h := Comm(c^2, x);
                                 else
@@ -276,13 +285,13 @@ NiceGeneratorsSnAn := function ( n, grp, N )
                                 # k= 4, n-1
                                 x := c^b;
                                 y := c^x;
-                                if Comm(y,y^b)=l then
+                                if RecSnAnIsOne(Comm(y,y^b)) then
                                     # y = (n-1, 1, 3), c = (1,2,n-1)
                                     h := Comm(c^2,x); 
-                                elif Comm(y,y^(b^2))=l then
+                                elif RecSnAnIsOne(Comm(y,y^(b^2))) then
                                     # y = (1,4,5) c = (1,4,2)
                                     h := Comm(c,x^2);
-                                elif (y*y^b)^2=l then
+                                elif RecSnAnIsOne((y*y^b)^2) then
                                     # y = (1, n-1, n)  c = (1, n-1, 2)
                                     h := Comm(c,x^2);
                                 else
@@ -318,7 +327,8 @@ NiceGeneratorsSnAn := function ( n, grp, N )
                     # use this opportunity again to check that 
                     # a really is a 3-cycle
                     x := a * c;
-                    if x<>l and x^2<>l and x^3<>l and x^5<>l then
+                    if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and 
+                       not(RecSnAnIsOne(x^3)) and not(RecSnAnIsOne(x^5)) then
                         # a is not a 3-cycle
                         Info( InfoRecSnAn, 2, "a is not a 3-cycle");
                         RemoveElmList(g4,Position(g4,a));
@@ -326,8 +336,9 @@ NiceGeneratorsSnAn := function ( n, grp, N )
                         i := 0;
                     else
                         for b in g3 do
-                          if Comm(c,c^b)<>l and Comm(c,c^(b^2))<>l and
-                             Comm(c,c^(b^4))<>l then
+                          if not(RecSnAnIsOne(Comm(c,c^b))) and 
+                             not(RecSnAnIsOne(Comm(c,c^(b^2)))) and
+                             not(RecSnAnIsOne(Comm(c,c^(b^4)))) then
                             # hope: supp (c) = {1,i,j}
                             h := Comm(c^b,c);
                             # h = (1,i,i+1)
@@ -486,7 +497,7 @@ IsImagePoint := function ( n, z, g,  h, j,  t1z, t2z )
 
     cnt := 0;
     for k in [ 1 .. 4 ] do
-        if t1z*s[k] <> s[k]*t1z then
+        if not(RecSnAnEq(t1z*s[k],s[k]*t1z)) then
             cnt := cnt + 1;
         fi;
     od;
@@ -494,7 +505,7 @@ IsImagePoint := function ( n, z, g,  h, j,  t1z, t2z )
 
     cnt := 0;
     for k in [ 1 .. 4 ] do
-        if t2z*s[k] <> s[k]*t2z then
+        if not(RecSnAnEq(t2z*s[k],s[k]*t2z)) then
             cnt := cnt + 1;
         fi;
     od;
@@ -528,10 +539,10 @@ FindImageSn := function( n, z, g, h, xis, xisl )
             mxjpm := xisl[j+m];
             while l <= 3 do  # limit support of i+l-1
                 lp1 := l mod 3 + 1;
-                if tz[l]*xis[j] = xis[j]*tz[l] then
+                if RecSnAnEq(tz[l]*xis[j],xis[j]*tz[l]) then
                     sup[l] := Difference( sup[l], mxj);
                     sup[lp1] := Difference( sup[lp1], mxj);
-                    if tz[lp1]*xis[j] = xis[j]*tz[lp1] then
+                    if RecSnAnEq(tz[lp1]*xis[j],xis[j]*tz[lp1]) then
                         sup[lp1 mod 3 + 1] := 
                             Difference( sup[lp1 mod 3 + 1], mxj);
                     else
@@ -539,10 +550,10 @@ FindImageSn := function( n, z, g, h, xis, xisl )
                             Difference( sup[lp1 mod 3 + 1], mxjpm);
                     fi;
                     l := 4;  # exit loop over l
-                elif tz[l]*xis[j+m] = xis[j+m]*tz[l] then
+                elif RecSnAnEq(tz[l]*xis[j+m],xis[j+m]*tz[l]) then
                     sup[l] := Difference( sup[l], mxjpm);
                     sup[lp1] := Difference( sup[lp1], mxjpm);
-                    if tz[lp1]*xis[j+m] = xis[j+m]*tz[lp1] then
+                    if RecSnAnEq(tz[lp1]*xis[j+m],xis[j+m]*tz[lp1]) then
                         sup[(lp1) mod 3 + 1] := 
                             Difference( sup[lp1 mod 3 + 1], mxjpm);
                     else
@@ -981,7 +992,7 @@ IsImagePointAn := function ( n, z, g, h, j, s, a, b, t1z, t2z )
 
     cnt := 0;
     for k in [ 1 .. 5 ] do
-        if t1z*sc[k] <> sc[k]*t1z then
+        if not(RecSnAnEq(t1z*sc[k],sc[k]*t1z)) then
             cnt := cnt + 1;
         fi;
     od;
@@ -989,7 +1000,7 @@ IsImagePointAn := function ( n, z, g, h, j, s, a, b, t1z, t2z )
 
     cnt := 0;
     for k in [ 1 .. 5 ] do
-        if t2z*sc[k] <> sc[k]*t2z then
+        if not(RecSnAnEq(t2z*sc[k],sc[k]*t2z)) then
             cnt := cnt + 1;
         fi;
     od;
@@ -1061,28 +1072,28 @@ FindImageAn := function( n, z, g, h, xis, xisl )
             mxj := xisl[j];
             mxjpm := xisl[j+m];
             while d <= 10 do
-                if tdz[d]*xis[j] = xis[j]*tdz[d] then
+                if RecSnAnEq(tdz[d]*xis[j],xis[j]*tdz[d]) then
                     sup[tim[d][1]] := Difference( sup[tim[d][1]], mxj);
                     sup[tim[d][2]] := Difference( sup[tim[d][2]], mxj);
                     sup[tim[d][3]] := Difference( sup[tim[d][3]], mxj);
                     k := tc[d];
                     for jj in [ 1 .. 2 ] do 
                         dd := Difference(tim[k[jj]], tim[d])[1];
-                        if tdz[k[jj]]*xis[j] = xis[j]*tdz[k[jj]] then
+                        if RecSnAnEq(tdz[k[jj]]*xis[j],xis[j]*tdz[k[jj]]) then
                             sup[dd] :=  Difference( sup[dd], mxj);
                         else
                             sup[dd] :=  Difference( sup[dd], mxjpm);
                         fi;
                     od;
                     d := 11;
-                elif tdz[d]*xis[j+m] = xis[j+m]*tdz[d] then
+                elif RecSnAnEq(tdz[d]*xis[j+m],xis[j+m]*tdz[d]) then
                     sup[tim[d][1]] := Difference(sup[tim[d][1]], mxjpm);
                     sup[tim[d][2]] := Difference(sup[tim[d][2]], mxjpm);
                     sup[tim[d][3]] := Difference(sup[tim[d][3]], mxjpm);
                     k := tc[d];
                     for jj in [ 1 .. 2 ] do 
                         dd := Difference(tim[k[jj]], tim[d])[1];
-                        if tdz[k[jj]]*xis[j+m]=xis[j+m]*tdz[k[jj]] then
+                        if RecSnAnEq(tdz[k[jj]]*xis[j+m],xis[j+m]*tdz[k[jj]]) then
                             sup[dd] :=  Difference( sup[dd], mxjpm);
                         else
                             sup[dd] :=  Difference( sup[dd], mxj);
@@ -1362,7 +1373,7 @@ RecogniseSnAn :=  function( n, grp, eps )
             if gl = fail then return fail; fi;
             slp := SLPforSn( n, gl );
             eval := ResultOfStraightLineProgram(slp, [gens[2],gens[1]]);
-            if eval <> g then return fail; fi;
+            if not(RecSnAnEq(eval,g)) then return fail; fi;
         od;
         return [ "Sn", [gens[1],gens[2]], xis ];
     else
@@ -1388,7 +1399,7 @@ RecogniseSnAn :=  function( n, grp, eps )
                         if gl = fail then return fail; fi;
                         slp := SLPforSn(n, gl);
                         eval := ResultOfStraightLineProgram(slp,[h,b]);
-                        if eval <> g then return fail; fi;
+                        if not(RecSnAnEq(eval,g)) then return fail; fi;
                     od;
                     return [ "Sn", [g,h] ,xis ];
                 else
@@ -1397,7 +1408,7 @@ RecogniseSnAn :=  function( n, grp, eps )
             else
                 slp := SLPforAn( n, gl );
                 eval:=ResultOfStraightLineProgram(slp,[gens[2],gens[1]]);
-                if eval <> g then return fail; fi;			
+                if not(RecSnAnEq(eval,g)) then return fail; fi;			
             fi;
         od;
 
