@@ -455,7 +455,7 @@ FindHomMethodsMatrix.BlockDiagonal := function(ri,G)
   Setmethodsforfactor(ri,FindHomDbProjective);
 
   # the kernel:
-  findgensNmeth(ri).args[1] := Length(ri!.blocks)+5;
+  findgensNmeth(ri).args[1] := Length(ri!.blocks)+10;
   findgensNmeth(ri).args[2] := 7;
   # In the projective case we have to do a trick: We use an isomorphism
   # to a matrix group by multiplying things such that the last block
