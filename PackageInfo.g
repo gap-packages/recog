@@ -92,6 +92,16 @@ Persons := [
     Place         := "St Andrews",
     Institution   := "University of St Andrews"
   ),
+  rec(
+    LastName      := "Malle",
+    FirstNames    := "Gunter",
+    IsAuthor      := true,
+    IsMaintainer  := false,
+    Email         := "malle@mathematik.uni-kl.de",
+    WWWHome       := "http://www.mathematik.uni-kl.de/~malle/",
+    Place         := "Kaiserslautern",
+    Institution   := "Universitaet Kaiserslautern",
+  ),
   rec( 
     LastName      := "Neunhoeffer",
     FirstNames    := "Max",
@@ -124,6 +134,16 @@ Persons := [
                        "Western Australia" ] ),
     Place         := "Perth",
     Institution   := "University of Western Australia"
+  ),
+  rec(
+    LastName      := "O'Brien",
+    FirstNames    := "Eamonn",
+    IsAuthor      := true,
+    IsMaintainer  := false,
+    Email         := "obrien@math.auckland.ac.nz",
+    WWWHome       := "http://www.math.auckland.ac.nz/~obrien/",
+    Place         := "Auckland",
+    Institution   := "University of Auckland",
   ),
   rec(
     LastName      := "Roney-Dougal",
