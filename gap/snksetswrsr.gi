@@ -417,7 +417,7 @@ RECOG.AllJellyfish := function( G )
         fi;
     od;
 
-    Info(InfoRecog,2,"getting jellyfish failed");
+    Info(InfoRecog,3,"getting jellyfish failed");
     return fail;
 
 end;

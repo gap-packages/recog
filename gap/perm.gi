@@ -285,6 +285,25 @@ FindHomMethodsPerm.StabChain :=
      return true;
    end;
 
+SLPforElementFuncsPerm.StabilizerChain := function(ri,x)
+  local r;
+  r := SiftGroupElementSLP(ri!.stabilizerchain,x);
+  return r.slp;
+end;
+
+FindHomMethodsPerm.StabilizerChain := function(ri,G)
+  local Gm,S;
+  Gm := GroupWithMemory(G);
+  S := StabilizerChain(Gm);
+  SetSize(ri,Size(S));
+  ri!.stabilizerchain := S;
+  Setslptonice(ri,SLPOfElms(StrongGenerators(S)));
+  ForgetMemory(S);
+  Setslpforelement(ri,SLPforElementFuncsPerm.StabilizerChain);
+  SetFilterObj(ri,IsLeaf);
+  return true;
+end;
+
 WordinLabels := function(word,S,g)
   local i,point,start;
   if not(IsBound(S.orbit) and IsBound(S.orbit[1])) then
@@ -435,6 +454,9 @@ AddMethod(FindHomDbPerm, FindHomMethodsPerm.Imprimitive,
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.SnkSetswrSr, 
           60, "SnkSetswrSr",
           "tries to find jellyfish" );
+AddMethod(FindHomDbPerm, FindHomMethodsPerm.StabilizerChain, 
+          55, "StabilizerChain", 
+          "for a permutation group using a stabilizer chain (genss)");
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.StabChain, 
           50, "StabChain", 
           "for a permutation group using a stabilizer chain");
