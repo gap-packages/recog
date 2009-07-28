@@ -260,6 +260,10 @@ InstallMethod( FindEvenNormalSubgroup, "for a group object and a record",
           if x = fail then   # suspect that all involutions are central in H!
               Info(InfoFindEvenNormal,2,"Found ",Length(invols),
                    " central ones.");
+              if Length(invols) = 0 then
+                  return rec( success := false,
+                              msg := "No central involutions found" );
+              fi;
               invgrp := Group(invols);
               S := StabilizerChain(invgrp,rec( Projective := opt.Projective,
                                                isone := opt.IsOne ) );
@@ -333,7 +337,7 @@ InstallMethod( FindEvenNormalSubgroup, "for a group object and a record",
 end );
 
 FindHomMethodsProjective.FindEvenNormal := function(ri,G)
-  local r,rr,f,m,mm;
+  local count,r,rr,f,m,mm,res;
   r := FindEvenNormalSubgroup(G,
           rec( Projective := true, DoBlindDescent := true));
   if r.success then
@@ -344,16 +348,26 @@ FindHomMethodsProjective.FindEvenNormal := function(ri,G)
           return RECOG.SortOutReducibleNormalSubgroup(ri,G,r.Ngens,m);
       else
           Info(InfoRecog,2,"Found irreducible proper normal subgroup!");
-          rr := FindEvenNormalSubgroup(Group(r.Ngens),
-                       rec( Projective:=true, DoBlindDescent := true ));
-          if rr.success then
-              mm := GModuleByMats(rr.Ngens,f);
-              if not(MTX.IsIrreducible(mm)) then
-                  return RECOG.SortOutReducibleSecondNormalSubgroup(ri,G,
+          count := 0;
+          repeat
+              count := count + 1;
+              rr := FindEvenNormalSubgroup(Group(r.Ngens),
+                           rec( Projective:=true, DoBlindDescent := true ));
+              if rr.success then
+                  mm := GModuleByMats(rr.Ngens,f);
+                  if MTX.IsIrreducible(mm) then 
+                      Info(InfoRecog,2,
+                           "Second normal subgroup was not reducible.");
+                      return fail; 
+                  fi;
+                  res := RECOG.SortOutReducibleSecondNormalSubgroup(ri,G,
                                     rr.Ngens,mm);
+                  if res = true then return res; fi;
+                  r := rr;
+              else
+                  return fail;
               fi;
-              Info(InfoRecog,2,"Second normal subgroup was not reducible.");
-          fi;
+          until count >= 2;
       fi;
   fi;
   return fail;
