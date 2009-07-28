@@ -296,6 +296,7 @@ FindHomMethodsPerm.StabilizerChain := function(ri,G)
   Gm := GroupWithMemory(G);
   S := StabilizerChain(Gm);
   SetSize(ri,Size(S));
+  SetSize(group(ri),Size(S));
   ri!.stabilizerchain := S;
   Setslptonice(ri,SLPOfElms(StrongGenerators(S)));
   ForgetMemory(S);
