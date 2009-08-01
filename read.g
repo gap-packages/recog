@@ -12,6 +12,9 @@
 ##
 #############################################################################
 
+# Some tools:
+ReadPackage("recog","gap/tools.gi");
+
 # Permutations:
 ReadPackage("recog","gap/recoggiant.gi");
 ReadPackage("recog","gap/snksetswrsr.gi");

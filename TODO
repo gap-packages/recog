@@ -73,3 +73,21 @@ to change once the new vector/matrix interface is in place:
 
   FieldOfMatrixGroup/DefaultFieldOfMatrixGroup
   
+
+Lie:
+
+A,l,q   ->   Darstellungen SL(l+1,q) = proj. Darstellungen PSL(l+1,q)
+B,l,q   ->   Spin(2l+1,q)      PSpin , Omega in SO(2l+1,q)
+C,l,q   ->   Sp(2l,q)                  PSp(2l,q)
+D,l,q   ->   Spin(2l,q)        
+E,6-8,
+F,4
+G,2
+2A,l,q  ->   SU(l+1,q)
+2D,l,q  ->   Spin^-(2l,q)
+3D,4,q
+2E,6,q
+2B,2,q=2^*   (* ist ungerade)
+2F,2,q=2^*   (* ist ungerade)
+2G,2,q=3^*   (* ist ungerade)
+
