@@ -58,7 +58,8 @@ InstallMethod( ViewObj, "for recognition infos", [IsRecognitionInfo],
         Print(" Size=",Size(ri));
     fi;
     if Hasgroup(ri) and IsMatrixGroup(group(ri)) then
-        Print(" Dim=",DimensionOfMatrixGroup(group(ri)));
+        Print(" Dim=",ri!.dimension);
+        Print(" Field=",Size(ri!.field));
     fi;
     if not(IsLeaf(ri)) then
         Print("\n",String("",RECINFORECURLEVEL)," F:"); 
@@ -190,8 +191,8 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
         ri!.dimension := DimensionOfMatrixGroup(H);
     fi;
     ri!.pr := ProductReplacer(GeneratorsOfGroup(H));
-    ri!.prodrep := ProductReplacer(GeneratorsWithMemory(GeneratorsOfGroup(H)),
-                                   rec( maxdepth := 400 ));
+    ri!.gensHmem := GeneratorsWithMemory(GeneratorsOfGroup(H));
+    ri!.prodrep := ProductReplacer(ri!.gensHmem, rec( maxdepth := 400 ));
     ri!.randr := EmptyPlist(100);
     ri!.rando := EmptyPlist(100);
     ri!.randp := EmptyPlist(100);
@@ -418,6 +419,7 @@ InstallGlobalFunction( RecogniseGeneric,
         # these two were set correctly by FindHomomorphism
         if IsLeaf(ri) then SetFilterObj(ri,IsReady); fi;
         if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
+        # StopStoringRandEls(ri);
         return ri;
     fi;
 
@@ -455,8 +457,8 @@ InstallGlobalFunction( RecogniseGeneric,
 
         if IsMatrixGroup(H) then
             Info(InfoRecog,2,"Back from factor (depth=",Length(depth),
-                 ", dim=",DimensionOfMatrixGroup(H),", field=",
-                 Size(FieldOfMatrixGroup(H)),").");
+                 ", dim=",ri!.dimension,", field=",
+                 Size(ri!.field),").");
         else
             Info(InfoRecog,2,"Back from factor (depth=",Length(depth),").");
         fi;
@@ -469,11 +471,9 @@ InstallGlobalFunction( RecogniseGeneric,
 
         # Now we want to have preimages of the new generators in the factor:
         Info(InfoRecog,2,"Calculating preimages of nice generators.");
-        Setpregensfac( ri, CalcNiceGens(rifac,GeneratorsOfGroup(H)));
-
-        ri!.genswithmem := GeneratorsWithMemory(
-            Concatenation(GeneratorsOfGroup(H),pregensfac(ri)));
-        ri!.groupmem := Group(ri!.genswithmem{[1..ri!.nrgensH]});
+        Setpregensfac( ri, CalcNiceGens(rifac,ri!.gensHmem) );
+        ri!.genswithmem := Concatenation(ri!.gensHmem,pregensfac(ri));
+        ForgetMemory(pregensfac(ri));
 
         # Now create the kernel generators with the stored method:
         methgensN := findgensNmeth(ri);
@@ -511,6 +511,7 @@ InstallGlobalFunction( RecogniseGeneric,
         Setnicegens(ri,pregensfac(ri));
         SetFilterObj(ri,IsReady);
         if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
+        # StopStoringRandEls(ri);
         return ri;
     fi;
 
@@ -518,8 +519,7 @@ InstallGlobalFunction( RecogniseGeneric,
     repeat
         # Now we go on as usual:
         SetgensNslp(ri,SLPOfElms(gensN(ri)));
-        # This is now in terms of the generators of H plus the preimages
-        # of the nice generators behind the homomorphism!
+        # This is now in terms of the generators of H!
         N := Group(StripMemory(gensN(ri)));
         
         Add(depth,'K');
@@ -536,7 +536,7 @@ InstallGlobalFunction( RecogniseGeneric,
             Info(InfoRecog,2,"Doing immediate verification.");
             i := 1;
             for i in [1..5] do
-                x := PseudoRandom( ri!.groupmem );
+                x := RandomElm(ri,"VERIFY",true);
                 s := SLPforElement(rifac,ImageElm( homom(ri), x!.el ));
                 if s = fail then
                     Error("Very bad: factor was wrongly recognised and we ",
@@ -571,7 +571,7 @@ InstallGlobalFunction( RecogniseGeneric,
 
     if IsReady(riker) then    # we are only ready when the kernel is
         # Now make the two projection slps:
-        Setnicegens(ri,Concatenation(pregensfac(ri),nicegens(riker)));
+        Setnicegens(ri,Concatenation(pregensfac(ri), nicegens(riker)));
         #ll := List([1..Length(nicegens(rifac))],i->[i,1]);
         #ri!.proj1 := StraightLineProgramNC([ll],Length(nicegens(ri)));
         #ll := List([1..Length(nicegens(riker))],
@@ -580,6 +580,7 @@ InstallGlobalFunction( RecogniseGeneric,
         SetFilterObj(ri,IsReady);
     fi;
     if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
+    # StopStoringRandEls(ri);
     return ri;
   end);
 
@@ -607,8 +608,7 @@ InstallGlobalFunction( CalcNiceGensHomNode,
     if Haskernel(ri) and kernel(ri) <> fail then
         pregensfactor := CalcNiceGens(rifac,origgens);
         riker := kernel(ri);
-        origkergens := ResultOfStraightLineProgram( gensNslp(ri), 
-                    Concatenation(origgens,pregensfactor) );
+        origkergens := ResultOfStraightLineProgram( gensNslp(ri), origgens );
         return Concatenation( pregensfactor,
                               CalcNiceGens(riker,origkergens) );
     else
@@ -667,7 +667,7 @@ InstallGlobalFunction( FindKernelRandom,
     l := gensN(ri);
     rifac := factor(ri);
     for i in [1..n] do
-        x := PseudoRandom( ri!.groupmem );
+        x := RandomElm(ri,"KERNEL",true);
         s := SLPforElement(rifac,ImageElm( homom(ri), x!.el ));
         if s = fail then
             return false;
@@ -715,10 +715,10 @@ InstallGlobalFunction( RandomSubproduct, function(a)
     return prod;
 end );
 
-InstallGlobalFunction( FastNormalClosure , function( grp, list, n )
+InstallGlobalFunction( FastNormalClosure , function( grpgens, list, n )
   local i,list2,randgens,randlist;
   list2:=ShallowCopy(list);
-  if Length(GeneratorsOfGroup(grp)) > 3 then
+  if Length(grpgens) > 3 then
     for i in [1..6*n] do
       if Length(list2)=1 then
         randlist:=list2[1];
@@ -726,7 +726,7 @@ InstallGlobalFunction( FastNormalClosure , function( grp, list, n )
         randlist:=RandomSubproduct(list2);
       fi;
       if not(IsOne(randlist)) then
-        randgens:=RandomSubproduct(GeneratorsOfGroup(grp));
+        randgens:=RandomSubproduct(grpgens);
         if not(IsOne(randgens)) then
           Add(list2,randlist^randgens);
         fi;
@@ -739,8 +739,8 @@ InstallGlobalFunction( FastNormalClosure , function( grp, list, n )
       else
         randlist:=RandomSubproduct(list2);
       fi;
-      if randlist <> One(grp) then
-         for randgens in GeneratorsOfGroup(grp) do
+      if not(IsOne(randlist)) then
+         for randgens in grpgens do
              Add(list2, randlist^randgens);
          od;
       fi;
@@ -759,7 +759,7 @@ InstallGlobalFunction( FindKernelFastNormalClosure,
         return false;
     fi;
 
-    SetgensN(ri,FastNormalClosure(ri!.groupmem,gensN(ri),n2));
+    SetgensN(ri,FastNormalClosure(ri!.genswithmem,gensN(ri),n2));
 
     return true;
   end);
