@@ -655,8 +655,12 @@ RECOG.SLPforAn :=  function( n, pi )
                 if ( j = n-1 and IsOddInt( nexttrpn ) ) or
                    ( j = n and IsEvenInt( nexttrpn ) ) then
                     if IsEvenInt( n-i ) then
-                        Append( cycslp,
+                        if n-i>2 then
+                           Append( cycslp,
                                 [ 3,i+2-n, 2,2, 3,1, 2,1, 3,n-i-3  ] );
+                        else
+                           Append( cycslp, [ 2,2 ] );
+                        fi;
                     else
                         Append( cycslp,
                                 [ 3,i+2-n, 2,1, 3,1, 2,1, 3,n-i-3  ] );
@@ -664,8 +668,12 @@ RECOG.SLPforAn :=  function( n, pi )
                 elif ( j = n and IsOddInt( nexttrpn ) ) or
                      ( j = n-1 and IsEvenInt( nexttrpn ) ) then
                     if IsEvenInt( n-i ) then
-                        Append( cycslp,
+                        if n-i>2 then
+                           Append( cycslp,
                                 [ 3,i+3-n, 2,2, 3,-1, 2,1, 3,n-i-2  ] );
+                        else
+                           Append( cycslp, [ 2,1 ] );
+                        fi;
                     else
                         Append( cycslp,
                                 [ 3,i+3-n, 2,2, 3,-1, 2,2, 3,n-i-2  ] );
