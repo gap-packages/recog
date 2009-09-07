@@ -185,10 +185,156 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     ri!.projective := projective;
     SetfindgensNmeth(ri,rec(method := FindKernelFastNormalClosure, 
                             args := [3,3]));
+    if IsMatrixGroup(H) then
+        ri!.field := FieldOfMatrixGroup(H);
+        ri!.dimension := DimensionOfMatrixGroup(H);
+    fi;
     ri!.pr := ProductReplacer(GeneratorsOfGroup(H));
+    ri!.prodrep := ProductReplacer(GeneratorsWithMemory(GeneratorsOfGroup(H)),
+                                   rec( maxdepth := 400 ));
+    ri!.randr := EmptyPlist(100);
+    ri!.rando := EmptyPlist(100);
+    ri!.randp := EmptyPlist(100);
+    ri!.randrpt := rec();
+    ri!.randopt := rec();
+    ri!.randppt := rec();
+    ri!.randstore := true;
     return ri;
   end );
     
+InstallMethod( RandomElm, "for a recognition info record, a string and a bool",
+  [ IsRecognitionInfo, IsString, IsBool ],
+  function(ri, s, mem)
+    local pos,el;
+    if ri!.randstore then
+        if not(IsBound(ri!.randrpt.(s))) then 
+            ri!.randrpt.(s) := 1; 
+            pos := 1;
+        else
+            ri!.randrpt.(s) := ri!.randrpt.(s) + 1;
+            pos := ri!.randrpt.(s);
+        fi;
+        if not(IsBound(ri!.randr[pos])) then
+            ri!.randr[pos] := Next(ri!.prodrep);
+        fi;
+        el := ri!.randr[pos];
+    else
+        el := Next(ri!.prodrep);
+    fi;
+    if mem then
+        return el;
+    else
+        return el!.el;
+    fi;
+  end );
+
+InstallMethod( RandomElmOrd, 
+  "for a recognition info record, a string and a bool",
+  [ IsRecognitionInfo, IsString, IsBool ],
+  function(ri, s, mem)
+    local pos,res;
+    if ri!.randstore then
+        if not(IsBound(ri!.randopt.(s))) then 
+            ri!.randopt.(s) := 1; 
+            pos := 1;
+        else
+            ri!.randopt.(s) := ri!.randopt.(s) + 1;
+            pos := ri!.randopt.(s);
+        fi;
+        if not(IsBound(ri!.rando[pos])) then
+            if not(IsBound(ri!.randr[pos])) then
+                ri!.randr[pos] := Next(ri!.prodrep);
+            fi;
+            if ri!.projective then
+                ri!.rando[pos] := ProjectiveOrder(ri!.randr[pos]!.el)[1];
+            else
+                ri!.rando[pos] := Order(ri!.randr[pos]!.el);
+            fi;
+        fi;
+        res := rec( order := ri!.rando[pos], projective := ri!.projective,
+                    el := ri!.randr[pos] );
+    else
+        res := rec( el := Next(ri!.prodrep) );
+        if ri!.projective then
+            res.order := ProjectiveOrder(res.el!.el)[1];
+        else
+            res.order := Order(res.el!.el);
+        fi;
+        res.projective := ri!.projective;
+        Add(ri!.rando,res.order);
+    fi;
+    if not(mem) then
+        res.el := res.el!.el;
+    fi;
+    return res;
+  end );
+
+InstallMethod( RandomElmPpd, 
+  "for a recognition info record, a string and a bool",
+  [ IsRecognitionInfo, IsString, IsBool ],
+  function(ri, s, mem)
+    local pos,res;
+    if ri!.randstore then
+        if not(IsBound(ri!.randppt.(s))) then 
+            ri!.randppt.(s) := 1; 
+            pos := 1;
+        else
+            ri!.randppt.(s) := ri!.randppt.(s) + 1;
+            pos := ri!.randppt.(s);
+        fi;
+        if not(IsBound(ri!.randp[pos])) then
+            if not(IsBound(ri!.randr[pos])) then
+                ri!.randr[pos] := Next(ri!.prodrep);
+            fi;
+            if not(IsMatrix(ri!.randr[pos])) then
+                Error("ppd elements only make sense for matrices");
+            fi;
+            res := rec( el := ri!.randr[pos] );
+            res.charpoly := CharacteristicPolynomial(ri!.field,ri!.field,
+                                                     res.el!.el,1);
+            res.factors := Factors(PolynomialRing(ri!.field), res.charpoly);
+            res.degrees := List(res.factors,Degree);
+            res.degset := Set(res.degrees);
+            ri!.randp[pos] := ShallowCopy(res);
+            Unbind(ri!.randp[pos].el);
+        else
+            res := ShallowCopy(ri!.randp[pos]);
+            res.el := ri!.randr[pos];
+        fi;
+    else
+        res := rec( el := Next(ri!.prodrep) );
+        res.charpoly := CharacteristicPolynomial(ri!.field,ri!.field,
+                                                 res.el!.el,1);
+        res.factors := Factors(PolynomialRing(ri!.field), res.charpoly);
+        res.degrees := List(res.factors,Degree);
+        res.degset := Set(res.degrees);
+    fi;
+    if not(mem) then
+        res.el := res.el!.el;
+    fi;
+    return res;
+  end );
+
+
+InstallMethod( RandomOrdersSeen, "for a recognition info record",
+  [ IsRecognitionInfo ],
+  function(ri)
+    return Compacted(ri!.rando);
+  end );
+
+InstallMethod( StopStoringRandEls, "for a recognition info record",
+  [ IsRecognitionInfo ],
+  function(ri)
+    ri!.randstore := false;
+    Unbind(ri!.randr);
+    Unbind(ri!.randp);
+    Unbind(ri!.randrpt);
+    Unbind(ri!.randopt);
+    Unbind(ri!.randppt);
+    ri!.rando := Compacted(ri!.rando);
+    # Note that we keep the random element orders seen!
+  end );
+
 InstallGlobalFunction( PrintTreePos,
   function(mark,depth,H)
     if InfoLevel(InfoRecog) = 1 then
@@ -328,7 +474,6 @@ InstallGlobalFunction( RecogniseGeneric,
         ri!.genswithmem := GeneratorsWithMemory(
             Concatenation(GeneratorsOfGroup(H),pregensfac(ri)));
         ri!.groupmem := Group(ri!.genswithmem{[1..ri!.nrgensH]});
-        ri!.prmem := ProductReplacer(ri!.genswithmem);
 
         # Now create the kernel generators with the stored method:
         methgensN := findgensNmeth(ri);
