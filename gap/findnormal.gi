@@ -12,7 +12,7 @@
 ##
 #############################################################################
 
-InstallValue( FINDNORMALOPTS, rec(
+InstallValue( FINDEVENNORMALOPTS, rec(
   # Try up to this limit random elements to find an involution:
   NonCentInvSearchLimit := 20,
   # Number of random elements for normal closure computation:
@@ -308,7 +308,7 @@ InstallMethod( FindEvenNormalSubgroup, "for a group object and a record",
       if not(IsBound(opt.Eq)) then opt.Eq := RECOG_EqProjective; fi;
       if not(IsBound(opt.Order)) then opt.Order := RECOG.ProjectiveOrder; fi;
   fi;
-  GENSS_CopyDefaultOptions( FINDNORMALOPTS, opt );
+  GENSS_CopyDefaultOptions( FINDEVENNORMALOPTS, opt );
 
   # Initialise a product replacer:
   if not(IsBound(opt.pr)) then

@@ -318,8 +318,8 @@ FindHomMethodsProjective.D247 := function(ri,G)
   CheckNormalClosure := function(x)
     # This is called with an element that we hope lies in a normal subgroup.
     local H,a,basis,collf,conjgensG,count,dim,hom,homcomp,homs,homsimg,i,
-          kro,m,mm,mult,n,ngens,nngens,o,orb,pr,r,subdim,y,z;
-    ngens := FastNormalClosure(G,[x],4);
+          kro,m,mm,mult,ngens,nngens,o,orb,pr,r,subdim,y,z;
+    ngens := FastNormalClosure(GeneratorsOfGroup(G),[x],4);
     m := GModuleByMats(ngens,f);
     if MTX.IsIrreducible(m) then
         if not(ispower) then 
@@ -328,7 +328,7 @@ FindHomMethodsProjective.D247 := function(ri,G)
         fi;
         # we want to look for D7 here, using the same trick again:
         count := 0;
-        n := GroupWithGenerators(ngens);
+        #n := GroupWithGenerators(ngens);
         pr := ProductReplacer(ngens);
         y := RECOG.InvolutionJumper(pr,RECOG.ProjectiveOrder,x,200,false);
         if y = fail then return fail; fi;
@@ -336,7 +336,7 @@ FindHomMethodsProjective.D247 := function(ri,G)
             z := RECOG.InvolutionJumper(pr,RECOG.ProjectiveOrder,y,200,false);
             if z <> fail then y := z; fi;
         od;
-        nngens := FastNormalClosure(n,[y],2);
+        nngens := FastNormalClosure(ngens,[y],2);
         mm := GModuleByMats(nngens,f);
         if not(MTX.IsIrreducible(mm)) then
             return RECOG.SortOutReducibleSecondNormalSubgroup(ri,G,nngens,mm);

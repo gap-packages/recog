@@ -15,7 +15,7 @@
 DeclareInfoClass("InfoFindEvenNormal");
 SetInfoLevel(InfoFindEvenNormal,0);
 
-DeclareGlobalVariable("FINDNORMALOPTS");
+DeclareGlobalVariable("FINDEVENNORMALOPTS");
 
 DeclareGlobalFunction("RECOG_EqProjective");
 DeclareGlobalFunction("RECOG_IsNormal");

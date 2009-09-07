@@ -56,7 +56,7 @@ RECOG.FindTensorKernel := function(G,onlyone)
           fi;
       od;
       #Print(Length(notused)," \c");
-      N := GroupWithGenerators(FastNormalClosure(G,[c],10));
+      N := GroupWithGenerators(FastNormalClosure(GeneratorsOfGroup(G),[c],10));
       if onlyone and
          (ForAny(GeneratorsOfGroup(N),m->IsZero(m[1][1]) or 
                                          not(IsOne(m*(m[1][1])^-1)))) then

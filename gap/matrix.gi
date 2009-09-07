@@ -568,7 +568,7 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
                        # giving no new dimension
     rifac := factor(ri);
     while nothingnew < 10 do
-        x := PseudoRandom( ri!.groupmem );
+        x := RandomElm(ri,"KERNEL",true);
         s := SLPforElement(rifac,ImageElm( homom(ri), x!.el ));
         y := ResultOfStraightLineProgram(s,
                  ri!.genswithmem{[ri!.nrgensH+1..Length(ri!.genswithmem)]});

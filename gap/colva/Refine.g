@@ -52,6 +52,7 @@ InsertSubTree := function(ri,rifac,maps)
    lri[i]!.genswithmem := GeneratorsWithMemory(
             Concatenation(GeneratorsOfGroup(group(lri[i])),pregensfac(lri[i])));
    lri[i]!.groupmem := Group(lri[i]!.genswithmem{[1..lri[i]!.nrgensH]});
+   # FIXME: This is broken due to the new random element infrastructure!
 
 
 # Setup the kernel

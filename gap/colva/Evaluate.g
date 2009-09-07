@@ -249,6 +249,7 @@ InstallGlobalFunction( NormalTree,
         ri!.genswithmem := GeneratorsWithMemory(
             Concatenation(GeneratorsOfGroup(H),pregensfac(ri)));
         ri!.groupmem := Group(ri!.genswithmem{[1..ri!.nrgensH]});
+        # FIXME: This is broken due to the new random element infrastructure!
 
         # Now create the kernel generators with the stored method:
         Info(InfoRecognition,2,"Creating kernel elements.");

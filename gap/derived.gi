@@ -20,7 +20,7 @@ RECOG.DerivedSubgroupMonteCarlo := function(g)
       y := PseudoRandom(g);
       Add(gens,Comm(x,y));
   od;
-  gens2 := FastNormalClosure(g,gens,10);
+  gens2 := FastNormalClosure(GeneratorsOfGroup(g),gens,10);
   return GroupWithGenerators(gens2);
 end;
 

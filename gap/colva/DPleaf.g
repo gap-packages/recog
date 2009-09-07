@@ -308,7 +308,7 @@ SolveLeafDP := function(ri,rifac,name)
  econj := List([1..Size(e)],i->GroupHomomorphismByFunction(group(ri),group(ri),g->g^e[i]));
 
  gens := List([1..3],i->FindPoint(group(ri),phi,1,I));  
- H1 := SubgroupNC(group(ri),FastNormalClosure(group(ri),gens,1));
+ H1 := SubgroupNC(group(ri),FastNormalClosure(GeneratorsOfGroup(group(ri)),gens,1));
  H1toblk := phi*projs[1];
  H1toblk!.Source := H1;
  blk := GroupWithGenerators(List(GeneratorsOfGroup(H1),x->ImageElm(H1toblk,x)));
