@@ -115,7 +115,7 @@ FindHomMethodsProjective.StabilizerChain := function(ri,G)
   #if q^(d-1) > 100000 then
   #    opt.TryShortOrbit := 5;
   #fi;
-  Gm := GroupWithMemory(G);
+  Gm := GroupWithGenerators(ri!.gensHmem);
   S := StabilizerChain(Gm,opt);
   SetSize(ri,Size(S));
   ri!.stabilizerchain := S;
