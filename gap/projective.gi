@@ -627,17 +627,20 @@ AddMethod( FindHomDbProjective, FindHomMethodsProjective.TensorDecomposable,
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.LowIndex,
    600, "LowIndex",
         "find an (imprimitive) action on subspaces" );
-# By now we suspect it to be a simple group
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.SporadicsByOrders,
-   550, "SporadicsByOrders",
-        "generate a few random elements and compute the proj. orders" );
+# By now we suspect it to be an almost simple group
+#AddMethod( FindHomDbProjective, FindHomMethodsProjective.SporadicsByOrders,
+#   550, "SporadicsByOrders",
+#        "generate a few random elements and compute the proj. orders" );
 # Disabled because it has a bug and is not fast enough:
 #AddMethod( FindHomDbProjective, FindHomMethodsProjective.AlternatingBBByOrders,
 #   530, "AlternatingBBByOrders",
 #        "generate a few random elements and compute the proj. orders" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.TwoLargeElOrders,
-   500, "TwoLargeElOrders",
-        "look at two large element orders" );
+AddMethod( FindHomDbProjective, FindHomMethodsProjective.ComputeSimpleSocle, 
+   550, "ComputeSimpleSocle",
+        "compute simple socle of almost simple group" );
+AddMethod( FindHomDbProjective, FindHomMethodsProjective.ThreeLargeElOrders,
+   500, "ThreeLargeElOrders",
+        "look at three large element orders" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.StabilizerChain,
    100, "StabilizerChain",
         "last resort: compute a stabilizer chain (projectively)" );

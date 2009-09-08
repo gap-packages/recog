@@ -208,10 +208,6 @@ RECOG.SortOutReducibleNormalSubgroup :=
             return false;
         fi;
         homs := MTX.Homomorphisms(collf[1][1],m);
-        if Length(homs) = 0 then
-            Info(InfoRecog,2,"Restricted module not semisimple ==> not normal");
-            return false;
-        fi;
         basis := Concatenation(homs);
 # FIXME: This will go:
         ConvertToMatrixRep(basis,Size(f));
@@ -249,6 +245,10 @@ RECOG.SortOutReducibleNormalSubgroup :=
            " (",Length(collf)," elements)...");
     # Now find a homogeneous component to act on it:
     homs := MTX.Homomorphisms(collf[1][1],m);
+    if Length(homs) = 0 then
+        Info(InfoRecog,2,"Restricted module not semisimple ==> not normal");
+        return fail;
+    fi;
     homsimg := BasisVectors(Basis(VectorSpace(f,Concatenation(homs))));
     homcomp := MutableCopyMat(homsimg);
 # FIXME: This will go:
