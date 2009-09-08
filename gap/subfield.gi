@@ -653,7 +653,7 @@ FindHomMethodsProjective.Subfield :=
     # We assume G to be absolutely irreducible, although this is not 
     # necessary:
     local Gprime,H,b,dim,f,hom,mo,newgens,pf,r;
-    f := FieldOfMatrixGroup(G);
+    f := ri!.field;
     if IsPrimeField(f) then
         return false;     # nothing to do
     fi;
@@ -663,7 +663,7 @@ FindHomMethodsProjective.Subfield :=
     if not(MTX.IsIrreducible(ri!.meataxemodule)) then
         return false;     # not our case
     fi;
-    dim := DimensionOfMatrixGroup(G);
+    dim := ri!.dimension;
     pf := PrimeField(f);
     b := SUBFIELD.BaseChangeForSmallestPossibleField(G,ri!.meataxemodule,f);
     if b <> fail then

@@ -194,7 +194,7 @@ RECOG.SortOutReducibleNormalSubgroup :=
 
     local H,a,basis,collf,conjgensG,f,hom,homcomp,homs,homsimg,kro,o,r,subdim;
 
-    f := FieldOfMatrixGroup(G);
+    f := ri!.field;
     collf := MTX.CollectedFactors(m);
     if Length(collf) = 1 then    # only one homogeneous component!
         if MTX.Dimension(collf[1][1]) = 1 then
@@ -208,6 +208,10 @@ RECOG.SortOutReducibleNormalSubgroup :=
             return false;
         fi;
         homs := MTX.Homomorphisms(collf[1][1],m);
+        if Length(homs) = 0 then
+            Info(InfoRecog,2,"Restricted module not semisimple ==> not normal");
+            return false;
+        fi;
         basis := Concatenation(homs);
 # FIXME: This will go:
         ConvertToMatrixRep(basis,Size(f));
@@ -251,7 +255,7 @@ RECOG.SortOutReducibleNormalSubgroup :=
 ConvertToMatrixRep(homcomp,Size(f));
     TriangulizeMat(homcomp);
     o := Orb(G,homcomp,OnSubspacesByCanonicalBasis,rec(storenumbers := true));
-    Enumerate(o,QuoInt(DimensionOfMatrixGroup(G),Length(homcomp)));
+    Enumerate(o,QuoInt(ri!.dimension,Length(homcomp)));
     if not(IsClosed(o)) then
         Info(InfoRecog,2,"D247:Obviously did not get normal subgroup!");
         return fail;
@@ -349,8 +353,8 @@ FindHomMethodsProjective.D247 := function(ri,G)
   end;   
 
   Info(InfoRecog,2,"D247: Trying the involution jumper 9 times...");
-  f := FieldOfMatrixGroup(G);
-  ispower := Length(RECOG.IsPower(DimensionOfMatrixGroup(G))) > 0;
+  f := ri!.field;
+  ispower := Length(RECOG.IsPower(ri!.dimension)) > 0;
   x := RECOG.InvolutionSearcher(ri!.pr,RECOG.ProjectiveOrder,100);
   if x = fail then
       Info(InfoRecog,2,"Did not find an involution! Giving up.");

@@ -41,7 +41,7 @@ end;
 FindHomMethodsMatrix.DiagonalMatrices := function(ri, G)
   local H,d,f,gens,hom,i,isscalars,j,newgens,upperleft;
 
-  d := DimensionOfMatrixGroup(G);
+  d := ri!.dimension;
   if d = 1 then
       Info(InfoRecog,2,"Found dimension 1, going to Scalars method");
       return FindHomMethodsMatrix.Scalar(ri,G);
@@ -53,7 +53,7 @@ FindHomMethodsMatrix.DiagonalMatrices := function(ri, G)
   fi;
 
   # FIXME: FieldOfMatrixGroup
-  f := FieldOfMatrixGroup(G);
+  f := ri!.field;
   isscalars := true;
   i := 1;
   while isscalars and i <= Length(gens) do
@@ -100,7 +100,7 @@ end;
 
 #FindHomMethodsMatrix.Determinant := function(ri, G)
 #  local H,d,dets,gens,hom;
-#  d := DimensionOfMatrixGroup(G);
+#  d := ri!.dimension;
 #  if d = 1 then
 #      Info(InfoRecog,2,"Found dimension 1, going to Scalar method");
 #      return FindHomMethodsMatrix.Scalar(ri,G);
@@ -137,12 +137,12 @@ end;
 
 FindHomMethodsMatrix.Scalar := function(ri, G)
   local f,gcd,generator,gens,i,l,o,pows,q,rep,slp,subset,z;
-  if DimensionOfMatrixGroup(G) > 1 then
+  if ri!.dimension > 1 then
       return NotApplicable;
   fi;
 
   # FIXME: FieldOfMatrixGroup
-  f := FieldOfMatrixGroup(G);
+  f := ri!.field;
   o := One(f);
   gens := List(GeneratorsOfGroup(G),x->x[1][1]);
   subset := Filtered([1..Length(gens)],i->not(IsOne(gens[i])));
@@ -366,7 +366,7 @@ FindHomMethodsMatrix.ReducibleIso := function(ri,G)
   fi;
 
   # FIXME:
-  f := FieldOfMatrixGroup(G);
+  f := ri!.field;
   m := GModuleByMats(GeneratorsOfGroup(G),f);
   isirred := MTX.IsIrreducible(m);
   
@@ -380,7 +380,7 @@ FindHomMethodsMatrix.ReducibleIso := function(ri,G)
   bc := RECOG.FindAdjustedBasis(compseries);
 
   Info(InfoRecog,2,"Found composition series with block sizes ",
-       List(bc.blocks,Length)," (dim=",DimensionOfMatrixGroup(G),")");
+       List(bc.blocks,Length)," (dim=",ri!.dimension,")");
 
   # Do the base change:
   newgens := List(GeneratorsOfGroup(G),x->bc.base*x*bc.baseinv);
@@ -490,7 +490,7 @@ end;
 #
 #  # Project onto factor:
 #  gens := GeneratorsOfGroup(G);
-#  dim := DimensionOfMatrixGroup(G);
+#  dim := ri!.dimension;
 #  data := rec(subdim := ri!.subdim);
 #  newgens := List(gens, x->RECOG.HomInducedOnFactor(data,x));
 #  H := GroupWithGenerators(newgens);
@@ -549,7 +549,7 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
   function(ri)
     local b,curlay,done,el,f,i,l,lens,lvec,nothingnew,pivots,pos,ready,
           rifac,s,v,x,y;
-    f := FieldOfMatrixGroup(group(ri));
+    f := ri!.field;
     if not(IsPrimeField(f)) then
         b := CanonicalBasis(f);  # a basis over the prime field
     else
@@ -691,7 +691,7 @@ FindHomMethodsMatrix.LowerLeftPGroup := function(ri,G)
       return NotApplicable;
   fi; 
   # We are done, because we can do linear algebra:
-  f := FieldOfMatrixGroup(G);
+  f := ri!.field;
   p := Characteristic(f);
   SetFilterObj(ri,IsLeaf);
   Setslpforelement(ri,SLPforElementFuncsMatrix.LowerLeftPGroup);
@@ -707,7 +707,7 @@ FindHomMethodsMatrix.GoProjective := function(ri,G)
   Setmethodsforfactor(ri,FindHomDbProjective);
 
   # the kernel:
-  q := Size(FieldOfMatrixGroup(G));
+  q := Size(ri!.field);
   findgensNmeth(ri).args[1] := Length(Factors(q-1))+5;
   findgensNmeth(ri).args[2] := 0;
   return true;
@@ -715,9 +715,8 @@ end;
   
 #FindHomMethodsMatrix.SmallVectorSpace := function(ri,G)
 #  local d,f,hom,l,method,o,q,r,v,w;
-#  d := DimensionOfMatrixGroup(G);
-#  # FIXME: FieldOfMatrixGroup
-#  f := FieldOfMatrixGroup(G);
+#  d := ri!.dimension;
+#  f := ri!.field;
 #  q := Size(f);
 #  if q^d > 10000 then
 #      return false;

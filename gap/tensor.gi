@@ -325,11 +325,11 @@ FindHomMethodsProjective.TensorDecomposable := function(ri,G)
   # factorization test... Later!
   # Do we want?
 
-  d := DimensionOfMatrixGroup(G);
+  d := ri!.dimension;
   if IsPrime(d) then
       return false;
   fi;
-  f := FieldOfMatrixGroup(G);
+  f := ri!.field;
 
   # Now assume a tensor factorization exists:
   #Gm := GroupWithMemory(G);???
@@ -402,7 +402,7 @@ FindHomMethodsProjective.KroneckerProduct := function(ri,G)
 
   # Tell the kernel that it is block diagonal projectively:
   bl := [];
-  d := DimensionOfMatrixGroup(G);
+  d := ri!.dimension;
   for i in [1,1+ri!.blocksize..d-ri!.blocksize+1] do
       Add(bl,[i..i+ri!.blocksize-1]);
   od;

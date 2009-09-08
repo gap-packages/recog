@@ -28,7 +28,7 @@ FindHomMethodsProjective.Derived :=
   function(ri,G)
     # We assume G to act absolutely irreducible
     local H,a,basis,collf,conjgensG,f,hom,homcomp,homs,homsimg,kro,o,r,subdim;
-    f := FieldOfMatrixGroup(G);
+    f := ri!.field;
     if not(IsBound(ri!.derived)) then
       ri!.derived := RECOG.DerivedSubgroupMonteCarlo(G);
       ri!.derived_mtx := GModuleByMats(GeneratorsOfGroup(ri!.derived),f);

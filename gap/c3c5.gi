@@ -123,7 +123,7 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
       return false;
   fi;
 
-  f := FieldOfMatrixGroup(G);
+  f := ri!.field;
 
   # This usually comes after "ReducibleIso", which provides the following,
   # however, just to be sure:
@@ -355,7 +355,7 @@ FindHomMethodsProjective.Subfield :=
     # We assume G to be absolutely irreducible, although this is not 
     # necessary:
     local Gprime,H,b,dim,f,hom,mo,newgens,pf,r;
-    f := FieldOfMatrixGroup(G);
+    f := ri!.field;
     if IsPrimeField(f) then
         return false;     # nothing to do
     fi;
@@ -365,7 +365,7 @@ FindHomMethodsProjective.Subfield :=
     if not(MTX.IsIrreducible(ri!.meataxemodule)) then
         return false;     # not our case
     fi;
-    dim := DimensionOfMatrixGroup(G);
+    dim := ri!.dimension;
     pf := PrimeField(f);
     b := RECOG.BaseChangeForSmallestPossibleField(G,ri!.meataxemodule,f);
     if b <> fail then
@@ -396,7 +396,7 @@ end;
 RECOG.HomCommutator := function(data,el)
   local y;
   y := Comm(data.x,el);
-  if RECOG.IsScalarMat(y) = fail then return fail; fi;
+  if RECOG.IsScalarMat(y) = false then return fail; fi;
   return ExtractSubMatrix(y,[1],[1]);
 end;
 
@@ -531,16 +531,16 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
   # the derived subgroup...
   local H,HH,Hgens,a,b,basis,c,cc,cgen,collf,coms,conjgensG,cyc,deg,dim,
         f,g,gens,gensim,hom,homcomp,homs,homsimg,i,j,kro,m,newgens,nr,o,
-        pf,pos,pr,pr2,q,r,scalar,subdim,x;
+        pf,pos,pr,pr2,q,r,scalar,subdim,x,poss;
 
-  f := FieldOfMatrixGroup(G);
+  f := ri!.field;
   if not(IsBound(ri!.meataxemodule)) then
       ri!.meataxemodule := GModuleByMats(GeneratorsOfGroup(G),f);
   fi;
   if not(MTX.IsIrreducible(ri!.meataxemodule)) then
       return false;     # not our case
   fi;
-  dim := DimensionOfMatrixGroup(G);
+  dim := ri!.dimension;
   pf := PrimeField(f);
 
   # First compute a few random commutators:
@@ -588,6 +588,9 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
           hom := GroupHomByFuncWithData(G,H,RECOG.HomCommutator,r);
           Sethomom(ri,hom);
           Setmethodsforfactor(ri,FindHomDbMatrix);
+          poss := Filtered([1..Length(gensim)],i->IsOne(gensim[i]));
+          Append(gensN(ri),ri!.gensHmem{poss});
+          findgensNmeth(ri).args[1] := 5;
           return true;
       fi;
   fi;

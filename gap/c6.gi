@@ -717,8 +717,7 @@ FindHomMethodsProjective.C6 := function(ri,G)
                  RECOG.HomFuncActionOnBlocks, 
                  rec(r := re.r,n := re.n,q := re.q,blks := re.basis.blocks));
         forkernel(ri).t := re.basis.blocks.blocks;
-        forkernel(ri).blocksize := DimensionOfMatrixGroup(G)
-                                   / re.basis.blocks.ell;
+        forkernel(ri).blocksize := ri!.dimension / re.basis.blocks.ell;
         Add(forkernel(ri).hints, 
             rec(method := FindHomMethodsProjective.DoBaseChangeForBlocks, 
                 rank := 2000, stamp := "DoBaseChangeForBlocks"),1);
@@ -734,6 +733,7 @@ FindHomMethodsProjective.C6 := function(ri,G)
         findgensNmeth(ri).args[1] := 3 + re.n;
         findgensNmeth(ri).args[2] := 5;
         Setimmediateverification(ri,true);
+        Setmethodsforfactor(ri,FindHomDbMatrix);
     fi;
     Sethomom(ri,hom);
 

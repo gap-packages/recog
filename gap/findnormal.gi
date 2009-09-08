@@ -341,7 +341,7 @@ FindHomMethodsProjective.FindEvenNormal := function(ri,G)
   r := FindEvenNormalSubgroup(G,
           rec( Projective := true, DoBlindDescent := true));
   if r.success then
-      f := FieldOfMatrixGroup(G);
+      f := ri!.field;
       m := GModuleByMats(r.Ngens,f);
       if not(MTX.IsIrreducible(m)) then
           Info(InfoRecog,2,"Found reducible proper normal subgroup!");

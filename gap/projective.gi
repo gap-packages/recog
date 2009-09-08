@@ -106,11 +106,12 @@ SLPforElementFuncsProjective.StabilizerChain := function(ri,x)
 end;
 
 FindHomMethodsProjective.StabilizerChain := function(ri,G)
-  local Gm,S,d,f,opt,q;
-  d := DimensionOfMatrixGroup(G);
-  f := FieldOfMatrixGroup(G);
+  local Gm,S,d,f,opt,q,fu;
+  d := ri!.dimension;
+  f := ri!.field;
   q := Size(f);
-  opt := rec( Projective := true );
+  fu := function() return RandomElm(ri,"StabChain",true); end;
+  opt := rec( Projective := true, RandomElmFunc := fu );
   #if q^(d-1) > 100000 then
   #    opt.TryShortOrbit := 5;
   #fi;
@@ -120,6 +121,7 @@ FindHomMethodsProjective.StabilizerChain := function(ri,G)
   ri!.stabilizerchain := S;
   Setslptonice(ri,SLPOfElms(StrongGenerators(S)));
   ForgetMemory(S);
+  Unbind(S!.opt.RandomElmFunc);
   Setslpforelement(ri,SLPforElementFuncsProjective.StabilizerChain);
   SetFilterObj(ri,IsLeaf);
   return true;
@@ -131,8 +133,8 @@ end;
 
 FindHomMethodsProjective.ProjDeterminant := function(ri,G)
   local H,c,d,detsadd,f,gcd,hom,newgens,q,z;
-  f := FieldOfMatrixGroup(G);
-  d := DimensionOfMatrixGroup(G);
+  f := ri!.field;
+  d := ri!.dimension;
   q := Size(f);
   gcd := GcdInt(q-1,d);
   if gcd = 1 then return false; fi;
@@ -403,7 +405,7 @@ FindHomMethodsProjective.AlternatingBBByOrders := function(ri,G)
   else
       ordersseen := [];
   fi;
-  limit := QuoInt(3*DimensionOfMatrixGroup(G),2);
+  limit := QuoInt(3*ri!.dimension,2);
   while Length(ordersseen) <= limit do
       Add(ordersseen,RECOG.ProjectiveOrder(PseudoRandom(G)));
       if Length(ordersseen) mod 20 = 0 or

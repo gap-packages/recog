@@ -181,8 +181,8 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
 
   Info(InfoRecog,2,"Got hint for group, trying LowIndex...");
 
-  fld := FieldOfMatrixGroup(G);
-  d := DimensionOfMatrixGroup(G);
+  fld := ri!.field;
+  d := ri!.dimension;
   if IsBound(hint.elordersstart) then
       repeat
           x := PseudoRandom(G);
@@ -332,10 +332,10 @@ InstallGlobalFunction( LookupHintForSimple,
     if IsBound(RECOG.SimplesHints.(name)) then
         j := 1;
         hi := RECOG.SimplesHints.(name);
-        f := DefaultFieldOfMatrixGroup(G);
+        f := ri!.field;
         p := Characteristic(f);
         q := Size(f);
-        dim := DimensionOfMatrixGroup(G);
+        dim := ri!.dimension;
         while j <= Length(hi) do
             if (not(IsBound(hi[j].characteristics)) or 
                 p in hi[j].characteristics) and 
@@ -367,7 +367,7 @@ FindHomMethodsProjective.LowIndex := function(ri,G)
   else
       res := res[1];
       # Now distinguish between a block system and just an orbit:
-      if Length(res.orb) * Length(res.orb[1]) <> DimensionOfMatrixGroup(G) then
+      if Length(res.orb) * Length(res.orb[1]) <> ri!.dimension then
           Info(InfoRecog,2,"Found orbit of length ",Length(res.orb),
                " - not a block system.");
       else
@@ -422,7 +422,7 @@ FindHomMethodsProjective.Blocks := function(ri,G)
   hom := IdentityMapping(G);
   Sethomom(ri,hom);
   blocks := [];
-  d := DimensionOfMatrixGroup(G);
+  d := ri!.dimension;
   for i in [1..d/ri!.blocksize] do
       Add(blocks,[(i-1)*ri!.blocksize+1..i*ri!.blocksize]);
   od;
@@ -471,7 +471,7 @@ end;
 
 #FindHomMethodsProjective.BalTreeForBlocks := function(ri,G)
 #  local H,cut,dim,hom,newgens,nrblocks,subdim,gen;
-#  dim := DimensionOfMatrixGroup(G);
+#  dim := ri!.dimension;
 #  nrblocks := dim / ri!.blocksize;   # this we know from above
 #  if nrblocks = 1 then     # this might happen during the descent into the tree
 #      return false;

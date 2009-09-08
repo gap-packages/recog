@@ -118,7 +118,7 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
       return false;
   fi;
 
-  f := FieldOfMatrixGroup(G);
+  f := ri!.field;
 
   # Just to be sure:
   if not(IsBound(ri!.meataxemodule)) then

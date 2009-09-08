@@ -2477,8 +2477,8 @@ FindHomMethodsMatrix.NaturalSL := function(ri,G)
     fi;
 
 
-  n:=DimensionOfMatrixGroup(G);
-  q:=Size(FieldOfMatrixGroup(G));
+  n:=ri!.dimension;
+  q:=Size(ri!.field);
   p:=Factors(q)[1];
   e:=LogInt(q,p);
   grpmem := GroupWithMemory(G);

@@ -4329,7 +4329,7 @@ end;
 
 FindHomMethodsProjective.TwoLargeElOrders := function(ri,G)
   local d,epsilon,hint,i,max,name,namecat,nr,o,p,res,tab;
-  d := DimensionOfMatrixGroup(G);
+  d := ri!.dimension;
   epsilon := 1/100;
   #nr := 16 * LogInt(3*d,2) * LogInt(2/epsilon,2);
   # A cheat: 16 is theoretically OK for up to degree 5000,
