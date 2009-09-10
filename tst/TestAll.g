@@ -32,3 +32,5 @@ ReadPackage("recog","tst/MatC3_2.g");
 ReadPackage("recog","tst/MatHSmax5.g");
 ReadPackage("recog","tst/ProjDet.g");
 ReadPackage("recog","tst/ProjTensorInduced.g");
+ReadPackage("recog","tst/MatSn.g");
+ReadPackage("recog","tst/MatAn.g");
