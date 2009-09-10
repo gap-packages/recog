@@ -198,9 +198,15 @@ RECOG.SortOutReducibleNormalSubgroup :=
     collf := MTX.CollectedFactors(m);
     if Length(collf) = 1 then    # only one homogeneous component!
         if MTX.Dimension(collf[1][1]) = 1 then
-            Error("This should never have happened (345), tell Max.");
-            # This should have been caught by using projective orders.
-            return false;
+            # If we get here, the computed normal closure cannot be normal
+            # since if m were semisimple, then all generators would be scalar
+            # which they were not. So we conclude that FastNormalClosure
+            # did not compute the full normal closure and for the moment
+            # give up.
+            # Usually this should have been caught by using projective orders.
+            Info(InfoRecog,2,"D247:Scalar subgroup, FastNormalClosure must ",
+                 "have made a mistake!");
+            return fail;
         fi;
         Info(InfoRecog,2,"D247:Restriction to normal subgroup is homogeneous.");
         if not(MTX.IsAbsolutelyIrreducible(collf[1][1])) then

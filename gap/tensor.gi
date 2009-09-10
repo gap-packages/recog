@@ -155,7 +155,6 @@ RECOG.FindTensorDecomposition := function(G,N)
   h := Concatenation(h);
   ConvertToMatrixRep(h);
 
-Error();
   if i > Length(l) then    # by Clifford this should never happen, but still...
       if Length(l) = 1 then
           return fail;

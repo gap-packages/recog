@@ -23,7 +23,7 @@
 ##
 ##
 DeclareInfoClass( "InfoRecSnAn" );
-SetInfoLevel( InfoRecSnAn, 3 );
+SetInfoLevel( InfoRecSnAn, 0 );
 
 # The following are used for comparisons:
 RecSnAnIsOne := IsOne;
@@ -1361,7 +1361,8 @@ RecogniseSnAn :=  function( n, grp, eps )
         le := le + 1;
     od;
 
-    N := Int(24 * (4/3)^3 * le * 6 * n);
+    # N := Int(24 * (4/3)^3 * le * 6 * n);
+    N := 20 * n;
 
     gens := NiceGeneratorsSnAn( n, grp, N );
     if gens = fail then return fail; fi;
@@ -1401,7 +1402,7 @@ RecogniseSnAn :=  function( n, grp, eps )
                         eval := ResultOfStraightLineProgram(slp,[h,b]);
                         if not(RecSnAnEq(eval,g)) then return fail; fi;
                     od;
-                    return [ "Sn", [g,h] ,xis ];
+                    return [ "Sn", [b,h] ,xis ];
                 else
                     return fail;
                 fi;
