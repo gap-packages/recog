@@ -12,10 +12,6 @@
 ##
 #############################################################################
 
-DeclareGlobalFunction( "InstallLowIndexHint" );
-DeclareGlobalFunction( "DoHintedLowIndex" );
-DeclareGlobalFunction( "LookupHintForSimple" );
-
 DeclareGlobalVariable( "SUBFIELD" );  # for the subfield code
 
 ##

@@ -26,6 +26,11 @@ RECOG.ParseNumber := function( number, d, default )
   return default;
 end;
 
+InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
+    Info( InfoRecog, 2, "Got stab chain hint, not yet implemented!" );
+    return fail;
+  end );
+
 InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
   local bas,d,fld,gens,hm,hom,i,numberrandgens,orb,orblenlimit,s,
         tries,triesinner,triesinnerlimit,trieslimit,x,y;
@@ -136,23 +141,26 @@ end );
 # We start a database of hints, whenever we discover a certain group, we
 # can ask this database what to do:
 
-RECOG.SimplesHints := rec();
+RECOG.AlmostSimpleHints := rec();
 
-InstallGlobalFunction( InstallLowIndexHint,
+InstallGlobalFunction( InstallAlmostSimpleHint,
   function( name, type, re )
-    if not(IsBound(RECOG.SimplesHints.(name))) then
-        RECOG.SimplesHints.(name) := [];
+    if not(IsBound(RECOG.AlmostSimpleHints.(name))) then
+        RECOG.AlmostSimpleHints.(name) := [];
     fi;
-    re.type := "LowIndexHint";
-    Add( RECOG.SimplesHints.(name),re );
+    re.type := type;
+    Add( RECOG.AlmostSimpleHints.(name),re );
   end );
 
-InstallLowIndexHint( "HS", "LowIndexHint",
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( characteristics := [2], degree := 10, degreeupperlimit := 10 ) );
+
+InstallAlmostSimpleHint( "HS", "LowIndexHint",
   rec( characteristics := [2], degreedivs := [20,56,132,518,896,1000,1408],
        elordersstart := [11], numberrandgens := 2, tries := 10,
        triesforgens := 300,
        subspacedims := [1,10,34,70], orblenlimit := 100 ) );
-InstallLowIndexHint( "HS", "LowIndexHint",
+InstallAlmostSimpleHint( "HS", "LowIndexHint",
   rec( characteristics := [3], degreedivs := [22,77,154],  # more?
        elordersstart := [11], numberrandgens := 2, tries := 10,
        triesforgens := 300,
@@ -171,7 +179,7 @@ InstallLowIndexHint( "HS", "LowIndexHint",
 #        orblenlimit := "4d" )
 # is the standard low index.
 
-InstallLowIndexHint( "L2(31)", "LowIndexHint",
+InstallAlmostSimpleHint( "L2(31)", "LowIndexHint",
   rec( characteristics := true, degrees := [1,2,3],
        elordersstart := [31], numberrandgens := 2, tries := 1,
        triesforgens := 100, orblenlimit := 32 ) );
@@ -180,9 +188,9 @@ InstallGlobalFunction( LookupHintForSimple,
   function(ri,G,name)
     local dim,f,hi,j,p,q;
     Info(InfoRecog,2,"Looking up hints for ",name,"...");
-    if IsBound(RECOG.SimplesHints.(name)) then
+    if IsBound(RECOG.AlmostSimpleHints.(name)) then
         j := 1;
-        hi := RECOG.SimplesHints.(name);
+        hi := RECOG.AlmostSimpleHints.(name);
         f := ri!.field;
         p := Characteristic(f);
         q := Size(f);
@@ -192,6 +200,8 @@ InstallGlobalFunction( LookupHintForSimple,
                 p in hi[j].characteristics) and 
                (not(IsBound(hi[j].degreedivs)) or 
                 ForAny(hi[j].degreedivs,d->dim mod d = 0)) and
+               (not(IsBound(hi[j].degree)) or
+                hi[j].degree = dim) and
                (not(IsBound(hi[j].degreeupperlimit)) or
                 dim <= hi[j].degreeupperlimit) and
                (not(IsBound(hi[j].degreelowerlimit)) or
@@ -199,6 +209,8 @@ InstallGlobalFunction( LookupHintForSimple,
                 # This hint is applicable!
                 if hi[j].type = "LowIndexHint" then
                     return DoHintedLowIndex(ri,G,hi[j]);
+                elif hi[j].type = "StabChainHint" then
+                    return DoHintedStabChain(ri,G,hi[j]);
                 # Put other hint types here!
                 fi;
             fi;
