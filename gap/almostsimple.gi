@@ -3393,21 +3393,21 @@ RECOG.simplesocle := function(ri,g)
   local x,y,comm,comm2,comm3,gensH;
 
   repeat
-    x:=RandomElm(ri,"simplesocle",true);
+    x:=RandomElm(ri,"simplesocle",true).el;
   until not ri!.isone(x);
 
   repeat
-    y:=RandomElm(ri,"simplesocle",true);
+    y:=RandomElm(ri,"simplesocle",true).el;
     comm:=Comm(x,y);
   until not ri!.isone(comm);
 
   repeat
-    y:=RandomElm(ri,"simplesocle",true);
+    y:=RandomElm(ri,"simplesocle",true).el;
     comm2:=Comm(comm,comm^y);
   until not ri!.isone(comm2);
 
   repeat
-    y:=RandomElm(ri,"simplesocle",true);
+    y:=RandomElm(ri,"simplesocle",true).el;
     comm3:=Comm(comm2,comm2^y);
   until not ri!.isone(comm3);
 
@@ -3631,10 +3631,10 @@ FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
   f := ri!.field;
   p := Characteristic(f);
   totry := EmptyPlist(2);
-  if (d+1) mod p <> 0 then
+  if (d+1) mod p <> 0 and d+1 > 10 then
       Add(totry,d+1);
   fi;
-  if (d+2) mod p = 0 then
+  if (d+2) mod p = 0 and d+2 > 10 then
       Add(totry,d+2);
   fi;
   for deg in totry do
@@ -3682,21 +3682,25 @@ end;
 
 RECOG.SporadicsElementOrders :=
 [ [ 1,2,3,5,6,7,10,11,15,19 ],[ 1,2,3,4,5,6,8,11 ],
-  [ 1,2,3,4,5,6,8,10,11 ], [ 1,2,3,4,5,6,8,9,10,12,15,17,19 ],
+  [ 1,2,3,4,5,6,8,10,11 ],
+  [ 1,2,3,4,5,6,8,9,10,12,15,17,19 ],
   [ 1,2,3,4,5,6,7,8,11,14,15,23 ],[ 1,2,3,4,5,6,7,8,11 ],
-  [ 1,2,3,4,5,6,7,8,10,12,15 ], [ 1,2,3,4,5,6,7,8,10,12,14,15,17,21,28 ],
+  [ 1,2,3,4,5,6,7,8,10,12,15 ],
+  [ 1,2,3,4,5,6,7,8,10,12,14,15,17,21,28 ],
   [ 1,2,3,4,5,6,7,8,10,12,13,14,15,16,20,24,26,29 ],
-  [ 1,2,3,4,5,6,7,8,10,11,12,15,20 ], [ 1,2,3,4,5,6,7,8,10,11,12,14,15,21,23 ],
+  [ 1,2,3,4,5,6,7,8,10,11,12,15,20 ],
+  [ 1,2,3,4,5,6,7,8,10,11,12,14,15,21,23 ],
   [ 1,2,3,4,5,6,7,8,10,11,12,14,15,16,20,21,22,23,24,28,
       29,30,31,33,35,37,40,42,43,44,66 ],
   [ 1,2,3,4,5,6,7,8,10,11,12,14,15,16,19,20,28,31 ],
-  [ 1,2,3,4,5,6,7,8,9,10,12,13,14,15,18,19,20,21,24,27, 28,30,31,36,39 ],
+  [ 1,2,3,4,5,6,7,8,9,10,12,13,14,15,18,19,20,21,24,27,
+      28,30,31,36,39 ],
   [ 1,2,3,4,5,6,7,8,9,10,11,12,14,15,30 ],
   [ 1,2,3,4,5,6,7,8,9,10,11,12,14,15,19,20,21,22,25,30, 35,40 ],
   [ 1,2,3,4,5,6,7,8,9,10,11,12,14,15,18,20,21,22,24,25,
       28,30,31,33,37,40,42,67 ],
-  [ 1,2,3,4,5,6,7,8,9,10,11,12,14,15,18,20,21,22,23,24,30 ],
-  [ 1,2,3,4,5,6,7,8,9,10,11,12,14,15,16,18,20,23,24,28,30 ],
+  [ 1,2,3,4,5,6,7,8,9,10,11,12,14,15,18,20,21,22,23,24,30 
+     ],[ 1,2,3,4,5,6,7,8,9,10,11,12,14,15,16,18,20,23,24,28,30 ],
   [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,18,20,21,24 ],
   [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,18,20,21,22,24,30 ],
   [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,18,20,21,22,
@@ -3711,7 +3715,23 @@ RECOG.SporadicsElementOrders :=
   [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
       21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,38,39,
       40,41,42,44,45,46,47,48,50,51,52,54,55,56,57,59,60,62,
-      66,68,69,70,71,78,84,87,88,92,93,94,95,104,105,110,119 ] ];
+      66,68,69,70,71,78,84,87,88,92,93,94,95,104,105,110,119 ]
+    ,[ 1,2,3,4,5,6,8,10,11,12 ],
+  [ 1,2,3,4,5,6,7,8,10,11,12,14 ],
+  [ 1,2,3,4,5,6,7,8,10,11,12,14,15,20,30 ],
+  [ 1,2,3,4,5,6,7,8,10,12,14,15,24 ],
+  [ 1,2,3,4,5,6,7,8,9,10,11,12,14,15,20,22,24,30 ],
+  [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,18,20,21,22,24,28,30,40 ],
+  [ 1,2,3,4,5,6,7,8,10,12,14,15,16,17,20,21,24,28,30,42 ],
+  [ 1,2,3,4,5,6,7,8,9,10,11,12,14,15,18,19,20,21,22,24,
+      25,28,30,35,40,42,44,60 ],
+  [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,18,20,21,22,24,30,36,42 ],
+  [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,20,21,
+      22,23,24,26,27,28,29,30,33,34,35,36,39,40,42,45,46,54,60,66,70,78,84 ],
+  [ 1,2,3,4,5,6,7,8,10,11,12,14,15,16,19,20,22,24,28,30,
+      31,38,56 ],[ 1,2,3,4,5,6,8,9,10,12,15,17,18,19,24,34 ]
+    ,[ 1,2,3,4,5,6,8,10,12,13,16 ],
+  [ 1,2,3,4,5,6,8,10,12,13,16,20 ] ];
 RECOG.SporadicsProbabilities :=
 [ [ 1/175560,1/120,1/30,1/15,1/6,1/7,1/5,1/11,2/15,3/19 ],
   [ 1/7920,1/48,1/18,1/8,1/5,1/6,1/4,2/11 ],
@@ -3794,24 +3814,70 @@ RECOG.SporadicsProbabilities :=
       1/48,1/76,25/702,49/1600,1/41,1/56,1/176,1/135,3/92,1/47,
       1/96,1/50,1/51,3/104,1/54,1/110,5/112,1/57,2/59,41/720,1/31,
       1/44,1/68,2/69,3/140,2/71,1/26,1/28,2/87,1/44,1/46,2/93,
-      1/47,2/95,1/52,1/105,1/110,2/119 ] ];
+      1/47,2/95,1/52,1/105,1/110,2/119 ],
+  [ 1/190080,17/1920,5/216,3/32,1/20,5/24,1/8,3/20,1/11,1/4 ],
+  [ 1/887040,29/8960,1/72,7/96,1/10,1/8,1/7,1/8,1/10,1/11,1/12,1/7 
+     ],[ 1/88704000,11/21504,1/720,7/240,17/750,17/240,1/14,1/8,1/6,
+      1/11,1/12,1/14,1/30,1/5,1/30 ],
+  [ 1/1209600,103/26880,31/2160,11/192,7/300,7/48,1/14,5/48,3/20,
+      5/24,1/14,1/15,1/12 ],
+  [ 1/1796256000,67/887040,31/58320,17/2880,31/1500,31/720,1/14,5/48,
+      1/27,7/60,1/11,7/72,1/14,1/30,1/10,1/11,1/12,1/30 ],
+  [ 1/896690995200,16081/2554675200,661/3919104,1031/322560,7/3600,
+      2879/103680,1/168,53/1440,1/54,89/1200,1/22,65/576,1/13,3/56,
+      1/18,1/16,1/18,1/40,1/21,1/22,19/144,1/28,1/30,1/20 ],
+  [ 1/8060774400,23/387072,1/945,9/1120,1/600,473/7560,95/8232,7/96,
+      1/24,1/8,19/168,1/30,1/8,1/17,1/20,2/21,1/12,1/28,1/30,1/21 ]
+    ,[ 1/546061824000000,7057/25546752000,59/3265920,119351/177408000,
+      16913/63000000,2497/362880,1/840,21/640,1/54,691/24000,1/44,
+      101/1440,5/168,13/360,1/18,1/19,743/6000,1/42,1/44,1/8,1/25,
+      1/28,7/120,1/35,1/10,1/42,1/22,1/60 ],
+  [ 1/129123503308800,10781/17517772800,11419/352719360,329/414720,
+      1/1200,46757/4354560,1/84,1/32,5/216,17/400,1/22,295/2592,1/13,
+      1/12,1/60,1/16,29/216,1/20,1/42,1/22,1/8,1/20,1/36,1/42 ],
+  [ 1/2510411418381323442585600,352149857/65431527572688076800,
+      144613199/8824784429260800,12091/4180377600,1/1814400,
+      20115929623/65368773550080,67/246960,13/7680,1189/2099520,97/67200,
+      1/264,282547/13063680,1/468,31/1680,103/32400,1/32,1/34,
+      4153/139968,41/2400,17/504,7/264,1/23,7/96,5/156,1/54,2/21,
+      1/29,11/240,1/33,1/34,1/70,31/432,2/117,1/40,11/168,1/45,
+      1/23,1/54,1/60,1/33,1/70,1/39,1/84 ],
+  [ 1/921631011840,401/67415040,1/6480,79/40320,1/360,17/720,29/2744,
+      43/672,7/120,1/22,1/72,5/56,1/45,1/8,3/38,1/20,1/22,1/12,
+      1/28,1/15,1/31,3/38,1/14 ],
+  [ 1/100465920,91/195840,49/19440,1/64,1/30,11/144,5/48,1/18,1/10,
+      1/8,1/15,1/17,1/6,1/19,1/12,1/17 ],
+  [ 1/17971200,23/30720,1/108,11/384,1/50,1/12,3/16,1/10,1/6,2/13,
+      1/4 ],[ 1/35942400,23/61440,1/216,37/1280,1/100,1/24,3/16,1/20,
+      1/4,1/13,1/4,1/10 ] ];
 RECOG.SporadicsNames :=
 [ "J1","M11","M12","J3","M23","M22","J2","He","Ru","HS","M24",
   "J4","ON","Th","McL","HN","Ly","Co3","Co2","Suz","Fi22","Co1",
-  "Fi23","F3+","B","M" ];
+  "Fi23","Fi24'","B","M","M12.2","M22.2","HS.2","J2.2","McL.2","Suz.2",
+  "He.2","HN.2","Fi22.2","Fi24'.2","ON.2","J3.2","2F4(2)'","2F4(2)'.2"];
 RECOG.SporadicsSizes :=
-[ 175560, 7920, 95040, 50232960, 10200960, 443520, 604800, 4030387200, 
-  145926144000, 44352000, 244823040, 86775571046077562880, 460815505920, 
-  90745943887872000, 898128000, 273030912000000, 51765179004000000, 
-  495766656000, 42305421312000, 448345497600, 64561751654400, 
-  4157776806543360000, 4089470473293004800, 1255205709190661721292800, 
-  4154781481226426191177580544000000, 
-  808017424794512875886459904961710757005754368000000000 ];
+[ 175560,7920,95040,50232960,10200960,443520,604800,4030387200,
+  145926144000,44352000,244823040,86775571046077562880,460815505920,
+  90745943887872000,898128000,273030912000000,51765179004000000,
+  495766656000,42305421312000,448345497600,64561751654400,
+  4157776806543360000,4089470473293004800,1255205709190661721292800,
+  4154781481226426191177580544000000,
+  808017424794512875886459904961710757005754368000000000,190080,887040,
+  88704000,1209600,1796256000,896690995200,8060774400,546061824000000,
+  129123503308800,2510411418381323442585600,921631011840,100465920,
+  17971200,35942400 ];
 RECOG.SporadicsKillers :=
-[ ,,,,,,,,,,,,,,,,,,,,[[18..22]],[[26..32],[25..32]],
-  [[28..32],[27..32]],[[27..35],[29..35],[27,29,34]], # the latter is for Fi23
-  [[31..49],[40,41,42,43,44,45,46,48,49]],   # the latter is against Fi23
-  [[32..73],[61..73]] ];
+[ [[ 5,7 ]],[[ 5,7 ]],[[ 6,7 ]],[[ 11,9 ]],[[ 10,9 ]],[[ 5,7 ]],[[ 7,9 ]],
+  [[ 11,14 ]],[[ 14,15 ]],[[ 10,8 ]],[[ 12,11 ]],[[ 29,20,26,23 ]],
+  [[ 15,14 ]],[[ 20,19 ]],[[ 13,11 ]],[[ 12,16 ]],[[ 19,23 ]],[[ 11,14,16 ]],
+  [[ 17,14,21 ]],[[ 15,13 ]],[ [ 18 .. 22 ] ],
+  [ [ 26 .. 32 ],[ 25 .. 32 ] ],[ [ 28 .. 32 ],[ 27 .. 32 ] ],
+  [ [ 27 .. 35 ],[ 29 .. 35 ],[ 27,29,34 ] ],  # the latter is for Fi23
+  [ [ 31 .. 49 ],[ 40,41,42,43,44,45,46,48,49 ] ], # the latter is agains Fi23
+  [ [ 32 .. 73 ],[ 61 .. 73 ] ],[[ 6,10 ]],[[ 7,12 ]],[[ 9,14 ]],[[ 9,10 ]],
+  [[ 15,8,10 ]],[[ 13,12,21 ]],[[ 11,13,10 ]],[[ 25,17,20 ]],
+  [[ 21,17 ],[23,24]],   # the latter is to distinguish Fi22.2 and Fi22
+  [[ 35,32,23,26 ]],[[ 18,12,14 ]],[[ 10,13 ]],[[ 7,11 ]],[[ 9,11 ]] ];
 RECOG.SporadicsWorkers := [];
 RECOG.SporadicsWorkers[2] := SporadicsWorkerGenSift;   # M11
 RECOG.SporadicsWorkers[3] := SporadicsWorkerGenSift;   # M12
@@ -3821,29 +3887,93 @@ RECOG.SporadicsWorkers[10] := SporadicsWorkerGenSift;  # HS
 RECOG.SporadicsWorkers[17] := SporadicsWorkerGenSift;  # Ly
 RECOG.SporadicsWorkers[18] := SporadicsWorkerGenSift;  # Co3
 RECOG.SporadicsWorkers[19] := SporadicsWorkerGenSift;  # Co2
-LastRecognisedSporadic := fail;
+
+RECOG.MakeSporadicsInfo := function(name)
+  local ct,i,index,killers,o,orders,p,pos,prob,probs,probscopy,sum;
+  ct := CharacterTable(name);
+  orders := Set(OrdersClassRepresentatives(ct));
+  probs := [];
+  for o in orders do
+      prob := 0;
+      pos := Positions(OrdersClassRepresentatives(ct),o);
+      for p in pos do
+          prob := prob + 1/SizesCentralizers(ct)[p];
+      od;
+      Add(probs,prob);
+  od;
+  index := [1..Length(orders)];
+  probscopy := ShallowCopy(probs);
+  SortParallel(probscopy,index);
+  sum := probscopy[Length(orders)];
+  i := Length(orders);
+  repeat
+      i := i - 1;
+      sum := sum + probscopy[i];
+  until sum > 1/4;
+  killers := index{[i..Length(orders)]};
+  return rec( size := Size(ct), orders := orders,
+              probabilities := probs, killers := killers, name := name );
+end;
+
+RECOG.RuleOutSmallProjOrder := function(m)
+  local l,o,v;
+  if IsPerm(m) then
+      o := Order(m);
+      if o > 119 then return fail; fi;
+      return o;
+  fi;
+  v := ShallowCopy(m[1]);
+  Randomize(v);
+  ORB_NormalizeVector(v);
+  o := Orb([m],v,OnLines,rec( hashlen := 300, report := 0 ));
+  Enumerate(o,121);
+  if not(IsClosed(o)) then return fail; fi;
+  l := Length(o);
+  Randomize(v);
+  ORB_NormalizeVector(v);
+  o := Orb([m],v,OnLines,rec( hashlen := 300, report := 0 ));
+  Enumerate(o,121);
+  if not(IsClosed(o)) then return fail; fi;
+  l := Lcm(l,Length(o));
+  if l > 119 then return fail; fi;
+  return l;
+end;
 
 FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
-  local LastRecognisedSporadic,i,j,jj,k,killers,l,limit,o,ordersseen,
-        pp,raus,res,x;
-  l := [1..26];
-  pp := 0*[1..26];
+  local count,gens,i,j,jj,k,killers,l,limit,o,ordersseen,pp,r,raus,res,x;
+  l := [1..Length(RECOG.SporadicsNames)];
+  pp := 0*l;
   ordersseen := [];
-  for i in [1..120] do
-      x := RECOG.RandElFuncSimpleSocle(ri);
-      o := x.order;
-      x := x.el;
+  count := 0;
+  gens := GeneratorsOfGroup(G);
+  limit := 120+Length(gens);
+  for i in [1..limit] do
+      if i <= Length(gens) then
+          r := rec( el := gens[i] );
+      else
+          r := RandomElm(ri,"Sporadics",false);
+      fi;
+      o := RECOG.RuleOutSmallProjOrder(r.el);
+      if o = fail then
+          Info(InfoRecog,2,"Ruled out all sporadic groups.");
+          return false;
+      fi;
+      if i <= Length(gens) then
+          if ri!.projective then
+              r.order := ProjectiveOrder(r.el)[1];
+          else
+              r.order := Order(r.el);
+          fi;
+      else
+          GetElmOrd(ri,r);
+      fi;
+      o := r.order;
+      x := r.el;
       AddSet(ordersseen,o);
       Info(InfoRecog,3,"Found order: ",String(o,3)," (element #",i,")");
       l := Filtered(l,i->o in RECOG.SporadicsElementOrders[i]);
       if l = [] then
-          LastRecognisedSporadic := fail;
           Info(InfoRecog,2,"Ruled out all sporadic groups.");
-          if not(IsBound(ri!.projordersseen)) then
-              ri!.projordersseen := ordersseen;
-          else
-              Append(ri!.projordersseen,ordersseen);
-          fi;
           return false;
       fi;
       # Throw out improbable ones:
@@ -3871,7 +4001,7 @@ FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
               if Intersection(ordersseen,
                               RECOG.SporadicsElementOrders[jj]{killers})=[]
                  and (1-Sum(RECOG.SporadicsProbabilities[jj]{killers}))^i 
-                     < 10^-5 then
+                     < 10^-3 then
                   raus := true;
                   break;
                   Info(InfoRecog,3,"Have thrown out ",RECOG.SporadicsNames[jj],
@@ -3887,49 +4017,39 @@ FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
           fi;
       od;
       if l = [] then
-          LastRecognisedSporadic := fail;
           Info(InfoRecog,2,"Ruled out all sporadic groups.");
-          if not(IsBound(ri!.projordersseen)) then
-              ri!.projordersseen := ordersseen;
-          else
-              Append(ri!.projordersseen,ordersseen);
-          fi;
           return false;
       fi;
-      if Length(l) = 1 and i > 80 then
+      if Length(l) = 1 then
+        count := count + 1;
+        if count >= 9 then
           Info(InfoRecog,2,"I guess that this is the sporadic simple group ",
                RECOG.SporadicsNames[l[1]],".");
-          res := LookupHintForSimple(ri,G,RECOG.SporadicsNames[l[1]]);
-          if res = true then return res; fi;
-          if IsBound(RECOG.SporadicsWorkers[l[1]]) then
-              Info(InfoRecog,2,"Calling its installed worker...");
-              return RECOG.SporadicsWorkers[l[1]](RECOG.SporadicsNames[l[1]],
-                                             RECOG.SporadicsSizes[l[1]],ri,G);
-          fi;
-          Info(InfoRecog,2,"However, I cannot verify this.");
-          LastRecognisedSporadic := RECOG.SporadicsNames[l[1]];
-          if not(IsBound(ri!.projordersseen)) then
-              ri!.projordersseen := ordersseen;
-          else
-              Append(ri!.projordersseen,ordersseen);
-          fi;
-          return false;
+          break;
+        fi;
       fi;
       if Length(l) < 6 then
-          Info(InfoRecog,3,"Possible sporadics left: ",
-               RECOG.SporadicsNames{l});
+          Info(InfoRecog,2,"Possible sporadics left: ",
+               RECOG.SporadicsNames{l}," i=",i);
       else
-          Info(InfoRecog,3,"Possible sporadics left: ",Length(l));
+          Info(InfoRecog,2,"Possible sporadics left: ",Length(l)," i=",i);
       fi;
   od;
-  Info(InfoRecog,2,"Giving up, still possible Sporadics: ",
-       RECOG.SporadicsNames{l});
-  LastRecognisedSporadic := fail;
-  if not(IsBound(ri!.projordersseen)) then
-      ri!.projordersseen := ordersseen;
-  else
-      Append(ri!.projordersseen,ordersseen);
+  if ValueOption("DEBUGRECOGSPORADICS") <> fail then
+      return RECOG.SporadicsNames{l};
   fi;
+  for i in [1..Length(l)] do
+      Info(InfoRecog,2,"Trying hint for ",RECOG.SporadicsNames[l[i]],"...");
+      res := LookupHintForSimple(ri,G,RECOG.SporadicsNames[l[i]]);
+      if res = true then return res; fi;
+      if IsBound(RECOG.SporadicsWorkers[l[i]]) then
+          Info(InfoRecog,2,"Calling its installed worker...");
+          res := RECOG.SporadicsWorkers[l[1]](RECOG.SporadicsNames[l[i]],
+                                        RECOG.SporadicsSizes[l[i]],ri,G);
+          if res = true then return res; fi;
+      fi;
+      Info(InfoRecog,2,"This did not work.");
+  od;
   return false;
 end;
 

@@ -110,7 +110,7 @@ FindHomMethodsProjective.StabilizerChain := function(ri,G)
   d := ri!.dimension;
   f := ri!.field;
   q := Size(f);
-  fu := function() return RandomElm(ri,"StabChain",true); end;
+  fu := function() return RandomElm(ri,"StabChain",true).el; end;
   opt := rec( Projective := true, RandomElmFunc := fu );
   #if q^(d-1) > 100000 then
   #    opt.TryShortOrbit := 5;
@@ -266,15 +266,15 @@ AddMethod( FindHomDbProjective, FindHomMethodsProjective.LowIndex,
 #AddMethod( FindHomDbProjective, FindHomMethodsProjective.AlternatingBBByOrders,
 #   580, "AlternatingBBByOrders",
 #        "generate a few random elements and compute the proj. orders" );
+AddMethod( FindHomDbProjective, FindHomMethodsProjective.SporadicsByOrders,
+   590, "SporadicsByOrders",
+        "generate a few random elements and compute the proj. orders" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.AltSymBBByDegree,
    580, "AltSymBBByDegree",
         "try BB recognition for dim+1 and/or dim+2 if sensible" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.ComputeSimpleSocle, 
    550, "ComputeSimpleSocle",
         "compute simple socle of almost simple group" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.SporadicsByOrders,
-   530, "SporadicsByOrders",
-        "generate a few random elements and compute the proj. orders" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.ThreeLargeElOrders,
    500, "ThreeLargeElOrders",
         "look at three large element orders" );

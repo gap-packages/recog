@@ -1153,6 +1153,7 @@ SporadicGroupData := [
                       rec( req := [37,43],
                            allowed := [16,23,24,28,29,30,31,33,35,40,42,44,66],
                            name := "J_4")];
+                           # is 15 not needed here?
                       
                       
 

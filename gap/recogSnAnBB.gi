@@ -63,7 +63,7 @@ end;
 
 SatisfiesAnPresentation := function( n, s, t )
 	 
-    local j, r;
+    local j, r, ti;
 
     Info( InfoRecSnAn, 1, "calling Satisfies An Presentation");
 
@@ -73,7 +73,7 @@ SatisfiesAnPresentation := function( n, s, t )
     fi;
 
     if n mod 2 <> 0 then
-        # we already know r^(n-2) = s^3 = 1
+        # we already know s^(n-2) = t^3 = 1
         if not(RecSnAnIsOne((s * t)^n)) then
             Info( InfoRecSnAn, 1, "does not satisfy presentation");
             return false;
@@ -90,11 +90,23 @@ SatisfiesAnPresentation := function( n, s, t )
         od;
         return true;
     else
-        if not(RecSnAnIsOne((s*t)^(n-1))) or 
-           not(RecSnAnIsOne(Comm(t,s)^2)) then
+        # we already know s^(n-2) = t^3 = 1
+        if not(RecSnAnIsOne((s * t)^(n-1))) then
             Info( InfoRecSnAn, 1, "does not satisfy presentation");
             return false;
         fi;
+        j := 1;
+        r := s^0;
+        while j <= (n-2)/2  do
+            r := r * s;
+            ti := t^-1;
+            if (IsEvenInt(j) and not(RecSnAnIsOne((t *(t^r))^2))) or
+               (IsOddInt(j) and not(RecSnAnIsOne((ti *(t^r))^2))) then
+                Info( InfoRecSnAn, 1, "does not satisfy presentation");
+                return false;
+            fi;
+            j := j + 1;
+        od;
         return true;
     fi;
 
@@ -1162,6 +1174,10 @@ SLPforSn :=  function( n, pi )
 
     local cycles, initpts, c, newc, i, R, ci, cycslp, k ;
 
+    if IsOne(pi) then
+        return StraightLineProgram([[1,0]],2);
+    fi;
+
     # we need the cycles of pi of length > 1 to be written such 
     # that the minimum point is the initial point of the cycle
     initpts := [ ];
@@ -1224,6 +1240,10 @@ SLPforAn :=  function( n, pi )
 
     local cycles, initpts, c, newc,  R, i, nexttrpn, ci, cycslp, k, j,
           nexttau, nextsigma ;
+
+    if IsOne(pi) then
+        return StraightLineProgram([[1,0]],2);
+    fi;
 
     # we need the cycles of pi of length > 1 to be written such 
     # that the minimum point is the initial point of the cycle
@@ -1361,7 +1381,7 @@ RecogniseSnAn :=  function( n, grp, eps )
         le := le + 1;
     od;
 
-    # N := Int(24 * (4/3)^3 * le * 6 * n);
+    #N := Int(24 * (4/3)^3 * le * 6 * n);
     N := 20 * n;
 
     gens := NiceGeneratorsSnAn( n, grp, N );
