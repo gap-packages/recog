@@ -223,9 +223,9 @@ InstallMethod( RandomElm, "for a recognition info record, a string and a bool",
         el := Next(ri!.prodrep);
     fi;
     if mem then
-        return el;
+        return rec( el := el, nr := pos );
     else
-        return el!.el;
+        return rec( el := el!.el, nr := pos );
     fi;
   end );
 
@@ -268,6 +268,35 @@ InstallMethod( RandomElmOrd,
         res.el := res.el!.el;
     fi;
     return res;
+  end );
+
+InstallMethod( GetElmOrd, "for a recognition info record and a record",
+  [ IsRecognitionInfo, IsRecord ],
+  function( ri, r )
+    local x;
+    if ri!.randstore and r.nr > 0 then
+        if not( IsBound(ri!.rando[r.nr]) ) then
+            if ri!.projective then
+                ri!.rando[r.nr] := ProjectiveOrder(ri!.randr[r.nr]!.el)[1];
+            else
+                ri!.rando[r.nr] := Order(ri!.randr[r.nr]!.el);
+            fi;
+            r.order := ri!.rando[r.nr];
+        else
+            r.order := ri!.rando[r.nr];
+        fi;
+    else
+        if IsObjWithMemory(r.el) then
+            x := r.el!.el;
+        else
+            x := r.el;
+        fi;
+        if ri!.projective then
+            r.order := ProjectiveOrder(x)[1];
+        else
+            r.order := Order(x);
+        fi;
+    fi;
   end );
 
 InstallMethod( RandomElmPpd, 
@@ -314,6 +343,38 @@ InstallMethod( RandomElmPpd,
         res.el := res.el!.el;
     fi;
     return res;
+  end );
+
+InstallMethod( GetElmPpd, "for a recognition info record and a record",
+  [ IsRecognitionInfo, IsRecord ],
+  function( ri, r )
+    local x;
+    if IsObjWithMemory(r.el) then
+        x := r.el!.el;
+    else
+        x := r.el;
+    fi;
+    if ri!.randstore and r.nr > 0 then
+        if not( IsBound(ri!.randp[r.nr]) ) then
+            r.charpoly := CharacteristicPolynomial(ri!.field,ri!.field,x,1);
+            r.factors := Factors(PolynomialRing(ri!.field), r.charpoly);
+            r.degrees := List(r.factors,Degree);
+            r.degset := Set(r.degrees);
+            ri!.randp[r.nr] := ShallowCopy(r);
+            Unbind(ri!.randp[r.nr].el);
+            Unbind(ri!.randp[r.nr].nr);
+        else
+            r.charpoly := ri!.randp[r.nr].charpoly;
+            r.factors := ri!.randp[r.nr].factors;
+            r.degrees := ri!.randp[r.nr].degrees;
+            r.degset := ri!.randp[r.nr].degset;
+        fi;
+    else
+        r.charpoly := CharacteristicPolynomial(ri!.field,ri!.field,x,1);
+        r.factors := Factors(PolynomialRing(ri!.field), r.charpoly);
+        r.degrees := List(r.factors,Degree);
+        r.degset := Set(r.degrees);
+    fi;
   end );
 
 
@@ -536,7 +597,7 @@ InstallGlobalFunction( RecogniseGeneric,
             Info(InfoRecog,2,"Doing immediate verification.");
             i := 1;
             for i in [1..5] do
-                x := RandomElm(ri,"VERIFY",true);
+                x := RandomElm(ri,"VERIFY",true).el;
                 s := SLPforElement(rifac,ImageElm( homom(ri), x!.el ));
                 if s = fail then
                     Error("Very bad: factor was wrongly recognised and we ",
@@ -667,7 +728,7 @@ InstallGlobalFunction( FindKernelRandom,
     l := gensN(ri);
     rifac := factor(ri);
     for i in [1..n] do
-        x := RandomElm(ri,"KERNEL",true);
+        x := RandomElm(ri,"KERNEL",true).el;
         s := SLPforElement(rifac,ImageElm( homom(ri), x!.el ));
         if s = fail then
             return false;

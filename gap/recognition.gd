@@ -120,6 +120,8 @@ DeclareOperation( "RandomElmOrd", [ IsRecognitionInfo, IsString, IsBool ] );
 DeclareOperation( "RandomElmPpd", [ IsRecognitionInfo, IsString, IsBool ] );
 DeclareOperation( "RandomOrdersSeen", [ IsRecognitionInfo ] );
 DeclareOperation( "StopStoringRandEls", [ IsRecognitionInfo ] );
+DeclareOperation( "GetElmOrd", [ IsRecognitionInfo, IsRecord ] );
+DeclareOperation( "GetElmPpd", [ IsRecognitionInfo, IsRecord ] );
 
 
 
