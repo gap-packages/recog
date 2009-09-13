@@ -72,6 +72,15 @@ InstallOtherMethod( MutableCopyMat, "for a compressed 8bit matrix",
     return n;
   end );
 
+InstallMethod( PseudoRandom, "for a group object with generators, use func", 
+  [ IsGroup and HasGeneratorsOfGroup ], 1,
+  function( g )
+    if IsBound(g!.pseudorandomfunc) then
+        return g!.pseudorandomfunc();
+    fi;
+    TryNextMethod();
+  end );
+
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU General Public License as published by
