@@ -1,3 +1,9 @@
+Before release:
+
+ - create Makefile
+ - do not ship contrib
+ - do not ship named subdirs in gap
+
 Do soonish:
 
 Investigate bug in DisplayCompositionFactors for ex9 in talk

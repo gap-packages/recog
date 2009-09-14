@@ -1,0 +1,474 @@
+# Hints for J1:
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [2], dimensions := [20], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [8], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [2], dimensions := [76], 
+       usemax := [ 3, 5, 2 ], 
+       size := 175560, atlasrepnrs := [9], 
+       values := [ [ 15, 1463 ], [ 16, 1596 ], [ 22, 1045 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [2], dimensions := [76], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [10], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [2], dimensions := [112], 
+       usemax := [ 3, 2, 1 ], 
+       size := 175560, atlasrepnrs := [11], 
+       values := [ [ 15, 1463 ], [ 22, 1045 ], [ 30, 266 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [2], dimensions := [112], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [12], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [2], dimensions := [360], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [13], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [3], dimensions := [76], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [14], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [3], dimensions := [76], 
+       usemax := [ 1, 3, 4 ], 
+       size := 175560, atlasrepnrs := [15], 
+       values := [ [ 15, 266 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [3], dimensions := [112], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [16], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [3], dimensions := [133], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [17], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [3], dimensions := [154], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [18], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [3], dimensions := [360], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [19], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [4], dimensions := [56], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [20], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [4], dimensions := [56], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [21], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [4], dimensions := [56], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [22], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [4], dimensions := [56], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [23], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [5], dimensions := [56], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [24], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [5], dimensions := [76], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [25], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [5], dimensions := [76], 
+       usemax := [ 3, 4, 5 ], 
+       size := 175560, atlasrepnrs := [26], 
+       values := [ [ 15, 1463 ], [ 16, 1540 ], [ 16, 1596 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [5], dimensions := [77], 
+       usemax := [ 1, 3, 4 ], 
+       size := 175560, atlasrepnrs := [27], 
+       values := [ [ 3, 266 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [5], dimensions := [133], 
+       usemax := [ 1, 3, 4 ], 
+       size := 175560, atlasrepnrs := [28], 
+       values := [ [ 15, 266 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [5], dimensions := [360], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [29], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [7], dimensions := [31], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [30], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [7], dimensions := [45], 
+       usemax := [ 2, 4, 5 ], 
+       size := 175560, atlasrepnrs := [31], 
+       values := [ [ 11, 1045 ], [ 16, 1540 ], [ 16, 1596 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [7], dimensions := [75], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [32], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [7], dimensions := [77], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [33], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [7], dimensions := [89], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [34], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [7], dimensions := [112], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [35], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [7], dimensions := [120], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [36], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [7], dimensions := [133], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [37], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [7], dimensions := [154], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [38], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [7], dimensions := [266], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [39], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [8], dimensions := [120], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [40], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [8], dimensions := [120], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [41], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [8], dimensions := [120], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [42], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [9], dimensions := [56], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [43], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [9], dimensions := [56], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [44], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [9], dimensions := [77], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [45], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [9], dimensions := [77], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [46], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [7], 
+       usemax := [ 4, 5, 6 ], 
+       size := 175560, atlasrepnrs := [47], 
+       values := [ [ 16, 1540 ], [ 16, 1596 ], [ 30, 2926 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [14], 
+       usemax := [ 1, 5, 6 ], 
+       size := 175560, atlasrepnrs := [48], 
+       values := [ [ 9, 266 ], [ 16, 1596 ], [ 30, 2926 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [27], 
+       usemax := [ 1, 3, 4 ], 
+       size := 175560, atlasrepnrs := [49], 
+       values := [ [ 15, 266 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [49], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [50], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [56], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [51], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [64], 
+       usemax := [ 1, 5, 2 ], 
+       size := 175560, atlasrepnrs := [52], 
+       values := [ [ 15, 266 ], [ 16, 1596 ], [ 22, 1045 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [69], 
+       usemax := [ 1, 3, 4 ], 
+       size := 175560, atlasrepnrs := [53], 
+       values := [ [ 9, 266 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [77], 
+       usemax := [ 1, 3, 4 ], 
+       size := 175560, atlasrepnrs := [54], 
+       values := [ [ 3, 266 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [77], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [55], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [77], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [56], 
+       values := [ [ 9, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [106], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [57], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [119], 
+       usemax := [ 1, 3, 4 ], 
+       size := 175560, atlasrepnrs := [58], 
+       values := [ [ 9, 266 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [209], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [59], 
+       values := [ [ 9, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [19], dimensions := [22], 
+       usemax := [ 2, 4, 1 ], 
+       size := 175560, atlasrepnrs := [60], 
+       values := [ [ 11, 1045 ], [ 16, 1540 ], [ 30, 266 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [19], dimensions := [34], 
+       usemax := [ 1, 3, 4 ], 
+       size := 175560, atlasrepnrs := [61], 
+       values := [ [ 3, 266 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [19], dimensions := [43], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [62], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [19], dimensions := [55], 
+       usemax := [ 3, 4, 5 ], 
+       size := 175560, atlasrepnrs := [63], 
+       values := [ [ 15, 1463 ], [ 16, 1540 ], [ 16, 1596 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [19], dimensions := [76], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [64], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [19], dimensions := [76], 
+       usemax := [ 3, 4, 5 ], 
+       size := 175560, atlasrepnrs := [65], 
+       values := [ [ 15, 1463 ], [ 16, 1540 ], [ 16, 1596 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [19], dimensions := [77], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [66], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [19], dimensions := [133], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [67], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [19], dimensions := [133], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [68], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [19], dimensions := [133], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [69], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [19], dimensions := [209], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [70], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [27], dimensions := [120], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [71], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [27], dimensions := [120], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [72], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [27], dimensions := [120], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [73], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [49], dimensions := [56], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [74], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [49], dimensions := [56], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [75], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [49], dimensions := [77], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [76], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [49], dimensions := [77], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [77], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [49], dimensions := [133], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [78], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [49], dimensions := [133], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [79], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [125], dimensions := [120], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [80], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [125], dimensions := [120], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [81], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+>>>SAME FIELD AND DIM
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [125], dimensions := [120], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [82], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));

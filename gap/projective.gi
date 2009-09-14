@@ -225,11 +225,11 @@ AddMethod( FindHomDbProjective, FindHomMethodsProjective.TrivialProjectiveGroup,
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.ProjDeterminant,
   1300, "ProjDeterminant",
         "find homomorphism to non-zero scalars mod d-th powers" );
-# Note that we *can* in fact use the Matrix method here, because it
-# will do the right thing when used in projective mode:
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.FewGensAbelian,
   1250, "FewGensAbelian",
      "if very few generators, check IsAbelian and if yes, do KnownNilpotent");
+# Note that we *can* in fact use the Matrix method here, because it
+# will do the right thing when used in projective mode:
 AddMethod( FindHomDbProjective, FindHomMethodsMatrix.ReducibleIso,
   1200, "ReducibleIso",
         "use MeatAxe to find a composition series, do base change" );

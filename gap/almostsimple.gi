@@ -26,7 +26,166 @@ RECOG.ParseNumber := function( number, d, default )
   return default;
 end;
 
+RECOG.MakeStabChainHint := function( chain, stdgens )
+  local b,bb,choice,dims,f,gens,grpnum,grps,i,j,lens,llens,m,name,names,nams,nrs,o,orblens,pts,r,size,slps;
+  f := FieldOfMatrixList(stdgens);
+  name := chain[1].name;
+  size := chain[1].order;
+  slps := [];
+  names := [];
+  dims := [];
+  orblens := [];
+  pts := [];
+  gens := stdgens;
+  repeat
+      Print("Working on ",name,"\n");
+      grps := [];
+      nams := [];
+      nrs := [];
+      for i in [1..Length(chain)] do
+          r := chain[i];
+          if IsBound(r.parent) and r.parent = name then
+              Add(grps,ResultOfStraightLineProgram(r.generators,gens));
+              Add(nams,r.name);
+              Add(nrs,i);
+          fi;
+      od;
+      if Length(grps) = 0 then break; fi;
+      Print("Considering subgroups: ",nams,"\n");
+      bb := [];
+      llens := [];
+      grpnum := [];
+      for i in [1..Length(grps)] do
+          # will be left by break in case of success
+          Print("  Considering ",nams[i],"\n");
+          m := GModuleByMats(grps[i],f);
+          if not MTX.IsIrreducible(m) then
+              b := List(MTX.BasesMinimalSubmodules(m),MutableCopyMat);
+              Sort(b,function(a,b) return Length(a) < Length(b); end );
+              Print("    Dimensions: ",List(b,Length),"\n");
+              lens := [];
+              for j in [1..Length(b)] do
+                  TriangulizeMat(b[j]);
+                  if Length(b[j]) = 1 then
+                      o := Orb(gens,b[j][1],OnLines,rec( report := 10000,
+                             treehashsize := 1000, storenumbers := true ));
+                  else
+                      o := Orb(gens,b[j],OnSubspacesByCanonicalBasis,
+                         rec( report := 10000, treehashsize := 1000, 
+                              storenumbers := true ));
+                  fi;
+                  Enumerate(o);
+                  Print("    Found orbit of length ",Length(o),"\n");
+                  lens[j] := Length(o);
+              od;
+              Append(bb,b);
+              Append(llens,lens);
+              Append(grpnum,ListWithIdenticalEntries(Length(b),i));
+          else
+              Print("    Restriction is irreducible!\n");
+          fi;
+      od;
+      choice := 1;
+      Print("Dimensions: ",List(bb,Length),"\n");
+      Print("Orbit lengths: ",llens,"\n");
+      Error("now decide which orbit to take, set choice");
+      if choice > 0 then
+          i := grpnum[choice];
+          Add(names,nams[i]);
+          Add(dims,Length(bb[choice]));
+          name := nams[i];
+          gens := grps[i];
+          size := size / llens[choice];
+          Add(orblens,llens[choice]);
+          Add(slps,chain[nrs[i]].generators);
+          Add(pts,bb[choice]);
+      fi;
+  until size = 1 or choice = 0;
+  return rec( slps := slps, names := names, dims := dims, orblens := orblens,
+              pts := pts );
+end;
+
 InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
+    local S,b,bra,c,cf,elm,finder,fu,gm,homs,m,max,maxes,maxgens,opt,s,stdgens;
+    finder := AtlasProgram(hint.name,"find");
+    if finder = fail then
+        Info(InfoRecog,1,"Expected BBox finder for stdgens of ",hint.name,
+             " not availabe!");
+        Info(InfoRecog,1,"Check your AtlasRep installation!");
+        return fail;
+    fi;
+    gm := Group(ri!.gensHmem);
+    gm!.pseudorandomfunc := [rec( 
+       func := function(ri) return RandomElm(ri,"StdGens",true).el; end,
+       args := [ri])];
+    stdgens := ResultOfBBoxProgram(finder.program,gm);
+    if stdgens = fail or stdgens = "timeout" then
+        Info(InfoRecog,2,"Stdgens finder did not succeed for ",hint.name);
+        return fail;
+    fi;
+    Setslptostd(ri,SLPOfElms(stdgens));
+    Setstdgens(ri,StripMemory(stdgens));
+    if IsBound(hint.usemax) then
+        if IsBound(hint.brauercharelm) then
+            elm := ResultOfStraightLineProgram(hint.brauercharelm,stdgens);
+            bra := BrauerCharacterValue(elm!.el);
+            maxes := hint.usemax{Filtered([1..Length(hint.usemax)],
+                                          i->hint.brauercharvals[i] = bra)};
+        else
+            maxes := hint.usemax;
+        fi;
+        for max in maxes do
+            s := AtlasProgram(hint.name,max);
+            if s = fail then
+                Info(InfoRecog,1,"Expected maximal subgroup slp of ",hint.name,
+                     " not available!");
+                Info(InfoRecog,1,"Check your AtlasRep installation!");
+                return fail;
+            fi;
+            maxgens := ResultOfStraightLineProgram(s.program,
+                                                   StripMemory(stdgens));
+            m := GModuleByMats(maxgens,ri!.field);
+            if MTX.IsIrreducible(m) then
+                Info(InfoRecog,2,"Found irreducible submodule!");
+                continue;
+            fi;
+            cf := MTX.CompositionFactors(m);
+            Sort(cf,function(a,b) return a.dimension < b.dimension; end);
+            for c in cf do
+                homs := MTX.Homomorphisms(c,m);
+                if Length(homs) > 0 then
+                    ConvertToMatrixRep(homs[1],ri!.field);
+                    b := MutableCopyMat(homs[1]);
+                    break;
+                fi;
+                # Some must be in the socle, so this terminates with break!
+            od;
+            TriangulizeMat(b);
+            fu := function() return RandomElm(ri,"StabChain",true).el; end;
+            opt := rec( Projective := true, RandomElmFunc := fu );
+            if Length(b) = 1 then
+                opt.Cand := rec( points := [b[1]], ops := [OnLines] );
+            else
+                opt.Cand := rec( points := [b], 
+                                 ops := [OnSubspacesByCanonicalBasis] );
+            fi;
+            gm := GroupWithGenerators(stdgens);
+            opt.Size := hint.size;
+            Info(InfoRecog,2,"Computing hinted stabilizer chain for ",
+                 hint.name," ...");
+            S := StabilizerChain(gm,opt);
+            # Verify correctness by sifting original gens:
+            # ...
+            ri!.stabilizerchain := S;
+            Setslptonice(ri,SLPOfElms(StrongGenerators(S)));
+            SetSize(ri,hint.size);
+            ForgetMemory(S);
+            Unbind(S!.opt.RandomElmFunc);
+            Setslpforelement(ri,SLPforElementFuncsProjective.StabilizerChain);
+            SetFilterObj(ri,IsLeaf);
+            return true;
+        od;
+    fi;
     Info( InfoRecog, 2, "Got stab chain hint, not yet implemented!" );
     return fail;
   end );
@@ -152,21 +311,537 @@ InstallGlobalFunction( InstallAlmostSimpleHint,
     Add( RECOG.AlmostSimpleHints.(name),re );
   end );
 
+RECOG.ProduceTrivialStabChainHint := function(name,reps,maxes)
+  local bad,f,g,gens,hint,list,m,o,prevdim,prevfield,r,range,res,ri,
+        size,success,t,values,x;
+  PrintTo(Concatenation("NEWHINTS.",name),"# Hints for ",name,":\n");
+  prevdim := fail;
+  prevfield := fail;
+  for r in reps do
+      Print("\nDoing representation #",r,"\n");
+      gens := AtlasGenerators(name,r);
+      g := Group(gens.generators);
+      f := gens.ring;
+      values := [];
+      success := false;
+      size := Size(CharacterTable(name));
+      for m in [1..Length(maxes)] do
+          Print("Doing maximal subgroup #",m,"\n");
+          hint := rec( name := name, size := size, usemax := [m] );
+          ri := EmptyRecognitionInfoRecord(rec(),g,true);
+          t := Runtime();
+          res := DoHintedStabChain(ri,g,hint);
+          t := Runtime() - t;
+          if res = true then
+              o := ri!.stabilizerchain!.orb;
+              x := o[1];
+              if IsMatrix(x) then
+                  Add(values,[Length(x)*QuoInt(Length(o)+99,100),Length(o)]);
+              else
+                  Add(values,[QuoInt(Length(o)+99,100),Length(o)]);
+              fi;
+              Print("value=",values[Length(values)]," time=",t," orblen=",
+                    Length(o)," subspace=");
+              ViewObj(x);
+              Print("\n");
+              success := true;
+          else
+              Add(values,[infinity,infinity]);
+              Print("failure\n");
+          fi;
+      od;
+      if success then
+          if Size(f) = prevfield and Length(gens.generators[1]) = prevdim then
+              AppendTo(Concatenation("NEWHINTS.",name),
+                       ">>>SAME FIELD AND DIM\n");
+          fi;
+          list := ShallowCopy(maxes);
+          SortParallel(values,list);
+          bad := First([1..Length(values)],i->values[i][1] = infinity);
+          if bad = fail or bad > 3 then
+              range := [1..3];
+          else
+              range := [1..bad-1];
+          fi;
+          AppendTo(Concatenation("NEWHINTS.",name),
+                "InstallAlmostSimpleHint( \"",name,"\", \"StabChainHint\",\n",
+                "  rec( name := \"",name,"\", fields := [",
+                Size(f),"], dimensions := [",Length(gens.generators[1]),
+                "], \n       usemax := ",list{range},
+                ", \n       size := ", size, 
+                ", atlasrepnrs := [",r,"], \n       values := ",
+                values{range},"\n  ));\n");
+      fi;
+      prevfield := Size(f);
+      prevdim := Length(gens.generators[1]);
+  od;
+end;
+
+RECOG.DistinguishAtlasReps := function(name,rep1,rep2)
+  local br1,br2,classes,gens1,gens2,guck1,guck2,l,lens,slps;
+  classes := AtlasProgram(name,"cyclic").program;
+  gens1 := GeneratorsWithMemory(AtlasGenerators(name,rep1).generators);
+  gens2 := AtlasGenerators(name,rep2).generators;
+  guck1 := ResultOfStraightLineProgram(classes,gens1);
+  guck2 := ResultOfStraightLineProgram(classes,gens2);
+  br1 := List(guck1,x->BrauerCharacterValue(x!.el));
+  br2 := List(guck2,BrauerCharacterValue);
+  l := Filtered([1..Length(br1)],i->br1[i]<>br2[i]);
+  slps := List(guck1,SLPOfElm);
+  lens := List(l,x->Length(LinesOfStraightLineProgram(slps[x])));
+  SortParallel(lens,l);
+  Print("brauercharelm := ",slps[l[1]],", brauercharvals := ",
+        [br1[l[1]],br2[l[1]]],",\n");
+end;
+
+
+# Hints for M11:
 InstallAlmostSimpleHint( "M11", "StabChainHint",
-  rec( characteristics := [2], degree := 10, degreeupperlimit := 10 ) );
+  rec( name := "M11", fields := [2], dimensions := [10], 
+       usemax := [ 1, 3, 4 ], 
+       size := 7920, atlasrepnrs := [6], 
+       values := [ [ 1, 11 ], [ 1, 55 ], [ 1, 66 ] ]
+  ));
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( name := "M11", fields := [2], dimensions := [32], 
+       usemax := [ 4, 5, 3 ], 
+       size := 7920, atlasrepnrs := [7], 
+       values := [ [ 4, 66 ], [ 4, 165 ], [ 8, 55 ] ]
+  ));
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( name := "M11", fields := [2], dimensions := [44], 
+       usemax := [ 3, 4, 5 ], 
+       size := 7920, atlasrepnrs := [8], 
+       values := [ [ 1, 55 ], [ 1, 66 ], [ 2, 165 ] ]
+  ));
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( name := "M11", fields := [3], dimensions := [5], 
+       usemax := [ 3, 1, 4 ], 
+       size := 7920, atlasrepnrs := [9,10], 
+  ));
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( name := "M11", fields := [3], dimensions := [10], 
+       usemax := [ 3 ], 
+       size := 7920, atlasrepnrs := [11,12,13], 
+  ));
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( name := "M11", fields := [3], dimensions := [24], 
+       usemax := [ 3, 5, 1 ], 
+       size := 7920, atlasrepnrs := [14], 
+       values := [ [ 2, 55 ], [ 2, 165 ], [ 4, 11 ] ]
+  ));
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( name := "M11", fields := [3], dimensions := [45], 
+       usemax := [ 3, 5, 4 ], 
+       size := 7920, atlasrepnrs := [15], 
+       values := [ [ 1, 55 ], [ 2, 165 ], [ 4, 66 ] ]
+  ));
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( name := "M11", fields := [4], dimensions := [16], 
+       usemax := [ 4, 5, 2 ], 
+       size := 7920, atlasrepnrs := [16,17], 
+       values := [ [ 4, 66 ], [ 4, 165 ], [ 5, 12 ] ]
+  ));
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( name := "M11", fields := [5], dimensions := [10], 
+       usemax := [ 1, 3, 4 ], 
+       size := 7920, atlasrepnrs := [18], 
+       values := [ [ 1, 11 ], [ 1, 55 ], [ 1, 66 ] ]
+  ));
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( name := "M11", fields := [5], dimensions := [11], 
+       usemax := [ 1, 2, 3 ], 
+       size := 7920, atlasrepnrs := [19], 
+       values := [ [ 1, 11 ], [ 1, 12 ], [ 1, 55 ] ]
+  ));
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( name := "M11", fields := [5], dimensions := [16], 
+       usemax := [ 4, 5, 2 ], 
+       size := 7920, atlasrepnrs := [20,21], 
+       values := [ [ 3, 66 ], [ 4, 165 ], [ 5, 12 ] ]
+  ));
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( name := "M11", fields := [5], dimensions := [20], 
+       usemax := [ 5, 4, 3 ], 
+       size := 7920, atlasrepnrs := [22], 
+       values := [ [ 2, 165 ], [ 3, 66 ], [ 4, 55 ] ]
+  ));
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( name := "M11", fields := [5], dimensions := [45], 
+       usemax := [ 3, 5, 4 ], 
+       size := 7920, atlasrepnrs := [23], 
+       values := [ [ 1, 55 ], [ 2, 165 ], [ 3, 66 ] ]
+  ));
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( name := "M11", fields := [5], dimensions := [55], 
+       usemax := [ 3, 4, 5 ], 
+       size := 7920, atlasrepnrs := [24], 
+       values := [ [ 1, 55 ], [ 1, 66 ], [ 2, 165 ] ]
+  ));
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( name := "M11", fields := [11], dimensions := [9], 
+       usemax := [ 3, 4, 5 ], 
+       size := 7920, atlasrepnrs := [25], 
+       values := [ [ 1, 55 ], [ 4, 66 ], [ 4, 165 ] ]
+  ));
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( name := "M11", fields := [11], dimensions := [10], 
+       usemax := [ 3, 5 ], 
+       size := 7920, atlasrepnrs := [26,27], 
+  ));
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( name := "M11", fields := [11], dimensions := [11], 
+       usemax := [ 1, 2, 3 ], 
+       size := 7920, atlasrepnrs := [28], 
+       values := [ [ 1, 11 ], [ 1, 12 ], [ 1, 55 ] ]
+  ));
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( name := "M11", fields := [11], dimensions := [16], 
+       usemax := [ 5, 2, 4 ], 
+       size := 7920, atlasrepnrs := [29], 
+       values := [ [ 4, 165 ], [ 5, 12 ], [ 5, 66 ] ]
+  ));
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( name := "M11", fields := [11], dimensions := [44], 
+       usemax := [ 3, 4, 5 ], 
+       size := 7920, atlasrepnrs := [30], 
+       values := [ [ 1, 55 ], [ 1, 66 ], [ 2, 165 ] ]
+  ));
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( name := "M11", fields := [11], dimensions := [55], 
+       usemax := [ 3, 4, 5 ], 
+       size := 7920, atlasrepnrs := [31], 
+       values := [ [ 1, 55 ], [ 1, 66 ], [ 2, 165 ] ]
+  ));
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( name := "M11", fields := [25], dimensions := [10], 
+       usemax := [ 3, 5, 4 ], 
+       size := 7920, atlasrepnrs := [32,33], 
+       values := [ [ 2, 55 ], [ 2, 165 ], [ 3, 66 ] ]
+  ));
+
+# Hints for J1:
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [2], dimensions := [20], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [8], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [2], dimensions := [76], 
+       usemax := [ 3, 2 ], 
+       size := 175560, atlasrepnrs := [9,10], 
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [2], dimensions := [112], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [11,12], 
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [2], dimensions := [360], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [13], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [3], dimensions := [76], 
+       usemax := [ 1, 3 ], 
+       size := 175560, atlasrepnrs := [14,15], 
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [3], dimensions := [112], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [16], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [3], dimensions := [133], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [17], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [3], dimensions := [154], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [18], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [3], dimensions := [360], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [19], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [4], dimensions := [56], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [20,21,22,23], 
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [5], dimensions := [56], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [24], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [5], dimensions := [76], 
+       usemax := [ 3 ], 
+       size := 175560, atlasrepnrs := [25,26], 
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [5], dimensions := [77], 
+       usemax := [ 1, 3, 4 ], 
+       size := 175560, atlasrepnrs := [27], 
+       values := [ [ 3, 266 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [5], dimensions := [133], 
+       usemax := [ 1, 3, 4 ], 
+       size := 175560, atlasrepnrs := [28], 
+       values := [ [ 15, 266 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [5], dimensions := [360], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [29], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [7], dimensions := [31], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [30], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [7], dimensions := [45], 
+       usemax := [ 2, 4, 5 ], 
+       size := 175560, atlasrepnrs := [31], 
+       values := [ [ 11, 1045 ], [ 16, 1540 ], [ 16, 1596 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [7], dimensions := [75], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [32], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [7], dimensions := [77], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [33], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [7], dimensions := [89], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [34], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [7], dimensions := [112], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [35], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [7], dimensions := [120], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [36], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [7], dimensions := [133], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [37], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [7], dimensions := [154], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [38], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [7], dimensions := [266], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [39], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [8], dimensions := [120], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [40,41,42], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [9], dimensions := [56], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [43,44], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [9], dimensions := [77], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [45,46], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [7], 
+       usemax := [ 4, 5, 6 ], 
+       size := 175560, atlasrepnrs := [47], 
+       values := [ [ 16, 1540 ], [ 16, 1596 ], [ 30, 2926 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [14], 
+       usemax := [ 1, 5, 6 ], 
+       size := 175560, atlasrepnrs := [48], 
+       values := [ [ 9, 266 ], [ 16, 1596 ], [ 30, 2926 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [27], 
+       usemax := [ 1, 3, 4 ], 
+       size := 175560, atlasrepnrs := [49], 
+       values := [ [ 15, 266 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [49], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [50], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [56], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [51], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [64], 
+       usemax := [ 1, 5, 2 ], 
+       size := 175560, atlasrepnrs := [52], 
+       values := [ [ 15, 266 ], [ 16, 1596 ], [ 22, 1045 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [69], 
+       usemax := [ 1, 3, 4 ], 
+       size := 175560, atlasrepnrs := [53], 
+       values := [ [ 9, 266 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [77], 
+       usemax := [ 3 ], 
+       size := 175560, atlasrepnrs := [54,55,56], 
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [106], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [57], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [119], 
+       usemax := [ 1, 3, 4 ], 
+       size := 175560, atlasrepnrs := [58], 
+       values := [ [ 9, 266 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [11], dimensions := [209], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [59], 
+       values := [ [ 9, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [19], dimensions := [22], 
+       usemax := [ 2, 4, 1 ], 
+       size := 175560, atlasrepnrs := [60], 
+       values := [ [ 11, 1045 ], [ 16, 1540 ], [ 30, 266 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [19], dimensions := [34], 
+       usemax := [ 1, 3, 4 ], 
+       size := 175560, atlasrepnrs := [61], 
+       values := [ [ 3, 266 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [19], dimensions := [43], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [62], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [19], dimensions := [55], 
+       usemax := [ 3, 4, 5 ], 
+       size := 175560, atlasrepnrs := [63], 
+       values := [ [ 15, 1463 ], [ 16, 1540 ], [ 16, 1596 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [19], dimensions := [76], 
+       usemax := [ 1, 3 ], 
+       size := 175560, atlasrepnrs := [64,65], 
+       brauercharelm := StraightLineProgram( [ [ 1, 1, 2, 1 ], [ 3, 1, 2, 1 ], 
+         [ 3, 1, 4, 1 ], [ 3, 1, 5, 1 ], [ 6, 1, 4, 1 ], [ 5, 1, 7, 1 ] ], 2 ), 
+       brauercharvals := [ -1, 1 ],
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [19], dimensions := [77], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [66], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [19], dimensions := [133], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [67,68,69], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [19], dimensions := [209], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [70], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [27], dimensions := [120], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [71,72,73], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [49], dimensions := [56], 
+       usemax := [ 1, 2, 3 ], 
+       size := 175560, atlasrepnrs := [74,75], 
+       values := [ [ 3, 266 ], [ 11, 1045 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [49], dimensions := [77], 
+       usemax := [ 2, 3, 4 ], 
+       size := 175560, atlasrepnrs := [76,77], 
+       values := [ [ 11, 1045 ], [ 15, 1463 ], [ 16, 1540 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [49], dimensions := [133], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [78,79], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", fields := [125], dimensions := [120], 
+       usemax := [ 2, 1, 3 ], 
+       size := 175560, atlasrepnrs := [80,81,82], 
+       values := [ [ 11, 1045 ], [ 15, 266 ], [ 15, 1463 ] ]
+  ));
+
 
 InstallAlmostSimpleHint( "HS", "LowIndexHint",
-  rec( characteristics := [2], degreedivs := [20,56,132,518,896,1000,1408],
+  rec( characteristics := [2], dimensiondivs := [20,56,132,518,896,1000,1408],
        elordersstart := [11], numberrandgens := 2, tries := 10,
        triesforgens := 300,
        subspacedims := [1,10,34,70], orblenlimit := 100 ) );
 InstallAlmostSimpleHint( "HS", "LowIndexHint",
-  rec( characteristics := [3], degreedivs := [22,77,154],  # more?
+  rec( characteristics := [3], dimensiondivs := [22,77,154],  # more?
        elordersstart := [11], numberrandgens := 2, tries := 10,
        triesforgens := 300,
        subspacedims := [1,21,45,49,55,99], orblenlimit := 100 ) );
-# degreeupperlimit optionally
-# degreelowerlimit optionally
+# dimensions optionally
 # subspacedims there or not
 # elordersstart unbound ==> start with empty generator list
 # if numberrandgens = "logd" then it will use LogInt(d,2)
@@ -180,7 +855,7 @@ InstallAlmostSimpleHint( "HS", "LowIndexHint",
 # is the standard low index.
 
 InstallAlmostSimpleHint( "L2(31)", "LowIndexHint",
-  rec( characteristics := true, degrees := [1,2,3],
+  rec( characteristics := [31], dimensions := [1,2,3],
        elordersstart := [31], numberrandgens := 2, tries := 1,
        triesforgens := 100, orblenlimit := 32 ) );
 
@@ -198,14 +873,12 @@ InstallGlobalFunction( LookupHintForSimple,
         while j <= Length(hi) do
             if (not(IsBound(hi[j].characteristics)) or 
                 p in hi[j].characteristics) and 
-               (not(IsBound(hi[j].degreedivs)) or 
-                ForAny(hi[j].degreedivs,d->dim mod d = 0)) and
-               (not(IsBound(hi[j].degree)) or
-                hi[j].degree = dim) and
-               (not(IsBound(hi[j].degreeupperlimit)) or
-                dim <= hi[j].degreeupperlimit) and
-               (not(IsBound(hi[j].degreelowerlimit)) or
-                dim >= hi[j].degreelowerlimit) then
+               (not(IsBound(hi[j].fields)) or
+                q in hi[j].fields) and
+               (not(IsBound(hi[j].dimensiondivs)) or 
+                ForAny(hi[j].dimensiondivs,d->dim mod d = 0)) and
+               (not(IsBound(hi[j].dimensions)) or
+                dim in hi[j].dimensions) then
                 # This hint is applicable!
                 if hi[j].type = "LowIndexHint" then
                     return DoHintedLowIndex(ri,G,hi[j]);
