@@ -200,6 +200,10 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     ri!.randopt := rec();
     ri!.randppt := rec();
     ri!.randstore := true;
+    H!.pseudorandomfunc := [rec(func := function(ri,name,bool)
+                                          return RandomElm(ri,name,bool).el;
+                                        end,
+                                args := [ri,"PseudoRandom",false])];
     return ri;
   end );
     
