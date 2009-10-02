@@ -897,6 +897,554 @@ InstallAlmostSimpleHint( "M22", "StabChainHint",
        values := [ [ 10, 77 ], [ 12, 231 ], [ 12, 330 ] ]
   ));
 
+# Hints for M23:
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [2], dimensions := [11], 
+       usemax := [ 3 ], 
+       size := 10200960, atlasrepnrs := [8,9], 
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [2], dimensions := [44], 
+       usemax := [ 6 ], 
+       size := 10200960, atlasrepnrs := [10,11], 
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [2], dimensions := [120], 
+       usemax := [ 1, 3, 4 ], 
+       size := 10200960, atlasrepnrs := [12], 
+       values := [ [ 10, 23 ], [ 18, 253 ], [ 24, 506 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [2], dimensions := [220], 
+       usemax := [ 2 ], 
+       size := 10200960, atlasrepnrs := [13,14], 
+       values := [ [ 27, 253 ], [ 34, 23 ], [ 36, 1771 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [2], dimensions := [252], 
+       usemax := [ 3, 6, 4 ], 
+       size := 10200960, atlasrepnrs := [15], 
+       values := [ [ 12, 253 ], [ 18, 1771 ], [ 24, 506 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [3], dimensions := [22], 
+       usemax := [ 1, 2, 3 ], 
+       size := 10200960, atlasrepnrs := [16], 
+       values := [ [ 1, 23 ], [ 3, 253 ], [ 3, 253 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [3], dimensions := [104], 
+       usemax := [ 3 ], 
+       size := 10200960, atlasrepnrs := [17,18], 
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [3], dimensions := [231], 
+       usemax := [ 2, 3, 6 ], 
+       size := 10200960, atlasrepnrs := [19], 
+       values := [ [ 3, 253 ], [ 18, 253 ], [ 18, 1771 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [3], dimensions := [253], 
+       usemax := [ 4, 6, 3 ], 
+       size := 10200960, atlasrepnrs := [20], 
+       values := [ [ 6, 506 ], [ 18, 1771 ], [ 39, 253 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [3], dimensions := [770], 
+       usemax := [ 6, 2, 3 ], 
+       size := 10200960, atlasrepnrs := [21], 
+       values := [ [ 18, 1771 ], [ 45, 253 ], [ 45, 253 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [4], dimensions := [896], 
+       usemax := [ 2, 3, 1 ], 
+       size := 10200960, atlasrepnrs := [22,23], 
+       values := [ [ 48, 253 ], [ 60, 253 ], [ 70, 23 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [5], dimensions := [22], 
+       usemax := [ 1, 2, 3 ], 
+       size := 10200960, atlasrepnrs := [24], 
+       values := [ [ 1, 23 ], [ 3, 253 ], [ 3, 253 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [5], dimensions := [230], 
+       usemax := [ 2, 3, 4 ], 
+       size := 10200960, atlasrepnrs := [25], 
+       values := [ [ 3, 253 ], [ 3, 253 ], [ 6, 506 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [5], dimensions := [231], 
+       usemax := [ 3, 6 ], 
+       size := 10200960, atlasrepnrs := [26,27], 
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [5], dimensions := [896], 
+       usemax := [ 3, 6, 4 ], 
+       size := 10200960, atlasrepnrs := [28], 
+       values := [ [ 39, 253 ], [ 54, 1771 ], [ 78, 506 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [7], dimensions := [22], 
+       usemax := [ 1, 2, 3 ], 
+       size := 10200960, atlasrepnrs := [29], 
+       values := [ [ 1, 23 ], [ 3, 253 ], [ 3, 253 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [7], dimensions := [45], 
+       usemax := [ 7 ], 
+       size := 10200960, atlasrepnrs := [30], 
+       values := [ [ 404, 40320 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [7], dimensions := [208], 
+       usemax := [ 4, 6, 3 ], 
+       size := 10200960, atlasrepnrs := [31], 
+       values := [ [ 6, 506 ], [ 18, 1771 ], [ 42, 253 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [7], dimensions := [231], 
+       usemax := [ 2, 3, 6 ], 
+       size := 10200960, atlasrepnrs := [32], 
+       values := [ [ 3, 253 ], [ 15, 253 ], [ 18, 1771 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [7], dimensions := [990], 
+       usemax := [ 3, 1, 6 ], 
+       size := 10200960, atlasrepnrs := [33], 
+       values := [ [ 30, 253 ], [ 45, 23 ], [ 72, 1771 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [9], dimensions := [45], 
+       usemax := [ 7 ], 
+       size := 10200960, atlasrepnrs := [35], 
+       values := [ [ 404, 40320 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [9], dimensions := [990], 
+       usemax := [ 3, 1, 2 ], 
+       size := 10200960, atlasrepnrs := [37], 
+       values := [ [ 30, 253 ], [ 45, 23 ], [ 45, 253 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [11], dimensions := [22], 
+       usemax := [ 1, 2, 3 ], 
+       size := 10200960, atlasrepnrs := [38], 
+       values := [ [ 1, 23 ], [ 3, 253 ], [ 3, 253 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [11], dimensions := [45], 
+       usemax := [ 5, 7 ], 
+       size := 10200960, atlasrepnrs := [39], 
+       values := [ [ 208, 1288 ], [ 404, 40320 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [11], dimensions := [229], 
+       usemax := [ 5, 3, 6 ], 
+       size := 10200960, atlasrepnrs := [40], 
+       values := [ [ 13, 1288 ], [ 18, 253 ], [ 18, 1771 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [11], dimensions := [231], 
+       usemax := [ 2, 3, 6 ], 
+       size := 10200960, atlasrepnrs := [41], 
+       values := [ [ 3, 253 ], [ 18, 253 ], [ 18, 1771 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [11], dimensions := [253], 
+       usemax := [ 4, 6, 3 ], 
+       size := 10200960, atlasrepnrs := [42], 
+       values := [ [ 6, 506 ], [ 18, 1771 ], [ 42, 253 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [11], dimensions := [806], 
+       usemax := [ 3, 6, 2 ], 
+       size := 10200960, atlasrepnrs := [43], 
+       values := [ [ 63, 253 ], [ 90, 1771 ], [ 105, 253 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [11], dimensions := [990], 
+       usemax := [ 3, 1, 6 ], 
+       size := 10200960, atlasrepnrs := [44], 
+       values := [ [ 30, 253 ], [ 45, 23 ], [ 72, 1771 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [23], dimensions := [21], 
+       usemax := [ 2, 3, 6 ], 
+       size := 10200960, atlasrepnrs := [45], 
+       values := [ [ 3, 253 ], [ 18, 253 ], [ 36, 1771 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [23], dimensions := [45], 
+       usemax := [ 7 ], 
+       size := 10200960, atlasrepnrs := [47], 
+       values := [ [ 404, 40320 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [23], dimensions := [210], 
+       usemax := [ 6, 3, 2 ], 
+       size := 10200960, atlasrepnrs := [48], 
+       values := [ [ 18, 1771 ], [ 45, 253 ], [ 60, 253 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [23], dimensions := [230], 
+       usemax := [ 2, 3, 4 ], 
+       size := 10200960, atlasrepnrs := [49], 
+       values := [ [ 3, 253 ], [ 3, 253 ], [ 6, 506 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [23], dimensions := [231], 
+       usemax := [ 3, 6, 2 ], 
+       size := 10200960, atlasrepnrs := [50], 
+       values := [ [ 63, 253 ], [ 90, 1771 ], [ 105, 253 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [23], dimensions := [253], 
+       usemax := [ 4, 6, 3 ], 
+       size := 10200960, atlasrepnrs := [51], 
+       values := [ [ 6, 506 ], [ 18, 1771 ], [ 42, 253 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [23], dimensions := [280], 
+       usemax := [ 3, 6, 4 ], 
+       size := 10200960, atlasrepnrs := [52], 
+       values := [ [ 30, 253 ], [ 72, 1771 ], [ 126, 506 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [23], dimensions := [665], 
+       usemax := [ 6, 2, 3 ], 
+       size := 10200960, atlasrepnrs := [53], 
+       values := [ [ 90, 1771 ], [ 105, 253 ], [ 105, 253 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [25], dimensions := [45], 
+       usemax := [ 7 ], 
+       size := 10200960, atlasrepnrs := [54], 
+       values := [ [ 404, 40320 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [25], dimensions := [770], 
+       usemax := [ 6, 3, 2 ], 
+       size := 10200960, atlasrepnrs := [55], 
+       values := [ [ 18, 1771 ], [ 30, 253 ], [ 60, 253 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [25], dimensions := [990], 
+       usemax := [ 3, 1, 6 ], 
+       size := 10200960, atlasrepnrs := [56], 
+       values := [ [ 30, 253 ], [ 45, 23 ], [ 54, 1771 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [49], dimensions := [231], 
+       usemax := [ 3, 6, 2 ], 
+       size := 10200960, atlasrepnrs := [57,58], 
+       values := [ [ 63, 253 ], [ 90, 1771 ], [ 105, 253 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [49], dimensions := [770], 
+       usemax := [ 6, 3, 2 ], 
+       size := 10200960, atlasrepnrs := [59,60], 
+       values := [ [ 18, 1771 ], [ 30, 253 ], [ 57, 253 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [49], dimensions := [896], 
+       usemax := [ 3, 6, 2 ], 
+       size := 10200960, atlasrepnrs := [61,62], 
+       values := [ [ 63, 253 ], [ 90, 1771 ], [ 105, 253 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [121], dimensions := [231], 
+       usemax := [ 3, 6, 2 ], 
+       size := 10200960, atlasrepnrs := [63,64], 
+       values := [ [ 63, 253 ], [ 90, 1771 ], [ 105, 253 ] ]
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", fields := [121], dimensions := [770], 
+       usemax := [ 6, 3, 2 ], 
+       size := 10200960, atlasrepnrs := [65,66], 
+       values := [ [ 18, 1771 ], [ 30, 253 ], [ 60, 253 ] ]
+  ));
+
+# Hints for M24:
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [2], dimensions := [11], 
+       usemax := [ 2 ], 
+       size := 244823040, atlasrepnrs := [8,9], 
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [2], dimensions := [44], 
+       usemax := [ 5 ], 
+       size := 244823040, atlasrepnrs := [10,11], 
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [2], dimensions := [120], 
+       usemax := [ 2, 3, 5 ], 
+       size := 244823040, atlasrepnrs := [12], 
+       values := [ [ 30, 276 ], [ 48, 759 ], [ 72, 1771 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [2], dimensions := [220], 
+       usemax := [ 5 ], 
+       size := 244823040, atlasrepnrs := [13,14], 
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [2], dimensions := [252], 
+       usemax := [ 5, 3, 7 ], 
+       size := 244823040, atlasrepnrs := [15], 
+       values := [ [ 18, 1771 ], [ 32, 759 ], [ 114, 3795 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [2], dimensions := [320], 
+       usemax := [ 1 ], 
+       size := 244823040, atlasrepnrs := [16,17], 
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [2], dimensions := [1242], 
+       usemax := [ 3, 5, 7 ], 
+       size := 244823040, atlasrepnrs := [18], 
+       values := [ [ 32, 759 ], [ 108, 1771 ], [ 114, 3795 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [2], dimensions := [1792], 
+       usemax := [ 5, 3, 7 ], 
+       size := 244823040, atlasrepnrs := [19], 
+       values := [ [ 108, 1771 ], [ 160, 759 ], [ 228, 3795 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [3], dimensions := [22], 
+       usemax := [ 2, 4, 6 ], 
+       size := 244823040, atlasrepnrs := [20], 
+       values := [ [ 3, 276 ], [ 13, 1288 ], [ 21, 2024 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [3], dimensions := [231], 
+       usemax := [ 6, 2, 5 ], 
+       size := 244823040, atlasrepnrs := [21], 
+       values := [ [ 21, 2024 ], [ 63, 276 ], [ 108, 1771 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [3], dimensions := [252], 
+       usemax := [ 2, 3, 4 ], 
+       size := 244823040, atlasrepnrs := [22], 
+       values := [ [ 3, 276 ], [ 8, 759 ], [ 13, 1288 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [3], dimensions := [483], 
+       usemax := [ 3, 5, 6 ], 
+       size := 244823040, atlasrepnrs := [23], 
+       values := [ [ 8, 759 ], [ 18, 1771 ], [ 21, 2024 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [3], dimensions := [770], 
+       usemax := [ 5, 7, 3 ], 
+       size := 244823040, atlasrepnrs := [24,25], 
+       values := [ [ 72, 1771 ], [ 266, 3795 ], [ 280, 759 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [5], dimensions := [23], 
+       usemax := [ 1, 2, 3 ], 
+       size := 244823040, atlasrepnrs := [26], 
+       values := [ [ 1, 24 ], [ 3, 276 ], [ 8, 759 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [5], dimensions := [231], 
+       usemax := [ 5, 3, 2 ], 
+       size := 244823040, atlasrepnrs := [27], 
+       values := [ [ 108, 1771 ], [ 168, 759 ], [ 294, 276 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [5], dimensions := [252], 
+       usemax := [ 2, 3, 4 ], 
+       size := 244823040, atlasrepnrs := [28], 
+       values := [ [ 3, 276 ], [ 8, 759 ], [ 13, 1288 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [5], dimensions := [253], 
+       usemax := [ 2, 6, 1 ], 
+       size := 244823040, atlasrepnrs := [29], 
+       values := [ [ 3, 276 ], [ 21, 2024 ], [ 22, 24 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [7], dimensions := [23], 
+       usemax := [ 1, 2, 3 ], 
+       size := 244823040, atlasrepnrs := [30], 
+       values := [ [ 1, 24 ], [ 3, 276 ], [ 8, 759 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [7], dimensions := [45], 
+       usemax := [ 7 ], 
+       size := 244823040, atlasrepnrs := [31], 
+       values := [ [ 114, 3795 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [7], dimensions := [252], 
+       usemax := [ 2, 3, 4 ], 
+       size := 244823040, atlasrepnrs := [32], 
+       values := [ [ 3, 276 ], [ 8, 759 ], [ 13, 1288 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [7], dimensions := [253], 
+       usemax := [ 2, 6, 1 ], 
+       size := 244823040, atlasrepnrs := [33], 
+       values := [ [ 3, 276 ], [ 21, 2024 ], [ 22, 24 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [7], dimensions := [483], 
+       usemax := [ 3, 5, 6 ], 
+       size := 244823040, atlasrepnrs := [34], 
+       values := [ [ 8, 759 ], [ 18, 1771 ], [ 21, 2024 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [7], dimensions := [990], 
+       usemax := [ 7, 2, 3 ], 
+       size := 244823040, atlasrepnrs := [35], 
+       values := [ [ 114, 3795 ], [ 135, 276 ], [ 360, 759 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [9], dimensions := [45], 
+       usemax := [ 7 ], 
+       size := 244823040, atlasrepnrs := [36,37], 
+       values := [ [ 114, 3795 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [9], dimensions := [990], 
+       usemax := [ 7, 2, 3 ], 
+       size := 244823040, atlasrepnrs := [38], 
+       values := [ [ 114, 3795 ], [ 135, 276 ], [ 360, 759 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [11], dimensions := [23], 
+       usemax := [ 1, 2, 3 ], 
+       size := 244823040, atlasrepnrs := [39], 
+       values := [ [ 1, 24 ], [ 3, 276 ], [ 8, 759 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [11], dimensions := [45], 
+       usemax := [ 7, 4 ], 
+       size := 244823040, atlasrepnrs := [40], 
+       values := [ [ 114, 3795 ], [ 208, 1288 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [11], dimensions := [229], 
+       usemax := [ 4, 5, 7 ], 
+       size := 244823040, atlasrepnrs := [41], 
+       values := [ [ 13, 1288 ], [ 18, 1771 ], [ 38, 3795 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [11], dimensions := [253], 
+       usemax := [ 2, 6, 1 ], 
+       size := 244823040, atlasrepnrs := [42], 
+       values := [ [ 3, 276 ], [ 21, 2024 ], [ 22, 24 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [11], dimensions := [482], 
+       usemax := [ 2, 7, 5 ], 
+       size := 244823040, atlasrepnrs := [43], 
+       values := [ [ 60, 276 ], [ 76, 3795 ], [ 90, 1771 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [11], dimensions := [806], 
+       usemax := [ 5, 4, 7 ], 
+       size := 244823040, atlasrepnrs := [44], 
+       values := [ [ 90, 1771 ], [ 208, 1288 ], [ 228, 3795 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [11], dimensions := [990], 
+       usemax := [ 7, 2, 3 ], 
+       size := 244823040, atlasrepnrs := [45], 
+       values := [ [ 114, 3795 ], [ 135, 276 ], [ 360, 759 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [23], dimensions := [23], 
+       usemax := [ 1, 2, 3 ], 
+       size := 244823040, atlasrepnrs := [46], 
+       values := [ [ 1, 24 ], [ 3, 276 ], [ 8, 759 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [23], dimensions := [45], 
+       usemax := [ 7 ], 
+       size := 244823040, atlasrepnrs := [47], 
+       values := [ [ 114, 3795 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [23], dimensions := [231], 
+       usemax := [ 5, 3, 4 ], 
+       size := 244823040, atlasrepnrs := [48], 
+       values := [ [ 108, 1771 ], [ 168, 759 ], [ 715, 1288 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [23], dimensions := [251], 
+       usemax := [ 1, 6, 3 ], 
+       size := 244823040, atlasrepnrs := [49], 
+       values := [ [ 21, 24 ], [ 42, 2024 ], [ 56, 759 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [23], dimensions := [253], 
+       usemax := [ 2, 1, 6 ], 
+       size := 244823040, atlasrepnrs := [50], 
+       values := [ [ 3, 276 ], [ 21, 24 ], [ 21, 2024 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [23], dimensions := [483], 
+       usemax := [ 3, 5, 6 ], 
+       size := 244823040, atlasrepnrs := [51], 
+       values := [ [ 8, 759 ], [ 18, 1771 ], [ 21, 2024 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [23], dimensions := [770], 
+       usemax := [ 5, 1, 3 ], 
+       size := 244823040, atlasrepnrs := [52], 
+       values := [ [ 90, 1771 ], [ 280, 24 ], [ 280, 759 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [23], dimensions := [990], 
+       usemax := [ 7, 2, 3 ], 
+       size := 244823040, atlasrepnrs := [53], 
+       values := [ [ 114, 3795 ], [ 135, 276 ], [ 360, 759 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [25], dimensions := [45], 
+       usemax := [ 7 ], 
+       size := 244823040, atlasrepnrs := [54,55], 
+       values := [ [ 114, 3795 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [25], dimensions := [770], 
+       usemax := [ 5, 3, 6 ], 
+       size := 244823040, atlasrepnrs := [56], 
+       values := [ [ 90, 1771 ], [ 280, 759 ], [ 420, 2024 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [25], dimensions := [990], 
+       usemax := [ 7, 2, 3 ], 
+       size := 244823040, atlasrepnrs := [57], 
+       values := [ [ 114, 3795 ], [ 135, 276 ], [ 360, 759 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [49], dimensions := [231], 
+       usemax := [ 5, 3, 4 ], 
+       size := 244823040, atlasrepnrs := [58], 
+       values := [ [ 108, 1771 ], [ 168, 759 ], [ 715, 1288 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [49], dimensions := [770], 
+       usemax := [ 5, 3, 6 ], 
+       size := 244823040, atlasrepnrs := [59], 
+       values := [ [ 90, 1771 ], [ 280, 759 ], [ 399, 2024 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [121], dimensions := [231], 
+       usemax := [ 5, 3, 4 ], 
+       size := 244823040, atlasrepnrs := [60], 
+       values := [ [ 108, 1771 ], [ 168, 759 ], [ 715, 1288 ] ]
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", fields := [121], dimensions := [770], 
+       usemax := [ 5, 3, 6 ], 
+       size := 244823040, atlasrepnrs := [61], 
+       values := [ [ 90, 1771 ], [ 280, 759 ], [ 420, 2024 ] ]
+  ));
+
 # Hints for J1:
 InstallAlmostSimpleHint( "J1", "StabChainHint",
   rec( name := "J1", fields := [2], dimensions := [20], 

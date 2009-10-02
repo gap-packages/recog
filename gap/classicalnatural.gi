@@ -149,3 +149,167 @@ RECOG.FindStdGensUsingBSGS := function(g,stdgens,projective,large)
   return SLPOfElms(gens);
 end;
 
+RECOG.InitSLSLP := function(p, ext, stdgens)
+  local r,f;
+  r := rec( t := stdgens[1], s := stdgens[2], a := stdgens[3],
+            b := stdgens[4], c := stdgens[5], std := stdgens, 
+            elm := stdgens[1]^0, q := p^ext, ext := ext, p := p,
+            f := GF(p,ext), cb := CanonicalBasis(f),
+            cache := [EmptyPlist(100),EmptyPlist(100),EmptyPlist(100)] );
+  return r;
+end;
+
+RECOG.FindFFCoeffs := function(r,lambda)
+  return IntVecFFE(Coefficients(r.cb,lambda));
+end;
+
+RECOG.SL_Even_DoRowOp := function(i,j,lambda,r)
+  # add lambda times j-th row to i-th row, i<>j, lambda<>0
+  # by left-multiplying with an expressing in the standard generators:
+  #   t : e_n -> e_{n-1} -> ... -> e_1 -> *    where * in V_n
+  #   s : e_n -> e_{n-1} -> ... -> e_2 -> e_n and e_1 -> e_1
+  #   a : e_1 -> e_1+e_2, e_i -> e_i   for i > 1
+  #   b : e_2 -> e_1+e_2, e_i -> e_i   for i <> 2
+  #   c : e_1 -> omega e_1, e_2 -> omega^-1 e_2, e_i -> e_i for i > 2
+  # Note that V_i = <e_1,...,e_i>.
+  # So <a,b,c> is an SL_2 in the upper left corner, t is an n-cycle
+  # with garbage in the first row, s is an n-1 cycle with garbage in the
+  # first two rows.
+  # Let q=2^k and call a_0 := a, a_1 := a^(c^(q/2)), a_i := a_1 ^ i
+  #           and call b_0 := b, b_1 := b^(c^(-q/2)), b_i := b_1 ^ i
+  # This only modifies the record r collecting a straight line program.
+  local Getak,Getsj,Getti,coeffs,k,new;
+  
+  Getti := function(r,l)
+      if not IsBound(r.cache[1][l]) then
+          r.cache[1][l] := r.t^(l);
+      fi;
+      return r.cache[1][l];
+  end;
+  Getsj := function(r,l)
+      if not IsBound(r.cache[2][l]) then
+          r.cache[2][l] := r.s^l;
+      fi;
+      return r.cache[2][l];
+  end;
+  Getak := function(r,k)
+      if not IsBound(r.cache[3][k]) then
+          if k = 1 then
+              r.cache[3][k] := r.a;
+          else
+              if not IsBound(r.cache[3][2]) then
+                  r.cache[3][2] := r.a^(r.c^(r.q/2));
+              fi;
+              if k > 2 then
+                  r.cache[3][k] := r.cache[3][2]^(k-1);
+              fi;
+          fi;
+      fi;
+      return r.cache[3][k];
+  end;
+
+  new := r.t^0;
+  coeffs := RECOG.FindFFCoeffs(lambda,r.p,r.ext,r.q);
+  for k in [1..r.ext] do
+    if not(IsZero(coeffs[k])) then
+      if i < j then
+          # We need to multiply with the element
+          #    t^(i-1) * s^(j-i-1) * a_k * s^-(j-i-1) * t^-(i-1)
+          # from the left.
+          if i > 1 then new := Getti(r,i-1)^-1 * new; fi;
+          if j > i+1 then new := Getsj(r,j-i-1)^-1 * new; fi;
+          new := Getak(r,k) * new;
+          if j > i+1 then new := Getsj(r,j-i-1) * new; fi;
+          if i > 1 then new := Getti(r,i-1) * new; fi;
+      elif i > j then
+          # We need to multiply with the element
+          #    t^(j-1) * s^(i-j-1) * a_k * s^-(i-j-1) * t^-(j-1)
+          # from the left.
+          if i > 1 then new := Getti(r,j-1)^-1 * new; fi;
+          if j > i+1 then new := Getsj(r,i-j-1)^-1 * new; fi;
+          new := Getak(r,k) * new;
+          if j > i+1 then new := Getsj(r,i-j-1) * new; fi;
+          if i > 1 then new := Getti(r,j-1) * new; fi;
+      fi;
+    fi;
+  od;
+  r.elm := r.new * r.elm;
+  return r.new;
+end;
+
+RECOG.MakeSL_Even_StdGens := function(p,ext,n,d)
+  local a,b,c,f,q,s,t;
+  f := GF(p,ext);
+  q := Size(f);
+  t := IdentityMat(d,f);
+  t := t{Concatenation([n],[1..n-1],[n+1..d])};
+  ConvertToMatrixRep(t,q);
+  s := IdentityMat(d,f);
+  s := s{Concatenation([1,n],[2..n-1],[n+1..d])};
+  ConvertToMatrixRep(s,q);
+  a := IdentityMat(d,f);
+  a[1][2] := One(f);
+  b := IdentityMat(d,f);
+  b[2][1] := One(f);
+  c := IdentityMat(d,f);
+  c[1][1] := Z(q);
+  c[2][2] := Z(q)^-1;
+  return [t,s,a,b,c];
+end;
+
+RECOG.FindStdGens_SL_EvenChar := function(sld,sl2,bas,p,ext)
+  # gens must be gens for SL(d,q) in its natural rep with memory
+  # sl2 < SL(d,q) of isotype SL(2,q) in std gens acting on the subspace
+  # of dimension 2 given by bas (mutable), we assume that sl2 gens are
+  # expressed in terms of gens
+  local n,sl2gens;
+
+  f := GF(p,ext);
+  q := Size(f);
+
+  n := 2;
+  sl2gens := GeneratorsOfGroup(sl2);
+
+  a := sl2gens[1];
+  b := sl2gens[2];
+  c := sl2gens[3];
+  
+  fakegens := ListWithIdenticalEntries( 5+Length(GeneratorsOfGroup(sld
+  n := 2;
+  while n < d do
+      repeat
+          x := PseudoRandom(sld);
+          ax := a^x;
+          u := bas * (ax-One(ax));
+          inter := NullspaceMat(u);
+      until Length(inter) = n-1;
+      z := NullspaceMat(TransposedMat(inter))[1];
+      # Now we would like to have an element y of sl_n with last column
+      # being equal to TransposedMat(z).
+      r := RECOG.InitSLSLP(p,ext,fakegens{[1..5]});
+      if IsZero(z[n]) then
+          pos := PositionNonZero(z);
+          z := z * (z[pos]^-1);
+          RECOG.SL_Even_DoRowOp(pos,n,One(f),r);
+      else
+          pos := n;
+          z := z * (z[n]^-1);
+      fi;
+      for i in [1..n] do
+          if i <> pos and not(IsZero(pos[i])) then
+              RECOG.SL_Even_DoRowOp(i,pos,z[i],r);
+          fi;
+      od;
+      y := r.elm;
+      newt := t * ax^y;
+      Add(bas,bas[n] * newt^-1);
+      n := n + 1;
+      news := 
+
+
+
+  od;
+
+end;
+
+  
