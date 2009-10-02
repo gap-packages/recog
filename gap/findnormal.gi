@@ -35,6 +35,10 @@ InstallValue( FINDEVENNORMALOPTS, rec(
   Projective := false,
   # Set this to true if blind descent should be tried:
   DoBlindDescent := false,
+  # The random source to use:
+  RandomSource := GlobalMersenneTwister,
+  # Up to this size we check all involutions:
+  SizeLimitAllInvols := 32,
 ) );
 
 InstallGlobalFunction( RECOG_EqProjective,
@@ -267,7 +271,7 @@ InstallMethod( FindEvenNormalSubgroup, "for a group object and a record",
               invgrp := Group(invols);
               S := StabilizerChain(invgrp,rec( Projective := opt.Projective,
                                                isone := opt.IsOne ) );
-              if Size(S) <= 32 then
+              if Size(S) <= opt.SizeLimitAllInvols then
                   iter := GroupIteratorByStabilizerChain(S);
                   Info(InfoFindEvenNormal,2,"Looking through ",Size(S),
                        " central involutions...");
@@ -336,6 +340,338 @@ InstallMethod( FindEvenNormalSubgroup, "for a group object and a record",
   return res;
 end );
 
+# All powers that can be done with at most 5 multiplications/inversion:
+RECOG.MYRANDOMSUBPRODUCTPOWERS :=
+  [1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,20,24,32,
+   -1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-12,-16];
+  # (without undue and unimplemented tricks)!
+
+RECOG.RandomSubproduct := function(a,opt)
+    local dopowers,g,isone,power,prod,rs;
+
+    if IsBound(opt.RandomSource) then
+        rs := opt.RandomSource;
+    else
+        rs := GlobalMersenneTwister;
+    fi;
+    if IsBound(opt.DoPowers) then 
+        dopowers := opt.DoPowers;
+    else
+        dopowers := false;
+    fi;
+    if IsBound(opt.IsOne) then
+        isone := opt.IsOne;
+    else
+        isone := IsOne;
+    fi;
+
+    prod := One(a[1]);
+    repeat
+        for g in a do
+            if Random( rs, [ true, false ] )  then
+                if dopowers then
+                    power := Random(rs,RECOG.RANDOMSUBPRODUCTPOWERS);
+                else
+                    power := 1;
+                fi;
+                if Random( rs, [ true, false ] )  then
+                    prod := prod * g^power;
+                else
+                    prod := g^power * prod;
+                fi;
+            fi;
+        od;
+    until not(isone(prod));
+    return prod;
+end;
+
+RECOG.BlindDescentStep := function(G,x,y,opt)
+  # If either x or y are in a proper normal subgroup, then the result will
+  # be and it will be nontrivial:
+  # Only use for non-abelian groups and for non-trivial x and y!
+
+  local c,i,isone,l,usepseudo,xx;
+
+  if IsBound(opt.IsOne) then
+      isone := opt.IsOne;
+  else
+      isone := IsOne;
+  fi;
+  if IsBound(opt.UsePseudoRandom) then
+      usepseudo := opt.UsePseudoRandom;
+  else
+      usepseudo := false;
+  fi;
+
+  c := Comm(x,y); 
+  if not(isone(c)) then
+      return rec( el := c, Ngens := [c], Nready := false, central := false,
+                  isknownproper := false );
+  fi;
+  # y could be central in G:
+  if ForAll(GeneratorsOfGroup(G),g->isone(Comm(g,y))) then
+      return rec( el := y, central := true, Ngens := [y], Nready := true,
+                  isknownproper := true );  # G was not abelian!
+  fi;
+  # Now try generators for the normal closure of x:
+  l := [x];
+  for i in [1..18] do
+    if usepseudo then
+        xx := RECOG.RandomSubproduct(l,opt)^PseudoRandom(G);
+    else
+        xx := RECOG.RandomSubproduct(l,opt)^
+              RECOG.RandomSubproduct(GeneratorsOfGroup(G),opt);
+    fi;
+    Add(l,xx);
+    c := Comm(xx,y);
+    if not(isone(c)) then
+        return rec( el := c, central := false, Ngens := l, Nready := false,
+                    isknownproper := false );
+    fi;
+  od;
+  # Now y seems to commute with <x^G> but not with all of G, thus <x^G>
+  # is a proper normal subgroup:
+  return rec( el := x, central := false, Ngens := l, Nready := true,
+              isknownproper := true );
+end;
+
+InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object",
+  [ IsGroup ],
+  function( g ) return FindElmOfEvenNormalSubgroup( g, rec() ); end );
+
+InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
+  [ IsGroup, IsRecord ],
+  function( g, opt )
+    local AddList,FindNonCentralInvolution,InvCentDescent,LookAtInvolutions,
+          UseElement,abelian,blind,blindr,gens,i,invols,j,pos,res;
+
+    Info(InfoFindEvenNormal,1,"FindElmOfEvenNormalSubgroup called...");
+
+    # Some helper function:
+    AddList := function(l,el)
+      if opt.IsOne(el) then return false; fi;
+      for i in [1..Length(l)] do
+          if opt.Eq(l[i],el) then return false; fi;
+      od;
+      Add(l,el);
+      return true;
+    end;
+
+    FindNonCentralInvolution := function(h,invols)
+      # Find a non-central involution:
+      local count,o,x;
+      count := 0;
+      repeat
+          x := PseudoRandom(h);
+          o := opt.Order(x);
+          if IsEvenInt(o) then
+              if InfoLevel(InfoFindEvenNormal) >= 3 then Print("+\c"); fi;
+              x := x^(o/2);
+              if AddList(invols,x) then
+                  if ForAny(GeneratorsOfGroup(h),a->not opt.Eq(a*x,x*a)) then
+                      return x;
+                  fi;
+              fi;
+          else
+              if InfoLevel(InfoFindEvenNormal) >= 3 then Print("-\c"); fi;
+          fi;
+          count := count + 1;
+      until count > opt.NonCentInvSearchLimit;
+      return fail;
+    end;
+
+    UseElement := function(y)
+      # This does a blind descent step possibly ending everything!
+      # It refers to the outer variables g, blind, blindr and opt!
+      blindr := RECOG.BlindDescentStep(g,blind,y,opt);
+      if blindr.isknownproper then
+          blindr.success := true;
+          if blindr.central then
+              blindr.msg := "Found central element";
+          else
+              blindr.msg := "Normal closure almost certainly proper";
+          fi;
+      fi;
+      blind := blindr.el;
+    end;
+
+    InvCentDescent := function(h,x,centinvols)
+      local c,centgens,count,counteven,countodd,o,prc,y,z;
+      Info(InfoFindEvenNormal,2,"Descending to involution centraliser...");
+      # We produce generators for the involution centraliser:
+      centgens := Concatenation([x],centinvols);
+      count := 0;
+      counteven := 0;
+      countodd := 0;
+      repeat
+          y := PseudoRandom(h);
+          c := x * x^y;       # = Comm(x,y) since x is an involution
+          o := opt.Order(c);
+          if IsEvenInt(o) then   # <x,y> is dihedral with order = 0 mod 4
+              if InfoLevel(InfoFindEvenNormal) >= 3 then Print("+\c"); fi;
+              z := c^(o/2);
+              if AddList(centinvols,z) then
+                  AddList(centgens,z);
+                  counteven := counteven + 1;
+                  UseElement(z);
+                  if blindr.isknownproper then 
+                      if InfoLevel(InfoFindEvenNormal)>=3 then Print("\n"); fi;
+                      return blindr; 
+                  fi;
+              fi;
+              z := (x * x^(y^-1))^(o/2);
+              if AddList(centinvols,z) then
+                  AddList(centgens,z);
+                  counteven := counteven + 1;
+                  UseElement(z);
+                  if blindr.isknownproper then 
+                      if InfoLevel(InfoFindEvenNormal)>=3 then Print("\n"); fi;
+                      return blindr; 
+                  fi;
+              fi;
+          else
+              # This is a uniformly distributed random element in C_G(x):
+              if InfoLevel(InfoFindEvenNormal) >= 3 then Print("-\c"); fi;
+              z := y*c^((o-1)/2);
+              AddList(centgens,z);
+              countodd := countodd + 1;
+              o := opt.Order(z);
+              if IsEvenInt(o) then
+                  z := z^(o/2);
+                  if AddList(centinvols,z^(o/2)) then
+                      UseElement(z);
+                      if blindr.isknownproper then 
+                      if InfoLevel(InfoFindEvenNormal)>=3 then Print("\n"); fi;
+                          return blindr; 
+                      fi;
+                  fi;
+              fi;
+          fi;
+          count := count + 1;
+      until countodd >= opt.NrOddForInvCent or
+            count >= opt.NrStepsGiveUpForInvCent;
+      if InfoLevel(InfoFindEvenNormal) >= 3 then Print("\n"); fi;
+      c := GroupWithGenerators(centgens);
+      prc := ProductReplacer(c,rec( scramblefactor := 3 ) );
+      c!.pseudorandomfunc := [rec( func := Next, args := [prc] )];
+      return LookAtInvolutions(c,centinvols);
+    end;
+
+    LookAtInvolutions := function(h,invols)
+      local S,i,invgrp,iter,x,y;
+      Info(InfoFindEvenNormal,2,"Looking for non-central involutions...");
+      i := 1;
+      while i <= Length(invols) do
+          if ForAny(GeneratorsOfGroup(h),
+                    a->not opt.Eq(a*invols[i],invols[i]*a)) then
+              break;
+          fi;
+          i := i + 1;
+      od;
+      if i <= Length(invols) then
+          x := invols[i];
+          if InfoLevel(InfoFindEvenNormal) >= 3 then Print("\n"); fi;
+      else
+          x := FindNonCentralInvolution(h,invols);
+          if InfoLevel(InfoFindEvenNormal) >= 3 then Print("\n"); fi;
+          if x = fail then   # suspect that all involutions are central in H!
+              Info(InfoFindEvenNormal,2,"Found ",Length(invols),
+                   " central ones.");
+              if Length(invols) = 0 then
+                  return rec( success := fail,
+                              msg := "No central involutions found" );
+              fi;
+              invgrp := GroupWithGenerators(invols);
+              Info(InfoFindEvenNormal,3,"Computing stabiliser chain...");
+              S := StabilizerChain(invgrp,rec( Projective := opt.Projective,
+                                               IsOne := opt.IsOne ) );
+              Info(InfoFindEvenNormal,3,"...done, size is ",Size(S),".");
+              if Size(S) <= opt.SizeLimitAllInvols then
+                  iter := GroupIteratorByStabilizerChain(S);
+                  Info(InfoFindEvenNormal,2,"Looking through ",Size(S),
+                       " central involutions...");
+                  for y in iter do
+                      if not(opt.IsOne(y)) then
+                          UseElement(y);
+                          if blindr.isknownproper then return blindr; fi;
+                      fi;
+                  od;
+                  blindr.msg := 
+  "If at all possible, we found an element of an even proper normal subgroup.";
+                  blindr.success := true;
+                  return blindr;
+              else
+                  for i in [1..20] do
+                      y := Random(S);
+                      if not(opt.IsOne(y)) then
+                          UseElement(y);
+                          if blindr.isknownproper then return blindr; fi;
+                      fi;
+                  od;
+                  blindr.msg :=
+  "We could have found an element of an even proper normal subgroup.";
+                  blindr.success := "Perhaps";
+                  return blindr;
+              fi;
+          fi;
+          i := Length(invols);
+      fi;
+      # If we get here, we have found a non-central involution and
+      # invols{[1..i-1]} is a list of central ones!
+      return InvCentDescent(h,x,invols{[1..i-1]});
+  end;
+
+  # Here the main routine starts:
+
+  # Set some defaults:
+  if IsBound(opt.Projective) and opt.Projective then
+      if not(IsBound(opt.IsOne)) then opt.IsOne := GENSS_IsOneProjective; fi;
+      if not(IsBound(opt.Eq)) then opt.Eq := RECOG_EqProjective; fi;
+      if not(IsBound(opt.Order)) then opt.Order := RECOG.ProjectiveOrder; fi;
+  fi;
+  GENSS_CopyDefaultOptions( FINDEVENNORMALOPTS, opt );
+
+  # First test whether or not we are abelian:
+  if not(IsBound(opt.SkipTrivAbelian)) then
+      gens := GeneratorsOfGroup(g);
+      pos := First([1..Length(gens)],i->not(opt.IsOne(gens[i])));
+      if pos = fail then
+          res := rec( success := fail, msg := "Group is trivial" );
+      fi;
+      i := 1;
+      abelian := true;
+      while abelian and i < Length(gens) do
+          j := i+1;
+          while abelian and j <= Length(gens) do
+              if not(opt.Eq(gens[i]*gens[j],gens[j]*gens[i])) then
+                  abelian := false;
+              fi;
+              j := j + 1;
+          od;
+          i := i + 1;
+      od;
+      if abelian then
+          res := rec( success := true, msg := "Group is abelian",
+                      el := gens[pos] );
+      fi;
+  fi;
+
+  opt.UsePseudoRandom := true;   # This is for the blind descent
+
+  # First make sure we have an involution list:
+  if IsBound(opt.invols) then
+      invols := opt.invols;
+  else
+      invols := [];
+  fi;
+
+  blind := PseudoRandom(g);
+  blindr := rec();    # will be overwritten in UseElement
+  res := LookAtInvolutions(g,invols);
+  Info(InfoFindEvenNormal,1,"FindElmOfEvenNormalSubgroup: ",res.success,"!");
+  return res;
+end );
+
 FindHomMethodsProjective.FindEvenNormal := function(ri,G)
   local count,r,rr,f,m,mm,res;
   r := FindEvenNormalSubgroup(G,
@@ -344,10 +680,12 @@ FindHomMethodsProjective.FindEvenNormal := function(ri,G)
       f := ri!.field;
       m := GModuleByMats(r.Ngens,f);
       if not(MTX.IsIrreducible(m)) then
-          Info(InfoRecog,2,"Found reducible proper normal subgroup!");
+          Info(InfoRecog,2,
+               "FindEvenNormal: Found reducible proper normal subgroup!");
           return RECOG.SortOutReducibleNormalSubgroup(ri,G,r.Ngens,m);
       else
-          Info(InfoRecog,2,"Found irreducible proper normal subgroup!");
+          Info(InfoRecog,2,
+               "FindEvenNormal: Found irreducible proper normal subgroup!");
           count := 0;
           repeat
               count := count + 1;
@@ -357,7 +695,7 @@ FindHomMethodsProjective.FindEvenNormal := function(ri,G)
                   mm := GModuleByMats(rr.Ngens,f);
                   if MTX.IsIrreducible(mm) then 
                       Info(InfoRecog,2,
-                           "Second normal subgroup was not reducible.");
+            "FindEvenNormal: Second normal subgroup was not reducible.");
                       return fail; 
                   fi;
                   res := RECOG.SortOutReducibleSecondNormalSubgroup(ri,G,
@@ -369,6 +707,46 @@ FindHomMethodsProjective.FindEvenNormal := function(ri,G)
               fi;
           until count >= 2;
       fi;
+  fi;
+  return fail;
+end;
+
+FindHomMethodsProjective.FindElmEvenNormal := function(ri,G)
+  local count,f,m,mm,r,res,rr;
+  r := FindElmOfEvenNormalSubgroup(G, 
+          rec( Projective := true, SkipTrivAbelian := true ));
+  if r.success = fail then return fail; fi;
+  if not IsBound(r.Nready) or not(r.Nready) then
+      r.Ngens := FastNormalClosure(GeneratorsOfGroup(G),[r.el],20);
+  fi;
+  f := ri!.field;
+  m := GModuleByMats(r.Ngens,f);
+  if not(MTX.IsIrreducible(m)) then
+      Info(InfoRecog,2,
+           "FindElmEvenNormal: Found reducible proper normal subgroup!");
+      return RECOG.SortOutReducibleNormalSubgroup(ri,G,r.Ngens,m);
+  else
+      Info(InfoRecog,2,
+           "FindElmEvenNormal: Could be irreducible proper normal subgroup!");
+      count := 0;
+      repeat
+          count := count + 1;
+          rr := FindElmOfEvenNormalSubgroup(Group(r.Ngens),
+                       rec( Projective:=true, SkipTrivAbelian := true ));
+          if rr.success = fail then continue; fi;
+          if not IsBound(rr.Nready) or not(rr.Nready) then
+              rr.Ngens := FastNormalClosure(r.Ngens,[rr.el],20);
+          fi;
+          mm := GModuleByMats(rr.Ngens,f);
+          if MTX.IsIrreducible(mm) then 
+              Info(InfoRecog,2,
+               "FindElmEvenNormal: Second normal subgroup was not reducible.");
+              return fail; 
+          fi;
+          res := RECOG.SortOutReducibleSecondNormalSubgroup(ri,G,rr.Ngens,mm);
+          if res = true then return res; fi;
+          r := rr;
+      until count >= 2;
   fi;
   return fail;
 end;

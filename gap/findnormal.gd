@@ -22,4 +22,5 @@ DeclareGlobalFunction("RECOG_IsNormal");
 
 DeclareOperation( "FindEvenNormalSubgroup", [ IsGroup, IsRecord ] );
 DeclareOperation( "FindEvenNormalSubgroup", [ IsGroup ] );
-
+DeclareOperation( "FindElmOfEvenNormalSubgroup", [ IsGroup, IsRecord ] );
+DeclareOperation( "FindElmOfEvenNormalSubgroup", [ IsGroup ] );

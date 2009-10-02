@@ -1,3 +1,16 @@
+Local TODO list:
+
+  - Look at Product Replacers again (--> orb): no need for accus during mixing
+  - Look at random sources in recog?
+  - Use RECOG.RandomSubProduct everywhere
+  - Look at all PseudoRandoms (still TODO)
+  - Move D247 before FindEvenNormal to speed up things
+  - early sporadics methods?
+  - detect classical natural early on
+  - implement classical natural for odd case (--> LG OB)
+  - genss: Make call to StabilizerChain which is guaranteed to be quick
+    possible
+
 Before release:
 
  - create Makefile

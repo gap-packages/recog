@@ -249,6 +249,9 @@ AddMethod( FindHomDbProjective, FindHomMethodsProjective.C3C5,
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.C6,
    850, "C6",
         "find either an (imprimitive) action or a symplectic one" );
+AddMethod( FindHomDbProjective, FindHomMethodsProjective.FindElmEvenNormal,
+   840, "FindElmEvenNormal",
+        "find D2, D4 or D7 by finding an element of an even normal subgroup" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.FindEvenNormal,
    825, "FindEvenNormal",
         "find D2, D4 or D7 by finding reducible normal subgroup" );
