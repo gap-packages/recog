@@ -310,3 +310,193 @@ local a,ax,b,c,d,f,fakegens,i,inter,n,news,newt,pos,q,r,sl2gens,u,t,x,y,z;
 end;
 
   
+RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
+  # f a finite field, g equal to SL(2,Size(f)), t either an element
+  # of order p = Characteristic(f) or false.
+  # Returns a set of standard generators for SL_2 and the base change
+  # to expose it. Works with memory. Uses PseudoRandom.
+  local a,b,bas,c,can,ch,co,co2,deg,el,ev,eva,evb,evbi,i,j,limit,mas,masi,
+        mat,mati,mb,o,one,p,pos,q,ss,ssm,t,tb,tm,tt,ttm,u,v,x,xb,xm,gens;
+  q := Size(f);
+  p := Characteristic(f);
+  deg := DegreeOverPrimeField(f);
+  if torig = false then
+      i := 1;
+      gens := GeneratorsOfGroup(g);
+      while i <= Length(gens) do
+          if not(IsOne(gens[i])) and IsOne(gens[i]^2) then
+              torig := gens[i];
+              break;
+          fi;
+          i := i + 1;
+      od;
+  fi;
+  if torig = false then
+      repeat
+          a := PseudoRandom(g);
+      until Order(a) = q-1;
+      eva := Eigenvectors(f,a);
+      repeat
+          b := a^PseudoRandom(g);
+      until a*b<>b*a;
+      ev := Eigenvalues(f,b);
+      evb := List(ev,v->NullspaceMat(b-v*One(b))[1]);
+      evbi := evb^-1;
+      c := evb*a*evbi;
+      if IsZero(c[1][2]) or IsZero(c[2][1]) then
+          # We were lucky, a and b share an eigenspace
+          tm := Comm(a,b);
+      else
+          u := eva[1]*evbi;
+          # We know that both components are non-zero since a and b do not
+          # have a common eigenspace!
+          repeat
+              c := a^PseudoRandom(g);
+              v := (eva[1]*c)*evbi;
+          until not(IsZero(v[1]) or IsZero(v[2]));
+          pos := LogFFE((v[2]/v[1])/(u[2]/u[1]),ev[2]);
+          if ev[2]^pos <> (v[2]/v[1])/(u[2]/u[1]) then Error(3); fi;
+          if IsOddInt(pos) then
+              pos := (pos + q - 1) / 2;
+          else
+              pos := pos / 2;
+          fi;
+          tm := Comm(a,b^pos*c^-1);
+          if Order(tm) <> 2 then Error(2); fi;
+      fi;
+  else
+      tm := torig;
+  fi;
+  t := StripMemory(tm);
+  ch := Factors(CharacteristicPolynomial(f,f,t,1));
+  if Length(ch) <> 2 or ch[1] <> ch[2] then
+      Error("how could this have happened?");
+  fi;
+  one := OneMutable(t);
+  bas := MutableCopyMat(NullspaceMat(Value(ch[1],t)));
+  Add(bas,one[1]);
+  if RankMat(bas) < 2 then
+      bas[2] := one[2];
+  fi;
+  tb := bas*t*bas^-1;
+  can := CanonicalBasis(f);
+  tt := [t];
+  ttm := [tm];
+  mat := [Coefficients(can,tb[2][1])];
+  mb := MutableBasis(GF(2),mat);
+  o := Orb(g,GeneratorsOfGroup(g)[1],OnRight);
+  limit := deg;
+  Enumerate(o,limit);
+  j := 1;
+  while Length(tt) < deg do
+      repeat
+          repeat
+              if j > Length(o) then 
+                  limit := limit + 5;
+                  Enumerate(o,limit);
+              fi;
+              xm := o[j];
+              j := j + 1;
+              c := Comm(tm,xm);
+          until not(IsOne(c^2));
+          xm := xm * c^(((q-1)*(q+1)-1)/2);
+          x := StripMemory(xm);
+          xb := bas*x*bas^-1;
+          co := Coefficients(can,xb[2][1]);
+      until not(IsContainedInSpan(mb,co));
+      CloseMutableBasis(mb,co);
+      Add(tt,x);
+      Add(ttm,xm);
+      Add(mat,co);
+      #Print(".\c");
+  od;
+  #Print(j-1,"\n");
+  ConvertToMatrixRep(mat,2);
+  mati := mat^-1;
+
+  # Now we can perform add an arbitrary multiple of the first row to the
+  # second and an arbitrary multiple of the second column to the first.
+  # Therefore we quickly find other complimentary transvections.
+  ss := [];
+  ssm := [];
+  mas := [];
+  mb := MutableBasis(GF(2),mas,ZeroMutable(mat[1]));
+  j := 1;
+  while Length(ss) < deg do
+      while true do   # will be left by break
+          repeat
+              if j > Length(o) then 
+                  limit := limit + 5;
+                  Enumerate(o,limit);
+              fi;
+              xm := o[j];
+              j := j + 1;
+              x := MutableCopyMat(bas*StripMemory(xm)*bas^-1);
+          until not(IsZero(x[1][2]));
+          if not(IsOne(x[2][2])) then
+              el := (One(f)-x[2][2])/x[1][2];
+              co := Coefficients(can,el) * mati;
+              for i in [1..Length(co)] do 
+                  if not(IsZero(co[i])) then
+                      xm := ttm[i] * xm;
+                  fi;
+              od;
+              x[2] := x[2] + x[1] * el;
+              if x <> bas*StripMemory(xm)*bas^-1 then Error("!!!"); fi;
+          fi;
+          # now x[2][2] is equal to One(f)
+          # we postpone the actual computation of the final x until we
+          # know it is needed:
+          co := Coefficients(can,x[1][2]);
+          if IsContainedInSpan(mb,co) then continue; fi;
+          # OK, we need it, so let's make it:
+          el := x[2][1];
+          co2 := Coefficients(can,el) * mati;
+          for i in [1..Length(co2)] do 
+              if not(IsZero(co2[i])) then
+                  xm := xm * ttm[i];
+              fi;
+          od;
+          x := StripMemory(xm);
+          # now x[2][1] is equal to Zero(f) and thus x[1][1] is One(f) as well
+          break;
+      od;
+      CloseMutableBasis(mb,co);
+      Add(ss,x);
+      Add(ssm,xm);
+      Add(mas,co);
+      #Print(".\c");
+  od;
+  #Print("\n");
+  ConvertToMatrixRep(mas,2);
+  masi := mas^-1;
+
+  return rec( g := g, std := Concatenation(ttm,ssm), t := tm, 
+              mati := mati, masi := masi, bas := bas, basi := bas^-1 );
+end;
+
+RECOG.GuessSL2ElmOrder := function(x,q)
+  local facts,i,j,o,p,r,s,y,z;
+  if IsOne(x^(q-1)) then
+      facts := Collected(FactInt(q-1:cheap)[1]);
+      s := Product(facts,x->x[1]^x[2]);
+      r := (q-1)/s;
+  else
+      facts := Collected(FactInt(q+1:cheap)[1]);
+      s := Product(facts,x->x[1]^x[2]);
+      r := (q+1)/s;
+  fi;
+  y := x^r;
+  o := r;
+  for i in [1..Length(facts)] do
+      p := facts[i];
+      j := p[2]-1;
+      while j >= 0 do
+          z := y^(s/p[1]^(p[2]-j));
+          if not(IsOne(z)) then break; fi;
+          j := j - 1;
+      od;
+      o := o * p[1]^(j+1);
+  od;
+  return o;
+end;
