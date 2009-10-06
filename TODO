@@ -10,6 +10,13 @@ Local TODO list:
   - implement classical natural for odd case (--> LG OB)
   - genss: Make call to StabilizerChain which is guaranteed to be quick
     possible
+  - generic sporadics hint
+  - more reps for specific hint (-> covers and non-atlasrep reps)
+  - think about BrauerCharacterValue method
+  - general tuning
+  - revisit examples/challenges
+  - implement sl2 natural
+  - fix new FindElmOf method with respect to PseudoRandom
 
 Before release:
 

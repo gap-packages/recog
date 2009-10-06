@@ -262,7 +262,7 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,sl2,bas,p,ext)
   # sl2 < SL(d,q) of isotype SL(2,q) in std gens acting on the subspace
   # of dimension 2 given by bas (mutable), we assume that sl2 gens are
   # expressed in terms of gens
-  local n,sl2gens;
+local a,ax,b,c,d,f,fakegens,i,inter,n,news,newt,pos,q,r,sl2gens,u,t,x,y,z;
 
   f := GF(p,ext);
   q := Size(f);
@@ -274,7 +274,7 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,sl2,bas,p,ext)
   b := sl2gens[2];
   c := sl2gens[3];
   
-  fakegens := ListWithIdenticalEntries( 5+Length(GeneratorsOfGroup(sld
+  fakegens := ListWithIdenticalEntries( 5+Length(GeneratorsOfGroup(sld)),());
   n := 2;
   while n < d do
       repeat
@@ -304,10 +304,7 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,sl2,bas,p,ext)
       newt := t * ax^y;
       Add(bas,bas[n] * newt^-1);
       n := n + 1;
-      news := 
-
-
-
+      news :=  1;
   od;
 
 end;
