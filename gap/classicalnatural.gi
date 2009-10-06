@@ -13,24 +13,23 @@
 ##
 #############################################################################
 
-
-RECOG.SL_Even_godownone:=function(g,subspg,q)
-local n,d,y,yy,yyy,ready,order,es,null,subsph,z,x,a,b,c,h,r,divisors,cent,i,
+RECOG.SL_Even_godownone:=function(g,subspg,q,d)
+local n,y,yy,yyy,ready,order,es,null,subsph,z,x,a,b,c,h,r,divisors,cent,i,
 pol,factors,degrees;
 
 n:=DimensionOfMatrixGroup(g);
-d:=Dimension(subspg);
+#d:=Dimension(subspg);
 repeat 
   ready:=false;
   y:=PseudoRandom(g);
-  pol:=CharacteristicPolynomial(y);
+  pol:=CharacteristicPolynomial(GF(q),GF(q),StripMemory(y),1);
   factors:=Factors(pol);
   degrees:=List(factors,Degree);
   if d-1 in degrees then 
      order:=Order(y);
      yy:=y^(order/Gcd(order,q-1));
      if not IsOne(yy) then 
-          es:= Eigenspaces(GF(q),yy);
+          es:= Eigenspaces(GF(q),StripMemory(yy));
           es:=Filtered(es,x->Dimension(x)=d-1 and IsSubspace(subspg,x));
           if Length(es)>0 then
              subsph:=es[1];
@@ -62,9 +61,10 @@ od;
 return [Group(cent), subsph];
 end;
 
+
 RECOG.SL_Even_constructdata:=function(g,q)
 local n,subgplist,subspg,i,j,r,hgens,output,h,workingdim,y,yy,order,
-gens,degrees, factors, pol, ready,ready2,list,hmod,cf, fac,vs,z;
+gens,degrees,factors,pol,ready,ready2,ready3,z;
 
 n:=DimensionOfMatrixGroup(g);
 
@@ -73,15 +73,15 @@ if q-1>n then
   subgplist:=[g,subspg];
   workingdim:=n;
   while workingdim > 2 do
-    subgplist:=RECOG.SL_Even_godownone(subgplist[1],subgplist[2],q);
+    subgplist:=RECOG.SL_Even_godownone(subgplist[1],subgplist[2],q,workingdim);
     workingdim:=workingdim-1;
   od;
 else
-  n:=DimensionOfMatrixGroup(g);
+  #case of small q
   repeat  
     ready:=false;
     y:=PseudoRandom(g);
-    pol:=CharacteristicPolynomial(y);
+    pol:=CharacteristicPolynomial(GF(q),GF(q),StripMemory(y),1);
     factors:=Factors(pol);
     degrees:=List(factors,Degree);
     if SortedList(degrees)=[1,1,n-2] then 
@@ -94,29 +94,33 @@ else
   until ready;
 
   ready2:=false;
+  ready3:=false;
   repeat
      gens:=[yy];
      Add(gens,yy^PseudoRandom(g));
      Add(gens,yy^PseudoRandom(g));
      h:=Group(gens);
-     list:=[];
      for i in [1..10] do
        z:=PseudoRandom(h);
-       pol:=CharacteristicPolynomial(z);
+       pol:=CharacteristicPolynomial(GF(q),GF(q),StripMemory(z),1);
        factors:=Factors(pol);
        degrees:=List(factors,Degree);
-       Add(list,Maximum(degrees));
+       if Maximum(degrees)=2 then
+          ready2:=true;
+       elif Maximum(degrees)=3 then
+          ready3:=true;
+       fi;
+       if ready2 and ready3 then 
+           break;
+       fi;
      od;
-     list:=Set(list);
-     if 3 in list and 2 in list then 
-       ready2:=true;
-       hmod:=GModuleByMats(gens,GF(q));
-       cf:=MTX.CompositionFactors(hmod);
-       fac:=Filtered(cf,x->x.dimension=3);
-       vs:=VectorSpace(GF(q), MTX.Homomorphisms(fac[1],hmod)[1]);
-       subgplist:=RECOG.SL_Even_godownone(h,vs,q);
+     if not (ready2 and ready3) then 
+        ready2:=false;
+        ready3:=false;
      fi;
-   until ready2;
+  until ready2 and ready3; 
+  
+  subgplist:=RECOG.SL_Even_godownone(h,VectorSpace(GF(q),One(g)),q,3);
 fi;
 
 return subgplist;
@@ -165,7 +169,7 @@ end;
 
 RECOG.SL_Even_DoRowOp := function(i,j,lambda,r)
   # add lambda times j-th row to i-th row, i<>j, lambda<>0
-  # by left-multiplying with an expressing in the standard generators:
+  # by left-multiplying with an expression in the standard generators:
   #   t : e_n -> e_{n-1} -> ... -> e_1 -> *    where * in V_n
   #   s : e_n -> e_{n-1} -> ... -> e_2 -> e_n and e_1 -> e_1
   #   a : e_1 -> e_1+e_2, e_i -> e_i   for i > 1
@@ -257,18 +261,54 @@ RECOG.MakeSL_Even_StdGens := function(p,ext,n,d)
   return [t,s,a,b,c];
 end;
 
+RECOG.ExpressInStd_SL2 := function(m,r)
+  if not(IsOne(m[1][1])) then
+      if IsZero(m[2][1]) then
+          RECOG.DoRowOp_SL(m,2,1,r.one,r);
+          # Now m[2][1] is non-zero
+      fi;
+      RECOG.DoRowOp_SL(m,1,2,(r.one-m[1][1])/m[2][1],r);
+  fi;
+  # Now m[1][1] is equal to one
+  if not(IsZero(m[2][1])) then
+      RECOG.DoRowOp_SL(m,2,1,-m[2][1],r);
+  fi;
+  # Now m[2][1] is equal to zero and thus m[2][2] equal to zero
+  if not(IsZero(m[1][2]) then
+  RECOG.DoRowOp_SL(m,1,2,-m[1][2],r);
+  # Now m is the identity matrix, the element collected in r
+  # is the one to multiply on the left hand side to transform m to the
+  # identity. Thus it is equal to the inverse of m.
+end;
+
 RECOG.FindStdGens_SL_EvenChar := function(sld,sl2,bas,p,ext)
-  # gens must be gens for SL(d,q) in its natural rep with memory
+  # gens of sld must be gens for SL(d,q) in its natural rep with memory
   # sl2 < SL(d,q) of isotype SL(2,q) in std gens acting on the subspace
   # of dimension 2 given by bas (mutable), we assume that sl2 gens are
-  # expressed in terms of gens
-local a,ax,b,c,d,f,fakegens,i,inter,n,news,newt,pos,q,r,sl2gens,u,t,x,y,z;
+  # expressed in terms of gens, furthermore, the group sl2 must have
+  # an d-2 - dimensional fixed space.
+  # This function extends bas to a basis of the full row space
+  # and returns an slp such that
+
 
   f := GF(p,ext);
   q := Size(f);
 
   n := 2;
   sl2gens := GeneratorsOfGroup(sl2);
+  V := VectorSpace(f,bas);
+  b := Basis(V,bas);
+  sl2genss := List(sl2gens,x->List(BasisVectors(b),v->Coefficients(b,v*x)));
+  sl2genss := GeneratorsWithMemory(slp2genss);
+  resl2 := RECOG.RecogniseSL2NaturalEvenChar(Group(sl2genss),f,false);
+  slp := SLPOfElms(re.std);
+  bas := re.bas * bas;
+  masi := re.masi;
+  mati := re.mati;
+
+  fakegens := ListWithIdenticalEntries(Length(GeneratorsOfGroup(sld)),());
+  fakegens := GeneratorsWithMemory(fakegens);
+  sl2std := ResultOfStraightLineProgram(slp,fakegens);
 
   a := sl2gens[1];
   b := sl2gens[2];
@@ -315,14 +355,15 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   # of order p = Characteristic(f) or false.
   # Returns a set of standard generators for SL_2 and the base change
   # to expose it. Works with memory. Uses PseudoRandom.
-  local a,b,bas,c,can,ch,co,co2,deg,el,ev,eva,evb,evbi,i,j,limit,mas,masi,
-        mat,mati,mb,o,one,p,pos,q,ss,ssm,t,tb,tm,tt,ttm,u,v,x,xb,xm,gens;
+  local a,actpos,am,b,bas,bm,c,can,ch,cm,co,co2,deg,el,ev,eva,evb,evbi,
+        gens,i,j,k,kk,mas,masi,mat,mati,mb,o,one,os,p,pos,q,ss,ssm,t,tb,
+        tm,tt,ttm,u,v,x,xb,xm;
   q := Size(f);
   p := Characteristic(f);
   deg := DegreeOverPrimeField(f);
+  gens := GeneratorsOfGroup(g);
   if torig = false then
       i := 1;
-      gens := GeneratorsOfGroup(g);
       while i <= Length(gens) do
           if not(IsOne(gens[i])) and IsOne(gens[i]^2) then
               torig := gens[i];
@@ -333,35 +374,37 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   fi;
   if torig = false then
       repeat
-          a := PseudoRandom(g);
-      until Order(a) = q-1;
+          am := PseudoRandom(g);
+      until Order(am) = q-1;
+      a := StripMemory(am);
       eva := Eigenvectors(f,a);
       repeat
-          b := a^PseudoRandom(g);
-      until a*b<>b*a;
+          bm := am^PseudoRandom(g);
+      until am*bm<>bm*am;
+      b := StripMemory(bm);
       ev := Eigenvalues(f,b);
       evb := List(ev,v->NullspaceMat(b-v*One(b))[1]);
       evbi := evb^-1;
       c := evb*a*evbi;
       if IsZero(c[1][2]) or IsZero(c[2][1]) then
           # We were lucky, a and b share an eigenspace
-          tm := Comm(a,b);
+          tm := Comm(am,bm);
       else
           u := eva[1]*evbi;
           # We know that both components are non-zero since a and b do not
           # have a common eigenspace!
           repeat
-              c := a^PseudoRandom(g);
+              cm := am^PseudoRandom(g);
+              c := StripMemory(cm);
               v := (eva[1]*c)*evbi;
           until not(IsZero(v[1]) or IsZero(v[2]));
           pos := LogFFE((v[2]/v[1])/(u[2]/u[1]),ev[2]);
-          if ev[2]^pos <> (v[2]/v[1])/(u[2]/u[1]) then Error(3); fi;
           if IsOddInt(pos) then
               pos := (pos + q - 1) / 2;
           else
               pos := pos / 2;
           fi;
-          tm := Comm(a,b^pos*c^-1);
+          tm := Comm(am,bm^pos*cm^-1);
           if Order(tm) <> 2 then Error(2); fi;
       fi;
   else
@@ -384,17 +427,24 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   ttm := [tm];
   mat := [Coefficients(can,tb[2][1])];
   mb := MutableBasis(GF(2),mat);
-  o := Orb(g,GeneratorsOfGroup(g)[1],OnRight);
-  limit := deg;
-  Enumerate(o,limit);
+  o := [gens[1]];
+  os := [gens[1]];
+  actpos := 1;
   j := 1;
   while Length(tt) < deg do
       repeat
           repeat
-              if j > Length(o) then 
-                  limit := limit + 5;
-                  Enumerate(o,limit);
-              fi;
+              while j > Length(o) do
+                  for k in gens do
+                      kk := o[actpos]*k;
+                      pos := PositionSorted(os,kk);
+                      if pos > Length(os) or os[pos] <> kk then
+                          Add(o,kk);
+                          Add(os,kk,pos);
+                      fi;
+                  od;
+                  actpos := actpos + 1;
+              od;
               xm := o[j];
               j := j + 1;
               c := Comm(tm,xm);
@@ -414,9 +464,9 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   ConvertToMatrixRep(mat,2);
   mati := mat^-1;
 
-  # Now we can perform add an arbitrary multiple of the first row to the
+  # Now we can add an arbitrary multiple of the first row to the
   # second and an arbitrary multiple of the second column to the first.
-  # Therefore we quickly find other complimentary transvections.
+  # Therefore we quickly find other complimentary transvections:
   ss := [];
   ssm := [];
   mas := [];
@@ -425,10 +475,17 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   while Length(ss) < deg do
       while true do   # will be left by break
           repeat
-              if j > Length(o) then 
-                  limit := limit + 5;
-                  Enumerate(o,limit);
-              fi;
+              while j > Length(o) do
+                  for k in gens do
+                      kk := o[actpos]*k;
+                      pos := PositionSorted(os,kk);
+                      if pos > Length(os) or os[pos] <> kk then
+                          Add(o,kk);
+                          Add(os,kk,pos);
+                      fi;
+                  od;
+                  actpos := actpos + 1;
+              od;
               xm := o[j];
               j := j + 1;
               x := MutableCopyMat(bas*StripMemory(xm)*bas^-1);
@@ -471,7 +528,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   ConvertToMatrixRep(mas,2);
   masi := mas^-1;
 
-  return rec( g := g, std := Concatenation(ttm,ssm), t := tm, 
+  return rec( g := g, std := Concatenation(ssm,ttm), t := tm, 
               mati := mati, masi := masi, bas := bas, basi := bas^-1 );
 end;
 
@@ -500,3 +557,4 @@ RECOG.GuessSL2ElmOrder := function(x,q)
   od;
   return o;
 end;
+
