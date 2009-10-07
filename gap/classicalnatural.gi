@@ -63,8 +63,8 @@ end;
 
 
 RECOG.SL_Even_constructdata:=function(g,q)
-local n,subgplist,subspg,i,j,r,hgens,output,h,workingdim,y,yy,order,
-gens,degrees,factors,pol,ready,ready2,ready3,z;
+local degrees,factors,gens,h,i,n,o,order,pol,ready,ready2,ready3,
+      subgplist,subspg,w,workingdim,ww,www,y,yy,z;
 
 n:=DimensionOfMatrixGroup(g);
 
@@ -75,6 +75,7 @@ if q-1>n then
   while workingdim > 2 do
     subgplist:=RECOG.SL_Even_godownone(subgplist[1],subgplist[2],q,workingdim);
     workingdim:=workingdim-1;
+    Print(workingdim," \c");
   od;
 else
   #case of small q
@@ -85,13 +86,29 @@ else
     factors:=Factors(pol);
     degrees:=List(factors,Degree);
     if SortedList(degrees)=[1,1,n-2] then 
-       order:=Order(y);
-       if order mod 2 = 0 then
-          yy:=y^(order/2);
-          ready:=true;
-       fi;
+       yy := y^(q^(n-2)-1);
+       if not(IsOne(yy)) and IsOne(yy^2) then ready := true; fi;
     fi;
   until ready;
+  if q=2 then
+    repeat
+      z := yy^PseudoRandom(g);
+    until Order(z*yy) = 3;
+    o := OneMutable(z);
+    i := 1;
+    while i <= n do
+      w := o[i]*yy-o[i];
+      if not(IsZero(w)) then break; fi;
+      i := i + 1;
+    od;
+    i := 1;
+    while i <= n do
+      ww := o[i]*z-o[i];
+      if not(IsZero(ww)) then break; fi;
+      i := i + 1;
+    od;
+    return [Group(z,yy),VectorSpace(GF(2),[w,ww])];
+  fi;
 
   ready2:=false;
   ready3:=false;
@@ -120,6 +137,28 @@ else
      fi;
   until ready2 and ready3; 
   
+  if q = 4 then
+    o := One(h);
+    i := 1;
+    while i <= n do
+      w := o[i]*GeneratorsOfGroup(h)[1]-o[i];
+      if not(IsZero(w)) then break; fi;
+      i := i + 1;
+    od;
+    i := 1;
+    while i <= n do
+      ww := o[i]*GeneratorsOfGroup(h)[2]-o[i];
+      if not(IsZero(ww)) then break; fi;
+      i := i + 1;
+    od;
+    while i <= n do
+      www := o[i]*GeneratorsOfGroup(h)[3]-o[i];
+      if not(IsZero(www)) then break; fi;
+      i := i + 1;
+    od;
+    return [h,VectorSpace(GF(q),[w,ww,www])];
+  fi;
+      
   subgplist:=RECOG.SL_Even_godownone(h,VectorSpace(GF(q),One(g)),q,3);
 fi;
 
@@ -153,200 +192,479 @@ RECOG.FindStdGensUsingBSGS := function(g,stdgens,projective,large)
   return SLPOfElms(gens);
 end;
 
-RECOG.InitSLSLP := function(p, ext, stdgens)
-  local r,f;
-  r := rec( t := stdgens[1], s := stdgens[2], a := stdgens[3],
-            b := stdgens[4], c := stdgens[5], std := stdgens, 
-            elm := stdgens[1]^0, q := p^ext, ext := ext, p := p,
-            f := GF(p,ext), cb := CanonicalBasis(f),
-            cache := [EmptyPlist(100),EmptyPlist(100),EmptyPlist(100)] );
+RECOG.ResetSLstd := function(r)
+  r.left := One(r.a);
+  r.right := One(r.a);
+  r.cache := [EmptyPlist(100),EmptyPlist(100)];
   return r;
+end;
+  
+RECOG.InitSLstd := function(f,d,s,t,a,b)
+  local r;
+  r := rec( f := f, p := Characteristic(f), ext := DegreeOverPrimeField(f),
+            q := Size(f), d := d, all := Concatenation(s,t,[a],[b]),
+            one := One(f), One := One(s[1]), s := s, t := t, a := a, b := b );
+  return RECOG.ResetSLstd(r);
 end;
 
 RECOG.FindFFCoeffs := function(r,lambda)
-  return IntVecFFE(Coefficients(r.cb,lambda));
+  return IntVecFFE(Coefficients(CanonicalBasis(r.f),lambda));
 end;
 
-RECOG.SL_Even_DoRowOp := function(i,j,lambda,r)
-  # add lambda times j-th row to i-th row, i<>j, lambda<>0
+RECOG.InitSLfake := function(f,d)
+  local ext,l;
+  ext := DegreeOverPrimeField(f);
+  l := ListWithIdenticalEntries(2*ext+2,());
+  l := GeneratorsWithMemory(l);
+  return RECOG.InitSLstd(f,d,l{[1..ext]},l{[ext+1..2*ext]},
+                         l[2*ext+1],l[2*ext+2]);
+end;
+
+RECOG.DoRowOp_SL := function(m,i,j,lambda,std)
+  # add lambda times j-th row to i-th row, i<>j
   # by left-multiplying with an expression in the standard generators:
-  #   t : e_n -> e_{n-1} -> ... -> e_1 -> *    where * in V_n
-  #   s : e_n -> e_{n-1} -> ... -> e_2 -> e_n and e_1 -> e_1
-  #   a : e_1 -> e_1+e_2, e_i -> e_i   for i > 1
-  #   b : e_2 -> e_1+e_2, e_i -> e_i   for i <> 2
-  #   c : e_1 -> omega e_1, e_2 -> omega^-1 e_2, e_i -> e_i for i > 2
+  #   a : e_n -> e_{n-1} -> ... -> e_1 -> e_n
+  #   b : e_n -> e_{n-1} -> ... -> e_2 -> e_n and e_1 -> e_1
+  #   s : e_1 -> e_1+ * e_2, e_i -> e_i   for i > 1
+  #   t : e_2 -> e_1+ * e_2, e_i -> e_i   for i <> 2
+  # s and t are lists of length ext to span over GF(p) all the scalars
+  # in *.
   # Note that V_i = <e_1,...,e_i>.
-  # So <a,b,c> is an SL_2 in the upper left corner, t is an n-cycle
-  # with garbage in the first row, s is an n-1 cycle with garbage in the
-  # first two rows.
-  # Let q=2^k and call a_0 := a, a_1 := a^(c^(q/2)), a_i := a_1 ^ i
-  #           and call b_0 := b, b_1 := b^(c^(-q/2)), b_i := b_1 ^ i
-  # This only modifies the record r collecting a straight line program.
-  local Getak,Getsj,Getti,coeffs,k,new;
+  # So <s,t> is an SL_2 in the upper left corner, a is an n-cycle
+  # b is an n-1 cycle with garbage fixing the first vector
+  # This only modifies the record std collecting a straight line program.
+  local Getai,Getbj,coeffs,k,new;
   
-  Getti := function(r,l)
-      if not IsBound(r.cache[1][l]) then
-          r.cache[1][l] := r.t^(l);
+  Getai := function(l)
+      if not IsBound(std.cache[1][l]) then
+          std.cache[1][l] := std.a^(l);
       fi;
-      return r.cache[1][l];
+      return std.cache[1][l];
   end;
-  Getsj := function(r,l)
-      if not IsBound(r.cache[2][l]) then
-          r.cache[2][l] := r.s^l;
+  Getbj := function(l)
+      if not IsBound(std.cache[2][l]) then
+          std.cache[2][l] := std.b^l;
       fi;
-      return r.cache[2][l];
-  end;
-  Getak := function(r,k)
-      if not IsBound(r.cache[3][k]) then
-          if k = 1 then
-              r.cache[3][k] := r.a;
-          else
-              if not IsBound(r.cache[3][2]) then
-                  r.cache[3][2] := r.a^(r.c^(r.q/2));
-              fi;
-              if k > 2 then
-                  r.cache[3][k] := r.cache[3][2]^(k-1);
-              fi;
-          fi;
-      fi;
-      return r.cache[3][k];
+      return std.cache[2][l];
   end;
 
-  new := r.t^0;
-  coeffs := RECOG.FindFFCoeffs(lambda,r.p,r.ext,r.q);
-  for k in [1..r.ext] do
+  new := std.One;
+  coeffs := RECOG.FindFFCoeffs(std,lambda);
+  for k in [1..std.ext] do
     if not(IsZero(coeffs[k])) then
       if i < j then
-          # We need to multiply with the element
-          #    t^(i-1) * s^(j-i-1) * a_k * s^-(j-i-1) * t^-(i-1)
+          # We need to multiply from the left with the element
+          #    a^(i-1) * b^(j-i-1) * s_k * b^-(j-i-1) * a^-(i-1)
           # from the left.
-          if i > 1 then new := Getti(r,i-1)^-1 * new; fi;
-          if j > i+1 then new := Getsj(r,j-i-1)^-1 * new; fi;
-          new := Getak(r,k) * new;
-          if j > i+1 then new := Getsj(r,j-i-1) * new; fi;
-          if i > 1 then new := Getti(r,i-1) * new; fi;
+          if i > 1 then new := Getai(i-1)^-1 * new; fi;
+          if j > i+1 then new := Getbj(j-i-1)^-1 * new; fi;
+          new := std.s[k] * new;
+          if j > i+1 then new := Getbj(j-i-1) * new; fi;
+          if i > 1 then new := Getai(i-1) * new; fi;
       elif i > j then
-          # We need to multiply with the element
-          #    t^(j-1) * s^(i-j-1) * a_k * s^-(i-j-1) * t^-(j-1)
+          # We need to multiply from the left with the element
+          #    a^(j-1) * b^(i-j-1) * t_k * b^-(i-j-1) * a^-(j-1)
           # from the left.
-          if i > 1 then new := Getti(r,j-1)^-1 * new; fi;
-          if j > i+1 then new := Getsj(r,i-j-1)^-1 * new; fi;
-          new := Getak(r,k) * new;
-          if j > i+1 then new := Getsj(r,i-j-1) * new; fi;
-          if i > 1 then new := Getti(r,j-1) * new; fi;
+          if j > 1 then new := Getai(j-1)^-1 * new; fi;
+          if i > j+1 then new := Getbj(i-j-1)^-1 * new; fi;
+          new := std.t[k] * new;
+          if i > j+1 then new := Getbj(i-j-1) * new; fi;
+          if j > 1 then new := Getai(j-1) * new; fi;
       fi;
     fi;
   od;
-  r.elm := r.new * r.elm;
-  return r.new;
+  std.left := new * std.left;
+  if m <> false and not(IsZero(lambda)) then m[i] := m[i] + m[j] * lambda; fi;
+  return new;
 end;
 
-RECOG.MakeSL_Even_StdGens := function(p,ext,n,d)
-  local a,b,c,f,q,s,t;
-  f := GF(p,ext);
-  q := Size(f);
-  t := IdentityMat(d,f);
-  t := t{Concatenation([n],[1..n-1],[n+1..d])};
-  ConvertToMatrixRep(t,q);
-  s := IdentityMat(d,f);
-  s := s{Concatenation([1,n],[2..n-1],[n+1..d])};
-  ConvertToMatrixRep(s,q);
-  a := IdentityMat(d,f);
-  a[1][2] := One(f);
-  b := IdentityMat(d,f);
-  b[2][1] := One(f);
-  c := IdentityMat(d,f);
-  c[1][1] := Z(q);
-  c[2][2] := Z(q)^-1;
-  return [t,s,a,b,c];
-end;
-
-RECOG.ExpressInStd_SL2 := function(m,r)
-  if not(IsOne(m[1][1])) then
-      if IsZero(m[2][1]) then
-          RECOG.DoRowOp_SL(m,2,1,r.one,r);
-          # Now m[2][1] is non-zero
+RECOG.DoColOp_SL := function(m,i,j,lambda,std)
+  # add lambda times i-th column to j-th column, i<>j
+  # by left-multiplying with an expression in the standard generators:
+  #   a : e_n -> e_{n-1} -> ... -> e_1 -> e_n
+  #   b : e_n -> e_{n-1} -> ... -> e_2 -> e_n and e_1 -> e_1
+  #   s : e_1 -> e_1+ * e_2, e_i -> e_i   for i > 1
+  #   t : e_2 -> e_1+ * e_2, e_i -> e_i   for i <> 2
+  # s and t are lists of length ext to span over GF(p) all the scalars
+  # in *.
+  # Note that V_i = <e_1,...,e_i>.
+  # So <s,t> is an SL_2 in the upper left corner, a is an n-cycle
+  # b is an n-1 cycle with garbage fixing the first vector
+  # This only modifies the record std collecting a straight line program.
+  local Getai,Getbj,coeffs,k,new;
+  
+  Getai := function(l)
+      if not IsBound(std.cache[1][l]) then
+          std.cache[1][l] := std.a^(l);
       fi;
-      RECOG.DoRowOp_SL(m,1,2,(r.one-m[1][1])/m[2][1],r);
+      return std.cache[1][l];
+  end;
+  Getbj := function(l)
+      if not IsBound(std.cache[2][l]) then
+          std.cache[2][l] := std.b^l;
+      fi;
+      return std.cache[2][l];
+  end;
+
+  new := std.One;
+  coeffs := RECOG.FindFFCoeffs(std,lambda);
+  for k in [1..std.ext] do
+    if not(IsZero(coeffs[k])) then
+      if i < j then
+          # We need to multiply from the right with the element
+          #    a^(i-1) * b^(j-i-1) * s_k * b^-(j-i-1) * a^-(i-1)
+          # from the left.
+          if i > 1 then new := Getai(i-1)^-1 * new; fi;
+          if j > i+1 then new := Getbj(j-i-1)^-1 * new; fi;
+          new := std.s[k] * new;
+          if j > i+1 then new := Getbj(j-i-1) * new; fi;
+          if i > 1 then new := Getai(i-1) * new; fi;
+      elif i > j then
+          # We need to multiply from the right with the element
+          #    a^(j-1) * b^(i-j-1) * t_k * b^-(i-j-1) * a^-(j-1)
+          # from the left.
+          if j > 1 then new := Getai(j-1)^-1 * new; fi;
+          if i > j+1 then new := Getbj(i-j-1)^-1 * new; fi;
+          new := std.t[k] * new;
+          if i > j+1 then new := Getbj(i-j-1) * new; fi;
+          if j > 1 then new := Getai(j-1) * new; fi;
+      fi;
+    fi;
+  od;
+  std.right := std.right * new;
+  if m <> false and not(IsZero(lambda)) then 
+      for k in [1..Length(m)] do
+          m[k][j] := m[k][j] + m[k][i] * lambda; 
+      od;
   fi;
-  # Now m[1][1] is equal to one
-  if not(IsZero(m[2][1])) then
-      RECOG.DoRowOp_SL(m,2,1,-m[2][1],r);
-  fi;
-  # Now m[2][1] is equal to zero and thus m[2][2] equal to zero
-  if not(IsZero(m[1][2]) then
-  RECOG.DoRowOp_SL(m,1,2,-m[1][2],r);
-  # Now m is the identity matrix, the element collected in r
-  # is the one to multiply on the left hand side to transform m to the
-  # identity. Thus it is equal to the inverse of m.
+
+  return new;
 end;
 
-RECOG.FindStdGens_SL_EvenChar := function(sld,sl2,bas,p,ext)
-  # gens of sld must be gens for SL(d,q) in its natural rep with memory
-  # sl2 < SL(d,q) of isotype SL(2,q) in std gens acting on the subspace
-  # of dimension 2 given by bas (mutable), we assume that sl2 gens are
-  # expressed in terms of gens, furthermore, the group sl2 must have
-  # an d-2 - dimensional fixed space.
-  # This function extends bas to a basis of the full row space
-  # and returns an slp such that
-
-
+RECOG.MakeSL_StdGens := function(p,ext,n,d)
+  local a,b,f,i,q,s,t,x,res;
   f := GF(p,ext);
   q := Size(f);
+  a := IdentityMat(d,f);
+  a := a{Concatenation([n],[1..n-1],[n+1..d])};
+  ConvertToMatrixRep(a,q);
+  b := IdentityMat(d,f);
+  b := b{Concatenation([1,n],[2..n-1],[n+1..d])};
+  ConvertToMatrixRep(b,q);
+  s := [];
+  t := [];
+  for i in [0..ext-1] do
+      x := IdentityMat(d,f);
+      x[1][2] := Z(p,ext)^i;
+      Add(s,x);
+      x := IdentityMat(d,f);
+      x[2][1] := Z(p,ext)^i;
+      Add(t,x);
+  od;
+  res := rec( s := s, t := t, a := a, b := b, f := f, q := q, p := p,
+              ext := ext, One := IdentityMat(d,f), one := One(f),
+              d := d );
+  res.all := Concatenation( res.s, res.t, [res.a], [res.b] );
+  return res;
+end;
 
-  n := 2;
-  sl2gens := GeneratorsOfGroup(sl2);
+RECOG.ExpressInStd_SL2 := function(m,std)
+  local mi;
+
+  if IsObjWithMemory(m) then
+      mi := InverseMutable(StripMemory(m));
+  else
+      mi := InverseMutable(m);
+  fi;
+  std.left := std.One;
+  if not(IsOne(mi[1][1])) then
+      if IsZero(mi[2][1]) then
+          RECOG.DoRowOp_SL(mi,2,1,std.one,std);
+          # Now mi[2][1] is non-zero
+      fi;
+      RECOG.DoRowOp_SL(mi,1,2,(std.one-mi[1][1])/mi[2][1],std);
+  fi;
+  # Now mi[1][1] is equal to one
+  if not(IsZero(mi[2][1])) then
+      RECOG.DoRowOp_SL(mi,2,1,-mi[2][1],std);
+  fi;
+  # Now mi[2][1] is equal to zero and thus mi[2][2] equal to one
+  if not(IsZero(mi[1][2])) then
+      RECOG.DoRowOp_SL(mi,1,2,-mi[1][2],std);
+  fi;
+  # Now mi is the identity matrix, the element collected in std
+  # is the one to multiply on the left hand side to transform mi to the
+  # identity. Thus it is equal to m.
+  return SLPOfElm(std.left);
+end;
+
+RECOG.ExpressInStd_SL := function(m,std)
+  # m a matrix, std a fake standard generator record with trivial
+  # generators with memory
+  local d,i,j,mi,pos;
+
+  if IsObjWithMemory(m) then
+      mi := InverseMutable(StripMemory(m));
+  else
+      mi := InverseMutable(m);
+  fi;
+  std.left := std.One;
+  d := Length(m);
+  for i in [1..d] do
+      if not(IsOne(mi[i][i])) then
+          pos := First([i+1..d],k->not IsZero(mi[k][i]));
+          if pos = fail then
+              if i = 1 then
+                  pos := 2;
+              else
+                  pos := 1;
+              fi;
+              RECOG.DoRowOp_SL(mi,pos,i,std.one,std);
+          fi;
+          RECOG.DoRowOp_SL(mi,i,pos,(std.one-mi[i][i])/mi[pos][i],std);
+      fi;
+      # Now mi[i][i] is equal to one
+      for j in Concatenation([1..i-1],[i+1..d]) do
+          if not(IsZero(mi[j][i])) then
+              RECOG.DoRowOp_SL(mi,j,i,mi[j][i],std);
+          fi;
+      od;
+      # Now mi[i][i] is the only non-zero entry in the column
+  od;
+  # Now mi is the identity matrix, the element collected in std
+  # is the one to multiply on the left hand side to transform mi to the
+  # identity. Thus it is equal to m.
+  return SLPOfElm(std.left);
+end;
+
+
+RECOG.FindStdGens_SL_EvenChar := function(sld,f)
+  # gens of sld must be gens for SL(d,q) in its natural rep with memory
+  # This function calls RECOG.SL_Even_constructdata and then extends 
+  # the basis to a basis of the full row space and returns an slp such
+  # that the SL(d,q) standard generators with respect to this basis are
+  # expressed by the slp in terms of the original generators of sld.
+local V,b,bas,basi,basit,d,data,diffv,diffw,el,ext,fakegens,gens,i,id,lambda,mu,n,notinv,nu,nu2,oldyf,oldyy,p,pos,q,resl2,sl2,sl2gens,sl2gensf,sl2genss,sl2stdf,slp,slpsl2std,slptosl2,st,std,stdsl2,w,x,xf,y,y2f,y3f,yf,yy,yy2,yy3,z,zf;
+
+  # Some setup:
+  p := Characteristic(f);
+  q := Size(f);
+  ext := DegreeOverPrimeField(f);
+  d := DimensionOfMatrixGroup(sld);
+
+  # First find an SL2 with the space it acts on:
+  Print("Finding an SL2...\c");
+  data := RECOG.SL_Even_constructdata(sld,q);
+  Print("done.\n");
+  bas := ShallowCopy(BasisVectors(Basis(data[2])));
+  sl2 := data[1];
+  slptosl2 := SLPOfElms(GeneratorsOfGroup(sl2));
+
+  # Now compute the natural SL2 action and run constructive recognition:
+  Print("Recognising this SL2 constructively in 2 dimensions...\c");
+  sl2gens := StripMemory(GeneratorsOfGroup(sl2));
   V := VectorSpace(f,bas);
   b := Basis(V,bas);
   sl2genss := List(sl2gens,x->List(BasisVectors(b),v->Coefficients(b,v*x)));
-  sl2genss := GeneratorsWithMemory(slp2genss);
+  sl2genss := GeneratorsWithMemory(sl2genss);
   resl2 := RECOG.RecogniseSL2NaturalEvenChar(Group(sl2genss),f,false);
-  slp := SLPOfElms(re.std);
-  bas := re.bas * bas;
-  masi := re.masi;
-  mati := re.mati;
+  Print("done.\n");
+  slpsl2std := SLPOfElms(resl2.all);
+  bas := resl2.bas * bas;
+  # We need the actual transvections:
+  slp := SLPOfElms([resl2.s[1],resl2.t[1]]);
+  st := ResultOfStraightLineProgram(slp,StripMemory(GeneratorsOfGroup(sl2)));
+  
+  # Extend basis by something invariant under SL2:
+  id := IdentityMat(d,f);
+  nu := NullspaceMat(StripMemory(st[1]+id));
+  nu2 := NullspaceMat(StripMemory(st[2]+id));
+  Append(bas,SumIntersectionMat(nu,nu2)[2]);
+  basi := bas^-1;
+  basit := TransposedMatMutable(basi);
 
+  # Now set up fake generators for keeping track what we do:
   fakegens := ListWithIdenticalEntries(Length(GeneratorsOfGroup(sld)),());
   fakegens := GeneratorsWithMemory(fakegens);
-  sl2std := ResultOfStraightLineProgram(slp,fakegens);
+  sl2gensf := ResultOfStraightLineProgram(slptosl2,fakegens);
+  sl2stdf := ResultOfStraightLineProgram(slpsl2std,sl2gensf);
+  std := RECOG.InitSLstd(f,d,sl2stdf{[1..ext]},sl2stdf{[ext+1..2*ext]},
+                         sl2stdf[2*ext+1],sl2stdf[2*ext+2]);
 
-  a := sl2gens[1];
-  b := sl2gens[2];
-  c := sl2gens[3];
-  
-  fakegens := ListWithIdenticalEntries( 5+Length(GeneratorsOfGroup(sld)),());
-  n := 2;
-  while n < d do
-      repeat
+  for n in [2..d-1] do
+      Print(n," \c");
+      while true do   # will be left by break at the end
           x := PseudoRandom(sld);
-          ax := a^x;
-          u := bas * (ax-One(ax));
-          inter := NullspaceMat(u);
-      until Length(inter) = n-1;
-      z := NullspaceMat(TransposedMat(inter))[1];
-      # Now we would like to have an element y of sl_n with last column
-      # being equal to TransposedMat(z).
-      r := RECOG.InitSLSLP(p,ext,fakegens{[1..5]});
-      if IsZero(z[n]) then
-          pos := PositionNonZero(z);
-          z := z * (z[pos]^-1);
-          RECOG.SL_Even_DoRowOp(pos,n,One(f),r);
-      else
-          pos := n;
-          z := z * (z[n]^-1);
+          slp := SLPOfElm(x);
+          xf := ResultOfStraightLineProgram(slp,fakegens);
+          # From now on plain matrices, we have to keep track with the 
+          # fake ones!
+          x := StripMemory(x);
+
+          # Find a new basis vector:
+          y := st[1]^x;
+          notinv := First([1..n],i->bas[i]*y<>bas[i]);
+          if notinv = fail then continue; fi;  # try next x
+          w := bas[notinv]*y-bas[notinv];
+          if ForAll(basit{[n+1..d]},v->IsZero(ScalarProduct(v,w))) then
+              continue;   # try next x
+          fi;
+          # Now make it so that w is invariant under SL_n by modifying
+          # it by something in the span of bas{[1..n]}:
+          for i in [1..n] do
+              w := w - bas[i] * ScalarProduct(w,basit[i]);
+          od;
+          if w*y=w then Print("!\c"); continue; fi;
+
+          # w is supposed to become the next basis vector number n+1.
+          # So we need to throw away one of bas{[n+1..d]}:
+          i := First([n+1..d],i->not(IsZero(ScalarProduct(w,basit[i]))));
+          Remove(bas,i);
+          Add(bas,w,n+1);
+          # However, we want that the rest of them bas{[n+2..d]} is invariant
+          # under y which we can achieve by adding a multiple of w:
+          diffw := w*y-w;
+          pos := PositionNonZero(diffw);
+          for i in [n+2..d] do
+              diffv := bas[i]*y-bas[i];
+              if not(IsZero(diffv)) then
+                  bas[i] := bas[i] - (diffv[pos]/diffw[pos]) * w;
+              fi;
+          od;
+          basi := bas^-1;
+          basit := TransposedMat(basi);
+          # FIXME: This should be done more efficiently!
+
+          # Compute the action of y-One(y) on Span(bas{[1..n+1]})
+          yy := EmptyPlist(n+1);
+          for i in [1..n+1] do
+              Add(yy,(bas[i]*y-bas[i])*basi);
+              yy[i] := yy[i]{[1..n+1]};
+          od;
+          if IsOne(yy[n+1][n+1]) then Print("#\c"); continue; fi;
+          break;
+      od;
+      yf := xf^-1*std.s[1]*xf;
+
+      # make sure that rows n-1 and n are non-zero:
+      std.left := std.One;
+      std.right := std.One;
+      if IsZero(yy[n-1]) then
+          RECOG.DoRowOp_SL(yy,n-1,notinv,std.one,std);
+          RECOG.DoColOp_SL(yy,n-1,notinv,std.one,std);
       fi;
-      for i in [1..n] do
-          if i <> pos and not(IsZero(pos[i])) then
-              RECOG.SL_Even_DoRowOp(i,pos,z[i],r);
+      if IsZero(yy[n]) then
+          RECOG.DoRowOp_SL(yy,n,notinv,std.one,std);
+          RECOG.DoColOp_SL(yy,n,notinv,std.one,std);
+      fi;
+      yf := std.left * yf * std.right;
+
+      oldyy := MutableCopyMat(yy);
+      oldyf := yf;
+
+      while true do   # will be left by break when we had success!
+          # Note that by construction yy[n][n+1] is not zero!
+          yy2 := MutableCopyMat(yy);
+          std.left := std.One;
+          std.right := std.One;
+          # We want to be careful not to kill row n:
+          repeat
+              lambda := PrimitiveRoot(f)^Random(0,q-1);
+          until lambda <> yy2[n][n+1]/yy2[n-1][n+1];
+          RECOG.DoRowOp_SL(yy2,n,n-1,lambda,std);
+          RECOG.DoColOp_SL(yy2,n,n-1,lambda,std);
+          mu := lambda;
+          y2f := std.left * yf * std.right;
+
+          yy3 := MutableCopyMat(yy);
+          std.left := std.One;
+          std.right := std.One;
+          # We want to be careful not to kill row n:
+          repeat
+              lambda := PrimitiveRoot(f)^Random(0,q-1);
+          until lambda <> yy3[n][n+1]/yy3[n-1][n+1] and lambda <> mu;
+          RECOG.DoRowOp_SL(yy3,n,n-1,lambda,std);
+          RECOG.DoColOp_SL(yy3,n,n-1,lambda,std);
+          y3f := std.left * yf * std.right;
+
+          # We now perform conjugations such that y leaves bas{[1..n-1]} fixed:
+          # (remember that y+One(y) has rank 1 and does not fix bas[notinv])
+          std.left := std.One;
+          std.right := std.One;
+          for i in [1..n-1] do
+              lambda := -yy[i][n+1]/yy[n][n+1];
+              RECOG.DoRowOp_SL(yy,i,n,lambda,std);
+              RECOG.DoColOp_SL(yy,i,n,lambda,std);
+          od;
+          yf := std.left * yf * std.right;
+
+          std.left := std.One;
+          std.right := std.One;
+          for i in [1..n-1] do
+              lambda := -yy2[i][n+1]/yy2[n][n+1];
+              RECOG.DoRowOp_SL(yy2,i,n,lambda,std);
+              RECOG.DoColOp_SL(yy2,i,n,lambda,std);
+          od;
+          y2f := std.left * y2f * std.right;
+
+          std.left := std.One;
+          std.right := std.One;
+          for i in [1..n-1] do
+              lambda := -yy3[i][n+1]/yy3[n][n+1];
+              RECOG.DoRowOp_SL(yy3,i,n,lambda,std);
+              RECOG.DoColOp_SL(yy3,i,n,lambda,std);
+          od;
+          y3f := std.left * y3f * std.right;
+
+          gens :=[ExtractSubMatrix(yy,[n,n+1],[n,n+1])+IdentityMat(2,f),
+                  ExtractSubMatrix(yy2,[n,n+1],[n,n+1])+IdentityMat(2,f),
+                  ExtractSubMatrix(yy3,[n,n+1],[n,n+1])+IdentityMat(2,f)];
+          if RECOG.IsThisSL2Natural(gens,f) = true then break; fi;
+          Print("$\c");
+          yy := MutableCopyMat(oldyy);
+          yf := oldyf;
+      od;
+
+      # Now perform a constructive recognition in the SL2 in the lower
+      # right corner:
+      gens := GeneratorsWithMemory(gens);
+      resl2 := RECOG.RecogniseSL2NaturalEvenChar(Group(gens),f,gens[1]);
+      stdsl2 := RECOG.InitSLfake(f,2);
+      slp := RECOG.ExpressInStd_SL2(
+               resl2.bas*Reversed(IdentityMat(2,f))*resl2.basi,stdsl2);
+      el := ResultOfStraightLineProgram(slp,resl2.all);
+      slp := SLPOfElm(el);
+      # FIXME: this must be done more efficiently:
+      z := ResultOfStraightLineProgram(slp,
+                  [yy+One(yy),yy2+One(yy),yy3+One(yy)]);
+      zf := ResultOfStraightLineProgram(slp,[yf,y2f,y3f]);
+
+      std.left := std.One;
+      std.right := std.One;
+      # Now we clean out the last row of z:
+      for i in [1..n-1] do
+          if not(IsZero(z[n+1][i])) then
+              RECOG.DoColOp_SL(z,n,i,z[n+1][i],std);
           fi;
       od;
-      y := r.elm;
-      newt := t * ax^y;
-      Add(bas,bas[n] * newt^-1);
-      n := n + 1;
-      news :=  1;
-  od;
+      # Now we clean out the second last row of z:
+      for i in [1..n-1] do
+          if not(IsZero(z[n][i])) then
+              RECOG.DoRowOp_SL(z,n,i,z[n][i],std);
+          fi;
+      od;
+      zf := std.left * zf * std.right;
 
+      # Now change the standard generators in the fakes:
+      std.a := std.a * zf;
+      std.b := std.b * zf;
+      std.all[std.ext*2+1] := std.a;
+      std.all[std.ext*2+2] := std.b;
+      RECOG.ResetSLstd(std);
+
+  od;
+  Print("done.\n");
+  return rec( slpstd := SLPOfElms(std.all), bas := bas, basi := basi );
 end;
 
   
@@ -355,12 +673,12 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   # of order p = Characteristic(f) or false.
   # Returns a set of standard generators for SL_2 and the base change
   # to expose it. Works with memory. Uses PseudoRandom.
-  local a,actpos,am,b,bas,bm,c,can,ch,cm,co,co2,deg,el,ev,eva,evb,evbi,
-        gens,i,j,k,kk,mas,masi,mat,mati,mb,o,one,os,p,pos,q,ss,ssm,t,tb,
+  local a,actpos,am,b,bas,bm,c,can,ch,cm,co,co2,ext,el,ev,eva,evb,evbi,
+        gens,i,j,k,kk,mas,masi,mat,mati,mb,o,one,os,p,pos,q,res,ss,ssm,t,tb,
         tm,tt,ttm,u,v,x,xb,xm;
   q := Size(f);
   p := Characteristic(f);
-  deg := DegreeOverPrimeField(f);
+  ext := DegreeOverPrimeField(f);
   gens := GeneratorsOfGroup(g);
   if torig = false then
       i := 1;
@@ -379,34 +697,35 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
       a := StripMemory(am);
       eva := Eigenvectors(f,a);
       repeat
-          bm := am^PseudoRandom(g);
-      until am*bm<>bm*am;
-      b := StripMemory(bm);
-      ev := Eigenvalues(f,b);
-      evb := List(ev,v->NullspaceMat(b-v*One(b))[1]);
-      evbi := evb^-1;
-      c := evb*a*evbi;
-      if IsZero(c[1][2]) or IsZero(c[2][1]) then
-          # We were lucky, a and b share an eigenspace
-          tm := Comm(am,bm);
-      else
-          u := eva[1]*evbi;
-          # We know that both components are non-zero since a and b do not
-          # have a common eigenspace!
           repeat
-              cm := am^PseudoRandom(g);
-              c := StripMemory(cm);
-              v := (eva[1]*c)*evbi;
-          until not(IsZero(v[1]) or IsZero(v[2]));
-          pos := LogFFE((v[2]/v[1])/(u[2]/u[1]),ev[2]);
-          if IsOddInt(pos) then
-              pos := (pos + q - 1) / 2;
+              bm := am^PseudoRandom(g);
+          until am*bm<>bm*am;
+          b := StripMemory(bm);
+          ev := Eigenvalues(f,b);
+          evb := List(ev,v->NullspaceMat(b-v*One(b))[1]);
+          evbi := evb^-1;
+          c := evb*a*evbi;
+          if IsZero(c[1][2]) or IsZero(c[2][1]) then
+              # We were lucky, a and b share an eigenspace
+              tm := Comm(am,bm);
           else
-              pos := pos / 2;
+              u := eva[1]*evbi;
+              # We know that both components are non-zero since a and b do not
+              # have a common eigenspace!
+              repeat
+                  cm := am^PseudoRandom(g);
+                  c := StripMemory(cm);
+                  v := (eva[1]*c)*evbi;
+              until not(IsZero(v[1]) or IsZero(v[2]));
+              pos := LogFFE((v[2]/v[1])/(u[2]/u[1]),ev[2]);
+              if IsOddInt(pos) then
+                  pos := (pos + q - 1) / 2;
+              else
+                  pos := pos / 2;
+              fi;
+              tm := Comm(am,bm^pos*cm^-1);
           fi;
-          tm := Comm(am,bm^pos*cm^-1);
-          if Order(tm) <> 2 then Error(2); fi;
-      fi;
+      until not(IsOne(tm));
   else
       tm := torig;
   fi;
@@ -431,7 +750,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   os := [gens[1]];
   actpos := 1;
   j := 1;
-  while Length(tt) < deg do
+  while Length(tt) < ext do
       repeat
           repeat
               while j > Length(o) do
@@ -472,7 +791,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   mas := [];
   mb := MutableBasis(GF(2),mas,ZeroMutable(mat[1]));
   j := 1;
-  while Length(ss) < deg do
+  while Length(ss) < ext do
       while true do   # will be left by break
           repeat
               while j > Length(o) do
@@ -528,12 +847,30 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   ConvertToMatrixRep(mas,2);
   masi := mas^-1;
 
-  return rec( g := g, std := Concatenation(ssm,ttm), t := tm, 
-              mati := mati, masi := masi, bas := bas, basi := bas^-1 );
+  # Now we replace all the s and the t by some products to get rid
+  # of the base changes:
+  s := EmptyPlist(ext);
+  t := EmptyPlist(ext);
+  for i in [1..ext] do
+      co := Positions(masi[i],Z(2));
+      Add(s,Product(ssm{co}));
+      co := Positions(mati[i],Z(2));
+      Add(t,Product(ttm{co}));
+  od;
+
+  res :=  rec( g := g, t := t, s := s, bas := bas, basi := bas^-1,
+              one := One(f), a := s[1]*t[1]*s[1], b := One(s[1]),
+              One := One(s[1]), f := f, q := q, p := p, ext := ext,
+              d := 2 );
+  res.all := Concatenation(res.s,res.t,[res.a],[res.b]);
+  return res;
 end;
 
 RECOG.GuessSL2ElmOrder := function(x,q)
   local facts,i,j,o,p,r,s,y,z;
+  if IsOne(x) then return 1;
+  elif IsOne(x^2) then return 2;
+  fi;
   if IsOne(x^(q-1)) then
       facts := Collected(FactInt(q-1:cheap)[1]);
       s := Product(facts,x->x[1]^x[2]);
@@ -558,3 +895,100 @@ RECOG.GuessSL2ElmOrder := function(x,q)
   return o;
 end;
 
+RECOG.IsThisSL2Natural := function(gens,f)
+  # Checks quickly whether or not this is SL(2,f).
+  # The answer is not guaranteed to be correct, this is Las Vegas.
+  local CheckElm,a,b,clos,coms,i,isabelian,j,l,notA5,q,seenqm1,seenqp1,x;
+
+  CheckElm := function(x)
+      local o;
+      o := RECOG.GuessSL2ElmOrder(x,q);
+      if o in [1,2] then return false; fi;
+      if o > 5 then 
+          if notA5 = false then Info(InfoRecog,4,"SL2: Group is not A5"); fi;
+          notA5 := true; 
+      fi;
+      if (q+1) mod o = 0 then
+          Info(InfoRecog,4,"SL2: Found element of order dividing q+1.");
+          seenqp1 := true;
+          if seenqm1 then return true; fi;
+      else
+          Info(InfoRecog,4,"SL2: Found element of order dividing q-1.");
+          seenqm1 := true;
+          if seenqp1 then return true; fi;
+      fi;
+      return false;
+  end;
+
+  if Length(gens) <= 1 then 
+      Info(InfoRecog,4,"SL2: Group cyclic");
+      return false; 
+  fi;
+
+  q := Size(f);
+  seenqp1 := false;
+  seenqm1 := false;
+  notA5 := false;
+
+  for i in [1..Length(gens)] do
+      if CheckElm(gens[i]) then return true; fi;
+  od;
+  CheckElm(gens[1]*gens[2]);
+  if Length(gens) >= 3 then
+      CheckElm(gens[1]*gens[3]);
+      CheckElm(gens[2]*gens[3]);
+  fi;
+
+  # First we check the derived group:
+  coms := EmptyPlist(20);
+  l := Length(gens);
+  if l <= 4 then
+      Info(InfoRecog,4,"SL2: Computing commutators of gens...");
+      for i in [1..l-1] do
+          for j in [i+1..l] do
+              x := Comm(gens[i],gens[j]);
+              if CheckElm(x) then return true; fi;
+              Add(coms,x);
+          od;
+      od;
+  else
+      Info(InfoRecog,4,"SL2: Computing 6 random commutators...");
+      for i in [1..6] do
+          a := RandomSubproduct(gens);
+          b := RandomSubproduct(gens);
+          x := Comm(a,b);
+          if CheckElm(x) then return true; fi;
+          Add(coms,x);
+      od;
+  fi;
+  if ForAll(coms,c->RECOG.IsScalarMat(c) <> false) then 
+      Info(InfoRecog,4,"SL2: Group is soluble, commutators are central");
+      return false; 
+  fi;
+  Info(InfoRecog,4,"SL2: Computing normal closure...");
+  clos := FastNormalClosure(gens,coms,5);
+  for i in [Length(coms)+1..Length(clos)] do
+      if CheckElm(clos[i]) then return true; fi;
+  od;
+  if ForAll(clos{[Length(coms)+1..Length(clos)]},
+            c->RECOG.IsScalarMat(c) <> false) then 
+      Info(InfoRecog,4,"SL2: Group is soluble, derived subgroup central");
+      return false; 
+  fi;
+  Info(InfoRecog,4,"SL2: Computing 6 random commutators...");
+  isabelian := true;
+  for i in [1..6] do
+      a := RandomSubproduct(clos);
+      b := RandomSubproduct(clos);
+      x := Comm(a,b);
+      if not(IsOne(x)) then isabelian := false; break; fi;
+  od;
+  if isabelian then 
+      Info(InfoRecog,4,"SL2: Group is soluble, derived subgroup abelian");
+      return false; 
+  fi;
+
+  # Now we know that the group is not dihedral!
+  if notA5 then return true; fi;
+  return false;
+end;

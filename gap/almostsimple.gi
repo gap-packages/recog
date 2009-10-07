@@ -5174,7 +5174,9 @@ p := Characteristic(ri!.field);
 d := ri!.dimension;
 mat:=One(G);
 vs:=VectorSpace(GF(p),mat);
-vec:=Random(vs);
+repeat
+  vec:=Random(vs);
+until not(IsZero(vec));
 
 if RECOG.shortorbit(vec,Product(GeneratorsOfGroup(G)), 3*d) = 3*d then 
    return p;
