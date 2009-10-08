@@ -172,7 +172,11 @@ RECOG.FindStdGensUsingBSGS := function(g,stdgens,projective,large)
   # set large to true if we should not bother finding nice base points!
   local S,dim,gens,gm,i,l,strong;
   dim := DimensionOfMatrixGroup(g);
-  gm := GroupWithMemory(g);
+  if IsObjWithMemory(GeneratorsOfGroup(g)[1]) then
+      gm := GroupWithMemory(StripMemory(GeneratorsOfGroup(g)));
+  else
+      gm := GroupWithMemory(g);
+  fi;
   if HasSize(g) then SetSize(gm,Size(g)); fi;
   if large then
       S := StabilizerChain(gm,rec( Projective := projective,
@@ -451,6 +455,9 @@ local V,b,bas,basi,basit,d,data,diffv,diffw,el,ext,fakegens,gens,i,id,lambda,mu,
   q := Size(f);
   ext := DegreeOverPrimeField(f);
   d := DimensionOfMatrixGroup(sld);
+  if not(IsObjWithMemory(GeneratorsOfGroup(sld)[1])) then
+      sld := GroupWithMemory(sld);
+  fi;
 
   # First find an SL2 with the space it acts on:
   Print("Finding an SL2...\c");
@@ -461,19 +468,28 @@ local V,b,bas,basi,basit,d,data,diffv,diffw,el,ext,fakegens,gens,i,id,lambda,mu,
   slptosl2 := SLPOfElms(GeneratorsOfGroup(sl2));
 
   # Now compute the natural SL2 action and run constructive recognition:
-  Print("Recognising this SL2 constructively in 2 dimensions...\c");
   sl2gens := StripMemory(GeneratorsOfGroup(sl2));
   V := VectorSpace(f,bas);
   b := Basis(V,bas);
   sl2genss := List(sl2gens,x->List(BasisVectors(b),v->Coefficients(b,v*x)));
-  sl2genss := GeneratorsWithMemory(sl2genss);
-  resl2 := RECOG.RecogniseSL2NaturalEvenChar(Group(sl2genss),f,false);
-  Print("done.\n");
-  slpsl2std := SLPOfElms(resl2.all);
-  bas := resl2.bas * bas;
-  # We need the actual transvections:
-  slp := SLPOfElms([resl2.s[1],resl2.t[1]]);
+  if q = 4 and Length(bas) = 3 then   # the exceptional result!
+      Print("Recognising SL(3,4) constructively in 3 dimensions...\c");
+      st := RECOG.MakeSL_StdGens(2,2,3,3);
+      slpsl2std := RECOG.FindStdGensUsingBSGS(Group(sl2genss),
+                Concatenation(st.s,st.t,[st.a],[st.b]),false,true);
+      # We need the actual transvections:
+      slp := RestrictOutputsOfSLP(slpsl2std,[1,5]);
+  else
+      Print("Recognising this SL2 constructively in 2 dimensions...\c");
+      sl2genss := GeneratorsWithMemory(sl2genss);
+      resl2 := RECOG.RecogniseSL2NaturalEvenChar(Group(sl2genss),f,false);
+      slpsl2std := SLPOfElms(resl2.all);
+      bas := resl2.bas * bas;
+      # We need the actual transvections:
+      slp := SLPOfElms([resl2.s[1],resl2.t[1]]);
+  fi;
   st := ResultOfStraightLineProgram(slp,StripMemory(GeneratorsOfGroup(sl2)));
+  Print("done.\n");
   
   # Extend basis by something invariant under SL2:
   id := IdentityMat(d,f);
@@ -491,7 +507,7 @@ local V,b,bas,basi,basit,d,data,diffv,diffw,el,ext,fakegens,gens,i,id,lambda,mu,
   std := RECOG.InitSLstd(f,d,sl2stdf{[1..ext]},sl2stdf{[ext+1..2*ext]},
                          sl2stdf[2*ext+1],sl2stdf[2*ext+2]);
 
-  for n in [2..d-1] do
+  for n in [Dimension(data[2])..d-1] do
       Print(n," \c");
       while true do   # will be left by break at the end
           x := PseudoRandom(sld);
@@ -541,7 +557,7 @@ local V,b,bas,basi,basit,d,data,diffv,diffw,el,ext,fakegens,gens,i,id,lambda,mu,
               Add(yy,(bas[i]*y-bas[i])*basi);
               yy[i] := yy[i]{[1..n+1]};
           od;
-          if IsOne(yy[n+1][n+1]) then Print("#\c"); continue; fi;
+          if q > 2 and IsOne(yy[n+1][n+1]) then Print("#\c"); continue; fi;
           break;
       od;
       yf := xf^-1*std.s[1]*xf;
@@ -562,32 +578,8 @@ local V,b,bas,basi,basit,d,data,diffv,diffw,el,ext,fakegens,gens,i,id,lambda,mu,
       oldyy := MutableCopyMat(yy);
       oldyf := yf;
 
-      while true do   # will be left by break when we had success!
-          # Note that by construction yy[n][n+1] is not zero!
-          yy2 := MutableCopyMat(yy);
-          std.left := std.One;
-          std.right := std.One;
-          # We want to be careful not to kill row n:
-          repeat
-              lambda := PrimitiveRoot(f)^Random(0,q-1);
-          until lambda <> yy2[n][n+1]/yy2[n-1][n+1];
-          RECOG.DoRowOp_SL(yy2,n,n-1,lambda,std);
-          RECOG.DoColOp_SL(yy2,n,n-1,lambda,std);
-          mu := lambda;
-          y2f := std.left * yf * std.right;
-
-          yy3 := MutableCopyMat(yy);
-          std.left := std.One;
-          std.right := std.One;
-          # We want to be careful not to kill row n:
-          repeat
-              lambda := PrimitiveRoot(f)^Random(0,q-1);
-          until lambda <> yy3[n][n+1]/yy3[n-1][n+1] and lambda <> mu;
-          RECOG.DoRowOp_SL(yy3,n,n-1,lambda,std);
-          RECOG.DoColOp_SL(yy3,n,n-1,lambda,std);
-          y3f := std.left * yf * std.right;
-
-          # We now perform conjugations such that y leaves bas{[1..n-1]} fixed:
+      if q = 2 then
+          # In this case y is already good after cleaning out!
           # (remember that y+One(y) has rank 1 and does not fix bas[notinv])
           std.left := std.One;
           std.right := std.One;
@@ -597,47 +589,92 @@ local V,b,bas,basi,basit,d,data,diffv,diffw,el,ext,fakegens,gens,i,id,lambda,mu,
               RECOG.DoColOp_SL(yy,i,n,lambda,std);
           od;
           yf := std.left * yf * std.right;
+          z := yy+One(yy);
+          zf := yf;
+          if not(IsZero(z[n][n])) or not(IsOne(z[n][n+1])) or
+             not(IsZero(z[n+1][n+1])) or not(IsOne(z[n+1][n])) then
+              Error("How on earth could this happen???");
+          fi;
+      else  # q > 2
+          while true do   # will be left by break when we had success!
+              # Note that by construction yy[n][n+1] is not zero!
+              yy2 := MutableCopyMat(yy);
+              std.left := std.One;
+              std.right := std.One;
+              # We want to be careful not to kill row n:
+              repeat
+                  lambda := PrimitiveRoot(f)^Random(0,q-1);
+              until lambda <> yy2[n][n+1]/yy2[n-1][n+1];
+              RECOG.DoRowOp_SL(yy2,n,n-1,lambda,std);
+              RECOG.DoColOp_SL(yy2,n,n-1,lambda,std);
+              mu := lambda;
+              y2f := std.left * yf * std.right;
 
-          std.left := std.One;
-          std.right := std.One;
-          for i in [1..n-1] do
-              lambda := -yy2[i][n+1]/yy2[n][n+1];
-              RECOG.DoRowOp_SL(yy2,i,n,lambda,std);
-              RECOG.DoColOp_SL(yy2,i,n,lambda,std);
+              yy3 := MutableCopyMat(yy);
+              std.left := std.One;
+              std.right := std.One;
+              # We want to be careful not to kill row n:
+              repeat
+                  lambda := PrimitiveRoot(f)^Random(0,q-1);
+              until lambda <> yy3[n][n+1]/yy3[n-1][n+1] and lambda <> mu;
+              RECOG.DoRowOp_SL(yy3,n,n-1,lambda,std);
+              RECOG.DoColOp_SL(yy3,n,n-1,lambda,std);
+              y3f := std.left * yf * std.right;
+
+              # We now perform conjugations such that the ys leave 
+              # bas{[1..n-1]} fixed:
+
+              # (remember that y+One(y) has rank 1 and does not fix bas[notinv])
+              std.left := std.One;
+              std.right := std.One;
+              for i in [1..n-1] do
+                  lambda := -yy[i][n+1]/yy[n][n+1];
+                  RECOG.DoRowOp_SL(yy,i,n,lambda,std);
+                  RECOG.DoColOp_SL(yy,i,n,lambda,std);
+              od;
+              yf := std.left * yf * std.right;
+
+              std.left := std.One;
+              std.right := std.One;
+              for i in [1..n-1] do
+                  lambda := -yy2[i][n+1]/yy2[n][n+1];
+                  RECOG.DoRowOp_SL(yy2,i,n,lambda,std);
+                  RECOG.DoColOp_SL(yy2,i,n,lambda,std);
+              od;
+              y2f := std.left * y2f * std.right;
+
+              std.left := std.One;
+              std.right := std.One;
+              for i in [1..n-1] do
+                  lambda := -yy3[i][n+1]/yy3[n][n+1];
+                  RECOG.DoRowOp_SL(yy3,i,n,lambda,std);
+                  RECOG.DoColOp_SL(yy3,i,n,lambda,std);
+              od;
+              y3f := std.left * y3f * std.right;
+
+              gens :=[ExtractSubMatrix(yy,[n,n+1],[n,n+1])+IdentityMat(2,f),
+                      ExtractSubMatrix(yy2,[n,n+1],[n,n+1])+IdentityMat(2,f),
+                      ExtractSubMatrix(yy3,[n,n+1],[n,n+1])+IdentityMat(2,f)];
+              if RECOG.IsThisSL2Natural(gens,f) = true then break; fi;
+              Print("$\c");
+              yy := MutableCopyMat(oldyy);
+              yf := oldyf;
           od;
-          y2f := std.left * y2f * std.right;
 
-          std.left := std.One;
-          std.right := std.One;
-          for i in [1..n-1] do
-              lambda := -yy3[i][n+1]/yy3[n][n+1];
-              RECOG.DoRowOp_SL(yy3,i,n,lambda,std);
-              RECOG.DoColOp_SL(yy3,i,n,lambda,std);
-          od;
-          y3f := std.left * y3f * std.right;
-
-          gens :=[ExtractSubMatrix(yy,[n,n+1],[n,n+1])+IdentityMat(2,f),
-                  ExtractSubMatrix(yy2,[n,n+1],[n,n+1])+IdentityMat(2,f),
-                  ExtractSubMatrix(yy3,[n,n+1],[n,n+1])+IdentityMat(2,f)];
-          if RECOG.IsThisSL2Natural(gens,f) = true then break; fi;
-          Print("$\c");
-          yy := MutableCopyMat(oldyy);
-          yf := oldyf;
-      od;
-
-      # Now perform a constructive recognition in the SL2 in the lower
-      # right corner:
-      gens := GeneratorsWithMemory(gens);
-      resl2 := RECOG.RecogniseSL2NaturalEvenChar(Group(gens),f,gens[1]);
-      stdsl2 := RECOG.InitSLfake(f,2);
-      slp := RECOG.ExpressInStd_SL2(
-               resl2.bas*Reversed(IdentityMat(2,f))*resl2.basi,stdsl2);
-      el := ResultOfStraightLineProgram(slp,resl2.all);
-      slp := SLPOfElm(el);
-      # FIXME: this must be done more efficiently:
-      z := ResultOfStraightLineProgram(slp,
-                  [yy+One(yy),yy2+One(yy),yy3+One(yy)]);
-      zf := ResultOfStraightLineProgram(slp,[yf,y2f,y3f]);
+          # Now perform a constructive recognition in the SL2 in the lower
+          # right corner:
+          gens := GeneratorsWithMemory(gens);
+          resl2 := RECOG.RecogniseSL2NaturalEvenChar(Group(gens),f,gens[1]);
+          stdsl2 := RECOG.InitSLfake(f,2);
+          slp := RECOG.ExpressInStd_SL2(
+                   resl2.bas*Reversed(IdentityMat(2,f))*resl2.basi,stdsl2);
+          el := ResultOfStraightLineProgram(slp,resl2.all);
+          slp := SLPOfElm(el);
+          # FIXME: this must be done more efficiently:
+          z := ResultOfStraightLineProgram(slp,
+                      [yy+One(yy),yy2+One(yy),yy3+One(yy)]);
+          zf := ResultOfStraightLineProgram(slp,[yf,y2f,y3f]);
+      fi;
 
       std.left := std.One;
       std.right := std.One;
