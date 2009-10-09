@@ -13,6 +13,16 @@
 ##
 #############################################################################
 
+RECOG.RelativePrimeToqm1Part := function(q,n)
+  local x,y;
+  x := (q^n-1)/(q-1);
+  repeat
+      y := x/(q-1);
+      x := NumeratorRat(y);
+  until DenominatorRat(y) = q-1;
+  return x;
+end;
+
 RECOG.SL_Even_godownone:=function(g,subspg,q,d)
 local n,y,yy,yyy,ready,order,es,null,subsph,z,x,a,b,c,h,r,divisors,cent,i,
 pol,factors,degrees;
@@ -63,83 +73,77 @@ end;
 
 
 RECOG.SL_Even_constructdata:=function(g,q)
-local degrees,factors,gens,h,i,n,o,order,pol,ready,ready2,ready3,
-      subgplist,subspg,w,workingdim,ww,www,y,yy,z,S;
+local S,a,b,degrees,eva,factors,gens,h,i,n,ns,o,pol,pos,ready,ready2,
+      ready3,subgplist,w,ww,y,yy,z;
 
 n:=DimensionOfMatrixGroup(g);
 
-if q-1>n then 
-  subspg:=VectorSpace(GF(q),One(g));
-  subgplist:=[g,subspg];
-  workingdim:=n;
-  while workingdim > 2 do
-    subgplist:=RECOG.SL_Even_godownone(subgplist[1],subgplist[2],q,workingdim);
-    workingdim:=workingdim-1;
-    if InfoLevel(InfoRecog) >= 3 then Print(workingdim," \c"); fi;
-  od;
-  if InfoLevel(InfoRecog) >= 3 then Print(".\n"); fi;
-else
-  #case of small q
-  repeat  
+if q=2 then
+  repeat
     ready:=false;
     y:=PseudoRandom(g);
     pol:=CharacteristicPolynomial(GF(q),GF(q),StripMemory(y),1);
     factors:=Factors(pol);
     degrees:=List(factors,Degree);
-    if SortedList(degrees)=[1,1,n-2] then 
+    if SortedList(degrees)=[1,1,n-2] then
        yy := y^(q^(n-2)-1);
        if not(IsOne(yy)) and IsOne(yy^2) then ready := true; fi;
     fi;
   until ready;
-  if q=2 then
-    repeat
-      z := yy^PseudoRandom(g);
-    until Order(z*yy) = 3;
-    o := OneMutable(z);
-    i := 1;
-    while i <= n do
-      w := o[i]*yy-o[i];
-      if not(IsZero(w)) then break; fi;
-      i := i + 1;
-    od;
-    i := 1;
-    while i <= n do
-      ww := o[i]*z-o[i];
-      if not(IsZero(ww)) then break; fi;
-      i := i + 1;
-    od;
-    return [Group(z,yy),VectorSpace(GF(2),[w,ww])];
-  fi;
+  repeat
+    z := yy^PseudoRandom(g);
+  until Order(z*yy) = 3;
+  o := OneMutable(z);
+  i := 1;
+  while i <= n do
+    w := o[i]*yy-o[i];
+    if not(IsZero(w)) then break; fi;
+    i := i + 1;
+  od;
+  i := 1;
+  while i <= n do
+    ww := o[i]*z-o[i];
+    if not(IsZero(ww)) then break; fi;
+    i := i + 1;
+  od;
+  return [Group(z,yy),VectorSpace(GF(2),[w,ww])];
+else
+  #case of q <> 2
+  repeat  
+    ready:=false;
+    y:=PseudoRandom(g);
+    if InfoLevel(InfoRecog) >= 3 then Print(".\c"); fi;
+    pol:=CharacteristicPolynomial(GF(q),GF(q),StripMemory(y),1);
+    factors:=Factors(pol);
+    degrees:=List(factors,Degree);
+    if n-1 in degrees then
+       yy := y^(RECOG.RelativePrimeToqm1Part(q,n-1));
+       o := Order(yy);
+       if o mod (q-1) = 0 then
+           yy := yy^(o/(q-1));
+           ready := true;
+       fi;
+    fi;
+  until ready;
+  if InfoLevel(InfoRecog) >= 3 then Print("\n"); fi;
 
   ready2:=false;
   ready3:=false;
   repeat
      gens:=[yy];
-     Add(gens,yy^PseudoRandom(g));
-     Add(gens,yy^PseudoRandom(g));
+     a := PseudoRandom(g);
+     b := PseudoRandom(g);
+     Add(gens,yy^a);
+     Add(gens,yy^b);
      h:=Group(gens);
      if q = 4 then
        S := StabilizerChain(h);
-       if Size(S) <> 60480 then continue; fi;
-       o := One(h);
-       i := 1;
-       while i <= n do
-         w := o[i]*GeneratorsOfGroup(h)[1]-o[i];
-         if not(IsZero(w)) then break; fi;
-         i := i + 1;
-       od;
-       i := 1;
-       while i <= n do
-         ww := o[i]*GeneratorsOfGroup(h)[2]-o[i];
-         if not(IsZero(ww)) then break; fi;
-         i := i + 1;
-       od;
-       while i <= n do
-         www := o[i]*GeneratorsOfGroup(h)[3]-o[i];
-         if not(IsZero(www)) then break; fi;
-         i := i + 1;
-       od;
-       return [h,VectorSpace(GF(q),[w,ww,www])];
+       if not(Size(S) in [60480,3*60480]) then continue; fi;
+       pos := Position(degrees,1);
+       eva := -Value(factors[pos],0*Z(q));
+       ns := NullspaceMat(StripMemory(y)-eva*One(StripMemory(y)));
+       return [h,
+          VectorSpace(GF(q),[ns[1],ns[1]*StripMemory(a),ns[1]*StripMemory(b)])];
      fi;
       
      # Now check using ppd-elements:
