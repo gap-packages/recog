@@ -533,6 +533,7 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
   std := RECOG.InitSLstd(f,d,sl2stdf{[1..ext]},sl2stdf{[ext+1..2*ext]},
                          sl2stdf[2*ext+1],sl2stdf[2*ext+2]);
 
+  Info(InfoRecog,2,"Going up to SL_d again...");
   for n in [Dimension(data[2])..d-1] do
       if InfoLevel(InfoRecog) >= 3 then Print(n," \c"); fi;
       while true do   # will be left by break at the end
@@ -1171,16 +1172,17 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
               return fail;
           fi;
           # OK, this is (P)SL2, lets set up the recognition:
+          Info(InfoRecog,2,"Classical: this is PSL_2!");
           std := RECOG.RecogniseSL2NaturalEvenChar(gm,f,false);
           Setslptonice(ri,SLPOfElms(std.all));
           ri!.nicebas := std.bas;
           ri!.nicebasi := std.basi;
           Setnicegens(ri,List(StripMemory(std.all),x->std.basi*x*std.bas));
           ri!.fakegens := RECOG.InitSLfake(f,2);
-          ri!.comment := "_SL2Even";
+          ri!.comment := "_PSL2Even";
           SetFilterObj(ri,IsLeaf);
-          SetSize(ri,(q^2-1)*(q+1));
-          #...
+          SetSize(ri,(q+1)*(q-1)*q);
+          Setslpforelement(ri,SLPforElementFuncsProjective.PSL2Even);
           return true;
       else   # odd case
           return FindHomMethodsProjective.StabilizerChain(ri,g);
