@@ -64,7 +64,7 @@ end;
 
 RECOG.SL_Even_constructdata:=function(g,q)
 local degrees,factors,gens,h,i,n,o,order,pol,ready,ready2,ready3,
-      subgplist,subspg,w,workingdim,ww,www,y,yy,z;
+      subgplist,subspg,w,workingdim,ww,www,y,yy,z,S;
 
 n:=DimensionOfMatrixGroup(g);
 
@@ -75,8 +75,9 @@ if q-1>n then
   while workingdim > 2 do
     subgplist:=RECOG.SL_Even_godownone(subgplist[1],subgplist[2],q,workingdim);
     workingdim:=workingdim-1;
-    Print(workingdim," \c");
+    if InfoLevel(InfoRecog) >= 3 then Print(workingdim," \c"); fi;
   od;
+  if InfoLevel(InfoRecog) >= 3 then Print(".\n"); fi;
 else
   #case of small q
   repeat  
@@ -117,6 +118,31 @@ else
      Add(gens,yy^PseudoRandom(g));
      Add(gens,yy^PseudoRandom(g));
      h:=Group(gens);
+     if q = 4 then
+       S := StabilizerChain(h);
+       if Size(S) <> 60480 then continue; fi;
+       o := One(h);
+       i := 1;
+       while i <= n do
+         w := o[i]*GeneratorsOfGroup(h)[1]-o[i];
+         if not(IsZero(w)) then break; fi;
+         i := i + 1;
+       od;
+       i := 1;
+       while i <= n do
+         ww := o[i]*GeneratorsOfGroup(h)[2]-o[i];
+         if not(IsZero(ww)) then break; fi;
+         i := i + 1;
+       od;
+       while i <= n do
+         www := o[i]*GeneratorsOfGroup(h)[3]-o[i];
+         if not(IsZero(www)) then break; fi;
+         i := i + 1;
+       od;
+       return [h,VectorSpace(GF(q),[w,ww,www])];
+     fi;
+      
+     # Now check using ppd-elements:
      for i in [1..10] do
        z:=PseudoRandom(h);
        pol:=CharacteristicPolynomial(GF(q),GF(q),StripMemory(z),1);
@@ -137,28 +163,6 @@ else
      fi;
   until ready2 and ready3; 
   
-  if q = 4 then
-    o := One(h);
-    i := 1;
-    while i <= n do
-      w := o[i]*GeneratorsOfGroup(h)[1]-o[i];
-      if not(IsZero(w)) then break; fi;
-      i := i + 1;
-    od;
-    i := 1;
-    while i <= n do
-      ww := o[i]*GeneratorsOfGroup(h)[2]-o[i];
-      if not(IsZero(ww)) then break; fi;
-      i := i + 1;
-    od;
-    while i <= n do
-      www := o[i]*GeneratorsOfGroup(h)[3]-o[i];
-      if not(IsZero(www)) then break; fi;
-      i := i + 1;
-    od;
-    return [h,VectorSpace(GF(q),[w,ww,www])];
-  fi;
-      
   subgplist:=RECOG.SL_Even_godownone(h,VectorSpace(GF(q),One(g)),q,3);
 fi;
 
@@ -441,6 +445,25 @@ RECOG.ExpressInStd_SL := function(m,std)
   return SLPOfElm(std.left);
 end;
 
+InstallOtherMethod( \*, "for two funny product objects",
+  [ IsFunnyProductObject, IsFunnyProductObject ],
+  function(a,b)
+    return Objectify(FunnyProductObjsType,[a![1]+a![2]*b![1],a![2]*b![2]]);
+  end );
+
+InstallOtherMethod( InverseSameMutability, "for a funny product object",
+  [ IsFunnyProductObject ],
+  function(a)
+    local i;
+    i := a![2]^-1;
+    return Objectify(FunnyProductObjsType,[-i*a![1],i]);
+  end );
+
+InstallMethod( FunnyProductObj, "for two arbitrary objects",
+  [ IsObject, IsObject ],
+  function(a,b)
+    return Objectify(FunnyProductObjsType,[a,b]);
+  end );
 
 RECOG.FindStdGens_SL_EvenChar := function(sld,f)
   # gens of sld must be gens for SL(d,q) in its natural rep with memory
@@ -448,7 +471,10 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
   # the basis to a basis of the full row space and returns an slp such
   # that the SL(d,q) standard generators with respect to this basis are
   # expressed by the slp in terms of the original generators of sld.
-local V,b,bas,basi,basit,d,data,diffv,diffw,el,ext,fakegens,gens,i,id,lambda,mu,n,notinv,nu,nu2,oldyf,oldyy,p,pos,q,resl2,sl2,sl2gens,sl2gensf,sl2genss,sl2stdf,slp,slpsl2std,slptosl2,st,std,stdsl2,w,x,xf,y,y2f,y3f,yf,yy,yy2,yy3,z,zf;
+  local V,b,bas,basi,basit,d,data,diffv,diffw,el,ext,fakegens,gens,i,id,
+        lambda,mu,n,notinv,nu,nu2,oldyf,oldyy,p,pos,q,resl2,sl2,sl2gens,
+        sl2gensf,sl2genss,sl2stdf,slp,slpsl2std,slptosl2,st,std,stdsl2,
+        w,x,xf,y,y2f,y3f,yf,yy,yy2,yy3,yyy,yyy2,yyy3,z,zf,zzz;
 
   # Some setup:
   p := Characteristic(f);
@@ -460,9 +486,8 @@ local V,b,bas,basi,basit,d,data,diffv,diffw,el,ext,fakegens,gens,i,id,lambda,mu,
   fi;
 
   # First find an SL2 with the space it acts on:
-  Print("Finding an SL2...\c");
+  Info(InfoRecog,2,"Finding an SL2...");
   data := RECOG.SL_Even_constructdata(sld,q);
-  Print("done.\n");
   bas := ShallowCopy(BasisVectors(Basis(data[2])));
   sl2 := data[1];
   slptosl2 := SLPOfElms(GeneratorsOfGroup(sl2));
@@ -473,14 +498,16 @@ local V,b,bas,basi,basit,d,data,diffv,diffw,el,ext,fakegens,gens,i,id,lambda,mu,
   b := Basis(V,bas);
   sl2genss := List(sl2gens,x->List(BasisVectors(b),v->Coefficients(b,v*x)));
   if q = 4 and Length(bas) = 3 then   # the exceptional result!
-      Print("Recognising SL(3,4) constructively in 3 dimensions...\c");
+      Info(InfoRecog,2,
+           "Recognising SL(3,4) constructively in 3 dimensions...");
       st := RECOG.MakeSL_StdGens(2,2,3,3);
       slpsl2std := RECOG.FindStdGensUsingBSGS(Group(sl2genss),
                 Concatenation(st.s,st.t,[st.a],[st.b]),false,true);
       # We need the actual transvections:
       slp := RestrictOutputsOfSLP(slpsl2std,[1,5]);
   else
-      Print("Recognising this SL2 constructively in 2 dimensions...\c");
+      Info(InfoRecog,2,
+           "Recognising this SL2 constructively in 2 dimensions...");
       sl2genss := GeneratorsWithMemory(sl2genss);
       resl2 := RECOG.RecogniseSL2NaturalEvenChar(Group(sl2genss),f,false);
       slpsl2std := SLPOfElms(resl2.all);
@@ -489,7 +516,6 @@ local V,b,bas,basi,basit,d,data,diffv,diffw,el,ext,fakegens,gens,i,id,lambda,mu,
       slp := SLPOfElms([resl2.s[1],resl2.t[1]]);
   fi;
   st := ResultOfStraightLineProgram(slp,StripMemory(GeneratorsOfGroup(sl2)));
-  Print("done.\n");
   
   # Extend basis by something invariant under SL2:
   id := IdentityMat(d,f);
@@ -508,7 +534,7 @@ local V,b,bas,basi,basit,d,data,diffv,diffw,el,ext,fakegens,gens,i,id,lambda,mu,
                          sl2stdf[2*ext+1],sl2stdf[2*ext+2]);
 
   for n in [Dimension(data[2])..d-1] do
-      Print(n," \c");
+      if InfoLevel(InfoRecog) >= 3 then Print(n," \c"); fi;
       while true do   # will be left by break at the end
           x := PseudoRandom(sld);
           slp := SLPOfElm(x);
@@ -530,7 +556,10 @@ local V,b,bas,basi,basit,d,data,diffv,diffw,el,ext,fakegens,gens,i,id,lambda,mu,
           for i in [1..n] do
               w := w - bas[i] * ScalarProduct(w,basit[i]);
           od;
-          if w*y=w then Print("!\c"); continue; fi;
+          if w*y=w then 
+              if InfoLevel(InfoRecog) >= 3 then Print("!\c"); fi;
+              continue; 
+          fi;
 
           # w is supposed to become the next basis vector number n+1.
           # So we need to throw away one of bas{[n+1..d]}:
@@ -549,7 +578,6 @@ local V,b,bas,basi,basit,d,data,diffv,diffw,el,ext,fakegens,gens,i,id,lambda,mu,
           od;
           basi := bas^-1;
           basit := TransposedMat(basi);
-          # FIXME: This should be done more efficiently!
 
           # Compute the action of y-One(y) on Span(bas{[1..n+1]})
           yy := EmptyPlist(n+1);
@@ -557,7 +585,11 @@ local V,b,bas,basi,basit,d,data,diffv,diffw,el,ext,fakegens,gens,i,id,lambda,mu,
               Add(yy,(bas[i]*y-bas[i])*basi);
               yy[i] := yy[i]{[1..n+1]};
           od;
-          if q > 2 and IsOne(yy[n+1][n+1]) then Print("#\c"); continue; fi;
+          if q > 2 and IsOne(yy[n+1][n+1]) then 
+              if InfoLevel(InfoRecog) >= 3 then Print("#\c"); fi;
+              continue; 
+          fi;
+          ConvertToMatrixRep(yy,q);
           break;
       od;
       yf := xf^-1*std.s[1]*xf;
@@ -656,7 +688,7 @@ local V,b,bas,basi,basit,d,data,diffv,diffw,el,ext,fakegens,gens,i,id,lambda,mu,
                       ExtractSubMatrix(yy2,[n,n+1],[n,n+1])+IdentityMat(2,f),
                       ExtractSubMatrix(yy3,[n,n+1],[n,n+1])+IdentityMat(2,f)];
               if RECOG.IsThisSL2Natural(gens,f) = true then break; fi;
-              Print("$\c");
+              if InfoLevel(InfoRecog) >= 3 then Print("$\c"); fi;
               yy := MutableCopyMat(oldyy);
               yf := oldyf;
           od;
@@ -670,9 +702,20 @@ local V,b,bas,basi,basit,d,data,diffv,diffw,el,ext,fakegens,gens,i,id,lambda,mu,
                    resl2.bas*Reversed(IdentityMat(2,f))*resl2.basi,stdsl2);
           el := ResultOfStraightLineProgram(slp,resl2.all);
           slp := SLPOfElm(el);
-          # FIXME: this must be done more efficiently:
-          z := ResultOfStraightLineProgram(slp,
-                      [yy+One(yy),yy2+One(yy),yy3+One(yy)]);
+
+          yy := yy+One(yy);
+          yy2 := yy2+One(yy2);
+          yy3 := yy3+One(yy3);
+          yyy := FunnyProductObj(ExtractSubMatrix(yy,[n,n+1],[1..n-1]),
+                                 ExtractSubMatrix(yy,[n,n+1],[n,n+1]));
+          yyy2 := FunnyProductObj(ExtractSubMatrix(yy2,[n,n+1],[1..n-1]),
+                                  ExtractSubMatrix(yy2,[n,n+1],[n,n+1]));
+          yyy3 := FunnyProductObj(ExtractSubMatrix(yy3,[n,n+1],[1..n-1]),
+                                  ExtractSubMatrix(yy3,[n,n+1],[n,n+1]));
+          zzz := ResultOfStraightLineProgram(slp,[yyy,yyy2,yyy3]);
+          z := OneMutable(yy);
+          CopySubMatrix(zzz![1],z,[1..2],[n,n+1],[1..n-1],[1..n-1]);
+          CopySubMatrix(zzz![2],z,[1..2],[n,n+1],[1..2],[n,n+1]);
           zf := ResultOfStraightLineProgram(slp,[yf,y2f,y3f]);
       fi;
 
@@ -700,7 +743,7 @@ local V,b,bas,basi,basit,d,data,diffv,diffw,el,ext,fakegens,gens,i,id,lambda,mu,
       RECOG.ResetSLstd(std);
 
   od;
-  Print("done.\n");
+  if InfoLevel(InfoRecog) >= 3 then Print(".\n"); fi;
   return rec( slpstd := SLPOfElms(std.all), bas := bas, basi := basi );
 end;
 
@@ -814,9 +857,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
       Add(tt,x);
       Add(ttm,xm);
       Add(mat,co);
-      #Print(".\c");
   od;
-  #Print(j-1,"\n");
   ConvertToMatrixRep(mat,2);
   mati := mat^-1;
 
@@ -878,9 +919,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
       Add(ss,x);
       Add(ssm,xm);
       Add(mas,co);
-      #Print(".\c");
   od;
-  #Print("\n");
   ConvertToMatrixRep(mas,2);
   masi := mas^-1;
 
@@ -903,10 +942,19 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   return res;
 end;
 
-RECOG.GuessSL2ElmOrder := function(x,q)
-  local facts,i,j,o,p,r,s,y,z;
+RECOG.GuessSL2ElmOrder := function(x,f)
+  local facts,i,j,o,p,q,r,s,y,z;
+  p := Characteristic(f);
+  q := Size(f);
   if IsOne(x) then return 1;
   elif IsOne(x^2) then return 2;
+  fi;
+  if p > 2 then
+      y := x^p;
+      if IsOne(y) then return p;
+      elif IsOddInt(p) and IsOne(y^2) then 
+          return 2*p;
+      fi;
   fi;
   if IsOne(x^(q-1)) then
       facts := Collected(FactInt(q-1:cheap)[1]);
@@ -932,27 +980,68 @@ RECOG.GuessSL2ElmOrder := function(x,q)
   return o;
 end;
 
+RECOG.GuessProjSL2ElmOrder := function(x,f)
+  local facts,i,j,o,p,q,r,s,y,z;
+  p := Characteristic(f);
+  q := Size(f);
+  if IsOneProjective(x) then return 1;
+  elif IsEvenInt(p) and IsOneProjective(x^2) then return 2;
+  fi;
+  if p > 2 then
+      y := x^p;
+      if IsOneProjective(y) then return p; fi;
+  fi;
+  if IsOneProjective(x^(q-1)) then
+      facts := Collected(FactInt(q-1:cheap)[1]);
+      s := Product(facts,x->x[1]^x[2]);
+      r := (q-1)/s;
+  else
+      facts := Collected(FactInt(q+1:cheap)[1]);
+      s := Product(facts,x->x[1]^x[2]);
+      r := (q+1)/s;
+  fi;
+  y := x^r;
+  o := r;
+  for i in [1..Length(facts)] do
+      p := facts[i];
+      j := p[2]-1;
+      while j >= 0 do
+          z := y^(s/p[1]^(p[2]-j));
+          if not(IsOneProjective(z)) then break; fi;
+          j := j - 1;
+      od;
+      o := o * p[1]^(j+1);
+  od;
+  return o;
+end;
+
 RECOG.IsThisSL2Natural := function(gens,f)
   # Checks quickly whether or not this is SL(2,f).
   # The answer is not guaranteed to be correct, this is Las Vegas.
-  local CheckElm,a,b,clos,coms,i,isabelian,j,l,notA5,q,seenqm1,seenqp1,x;
+  local CheckElm,a,b,clos,coms,i,isabelian,j,l,notA5,p,q,S,seenqm1,seenqp1,x;
 
   CheckElm := function(x)
       local o;
-      o := RECOG.GuessSL2ElmOrder(x,q);
+      o := RECOG.GuessProjSL2ElmOrder(x,f);
       if o in [1,2] then return false; fi;
       if o > 5 then 
           if notA5 = false then Info(InfoRecog,4,"SL2: Group is not A5"); fi;
           notA5 := true; 
+          if seenqp1 and seenqm1 then return true; fi;
       fi;
+      if o = p or o <= 5 then return false; fi;
       if (q+1) mod o = 0 then
-          Info(InfoRecog,4,"SL2: Found element of order dividing q+1.");
-          seenqp1 := true;
-          if seenqm1 then return true; fi;
+          if not(seenqp1) then
+              Info(InfoRecog,4,"SL2: Found element of order dividing q+1.");
+              seenqp1 := true;
+              if seenqm1 and notA5 then return true; fi;
+          fi;
       else
-          Info(InfoRecog,4,"SL2: Found element of order dividing q-1.");
-          seenqm1 := true;
-          if seenqp1 then return true; fi;
+          if not(seenqm1) then 
+              Info(InfoRecog,4,"SL2: Found element of order divising q-1.");
+              seenqm1 := true; 
+              if seenqp1 and notA5 then return true; fi;
+          fi;
       fi;
       return false;
   end;
@@ -961,8 +1050,16 @@ RECOG.IsThisSL2Natural := function(gens,f)
       Info(InfoRecog,4,"SL2: Group cyclic");
       return false; 
   fi;
-
+  
   q := Size(f);
+  p := Characteristic(f);
+  if q <= 32 then    # this could be increased if needed
+      Info(InfoRecog,4,"SL2: Computing stabiliser chain.");
+      S := StabilizerChain(Group(gens));
+      Info(InfoRecog,4,"SL2: size is ",Size(S));
+      return Size(S) = q*(q-1)*(q+1);
+  fi;
+
   seenqp1 := false;
   seenqm1 := false;
   notA5 := false;
@@ -1018,14 +1115,80 @@ RECOG.IsThisSL2Natural := function(gens,f)
       a := RandomSubproduct(clos);
       b := RandomSubproduct(clos);
       x := Comm(a,b);
-      if not(IsOne(x)) then isabelian := false; break; fi;
+      if RECOG.IsScalarMat(x) = false then isabelian := false; break; fi;
   od;
   if isabelian then 
-      Info(InfoRecog,4,"SL2: Group is soluble, derived subgroup abelian");
+      Info(InfoRecog,4,
+           "SL2: Group is soluble, derived subgroup abelian mod scalars");
       return false; 
   fi;
 
   # Now we know that the group is not dihedral!
-  if notA5 then return true; fi;
   return false;
 end;
+
+FindHomMethodsProjective.ClassicalNatural := function(ri,g)
+  local changed,d,det,f,gens,gm,i,p,pr,q,std,z;
+  d := ri!.dimension;
+  f := ri!.field;
+  q := Size(f);
+  p := Characteristic(f);
+
+  # First get rid of nasty determinants:
+  gens := ShallowCopy(GeneratorsOfGroup(g));
+  changed := false;
+  z := Z(f);
+  for i in [1..Length(gens)] do
+      det := DeterminantMat(gens[i]);
+      if not(IsOne(det)) then
+          gens[i] := gens[i] * z^(-LogFFE(det,z)/d);
+          changed := true;
+      fi;
+  od;
+  if changed then
+      g := GroupWithGenerators(gens);
+      gm := GroupWithMemory(gens);
+      pr := ProductReplacer(GeneratorsOfGroup(gm),rec(maxdepth := 500));
+      gm!.pseudorandomfunc := [rec( func := Next, args := [pr] )];
+  else
+      gm := Group(ri!.gensHmem);
+      gm!.pseudorandomfunc := [rec(func := function(ri,name,bool)
+                                      return RandomElm(ri,name,bool);
+                                    end,
+                            args := [ri,"PseudoRandom",true])];
+      RECOG.SetPseudoRandomStamp(g,"ClassicalNatural");
+  fi;
+
+  if d = 2 then
+      # We only have to check for (P)SL_2 since otherwise the subfield
+      # method will detect it. Note that this is a projective method,
+      # but a projective group contains PSL_2 if and only if the matrix
+      # group generated by the same matrices (possibly scaled to make
+      # the determinant to be 1) contains SL_2.
+      if IsEvenInt(q) then
+          if not(RECOG.IsThisSL2Natural(g)) then
+              RECOG.SetPseudoRandomStamp(g,"PseudoRandom");
+              return fail;
+          fi;
+          # OK, this is (P)SL2, lets set up the recognition:
+          std := RECOG.RecogniseSL2NaturalEvenChar(gm,f,false);
+          Setslptonice(ri,SLPOfElms(std.all));
+          ri!.nicebas := std.bas;
+          ri!.nicebasi := std.basi;
+          Setnicegens(ri,List(StripMemory(std.all),x->std.basi*x*std.bas));
+          ri!.fakegens := RECOG.InitSLfake(f,2);
+          ri!.comment := "_SL2Even";
+          SetFilterObj(ri,IsLeaf);
+          SetSize(ri,(q^2-1)*(q+1));
+          #...
+          return true;
+      else   # odd case
+          return FindHomMethodsProjective.StabilizerChain(ri,g);
+      fi;
+  else   # bigger than 2:
+      return fail;
+  fi;
+
+end;
+
+

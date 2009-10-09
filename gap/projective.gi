@@ -236,6 +236,9 @@ AddMethod( FindHomDbProjective, FindHomMethodsMatrix.ReducibleIso,
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.NotAbsolutelyIrred,
   1100, "NotAbsolutelyIrred",
         "write over a bigger field with smaller degree" );
+#AddMethod( FindHomDbProjective, FindHomMethodsProjective.ClassicalNatural,
+#  1050, "ClassicalNatural",
+#        "check whether it is a classical group in its natural representation" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.Subfield,
   1000, "Subfield",
         "write over a smaller field with same degree" );

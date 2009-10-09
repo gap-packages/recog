@@ -17,6 +17,10 @@ Local TODO list:
   - revisit examples/challenges
   - implement sl2 natural
   - fix new FindElmOf method with respect to PseudoRandom
+  - balanced trees?
+  - a_n in deleted perm rep
+  - adjoint rep of sl_n
+  - verification/presentations
 
 Before release:
 
