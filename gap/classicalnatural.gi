@@ -91,8 +91,8 @@ return [Group(cent), subsph];
 end;
 
 RECOG.SL_FindSL2 := function(g,f)
-  local V,a,bas,c,count,ev,gens,genss,genssm,gl4,h,i,j,n,ns,o,pos,pow,
-        pr,q,r,res,sl2gens,slp,std,v,w,y,z;
+  local V,a,bas,c,count,ev,gens,genss,genssm,gl4,h,i,j,n,ns,o,pos,pow,pr,q,r,
+        res,sl2gens,sl3,slp,std,v,w,y,z,zz;
   q := Size(f);
   n := DimensionOfMatrixGroup(g);
   if q = 2 then
@@ -118,15 +118,78 @@ RECOG.SL_FindSL2 := function(g,f)
       od;
       return [Group(gens),VectorSpace(GF(q),w)];
   fi;
-  if q = 4 and n = 3 then
-      std := RECOG.MakeSL_StdGens(2,2,2,3);
+  if q = 3 and n = 3 then
+      std := RECOG.MakeSL_StdGens(3,1,2,3);
       slp := RECOG.FindStdGensUsingBSGS(g,Concatenation(std.s,std.t),
                                         false,true);
+      if slp = fail then return fail; fi;
       h := Group(ResultOfStraightLineProgram(slp,GeneratorsOfGroup(g)));
       o := IdentityMat(3,f);
       return [h,VectorSpace(f,o{[1..2]})];
   fi;
-  if n mod (q-1) <> 0 then   # The generic case:
+  if q = 3 and n = 4 then
+      std := RECOG.MakeSL_StdGens(3,1,2,4);
+      slp := RECOG.FindStdGensUsingBSGS(g,Concatenation(std.s,std.t),
+                                        false,true);
+      if slp = fail then return fail; fi;
+      h := Group(ResultOfStraightLineProgram(slp,GeneratorsOfGroup(g)));
+      o := IdentityMat(4,f);
+      return [h,VectorSpace(f,o{[1..2]})];
+  fi;
+  if q = 3 then
+      # We look for a transvection:
+      while true do   # will be left by break
+          r := RECOG.SearchForElByCharPolFacts(g,f,[1,1,n-2],3*n+20);
+          if r = fail then return fail; fi;
+          y := r.el^(q^(n-2)-1);
+          if not IsOne(y) and IsOne(y^3) then break; fi;
+      od;
+      # Find a two good random conjugates:
+      while true do   # will be left by return
+          z := y^PseudoRandom(g);
+          zz := y^PseudoRandom(g);
+          gens := [y,z,zz];
+          o := IdentityMat(n,f);
+          ns := [];
+          for j in [1..3] do
+              for i in [1..n] do
+                  w := o[i]*gens[j]-o[i];
+                  if not(IsZero(w)) then break; fi;
+              od;
+              # Since y has order y at least one basis vector is moved.
+              ns[j] := w;
+          od;
+          V := VectorSpace(f,ns);
+          bas := Basis(V,ns);
+          genss := List(StripMemory(gens),
+                        x->List(ns,i->Coefficients(bas,i*x)));
+          genssm := GeneratorsWithMemory(genss);
+          sl3 := Group(genssm);
+          pr := ProductReplacer(genssm,rec( maxdepth := 400, scramble := 0,
+                                            scramblefactor := 0 ) );
+          sl3!.pseudorandomfunc := [rec(func := Next,args := [pr])];
+          res := RECOG.SL_FindSL2(sl3,f);
+          if res = fail then 
+              if InfoLevel(InfoRecog) >= 3 then Print("#\c"); fi;
+              continue;
+          fi;
+          slp := SLPOfElms(GeneratorsOfGroup(res[1]));
+          sl2gens := ResultOfStraightLineProgram(slp,gens);
+          ns := BasisVectors(Basis(res[2])) * ns;
+          ConvertToMatrixRep(ns,q);
+          return [Group(sl2gens),VectorSpace(f,ns)];
+      od;
+  fi;
+  if q = 4 and n = 3 then
+      std := RECOG.MakeSL_StdGens(2,2,2,3);
+      slp := RECOG.FindStdGensUsingBSGS(g,Concatenation(std.s,std.t),
+                                        false,true);
+      if slp = fail then return fail; fi;
+      h := Group(ResultOfStraightLineProgram(slp,GeneratorsOfGroup(g)));
+      o := IdentityMat(3,f);
+      return [h,VectorSpace(f,o{[1..2]})];
+  fi;
+  if n mod (q-1) <> 0 and q <> 3 then   # The generic case:
       # We look for an element with n-1 dimensional eigenspace:
       count := 0;
       while true do    # will be left by break
@@ -592,11 +655,7 @@ RECOG.ExpressInStd_SL := function(m,std)
       if not(IsOne(mi[i][i])) then
           pos := First([i+1..d],k->not IsZero(mi[k][i]));
           if pos = fail then
-              if i = 1 then
-                  pos := 2;
-              else
-                  pos := 1;
-              fi;
+              pos := i+1;
               RECOG.DoRowOp_SL(mi,pos,i,std.one,std);
           fi;
           RECOG.DoRowOp_SL(mi,i,pos,(std.one-mi[i][i])/mi[pos][i],std);
@@ -1292,8 +1351,44 @@ RECOG.IsThisSL2Natural := function(gens,f)
   return false;
 end;
 
+SLPforElementFuncsProjective.PSL2Even := function(ri,x)
+  local det,log,slp,y,z;
+  ri!.fakegens.count := ri!.fakegens.count + 1;
+  if ri!.fakegens.count > 1000 then
+      ri!.fakegens := RECOG.InitSLfake(ri!.field,2);
+      ri!.fakegens.count := 0;
+  fi;
+  y := ri!.nicebas * x * ri!.nicebasi;
+  det := DeterminantMat(y);
+  if not(IsOne(det)) then
+      z := PrimitiveRoot(ri!.field);
+      log := LogFFE(det,z);
+      y := y * z^(-log*ri!.gcd.coeff1/ri!.gcd.gcd);
+  fi;
+  slp := RECOG.ExpressInStd_SL2(y,ri!.fakegens);
+  return slp;
+end;
+
+SLPforElementFuncsProjective.PSLdEven := function(ri,x)
+  local det,log,slp,y,z;
+  ri!.fakegens.count := ri!.fakegens.count + 1;
+  if ri!.fakegens.count > 1000 then
+      ri!.fakegens := RECOG.InitSLfake(ri!.field,ri!.dimension);
+      ri!.fakegens.count := 0;
+  fi;
+  y := ri!.nicebas * x * ri!.nicebasi;
+  det := DeterminantMat(y);
+  if not(IsOne(det)) then
+      z := PrimitiveRoot(ri!.field);
+      log := LogFFE(det,z);
+      y := y * z^(-log*ri!.gcd.coeff1/ri!.gcd.gcd);
+  fi;
+  slp := RECOG.ExpressInStd_SL(y,ri!.fakegens);
+  return slp;
+end;
+
 FindHomMethodsProjective.ClassicalNatural := function(ri,g)
-  local changed,d,det,f,gens,gm,i,p,pr,q,std,z;
+  local changed,classical,d,det,ext,f,gcd,gens,gm,i,log,p,pr,q,std,stdg,z;
   d := ri!.dimension;
   f := ri!.field;
   q := Size(f);
@@ -1302,11 +1397,14 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
   # First get rid of nasty determinants:
   gens := ShallowCopy(GeneratorsOfGroup(g));
   changed := false;
-  z := Z(f);
+  z := Z(q);
+  gcd := Gcdex(d,q-1);
   for i in [1..Length(gens)] do
       det := DeterminantMat(gens[i]);
       if not(IsOne(det)) then
-          gens[i] := gens[i] * z^(-LogFFE(det,z)/d);
+          log := LogFFE(det,z);
+          if log mod gcd.gcd <> 0 then Error("!!!"); fi;
+          gens[i] := gens[i] * z^(-log*gcd.coeff1/gcd.gcd);
           changed := true;
       fi;
   od;
@@ -1318,9 +1416,9 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
   else
       gm := Group(ri!.gensHmem);
       gm!.pseudorandomfunc := [rec(func := function(ri,name,bool)
-                                      return RandomElm(ri,name,bool);
+                                      return RandomElm(ri,name,bool).el;
                                     end,
-                            args := [ri,"PseudoRandom",true])];
+                            args := [ri,"ClassicalNatural",true])];
       RECOG.SetPseudoRandomStamp(g,"ClassicalNatural");
   fi;
 
@@ -1331,7 +1429,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
       # group generated by the same matrices (possibly scaled to make
       # the determinant to be 1) contains SL_2.
       if IsEvenInt(q) then
-          if not(RECOG.IsThisSL2Natural(g)) then
+          if not(RECOG.IsThisSL2Natural(GeneratorsOfGroup(g),f)) then
               RECOG.SetPseudoRandomStamp(g,"PseudoRandom");
               return fail;
           fi;
@@ -1343,7 +1441,9 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
           ri!.nicebasi := std.basi;
           Setnicegens(ri,List(StripMemory(std.all),x->std.basi*x*std.bas));
           ri!.fakegens := RECOG.InitSLfake(f,2);
+          ri!.fakegens.count := 0;
           ri!.comment := "_PSL2Even";
+          ri!.gcd := gcd;
           SetFilterObj(ri,IsLeaf);
           SetSize(ri,(q+1)*(q-1)*q);
           Setslpforelement(ri,SLPforElementFuncsProjective.PSL2Even);
@@ -1352,6 +1452,30 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
           return FindHomMethodsProjective.StabilizerChain(ri,g);
       fi;
   else   # bigger than 2:
+      classical := RecogniseClassical(g);
+      if classical.IsSLContained = true then
+          if q mod 2 = 0 then
+              Info(InfoRecog,2,"Classical: this is PSL_n!");
+              std := RECOG.FindStdGens_SL_EvenChar(gm,f);
+              Setslptonice(ri,std.slpstd);
+              ri!.nicebas := std.bas;
+              ri!.nicebasi := std.basi;
+              ext := DegreeOverPrimeField(f);
+              stdg := RECOG.MakeSL_StdGens(p,ext,d,d);
+              Setnicegens(ri,List(StripMemory(stdg.all),
+                          x->std.basi*x*std.bas));
+              ri!.fakegens := RECOG.InitSLfake(f,d);
+              ri!.fakegens.count := 0;
+              ri!.comment := "_PSLdEven";
+              ri!.gcd := gcd;
+              SetFilterObj(ri,IsLeaf);
+              SetSize(ri,Product([0..d-1],i->(q^d-q^i))/((q-1)*gcd.gcd));
+              Setslpforelement(ri,SLPforElementFuncsProjective.PSLdEven);
+              return true;
+          fi;
+      else
+          Info(InfoRecog,3,"Classical: Is not PSL.");
+      fi;
       return fail;
   fi;
 

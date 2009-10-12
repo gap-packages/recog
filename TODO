@@ -1,16 +1,22 @@
+Tomorrow:
+
+  - decide whether new classical natural method is possible
+  - balanced trees
+  - some tuning
+  - revisit challenges
+  - early sporadics methods?
+  - generic sporadics hint
+  - verification/presentations
+
 Local TODO list:
 
   - Look at Product Replacers again (--> orb): no need for accus during mixing
-  - Look at random sources in recog?
   - Use RECOG.RandomSubProduct everywhere
   - Look at all PseudoRandoms (still TODO)
   - Move D247 before FindEvenNormal to speed up things
-  - early sporadics methods?
-  - detect classical natural early on
   - implement classical natural for odd case (--> LG OB)
   - genss: Make call to StabilizerChain which is guaranteed to be quick
     possible
-  - generic sporadics hint
   - more reps for specific hint (-> covers and non-atlasrep reps)
   - think about BrauerCharacterValue method
   - general tuning
@@ -20,7 +26,7 @@ Local TODO list:
   - balanced trees?
   - a_n in deleted perm rep
   - adjoint rep of sl_n
-  - verification/presentations
+  - nonconstructive Lie type
 
 Before release:
 
@@ -30,6 +36,7 @@ Before release:
 
 Do soonish:
 
+  - Look at random sources in recog?
 Investigate bug in DisplayCompositionFactors for ex9 in talk
 Put Eamonn and Gunter as authors
 Investigate MatC6 errors
