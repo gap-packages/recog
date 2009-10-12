@@ -499,7 +499,7 @@ RECOG.DoRowOp_SL := function(m,i,j,lambda,std)
           # from the left.
           if i > 1 then new := Getai(i-1)^-1 * new; fi;
           if j > i+1 then new := Getbj(j-i-1)^-1 * new; fi;
-          new := std.s[k] * new;
+          new := std.s[k]^coeffs[k] * new;
           if j > i+1 then new := Getbj(j-i-1) * new; fi;
           if i > 1 then new := Getai(i-1) * new; fi;
       elif i > j then
@@ -508,7 +508,7 @@ RECOG.DoRowOp_SL := function(m,i,j,lambda,std)
           # from the left.
           if j > 1 then new := Getai(j-1)^-1 * new; fi;
           if i > j+1 then new := Getbj(i-j-1)^-1 * new; fi;
-          new := std.t[k] * new;
+          new := std.t[k]^coeffs[k] * new;
           if i > j+1 then new := Getbj(i-j-1) * new; fi;
           if j > 1 then new := Getai(j-1) * new; fi;
       fi;
@@ -557,7 +557,7 @@ RECOG.DoColOp_SL := function(m,i,j,lambda,std)
           # from the left.
           if i > 1 then new := Getai(i-1)^-1 * new; fi;
           if j > i+1 then new := Getbj(j-i-1)^-1 * new; fi;
-          new := std.s[k] * new;
+          new := std.s[k]^coeffs[k] * new;
           if j > i+1 then new := Getbj(j-i-1) * new; fi;
           if i > 1 then new := Getai(i-1) * new; fi;
       elif i > j then
@@ -566,7 +566,7 @@ RECOG.DoColOp_SL := function(m,i,j,lambda,std)
           # from the left.
           if j > 1 then new := Getai(j-1)^-1 * new; fi;
           if i > j+1 then new := Getbj(i-j-1)^-1 * new; fi;
-          new := std.t[k] * new;
+          new := std.t[k]^coeffs[k] * new;
           if i > j+1 then new := Getbj(i-j-1) * new; fi;
           if j > 1 then new := Getai(j-1) * new; fi;
       fi;
@@ -592,6 +592,11 @@ RECOG.MakeSL_StdGens := function(p,ext,n,d)
   b := IdentityMat(d,f);
   b := b{Concatenation([1,n],[2..n-1],[n+1..d])};
   ConvertToMatrixRep(b,q);
+  if IsEvenInt(n) then
+      a[1] := -a[1];
+  else
+      b[2] := -b[2];
+  fi;
   s := [];
   t := [];
   for i in [0..ext-1] do
@@ -969,6 +974,25 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
   od;
   if InfoLevel(InfoRecog) >= 3 then Print(".\n"); fi;
   return rec( slpstd := SLPOfElms(std.all), bas := bas, basi := basi );
+end;
+
+RECOG.RecogniseSL2NaturalOddCharUsingBSGS := function(g,f)
+  local ext,p,q,res,slp,std;
+  p := Characteristic(f);
+  ext := DegreeOverPrimeField(f);
+  q := Size(f);
+  std := RECOG.MakeSL_StdGens(p,ext,2,2);
+  slp := RECOG.FindStdGensUsingBSGS(g,std.all,false,true);
+  if slp = fail then return fail; fi;
+  res := rec( g := g, one := One(f), One := One(g), f := f, q := q,
+              p := p, ext := ext, d := 2, bas := IdentityMat(2,f),
+              basi := IdentityMat(2,f) );
+  res.all := ResultOfStraightLineProgram(slp,GeneratorsOfGroup(g));
+  res.s := res.all{[1..ext]};
+  res.t := res.all{[ext+1..2*ext]};
+  res.a := res.all[2*ext+1];
+  res.b := res.all[2*ext+2];
+  return res;
 end;
 
   
@@ -1351,7 +1375,7 @@ RECOG.IsThisSL2Natural := function(gens,f)
   return false;
 end;
 
-SLPforElementFuncsProjective.PSL2Even := function(ri,x)
+SLPforElementFuncsProjective.PSL2 := function(ri,x)
   local det,log,slp,y,z;
   ri!.fakegens.count := ri!.fakegens.count + 1;
   if ri!.fakegens.count > 1000 then
@@ -1446,10 +1470,28 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
           ri!.gcd := gcd;
           SetFilterObj(ri,IsLeaf);
           SetSize(ri,(q+1)*(q-1)*q);
-          Setslpforelement(ri,SLPforElementFuncsProjective.PSL2Even);
+          Setslpforelement(ri,SLPforElementFuncsProjective.PSL2);
           return true;
       else   # odd case
-          return FindHomMethodsProjective.StabilizerChain(ri,g);
+          if not(RECOG.IsThisSL2Natural(GeneratorsOfGroup(g),f)) then
+              RECOG.SetPseudoRandomStamp(g,"PseudoRandom");
+              return fail;
+          fi;
+          # OK, this is (P)SL2, lets set up the recognition:
+          Info(InfoRecog,2,"Classical: this is PSL_2!");
+          std := RECOG.RecogniseSL2NaturalOddCharUsingBSGS(gm,f);
+          Setslptonice(ri,SLPOfElms(std.all));
+          ri!.nicebas := std.bas;
+          ri!.nicebasi := std.basi;
+          Setnicegens(ri,List(StripMemory(std.all),x->std.basi*x*std.bas));
+          ri!.fakegens := RECOG.InitSLfake(f,2);
+          ri!.fakegens.count := 0;
+          ri!.comment := "_PSL2Odd";
+          ri!.gcd := gcd;
+          SetFilterObj(ri,IsLeaf);
+          SetSize(ri,(q+1)*(q-1)*q);
+          Setslpforelement(ri,SLPforElementFuncsProjective.PSL2);
+          return true;
       fi;
   else   # bigger than 2:
       classical := RecogniseClassical(g);
