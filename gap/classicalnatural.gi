@@ -23,6 +23,25 @@ RECOG.RelativePrimeToqm1Part := function(q,n)
   return x;
 end;
 
+RECOG.SearchForElByCharPolFacts := function(g,f,degs,limit)
+  local count,degrees,factors,pol,y;
+  count := 0;
+  while true do   # will be left by return
+    if InfoLevel(InfoRecog) >= 3 then Print(".\c"); fi;
+    y:=PseudoRandom(g);
+    pol:=CharacteristicPolynomial(f,f,StripMemory(y),1);
+    factors:=Factors(PolynomialRing(f),pol);
+    degrees:=List(factors,Degree);
+    SortParallel(degrees,factors);
+    if degrees = degs then
+      if InfoLevel(InfoRecog) >= 3 then Print("\n"); fi;
+      return rec( el := y, factors := factors, degrees := degrees );
+    fi;
+    count := count + 1;
+    if count >= limit then return fail; fi;
+  od;
+end;
+  
 RECOG.SL_Even_godownone:=function(g,subspg,q,d)
 local n,y,yy,yyy,ready,order,es,null,subsph,z,x,a,b,c,h,r,divisors,cent,i,
 pol,factors,degrees;
@@ -69,6 +88,153 @@ for i in [1..4] do
     until ready=true;
 od;
 return [Group(cent), subsph];
+end;
+
+RECOG.SL_FindSL2 := function(g,f)
+  local V,a,bas,c,count,ev,gens,genss,genssm,gl4,h,i,j,n,ns,o,pos,pow,
+        pr,q,r,res,sl2gens,slp,std,v,w,y,z;
+  q := Size(f);
+  n := DimensionOfMatrixGroup(g);
+  if q = 2 then
+      # We look for a transvection:
+      while true do   # will be left by break
+          r := RECOG.SearchForElByCharPolFacts(g,f,[1,1,n-2],3*n+20);
+          if r = fail then return fail; fi;
+          y := r.el^(q^(n-2)-1);
+          if not IsOne(y) and IsOne(y^2) then break; fi;
+      od;
+      # Find a good random conjugate:
+      repeat
+          z := y^PseudoRandom(g);
+      until Order(z*y) = 3;
+      gens := [y,z];
+      o := IdentityMat(n,f);
+      w := [];
+      for i in [1..2] do
+          for j in [1..n] do
+              w[i] := o[j]*gens[i]-o[j];
+              if not(IsZero(w[i])) then break; fi;
+          od;
+      od;
+      return [Group(gens),VectorSpace(GF(q),w)];
+  fi;
+  if q = 4 and n = 3 then
+      std := RECOG.MakeSL_StdGens(2,2,2,3);
+      slp := RECOG.FindStdGensUsingBSGS(g,Concatenation(std.s,std.t),
+                                        false,true);
+      h := Group(ResultOfStraightLineProgram(slp,GeneratorsOfGroup(g)));
+      o := IdentityMat(3,f);
+      return [h,VectorSpace(f,o{[1..2]})];
+  fi;
+  if n mod (q-1) <> 0 then   # The generic case:
+      # We look for an element with n-1 dimensional eigenspace:
+      count := 0;
+      while true do    # will be left by break
+          count := count + 1;
+          if count > 20 then return fail; fi;
+          r := RECOG.SearchForElByCharPolFacts(g,f,[1,n-1],3*n+20);
+          if r = fail then return fail; fi;
+          pow := RECOG.RelativePrimeToqm1Part(q,n-1);
+          y := r.el^pow;
+          o := Order(y);
+          if o mod (q-1) = 0 then 
+              y := y^(o/(q-1));
+              break;
+          fi;
+      od;
+      # Now y has order q-1 and and n-1 dimensional eigenspace
+      ev := -Value(r.factors[1],0*Z(q));
+      ns := NullspaceMat(StripMemory(r.el)-ev*StripMemory(One(y)));
+      # this is a 1xn matrix now
+      ns := ns[1];
+      pos := PositionNonZero(ns);
+      ns := (ns[pos]^-1) * ns;
+      count := 0;
+      while true do   # will be left by break
+          count := count + 1;
+          if count > 20 then return fail; fi;
+          a := PseudoRandom(g);
+          v := OnLines(ns,a);
+          z := y^a;
+          if OnLines(v,y) <> v and OnLines(ns,z) <> ns then
+              # Now y and z most probably generate a GL(2,q), we need 
+              # the derived subgroup and then check:
+              c := Comm(y,z);
+              sl2gens := FastNormalClosure([y,z],[c],1);
+              V := VectorSpace(f,[ns,v]);
+              bas := Basis(V,[ns,v]);
+              genss := List(sl2gens,x->List([ns,v],i->Coefficients(bas,i*x)));
+              if RECOG.IsThisSL2Natural(genss,f) then break; fi;
+              if InfoLevel(InfoRecog) >= 3 then Print("$\c"); fi;
+          else
+              if InfoLevel(InfoRecog) >= 3 then Print("-\c"); fi;
+          fi;
+      od;
+      if InfoLevel(InfoRecog) >= 3 then Print("\n"); fi;
+      return [Group(sl2gens),VectorSpace(f,[ns,v])];
+  fi;
+  # Now q-1 does divide n, we have to do something else:
+  # We look for an element with n-2 dimensional eigenspace:
+  while true do    # will be left by break
+      r := RECOG.SearchForElByCharPolFacts(g,f,[1,1,n-2],5*n+20);
+      if r = fail then return fail; fi;
+      pow := RECOG.RelativePrimeToqm1Part(q,n-2);
+      y := r.el^pow;
+      o := Order(y);
+      if o mod (q-1) = 0 then 
+          y := y^(o/(q-1));
+          if RECOG.IsScalarMat(y) = false then break; fi;
+      fi;
+  od;
+  # Now y has order q-1 and n-2 dimensional eigenspace
+  if r.factors[1] <> r.factors[2] then
+      ev := -Value(r.factors[1],0*Z(q));
+      ns := NullspaceMat(StripMemory(r.el)-ev*StripMemory(One(y)));
+      if not(IsMutable(ns)) then ns := MutableCopyMat(ns); fi;
+      # this is a 1xn matrix now
+      ev := -Value(r.factors[2],0*Z(q));
+      Append(ns,NullspaceMat(StripMemory(r.el)-ev*StripMemory(One(y))));
+      # ns now is a 2xn matrix
+  else
+      ev := -Value(r.factors[1],0*Z(q));
+      ns := NullspaceMat((StripMemory(r.el)
+                                     -ev*StripMemory(One(y)))^2);
+      if not(IsMutable(ns)) then ns := MutableCopyMat(ns); fi;
+  fi;
+
+  count := 0;
+  while true do   # will be left by break
+      count := count + 1;
+      if count > 20 then return fail; fi;
+      if Length(ns) > 2 then ns := ns{[1..2]}; fi;
+      a := PseudoRandom(g);
+      Append(ns,ns * a);
+      if RankMat(ns) < 4 then
+          if InfoLevel(InfoRecog) >= 3 then Print("+\c"); fi;
+          continue;
+      fi;
+      z := y^a;
+      # Now y and z most probably generate a GL(4,q), we need 
+      # the derived subgroup and then check:
+      V := VectorSpace(f,ns);
+      bas := Basis(V,ns);
+      genss := List([y,z],x->List(ns,i->Coefficients(bas,i*x)));
+      genssm := GeneratorsWithMemory(genss);
+      gl4 := Group(genssm);
+      pr := ProductReplacer(genssm,rec( maxdepth := 400, scramble := 0,
+                                        scramblefactor := 0 ) );
+      gl4!.pseudorandomfunc := [rec(func := Next,args := [pr])];
+      res := RECOG.SL_FindSL2(gl4,f);
+      if res = fail then 
+          if InfoLevel(InfoRecog) >= 3 then Print("#\c"); fi;
+          continue;
+      fi;
+      slp := SLPOfElms(GeneratorsOfGroup(res[1]));
+      sl2gens := ResultOfStraightLineProgram(slp,[y,z]);
+      ns := BasisVectors(Basis(res[2])) * ns;
+      return [Group(sl2gens),VectorSpace(f,ns)];
+  od;
+  return fail;
 end;
 
 
@@ -491,7 +657,10 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
 
   # First find an SL2 with the space it acts on:
   Info(InfoRecog,2,"Finding an SL2...");
-  data := RECOG.SL_Even_constructdata(sld,q);
+  #data := RECOG.SL_Even_constructdata(sld,q);
+  repeat
+      data := RECOG.SL_FindSL2(sld,f);
+  until data <> fail;
   bas := ShallowCopy(BasisVectors(Basis(data[2])));
   sl2 := data[1];
   slptosl2 := SLPOfElms(GeneratorsOfGroup(sl2));
@@ -501,24 +670,14 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
   V := VectorSpace(f,bas);
   b := Basis(V,bas);
   sl2genss := List(sl2gens,x->List(BasisVectors(b),v->Coefficients(b,v*x)));
-  if q = 4 and Length(bas) = 3 then   # the exceptional result!
-      Info(InfoRecog,2,
-           "Recognising SL(3,4) constructively in 3 dimensions...");
-      st := RECOG.MakeSL_StdGens(2,2,3,3);
-      slpsl2std := RECOG.FindStdGensUsingBSGS(Group(sl2genss),
-                Concatenation(st.s,st.t,[st.a],[st.b]),false,true);
-      # We need the actual transvections:
-      slp := RestrictOutputsOfSLP(slpsl2std,[1,5]);
-  else
-      Info(InfoRecog,2,
-           "Recognising this SL2 constructively in 2 dimensions...");
-      sl2genss := GeneratorsWithMemory(sl2genss);
-      resl2 := RECOG.RecogniseSL2NaturalEvenChar(Group(sl2genss),f,false);
-      slpsl2std := SLPOfElms(resl2.all);
-      bas := resl2.bas * bas;
-      # We need the actual transvections:
-      slp := SLPOfElms([resl2.s[1],resl2.t[1]]);
-  fi;
+  Info(InfoRecog,2,
+       "Recognising this SL2 constructively in 2 dimensions...");
+  sl2genss := GeneratorsWithMemory(sl2genss);
+  resl2 := RECOG.RecogniseSL2NaturalEvenChar(Group(sl2genss),f,false);
+  slpsl2std := SLPOfElms(resl2.all);
+  bas := resl2.bas * bas;
+  # We need the actual transvections:
+  slp := SLPOfElms([resl2.s[1],resl2.t[1]]);
   st := ResultOfStraightLineProgram(slp,StripMemory(GeneratorsOfGroup(sl2)));
   
   # Extend basis by something invariant under SL2:
@@ -526,6 +685,7 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
   nu := NullspaceMat(StripMemory(st[1]+id));
   nu2 := NullspaceMat(StripMemory(st[2]+id));
   Append(bas,SumIntersectionMat(nu,nu2)[2]);
+  ConvertToMatrixRep(bas,q);
   basi := bas^-1;
   basit := TransposedMatMutable(basi);
 
