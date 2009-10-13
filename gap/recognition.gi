@@ -207,6 +207,10 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     return ri;
   end );
     
+RECOG.SetPseudoRandomStamp := function(g,st)
+  g!.pseudorandomfunc[Length(g!.pseudorandomfunc)].args[2] := st;
+end;
+
 InstallMethod( RandomElm, "for a recognition info record, a string and a bool",
   [ IsRecognitionInfo, IsString, IsBool ],
   function(ri, s, mem)
