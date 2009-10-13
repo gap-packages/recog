@@ -668,7 +668,7 @@ RECOG.ExpressInStd_SL := function(m,std)
       # Now mi[i][i] is equal to one
       for j in Concatenation([1..i-1],[i+1..d]) do
           if not(IsZero(mi[j][i])) then
-              RECOG.DoRowOp_SL(mi,j,i,mi[j][i],std);
+              RECOG.DoRowOp_SL(mi,j,i,-mi[j][i],std);
           fi;
       od;
       # Now mi[i][i] is the only non-zero entry in the column
@@ -693,6 +693,12 @@ InstallOtherMethod( InverseSameMutability, "for a funny product object",
     return Objectify(FunnyProductObjsType,[-i*a![1],i]);
   end );
 
+InstallOtherMethod( OneMutable, "for a funny product object",
+  [ IsFunnyProductObject ],
+  function(a)
+    return Objectify(FunnyProductObjsType,[Zero(a![1]),OneMutable(a![2])]);
+  end );
+
 InstallMethod( FunnyProductObj, "for two arbitrary objects",
   [ IsObject, IsObject ],
   function(a,b)
@@ -708,7 +714,7 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
   local V,b,bas,basi,basit,d,data,diffv,diffw,el,ext,fakegens,gens,i,id,
         lambda,mu,n,notinv,nu,nu2,oldyf,oldyy,p,pos,q,resl2,sl2,sl2gens,
         sl2gensf,sl2genss,sl2stdf,slp,slpsl2std,slptosl2,st,std,stdsl2,
-        w,x,xf,y,y2f,y3f,yf,yy,yy2,yy3,yyy,yyy2,yyy3,z,zf,zzz;
+        w,x,xf,y,y2f,y3f,yf,yy,yy2,yy3,yyy,yyy2,yyy3,z,zf,zzz,goodguy;
 
   # Some setup:
   p := Characteristic(f);
@@ -734,10 +740,15 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
   V := VectorSpace(f,bas);
   b := Basis(V,bas);
   sl2genss := List(sl2gens,x->List(BasisVectors(b),v->Coefficients(b,v*x)));
+  for i in sl2genss do ConvertToMatrixRep(i,q); od;
   Info(InfoRecog,2,
        "Recognising this SL2 constructively in 2 dimensions...");
   sl2genss := GeneratorsWithMemory(sl2genss);
-  resl2 := RECOG.RecogniseSL2NaturalEvenChar(Group(sl2genss),f,false);
+  if IsEvenInt(q) then
+      resl2 := RECOG.RecogniseSL2NaturalEvenChar(Group(sl2genss),f,false);
+  else
+      resl2 := RECOG.RecogniseSL2NaturalOddCharUsingBSGS(Group(sl2genss),f);
+  fi;
   slpsl2std := SLPOfElms(resl2.all);
   bas := resl2.bas * bas;
   # We need the actual transvections:
@@ -746,8 +757,8 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
   
   # Extend basis by something invariant under SL2:
   id := IdentityMat(d,f);
-  nu := NullspaceMat(StripMemory(st[1]+id));
-  nu2 := NullspaceMat(StripMemory(st[2]+id));
+  nu := NullspaceMat(StripMemory(st[1]-id));
+  nu2 := NullspaceMat(StripMemory(st[2]-id));
   Append(bas,SumIntersectionMat(nu,nu2)[2]);
   ConvertToMatrixRep(bas,q);
   basi := bas^-1;
@@ -828,11 +839,11 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
       std.right := std.One;
       if IsZero(yy[n-1]) then
           RECOG.DoRowOp_SL(yy,n-1,notinv,std.one,std);
-          RECOG.DoColOp_SL(yy,n-1,notinv,std.one,std);
+          RECOG.DoColOp_SL(yy,n-1,notinv,-std.one,std);
       fi;
       if IsZero(yy[n]) then
           RECOG.DoRowOp_SL(yy,n,notinv,std.one,std);
-          RECOG.DoColOp_SL(yy,n,notinv,std.one,std);
+          RECOG.DoColOp_SL(yy,n,notinv,-std.one,std);
       fi;
       yf := std.left * yf * std.right;
 
@@ -847,7 +858,7 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
           for i in [1..n-1] do
               lambda := -yy[i][n+1]/yy[n][n+1];
               RECOG.DoRowOp_SL(yy,i,n,lambda,std);
-              RECOG.DoColOp_SL(yy,i,n,lambda,std);
+              RECOG.DoColOp_SL(yy,i,n,-lambda,std);
           od;
           yf := std.left * yf * std.right;
           z := yy+One(yy);
@@ -865,9 +876,9 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
               # We want to be careful not to kill row n:
               repeat
                   lambda := PrimitiveRoot(f)^Random(0,q-1);
-              until lambda <> yy2[n][n+1]/yy2[n-1][n+1];
+              until lambda <> -yy2[n][n+1]/yy2[n-1][n+1];
               RECOG.DoRowOp_SL(yy2,n,n-1,lambda,std);
-              RECOG.DoColOp_SL(yy2,n,n-1,lambda,std);
+              RECOG.DoColOp_SL(yy2,n,n-1,-lambda,std);
               mu := lambda;
               y2f := std.left * yf * std.right;
 
@@ -877,21 +888,21 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
               # We want to be careful not to kill row n:
               repeat
                   lambda := PrimitiveRoot(f)^Random(0,q-1);
-              until lambda <> yy3[n][n+1]/yy3[n-1][n+1] and lambda <> mu;
+              until lambda <> -yy3[n][n+1]/yy3[n-1][n+1] and lambda <> mu;
               RECOG.DoRowOp_SL(yy3,n,n-1,lambda,std);
-              RECOG.DoColOp_SL(yy3,n,n-1,lambda,std);
+              RECOG.DoColOp_SL(yy3,n,n-1,-lambda,std);
               y3f := std.left * yf * std.right;
 
               # We now perform conjugations such that the ys leave 
               # bas{[1..n-1]} fixed:
 
-              # (remember that y+One(y) has rank 1 and does not fix bas[notinv])
+              # (remember that y-One(y) has rank 1 and does not fix bas[notinv])
               std.left := std.One;
               std.right := std.One;
               for i in [1..n-1] do
                   lambda := -yy[i][n+1]/yy[n][n+1];
                   RECOG.DoRowOp_SL(yy,i,n,lambda,std);
-                  RECOG.DoColOp_SL(yy,i,n,lambda,std);
+                  RECOG.DoColOp_SL(yy,i,n,-lambda,std);
               od;
               yf := std.left * yf * std.right;
 
@@ -900,7 +911,7 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
               for i in [1..n-1] do
                   lambda := -yy2[i][n+1]/yy2[n][n+1];
                   RECOG.DoRowOp_SL(yy2,i,n,lambda,std);
-                  RECOG.DoColOp_SL(yy2,i,n,lambda,std);
+                  RECOG.DoColOp_SL(yy2,i,n,-lambda,std);
               od;
               y2f := std.left * y2f * std.right;
 
@@ -909,7 +920,7 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
               for i in [1..n-1] do
                   lambda := -yy3[i][n+1]/yy3[n][n+1];
                   RECOG.DoRowOp_SL(yy3,i,n,lambda,std);
-                  RECOG.DoColOp_SL(yy3,i,n,lambda,std);
+                  RECOG.DoColOp_SL(yy3,i,n,-lambda,std);
               od;
               y3f := std.left * y3f * std.right;
 
@@ -925,10 +936,15 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
           # Now perform a constructive recognition in the SL2 in the lower
           # right corner:
           gens := GeneratorsWithMemory(gens);
-          resl2 := RECOG.RecogniseSL2NaturalEvenChar(Group(gens),f,gens[1]);
+          if IsEvenInt(q) then
+              resl2 := RECOG.RecogniseSL2NaturalEvenChar(Group(gens),f,gens[1]);
+          else
+              resl2 := RECOG.RecogniseSL2NaturalOddCharUsingBSGS(Group(gens),f);
+          fi;
           stdsl2 := RECOG.InitSLfake(f,2);
-          slp := RECOG.ExpressInStd_SL2(
-                   resl2.bas*Reversed(IdentityMat(2,f))*resl2.basi,stdsl2);
+          goodguy := Reversed(IdentityMat(2,f));
+          goodguy[1][2] := - goodguy[1][2];
+          slp := RECOG.ExpressInStd_SL2(resl2.bas*goodguy*resl2.basi,stdsl2);
           el := ResultOfStraightLineProgram(slp,resl2.all);
           slp := SLPOfElm(el);
 
@@ -953,13 +969,13 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
       # Now we clean out the last row of z:
       for i in [1..n-1] do
           if not(IsZero(z[n+1][i])) then
-              RECOG.DoColOp_SL(z,n,i,z[n+1][i],std);
+              RECOG.DoColOp_SL(z,n,i,-z[n+1][i],std);
           fi;
       od;
       # Now we clean out the second last row of z:
       for i in [1..n-1] do
           if not(IsZero(z[n][i])) then
-              RECOG.DoRowOp_SL(z,n,i,z[n][i],std);
+              RECOG.DoRowOp_SL(z,n,i,-z[n][i],std);
           fi;
       od;
       zf := std.left * zf * std.right;
@@ -1496,7 +1512,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
   else   # bigger than 2:
       classical := RecogniseClassical(g);
       if classical.IsSLContained = true then
-          if q mod 2 = 0 then
+          if not(q in [3,5]) = 0 then
               Info(InfoRecog,2,"Classical: this is PSL_n!");
               std := RECOG.FindStdGens_SL_EvenChar(gm,f);
               Setslptonice(ri,std.slpstd);
