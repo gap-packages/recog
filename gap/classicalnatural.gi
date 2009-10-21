@@ -1206,6 +1206,26 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   return res;
 end;
 
+RECOG.SL_DoubleDimension := function(sld,slnstd,d,n,f,bas,basi)
+  local c,ext,p,pf,q,x,y;
+  q := Size(f);
+  p := Characteristic(f);
+  ext := DegreeOverPrimeField(f);
+  pf := GF(p);
+
+  # First we need an element of sl_n with 1-dimensional fixed space in
+  # the n-space:
+  if p = 2 or IsOddInt(n) then
+      y := slnstd.a;                 # the n-cycle does the job
+  else
+      y := slnstd.b * slnstd.s[1];   # this does it.
+  fi;
+  x := PseudoRandom(sld);
+  c := y^x;
+
+  # We hope that H := <slnstd> and H^c generate an SL_(2n-1)
+end;
+
 RECOG.GuessSL2ElmOrder := function(x,f)
   local facts,i,j,o,p,q,r,s,y,z;
   p := Characteristic(f);
