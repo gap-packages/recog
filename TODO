@@ -1,5 +1,6 @@
 Today:
 
+  - Get rid of warnings about classical recog
   - Use RECOG.RandomSubProduct everywhere
   - generic sporadics hint
   - Move D247 before FindEvenNormal to speed up things

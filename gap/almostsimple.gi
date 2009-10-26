@@ -2276,6 +2276,177 @@ InstallAlmostSimpleHint( "HS", "LowIndexHint",
        triesforgens := 300,
        subspacedims := [1,21,45,49,55,99], orblenlimit := 100 ) );
 
+# Generic hints:
+InstallAlmostSimpleHint( "J1", "StabChainHint",
+  rec( name := "J1", usemax := [ 1, 2, 3, 4, 5, 6, 7 ],
+       size := 175560,
+  ));
+InstallAlmostSimpleHint( "M11", "StabChainHint",
+  rec( name := "M11", usemax := [ 1, 2, 3, 4, 5 ],
+       size := 7920,
+  ));
+InstallAlmostSimpleHint( "M12", "StabChainHint",
+  rec( name := "M12", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ],
+       size := 95040,
+  ));
+InstallAlmostSimpleHint( "J3", "StabChainHint",
+  rec( name := "J3", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
+       size := 50232960,
+  ));
+InstallAlmostSimpleHint( "M23", "StabChainHint",
+  rec( name := "M23", usemax := [ 1, 2, 3, 4, 5, 6, 7 ],
+       size := 10200960,
+  ));
+InstallAlmostSimpleHint( "M22", "StabChainHint",
+  rec( name := "M22", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8 ],
+       size := 443520,
+  ));
+InstallAlmostSimpleHint( "J2", "StabChainHint",
+  rec( name := "J2", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
+       size := 604800,
+  ));
+InstallAlmostSimpleHint( "He", "StabChainHint",
+  rec( name := "He", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ],
+       size := 4030387200,
+  ));
+InstallAlmostSimpleHint( "Ru", "StabChainHint",
+  rec( name := "Ru", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 
+  14, 15 ],
+       size := 145926144000,
+  ));
+InstallAlmostSimpleHint( "HS", "StabChainHint",
+  rec( name := "HS", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ],
+       size := 44352000,
+  ));
+InstallAlmostSimpleHint( "M24", "StabChainHint",
+  rec( name := "M24", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
+       size := 244823040,
+  ));
+InstallAlmostSimpleHint( "ON", "StabChainHint",
+  rec( name := "ON", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 ],
+       size := 460815505920,
+  ));
+InstallAlmostSimpleHint( "McL", "StabChainHint",
+  rec( name := "McL", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ],
+       size := 898128000,
+  ));
+InstallAlmostSimpleHint( "Co3", "StabChainHint",
+  rec( name := "Co3", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 
+  14 ],
+       size := 495766656000,
+  ));
+InstallAlmostSimpleHint( "Co2", "StabChainHint",
+  rec( name := "Co2", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ],
+       size := 42305421312000,
+  ));
+InstallAlmostSimpleHint( "Suz", "StabChainHint",
+  rec( name := "Suz", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 
+  14, 15, 16, 17 ],
+       size := 448345497600,
+  ));
+InstallAlmostSimpleHint( "Fi22", "StabChainHint",
+  rec( name := "Fi22", usemax := [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14 ],
+       size := 64561751654400,
+  ));
+InstallAlmostSimpleHint( "Co1", "StabChainHint",
+  rec( name := "Co1", usemax := [ 1, 2, 3, 4, 5, 6 ],
+       size := 4157776806543360000,
+  ));
+InstallAlmostSimpleHint( "Fi23", "StabChainHint",
+  rec( name := "Fi23", usemax := [ 1, 2, 3, 4, 5, 6, 9, 10, 13, 14 ],
+       size := 4089470473293004800,
+  ));
+InstallAlmostSimpleHint( "M12.2", "StabChainHint",
+  rec( name := "M12.2", usemax := [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+       size := 190080,
+  ));
+InstallAlmostSimpleHint( "M22.2", "StabChainHint",
+  rec( name := "M22.2", usemax := [ 1, 2, 3, 4, 5, 6, 7 ],
+       size := 887040,
+  ));
+InstallAlmostSimpleHint( "HS.2", "StabChainHint",
+  rec( name := "HS.2", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ],
+       size := 88704000,
+  ));
+InstallAlmostSimpleHint( "J2.2", "StabChainHint",
+  rec( name := "J2.2", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ],
+       size := 1209600,
+  ));
+InstallAlmostSimpleHint( "McL.2", "StabChainHint",
+  rec( name := "McL.2", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ],
+       size := 1796256000,
+  ));
+InstallAlmostSimpleHint( "Suz.2", "StabChainHint",
+  rec( name := "Suz.2", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 
+  13, 14, 15, 16 ],
+       size := 896690995200,
+  ));
+InstallAlmostSimpleHint( "He.2", "StabChainHint",
+  rec( name := "He.2", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ],
+       size := 8060774400,
+  ));
+InstallAlmostSimpleHint( "Fi22.2", "StabChainHint",
+  rec( name := "Fi22.2", usemax := [ 1, 2, 13 ],
+       size := 129123503308800,
+  ));
+InstallAlmostSimpleHint( "ON.2", "StabChainHint",
+  rec( name := "ON.2", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ],
+       size := 921631011840,
+  ));
+InstallAlmostSimpleHint( "J3.2", "StabChainHint",
+  rec( name := "J3.2", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ],
+       size := 100465920,
+  ));
+InstallAlmostSimpleHint( "2F4(2)'", "StabChainHint",
+  rec( name := "2F4(2)'", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8 ],
+       size := 17971200,
+  ));
+InstallAlmostSimpleHint( "2F4(2)'.2", "StabChainHint",
+  rec( name := "2F4(2)'.2", usemax := [ 1 ],  # not more avaiable as of now!
+       size := 35942400,
+  ));
+# No hints there for Fi24' since we do not have the maximal subgroups!
+InstallAlmostSimpleHint( "Fi24'.2", "StabChainHint",
+  rec( name := "Fi24'.2", usemax := [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 
+  13, 14, 15, 16, 17, 18, 19, 20, 21 ],
+       size := 2510411418381323442585600,
+  ));
+InstallAlmostSimpleHint( "HN", "StabChainHint",
+  rec( name := "HN", usemax := [ 1,2,3,4,5,6,7,10,11,12,14 ],
+       size := 273030912000000,
+  ));
+InstallAlmostSimpleHint( "HN.2", "StabChainHint",
+  rec( name := "HN", usemax := [ 1..13 ],
+       size := 546061824000000,
+  ));
+InstallAlmostSimpleHint( "J4", "StabChainHint",
+  rec( name := "J4", usemax := [ 1..13 ],
+       size := 86775571046077562880,
+  ));
+InstallAlmostSimpleHint( "Ly", "StabChainHint",
+  rec( name := "Ly", usemax := [ 1..9 ],
+       size := 51765179004000000,
+  ));
+InstallAlmostSimpleHint( "Th", "StabChainHint",
+  rec( name := "Th", usemax := [ 1..16 ],
+       size := 90745943887872000,
+  ));
+# No hints for B and M since we won't see them!
+
+RECOG.PrintGenericStabChainHint := function ( n )
+    local S,g,gens,nn,toc,tocs;
+    tocs := AGR_TablesOfContents( "all" );
+    nn := AGR_InfoForName( n )[2];
+    toc := tocs[1].(nn);
+    gens := AtlasGenerators( n, 1 ).generators;
+    g := Group( gens );
+    S := StabilizerChain( g );
+    Print( "InstallAlmostSimpleHint( \"", n, "\", \"StabChainHint\",\n" );
+    Print( "  rec( name := \"", n, "\", usemax := " );
+    Print( Set( List( toc.maxes, x->x[2] ) ) );
+    Print( ",\n       size := ", Size( S ), ",\n  ));\n" );
+end;
+
 # dimensions optionally
 # subspacedims there or not
 # elordersstart unbound ==> start with empty generator list
