@@ -189,6 +189,15 @@ RECOG.SL_FindSL2 := function(g,f)
       o := IdentityMat(3,f);
       return [h,VectorSpace(f,o{[1..2]})];
   fi;
+  if q = 5 and n = 4 then
+      std := RECOG.MakeSL_StdGens(5,1,2,4);
+      slp := RECOG.FindStdGensUsingBSGS(g,Concatenation(std.s,std.t),
+                                        false,true);
+      if slp = fail then return fail; fi;
+      h := Group(ResultOfStraightLineProgram(slp,GeneratorsOfGroup(g)));
+      o := IdentityMat(4,f);
+      return [h,VectorSpace(f,o{[1..2]})];
+  fi;
   if n mod (q-1) <> 0 and q <> 3 then   # The generic case:
       # We look for an element with n-1 dimensional eigenspace:
       count := 0;

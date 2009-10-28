@@ -711,8 +711,8 @@ FindHomMethodsProjective.FindEvenNormal := function(ri,G)
   return fail;
 end;
 
-FindHomMethodsProjective.FindElmEvenNormal := function(ri,G)
-  local count,f,m,mm,r,res,rr;
+FindHomMethodsProjective.FindElmOfEvenNormal := function(ri,G)
+  local cf,count,f,m,mm,r,res,rr;
   r := FindElmOfEvenNormalSubgroup(G, 
           rec( Projective := true, SkipTrivAbelian := true ));
   if r.success = fail then return fail; fi;
@@ -723,30 +723,37 @@ FindHomMethodsProjective.FindElmEvenNormal := function(ri,G)
   m := GModuleByMats(r.Ngens,f);
   if not(MTX.IsIrreducible(m)) then
       Info(InfoRecog,2,
-           "FindElmEvenNormal: Found reducible proper normal subgroup!");
+           "FindElmOfEvenNormal: Found reducible proper normal subgroup!");
       return RECOG.SortOutReducibleNormalSubgroup(ri,G,r.Ngens,m);
   else
       Info(InfoRecog,2,
-           "FindElmEvenNormal: Could be irreducible proper normal subgroup!");
-      count := 0;
-      repeat
-          count := count + 1;
-          rr := FindElmOfEvenNormalSubgroup(Group(r.Ngens),
-                       rec( Projective:=true, SkipTrivAbelian := true ));
-          if rr.success = fail then continue; fi;
-          if not IsBound(rr.Nready) or not(rr.Nready) then
-              rr.Ngens := FastNormalClosure(r.Ngens,[rr.el],20);
-          fi;
-          mm := GModuleByMats(rr.Ngens,f);
-          if MTX.IsIrreducible(mm) then 
-              Info(InfoRecog,2,
-               "FindElmEvenNormal: Second normal subgroup was not reducible.");
-              return fail; 
-          fi;
-          res := RECOG.SortOutReducibleSecondNormalSubgroup(ri,G,rr.Ngens,mm);
-          if res = true then return res; fi;
-          r := rr;
-      until count >= 2;
+           "FindElmOfEvenNormal: Could be irreducible proper normal subgroup!");
+      # First find out whether or not the dimension is a proper power:
+      cf := RECOG.IsPower(ri!.dimension);
+      if Length(cf) = 0 then
+          Info(InfoRecog,2,"Dimension no proper power, so this is not D7.");
+      else
+          count := 0;
+          repeat
+              count := count + 1;
+              rr := FindElmOfEvenNormalSubgroup(Group(r.Ngens),
+                           rec( Projective:=true, SkipTrivAbelian := true ));
+              if rr.success = fail then continue; fi;
+              if not IsBound(rr.Nready) or not(rr.Nready) then
+                  rr.Ngens := FastNormalClosure(r.Ngens,[rr.el],20);
+              fi;
+              mm := GModuleByMats(rr.Ngens,f);
+              if MTX.IsIrreducible(mm) then 
+                  Info(InfoRecog,2,
+           "FindElmOfEvenNormal: Second normal subgroup was not reducible.");
+                  return fail; 
+              fi;
+              res := RECOG.SortOutReducibleSecondNormalSubgroup(
+                                      ri,G,rr.Ngens,mm);
+              if res = true then return res; fi;
+              r := rr;
+          until count >= 2;
+      fi;
   fi;
   return fail;
 end;

@@ -118,11 +118,14 @@ InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
     gm!.pseudorandomfunc := [rec( 
        func := function(ri) return RandomElm(ri,"StdGens",true).el; end,
        args := [ri])];
-    stdgens := ResultOfBBoxProgram(finder.program,gm);
+    Info(InfoRecog,2,"Finding standard generators with bbox program...");
+    stdgens := RunBBoxProgram(finder.program,gm,ri!.gensHmem,
+                              rec( orderfunction := RECOG.ProjectiveOrder ) );
     if stdgens = fail or stdgens = "timeout" then
         Info(InfoRecog,2,"Stdgens finder did not succeed for ",hint.name);
         return fail;
     fi;
+    stdgens := stdgens.gens;
     Setslptostd(ri,SLPOfElms(stdgens));
     Setstdgens(ri,StripMemory(stdgens));
     if IsBound(hint.usemax) then
@@ -183,6 +186,7 @@ InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
             Unbind(S!.opt.RandomElmFunc);
             Setslpforelement(ri,SLPforElementFuncsProjective.StabilizerChain);
             SetFilterObj(ri,IsLeaf);
+            ri!.comment := Concatenation("_",hint.name);
             return true;
         od;
     fi;
@@ -359,7 +363,11 @@ RECOG.ProduceTrivialStabChainHint := function(name,reps,maxes)
           SortParallel(values,list);
           bad := First([1..Length(values)],i->values[i][1] = infinity);
           if bad = fail or bad > 3 then
-              range := [1..3];
+              if Length(values) > 3 then
+                  range := [1..3];
+              else
+                  range := [1..Length(values)];
+              fi;
           else
               range := [1..bad-1];
           fi;
@@ -2263,6 +2271,58 @@ InstallAlmostSimpleHint( "J2", "StabChainHint",
        usemax := [ 6, 3, 4 ], 
        size := 604800, atlasrepnrs := [46], 
        values := [ [ 11, 1008 ], [ 12, 315 ], [ 12, 525 ] ]
+  ));
+
+# Hints for Fi23:
+InstallAlmostSimpleHint( "Fi23", "StabChainHint",
+  rec( name := "Fi23", fields := [2], dimensions := [782],
+       usemax := [ 1 ],
+       size := 4089470473293004800, atlasrepnrs := [4],
+  ));
+InstallAlmostSimpleHint( "Fi23", "StabChainHint",
+  rec( name := "Fi23", fields := [2], dimensions := [1494],
+       usemax := [ 1 ],
+       size := 4089470473293004800, atlasrepnrs := [5],
+  ));
+InstallAlmostSimpleHint( "Fi23", "StabChainHint",
+  rec( name := "Fi23", fields := [3], dimensions := [253],
+       usemax := [ 1 ],
+       size := 4089470473293004800, atlasrepnrs := [6],
+  ));
+InstallAlmostSimpleHint( "Fi23", "StabChainHint",
+  rec( name := "Fi23", fields := [3], dimensions := [528],
+       usemax := [ 1 ],
+       size := 4089470473293004800, atlasrepnrs := [7],
+  ));
+InstallAlmostSimpleHint( "Fi23", "StabChainHint",
+  rec( name := "Fi23", fields := [5], dimensions := [782],
+       usemax := [ 1 ],
+       size := 4089470473293004800, atlasrepnrs := [8],
+  ));
+InstallAlmostSimpleHint( "Fi23", "StabChainHint",
+  rec( name := "Fi23", fields := [7], dimensions := [782],
+       usemax := [ 1 ],
+       size := 4089470473293004800, atlasrepnrs := [9],
+  ));
+InstallAlmostSimpleHint( "Fi23", "StabChainHint",
+  rec( name := "Fi23", fields := [11], dimensions := [782],
+       usemax := [ 1 ],
+       size := 4089470473293004800, atlasrepnrs := [10],
+  ));
+InstallAlmostSimpleHint( "Fi23", "StabChainHint",
+  rec( name := "Fi23", fields := [13], dimensions := [782],
+       usemax := [ 1 ],
+       size := 4089470473293004800, atlasrepnrs := [11],
+  ));
+InstallAlmostSimpleHint( "Fi23", "StabChainHint",
+  rec( name := "Fi23", fields := [17], dimensions := [782],
+       usemax := [ 1 ],
+       size := 4089470473293004800, atlasrepnrs := [12],
+  ));
+InstallAlmostSimpleHint( "Fi23", "StabChainHint",
+  rec( name := "Fi23", fields := [23], dimensions := [782],
+       usemax := [ 1 ],
+       size := 4089470473293004800, atlasrepnrs := [13],
   ));
 
 InstallAlmostSimpleHint( "HS", "LowIndexHint",
@@ -6172,7 +6232,8 @@ RECOG.SporadicsKillers :=
   [ [ 32 .. 73 ],[ 61 .. 73 ] ],[[ 6,10 ]],[[ 7,12 ]],[[ 9,14 ]],[[ 9,10 ]],
   [[ 15,8,10 ]],[[ 13,12,21 ]],[[ 11,13,10 ]],[[ 25,17,20 ]],
   [[ 21,17 ],[23,24]],   # the latter is to distinguish Fi22.2 and Fi22
-  [[ 35,32,23,26 ]],[[ 18,12,14 ]],[[ 10,13 ]],[[ 7,11 ]],[[ 9,11 ]] ];
+  [[ 35,32,23,26 ],[ 36,37,38,40,41,42,43 ]], # the latter is for Fi23
+  [[ 18,12,14 ]],[[ 10,13 ]],[[ 7,11 ]],[[ 9,11 ]] ];
 RECOG.SporadicsWorkers := [];
 RECOG.SporadicsWorkers[2] := SporadicsWorkerGenSift;   # M11
 RECOG.SporadicsWorkers[3] := SporadicsWorkerGenSift;   # M12

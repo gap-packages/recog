@@ -293,7 +293,7 @@ RECOG.SortOutReducibleSecondNormalSubgroup :=
     if Length(collf) = 1 then
         subdim := MTX.Dimension(collf[1][1]);
         dim := MTX.Dimension(mm);
-        mult := First([1..20],i->subdim^i = dim);
+        mult := First([2..20],i->subdim^i = dim);
         if mult <> fail then
             orb := RECOG.DirectFactorsFinder(GeneratorsOfGroup(G),
                                              nngens,mult,ri!.isequal);

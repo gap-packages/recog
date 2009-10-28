@@ -323,7 +323,7 @@ InstallGlobalFunction( IsPpdElementD2, function( F, m, e, p, a )
 
 
     # get rid of the non-ppd part
-    g := PowerMod( Indeterminate(F), pm.Psi, c );
+    g := PowerMod( Indeterminate(F), pm.noppds, c );
 
     # if it is one there is no ppd involved
     if IsOne(g)  then
@@ -451,11 +451,11 @@ end;
           v2 * phi * v3 = 0*v1[1] or
           v4 * phi * v3 <> 0 * v1[1] do
         v3 := FindVec();
-    Info( InfoClassical, 1, ".");
+    Info( InfoClassical, 2, ".");
     od;
     v3 := v3/(v2*phi*v3);
 
-    Info( InfoClassical, 1, "found all");
+    Info( InfoClassical, 2, "found all");
     return [v1, v2, v3, v4];
 
 end;
@@ -1698,7 +1698,7 @@ RECOG.NonGenericSymplectic := function(recognise, grp)
         if not 4 in recognise.LB then return fail; fi;
     else
         Info(InfoClassical,2,
-             "NonGenericSymplectic: d and q must have been be generic");
+             "NonGenericSymplectic: d and q must have been generic");
         return false;
     fi;
 
@@ -2433,7 +2433,7 @@ AddMethod( ClassicalMethDb, RECOG.IsSOContained, 19, "IsSOContained",
 
 InstallGlobalFunction( RecogniseClassical,
 function( arg )
-  local ret, recognise, grp, case, nrrandels, i, f, q;
+  local ret, recognise, grp, case, nrrandels, i, f, q, merkinfolevel;
 
   if Length( arg ) < 1 or Length( arg ) > 3 then
       Error( "Usage: RecogniseClassical( grp [,nrrandels][,case] )" );
@@ -2508,7 +2508,10 @@ function( arg )
                    IsSUContained := "unknown",
                    IsSOContained := "unknown",
                   );
+  merkinfolevel := InfoLevel(InfoMethSel);
+  SetInfoLevel(InfoMethSel,0);
   ret := CallMethods( ClassicalMethDb, nrrandels, recognise, grp );
+  SetInfoLevel(InfoMethSel,merkinfolevel);
   # fail: bedeutet, dass entnervt aufgegeben wurde
   # true: bedeutet, dass eine Methode "erfolgreich" war
   

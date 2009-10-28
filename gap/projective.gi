@@ -252,29 +252,23 @@ AddMethod( FindHomDbProjective, FindHomMethodsProjective.C3C5,
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.C6,
    850, "C6",
         "find either an (imprimitive) action or a symplectic one" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.FindElmEvenNormal,
-   840, "FindElmEvenNormal",
-        "find D2, D4 or D7 by finding an element of an even normal subgroup" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.FindEvenNormal,
-   825, "FindEvenNormal",
-        "find D2, D4 or D7 by finding reducible normal subgroup" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.D247,
-   800, "D247",
+   840, "D247",
         "play games to find a normal subgroup" );
+# We can do the following early on since it will quickly fail for
+# non-sporadic groups:
+AddMethod( FindHomDbProjective, FindHomMethodsProjective.SporadicsByOrders,
+   820, "SporadicsByOrders",
+        "generate a few random elements and compute the proj. orders" );
+AddMethod( FindHomDbProjective, FindHomMethodsProjective.FindElmOfEvenNormal,
+   800, "FindElmOfEvenNormal",
+        "find D2, D4 or D7 by finding an element of an even normal subgroup" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.TensorDecomposable,
    700, "Tensor",
         "find a tensor decomposition" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.LowIndex,
    600, "LowIndex",
         "find an (imprimitive) action on subspaces" );
-# By now we suspect it to be an almost simple group
-# Disabled because it has a bug and is not fast enough:
-#AddMethod( FindHomDbProjective, FindHomMethodsProjective.AlternatingBBByOrders,
-#   580, "AlternatingBBByOrders",
-#        "generate a few random elements and compute the proj. orders" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.SporadicsByOrders,
-   590, "SporadicsByOrders",
-        "generate a few random elements and compute the proj. orders" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.AltSymBBByDegree,
    580, "AltSymBBByDegree",
         "try BB recognition for dim+1 and/or dim+2 if sensible" );
@@ -287,6 +281,15 @@ AddMethod( FindHomDbProjective, FindHomMethodsProjective.ThreeLargeElOrders,
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.StabilizerChain,
    100, "StabilizerChain",
         "last resort: compute a stabilizer chain (projectively)" );
+
+# Old methods which are no longer used:
+
+#AddMethod( FindHomDbProjective, FindHomMethodsProjective.FindEvenNormal,
+#   825, "FindEvenNormal",
+#        "find D2, D4 or D7 by finding reducible normal subgroup" );
+#AddMethod( FindHomDbProjective, FindHomMethodsProjective.AlternatingBBByOrders,
+#   580, "AlternatingBBByOrders",
+#        "generate a few random elements and compute the proj. orders" );
 
 ##
 ##  This program is free software: you can redistribute it and/or modify
