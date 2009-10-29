@@ -2493,6 +2493,11 @@ InstallAlmostSimpleHint( "Th", "StabChainHint",
   ));
 # No hints for B and M since we won't see them!
 
+# This is for the released AtlasRep package:
+if not(IsBound(AGR_TablesOfContents)) then
+    AGR_TablesOfContents := fail;
+    AGR_InfoForName := fail;
+fi;
 RECOG.PrintGenericStabChainHint := function ( n )
     local S,g,gens,nn,toc,tocs;
     tocs := AGR_TablesOfContents( "all" );

@@ -1,5 +1,6 @@
 Today:
 
+  - SL(6,5) and SL(4,9) do not work (FindSL2)
   - Systematic test of classical natural
   - Tensor und Subfield tests fail because SL(4,5) does not find an SL2
   - Use RECOG.RandomSubProduct everywhere
