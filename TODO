@@ -1,5 +1,6 @@
 Today:
 
+  - More todo.
   - SL(6,5) and SL(4,9) do not work (FindSL2)
   - Bug with loading of single packages
   - Systematic test of classical natural
