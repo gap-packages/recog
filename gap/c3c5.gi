@@ -118,6 +118,8 @@ end;
 FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
   local H,f,hom,m,r;
 
+  RECOG.SetPseudoRandomStamp(G,"NotAbsolutelyIrred");
+
   if IsBound(ri!.isabsolutelyirred) and ri!.isabsolutelyirred then
       # this information is coming from above
       return false;
@@ -355,6 +357,7 @@ FindHomMethodsProjective.Subfield :=
     # We assume G to be absolutely irreducible, although this is not 
     # necessary:
     local Gprime,H,b,dim,f,hom,mo,newgens,pf,r;
+    RECOG.SetPseudoRandomStamp(G,"Subfield");
     f := ri!.field;
     if IsPrimeField(f) then
         return false;     # nothing to do
@@ -532,6 +535,8 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
   local H,HH,Hgens,a,b,basis,c,cc,cgen,collf,coms,conjgensG,cyc,deg,dim,
         f,g,gens,gensim,hom,homcomp,homs,homsimg,i,j,kro,m,newgens,nr,o,
         pf,pos,pr,pr2,q,r,scalar,subdim,x,poss;
+
+  RECOG.SetPseudoRandomStamp(G,"C3C5");
 
   f := ri!.field;
   if not(IsBound(ri!.meataxemodule)) then

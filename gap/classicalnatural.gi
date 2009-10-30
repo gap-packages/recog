@@ -1462,6 +1462,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
   f := ri!.field;
   q := Size(f);
   p := Characteristic(f);
+  RECOG.SetPseudoRandomStamp(g,"ClassicalNatural");
 
   # First get rid of nasty determinants:
   gens := ShallowCopy(GeneratorsOfGroup(g));
@@ -1488,7 +1489,6 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
                                       return RandomElm(ri,name,bool).el;
                                     end,
                             args := [ri,"ClassicalNatural",true])];
-      RECOG.SetPseudoRandomStamp(g,"ClassicalNatural");
   fi;
 
   if d = 2 then
@@ -1499,7 +1499,6 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
       # the determinant to be 1) contains SL_2.
       if IsEvenInt(q) then
           if not(RECOG.IsThisSL2Natural(GeneratorsOfGroup(g),f)) then
-              RECOG.SetPseudoRandomStamp(g,"PseudoRandom");
               return fail;
           fi;
           # OK, this is (P)SL2, lets set up the recognition:
@@ -1519,7 +1518,6 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
           return true;
       else   # odd case
           if not(RECOG.IsThisSL2Natural(GeneratorsOfGroup(g),f)) then
-              RECOG.SetPseudoRandomStamp(g,"PseudoRandom");
               return fail;
           fi;
           # OK, this is (P)SL2, lets set up the recognition:

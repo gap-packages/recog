@@ -360,6 +360,8 @@ FindHomMethodsMatrix.ReducibleIso := function(ri,G)
   # First we use the MeatAxe to find an invariant subspace:
   local H,bc,compseries,f,hom,isirred,m,newgens;
 
+  RECOG.SetPseudoRandomStamp(G,"ReducibleIso");
+
   if IsBound(ri!.isabsolutelyirred) and ri!.isabsolutelyirred then
       # this information is coming from above
       return false;

@@ -708,6 +708,9 @@ end;
 
 FindHomMethodsProjective.C6 := function(ri,G)
     local r,re,hom;
+
+    RECOG.SetPseudoRandomSeed(G,"C6");
+
     re := RECOG.New2RecogniseC6(G);
     if re = fail or re = false then return re; fi;
 

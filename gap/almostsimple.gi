@@ -5780,6 +5780,7 @@ FindHomMethodsProjective.ComputeSimpleSocle := function(ri,G)
   # This simply computes the simple socle, stores it and returns false
   # such that it is never called again for this node.
   local x;
+  RECOG.SetPseudoRandomSeed(G,"ComputeSimpleSocle");
   ri!.simplesocle := Group(RECOG.simplesocle(ri,G));
   ri!.simplesoclepr := ProductReplacer(ri!.simplesocle);
   ri!.simplesoclerand := EmptyPlist(100);
@@ -5809,6 +5810,7 @@ end;
 
 FindHomMethodsProjective.ThreeLargeElOrders := function(ri,G)
   local hint,name,namecat,p,res;
+  RECOG.SetPseudoRandomSeed(G,"ThreeLargeElOrders");
   ri!.simplesoclerandp := 0;
   p := RECOG.findchar(ri,ri!.simplesocle,RECOG.RandElFuncSimpleSocle);
   if p = Characteristic(ri!.field) then
@@ -5975,6 +5977,7 @@ end;
 
 FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
   local Gm,RecSnAnEq,RecSnAnIsOne,d,deg,f,fact,o,orders,p,primes,r,totry;
+  RECOG.SetPseudoRandomSeed(G,"AltSymBBByDegree");
   d := ri!.dimension;
   orders := RandomOrdersSeen(ri);
   if Length(orders) = 0 then
@@ -6302,6 +6305,9 @@ end;
 
 FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
   local count,gens,i,j,jj,k,killers,l,limit,o,ordersseen,pp,r,raus,res,x;
+
+  RECOG.SetPseudoRandomSeed(G,"SporadicsByOrders");
+
   l := [1..Length(RECOG.SporadicsNames)];
   pp := 0*l;
   ordersseen := [];
@@ -6312,7 +6318,7 @@ FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
       if i <= Length(gens) then
           r := rec( el := gens[i] );
       else
-          r := RandomElm(ri,"Sporadics",false);
+          r := RandomElm(ri,"SporadicsByOrders",false);
       fi;
       o := RECOG.RuleOutSmallProjOrder(r.el);
       if o = fail then

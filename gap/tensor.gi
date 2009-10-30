@@ -320,6 +320,8 @@ end;
 FindHomMethodsProjective.TensorDecomposable := function(ri,G)
   local H,N,conjgensG,d,f,hom,kro,r;
   
+  RECOG.SetPseudoRandomSeed(G,"TensorDecomposable");
+
   # Here we probably want to do an order test and even a polynomial
   # factorization test... Later!
   # Do we want?

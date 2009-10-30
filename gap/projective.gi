@@ -110,7 +110,7 @@ FindHomMethodsProjective.StabilizerChain := function(ri,G)
   d := ri!.dimension;
   f := ri!.field;
   q := Size(f);
-  fu := function() return RandomElm(ri,"StabChain",true).el; end;
+  fu := function() return RandomElm(ri,"StabilizerChain",true).el; end;
   opt := rec( Projective := true, RandomElmFunc := fu );
   #if q^(d-1) > 100000 then
   #    opt.TryShortOrbit := 5;

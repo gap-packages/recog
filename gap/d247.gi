@@ -325,6 +325,8 @@ FindHomMethodsProjective.D247 := function(ri,G)
   # tricks.
   local CheckNormalClosure,f,i,res,x,ispower;
 
+  RECOG.SetPseudoRandomSeed(G,"D247");
+
   CheckNormalClosure := function(x)
     # This is called with an element that we hope lies in a normal subgroup.
     local H,a,basis,collf,conjgensG,count,dim,hom,homcomp,homs,homsimg,i,

@@ -165,6 +165,7 @@ end;
 
 FindHomMethodsProjective.LowIndex := function(ri,G)
   local res;
+  RECOG.SetPseudoRandomSeed(G,"LowIndex");
   res := RECOG.SmallHomomorphicImageProjectiveGroup(G);
   if res = fail then
       return fail;
