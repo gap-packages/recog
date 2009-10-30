@@ -463,6 +463,8 @@ InstallGlobalFunction( RecogniseGeneric,
     else
         Setfhmethsel(ri,CallMethods( methoddb, 10, ri, H ));
     fi;
+    # Reset the pseudo random stamp:
+    SetPseudoRandomStamp(group(ri),"PseudoRandom");
     if fhmethsel(ri).result = fail then
         SetFilterObj(ri,IsLeaf);
         if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
