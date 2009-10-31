@@ -733,7 +733,11 @@ FindHomMethodsPerm.Giant :=
     if RECOG.IsGiant(grp,mp) = fail then
         return fail;
     fi;
-    grpmem := GroupWithMemory(grp);
+    grpmem := Group(ri!.gensHmem);
+    grpmem!.pseudorandomfunc := [rec(
+       func := function(ri) return RandomElm(ri,"Giant",true).el; end,
+       args := [ri])];
+
     res := RECOG.RecogniseGiant(mp,grpmem,RECOG.GiantEpsilon);
     if res = fail then
         return fail;

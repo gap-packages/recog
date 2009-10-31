@@ -474,6 +474,7 @@ FindHomMethodsPerm.SnkSetswrSr :=
     if not(IsPrimitive(grp)) then
         return false;
     fi;
+    RECOG.SetPseudoRandomStamp(grp,"Jellyfish");
     res := RECOG.AllJellyfish(grp);
     if res = fail or res = false then
         return res;

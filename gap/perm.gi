@@ -166,6 +166,8 @@ FindHomMethodsPerm.Imprimitive :=
         return false;   # never call us again
     fi;
     
+    RECOG.SetPseudoRandomStamp(G,"Imprimitive");
+
     # Now try to work:
     blocks := MaximalBlocks(G,MovedPoints(G));
     if Length(blocks) = 1 then
@@ -293,7 +295,10 @@ end;
 
 FindHomMethodsPerm.StabilizerChain := function(ri,G)
   local Gm,S;
-  Gm := GroupWithMemory(G);
+  Gm := Group(ri!.gensHmem);
+  Gm!.pseudorandomfunc := [rec(
+     func := function(ri) return RandomElm(ri,"StabilizerChain",true).el; end,
+     args := [ri])];
   S := StabilizerChain(Gm);
   SetSize(ri,Size(S));
   SetSize(group(ri),Size(S));
@@ -405,7 +410,10 @@ FindHomMethodsPerm.ThrowAwayFixedPoints :=
 FindHomMethodsPerm.Pcgs :=
   function( ri, G )
     local GM,S,pcgs;
-    GM := GroupWithMemory(G);
+    GM := Group(ri!.gensHmem);
+    GM!.pseudorandomfunc := [rec(
+       func := function(ri) return RandomElm(ri,"PCGS",true).el; end,
+       args := [ri])];
     pcgs := Pcgs(GM);
     if pcgs = fail then
         return false;

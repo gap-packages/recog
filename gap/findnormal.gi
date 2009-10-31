@@ -713,7 +713,7 @@ end;
 
 FindHomMethodsProjective.FindElmOfEvenNormal := function(ri,G)
   local cf,count,f,m,mm,r,res,rr;
-  RECOG.SetPseudoRandomSeed(G,"FindElmOfEvenNormal");
+  RECOG.SetPseudoRandomStamp(G,"FindElmOfEvenNormal");
   r := FindElmOfEvenNormalSubgroup(G, 
           rec( Projective := true, SkipTrivAbelian := true ));
   if r.success = fail then return fail; fi;

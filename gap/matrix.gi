@@ -52,7 +52,6 @@ FindHomMethodsMatrix.DiagonalMatrices := function(ri, G)
       return false;
   fi;
 
-  # FIXME: FieldOfMatrixGroup
   f := ri!.field;
   isscalars := true;
   i := 1;
