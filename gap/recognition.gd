@@ -69,21 +69,21 @@ DeclareAttribute( "isequal", IsRecognitionInfo, "mutable" );
 # Some variables to hold databases of methods and such things:
 #############################################################################
 
-DeclareGlobalVariable( "FindHomMethodsPerm" );
-DeclareGlobalVariable( "SLPforElementFuncsPerm" );
-DeclareGlobalVariable( "FindHomDbPerm" );
+BindGlobal( "FindHomMethodsPerm", rec() );
+BindGlobal( "SLPforElementFuncsPerm", rec() );
+BindGlobal( "FindHomDbPerm", [] );
 
-DeclareGlobalVariable( "FindHomMethodsMatrix" );
-DeclareGlobalVariable( "SLPforElementFuncsMatrix" );
-DeclareGlobalVariable( "FindHomDbMatrix" );
+BindGlobal( "FindHomMethodsMatrix", rec() );
+BindGlobal( "SLPforElementFuncsMatrix", rec() );
+BindGlobal( "FindHomDbMatrix", [] );
 
-DeclareGlobalVariable( "FindHomMethodsProjective" );
-DeclareGlobalVariable( "SLPforElementFuncsProjective" );
-DeclareGlobalVariable( "FindHomDbProjective" );
+BindGlobal( "FindHomMethodsProjective", rec() );
+BindGlobal( "SLPforElementFuncsProjective", rec() );
+BindGlobal( "FindHomDbProjective", [] );
 
-DeclareGlobalVariable( "FindHomMethodsBB" );
-DeclareGlobalVariable( "SLPforElementFuncsBB" );
-DeclareGlobalVariable( "FindHomDbBB" );
+BindGlobal( "FindHomMethodsBB", rec() );
+BindGlobal( "SLPforElementFuncsBB", rec() );
+BindGlobal( "FindHomDbBB", [] );
 
 
 # Our global functions for the main recursion:

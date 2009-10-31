@@ -84,45 +84,6 @@ InstallMethod( ViewObj, "for recognition infos", [IsRecognitionInfo],
     Print(">");
   end);
 
-#############################################################################
-# Some variables to hold databases of methods and such things:
-#############################################################################
-
-# Permutation groups:
-              
-InstallValue( FindHomMethodsPerm, rec() );   
-   # Here we collect FindHomomorphism methods by name
-InstallValue( SLPforElementFuncsPerm, rec() );   
-   # Here we collect SLPforElement functions by name
-InstallValue( FindHomDbPerm, [] );   
-   # and here in a list with records describing them
-
-# Matrix groups:
-
-InstallValue( FindHomMethodsMatrix, rec() );   
-   # Here we collect FindHomomorphism methods by name
-InstallValue( SLPforElementFuncsMatrix, rec() );   
-   # Here we collect SLPforElement functions by name
-InstallValue( FindHomDbMatrix, [] );   
-   # and here in a list with records describing them
-
-# Projective groups:
-
-InstallValue( FindHomMethodsProjective, rec() );   
-   # Here we collect FindHomomorphism methods by name
-InstallValue( SLPforElementFuncsProjective, rec() );   
-   # Here we collect SLPforElement functions by name
-InstallValue( FindHomDbProjective, [] );   
-   # and here in a list with records describing them
-
-# Black box groups:
-
-InstallValue( FindHomMethodsBB, rec() );   
-   # Here we collect FindHomomorphism methods by name
-InstallValue( SLPforElementFuncsBB, rec() );   
-   # Here we collect SLPforElement functions by name
-InstallValue( FindHomDbBB, [] );   
-   # and here in a list with records describing them
 
 #############################################################################
 # The main recursive function:
