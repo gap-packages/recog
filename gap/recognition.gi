@@ -464,7 +464,7 @@ InstallGlobalFunction( RecogniseGeneric,
         Setfhmethsel(ri,CallMethods( methoddb, 10, ri, H ));
     fi;
     # Reset the pseudo random stamp:
-    SetPseudoRandomStamp(group(ri),"PseudoRandom");
+    RECOG.SetPseudoRandomStamp(group(ri),"PseudoRandom");
     if fhmethsel(ri).result = fail then
         SetFilterObj(ri,IsLeaf);
         if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
@@ -607,7 +607,9 @@ InstallGlobalFunction( RecogniseGeneric,
             Info(InfoRecog,2,"Doing immediate verification.");
             i := 1;
             for i in [1..5] do
-                x := RandomElm(ri,"VERIFY",true).el;
+                # We must use different random elements than the kernel
+                # finding routines!
+                x := RandomElm(ri,"KERNELANDVERIFY",true).el;
                 s := SLPforElement(rifac,ImageElm( homom(ri), x!.el ));
                 if s = fail then
                     Error("Very bad: factor was wrongly recognised and we ",
@@ -738,7 +740,7 @@ InstallGlobalFunction( FindKernelRandom,
     l := gensN(ri);
     rifac := factor(ri);
     for i in [1..n] do
-        x := RandomElm(ri,"KERNEL",true).el;
+        x := RandomElm(ri,"KERNELANDVERIFY",true).el;
         s := SLPforElement(rifac,ImageElm( homom(ri), x!.el ));
         if s = fail then
             return false;
