@@ -4,7 +4,6 @@ Today:
     (q^d-1)/(q-1) < 1000
   - SL(n,3) going up does no longer work!
   - SL(6,5) and SL(4,9) do not work (FindSL2)
-  - Bug with loading of single packages
   - Systematic test of classical natural
   - Tensor und Subfield tests fail because SL(4,5) does not find an SL2
   - Use RECOG.RandomSubProduct everywhere
