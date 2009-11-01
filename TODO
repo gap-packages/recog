@@ -1,12 +1,14 @@
 Today:
 
   - nonconstructive Lie type
+  - Akos and me as main authors, new authors
   - decide about names for attributes
   - balanced trees
   - implement sl2 natural
   - create Makefile
   - do not ship contrib
   - do not ship named subdirs in gap
+  - early cheap stabchain method?
   - revisit examples/challenges
   - look at Pete's code (blackbox classical)
   - do something about long StabChain computations in FindElmOfEvenNormal
@@ -18,6 +20,7 @@ Bugs:
   - GL(6,4) and GL(9,4)
   - GL(2,5)
   - Tensor und Subfield tests fail because SL(4,5) does not find an SL2
+    -> work now but only by avoiding ClassicalNatural native methods.
   - DisplayCompositionFactors is seriously broken e.g. in the projective
     case
 

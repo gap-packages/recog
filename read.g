@@ -32,12 +32,12 @@ ReadPackage("recog","gap/shortorbs.gi");
 ReadPackage("recog","gap/forms.gi");
 ReadPackage("recog","gap/classical.gi");
 ReadPackage("recog","gap/slconstr.gi");
-ReadPackage("recog","gap/almostsimple.gi");
 #ReadPackage("recog","gap/derived.gi");
 #ReadPackage("recog","gap/semilinear.gi");
 #ReadPackage("recog","gap/subfield.gi");
 ReadPackage("recog","gap/c3c5.gi");
 ReadPackage("recog","gap/d247.gi");
+ReadPackage("recog","gap/almostsimple.gi");
 ReadPackage("recog","gap/classicalnatural.gi");
 ReadPackage("recog","gap/RecogniseAnSnOnFDPM.gi");
 
