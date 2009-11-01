@@ -7,5 +7,5 @@ repeat r := Random(GF(5)); until not(IsZero(r));
 Add(gens,gens[1]*r);
 g := GroupWithGenerators(gens);
 Print("Testing ProjTrivial:\n");
-RECOG.TestGroup(g,true,1);
+ri := RECOG.TestGroup(g,true,1);
 Print("\n");

@@ -10589,5 +10589,5 @@ gens :=
  ];
 g := Group(gens);
 Print("Testing MatC3_2:\n");
-RECOG.TestGroup(g,false,931392000);
+ri := RECOG.TestGroup(g,false,931392000);
 Print("\n");

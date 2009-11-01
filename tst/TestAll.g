@@ -34,3 +34,5 @@ ReadPackage("recog","tst/ProjDet.g");
 ReadPackage("recog","tst/ProjTensorInduced.g");
 ReadPackage("recog","tst/MatSn.g");
 ReadPackage("recog","tst/MatAn.g");
+ReadPackage("recog","tst/MatFDPM.g");
+# Note that this intentionally does not do the ClassicalNatural tests!

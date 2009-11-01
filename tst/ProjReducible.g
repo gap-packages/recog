@@ -27,5 +27,5 @@ x := PseudoRandom(GL(10,5));
 gens := [m1^x,m2^x];
 g := GroupWithGenerators(gens);
 Print("Testing ProjReducible:\n");
-RECOG.TestGroup(g,true,61035156250000);
+ri := RECOG.TestGroup(g,true,61035156250000);
 Print("\n");

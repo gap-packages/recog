@@ -6,5 +6,5 @@ gens := [[[Z(7)]],[[Z(7)^0]]];
 g := GroupWithGenerators(gens);
 g := WreathProductOfMatrixGroup(g,SymmetricGroup(5));
 Print("Testing ProjLowIndex:\n");
-RECOG.TestGroup(g,true,155520);
+ri := RECOG.TestGroup(g,true,155520);
 Print("\n");

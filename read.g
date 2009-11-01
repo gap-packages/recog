@@ -39,6 +39,7 @@ ReadPackage("recog","gap/almostsimple.gi");
 ReadPackage("recog","gap/c3c5.gi");
 ReadPackage("recog","gap/d247.gi");
 ReadPackage("recog","gap/classicalnatural.gi");
+ReadPackage("recog","gap/RecogniseAnSnOnFDPM.gi");
 
 # All the method installations are now here:
 ReadPackage("recog","gap/perm.gi");

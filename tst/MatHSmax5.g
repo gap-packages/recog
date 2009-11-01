@@ -6,5 +6,5 @@ s := AtlasStraightLineProgram("HS",5).program;
 gens := ResultOfStraightLineProgram(s,gens);
 g := GroupWithGenerators(gens);
 Print("Testing MatReducible:\n");
-RECOG.TestGroup(g,false,40320);
+ri := RECOG.TestGroup(g,false,40320);
 Print("\n");

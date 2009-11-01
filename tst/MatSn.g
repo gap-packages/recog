@@ -9,6 +9,6 @@ gens := cf[2].generators;
 g := Group(gens);
 g := Group(List([1..10],x->PseudoRandom(g)));
 Print("Testing MatSn:\n");
-RECOG.TestGroup(g,false,Factorial(30));
+ri := RECOG.TestGroup(g,false,Factorial(30));
 Print("\n");
 

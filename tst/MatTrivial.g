@@ -3,5 +3,5 @@
 LoadPackage("recog");
 g := GroupWithGenerators([One(GL(7,5))]);
 Print("Testing MatTrivial:\n");
-RECOG.TestGroup(g,false,1);
+ri := RECOG.TestGroup(g,false,1);
 Print("\n");

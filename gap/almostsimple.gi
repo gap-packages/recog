@@ -5975,8 +5975,16 @@ FindHomMethodsProjective.AlternatingBBByOrders := function(ri,G)
   return fail;
 end;
 
+RECOG.HomFDPM := function(data,x)
+  local r;
+  r := RECOG.FindPermutation(data.cob*x*data.cobi,data.fdpm);
+  if r = fail then return fail; fi;
+  return r[2];
+end;
+
 FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
-  local Gm,RecSnAnEq,RecSnAnIsOne,d,deg,f,fact,o,orders,p,primes,r,totry;
+  local GG,Gm,RecSnAnEq,RecSnAnIsOne,d,deg,f,fact,hom,newgens,o,orders,p,primes,
+        r,totry;
   RECOG.SetPseudoRandomStamp(G,"AltSymBBByDegree");
   d := ri!.dimension;
   orders := RandomOrdersSeen(ri);
@@ -5992,6 +6000,27 @@ FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
       fi;
   od;
   f := ri!.field;
+  # We first try the deleted permutation module method:
+  if d >= 6 then
+      Info(InfoRecog,3,"Trying deleted permutation module method...");
+      r := RECOG.RecogniseFDPM(G,f,1/10);
+      if r <> fail and IsRecord(r) then
+          # Now make a homomorphism object:
+          newgens := List(GeneratorsOfGroup(G),
+                          x->RECOG.HomFDPM(r,x));
+          if not(fail in newgens) then
+              GG := GroupWithGenerators(newgens);
+              hom := GroupHomByFuncWithData(G,GG,RECOG.HomFDPM,r);
+
+              Sethomom(ri,hom);
+              Setmethodsforfactor(ri,FindHomDbPerm);
+
+              ri!.comment := "_FDPM";
+              return true;
+          fi;
+      fi;
+      Info(InfoRecog,3,"Deleted permutation module method failed.");
+  fi;
   p := Characteristic(f);
   totry := EmptyPlist(2);
   if (d+1) mod p <> 0 and d+1 > 10 then

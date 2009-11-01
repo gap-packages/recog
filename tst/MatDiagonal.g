@@ -14,5 +14,5 @@ for i in [1..5] do
 od;
 g := GroupWithGenerators(gens);
 Print("Testing MatDiagonal:\n");
-RECOG.TestGroup(g,false,Size(g));
+ri := RECOG.TestGroup(g,false,Size(g));
 Print("\n");

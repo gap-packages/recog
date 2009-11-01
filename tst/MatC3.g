@@ -25,6 +25,6 @@ gens :=
 for i in gens do ConvertToMatrixRep(i,3); od;
 g := Group(gens);
 Print("Testing MatC3:\n");
-RECOG.TestGroup(g,false,21998167367904);
+ri := RECOG.TestGroup(g,false,21998167367904);
 Print("\n");
 

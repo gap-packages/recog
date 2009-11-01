@@ -702,6 +702,7 @@ end;
  
 FindHomMethodsMatrix.GoProjective := function(ri,G)
   local hom,q;
+  Info(InfoRecog,2,"Going projective...");
   hom := IdentityMapping(G);
   Sethomom(ri,hom);
   # Now give hints downward:

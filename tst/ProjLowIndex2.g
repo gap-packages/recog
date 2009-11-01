@@ -5,5 +5,5 @@ ReadPackage("recog","tst/products.g");
 gens := AtlasGenerators("HS",10).generators;
 g := GroupWithGenerators(gens);
 Print("Testing ProjLowIndex2:\n");
-RECOG.TestGroup(g,true,44352000);
+ri := RECOG.TestGroup(g,true,44352000);
 Print("\n");

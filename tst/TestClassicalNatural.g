@@ -1,0 +1,22 @@
+# Classical natural:
+# Usage: ReadPackage("recog","tst/TstClassicalNatural.g");
+LoadPackage("recog");
+for q in [2,3,4,5,7,8,9,11,13,16,17,25,81,256] do
+  for d in Set([2,3,4,5,6,7,8,9,10,q-1,q,q+1]) do
+    if (q > 25 and d >= Maximum(q,10)) or d<=1 then continue; fi;
+
+    h := GL(d,q);
+    gens := List([1..10],x->PseudoRandom(h));
+    g := GroupWithGenerators(gens);
+    Print("Testing GL(",d,",",q,") in its natural representation...\n");
+    ri := RECOG.TestGroup(g,false,Size(h));
+    r := ri;
+    if not(IsLeaf(ri)) then r := factor(ri); fi;
+    stamp := ri!.fhmethsel.successmethod;
+    if stamp="ProjDeterminant" then
+        r := kernel(r);
+        stamp := ri!.fhmethsel.successmethod;
+    fi;
+    Print("Stamp: ",r!.fhmethsel.successmethod,"\n\n");
+  od;
+od;

@@ -19,5 +19,5 @@ m := PermutationMat(p,27,GF(5));
 Add(gens,m);
 k := GroupWithGenerators(gens);
 Print("Testing ProjTensorInduced:\n");
-RECOG.TestGroup(k,true,Size(PGL(3,5))^3*6);
+ri := RECOG.TestGroup(k,true,Size(PGL(3,5))^3*6);
 Print("\n");

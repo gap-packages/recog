@@ -22,3 +22,4 @@ ReadPackage("recog","gap/classical.gd");
 ReadPackage("recog","gap/almostsimple.gd");
 ReadPackage("recog","gap/findnormal.gd");
 ReadPackage("recog","gap/classicalnatural.gd");
+ReadPackage("recog","gap/RecogniseAnSnOnFDPM.gd");
