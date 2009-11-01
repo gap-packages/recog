@@ -927,11 +927,12 @@ RECOG.TestGroup := function(g,proj,size)
           Error("Alarm: Size not correct!\n");
           if count = -1 then return fail; fi;
       else
+          Print("Test was OK!\n");
           count := 3;   # worked!
       fi;
   until count >= 3;
-  View(ri);
-  Print("\n");
+  #View(ri);
+  #Print("\n");
   count := 0;
   l := CalcNiceGens(ri,GeneratorsOfGroup(g));
   repeat
@@ -945,7 +946,7 @@ RECOG.TestGroup := function(g,proj,size)
           if count = -1 then return fail; fi;
       fi;
   until count >= 30;
-  Print("\n");
+  Print("\n30 random elements successfully sifted!\n");
   return ri;
 end;
 
