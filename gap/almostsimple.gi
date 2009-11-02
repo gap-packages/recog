@@ -6032,6 +6032,7 @@ FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
   if (d+2) mod p = 0 and d+2 > 10 then
       Add(totry,d+2);
   fi;
+  return fail;    # do not try any more now
   for deg in totry do
       Info(InfoRecog,3,"Looking for Alt/Sym(",deg,")...");
       RecSnAnIsOne := IsOneProjective;

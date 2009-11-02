@@ -22,17 +22,21 @@ Example 5:
 
 Example 6:
   Problems with matrices over field GF(2^16).
+  --> does not yet work, because no compression for such matrices
 
 Example 7:
   Comes from something in GL(10,3^10). Currently not feasible due to 
   proper matrices.
+  --> does not yet work
 
 Example 8:
   HS in a 21-dimension irreducible rep over GF(25), "augmented" to dimension
   98 by conjugating it around in GL(98,25).
+  --> works perfectly, Size=44352000
 
 Example 9:
   MeatAxe-Problems over GF(61^2) and many generators!
+  --> ???, runs very long
 
 Example 10:
   -
