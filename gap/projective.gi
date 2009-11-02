@@ -141,6 +141,7 @@ FindHomMethodsProjective.ProjDeterminant := function(ri,G)
   z := Z(q);
   detsadd := List(GeneratorsOfGroup(G),x->LogFFE(DeterminantMat(x),z) mod gcd);
   if IsZero(detsadd) then return false; fi;
+  Info(InfoRecog,2,"ProjDeterminant: found non-trivial homomorphism.");
   c := PermList(Concatenation([2..gcd],[1]));
   newgens := List(detsadd,x->c^x);
   H := GroupWithGenerators(newgens);

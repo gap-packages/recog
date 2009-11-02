@@ -1,9 +1,10 @@
 Today:
 
+  - revisit examples/challenges
   - decide about names for attributes
   - balanced trees
-  - revisit examples/challenges
   - do something about long StabChain computations in FindElmOfEvenNormal
+  - Make sure that projective leaf nodes do report "Size" correctly!
 
 Bugs:
 
