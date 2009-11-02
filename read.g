@@ -27,7 +27,6 @@ ReadPackage("recog","gap/findnormal.gi");
 ReadPackage("recog","gap/matimpr.gi");
 ReadPackage("recog","gap/c6.gi");
 ReadPackage("recog","gap/tensor.gi");
-ReadPackage("recog","gap/shortorbs.gi");
 ReadPackage("recog","gap/forms.gi");
 ReadPackage("recog","gap/classical.gi");
 ReadPackage("recog","gap/slconstr.gi");
