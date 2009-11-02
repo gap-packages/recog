@@ -1,19 +1,24 @@
 Example 1:
   SL(55,9) blown up into GL(110,3) 
+  --> works, but evaluation of nice gens is hard
 
 Example 2:
-  L(3,9) with 2*2 or 4 on top, in between conjugated in GF(25) instead GF(5)
+  2.L(3,9).2 in GL(91,5), in between conjugated in GL(91,25)
+  --> works, Alt/Sym(92) takes some time to fail, what can be done?
 
 Example 3:
   Lots of small subspaces, lots of A5s
   Seems to be D2, found by D2D4.
   Size=25865000878872449940580467214609161388032000000000000000000000000000000000000000000000000
+  --> works, takes some time to build tree..., needs lots of memory
 
 Example 4:
-  Contains eventually a classical SL(4,57).
+  Contains eventually a classical SL(57,4).
+  --> works, but evaluation of nice gens is hard
 
 Example 5:
   Contains eventually a classical orthogonal group.
+  --> does not yet work, even fails miserably in FindElmOfEvenNormalSubgroup
 
 Example 6:
   Problems with matrices over field GF(2^16).

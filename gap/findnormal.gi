@@ -347,7 +347,7 @@ RECOG.MYRANDOMSUBPRODUCTPOWERS :=
   # (without undue and unimplemented tricks)!
 
 RECOG.RandomSubproduct := function(a,opt)
-    local dopowers,g,isone,power,prod,rs;
+    local allone,dopowers,g,isone,power,prod,rs;
 
     if IsBound(opt.RandomSource) then
         rs := opt.RandomSource;
@@ -366,22 +366,26 @@ RECOG.RandomSubproduct := function(a,opt)
     fi;
 
     prod := One(a[1]);
+    allone := true;
     repeat
         for g in a do
-            if Random( rs, [ true, false ] )  then
-                if dopowers then
-                    power := Random(rs,RECOG.RANDOMSUBPRODUCTPOWERS);
-                else
-                    power := 1;
-                fi;
+            if not(isone(g)) then
+                allone := false;
                 if Random( rs, [ true, false ] )  then
-                    prod := prod * g^power;
-                else
-                    prod := g^power * prod;
+                    if dopowers then
+                        power := Random(rs,RECOG.RANDOMSUBPRODUCTPOWERS);
+                    else
+                        power := 1;
+                    fi;
+                    if Random( rs, [ true, false ] )  then
+                        prod := prod * g^power;
+                    else
+                        prod := g^power * prod;
+                    fi;
                 fi;
             fi;
         od;
-    until not(isone(prod));
+    until allone or not(isone(prod));
     return prod;
 end;
 

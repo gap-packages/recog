@@ -258,7 +258,9 @@ end,
 ##  in this file. If you are not happy with it, you can provide a string
 ##  here that is used as a banner. GAP decides when the banner is shown and
 ##  when it is not shown. *optional* (note the ~-syntax in this example)
-BannerString := Concatenation( 
+BannerString := Concatenation(
+  "----------------------------------------------------------------------",
+  "-------\n",
   "Loading  recog ", ~.Version, " - methods for constructive recognition\n\n",
   "by ", ~.Persons[1].FirstNames, " ", ~.Persons[1].LastName,
         " (", ~.Persons[1].WWWHome, ") and\n",
@@ -269,7 +271,10 @@ BannerString := Concatenation(
        p->["     ",p.FirstNames," ",p.LastName," (",p.WWWHome,"),\n"]))),
   " and ",~.Persons[Length(~.Persons)].FirstNames," ",
   ~.Persons[Length(~.Persons)].LastName," (",
-  ~.Persons[Length(~.Persons)].WWWHome,").\n\n"),
+  ~.Persons[Length(~.Persons)].WWWHome,").\n",
+  "-----------------------------------------------------------------------",
+  "------\n"
+),
 
 Autoload := false,
 
