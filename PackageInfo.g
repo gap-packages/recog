@@ -34,6 +34,38 @@ ArchiveFormats := ".tar.gz",
 
 Persons := [
   rec( 
+    LastName      := "Neunhoeffer",
+    FirstNames    := "Max",
+    IsAuthor      := true,
+    IsMaintainer  := true,
+    Email         := "neunhoef@mcs.st-and.ac.uk",
+    WWWHome       := "http://www-groups.mcs.st-and.ac.uk/~neunhoef",
+    PostalAddress := Concatenation( [
+                       "School of Mathematics and Statistics\n",
+                       "Mathematical Institute\n",
+                       "North Haugh\n",
+                       "St Andrews, Fife KY16 9SS\n",
+                       "Scotland, UK" ] ),
+    Place         := "St Andrews",
+    Institution   := "University of St Andrews"
+  ),
+  rec( 
+    LastName      := "Seress",
+    FirstNames    := "Akos",
+    IsAuthor      := true,
+    IsMaintainer  := false,
+    Email         := "akos@math.ohio-state.edu",
+    WWWHome       := "http://www.math.ohio-state.edu/~akos/",
+    PostalAddress := Concatenation( [
+                       "Akos Seress\n",
+                       "714 Math Tower\n",
+                       "231 W 18th ave\n",
+                       "Columbus, OH  43210\n",
+                       "USA" ] ),
+    Place         := "Columbus",
+    Institution   := "Ohio-state University at Columbus"
+  ),
+  rec( 
     LastName      := "Brooksbank",
     FirstNames    := "Peter",
     IsAuthor      := true,
@@ -103,22 +135,6 @@ Persons := [
     Institution   := "Universitaet Kaiserslautern",
   ),
   rec( 
-    LastName      := "Neunhoeffer",
-    FirstNames    := "Max",
-    IsAuthor      := true,
-    IsMaintainer  := true,
-    Email         := "neunhoef@mcs.st-and.ac.uk",
-    WWWHome       := "http://www-groups.mcs.st-and.ac.uk/~neunhoef",
-    PostalAddress := Concatenation( [
-                       "School of Mathematics and Statistics\n",
-                       "Mathematical Institute\n",
-                       "North Haugh\n",
-                       "St Andrews, Fife KY16 9SS\n",
-                       "Scotland, UK" ] ),
-    Place         := "St Andrews",
-    Institution   := "University of St Andrews"
-  ),
-  rec( 
     LastName      := "Niemeyer",
     FirstNames    := "Alice",
     IsAuthor      := true,
@@ -160,22 +176,6 @@ Persons := [
                        "Scotland, UK" ] ),
     Place         := "St Andrews",
     Institution   := "University of St Andrews"
-  ),
-  rec( 
-    LastName      := "Seress",
-    FirstNames    := "Akos",
-    IsAuthor      := true,
-    IsMaintainer  := false,
-    Email         := "akos@math.ohio-state.edu",
-    WWWHome       := "http://www.math.ohio-state.edu/~akos/",
-    PostalAddress := Concatenation( [
-                       "Akos Seress\n",
-                       "714 Math Tower\n",
-                       "231 W 18th ave\n",
-                       "Columbus, OH  43210\n",
-                       "USA" ] ),
-    Place         := "Columbus",
-    Institution   := "Ohio-state University at Columbus"
   ),
   
 ],
@@ -251,15 +251,18 @@ end,
 ##  in this file. If you are not happy with it, you can provide a string
 ##  here that is used as a banner. GAP decides when the banner is shown and
 ##  when it is not shown. *optional* (note the ~-syntax in this example)
-#BannerString := Concatenation( 
-#  "----------------------------------------------------------------\n",
-#  "Loading  recog ", ~.Version, "\n",
-#  "by ", ~.Persons[1].FirstNames, " ", ~.Persons[1].LastName,
-#        " (", ~.Persons[1].WWWHome, ")\n",
-#  "   ", ~.Persons[2].FirstNames, " ", ~.Persons[2].LastName,
-#        " (", ~.Persons[2].WWWHome, ")\n",
-#  "For help, type: ?recog package \n",
-#  "----------------------------------------------------------------\n" ),
+BannerString := Concatenation( 
+  "Loading  recog ", ~.Version, " - methods for constructive recognition\n\n",
+  "by ", ~.Persons[1].FirstNames, " ", ~.Persons[1].LastName,
+        " (", ~.Persons[1].WWWHome, ") and\n",
+  "   ", ~.Persons[2].FirstNames, " ", ~.Persons[2].LastName,
+        " (", ~.Persons[2].WWWHome, ")\n",
+  "with contributed code by:\n",
+  Concatenation(Concatenation(List(~.Persons{[3..Length(~.Persons)-1]},
+       p->["     ",p.FirstNames," ",p.LastName," (",p.WWWHome,"),\n"]))),
+  " and ",~.Persons[Length(~.Persons)].FirstNames," ",
+  ~.Persons[Length(~.Persons)].LastName," (",
+  ~.Persons[Length(~.Persons)].WWWHome,").\n\n"),
 
 Autoload := false,
 
