@@ -1,0 +1,10 @@
+g := SL(100,256);
+t := [];                                                      
+for i in [1..10] do
+gm := GroupWithMemory(g);                                 
+pr := ProductReplacer(GeneratorsOfGroup(gm),rec( maxdepth := 500));
+gm!.pseudorandomfunc := [rec(func := Next, args := [pr])];
+tt := Runtime(); r := RECOG.FindStdGens_SL_EvenChar(gm,FieldOfMatrixGroup(g));
+Add(t,Runtime()-tt); Print(t,"\n");
+od;
+
