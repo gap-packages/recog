@@ -39,17 +39,21 @@ Example 9:
   --> ???, runs very long
 
 Example 10:
-  -
+  Seems to be O+8(5) in a 160-dim irreducible rep in defining
+  characteristic.
+  --> does not work yet
 
 Example 11:
   Done, Size=2234313234074738601500687771369472
   ganz unten 2, L(2,37)'s, oben drauf eine PSL(2,7)
   This seems to be tensor induced D7!
   Seems to be (SL(2,37)^\otimes 7).L(3,2)   (on 7 points)
+  --> works, involution jumper takes it apart
 
 Example 12:
-  2^(1+17).U(2,8).3.2 
+  2^(1+17).U(8,2).3.2 
   with size: 396361728
+  --> works?
 
 Challenge 1:
   60.M22  over GF(11^2) in dimension 24 but not subfield!
