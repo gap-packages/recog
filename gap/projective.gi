@@ -278,6 +278,9 @@ AddMethod( FindHomDbProjective, FindHomMethodsProjective.ComputeSimpleSocle,
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.ThreeLargeElOrders,
    500, "ThreeLargeElOrders",
         "look at three large element orders" );
+AddMethod( FindHomDbProjective, FindHomMethodsProjective.LieTypeNonConstr,
+   400, "LieTypeNonConstr",
+        "do non-constructive recognition of Lie type groups" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.StabilizerChain,
    100, "StabilizerChain",
         "last resort: compute a stabilizer chain (projectively)" );

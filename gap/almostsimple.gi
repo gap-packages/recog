@@ -5790,6 +5790,8 @@ FindHomMethodsProjective.ComputeSimpleSocle := function(ri,G)
       Add(ri!.simplesoclerando,ProjectiveOrder(x)[1]);
   od;
   ri!.simplesoclerandp := 0;
+  ri!.simplesocle!.pseudorandomfunc := 
+       [rec( func := Next, args := [ri!.simplesoclepr] )];
   return false;
 end;
 
@@ -5834,7 +5836,8 @@ FindHomMethodsProjective.ThreeLargeElOrders := function(ri,G)
           fi;
       else
           if Length(name) = 3 then
-              namecat := Concatenation(name[1],String(name[2]),
+              namecat := Concatenation(UppercaseString(name[1]),
+                                       String(name[2]),
                                        "(",String(name[3]),")");
           else
               namecat := name[1];
@@ -6611,7 +6614,7 @@ RECOG.VerifyOrders := function (type, n, q, orders)
       orders := Filtered( orders, o-> ii mod o <> 0 );
   od;
   if orders = [] then
-      return Concatenation(type,"_",String(n), "(", String(q), ")");
+      return Concatenation(type,String(n), "(", String(q), ")");
   else
       return  "RO_CONTRADICTION";
   fi;
@@ -6862,7 +6865,7 @@ RECOG.OPlus83vsO73vsSP63 := function (G, orders, SampleSize)
     orders := temp[2];
     prob := prob[1];
     if AbsoluteValue (3/20 - prob) < AbsoluteValue (1/20 - prob) then 
-        return "O^+_8 ( 3 )";
+        return "O^+_8(3)";
     else 
         return RECOG.DistinguishSpO (G, 3, 3, 1, orders);
     fi;
@@ -7021,7 +7024,7 @@ RECOG.LieType := function (G, p, orders, Nmr)
 
    RemoveSet(invar,v2);
    if Length(invar)  = 0 then 
-       return "Unknown"; 
+       return "RO_Unknown"; 
    fi;
    v3 := Maximum (invar);
 
@@ -7238,7 +7241,41 @@ RECOG.LieType := function (G, p, orders, Nmr)
       return RECOG.VerifyOrders ("O^-", 2 * m, p^e, orders);
    fi; 
 
-   return "undecided ";
+   return "RO_undecided";
+end;
+
+FindHomMethodsProjective.LieTypeNonConstr := function(ri,G)
+    local count,dim,f,i,ords,p,q,r,res;
+    RECOG.SetPseudoRandomStamp(G,"LieTypeNonConstr");
+    dim := ri!.dimension;
+    f := ri!.field;
+    q := Size(f);
+    p := Characteristic(f);
+
+    count := 0;
+    ords := Set(ri!.simplesoclerando);
+    while true do   # will be left by return
+        r := RECOG.LieType(ri!.simplesocle,p,ords,30+10*dim);
+        if not(IsString(r)) or r{[1..3]} <> "RO_" then
+            # We found something:
+            Info(InfoRecog,2,"LieTypeNonConstr: found ",r,
+                 ", lookup up hints...");
+            ri!.comment := Concatenation("_",r);
+            res := LookupHintForSimple(ri,G,r);
+            if res = true then return true; fi;
+            Info(InfoRecog,2,"LieTypeNonConstr: giving up.");
+            return fail;
+        fi;
+        count := count + 1;
+        if count > 3 then
+            Info(InfoRecog,2,"LieTypeNonConstr: giving up...");
+            return fail;
+        fi;
+        Info(InfoRecog,2,"LieTypeNonConstr: need more element orders...");
+        for i in [1..dim] do
+            AddSet(ords,RandomElmOrd(ri,"LieTypeNonConstr",false).order);
+        od;
+    od;
 end;
 
 ##
