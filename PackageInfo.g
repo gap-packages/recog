@@ -91,6 +91,13 @@ Persons := [
     Place         := "Aachen",
     Institution   := "Lehrstuhl D fuer Mathematik, RWTH Aachen",
   ),
+  #rec(
+  #  LastName      := "Howe",
+  #  FirstNames    := "Stephen",
+  #  IsAuthor      := true,
+  #  IsMaintainer  := false,
+  #  WWWHome       := "",
+  #),
   rec( 
     LastName      := "Law",
     FirstNames    := "Maska",

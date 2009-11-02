@@ -5,14 +5,12 @@
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
 ##
-##  Copyright 2005-2008 by the authors.
+##  Copyright 2005-2009 by the authors.
 ##  This file is free software, see license information at the end.
 ##
 ##  A collection of find homomorphism methods for black box groups.
 ##
 #############################################################################
-
-DeclareGlobalFunction( "SporadicsWorkerGenSift" );
 
 ##
 ##  This program is free software: you can redistribute it and/or modify

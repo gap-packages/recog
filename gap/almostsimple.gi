@@ -6275,14 +6275,9 @@ RECOG.SporadicsKillers :=
   [[ 35,32,23,26 ],[ 36,37,38,40,41,42,43 ]], # the latter is for Fi23
   [[ 18,12,14 ]],[[ 10,13 ]],[[ 7,11 ]],[[ 9,11 ]] ];
 RECOG.SporadicsWorkers := [];
-RECOG.SporadicsWorkers[2] := SporadicsWorkerGenSift;   # M11
-RECOG.SporadicsWorkers[3] := SporadicsWorkerGenSift;   # M12
-RECOG.SporadicsWorkers[6] := SporadicsWorkerGenSift;   # M22
-RECOG.SporadicsWorkers[7] := SporadicsWorkerGenSift;   # J2
-RECOG.SporadicsWorkers[10] := SporadicsWorkerGenSift;  # HS
-RECOG.SporadicsWorkers[17] := SporadicsWorkerGenSift;  # Ly
-RECOG.SporadicsWorkers[18] := SporadicsWorkerGenSift;  # Co3
-RECOG.SporadicsWorkers[19] := SporadicsWorkerGenSift;  # Co2
+# Removed to avoid dependency on unpublished package gensift:
+#RECOG.SporadicsWorkers[2] := SporadicsWorkerGenSift;   # M11
+# and same for: M12, M22, J2, HS, Ly, Co3, Co2
 
 RECOG.MakeSporadicsInfo := function(name)
   local ct,i,index,killers,o,orders,p,pos,prob,probs,probscopy,sum;

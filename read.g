@@ -20,7 +20,6 @@ ReadPackage("recog","gap/recoggiant.gi");
 ReadPackage("recog","gap/snksetswrsr.gi");
 
 # Up to now there is not much here:
-ReadPackage("recog","gap/blackbox.gi");
 ReadPackage("recog","gap/recogSnAnBB.gi");
 
 # Matrices/Projective:
@@ -45,6 +44,7 @@ ReadPackage("recog","gap/RecogniseAnSnOnFDPM.gi");
 ReadPackage("recog","gap/perm.gi");
 ReadPackage("recog","gap/matrix.gi");
 ReadPackage("recog","gap/projective.gi");
+ReadPackage("recog","gap/blackbox.gi");
 
 ##
 ##  This program is free software: you can redistribute it and/or modify

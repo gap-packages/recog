@@ -335,7 +335,7 @@ FindHomMethodsProjective.D247 := function(ri,G)
     m := GModuleByMats(ngens,f);
     if MTX.IsIrreducible(m) then
         if not(ispower) then 
-            Info(InfoRecog,2,"Dimension is no power!");
+            Info(InfoRecog,4,"Dimension is no power!");
             return fail; 
         fi;
         # we want to look for D7 here, using the same trick again:
