@@ -16,11 +16,11 @@
 ReadPackage("recog","gap/tools.gi");
 
 # Permutations:
-ReadPackage("recog","gap/recoggiant.gi");
+ReadPackage("recog","gap/giant.gi");
 ReadPackage("recog","gap/snksetswrsr.gi");
 
 # Up to now there is not much here:
-ReadPackage("recog","gap/recogSnAnBB.gi");
+ReadPackage("recog","gap/SnAnBB.gi");
 
 # Matrices/Projective:
 ReadPackage("recog","gap/findnormal.gi");
@@ -31,9 +31,6 @@ ReadPackage("recog","gap/shortorbs.gi");
 ReadPackage("recog","gap/forms.gi");
 ReadPackage("recog","gap/classical.gi");
 ReadPackage("recog","gap/slconstr.gi");
-#ReadPackage("recog","gap/derived.gi");
-#ReadPackage("recog","gap/semilinear.gi");
-#ReadPackage("recog","gap/subfield.gi");
 ReadPackage("recog","gap/c3c5.gi");
 ReadPackage("recog","gap/d247.gi");
 ReadPackage("recog","gap/almostsimple.gi");
