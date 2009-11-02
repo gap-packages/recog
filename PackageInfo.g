@@ -89,8 +89,8 @@ PackageDoc := rec(
 
 Dependencies := rec(
   GAP := ">=4.4.12",
-  NeededOtherPackages := [["GAPDoc", ">= 1.2"],["gensift", ">= 0.6"],
-                          ["Orb", ">= 3.2"],["genss", ">= 1.1"]],
+  NeededOtherPackages := [["GAPDoc", ">= 1.2"],
+                          ["Orb", ">= 3.3"],["genss", ">= 1.3"]],
   SuggestedOtherPackages := [["recog", ">= 1.0"]],
   ExternalConditions := []
 ),
