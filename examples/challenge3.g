@@ -3876,5 +3876,5 @@ matrix2 := [
 ];
 challenge3 := Group(matrix1,matrix2);
 Print("Group saved under challenge3\n");
-
+g := challenge3;
 

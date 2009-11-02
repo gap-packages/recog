@@ -666,5 +666,5 @@ matrix2 := [
 ]*Z(17);
 challenge10 := Group(matrix1,matrix2);
 Print("Group saved under challenge10\n");
-
+g := challenge10;
 

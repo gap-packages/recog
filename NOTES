@@ -1,8 +1,3 @@
-Remember a projective method to check whether it is the trivial group!
-Make sure that projective leaf nodes do report "Size" correctly!
-Do more tests before embarking into Tensor?
-
-
 TensorInduced:
 
  - assume: low index already ran

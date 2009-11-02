@@ -3030,3 +3030,4 @@ for TMPMAT in TMPMATS do ConvertToMatrixRep(TMPMAT,5);od;
 example12:=Group(TMPMATS);
 Unbind(TMPMAT);Unbind(TMPMATS);Unbind(TMPELS);
 Print("# Read matrix group \"example12\" over GF(5) in dimension 144.\n");
+g := example12;

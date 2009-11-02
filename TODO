@@ -2,13 +2,7 @@ Today:
 
   - decide about names for attributes
   - balanced trees
-  - implement sl2 natural
-  - create Makefile
-  - do not ship contrib
-  - do not ship named subdirs in gap
-  - early cheap stabchain method?
   - revisit examples/challenges
-  - look at Pete's code (blackbox classical)
   - do something about long StabChain computations in FindElmOfEvenNormal
 
 Bugs:
@@ -21,6 +15,12 @@ Bugs:
     -> work now but only by avoiding ClassicalNatural native methods.
   - DisplayCompositionFactors is seriously broken e.g. in the projective
     case
+
+Later TODO list:
+
+  - implement sl2 natural for odd characteristic
+  - early cheap stabchain method? --> first groundwork in genss
+  - look at Pete's code (blackbox classical)
 
 Local TODO list:
 

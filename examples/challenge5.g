@@ -36,5 +36,5 @@ matrix2 := [
 ]*Z(5);
 challenge5 := Group(matrix1,matrix2);
 Print("Group saved under challenge5\n");
-
+g := challenge5;
 

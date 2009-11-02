@@ -1506,3 +1506,4 @@ for TMPMAT in TMPMATS do ConvertToMatrixRep(TMPMAT,3);od;
 example7:=Group(TMPMATS);
 Unbind(TMPMAT);Unbind(TMPMATS);Unbind(TMPELS);
 Print("# Read matrix group \"example7\" over GF(3) in dimension 100.\n");
+g := example7;
