@@ -1,8 +1,8 @@
 #############################################################################
 ##
-##  classical.gd
+##  ppd.gd
 ##                                recog package
-##                                                           Alice Niemeyer
+##                                                           Frank Celler
 ##
 ##  Copyright 2005-2008 by the authors.
 ##  This file is free software, see license information at the end.
@@ -11,10 +11,9 @@
 ##
 #############################################################################
 
-DeclareInfoClass( "InfoClassical" );
-SetInfoLevel(InfoClassical,1);
 
-DeclareGlobalFunction( "RecogniseClassical" );
+DeclareGlobalFunction( "IsPpdElement" );
+DeclareGlobalFunction( "IsPpdElementD2" );
 
 ##
 ##  This program is free software: you can redistribute it and/or modify
