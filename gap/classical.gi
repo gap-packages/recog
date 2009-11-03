@@ -75,7 +75,7 @@ PPDPartPDM1B := function( d, p )
     Phi := p^d - 1;
     q := 1;
     for i  in [ 1 .. d-1 ]  do
-        q := q * p;
+        q := q * p; # q = p^i
         if d mod i = 0  then
             repeat
                 a := GcdInt( Phi, q-1 );
@@ -404,112 +404,36 @@ end;
 
 ######################################################################
 ##
-#F  FindBase (d, q, phi) . . . . . . . . . . . find appropriate basis
+#F  FindBase (field, phi) . . . . . . . . . . . find appropriate basis
 ##
 ##  The following function returns a matrix B such that B phi B^T has
 ##  the form ( 0, 0, 0, -1), ( 0, 0, 1, 0 ) (0, 1, 0, 0), (-1, 0, 0, 0)
 ##
-FindBase := function( d, q, phi )
+FindBase := function( field, phi )
 
-    local FindVec, V, v1, v2, v3, v4;
+     local form, mat1, mat2, mat;
 
-FindVec := function()
-
-    local v;
-
-    v := Random( V );
-    while v * phi * v <> 0 * v[1]  or v = Zero(V) do
-        v := Random( V );
-    od;
-
-    return v;
-end;
-
-    V := GF(q)^d;
-
-#    if phi = [[ 0,0,0,-1],[ 0,0,1,0],[0,1,0,0],[-1,0,0,0]]*GF(q).one then
-#        return IdentityMat(d, GF(q));
-#    fi;
-    
-    Info( InfoClassical, 2, "finding v1");
-    v1 := FindVec();
-    Info( InfoClassical, 2, "finding v4");
-    v4 := FindVec();
-    while v1 * phi * v4 = 0 * v1[1] do
-        v4 := FindVec();
-    od;
-    v4 := -v4/(v1*phi*v4);
-    Info( InfoClassical, 2, "finding v2");
-    v2 := FindVec();
-    while v1 * phi * v2 <> 0 * v1[1] or 
-          v4 * phi * v2 <> 0 * v1[1] do
-        v2 := FindVec();
-    od;
-    Info( InfoClassical, 2, "finding v3");
-    v3 := FindVec();
-    while v1 * phi * v3 <> 0 * v1[1] or 
-          v2 * phi * v3 = 0*v1[1] or
-          v4 * phi * v3 <> 0 * v1[1] do
-        v3 := FindVec();
-    Info( InfoClassical, 2, ".");
-    od;
-    v3 := v3/(v2*phi*v3);
-
-    Info( InfoClassical, 2, "found all");
-    return [v1, v2, v3, v4];
+     form := BilinearFormByMatrix(
+          [[ 0,0,0,-1],[ 0,0,1,0],[0,1,0,0],[-1,0,0,0]]*One(field), field);
+     mat1 := BaseChangeToCanonical(phi);
+     mat2 := BaseChangeToCanonical(form);
+     mat := mat2 * mat1^-1;
+     return mat;
 
 end;
 
+FindBaseC2 := function( field, qf )
 
+     local form2, mat, mat2;
 
-FindBaseC2 := function( d, q, qf )
-
-    local FindVec, V, v1, v2, v3, v4;
-
-FindVec := function()
-
-    local v;
-
-    v := Random( V );
-    while v * qf * v <> 0 * v[1]  or v = Zero(V) do
-        v := Random( V );
-    od;
-
-    return v;
-end;
-
-    V := GF(q)^d;
-
-#    if phi = [[ 0,0,0,-1],[ 0,0,1,0],[0,1,0,0],[-1,0,0,0]]*GF(q).one then
-#        return IdentityMat(d, GF(q));
-#    fi;
-    
-    Info( InfoClassical, 2, "finding v1");
-    v1 := FindVec();
-    v3 := FindVec();
-    while (v1+v3) * qf * (v1+v3) = 0 * v1[1] do
-        v3 := FindVec();
-    od;
-    v3 := v3/((v1+v3)*qf*(v1+v3));
-    
-    v2 := FindVec();
-    while (v1+v2) * qf * (v1+v2) <> 0 * v1[1] or
-          (v2+v3) * qf * (v2+v3) <> 0 * v1[1] do
-        v2 := FindVec();
-    od;
-    
-    Info( InfoClassical, 2, "finding v4");
-    v4 := FindVec();
-    while (v1+v4) * qf * (v1+v4) <> 0 * v1[1] or
-          (v2+v4) * qf * (v2+v4) = 0 * v1[1] or
-          (v3+v4) * qf * (v3+v4) <> 0 * v1[1] do
-        v4 := FindVec();
-    od;
-    v4 := v4/((v2+v4)*qf*(v2+v4));
-
-    return [v1, v2, v4, v3];
+     form2 := [[0,0,0,-1],[0,0,1,0],[0,0,0,0],[0,0,0,0]]*One(field);
+     mat := BaseChangeToCanonical(qf);
+     mat2 := BaseChangeToCanonical(form2);
+     mat := mat2 * mat^-1;
+     return mat;
 
 end;
+
 
 ###################################
 ### The ppd stuff up there should go in the package
@@ -726,8 +650,8 @@ RECOG.IsNotAlternating := function( recognise, grp )
 #       return false;
 #   fi;
 
-    if Length(recognise.ClassicalForms) > 0 and not "linear" in 
-        recognise.ClassicalForms then 
+    if Length(recognise.ClassicalForms) > 0 and
+        First(recognise.ClassicalForms,IsTrivialForm)=fail then
        recognise.isNotAlternating := true;
        return false;
     fi;
@@ -796,8 +720,8 @@ RECOG.IsNotMathieu := function( recognise, grp )
 #       return false;
 #   fi;
 
-    if Length(recognise.ClassicalForms) > 0 and not "linear" in 
-        recognise.ClassicalForms then 
+    if Length(recognise.ClassicalForms) > 0 and
+        First(recognise.ClassicalForms,IsTrivialForm)=fail then
        recognise.isNotMathieu := true;
        return false;
     fi;
@@ -867,8 +791,8 @@ RECOG.IsNotPSL := function (recognise, grp)
 #        recognise.isNotPSL := true;
 #        return false;
 #    fi;
-    if Length(recognise.ClassicalForms) > 0 and not "linear" in 
-        recognise.ClassicalForms  then 
+    if Length(recognise.ClassicalForms) > 0 and
+        First(recognise.ClassicalForms,IsTrivialForm)=fail then
        recognise.isNotPSL := true;
        return false;
     fi;
@@ -961,7 +885,7 @@ end;
 RECOG.TestRandomElement := function (recognise, grp)
 
     local g, ppd, bppd, d, q, cpol, f, deg, facs, r, s, h, gmod, str,
-    ord, bc, phi, kf, o1, o2;
+    ord, bc, phi, kf, o1, o2, cf, i, found;
 
     recognise.g := PseudoRandom(grp);
     recognise.cpol := CharacteristicPolynomial(recognise.g); 
@@ -1010,6 +934,15 @@ RECOG.TestRandomElement := function (recognise, grp)
     if recognise.needE2 = true then
         ppd := IsPpdElementD2(f, cpol, d, recognise.q, 1); 
         if ppd <> false then 
+            str := "  Found a large and special ppd(";
+            str := Concatenation(str, String(recognise.d));
+            str := Concatenation(str, ", " );
+            str := Concatenation(str, String(recognise.q));
+            str := Concatenation(str, "; " );
+            str := Concatenation(str, String(ppd[1]));
+            str := Concatenation(str,  ")-element");
+
+
             AddSet( recognise.E2, ppd[1] );
             if ppd[2] = true then
         
@@ -1019,28 +952,22 @@ RECOG.TestRandomElement := function (recognise, grp)
             deg := List(facs, EuclideanDegree );
             if Length(deg) = 2 and deg[1] = deg[2] and deg[1] = d/2 then
 
+            ## Bug fix 29.10.09
             ## Now we compute the r-part h of g
-            r := ppd[3];
             s := Order(g);
-            while s mod r = 0 do s := Int (s/r); od;
-            str := "  Found a large and special ppd(";
-            str := Concatenation(str, String(recognise.d));
-            str := Concatenation(str, ", " );
-            str := Concatenation(str, String(recognise.q));
-            str := Concatenation(str, "; " );
-            str := Concatenation(str, String(ppd[1]));
-            str := Concatenation(str,  ")-element");
-	    if s = 1 and Length(facs) = 2 then 
+            s := Gcd(s, ppd[3]);
+            h := g^s;
+            ## now order(h) is the product of all ppds dividing |g|, see
+            ##  Section 6.1 page 250 of [3]
+            if IsOne(h) then return false; fi;
+            gmod := GModuleByMats([h], recognise.field);
+            cf := MTX.CollectedFactors(gmod);
+            if Length(cf) = 2 and cf[1][2] = cf[2][2] then
+                # we have two non-isomorphic composition factors
                 Info(InfoClassical,2, str );
                 AddSet(recognise.LS, ppd[1] );
-            else
-                h := g^s;
-                gmod := GModuleByMats([h], recognise.field);
-	        if Length(MTX.CollectedFactors(gmod ))  = 2 then
-                    Info(InfoClassical,2, str );
-                    AddSet(recognise.LS, ppd[1] );
-                fi;
             fi;
+
             fi;
           fi;
         fi;
@@ -1060,25 +987,31 @@ RECOG.TestRandomElement := function (recognise, grp)
             recognise.needForms := true;
             return NotApplicable;
         fi;
-        if "orthogonalplus" in recognise.ClassicalForms then
-            phi := recognise.InvariantDualForm;
-            if IsOddInt (q) then 
-                Info(InfoClassical, 2,"Performing base change");
-                bc := FindBase (d, q, phi);
-                Info(InfoClassical, 2,"Computed base change matrix");
-                bc := bc^-1;
-                recognise.bc := bc;
-            else 
-                bc := FindBaseC2 (d, q, recognise.QuadraticForm);
-                Info(InfoClassical,2,
+        i := 1;  found := false;
+        while not found and  i <= Length(recognise.ClassicalForms) do
+           phi := recognise.ClassicalForms[i];
+           if IsSesquilinearForm(phi) and IsHyperbolicForm(phi) then
+                found := true;
+                if IsOddInt (q) then 
+                    Info(InfoClassical, 2,"Performing base change");
+                    bc := FindBase (f, phi);
+                    Info(InfoClassical, 2,"Computed base change matrix");
+                    bc := bc^-1;
+                    recognise.bc := bc;
+                else 
+                    bc := FindBaseC2 (f, recognise.QuadraticForm);
+                    Info(InfoClassical,2,
                      "Computed base change matrix for char 2");
-                bc := bc^-1;
-                recognise.bc := bc;
+                    bc := bc^-1;
+                    recognise.bc := bc;
+                fi;
             fi;
-        else
+            i := i + 1;
+        od;
+        if not found then 
             Info(InfoClassical, 2, "need basechange only in O+");
             return fail;
-         fi;
+        fi;
      fi;
 
      if recognise.needKF  = true  then
@@ -1183,15 +1116,21 @@ end;
 
 RECOG.NoClassicalForms := function( recognise, grp )
 
-        PossibleClassicalForms( grp, recognise.g, recognise );
+    local d,field;
+    PossibleClassicalForms( grp, recognise.g, recognise );
 
-        if recognise.maybeDual = false and 
-           recognise.maybeFrobenius = false then  
-            recognise.ClassicalForms := ["linear"];
-            return false;
-        fi;
+    d := recognise.d;
+    field := recognise.field;
+    if recognise.maybeDual = false and 
+      recognise.maybeFrobenius = false then  
+          if First(recognise.ClassicalForms,IsTrivialForm)=fail then
+              Add(recognise.ClassicalForms,
+              BilinearFormByMatrix(NullMat(d,d,field),field));        
+          fi;
+          return false;
+   fi;
 
-        return fail;
+    return fail;
 
 end;
 
@@ -1201,7 +1140,7 @@ RECOG.ClassicalForms := function( recognise, grp)
     local   field,  z,  d,  i,  qq,  A,  c,  I,  t,  i0,  
             a,  l,  g,  module,  forms,  dmodule,  fmodule,  form;
 
-    if recognise.n > 15 then
+    if recognise.n > 1 then
         recognise.needForms := true;
     fi;
 
@@ -1222,49 +1161,65 @@ RECOG.ClassicalForms := function( recognise, grp)
     module := recognise.module;
 
     if recognise.maybeFrobenius  = true then
-        qq := Characteristic(field) ^ (LogInt( Size(field),
-              Characteristic(field))/2 );
+        qq := Characteristic(field)^(DegreeOverPrimeField(field)/2);
+    fi;
+
+    # if all forms are excluded then we are finished 
+    if not recognise.maybeDual and not recognise.maybeFrobenius  then
+        if First(recognise.ClassicalForms,IsTrivialForm)=fail then
+            Add(recognise.ClassicalForms,
+            BilinearFormByMatrix(NullMat(d,d,field), field ) ); 
+        fi;
+        return false;
     fi;
 
     # try to find generators without scalars
-    if recognise.maybeDual = true then
+    if recognise.maybeDual  then
         dmodule := ClassicalForms_GeneratorsWithoutScalarsDual(grp);
         if dmodule = false  then
-            Add( recognise.ClassicalForms,  "unknown"  );
             recognise.maybeDual := false;
         fi;
     fi;
-    if recognise.maybeFrobenius = true then
+    if recognise.maybeFrobenius then
         fmodule := ClassicalForms_GeneratorsWithoutScalarsFrobenius(grp);
         if fmodule = false  then
-            Add( recognise.ClassicalForms,  "unknown" );
+            recognise.maybeFrobenius := false;
+        fi;
+    fi;
+    # now try to find an invariant form
+    if recognise.maybeDual  then
+        form := ClassicalForms_InvariantFormDual(module,dmodule);
+        if form <> false  then
+            Add( recognise.ClassicalForms, 
+            BilinearFormByMatrix(form[2], field));
+            if Length(form)=4 then
+               recognise.QuadraticFormType := form[1];
+               recognise.QuadraticForm := QuadraticFormByMatrix(form[4]);
+            fi;
+        else
+            recognise.maybeDual := false;
+        fi;
+    fi;
+
+    if recognise.maybeFrobenius  then
+        form := ClassicalForms_InvariantFormFrobenius(module,fmodule);
+        if form <> false  then
+            Add( recognise.ClassicalForms,
+                 HermitianFormByMatrix(form[2], field));
+        else
             recognise.maybeFrobenius := false;
         fi;
     fi;
 
-    # now try to find an invariant form
-    if recognise.maybeDual  = true then
-        form := ClassicalForms_InvariantFormDual(module,dmodule);
-        if form <> false  then
-            Add( recognise.ClassicalForms, form[1] );
-            recognise.InvariantDualForm := form[2];
-            if Length(form) = 4 then
-                recognise.QuadraticForm := form[4];
-            fi;
-        else
-            Add( recognise.ClassicalForms, "dual"  );
+
+    # if all forms are excluded then we are finished 
+    if not recognise.maybeDual and not recognise.maybeFrobenius  then
+        if First(recognise.ClassicalForms,IsTrivialForm)=fail then
+            Add(recognise.ClassicalForms,
+            BilinearFormByMatrix(NullMat(d,d,field), field)); 
         fi;
     fi;
 
-    if recognise.maybeFrobenius = true then
-        form := ClassicalForms_InvariantFormFrobenius(module,fmodule);
-        if form <> false  then
-            Add( recognise.ClassicalForms, form[1] );
-            recognise.InvariantFrobeniusForm := form[2];
-        else
-            Add( recognise.ClassicalForms, "frobenius"  );
-        fi;
-    fi;
     return false;
 
 end;
@@ -1324,8 +1279,8 @@ RECOG.IsSLContained := function( recognise, grp )
         recognise.needForms := true;
         return NotApplicable;
     fi;
-        
-    if "linear" in recognise.ClassicalForms then
+
+    if First(recognise.ClassicalForms, IsTrivialForm) <> fail then
         recognise.IsSLContained := true;
         Info(InfoClassical,2,"The group contains SL(", recognise.d, ", ",
              recognise.q, ");");
@@ -1341,6 +1296,14 @@ end;
 
 ## Main function to test whether group contains Sp
 RECOG.IsSpContained := function( recognise, grp )
+
+    local isSpForm;
+
+    isSpForm := function(f)
+        if not IsSesquilinearForm(f) then return false; fi;
+        if IsSymplecticForm(f) then return true; fi;
+        return false;
+    end;
 
     # if the dimension is not even, the group cannot be symplectic
     if recognise.d mod 2 <> 0 then
@@ -1377,7 +1340,11 @@ RECOG.IsSpContained := function( recognise, grp )
         return NotApplicable;
     fi;
         
-    if "symplectic" in recognise.ClassicalForms then
+    # if the group preserves a symplectic form but not a 
+    # form we have found Sp
+    if recognise.QuadraticForm = false and
+        First(recognise.ClassicalForms,isSpForm) <> fail then
+        # symplectic form
         recognise.IsSpContained := true;
         recognise.isNotExt := true;
         Info(InfoClassical,2,"The group contains Sp(", recognise.d, ", ",
@@ -1395,7 +1362,14 @@ end;
 ## Main function to test whether group contains SU
 RECOG.IsSUContained := function( recognise, grp )
 
-    local f;
+    local f, isHermForm;
+
+    isHermForm := function(f)
+        if not IsSesquilinearForm(f) then return false; fi;
+        if IsHermitianForm(f) then return true; fi;
+        return false;
+    end;
+
 
     f := recognise.field;
 
@@ -1436,7 +1410,7 @@ RECOG.IsSUContained := function( recognise, grp )
         return NotApplicable;
     fi;
         
-    if "unitary" in recognise.ClassicalForms then
+    if First(recognise.ClassicalForms,isHermForm)<> fail then
         recognise.IsSUContained := true;
         Info(InfoClassical,2,"The group contains SU(", recognise.d, ", ",
              recognise.q, ");");
@@ -1454,7 +1428,25 @@ end;
 ## Main function to test whether group contains SO
 RECOG.IsSOContained := function( recognise, grp )
 
-    local f;
+    local f, isParForm, isEllForm, isHypForm;
+
+    isParForm := function(f)
+        if not IsSesquilinearForm(f) then return false; fi;
+        if IsParabolicForm(f) then return true; fi;
+        return false;
+    end;
+
+    isEllForm := function(f)
+        if not IsSesquilinearForm(f) then return false; fi;
+        if IsEllipticForm(f) then return true; fi;
+        return false;
+    end;
+
+    isHypForm := function(f)
+        if not IsSesquilinearForm(f) then return false; fi;
+        if IsHyperbolicForm(f) then return true; fi;
+        return false;
+    end;
 
     if recognise.IsSOContained = false then
         return false;
@@ -1489,7 +1481,10 @@ RECOG.IsSOContained := function( recognise, grp )
         return NotApplicable;
     fi;
         
-    if "orthogonalcircle" in recognise.ClassicalForms then
+    if First(recognise.ClassicalForms,isParForm)<> fail or
+        IsQuadraticForm( recognise.QuadraticForm) and
+        recognise.QuadraticFormType = "orthogonalcircle" then
+        #orthogonal circle
         if recognise.d mod 2 = 0 then return false; fi;
         if recognise.currentgcd <> 1 then return fail; fi;
         recognise.isNotExt := true;
@@ -1498,7 +1493,10 @@ RECOG.IsSOContained := function( recognise, grp )
              recognise.q, ");");
         return true;
 
-    elif "orthogonalplus" in recognise.ClassicalForms then
+    elif First(recognise.ClassicalForms,isHypForm) <> fail or
+        IsQuadraticForm( recognise.QuadraticForm) and
+        recognise.QuadraticFormType = "orthogonalplus" then
+        #orthogonal plus
         if recognise.d mod 2 <> 0 then return false; fi;
         if recognise.currentgcd <> 2 then return fail; fi;
         recognise.isNotExt := true;
@@ -1507,7 +1505,10 @@ RECOG.IsSOContained := function( recognise, grp )
              recognise.q, ");");
         return true;
 
-    elif "orthogonalminus" in recognise.ClassicalForms then
+    elif First(recognise.ClassicalForms,isEllForm) <> fail or
+        IsQuadraticForm( recognise.QuadraticForm) and
+        recognise.QuadraticFormType = "orthogonalminus" then
+        # orthogonal minus
         if recognise.d mod 2 <> 0 then return false; fi;
         if recognise.currentgcd <> 2 then return fail; fi;
         recognise.isNotExt := true;
@@ -1575,13 +1576,17 @@ RECOG.NonGenericLinear := function( recognise, grp )
     end;
                  
     if recognise.d > 3 then return false; fi;
+    if recognise.d = 3 and not IsPowerOfPrime(recognise.q+1, 2) then 
+        return false; 
+    fi;
+    # grp is non-generic if either d = 2 or (d,q) = (3, 2^s-1)
 
     if recognise.isReducible = true then
        return false;
     fi;
 
     if Length( recognise.ClassicalForms ) > 0 and 
-       not "linear" in recognise.ClassicalForms then
+       First(recognise.ClassicalForms,IsTrivialForm) = fail then
        return false;
     fi;
 
@@ -1596,7 +1601,7 @@ RECOG.NonGenericLinear := function( recognise, grp )
        and HasElementsMultipleOf(recognise.orders, [4]) then
            return CheckFlag();        
     fi;
-    
+
     return fail;
 end;
 
@@ -1606,7 +1611,14 @@ end;
 ##
 RECOG.NonGenericSymplectic := function(recognise, grp)
 
-    local d, q, CheckFlag;
+    local d, q, CheckFlag, isSpForm;
+
+    isSpForm := function(f)
+        if not IsSesquilinearForm(f) then return false; fi;
+        if IsSymplecticForm(f) then return true; fi;
+        return false;
+    end;
+
 
     CheckFlag := function( )
         if recognise.isReducible = "unknown" then
@@ -1634,7 +1646,8 @@ RECOG.NonGenericSymplectic := function(recognise, grp)
     fi;
 
     if Length( recognise.ClassicalForms ) > 0 and 
-       not "symplectic" in recognise.ClassicalForms then
+       recognise.QuadraticForm = false and 
+       First( recognise.ClassicalForms, isSpForm) = fail then
        return false;
     fi;
 
@@ -1669,7 +1682,7 @@ RECOG.NonGenericSymplectic := function(recognise, grp)
             return fail; 
         fi;
     elif d = 4 and q = 2 then
-        if Size(grp) mod (3*4*5*6) <> 0 then
+        if Size(grp) mod 720 <> 0 then
             Info(InfoClassical,2,"group does not contain Sp(", 
                  recognise.d, ", ", recognise.q, ");");
            recognise.isSpContained := false;
@@ -1712,7 +1725,13 @@ end;
 ##
 RECOG.NonGenericUnitary := function(recognise, grp)
 
-    local d, q, q0, g, f1, f2, o, CheckFlag;
+    local d, q, q0, g, f1, f2, o, CheckFlag, isHermForm;
+
+    isHermForm := function(f)
+        if not IsSesquilinearForm(f) then return false; fi;
+        if IsHermitianForm(f) then return true; fi;
+        return false;
+    end;
 
     CheckFlag := function( )
         if recognise.isReducible = "unknown" then
@@ -1741,7 +1760,7 @@ RECOG.NonGenericUnitary := function(recognise, grp)
     fi;
 
     if Length( recognise.ClassicalForms ) > 0 and 
-       not "unitary" in recognise.ClassicalForms then
+       First( recognise.ClassicalForms, isHermForm )=fail then
        return false;
     fi;
 
@@ -1910,7 +1929,13 @@ end;
 
 RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
 
-    local d, q, gp1, gp2, CheckFlag, pgrp, orbs;
+    local d, q, gp1, gp2, CheckFlag, pgrp, orbs, isHypForm;
+
+    isHypForm := function(f)
+        if not IsSesquilinearForm(f) then return false; fi;
+        if IsHyperbolicForm(f) then return true; fi;
+        return false;
+    end;
 
     CheckFlag := function( )
         if recognise.isReducible = "unknown" then
@@ -1938,8 +1963,10 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
        return false;
     fi;
 
-    if Length( recognise.ClassicalForms ) > 0 and 
-       not "orthogonalplus" in recognise.ClassicalForms then
+    if (Length( recognise.ClassicalForms ) > 0 and 
+       First(recognise.ClassicalForms, isHypForm)=fail) and
+       (not IsQuadraticForm(recognise.QuadraticForm) or not
+       recognise.QuadraticFormType = "orthogonalplus") then
        return false;
     fi;
 
@@ -1958,9 +1985,11 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
             return fail; 
         fi;
     elif d = 8 and q = 2 then
-        if not IsSubset(recognise.orders,[7, 9, 10, 15]) then 
+        if not HasElementsMultipleOf( recognise.orders, [7,9,15]) and
+           not HasElementsMultipleOf( recognise.orders, [7,10,15]) then
             return fail;
         fi;
+
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
         orbs := Orbits( pgrp, MovedPointsPerms( GeneratorsOfGroup(pgrp)));   
 
@@ -2001,7 +2030,10 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
         if not 6 in recognise.LB then return fail; fi;
         if not 4 in recognise.LS then return fail; fi;
     elif d = 6 and q = 2 then
-        if not IsSubset( recognise.orders, [7,15] ) then return fail; fi;
+        if not HasElementsMultipleOf( recognise.orders, [7]) and
+           not HasElementsMultipleOf( recognise.orders, [15]) then
+            return fail; 
+        fi;
     elif d = 6 and q = 3 then
         if not HasElementsMultipleOf( recognise.orders, [5])  then
             return fail; 
@@ -2119,8 +2151,14 @@ end;
 
 RECOG.NonGenericOrthogonalMinus := function(recognise, grp)
 
-    local d, q,  orbs, pgrp, h,  g, ppd,  CheckFlag;
+    local d, q,  orbs, pgrp, h,  g, ppd,  CheckFlag, isEllForm;
 
+
+    isEllForm := function(f)
+        if not IsSesquilinearForm(f) then return false; fi;
+        if IsEllipticForm(f) then return true; fi;
+        return false;
+    end;
 
     CheckFlag := function( )
         if recognise.isReducible = "unknown" then
@@ -2148,8 +2186,10 @@ RECOG.NonGenericOrthogonalMinus := function(recognise, grp)
        return false;
     fi;
 
-    if Length( recognise.ClassicalForms ) > 0 and 
-       not "orthogonalminus" in recognise.ClassicalForms then
+    if (Length(recognise.ClassicalForms) > 0 and 
+       First(recognise.ClassicalForms,isEllForm)=fail) and
+       (not IsQuadraticForm(recognise.QuadraticForm) or not
+       recognise.QuadraticFormType = "orthogonalminus") then
        return false;
     fi;
 
@@ -2178,17 +2218,16 @@ RECOG.NonGenericOrthogonalMinus := function(recognise, grp)
             return fail; 
         fi;
     elif d = 4 and q = 3 then
-        if not HasElementsMultipleOf( recognise.orders, [5])  then
+        if not HasElementsMultipleOf( recognise.orders, [3,5])  then
             return fail; 
         fi;
         pgrp := ProjectiveActionOnFullSpace( grp, GF(3), 4 );       
         orbs := Orbits( pgrp, MovedPointsPerms( GeneratorsOfGroup(pgrp)));
-        if Length(orbs) <>  3 then
+        if Length(orbs) >  3 then # ACN 10/6/08
             recognise.isSOContained := false;
             return false;
          fi;
     elif d = 4 and q >=  4 then
-         # TODO check this in Magma
         ppd := IsPpdElement( recognise.field, recognise.cpol, d, q, 1 );
         if ppd = false or ppd[1] <> 4  or ppd[2] <> true then return fail; fi;
         # found a ppd( 4, q; 4)-element
@@ -2217,8 +2256,13 @@ end;
 RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
 
 
-    local d, q, g, s, CheckFlag;
+    local d, q, g, s, CheckFlag, isParForm;
 
+    isParForm := function(f)
+        if not IsSesquilinearForm(f) then return false; fi;
+        if IsParabolicForm(f) then return true; fi;
+        return false;
+    end;
 
     if not IsOddInt(recognise.d) then return false; fi;
     if not IsOddInt(recognise.q) then return false; fi;
@@ -2245,10 +2289,13 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
        return false;
     fi;
 
-    if Length( recognise.ClassicalForms ) > 0 and 
-       not "orthogonalcircle" in recognise.ClassicalForms then
+    if (Length( recognise.ClassicalForms ) > 0 and 
+       First(recognise.ClassicalForms, isParForm)=fail) and
+       (not IsQuadraticForm(recognise.QuadraticForm) or not
+       recognise.QuadraticFormType = "orthogonalcircle") then
        return false;
     fi;
+
 
     if recognise.n <= 5 then
         return NotApplicable;
@@ -2491,7 +2538,7 @@ function( arg )
                    sq2 := [Z(q)*One(GL(2,q))],
                    scalars := Group(Z(q)*One(GL(2,q))),
                    needMeataxe := false,
-                   needForms := false,
+                   needForms := true, # changed 29.10.09
                    needOrders := false,
                    needPOrders := false,
                    needBaseChange := false,
@@ -2503,6 +2550,8 @@ function( arg )
                    maybeDual := true,
                    maybeFrobenius := (LogInt(Size(f),Characteristic(f)) mod 2=0),
                    ClassicalForms := [],
+                   QuadraticForm := false,
+                   QuadraticFormType := "unknown",
                    IsSLContained := "unknown",
                    IsSpContained := "unknown",
                    IsSUContained := "unknown",
@@ -2522,7 +2571,24 @@ end);
 DisplayRecog := function( r )
 
            Print("Reducible : ", r.isReducible, "\n" );
-           Print("Forms : ", r.ClassicalForms, "\n" );
+           Print("Forms : " );
+           if Length(r.ClassicalForms)<> 1 then
+              Print("Several Forms preserved\n");
+           elif IsTrivialForm( r.ClassicalForms[1] ) then 
+              Print("linear i.e. no forms\n");
+           elif IsQuadraticForm(r.QuadraticForm) then
+              Print("quadratic form of type: ", r.QuadraticFormType, "\n");
+           elif IsSymplecticForm(r.ClassicalForms[1]) then 
+              Print("symplectic\n");
+           elif IsHermitianForm( r.ClassicalForms[1] ) then 
+              Print("unitary\n");
+           elif IsEllipticForm( r.ClassicalForms[1] ) then 
+              Print("orthogonal minus\n");
+           elif IsParabolicForm( r.ClassicalForms[1] ) then 
+              Print("orthogonal circle\n");
+           elif IsHyperbolicForm( r.ClassicalForms[1] ) then 
+              Print("orthogonal plus\n");
+           fi;
            if Length(r.E) > 0 then
                Print("E : ", r.E, "\n" );
            fi;
