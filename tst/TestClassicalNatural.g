@@ -12,11 +12,12 @@ for q in [2,3,4,5,7,8,9,11,13,16,17,25,81,256] do
     ri := RECOG.TestGroup(g,false,Size(h));
     r := ri;
     if not(IsLeaf(ri)) then r := factor(ri); fi;
-    stamp := ri!.fhmethsel.successmethod;
+    stamp := r!.fhmethsel.successmethod;
     if stamp="ProjDeterminant" then
         r := kernel(r);
-        stamp := ri!.fhmethsel.successmethod;
+        stamp := r!.fhmethsel.successmethod;
     fi;
-    Print("Stamp: ",r!.fhmethsel.successmethod,"\n\n");
+    Print("Stamp: ",stamp,"\n\n");
+    Error();
   od;
 od;

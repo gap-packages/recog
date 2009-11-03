@@ -6,6 +6,9 @@ Today:
   - balanced trees
   - do something about long StabChain computations in FindElmOfEvenNormal
   - Make sure that projective leaf nodes do report "Size" correctly!
+  - Investigate PseudoRandom elements
+  - Look at documentation
+  - Finish web pages
 
 Bugs:
 
@@ -13,6 +16,7 @@ Bugs:
   - SL(6,5) and SL(4,9) do not work (FindSL2)
   - GL(6,4) and GL(9,4)
   - GL(2,5)
+  - SL(3,7) FindSL2
   - Tensor und Subfield tests fail because SL(4,5) does not find an SL2
     -> work now but only by avoiding ClassicalNatural native methods.
   - DisplayCompositionFactors is seriously broken e.g. in the projective

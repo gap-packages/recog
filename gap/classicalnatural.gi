@@ -1544,29 +1544,29 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
       if classical.IsSLContained = true then
           # Do not run the generic code in small cases:
           if (q^d-1)/(q-1) <= 1000 then
+              Info(InfoRecog,2,"Classical natural: SL(",d,",",q,"): small ",
+                   "case, handing over to Schreier-Sims.");
               ri!.comment := Concatenation("_SL(",String(d),",",String(q),")",
                                            "_StabilizerChain");
               return FindHomMethodsProjective.StabilizerChain(ri,g);
           fi;
-          if not(q in [3,5]) then
-              Info(InfoRecog,2,"ClassicalNatural: this is PSL_n!");
-              std := RECOG.FindStdGens_SL_EvenChar(gm,f);
-              Setslptonice(ri,std.slpstd);
-              ri!.nicebas := std.bas;
-              ri!.nicebasi := std.basi;
-              ext := DegreeOverPrimeField(f);
-              stdg := RECOG.MakeSL_StdGens(p,ext,d,d);
-              Setnicegens(ri,List(StripMemory(stdg.all),
-                          x->std.basi*x*std.bas));
-              ri!.fakegens := RECOG.InitSLfake(f,d);
-              ri!.fakegens.count := 0;
-              ri!.comment := "_PSLdEven";
-              ri!.gcd := gcd;
-              SetFilterObj(ri,IsLeaf);
-              SetSize(ri,Product([0..d-1],i->(q^d-q^i))/((q-1)*gcd.gcd));
-              Setslpforelement(ri,SLPforElementFuncsProjective.PSLdEven);
-              return true;
-          fi;
+          Info(InfoRecog,2,"ClassicalNatural: this is PSL_n!");
+          std := RECOG.FindStdGens_SL_EvenChar(gm,f);
+          Setslptonice(ri,std.slpstd);
+          ri!.nicebas := std.bas;
+          ri!.nicebasi := std.basi;
+          ext := DegreeOverPrimeField(f);
+          stdg := RECOG.MakeSL_StdGens(p,ext,d,d);
+          Setnicegens(ri,List(StripMemory(stdg.all),
+                      x->std.basi*x*std.bas));
+          ri!.fakegens := RECOG.InitSLfake(f,d);
+          ri!.fakegens.count := 0;
+          ri!.comment := "_PSLdEven";
+          ri!.gcd := gcd;
+          SetFilterObj(ri,IsLeaf);
+          SetSize(ri,Product([0..d-1],i->(q^d-q^i))/((q-1)*gcd.gcd));
+          Setslpforelement(ri,SLPforElementFuncsProjective.PSLdEven);
+          return true;
       else
           Info(InfoRecog,2,"ClassicalNatural: Is not PSL.");
       fi;

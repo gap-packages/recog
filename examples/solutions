@@ -57,48 +57,57 @@ Example 12:
 
 Challenge 1:
   60.M22  over GF(11^2) in dimension 24 but not subfield!
-  --> done by StabilizerChain
+  --> works by hinted StabilizerChain
 
 Challenge 2:
   J4 over GF(2^2) dim 112, subfield coming from GF(2)
-  --> failed because J4 cannot be handled
+  --> does not work because J4 cannot be handled sensibly
 
 Challenge 3:
   L2(243) over GF(11^2) in dimension 121
-  --> done by StabilizerChain
+  --> works, done by StabilizerChain in the end, do we want to hint at
+      this?
 
 Challenge 4:
   Two largest projective orders: 780, 390 ???
   This seems to be D7, found by doing involution trick twice.
-  --> Yes! Size is 615019392000000000000
+  --> Works, D247 finds it, size is 615019392000000000000
 
 Challenge 5:
-  This seems to be 2^(1+6).Sp(6,2) extraspecial.
-  --> Failed due to a bug in C6???
+  This is C6: 2^(1+8).Omega^+_8(2) < 2^(1+8).Sp(8,2) extraspecial.
+  --> Works, C6 finds it, then LieType finds it.
 
 Challenge 6:
   Has to to something with SL(55,11), but it seems to be smaller!
   Maybe a classical group in some bigger representation?
+  This is L10(11) in a 55-dim rep, special method missing.
+  (probably adjoint rep?)
+  --> does not work (yet)
 
 Challenge 7:
-  Highly reducible group involving 2^{15}.L(2,7), A5
+  Highly reducible group involving 2^{15}.SL(3,2).A5
   Size 330301440
+  --> works perfectly
 
 Challenge 8:
-  Reducible, contains L(5,13) (done by stabilizer chain).
+  Reducible, contains L(5,13) (done by classical natural)
   Size 2952418014702027260072949983477760000.
+  --> works perfectly
 
 Challenge 9:
   Tensor decomposable, S(6,3) and 2.O(7,3) (in dimension 8).
-  D2D4 does it, then StabilizerChain.
+  D2D4 does it, then StabilizerChain, although non-constr. recog. is OK
   Size 42050900058557644800.
+  --> works perfectly
 
 Challenge 10:
   Size 4751625928405674992410967408640000000000000000000000000
   This seems to be S.5 wr M24 with S5's irred. rep in dim 4
+  --> works perfectly, although slowly
 
 Challenge 11:
-  Seems to be SL(80,71).
+  This is SL(80,71).
+  --> works perfectly, preimages of nice generators always problematic
 
 Challenge 12:
   - 

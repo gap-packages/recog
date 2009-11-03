@@ -710,7 +710,7 @@ FindHomMethodsMatrix.GoProjective := function(ri,G)
 
   # the kernel:
   q := Size(ri!.field);
-  findgensNmeth(ri).args[1] := Length(Factors(q-1))+5;
+  findgensNmeth(ri).args[1] := Length(Factors(q-1))+10;
   findgensNmeth(ri).args[2] := 0;
   return true;
 end;

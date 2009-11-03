@@ -5820,6 +5820,7 @@ FindHomMethodsProjective.ThreeLargeElOrders := function(ri,G)
       return false;
   fi;
   # Try all possibilities:
+  Info(InfoRecog,2,"ThreeLargeElOrders: found ",p);
   for hint in p do
       Info(InfoRecog,2,"Trying ",hint);
       name := hint[3];

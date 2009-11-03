@@ -242,9 +242,9 @@ PackageDoc := rec(
 
 Dependencies := rec(
   GAP := ">=4.4.12",
-  NeededOtherPackages := [["GAPDoc", ">= 1.2"],
-                          ["Orb", ">= 3.3"],["genss", ">= 1.3"],
-                          ["recogbase", ">= 1.0"],["FactInt", ">= 1.5.2"],
+  NeededOtherPackages := [["GAPDoc", ">= 1.2"],["recogbase", ">= 1.0"],
+                          ["Forms", ">= 1.2"],["genss", ">= 1.3"],
+                          ["Orb", ">= 3.3"], ["FactInt", ">= 1.5.2"],
                           ["AtlasRep", ">= 1.4.0"]],
   SuggestedOtherPackages := [],
   ExternalConditions := []
