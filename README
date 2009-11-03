@@ -1,0 +1,47 @@
+     
+     ========================================
+      README file for the recogbase GAP4 package
+     ========================================
+        
+To get the newest version of this GAP 4 package download the
+archive file
+    recogbase-x.x.tar.gz
+    recogbase-x.x.zoo
+    recogbase-x.x.tar.bz2
+    recogbase-x.x.zip
+and unpack it using 
+    gunzip recogbase-x.x.tar.gz; tar xvf recogbase-x.x.tar
+respectively
+    unzoo -x recogbase-x.x.zoo
+and so on.
+
+Do this in a directory called 'pkg', preferably (but not necessarily)
+in the 'pkg' subdirectory of your GAP 4 installation. It creates a
+subdirectory called 'recogbase'.
+
+This is all which is needed if you installed the package in the standard
+'pkg' subdirectory.
+
+Note that the recogbase package needs the 'orb', 'genss', 'FactInt',
+'AtlasRep', 'Forms' and 'recog' packages to work properly.
+
+If you installed the package in another 'pkg' directory than the standard
+'pkg' directory in your GAP 4 installation, then you have to add the path
+to the directory containing your 'pkg' directory to GAP's list of directories.
+This can be done by starting GAP with the '-l' command line option
+followed by the name of the directory and a semicolon. Then your directory
+is prepended to the list of directories searched. Otherwise the package 
+is not found by GAP. Of course, you can add this option to your GAP
+startup script.
+
+Recompiling the documentation is possible by the command `gap makedoc.g'
+in the recogbase directory. But this should not be necessary.
+
+E-mail us if there are any questions, remarks, suggestions. Also, we
+would like to hear about applications of this package.
+
+
+  Max Neunhoeffer, e-mail: neunhoef@mcs.st-and.ac.uk
+and
+  Ákos Seress, e-mail: akos@math.ohio-state.edu
+
