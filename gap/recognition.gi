@@ -439,6 +439,9 @@ InstallGlobalFunction( RecogniseGeneric,
         if not(Hascalcnicegens(ri)) then
             Setcalcnicegens(ri,CalcNiceGensGeneric);
         fi;
+        if Hasslptonice(ri) and IsBound(SlotUsagePattern) then
+            SlotUsagePattern(slptonice(ri));
+        fi;
         # Handle the case that nobody set nice generators:
         if not(Hasnicegens(ri)) then
             if Hasslptonice(ri) then
