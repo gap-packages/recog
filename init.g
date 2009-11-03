@@ -17,7 +17,8 @@ ReadPackage("recog","gap/projective.gd");
 ReadPackage("recog","gap/blackbox.gd");
 
 ReadPackage("recog","gap/tensor.gd");
-ReadPackage("recog","gap/forms.gd");
+#ReadPackage("recog","gap/forms.gd");
+ReadPackage("recog","gap/ppd.gd");
 ReadPackage("recog","gap/classical.gd");
 ReadPackage("recog","gap/almostsimple.gd");
 ReadPackage("recog","gap/findnormal.gd");
