@@ -655,7 +655,12 @@ InstallGlobalFunction( CalcNiceGensHomNode,
 
 InstallGlobalFunction( SLPforElement,
   function(ri,x)
-    return slpforelement(ri)(ri,x);
+    local slp;
+    slp := slpforelement(ri)(ri,x);
+    if IsBound(SlotUsagePattern(slp)) then
+        SlotUsagePattern(slp);
+    fi;
+    return slp;
   end );
     
 InstallGlobalFunction( SLPforElementGeneric, 
