@@ -31,7 +31,7 @@ BindGlobal( "RECOG", rec() );
 DeclareFilter( "IsLeaf" );
 DeclareFilter( "IsReady" );
 DeclareAttribute( "Grp", IsRecognitionInfo, "mutable" );
-DeclareAttribute( "homom", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "Homom", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "stdgens", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "nicegens", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "factor", IsRecognitionInfo, "mutable" );

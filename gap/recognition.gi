@@ -471,11 +471,11 @@ InstallGlobalFunction( RecogniseGeneric,
             return ri;
         fi;
 
-        if IsMatrixGroup(Image(homom(ri))) then
+        if IsMatrixGroup(Image(Homom(ri))) then
             Info(InfoRecog,2,"Going to the factor (depth=",
               Length(depth),", try=",
-              counter,", dim=",DimensionOfMatrixGroup(Image(homom(ri))),
-              ", field=",Size(FieldOfMatrixGroup(Image(homom(ri)))),").");
+              counter,", dim=",DimensionOfMatrixGroup(Image(Homom(ri))),
+              ", field=",Size(FieldOfMatrixGroup(Image(Homom(ri)))),").");
         else
             Info(InfoRecog,2,"Going to the factor (depth=",
               Length(depth),", try=",
@@ -483,7 +483,7 @@ InstallGlobalFunction( RecogniseGeneric,
         fi;
         Add(depth,'F');
         rifac := RecogniseGeneric( 
-                  Group(List(GeneratorsOfGroup(H), x->ImageElm(homom(ri),x))), 
+                  Group(List(GeneratorsOfGroup(H), x->ImageElm(Homom(ri),x))), 
                   methodsforfactor(ri), depth, forfactor(ri) );
         Remove(depth);
         PrintTreePos("F",depth,H);
@@ -577,7 +577,7 @@ InstallGlobalFunction( RecogniseGeneric,
                 # We must use different random elements than the kernel
                 # finding routines!
                 x := RandomElm(ri,"KERNELANDVERIFY",true).el;
-                s := SLPforElement(rifac,ImageElm( homom(ri), x!.el ));
+                s := SLPforElement(rifac,ImageElm( Homom(ri), x!.el ));
                 if s = fail then
                     Error("Very bad: factor was wrongly recognised and we ",
                           "found out too late");
@@ -672,7 +672,7 @@ InstallGlobalFunction( SLPforElementGeneric,
     local gg,n,rifac,riker,s,s1,s2,y,nr1,nr2;
     rifac := factor(ri);
     riker := kernel(ri);   # note: might be fail
-    gg := ImageElm(homom(ri),g);
+    gg := ImageElm(Homom(ri),g);
     if gg = fail then
         return fail;
     fi;
@@ -713,7 +713,7 @@ InstallGlobalFunction( FindKernelRandom,
     rifac := factor(ri);
     for i in [1..n] do
         x := RandomElm(ri,"KERNELANDVERIFY",true).el;
-        s := SLPforElement(rifac,ImageElm( homom(ri), x!.el ));
+        s := SLPforElement(rifac,ImageElm( Homom(ri), x!.el ));
         if s = fail then
             return false;
         fi;
