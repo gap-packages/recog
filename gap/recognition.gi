@@ -660,7 +660,7 @@ InstallGlobalFunction( SLPforElement,
   function(ri,x)
     local slp;
     slp := slpforelement(ri)(ri,x);
-    if IsBound(SlotUsagePattern) then
+    if slp <> fail and IsBound(SlotUsagePattern) then
         SlotUsagePattern(slp);
     fi;
     return slp;
@@ -905,7 +905,7 @@ BindGlobal( "SLPforNiceGens", function(ri)
   l := GeneratorsWithMemory(l);
   ll := CalcNiceGens(ri,l);
   s := SLPOfElms(ll);
-  if IsBound(SlotUsagePattern) then
+  if s <> fail and IsBound(SlotUsagePattern) then
       SlotUsagePattern(s);
   fi;
   return s;
