@@ -495,7 +495,7 @@ end;
 #   ri!.t := r.t;
 #   ri!.ti := r.ti;
 #   ri!.blocksize := r.blocksize;
-#   Setkernel(ri,riker);
+#   SetRIKer(ri,riker);
 #   Setparent(riker,ri);
 #   SetRIFac(ri,rifac);
 #   Setparent(rifac,ri);
@@ -522,7 +522,7 @@ end;
 #   # preimages of the nice generators:
 #   geN := ResultOfStraightLineProgram(gensNslp(ri),origgens);
 #   Add(geN,geN[1]^0);  # The subnode wants the extra generator
-#   geNnice := CalcNiceGens(kernel(ri),geN);
+#   geNnice := CalcNiceGens(RIKer(ri),geN);
 #   # Make preimages of generators of H:
 #   gensGN := Concatenation(origgens,geNnice);
 #   geH := ResultOfStraightLineProgram(ri!.gensHslp,gensGN);
@@ -544,7 +544,7 @@ end;
 #                [(blockpos-1)*ri!.blocksize+1..blockpos*ri!.blocksize]);
 #   # FIXME:
 #   ConvertToMatrixRep(xxsmall);
-#   s2 := SLPforElement(kernel(ri),xxsmall);
+#   s2 := SLPforElement(RIKer(ri),xxsmall);
 #   if s2 = fail then return fail; fi;  
 #   n := ResultOfStraightLineProgram(s2,ri!.nicegensconj{[1..ri!.nrniceN]});
 #   yy := n^-1 * xx;

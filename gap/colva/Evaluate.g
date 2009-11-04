@@ -279,7 +279,7 @@ InstallGlobalFunction( NormalTree,
         # We found out that N is the trivial group!
         # In this case we do nothing, kernel is fail indicating this.
         Info(InfoRecognition,1,"Found trivial kernel (depth=",depth,").");
-        Setkernel(ri,fail);
+        SetRIKer(ri,fail);
         # We have to learn from the factor, what our nice generators are:
         SetNiceGens(ri,pregensfac(ri));
         SetFilterObj(ri,IsReady);
@@ -294,7 +294,7 @@ InstallGlobalFunction( NormalTree,
         N := Group(StripMemory(gensN(ri)));
         
         riker := NormalTree( N, nsm, depth+1 );;
-        Setkernel(ri,riker);
+        SetRIKer(ri,riker);
         Setparent(riker,ri);
         Info(InfoRecognition,1,"Back from kernel (depth=",depth,").");
 

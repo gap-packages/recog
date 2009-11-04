@@ -7,16 +7,16 @@ local nri, i, bool;
 nri:= StructuralCopy(ri);
 i:= 0;
 bool:= true;
-while Haskernel(nri) and not kernel(nri) = fail do
+while HasRIKer(nri) and not RIKer(nri) = fail do
   if not parent(RIFac(nri)) = nri then
     Print("factor error at level", i, "\n");
     bool:= false;
   fi;
-  if not parent(kernel(nri)) = nri then
+  if not parent(RIKer(nri)) = nri then
     Print("error: at level", i, "\n");
     bool:= false;
   fi;
-  nri:= kernel(nri);
+  nri:= RIKer(nri);
   i:= i+1;
 od;
 if not parent(RIFac(nri)) = nri then

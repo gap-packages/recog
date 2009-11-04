@@ -20,12 +20,12 @@ local soc_found, soc, nri, d, R, phi, I, i, Pgens, Pinv_ims, P, perms,
 
 nri:= StructuralCopy(ri);
 soc_found:= false;
-while Haskernel(nri) and not soc_found do
+while HasRIKer(nri) and not soc_found do
   if HasTFordered(RIFac(nri)) and TFordered(RIFac(nri)) = "Socle" then
       soc_found:= true;
   fi;
   if not soc_found then
-    nri:= kernel(nri);
+    nri:= RIKer(nri);
   fi;
 od;
 
@@ -66,27 +66,27 @@ while (Hasparent(nri)) do
   #first do the case where this is not a new action - must belong to a lower
   #factor group or be trivial.
   if IsSubgroup(P, GroupWithGenerators(perms)) then
-    if HasTFordered(RIFac(kernel(nri))) and (RIFac(kernel(nri))!.TFordered = "Socle") then 
+    if HasTFordered(RIFac(RIKer(nri))) and (RIFac(RIKer(nri))!.TFordered = "Socle") then 
       #don't reorder, just label this as the beginning of Pker
       SetTFordered(nri, "Pker");
-    elif HasTFordered(kernel(nri)) and kernel(nri)!.TFordered = "Pker" then
+    elif HasTFordered(RIKer(nri)) and RIKer(nri)!.TFordered = "Pker" then
       #move the label for Pker one level higher
-      Unbind(kernel(nri)!.TFordered);
-      ResetFilterObj(kernel(nri), HasTFordered);
+      Unbind(RIKer(nri)!.TFordered);
+      ResetFilterObj(RIKer(nri), HasTFordered);
       SetTFordered(nri, "Pker");
     else
       ki:= GroupHomomorphismByImagesNC(P, overgroup(soc), Pgens, Pinv_ims);
       #have to move down below all bits that act nontrivially on socle.
-      while not (HasTFordered(RIFac(kernel(nri))) and 
-                RIFac(kernel(nri))!.TFordered = "Socle") do
-          if IsBound(Grp(RIFac(kernel(nri)))!.Pcgs) then 
+      while not (HasTFordered(RIFac(RIKer(nri))) and 
+                RIFac(RIKer(nri))!.TFordered = "Socle") do
+          if IsBound(Grp(RIFac(RIKer(nri)))!.Pcgs) then 
             #move past a (soluble) PC group
-            pgs:= pregensfac(kernel(nri));
+            pgs:= pregensfac(RIKer(nri));
             pgs_ims:= List(pgs, x->x*Image(ki,MySocleAction(soc, x))^-1);
-            alpha:= GroupHomomorphismByImagesNC(Grp(RIFac(kernel(nri))), overgroup(nri), pgs, pgs_ims);
+            alpha:= GroupHomomorphismByImagesNC(Grp(RIFac(RIKer(nri))), overgroup(nri), pgs, pgs_ims);
             zeta:= function(g)
-               return Image(Homom(kernel(nri)),(g*Image(alpha, 
-                    Image(Homom(kernel(nri)), g))^-1));
+               return Image(Homom(RIKer(nri)),(g*Image(alpha, 
+                    Image(Homom(RIKer(nri)), g))^-1));
             end;
           else
             #should have a nonabelian group to move past here, 

@@ -14,7 +14,7 @@ InsertSubTree := function(ri,rifac,maps)
  local kerfac,phi,Q,GtoQ,lri,rri,ripregensfac,overgp,i,kgens;
 
  # remember the kernel of ri!
- kerfac := kernel(ri);;
+ kerfac := RIKer(ri);;
  
  # construct maps from ri -> new groups
  phi := StructuralCopy(Homom(ri));
@@ -68,7 +68,7 @@ InsertSubTree := function(ri,rifac,maps)
    lri[i+1] := rec();
    Objectify(RecognitionInfoType,lri[i+1]);;
    SetGrp(lri[i+1],GroupWithGenerators(kgens));
-   Setkernel(lri[i],lri[i+1]);
+   SetRIKer(lri[i],lri[i+1]);
    SetRIFac(lri[i],rri[i]);	
    Setparent(lri[i+1],lri[i]);
    Setparent(rri[i],lri[i]);   
@@ -81,15 +81,15 @@ InsertSubTree := function(ri,rifac,maps)
  fi;
 
  # tell last lri to be kerfac
-   Setkernel(lri[Size(Q)],StructuralCopy(kerfac));
-   Setparent(kernel(lri[Size(Q)]),lri[Size(Q)]);
+   SetRIKer(lri[Size(Q)],StructuralCopy(kerfac));
+   Setparent(RIKer(lri[Size(Q)]),lri[Size(Q)]);
  
  # Set up the nice generators
 
  i := Size(Q);
  while i>0 do
-   if kernel(lri[i]) <> fail then
-     SetNiceGens(lri[i],Concatenation(pregensfac(lri[i]),NiceGens(kernel(lri[i]))));
+   if RIKer(lri[i]) <> fail then
+     SetNiceGens(lri[i],Concatenation(pregensfac(lri[i]),NiceGens(RIKer(lri[i]))));
    else
      SetNiceGens(lri[i],pregensfac(lri[i]));
    fi;
@@ -110,10 +110,10 @@ RefineSolubleLayers := function(ri)
  I := Grp(rifac);
 
  if not IsPcGroup(I) or IsElementaryAbelian(I) then 
-   riker := kernel(ri);
-   Setkernel(ri,RefineSolubleLayers(riker));
-   if kernel(ri)<>fail then
-     SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(kernel(ri))));
+   riker := RIKer(ri);
+   SetRIKer(ri,RefineSolubleLayers(riker));
+   if RIKer(ri)<>fail then
+     SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(RIKer(ri))));
    else
      SetNiceGens(ri,pregensfac(ri));
    fi;
@@ -123,11 +123,11 @@ RefineSolubleLayers := function(ri)
   L := InvariantElementaryAbelianSeries(I,GeneratorsOfGroup(AutomorphismGroup(I)) : fine := true);
   maps := List([1..Length(L)-1],i->NaturalHomomorphismByNormalSubgroupNC(L[i],L[i+1]));
   ri := InsertSubTree(ri, rifac, maps);;
-  riker := kernel(ri);
-  Setkernel(ri,RefineSolubleLayers(riker));
-  Setparent(kernel(ri),ri);
-  if kernel(ri)<>fail then
-    SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(kernel(ri))));
+  riker := RIKer(ri);
+  SetRIKer(ri,RefineSolubleLayers(riker));
+  Setparent(RIKer(ri),ri);
+  if RIKer(ri)<>fail then
+    SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(RIKer(ri))));
   else
     SetNiceGens(ri,pregensfac(ri));
   fi;
@@ -162,10 +162,10 @@ RefineElementaryAbelianLayers := function(ri)
  I := Grp(rifac);
 
  if not IsPcGroup(I) or IsCyclic(I) then 
-   riker := kernel(ri);
-   Setkernel(ri,RefineElementaryAbelianLayers(riker));
-   if kernel(ri)<>fail then
-     SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(kernel(ri))));
+   riker := RIKer(ri);
+   SetRIKer(ri,RefineElementaryAbelianLayers(riker));
+   if RIKer(ri)<>fail then
+     SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(RIKer(ri))));
    else
      SetNiceGens(ri,pregensfac(ri));
    fi;
@@ -178,10 +178,10 @@ RefineElementaryAbelianLayers := function(ri)
 
  #if the module is irreducible then the ChiefSeries can't be refined.
  if MTX.IsIrreducible(M) then 
-   riker := kernel(ri);
-   Setkernel(ri,RefineElementaryAbelianLayers(riker));
-   if kernel(ri)<>fail then
-     SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(kernel(ri))));
+   riker := RIKer(ri);
+   SetRIKer(ri,RefineElementaryAbelianLayers(riker));
+   if RIKer(ri)<>fail then
+     SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(RIKer(ri))));
    else
      SetNiceGens(ri,pregensfac(ri));
    fi;
@@ -199,11 +199,11 @@ SubgroupNC(Grp(RIFac(ri)),List(CS[i],v->VectortoPc(v,Grp(RIFac(ri))))));
   
   maps := List([1..Length(L)-1],i->NaturalHomomorphismByNormalSubgroupNC(L[i],L[i+1]));
   ri := InsertSubTree(ri, rifac, maps);;
-  riker := kernel(ri);
-  Setkernel(ri,RefineElementaryAbelianLayers(riker));
-  Setparent(kernel(ri),ri);
-  if kernel(ri)<>fail then
-    SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(kernel(ri))));
+  riker := RIKer(ri);
+  SetRIKer(ri,RefineElementaryAbelianLayers(riker));
+  Setparent(RIKer(ri),ri);
+  if RIKer(ri)<>fail then
+    SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(RIKer(ri))));
   else
     SetNiceGens(ri,pregensfac(ri));
   fi;
@@ -218,7 +218,7 @@ RemoveTrivialLayers := function(ri)
  if ri=fail then return ri; fi;
 
  rifac := RIFac(ri);;
- riker := kernel(ri);;
+ riker := RIKer(ri);;
  I := Grp(rifac);
  if IsPcGroup(I) and IsTrivial(I) then
 # I is trivial!!
@@ -232,10 +232,10 @@ RemoveTrivialLayers := function(ri)
      Unbind(ri!.parent);
      ResetFilterObj(ri, Hasparent);
    fi; 
-   newriker := kernel(ri);
-   Setkernel(ri,RemoveTrivialLayers(newriker));
-   if kernel(ri)<>fail then
-     SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(kernel(ri))));
+   newriker := RIKer(ri);
+   SetRIKer(ri,RemoveTrivialLayers(newriker));
+   if RIKer(ri)<>fail then
+     SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(RIKer(ri))));
    else
      SetNiceGens(ri,pregensfac(ri));
    fi;
@@ -243,9 +243,9 @@ RemoveTrivialLayers := function(ri)
    return RemoveTrivialLayers(ri);
  fi;
 
- Setkernel(ri,RemoveTrivialLayers(riker));   
- if kernel(ri)<>fail then
-   SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(kernel(ri))));
+ SetRIKer(ri,RemoveTrivialLayers(riker));   
+ if RIKer(ri)<>fail then
+   SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(RIKer(ri))));
  else
    SetNiceGens(ri,pregensfac(ri));
  fi;

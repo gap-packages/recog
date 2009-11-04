@@ -102,10 +102,10 @@ PastNonAb := function(ri)
 
  
  x := pregensfac(ri)[1];
- if IsDirectProduct(Grp(RIFac(kernel(ri)))) and not IsTrivial(PermAction(GroupWithGenerators([x]),Grp(kernel(ri)),Homom(kernel(ri)),Grp(RIFac(kernel(ri))))) then return false;
+ if IsDirectProduct(Grp(RIFac(RIKer(ri)))) and not IsTrivial(PermAction(GroupWithGenerators([x]),Grp(RIKer(ri)),Homom(RIKer(ri)),Grp(RIFac(RIKer(ri))))) then return false;
  fi;
 
- riker := kernel(ri);
+ riker := RIKer(ri);
 # Consider the automorphism of RIFac(riker) induced by x
  aut := GroupHomomorphismByFunction(Grp(RIFac(riker)),Grp(RIFac(riker)),
 function(g)
@@ -155,14 +155,14 @@ end);
  return zeta;
 end;
 
-#returns a function from Grp(ri) to Grp(RIFac(kernel(ri))) if can do so, 
+#returns a function from Grp(ri) to Grp(RIFac(RIKer(ri))) if can do so, 
 #otherwise returns false.
 AbPastAb := function(ri)
 ## Tries to push an abelian layer past another abelian layer where the layers are over different primes
  local x,riker,i,im,q,l,zeta;
 
  x := pregensfac(ri)[1];
- riker := kernel(ri);;
+ riker := RIKer(ri);;
 # Does x act trivially on RIFac(riker)
  for i in [1..Length(NiceGens(RIFac(riker)))] do
    im := ImageElm(Homom(riker),pregensfac(riker)[i]^x);
@@ -188,7 +188,7 @@ AbPastAbSamePrime := function(ri)
        g,M,CS,maps,zeta,k,AcGens,L,intorikerfac;
 
  x := pregensfac(ri)[1];
- riker := kernel(ri);;
+ riker := RIKer(ri);;
  if not SanityCheck(ri) then
    Error(179);
  fi;
@@ -248,7 +248,7 @@ NonAbPastAb := function(ri)
 
  if not IsPermGroup(Grp(RIFac(ri))) then return false; fi;
  x := pregensfac(ri)[1];
- riker := kernel(ri);;
+ riker := RIKer(ri);;
 # Does x act trivially on RIFac(riker)
  for i in [1..Length(NiceGens(RIFac(riker)))] do
    im := ImageElm(Homom(riker),pregensfac(riker)[i]^x);
@@ -326,7 +326,7 @@ PushIntoSocle := function(ri,zeta)
  local riker,D,phi,im1,im2,nri,nrifac,list,g,overgp;
 
 
- riker := kernel(ri);;
+ riker := RIKer(ri);;
 # Form the direct product of the socle
  D := DirectProduct(Grp(RIFac(ri)),Grp(RIFac(riker)));
 # and the new map phi from Grp(ri) -> D
@@ -371,16 +371,16 @@ end);
  SetGrp(nri,Grp(ri));
  if Hasparent(ri) then
    Setparent(nri,parent(ri));
-   Setkernel(parent(nri),nri);
+   SetRIKer(parent(nri),nri);
    if not SanityCheck(parent(nri)) then
      Error(1);
    fi;
  fi;
- if Haskernel(riker) and kernel(riker) = fail then
-   Setkernel(nri, fail);
- elif Haskernel(riker) then
-   Setkernel(nri,kernel(riker)); 
-   Setparent(kernel(nri),nri);
+ if HasRIKer(riker) and RIKer(riker) = fail then
+   SetRIKer(nri, fail);
+ elif HasRIKer(riker) then
+   SetRIKer(nri,RIKer(riker)); 
+   Setparent(RIKer(nri),nri);
    if not SanityCheck(nri) then
      Error(2);
    fi;
@@ -392,9 +392,9 @@ List(pregensfac(ri),g->
 g*ResultOfStraightLineProgram(SLPforElement(RIFac(riker),ImageElm(phi*MyProjection(D,2),g)),pregensfac(riker))^-1),
 pregensfac(riker)));
  #this was causing problems with the kernel was fail. 
- if Haskernel(nri) and kernel(nri) <> fail then
-   SetNiceGens(nri,Concatenation(pregensfac(nri),NiceGens(kernel(nri))));
- elif Haskernel(nri) then 
+ if HasRIKer(nri) and RIKer(nri) <> fail then
+   SetNiceGens(nri,Concatenation(pregensfac(nri),NiceGens(RIKer(nri))));
+ elif HasRIKer(nri) then 
  #so the kernel is the trivial group, just need preimages of the socle generators.
    SetNiceGens(nri, pregensfac(nri));
  fi;
@@ -414,12 +414,12 @@ end;
 #into the socle.
 SwapFactors := function(ri,zeta)
 # Swaps the layers of the tree at ri using the map
-# zeta : Grp(ri) -> Grp(RIFac(kernel(ri)))
+# zeta : Grp(ri) -> Grp(RIFac(RIKer(ri)))
 
 
  local riker,rifac,rikerfac,nri,nriker,overgp;
 
- riker := kernel(ri);;
+ riker := RIKer(ri);;
  rifac := RIFac(ri);;
  rikerfac := RIFac(riker);;
 
@@ -433,10 +433,10 @@ SwapFactors := function(ri,zeta)
  SetHomom(nri,zeta);
  Setpregensfac(nri,StructuralCopy(pregensfac(riker)));
  Setpregensfac(nriker,List(pregensfac(ri),x->x*ResultOfStraightLineProgram(SLPforElement(rikerfac,ImageElm(zeta,x)),pregensfac(riker))^-1));  
- Setkernel(nriker,StructuralCopy(kernel(riker)));
- Setparent(kernel(nriker),nriker);
+ SetRIKer(nriker,StructuralCopy(RIKer(riker)));
+ Setparent(RIKer(nriker),nriker);
  Setparent(nriker,nri);
- Setkernel(nri, nriker);
+ SetRIKer(nri, nriker);
  if not SanityCheck(nri) then
    Error(3);
  fi;
@@ -445,14 +445,14 @@ SwapFactors := function(ri,zeta)
  #if IsBound(ri!.parent) then not sure whether should be checking Hasparent, try that instead.
  if Hasparent(ri) then
    Setparent(nri,StructuralCopy(parent(ri)));
-   Setkernel(parent(nri),nri);
+   SetRIKer(parent(nri),nri);
    if not SanityCheck(parent(nri)) then
      Error(4);
    fi;
  fi;
- if Haskernel(riker) then
-   Setkernel(nriker,kernel(riker)); 
-   Setparent(kernel(riker),nriker);
+ if HasRIKer(riker) then
+   SetRIKer(nriker,RIKer(riker)); 
+   Setparent(RIKer(riker),nriker);
    if not SanityCheck(nri) then
      Error(5);
    fi;
@@ -460,8 +460,8 @@ SwapFactors := function(ri,zeta)
  SetRIFac(nri,StructuralCopy(RIFac(riker)));
  #value of NiceGens is either the ones of the image on their own if kernel
  #is trivial, or gens for image plus gens for kernel.
- if Haskernel(nriker) and not (kernel(nriker) = fail) then
-   SetNiceGens(nriker,Concatenation(pregensfac(nriker),NiceGens(kernel(nriker))));
+ if HasRIKer(nriker) and not (RIKer(nriker) = fail) then
+   SetNiceGens(nriker,Concatenation(pregensfac(nriker),NiceGens(RIKer(nriker))));
  else
    SetNiceGens(nriker, pregensfac(nriker));
  fi;
@@ -470,9 +470,9 @@ SwapFactors := function(ri,zeta)
  Setcalcnicegens(nriker,CalcNiceGensHomNode);
  SetGrp(nri,StructuralCopy(Grp(ri)));
  #the group of nriker is the generators of the group of its kernel(if nontrivial) plus the preimages of the factor.
- if Haskernel(nriker) and not kernel(nriker) = fail then
-   SetGrp(nriker,GroupWithGenerators(Concatenation(GeneratorsOfGroup(Grp(kernel(nriker))),pregensfac(nriker))));
- elif Haskernel(nriker) then
+ if HasRIKer(nriker) and not RIKer(nriker) = fail then
+   SetGrp(nriker,GroupWithGenerators(Concatenation(GeneratorsOfGroup(Grp(RIKer(nriker))),pregensfac(nriker))));
+ elif HasRIKer(nriker) then
    SetGrp(nriker,GroupWithGenerators(pregensfac(nriker)));
  fi;
  Setslpforelement(nri,SLPforElementGeneric);
@@ -493,7 +493,7 @@ end;
 #so then group is soluble.
 IsSolubleTree := function(ri)
  if not IsBound(Grp(RIFac(ri))!.Pcgs) then return false; fi;
- if ri!.kernel <> fail then return IsSolubleTree(kernel(ri));
+ if ri!.RIKer <> fail then return IsSolubleTree(RIKer(ri));
  else
    return true;
  fi;
@@ -507,7 +507,7 @@ end;
 PushDown := function(pri)
  local priker,prifac,prikerfac,zeta,i,npri,nnpri,knpri;
 
- priker := kernel(pri);
+ priker := RIKer(pri);
  prifac := RIFac(pri);
  prikerfac := RIFac(priker);
 
@@ -569,11 +569,11 @@ PushDown := function(pri)
  for i in [1..Length(zeta)] do
    Print("trying zeta, i is", i, "\n");
    npri := SwapFactors(StructuralCopy(pri),zeta[i]);;
-   knpri := PushDown(StructuralCopy(kernel(npri)));;
+   knpri := PushDown(StructuralCopy(RIKer(npri)));;
 #having a problem with something believing it's got a parent when it doesn't.
    if knpri <> false and npri <> false then 
 #found a map that works.
-     Setkernel(npri,knpri);
+     SetRIKer(npri,knpri);
      Setparent(knpri,npri);
      if not SanityCheck(npri) then
        Error(6);
@@ -600,12 +600,12 @@ OrderTree := function(ri)
 # Is the tree soluble? in that case all is O_{\infty}(G) already.
  if IsSolubleTree(ri) then return ri; fi;
 # Is G simple?
- if ((not Haskernel(ri)) or (kernel(ri) = fail)) then return ri; fi;
+ if ((not HasRIKer(ri)) or (RIKer(ri) = fail)) then return ri; fi;
 
 # Find the last non-abelian chief factor.
  lastnonabri := StructuralCopy(ri);
- while kernel(lastnonabri) <> fail and not IsSolubleTree(kernel(lastnonabri)) do
-   lastnonabri := kernel(lastnonabri);
+ while RIKer(lastnonabri) <> fail and not IsSolubleTree(RIKer(lastnonabri)) do
+   lastnonabri := RIKer(lastnonabri);
  od;
 
 # Tell that chief factor that it will be where the socle collects.
@@ -618,7 +618,7 @@ OrderTree := function(ri)
 # Push the soluble layers down
  while Hasparent(pri) do
    pri := StructuralCopy(parent(pri));
-   SetNiceGens(pri,Concatenation(pregensfac(pri),NiceGens(kernel(pri))));
+   SetNiceGens(pri,Concatenation(pregensfac(pri),NiceGens(RIKer(pri))));
    npri := PushDown(StructuralCopy(pri));;
    if npri <> false then 
      pri := StructuralCopy(npri);
@@ -630,10 +630,10 @@ OrderTree := function(ri)
  
  #this is kind of messy, but i haven't managed to track down where all the 
  #parent kernel factor not matching up errors are occurring
- while Haskernel(pri) and not kernel(pri) = fail do
-   Setparent(kernel(pri), pri);
+ while HasRIKer(pri) and not RIKer(pri) = fail do
+   Setparent(RIKer(pri), pri);
    Setparent(RIFac(pri), pri);
-   pri:= kernel(pri);
+   pri:= RIKer(pri);
  od;
  while Hasparent(pri) do
    pri:= parent(pri);

@@ -14,7 +14,7 @@ for q in [2,3,4,5,7,8,9,11,13,16,17,25,81,256] do
     if not(IsLeaf(ri)) then r := RIFac(ri); fi;
     stamp := r!.fhmethsel.successmethod;
     if stamp="ProjDeterminant" then
-        r := kernel(r);
+        r := RIKer(r);
         stamp := r!.fhmethsel.successmethod;
     fi;
     Print("Stamp: ",stamp,"\n\n");
