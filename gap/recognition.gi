@@ -660,7 +660,7 @@ InstallGlobalFunction( SLPforElement,
   function(ri,x)
     local slp;
     slp := slpforelement(ri)(ri,x);
-    if IsBound(SlotUsagePattern(slp)) then
+    if IsBound(SlotUsagePattern) then
         SlotUsagePattern(slp);
     fi;
     return slp;
