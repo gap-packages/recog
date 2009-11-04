@@ -124,7 +124,7 @@ function(ri,I,name)
  rifac := rec();
  Objectify(RecognitionInfoType,rifac);;
  SetFilterObj(rifac,IsLeaf);
- Setparent(rifac,ri);
+ SetRIParent(rifac,ri);
  SetRIFac(ri,rifac);
  SetGrp(rifac,I);
  if IsPcGroup(I) then 

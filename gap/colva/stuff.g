@@ -8,18 +8,18 @@ nri:= StructuralCopy(ri);
 i:= 0;
 bool:= true;
 while HasRIKer(nri) and not RIKer(nri) = fail do
-  if not parent(RIFac(nri)) = nri then
+  if not RIParent(RIFac(nri)) = nri then
     Print("factor error at level", i, "\n");
     bool:= false;
   fi;
-  if not parent(RIKer(nri)) = nri then
+  if not RIParent(RIKer(nri)) = nri then
     Print("error: at level", i, "\n");
     bool:= false;
   fi;
   nri:= RIKer(nri);
   i:= i+1;
 od;
-if not parent(RIFac(nri)) = nri then
+if not RIParent(RIFac(nri)) = nri then
   Print("factor error at level", i, "\n");
 fi;
 return bool;

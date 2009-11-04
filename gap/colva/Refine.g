@@ -70,19 +70,19 @@ InsertSubTree := function(ri,rifac,maps)
    SetGrp(lri[i+1],GroupWithGenerators(kgens));
    SetRIKer(lri[i],lri[i+1]);
    SetRIFac(lri[i],rri[i]);	
-   Setparent(lri[i+1],lri[i]);
-   Setparent(rri[i],lri[i]);   
+   SetRIParent(lri[i+1],lri[i]);
+   SetRIParent(rri[i],lri[i]);   
  od;  
 
    
- # tell lri[1] to join onto parent(ri)
- if Hasparent(ri) then
-   Setparent(lri[1],StructuralCopy(parent(ri)));
+ # tell lri[1] to join onto RIParent(ri)
+ if HasRIParent(ri) then
+   SetRIParent(lri[1],StructuralCopy(RIParent(ri)));
  fi;
 
  # tell last lri to be kerfac
    SetRIKer(lri[Size(Q)],StructuralCopy(kerfac));
-   Setparent(RIKer(lri[Size(Q)]),lri[Size(Q)]);
+   SetRIParent(RIKer(lri[Size(Q)]),lri[Size(Q)]);
  
  # Set up the nice generators
 
@@ -125,7 +125,7 @@ RefineSolubleLayers := function(ri)
   ri := InsertSubTree(ri, rifac, maps);;
   riker := RIKer(ri);
   SetRIKer(ri,RefineSolubleLayers(riker));
-  Setparent(RIKer(ri),ri);
+  SetRIParent(RIKer(ri),ri);
   if RIKer(ri)<>fail then
     SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(RIKer(ri))));
   else
@@ -201,7 +201,7 @@ SubgroupNC(Grp(RIFac(ri)),List(CS[i],v->VectortoPc(v,Grp(RIFac(ri))))));
   ri := InsertSubTree(ri, rifac, maps);;
   riker := RIKer(ri);
   SetRIKer(ri,RefineElementaryAbelianLayers(riker));
-  Setparent(RIKer(ri),ri);
+  SetRIParent(RIKer(ri),ri);
   if RIKer(ri)<>fail then
     SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(RIKer(ri))));
   else
@@ -222,15 +222,15 @@ RemoveTrivialLayers := function(ri)
  I := Grp(rifac);
  if IsPcGroup(I) and IsTrivial(I) then
 # I is trivial!!
-   if Hasparent(ri) then
-     parri := StructuralCopy(parent(ri));
+   if HasRIParent(ri) then
+     parri := StructuralCopy(RIParent(ri));
    fi;
    ri := riker;;
    if IsBound(parri) then
-     Setparent(ri,parri);
+     SetRIParent(ri,parri);
    else
-     Unbind(ri!.parent);
-     ResetFilterObj(ri, Hasparent);
+     Unbind(ri!.RIParent);
+     ResetFilterObj(ri, HasRIParent);
    fi; 
    newriker := RIKer(ri);
    SetRIKer(ri,RemoveTrivialLayers(newriker));

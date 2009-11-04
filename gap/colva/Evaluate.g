@@ -230,7 +230,7 @@ InstallGlobalFunction( NormalTree,
     rifac := RecogniseLeaf(ri,I,name);;
 
      SetRIFac(ri,rifac);
-     Setparent(rifac,ri);
+     SetRIParent(rifac,ri);
 
      Info(InfoRecognition,1,"Back from factor (depth=",depth,").");
 
@@ -295,7 +295,7 @@ InstallGlobalFunction( NormalTree,
         
         riker := NormalTree( N, nsm, depth+1 );;
         SetRIKer(ri,riker);
-        Setparent(riker,ri);
+        SetRIParent(riker,ri);
         Info(InfoRecognition,1,"Back from kernel (depth=",depth,").");
 
         done := true;

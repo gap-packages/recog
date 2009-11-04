@@ -56,8 +56,8 @@ P:= GroupWithGenerators(Pgens);
 
 #work up the tree, checking whether action is trivial (in 
 #which case push down to Pker). 
-while (Hasparent(nri)) do
-  nri:= parent(nri);
+while (HasRIParent(nri)) do
+  nri:= RIParent(nri);
 
   #now need to find the permutation action of the preimages of the 
   #generators of  the factor on the factors of the socle.  

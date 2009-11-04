@@ -369,10 +369,10 @@ end);
  Objectify( RecognitionInfoType, nri );;
  SetRIFac(nri,nrifac);
  SetGrp(nri,Grp(ri));
- if Hasparent(ri) then
-   Setparent(nri,parent(ri));
-   SetRIKer(parent(nri),nri);
-   if not SanityCheck(parent(nri)) then
+ if HasRIParent(ri) then
+   SetRIParent(nri,RIParent(ri));
+   SetRIKer(RIParent(nri),nri);
+   if not SanityCheck(RIParent(nri)) then
      Error(1);
    fi;
  fi;
@@ -380,7 +380,7 @@ end);
    SetRIKer(nri, fail);
  elif HasRIKer(riker) then
    SetRIKer(nri,RIKer(riker)); 
-   Setparent(RIKer(nri),nri);
+   SetRIParent(RIKer(nri),nri);
    if not SanityCheck(nri) then
      Error(2);
    fi;
@@ -434,25 +434,25 @@ SwapFactors := function(ri,zeta)
  Setpregensfac(nri,StructuralCopy(pregensfac(riker)));
  Setpregensfac(nriker,List(pregensfac(ri),x->x*ResultOfStraightLineProgram(SLPforElement(rikerfac,ImageElm(zeta,x)),pregensfac(riker))^-1));  
  SetRIKer(nriker,StructuralCopy(RIKer(riker)));
- Setparent(RIKer(nriker),nriker);
- Setparent(nriker,nri);
+ SetRIParent(RIKer(nriker),nriker);
+ SetRIParent(nriker,nri);
  SetRIKer(nri, nriker);
  if not SanityCheck(nri) then
    Error(3);
  fi;
  SetRIFac(nriker,StructuralCopy(RIFac(ri)));
  #next two lines had capital p for parent before.
- #if IsBound(ri!.parent) then not sure whether should be checking Hasparent, try that instead.
- if Hasparent(ri) then
-   Setparent(nri,StructuralCopy(parent(ri)));
-   SetRIKer(parent(nri),nri);
-   if not SanityCheck(parent(nri)) then
+ #if IsBound(ri!.RIParent) then not sure whether should be checking HasRIParent, try that instead.
+ if HasRIParent(ri) then
+   SetRIParent(nri,StructuralCopy(RIParent(ri)));
+   SetRIKer(RIParent(nri),nri);
+   if not SanityCheck(RIParent(nri)) then
      Error(4);
    fi;
  fi;
  if HasRIKer(riker) then
    SetRIKer(nriker,RIKer(riker)); 
-   Setparent(RIKer(riker),nriker);
+   SetRIParent(RIKer(riker),nriker);
    if not SanityCheck(nri) then
      Error(5);
    fi;
@@ -553,7 +553,7 @@ PushDown := function(pri)
      npri := SwapFactors(pri,zeta);;
    fi;
    View(npri);
-   if not SanityCheck(parent(npri)) then
+   if not SanityCheck(RIParent(npri)) then
      Error(101);
    fi;
    return npri;
@@ -574,7 +574,7 @@ PushDown := function(pri)
    if knpri <> false and npri <> false then 
 #found a map that works.
      SetRIKer(npri,knpri);
-     Setparent(knpri,npri);
+     SetRIParent(knpri,npri);
      if not SanityCheck(npri) then
        Error(6);
      fi;
@@ -616,8 +616,8 @@ OrderTree := function(ri)
  pri:= StructuralCopy(lastnonabri);
 
 # Push the soluble layers down
- while Hasparent(pri) do
-   pri := StructuralCopy(parent(pri));
+ while HasRIParent(pri) do
+   pri := StructuralCopy(RIParent(pri));
    SetNiceGens(pri,Concatenation(pregensfac(pri),NiceGens(RIKer(pri))));
    npri := PushDown(StructuralCopy(pri));;
    if npri <> false then 
@@ -631,12 +631,12 @@ OrderTree := function(ri)
  #this is kind of messy, but i haven't managed to track down where all the 
  #parent kernel factor not matching up errors are occurring
  while HasRIKer(pri) and not RIKer(pri) = fail do
-   Setparent(RIKer(pri), pri);
-   Setparent(RIFac(pri), pri);
+   SetRIParent(RIKer(pri), pri);
+   SetRIParent(RIFac(pri), pri);
    pri:= RIKer(pri);
  od;
- while Hasparent(pri) do
-   pri:= parent(pri);
+ while HasRIParent(pri) do
+   pri:= RIParent(pri);
  od;
  return pri;
 end;
