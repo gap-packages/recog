@@ -897,7 +897,9 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
               # We want to be careful not to kill row n:
               repeat
                   lambda := PrimitiveRoot(f)^Random(0,q-1);
-              until lambda <> -yy3[n][n+1]/yy3[n-1][n+1] and lambda <> mu;
+              until (lambda <> -yy3[n][n+1]/yy3[n-1][n+1]) and 
+                    (lambda <> mu or q = 3);   
+                    # in GF(3) there are not enough values!
               RECOG.DoRowOp_SL(yy3,n,n-1,lambda,std);
               RECOG.DoColOp_SL(yy3,n,n-1,-lambda,std);
               y3f := std.left * yf * std.right;

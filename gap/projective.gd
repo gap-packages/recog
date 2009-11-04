@@ -13,6 +13,7 @@
 #############################################################################
 
 DeclareGlobalVariable( "SUBFIELD" );  # for the subfield code
+DeclareGlobalFunction( "FindKernelGoProjective" );
 
 ##
 ##  This program is free software: you can redistribute it and/or modify
