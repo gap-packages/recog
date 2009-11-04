@@ -37,7 +37,7 @@ DeclareAttribute( "NiceGens", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "RIFac", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "RIKer", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "RIParent", IsRecognitionInfo, "mutable" );
-DeclareAttribute( "presentation", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "StdPresentation", IsRecognitionInfo, "mutable" );
 
 DeclareAttribute( "pregensfac", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "calcnicegens", IsRecognitionInfo, "mutable" );

@@ -568,7 +568,7 @@ elements that are generated from them remember, how they were acquired.
 </ManSection>
 
 <ManSection>
-<Attr Name="presentation" Arg="ri"/>
+<Attr Name="StdPresentation" Arg="ri"/>
 <Description>
     After the verification phase, the presentation is stored here. Details
     have still to be decided upon.
