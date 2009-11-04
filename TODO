@@ -1,13 +1,11 @@
 Today:
 
-  - revisit examples/challenges
   - look at AltSymBB for next rep up if deleted perm went wrong?
-  - decide about names for attributes
   - balanced trees
   - do something about long StabChain computations in FindElmOfEvenNormal
   - Make sure that projective leaf nodes do report "Size" correctly!
-  - Investigate PseudoRandom elements
-  - Look at documentation
+  - Investigate maxdepth behaviour
+  - Look at documentation: StdGens, StdPresentation
   - Finish web pages
 
 Bugs:
