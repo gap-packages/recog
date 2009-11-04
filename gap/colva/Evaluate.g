@@ -229,7 +229,7 @@ InstallGlobalFunction( NormalTree,
 
     rifac := RecogniseLeaf(ri,I,name);;
 
-     Setfactor(ri,rifac);
+     SetRIFac(ri,rifac);
      Setparent(rifac,ri);
 
      Info(InfoRecognition,1,"Back from factor (depth=",depth,").");

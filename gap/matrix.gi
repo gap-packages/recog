@@ -567,7 +567,7 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
 
     nothingnew := 0;   # we count until we produced 10 new generators
                        # giving no new dimension
-    rifac := factor(ri);
+    rifac := RIFac(ri);
     while nothingnew < 10 do
         x := RandomElm(ri,"KERNEL",true).el;
         s := SLPforElement(rifac,ImageElm( Homom(ri), x!.el ));

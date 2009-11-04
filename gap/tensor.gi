@@ -497,7 +497,7 @@ end;
 #   ri!.blocksize := r.blocksize;
 #   Setkernel(ri,riker);
 #   Setparent(riker,ri);
-#   Setfactor(ri,rifac);
+#   SetRIFac(ri,rifac);
 #   Setparent(rifac,ri);
 #   ri!.nicegensconj := Concatenation(StripMemory(niceN),niceH);
 #   SetNiceGens(ri,List(ri!.nicegensconj,x->ri!.ti * x * ri!.t));
@@ -528,7 +528,7 @@ end;
 #   geH := ResultOfStraightLineProgram(ri!.gensHslp,gensGN);
 #   # and go to preimages of nice generators:
 #   Add(geH,geH[1]^0);
-#   geHnice := CalcNiceGens(factor(ri),geH);
+#   geHnice := CalcNiceGens(RIFac(ri),geH);
 #   return Concatenation(geNnice,geHnice);
 # end);
 # 
@@ -550,7 +550,7 @@ end;
 #   yy := n^-1 * xx;
 #   sublist := [1,ri!.blocksize+1 .. Length(yy)-ri!.blocksize+1];
 #   col := ExtractSubMatrix(yy,sublist,sublist);   # Collapse
-#   s1 := SLPforElement(factor(ri),col);
+#   s1 := SLPforElement(RIFac(ri),col);
 #   h := ResultOfStraightLineProgram(s1,
 #                 ri!.nicegensconj{[ri!.nrniceN+1..Length(ri!.nicegensconj)]});
 #   if n*h <> xx then   # something is wrong, maybe with the center?

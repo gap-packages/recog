@@ -69,7 +69,7 @@ InsertSubTree := function(ri,rifac,maps)
    Objectify(RecognitionInfoType,lri[i+1]);;
    SetGrp(lri[i+1],GroupWithGenerators(kgens));
    Setkernel(lri[i],lri[i+1]);
-   Setfactor(lri[i],rri[i]);	
+   SetRIFac(lri[i],rri[i]);	
    Setparent(lri[i+1],lri[i]);
    Setparent(rri[i],lri[i]);   
  od;  
@@ -105,7 +105,7 @@ RefineSolubleLayers := function(ri)
 
  if ri=fail then return ri; fi;
 
- rifac := factor(ri);;
+ rifac := RIFac(ri);;
  phi := Homom(ri);
  I := Grp(rifac);
 
@@ -142,7 +142,7 @@ ConstructActionMatrices := function(ri)
 
  AcGens := [];
  for g in GeneratorsOfGroup(overgroup(ri)) do
-   Add(AcGens,List(pregensfac(ri),x->ExponentsOfPcElement(Pcgs(factor(ri)!.group),ImageElm(Homom(ri),x^g))));
+   Add(AcGens,List(pregensfac(ri),x->ExponentsOfPcElement(Pcgs(RIFac(ri)!.group),ImageElm(Homom(ri),x^g))));
  od;
 
  return AcGens;
@@ -157,7 +157,7 @@ RefineElementaryAbelianLayers := function(ri)
 
  if ri=fail then return ri; fi;
 
- rifac := factor(ri);;
+ rifac := RIFac(ri);;
  phi := Homom(ri);
  I := Grp(rifac);
 
@@ -195,7 +195,7 @@ RefineElementaryAbelianLayers := function(ri)
 # get the list of normal subgroups
   
   L := List([Length(CS),Length(CS)-1..1],i->
-SubgroupNC(Grp(factor(ri)),List(CS[i],v->VectortoPc(v,Grp(factor(ri))))));
+SubgroupNC(Grp(RIFac(ri)),List(CS[i],v->VectortoPc(v,Grp(RIFac(ri))))));
   
   maps := List([1..Length(L)-1],i->NaturalHomomorphismByNormalSubgroupNC(L[i],L[i+1]));
   ri := InsertSubTree(ri, rifac, maps);;
@@ -217,7 +217,7 @@ RemoveTrivialLayers := function(ri)
  
  if ri=fail then return ri; fi;
 
- rifac := factor(ri);;
+ rifac := RIFac(ri);;
  riker := kernel(ri);;
  I := Grp(rifac);
  if IsPcGroup(I) and IsTrivial(I) then

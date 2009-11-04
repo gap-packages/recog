@@ -3,7 +3,7 @@
 
 MySocleAction:= function(soc, g)
 local grp;
-grp:= PermAction(GroupWithGenerators([g]), Grp(soc), Homom(soc), Grp(factor(soc)));
+grp:= PermAction(GroupWithGenerators([g]), Grp(soc), Homom(soc), Grp(RIFac(soc)));
 if not Size(GeneratorsOfGroup(grp)) = 1 then
   return fail;
 fi;
@@ -21,7 +21,7 @@ local soc_found, soc, nri, d, R, phi, I, i, Pgens, Pinv_ims, P, perms,
 nri:= StructuralCopy(ri);
 soc_found:= false;
 while Haskernel(nri) and not soc_found do
-  if HasTFordered(factor(nri)) and TFordered(factor(nri)) = "Socle" then
+  if HasTFordered(RIFac(nri)) and TFordered(RIFac(nri)) = "Socle" then
       soc_found:= true;
   fi;
   if not soc_found then
@@ -37,17 +37,17 @@ fi;
 #was hoping to use this a short-cut, but it seems that 
 #groups in the socle are not necessarily represented as explicit direct
 #products. 
-if not IsDirectProduct(Grp(factor(nri))) then 
+if not IsDirectProduct(Grp(RIFac(nri))) then 
   SetTFordered(ri, "Pker");
   return ri;
 fi;
 
 soc:= nri;
-R:= RefineMap(Grp(soc), Homom(soc), Grp(factor(soc)));
+R:= RefineMap(Grp(soc), Homom(soc), Grp(RIFac(soc)));
 phi:= R[1];
 I:= R[2];
 SetHomom(soc, phi);
-SetGrp(factor(soc), I);
+SetGrp(RIFac(soc), I);
 
 #now we find the degree of the permutation action.
 Pgens:= [Identity(SymmetricGroup(2))];
@@ -66,7 +66,7 @@ while (Hasparent(nri)) do
   #first do the case where this is not a new action - must belong to a lower
   #factor group or be trivial.
   if IsSubgroup(P, GroupWithGenerators(perms)) then
-    if HasTFordered(factor(kernel(nri))) and (factor(kernel(nri))!.TFordered = "Socle") then 
+    if HasTFordered(RIFac(kernel(nri))) and (RIFac(kernel(nri))!.TFordered = "Socle") then 
       #don't reorder, just label this as the beginning of Pker
       SetTFordered(nri, "Pker");
     elif HasTFordered(kernel(nri)) and kernel(nri)!.TFordered = "Pker" then
@@ -77,13 +77,13 @@ while (Hasparent(nri)) do
     else
       ki:= GroupHomomorphismByImagesNC(P, overgroup(soc), Pgens, Pinv_ims);
       #have to move down below all bits that act nontrivially on socle.
-      while not (HasTFordered(factor(kernel(nri))) and 
-                factor(kernel(nri))!.TFordered = "Socle") do
-          if IsBound(Grp(factor(kernel(nri)))!.Pcgs) then 
+      while not (HasTFordered(RIFac(kernel(nri))) and 
+                RIFac(kernel(nri))!.TFordered = "Socle") do
+          if IsBound(Grp(RIFac(kernel(nri)))!.Pcgs) then 
             #move past a (soluble) PC group
             pgs:= pregensfac(kernel(nri));
             pgs_ims:= List(pgs, x->x*Image(ki,MySocleAction(soc, x))^-1);
-            alpha:= GroupHomomorphismByImagesNC(Grp(factor(kernel(nri))), overgroup(nri), pgs, pgs_ims);
+            alpha:= GroupHomomorphismByImagesNC(Grp(RIFac(kernel(nri))), overgroup(nri), pgs, pgs_ims);
             zeta:= function(g)
                return Image(Homom(kernel(nri)),(g*Image(alpha, 
                     Image(Homom(kernel(nri)), g))^-1));

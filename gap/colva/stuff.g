@@ -8,7 +8,7 @@ nri:= StructuralCopy(ri);
 i:= 0;
 bool:= true;
 while Haskernel(nri) and not kernel(nri) = fail do
-  if not parent(factor(nri)) = nri then
+  if not parent(RIFac(nri)) = nri then
     Print("factor error at level", i, "\n");
     bool:= false;
   fi;
@@ -19,7 +19,7 @@ while Haskernel(nri) and not kernel(nri) = fail do
   nri:= kernel(nri);
   i:= i+1;
 od;
-if not parent(factor(nri)) = nri then
+if not parent(RIFac(nri)) = nri then
   Print("factor error at level", i, "\n");
 fi;
 return bool;

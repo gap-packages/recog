@@ -456,7 +456,7 @@ end;
 RECOG.CalcNiceGensKnownNilpotent := function(ri,origgens)
   local b;
   b := List([1..Length(ri!.waytonice)],i->origgens[i]^ri!.waytonice[i][1]);
-  return Concatenation(CalcNiceGens(factor(ri),origgens),
+  return Concatenation(CalcNiceGens(RIFac(ri),origgens),
                        CalcNiceGens(kernel(ri),b));
 end;
 
