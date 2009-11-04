@@ -444,7 +444,7 @@ elements that are generated from them remember, how they were acquired.
 </ManSection>
 
 <ManSection>
-<Attr Name="homom" Arg="ri"/>
+<Attr Name="Homom" Arg="ri"/>
 <Description>
     The value of this attribute is the homomorphism that was found from the
     group described by the recognition info record <A>ri</A> as a &GAP;
@@ -1020,7 +1020,7 @@ A successful find homomorphism method has the following duties:
 <Item>
     If a find homomorphism method has found a homomorphism, it has to
     store it as a &GAP; homomorphism object from <A>G</A> to the image
-    group in the attribute <Ref Attr="homom"/>. Note that if your homomorphism
+    group in the attribute <Ref Attr="Homom"/>. Note that if your homomorphism
     changes the representation (for example going from matrix groups to 
     permutation groups), you will have to set the attribute
     <Ref Attr="methodsforfactor"/> accordingly.
