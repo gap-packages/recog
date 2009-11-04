@@ -701,7 +701,7 @@ FindHomMethodsMatrix.LowerLeftPGroup := function(ri,G)
 end;
 
 InstallGlobalFunction( FindKernelGoProjective, function(ri,n)
-  local d,f,gcd,m,mm,q,slp;
+  local d,f,gcd,m,mm,moregroup,q,slp;
   if fhmethsel(RIFac(ri)).successmethod = "ClassicalNatural" or
      (fhmethsel(RIFac(ri)).successmethod = "ProjDeterminant" and
       fhmethsel(RIKer(RIFac(ri))).successmethod = "ClassicalNatural") then
@@ -714,11 +714,17 @@ InstallGlobalFunction( FindKernelGoProjective, function(ri,n)
      d := ri!.dimension;
      q := Size(f);
      gcd := GcdInt(q-1,d);
-     m := One(Grp(ri))*Z(q)^((q-1)/gcd);  # this has det 1
+     if fhmethsel(RIFac(ri)).successmethod = "ProjDeterminant" then
+         moregroup := Size(RIFac(RIFac(ri)));
+     fi;
+     m := IdentityMat(d,f)*Z(q)^(gcd/moregroup);  # this has det 1
      slp := SLPforElement(RIFac(ri),m);
      mm := ResultOfStraightLineProgram(slp,
                 ri!.genswithmem{[ri!.nrgensH+1..Length(ri!.genswithmem)]});
-     if m <> mm!.el then Error("was ist los???"); fi;
+     m[1] := m[1] * Z(q);
+     slp := SLPforElement(RIFac(ri),m);
+     mm := ResultOfStraightLineProgram(slp,
+                ri!.genswithmem{[ri!.nrgensH+1..Length(ri!.genswithmem)]});
      Add(gensN(ri),mm);
      return true;
   fi;
