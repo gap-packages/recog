@@ -34,7 +34,7 @@ FindHomMethodsPerm.Cyclic2 :=
              i := i + 1;
          od;
          ri!.firstnontrivialgen := i;
-         Setnicegens(ri,[GeneratorsOfGroup(H)[i]]);
+         SetNiceGens(ri,[GeneratorsOfGroup(H)[i]]);
          Setslptonice(StraightLineProgramNC([[[i,1]]],Length(gens)));
          Setslpforelement(ri,SLPforElementFuncsPerm.Cyclic2);
          SetFilterObj(ri,IsLeaf);
@@ -276,7 +276,7 @@ FindHomMethodsPerm.StabChain :=
      DoSafetyCheckStabChain(S);
      Setslptonice(ri,SLPOfElms(S.labels));
      StripStabChain(S);
-     Setnicegens(ri,S.labels);
+     SetNiceGens(ri,S.labels);
      MakeImmutable(S);
      SetStabChainImmutable(G,S);
      Setslpforelement(ri,SLPforElementFuncsPerm.StabChain);
@@ -422,7 +422,7 @@ FindHomMethodsPerm.Pcgs :=
     DoSafetyCheckStabChain(S);
     Setslptonice(ri,SLPOfElms(S.labels));
     StripStabChain(S);
-    Setnicegens(ri,S.labels);
+    SetNiceGens(ri,S.labels);
     MakeImmutable(S);
     SetStabChainImmutable(G,S);
     Setslpforelement(ri,SLPforElementFuncsPerm.StabChain);

@@ -281,7 +281,7 @@ InstallGlobalFunction( NormalTree,
         Info(InfoRecognition,1,"Found trivial kernel (depth=",depth,").");
         Setkernel(ri,fail);
         # We have to learn from the factor, what our nice generators are:
-        Setnicegens(ri,pregensfac(ri));
+        SetNiceGens(ri,pregensfac(ri));
         SetFilterObj(ri,IsReady);
         return ri;
     fi;
@@ -302,12 +302,12 @@ InstallGlobalFunction( NormalTree,
 
     if IsReady(riker) then    # we are only ready when the kernel is
         # Now make the two projection slps:
-        Setnicegens(ri,Concatenation(pregensfac(ri),nicegens(riker)));
-        #ll := List([1..Length(nicegens(rifac))],i->[i,1]);
-        #ri!.proj1 := StraightLineProgramNC([ll],Length(nicegens(ri)));
-        #ll := List([1..Length(nicegens(riker))],
-        #           i->[i+Length(nicegens(rifac)),1]);
-        #ri!.proj2 := StraightLineProgramNC([ll],Length(nicegens(ri)));
+        SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(riker)));
+        #ll := List([1..Length(NiceGens(rifac))],i->[i,1]);
+        #ri!.proj1 := StraightLineProgramNC([ll],Length(NiceGens(ri)));
+        #ll := List([1..Length(NiceGens(riker))],
+        #           i->[i+Length(NiceGens(rifac)),1]);
+        #ri!.proj2 := StraightLineProgramNC([ll],Length(NiceGens(ri)));
         SetFilterObj(ri,IsReady);
     fi;
     return ri;

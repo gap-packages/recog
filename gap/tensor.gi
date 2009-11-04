@@ -500,7 +500,7 @@ end;
 #   Setfactor(ri,rifac);
 #   Setparent(rifac,ri);
 #   ri!.nicegensconj := Concatenation(StripMemory(niceN),niceH);
-#   Setnicegens(ri,List(ri!.nicegensconj,x->ri!.ti * x * ri!.t));
+#   SetNiceGens(ri,List(ri!.nicegensconj,x->ri!.ti * x * ri!.t));
 #   ri!.nrniceN := Length(niceN);
 #   ri!.nrniceH := Length(niceH);
 #   ri!.gensHslp := SLPOfElms(gensH);

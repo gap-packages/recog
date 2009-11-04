@@ -2406,7 +2406,7 @@ local bb, q,p,e,n, r, grpmem, D, genlist;
   end;
   Setslpforelement(ri,SLPforElementFuncsMatrix.NaturalSLGL);
   SetFilterObj(ri,IsLeaf);
-  Setnicegens(ri,genlist);
+  SetNiceGens(ri,genlist);
   Setslptonice(ri,D.slpnice);
   return true;
 end;

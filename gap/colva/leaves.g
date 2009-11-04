@@ -26,7 +26,7 @@ SolveLeafPc := function(ri,rifac)
    SetName(rifac,"Trivial Group");
    Setslptonice( rifac, 
                 StraightLineProgramNC([[[1,0]]],Length(GeneratorsOfGroup(I))));
-   Setnicegens(rifac, [One(I)]);
+   SetNiceGens(rifac, [One(I)]);
    Setslpforelement( rifac, 
      function(rifac,g)
        return StraightLineProgramNC( [ [1,0] ], 1 );    
@@ -42,7 +42,7 @@ SolveLeafPc := function(ri,rifac)
  T := GroupWithGenerators(trivgens);
  rho := GroupHomomorphismByImages(I,T,gens,trivgens);
  P := Pcgs(I);
- Setnicegens(rifac,AsList(P));
+ SetNiceGens(rifac,AsList(P));
  mems := List(AsList(P),x->ImageElm(rho,x));
  Setslptonice(rifac,SLPOfElms(mems));   
  Setcalcnicegens(rifac, CalcNiceGensGeneric);

@@ -668,7 +668,7 @@ SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
           if not(IsZero(done)) then
               AddRowVector(h,ri!.gensNvectors[i],-done);
               pow := IntFFE(done);
-              g := nicegens(ri)[i]^(-pow) * g;
+              g := NiceGens(ri)[i]^(-pow) * g;
               Add(l,i);
               Add(l,IntFFE(done));
           fi;

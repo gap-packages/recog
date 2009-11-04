@@ -37,9 +37,9 @@ InsertSubTree := function(ri,rifac,maps)
    Objectify(RecognitionInfoType,rri[i]);;
    SetGrp(rri[i],Q[i]);
    SetHomom(lri[i],GtoQ[i]);
-   Setnicegens(rri[i],AsList(Pcgs(Q[i])));
+   SetNiceGens(rri[i],AsList(Pcgs(Q[i])));
    Setslpforelement(rri[i],SolvePcWord);
-   Setpregensfac(lri[i],List(nicegens(rri[i]),x-> ResultOfStraightLineProgram(slpforelement(rifac)(rifac,PreImagesRepresentative(maps[i],x)),ripregensfac)));
+   Setpregensfac(lri[i],List(NiceGens(rri[i]),x-> ResultOfStraightLineProgram(slpforelement(rifac)(rifac,PreImagesRepresentative(maps[i],x)),ripregensfac)));
    Setcalcnicegens(lri[i],CalcNiceGensHomNode);
    lri[i]!.nrgensH := Length(GeneratorsOfGroup(Grp(lri[i])));
    Setovergroup(lri[i],overgp);
@@ -89,9 +89,9 @@ InsertSubTree := function(ri,rifac,maps)
  i := Size(Q);
  while i>0 do
    if kernel(lri[i]) <> fail then
-     Setnicegens(lri[i],Concatenation(pregensfac(lri[i]),nicegens(kernel(lri[i]))));
+     SetNiceGens(lri[i],Concatenation(pregensfac(lri[i]),NiceGens(kernel(lri[i]))));
    else
-     Setnicegens(lri[i],pregensfac(lri[i]));
+     SetNiceGens(lri[i],pregensfac(lri[i]));
    fi;
    i := i - 1;
  od;
@@ -113,9 +113,9 @@ RefineSolubleLayers := function(ri)
    riker := kernel(ri);
    Setkernel(ri,RefineSolubleLayers(riker));
    if kernel(ri)<>fail then
-     Setnicegens(ri,Concatenation(pregensfac(ri),nicegens(kernel(ri))));
+     SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(kernel(ri))));
    else
-     Setnicegens(ri,pregensfac(ri));
+     SetNiceGens(ri,pregensfac(ri));
    fi;
    return ri;
  fi;
@@ -127,9 +127,9 @@ RefineSolubleLayers := function(ri)
   Setkernel(ri,RefineSolubleLayers(riker));
   Setparent(kernel(ri),ri);
   if kernel(ri)<>fail then
-    Setnicegens(ri,Concatenation(pregensfac(ri),nicegens(kernel(ri))));
+    SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(kernel(ri))));
   else
-    Setnicegens(ri,pregensfac(ri));
+    SetNiceGens(ri,pregensfac(ri));
   fi;
 
   return ri;
@@ -165,9 +165,9 @@ RefineElementaryAbelianLayers := function(ri)
    riker := kernel(ri);
    Setkernel(ri,RefineElementaryAbelianLayers(riker));
    if kernel(ri)<>fail then
-     Setnicegens(ri,Concatenation(pregensfac(ri),nicegens(kernel(ri))));
+     SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(kernel(ri))));
    else
-     Setnicegens(ri,pregensfac(ri));
+     SetNiceGens(ri,pregensfac(ri));
    fi;
    return ri;
  fi;
@@ -181,9 +181,9 @@ RefineElementaryAbelianLayers := function(ri)
    riker := kernel(ri);
    Setkernel(ri,RefineElementaryAbelianLayers(riker));
    if kernel(ri)<>fail then
-     Setnicegens(ri,Concatenation(pregensfac(ri),nicegens(kernel(ri))));
+     SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(kernel(ri))));
    else
-     Setnicegens(ri,pregensfac(ri));
+     SetNiceGens(ri,pregensfac(ri));
    fi;
    
    return ri;
@@ -203,9 +203,9 @@ SubgroupNC(Grp(factor(ri)),List(CS[i],v->VectortoPc(v,Grp(factor(ri))))));
   Setkernel(ri,RefineElementaryAbelianLayers(riker));
   Setparent(kernel(ri),ri);
   if kernel(ri)<>fail then
-    Setnicegens(ri,Concatenation(pregensfac(ri),nicegens(kernel(ri))));
+    SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(kernel(ri))));
   else
-    Setnicegens(ri,pregensfac(ri));
+    SetNiceGens(ri,pregensfac(ri));
   fi;
 
   return ri;
@@ -235,9 +235,9 @@ RemoveTrivialLayers := function(ri)
    newriker := kernel(ri);
    Setkernel(ri,RemoveTrivialLayers(newriker));
    if kernel(ri)<>fail then
-     Setnicegens(ri,Concatenation(pregensfac(ri),nicegens(kernel(ri))));
+     SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(kernel(ri))));
    else
-     Setnicegens(ri,pregensfac(ri));
+     SetNiceGens(ri,pregensfac(ri));
    fi;
 
    return RemoveTrivialLayers(ri);
@@ -245,9 +245,9 @@ RemoveTrivialLayers := function(ri)
 
  Setkernel(ri,RemoveTrivialLayers(riker));   
  if kernel(ri)<>fail then
-   Setnicegens(ri,Concatenation(pregensfac(ri),nicegens(kernel(ri))));
+   SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(kernel(ri))));
  else
-   Setnicegens(ri,pregensfac(ri));
+   SetNiceGens(ri,pregensfac(ri));
  fi;
  return ri;
 end;

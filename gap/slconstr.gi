@@ -2451,7 +2451,7 @@ SLCR.FindHom := function(ri,G,d,q)
   ri!.dimension := d;
   Setslpforelement(ri,SLPforElementFuncsMatrix.SLConstructive);
   SetFilterObj(ri,IsLeaf);
-  Setnicegens(ri,StripMemory(genlist));
+  SetNiceGens(ri,StripMemory(genlist));
   Setslptonice(ri,data.slpnice);
   return true;
 end;
@@ -2508,7 +2508,7 @@ FindHomMethodsMatrix.NaturalSL := function(ri,G)
   ri!.dimension:=n;
   Setslpforelement(ri,SLPforElementFuncsMatrix.SLConstructive);
   SetFilterObj(ri,IsLeaf);
-  Setnicegens(ri,StripMemory(genlist));
+  SetNiceGens(ri,StripMemory(genlist));
   Setslptonice(ri,data.slpnice);
   return true;
 end;

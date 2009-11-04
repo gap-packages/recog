@@ -325,7 +325,7 @@ SolveLeafDP := function(ri,rifac,name)
  blktoH1 := GroupHomomorphismByFunction(blk,Grp(ri),g->
 ResultOfStraightLineProgram( SLPforElement(blkdata,g),invims));
  
- Y := nicegens(blkdata);
+ Y := NiceGens(blkdata);
  YY := List(Y,y->ImageElm(MyEmbedding(I,1),y));
  r := Length(Y);
 
@@ -361,7 +361,7 @@ g->ImageElm(projs[i],phi!.fun(econj[i]!.fun(blktoH1!.fun(g)))));
  od;    
 
  Setpregensfac(ri,Yhat);
- Setnicegens(rifac,YY);
+ SetNiceGens(rifac,YY);
  Setslpforelement(rifac, function(rifac,g)
 
    local list;

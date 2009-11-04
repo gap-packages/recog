@@ -127,7 +127,7 @@ InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
     fi;
     stdgens := stdgens.gens;
     Setslptostd(ri,SLPOfElms(stdgens));
-    Setstdgens(ri,StripMemory(stdgens));
+    SetStdGens(ri,StripMemory(stdgens));
     if IsBound(hint.usemax) then
         if IsBound(hint.brauercharelm) then
             elm := ResultOfStraightLineProgram(hint.brauercharelm,stdgens);

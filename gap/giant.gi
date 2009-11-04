@@ -753,7 +753,7 @@ FindHomMethodsPerm.Giant :=
     else
         SetSize(ri,Factorial(Length(mp)));
     fi;
-    Setnicegens(ri,StripMemory(res.gens));
+    SetNiceGens(ri,StripMemory(res.gens));
     Setslptonice(ri,res.slpnice);
     return true;
   end;

@@ -164,9 +164,9 @@ AbPastAb := function(ri)
  x := pregensfac(ri)[1];
  riker := kernel(ri);;
 # Does x act trivially on factor(riker)
- for i in [1..Length(nicegens(factor(riker)))] do
+ for i in [1..Length(NiceGens(factor(riker)))] do
    im := ImageElm(Homom(riker),pregensfac(riker)[i]^x);
-   if im <> nicegens(factor(riker))[i] then
+   if im <> NiceGens(factor(riker))[i] then
      return false; 
    fi;
  od;
@@ -174,7 +174,7 @@ AbPastAb := function(ri)
 # Now we know x acts trivially on factor(riker)
 # Construct the new lifting
  q := Grp(factor(riker))!.Pcgs!.RelativeOrders[1];
- l := GroupHomomorphismByImagesNC(Grp(factor(ri)),Grp(ri),List(nicegens(factor(ri)),x->x^q),List(pregensfac(ri),x->x^q));  
+ l := GroupHomomorphismByImagesNC(Grp(factor(ri)),Grp(ri),List(NiceGens(factor(ri)),x->x^q),List(pregensfac(ri),x->x^q));  
  
 # Construct the new map
  zeta := GroupHomomorphismByFunction(Grp(ri),Grp(factor(riker)),g->ImageElm(Homom(riker),g*ImageElm(Homom(ri)*l,g)^-1));
@@ -193,16 +193,16 @@ AbPastAbSamePrime := function(ri)
    Error(179);
  fi;
 # Does x act trivially on factor(riker)
- for i in [1..Length(nicegens(factor(riker)))] do
+ for i in [1..Length(NiceGens(factor(riker)))] do
    im := ImageElm(Homom(riker),pregensfac(riker)[i]^x);
-   if im <> nicegens(factor(riker))[i] then
+   if im <> NiceGens(factor(riker))[i] then
      return [false]; 
    fi;
  od;
 
 # Construct a map down onto the direct product of the two factor groups
  p := Grp(factor(riker))!.Pcgs!.RelativeOrders[1];
- l := GroupHomomorphismByImagesNC(Grp(factor(ri)),Grp(ri),nicegens(factor(ri)),pregensfac(ri));  
+ l := GroupHomomorphismByImagesNC(Grp(factor(ri)),Grp(ri),NiceGens(factor(ri)),pregensfac(ri));  
  psi := GroupHomomorphismByFunction(Grp(ri),Grp(factor(riker)),g->ImageElm(Homom(riker),g*ImageElm(l,ImageElm(Homom(ri),g))^-1));
 # check generators and relations of facto(ri) map to 1 under psi
  checkelts1 := List(pregensfac(ri),x->x^p);
@@ -250,9 +250,9 @@ NonAbPastAb := function(ri)
  x := pregensfac(ri)[1];
  riker := kernel(ri);;
 # Does x act trivially on factor(riker)
- for i in [1..Length(nicegens(factor(riker)))] do
+ for i in [1..Length(NiceGens(factor(riker)))] do
    im := ImageElm(Homom(riker),pregensfac(riker)[i]^x);
-   if im <> nicegens(factor(riker))[i] then
+   if im <> NiceGens(factor(riker))[i] then
      return false; 
    fi;
  od;
@@ -347,8 +347,8 @@ end);
 #new factor group is direct product of old factor groups, both are now in the socle.
  SetGrp(nrifac,D);
 
-#map the nicegens for each factor into the direct product, and take both sets of nicegens.
- Setnicegens(nrifac,Concatenation(List(nicegens(factor(ri)),x->ImageElm(MyEmbedding(D,1),x)),List(nicegens(factor(riker)),x->ImageElm(MyEmbedding(D,2),x))));
+#map the NiceGens for each factor into the direct product, and take both sets of NiceGens.
+ SetNiceGens(nrifac,Concatenation(List(NiceGens(factor(ri)),x->ImageElm(MyEmbedding(D,1),x)),List(NiceGens(factor(riker)),x->ImageElm(MyEmbedding(D,2),x))));
 
  SetFilterObj(nrifac,IsLeaf);
  Setfhmethsel(nrifac,"socle"); 
@@ -393,10 +393,10 @@ g*ResultOfStraightLineProgram(SLPforElement(factor(riker),ImageElm(phi*MyProject
 pregensfac(riker)));
  #this was causing problems with the kernel was fail. 
  if Haskernel(nri) and kernel(nri) <> fail then
-   Setnicegens(nri,Concatenation(pregensfac(nri),nicegens(kernel(nri))));
+   SetNiceGens(nri,Concatenation(pregensfac(nri),NiceGens(kernel(nri))));
  elif Haskernel(nri) then 
  #so the kernel is the trivial group, just need preimages of the socle generators.
-   Setnicegens(nri, pregensfac(nri));
+   SetNiceGens(nri, pregensfac(nri));
  fi;
  Setcalcnicegens(nri,CalcNiceGensHomNode);
  SetName(nrifac,Concatenation(Name(factor(ri)),",",Name(factor(riker))));
@@ -458,14 +458,14 @@ SwapFactors := function(ri,zeta)
    fi;
  fi;
  Setfactor(nri,StructuralCopy(factor(riker)));
- #value of nicegens is either the ones of the image on their own if kernel
+ #value of NiceGens is either the ones of the image on their own if kernel
  #is trivial, or gens for image plus gens for kernel.
  if Haskernel(nriker) and not (kernel(nriker) = fail) then
-   Setnicegens(nriker,Concatenation(pregensfac(nriker),nicegens(kernel(nriker))));
+   SetNiceGens(nriker,Concatenation(pregensfac(nriker),NiceGens(kernel(nriker))));
  else
-   Setnicegens(nriker, pregensfac(nriker));
+   SetNiceGens(nriker, pregensfac(nriker));
  fi;
- Setnicegens(nri,Concatenation(pregensfac(nri),nicegens(nriker)));
+ SetNiceGens(nri,Concatenation(pregensfac(nri),NiceGens(nriker)));
  Setcalcnicegens(nri,CalcNiceGensHomNode);
  Setcalcnicegens(nriker,CalcNiceGensHomNode);
  SetGrp(nri,StructuralCopy(Grp(ri)));
@@ -578,7 +578,7 @@ PushDown := function(pri)
      if not SanityCheck(npri) then
        Error(6);
      fi;
-     Setnicegens(npri,Concatenation(pregensfac(npri),nicegens(knpri)));
+     SetNiceGens(npri,Concatenation(pregensfac(npri),NiceGens(knpri)));
      View(npri);
      if not SanityCheck(npri) then 
        Error(7);
@@ -618,7 +618,7 @@ OrderTree := function(ri)
 # Push the soluble layers down
  while Hasparent(pri) do
    pri := StructuralCopy(parent(pri));
-   Setnicegens(pri,Concatenation(pregensfac(pri),nicegens(kernel(pri))));
+   SetNiceGens(pri,Concatenation(pregensfac(pri),NiceGens(kernel(pri))));
    npri := PushDown(StructuralCopy(pri));;
    if npri <> false then 
      pri := StructuralCopy(npri);

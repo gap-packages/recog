@@ -650,7 +650,7 @@ SLPForElementGenSift := function(ri,x)
   s := MakeCompleteSLP(ri!.siftrec,y);
   # Do a security check: ==> not necessary, because the gensift does
   # detect a wrong result!
-  #if ResultOfStraightLineProgram(s,nicegens(ri)) <> x then
+  #if ResultOfStraightLineProgram(s,NiceGens(ri)) <> x then
   #    return fail;
   #else
   #fi;

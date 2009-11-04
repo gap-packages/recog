@@ -1509,7 +1509,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
           Setslptonice(ri,SLPOfElms(std.all));
           ri!.nicebas := std.bas;
           ri!.nicebasi := std.basi;
-          Setnicegens(ri,List(StripMemory(std.all),x->std.basi*x*std.bas));
+          SetNiceGens(ri,List(StripMemory(std.all),x->std.basi*x*std.bas));
           ri!.fakegens := RECOG.InitSLfake(f,2);
           ri!.fakegens.count := 0;
           ri!.comment := "_PSL2Even";
@@ -1529,7 +1529,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
           Setslptonice(ri,SLPOfElms(std.all));
           ri!.nicebas := std.bas;
           ri!.nicebasi := std.basi;
-          Setnicegens(ri,List(StripMemory(std.all),x->std.basi*x*std.bas));
+          SetNiceGens(ri,List(StripMemory(std.all),x->std.basi*x*std.bas));
           ri!.fakegens := RECOG.InitSLfake(f,2);
           ri!.fakegens.count := 0;
           ri!.comment := "_PSL2Odd";
@@ -1557,7 +1557,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
           ri!.nicebasi := std.basi;
           ext := DegreeOverPrimeField(f);
           stdg := RECOG.MakeSL_StdGens(p,ext,d,d);
-          Setnicegens(ri,List(StripMemory(stdg.all),
+          SetNiceGens(ri,List(StripMemory(stdg.all),
                       x->std.basi*x*std.bas));
           ri!.fakegens := RECOG.InitSLfake(f,d);
           ri!.fakegens.count := 0;
