@@ -488,7 +488,7 @@ InstallGlobalFunction( RecogniseGeneric,
         Remove(depth);
         PrintTreePos("F",depth,H);
         SetRIFac(ri,rifac);
-        Setparent(rifac,ri);
+        SetRIParent(rifac,ri);
 
         if IsMatrixGroup(H) then
             Info(InfoRecog,2,"Back from factor (depth=",Length(depth),
@@ -565,7 +565,7 @@ InstallGlobalFunction( RecogniseGeneric,
         Remove(depth);
         PrintTreePos("K",depth,H);
         SetRIKer(ri,riker);
-        Setparent(riker,ri);
+        SetRIParent(riker,ri);
         Info(InfoRecog,2,"Back from kernel (depth=",Length(depth),").");
 
         done := true;

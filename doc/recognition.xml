@@ -517,7 +517,7 @@ elements that are generated from them remember, how they were acquired.
 </ManSection>
 
 <ManSection>
-<Attr Name="parent" Arg="ri"/>
+<Attr Name="RIParent" Arg="ri"/>
 <Description>
     The value of this attribute is the recognition info record of the
     parent of this node in the recognition tree. The top node does not
