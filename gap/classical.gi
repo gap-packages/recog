@@ -599,9 +599,11 @@ RECOG.TestRandomElement := function (recognise, grp)
     cpol := recognise.cpol;
 
     if recognise.needOrders then
+        Print(".");
         ord := Order(g);
         recognise.ord := ord;
         AddSet( recognise.orders, ord );
+    else Print(",");
     fi;
     if recognise.needPOrders then
         ord := ProjectiveOrder(g);
@@ -874,41 +876,37 @@ RECOG.ClassicalForms := function( recognise, grp)
         return false;
     fi;
 
-    # try to find generators without scalars
-    if recognise.maybeDual  then
-        dmodule := ClassicalForms_GeneratorsWithoutScalarsDual(grp);
-        if dmodule = false  then
-            recognise.maybeDual := false;
-        fi;
-    fi;
-    if recognise.maybeFrobenius then
-        fmodule := ClassicalForms_GeneratorsWithoutScalarsFrobenius(grp);
-        if fmodule = false  then
-            recognise.maybeFrobenius := false;
-        fi;
-    fi;
+
     # now try to find an invariant form
-    if recognise.maybeDual  then
-        form := ClassicalForms_InvariantFormDual(module,dmodule);
-        if form <> false  then
-            Add( recognise.ClassicalForms, 
-            BilinearFormByMatrix(form[2], field));
-            if Length(form)=4 then
-               recognise.QuadraticFormType := form[1];
-               recognise.QuadraticForm := QuadraticFormByMatrix(form[4]);
+    if recognise.maybeDual then
+        dmodule := ClassicalForms_GeneratorsWithoutScalarsDual(grp);
+        if dmodule <> false then 
+            form := ClassicalForms_InvariantFormDual(module,dmodule);
+            if form <> false  then
+                Add( recognise.ClassicalForms, 
+                BilinearFormByMatrix(form[2], field));
+                if Length(form)=4 then
+                    recognise.QuadraticFormType := form[1];
+                    recognise.QuadraticForm := QuadraticFormByMatrix(form[4]);
+                fi;
+                return false;
+            else
+                recognise.maybeDual := false;
             fi;
-        else
-            recognise.maybeDual := false;
         fi;
     fi;
 
-    if recognise.maybeFrobenius  then
-        form := ClassicalForms_InvariantFormFrobenius(module,fmodule);
-        if form <> false  then
-            Add( recognise.ClassicalForms,
-                 HermitianFormByMatrix(form[2], field));
-        else
-            recognise.maybeFrobenius := false;
+    if recognise.maybeFrobenius then
+        fmodule := ClassicalForms_GeneratorsWithoutScalarsFrobenius(grp);
+        if fmodule <> false then
+            form := ClassicalForms_InvariantFormFrobenius(module,fmodule);
+            if form <> false  then
+                Add( recognise.ClassicalForms,
+                     HermitianFormByMatrix(form[2], field));
+               return false;
+            else
+                recognise.maybeFrobenius := false;
+            fi;
         fi;
     fi;
 
@@ -918,10 +916,11 @@ RECOG.ClassicalForms := function( recognise, grp)
         if First(recognise.ClassicalForms,IsTrivialForm)=fail then
             Add(recognise.ClassicalForms,
             BilinearFormByMatrix(NullMat(d,d,field), field)); 
+            return false;
         fi;
     fi;
 
-    return false;
+    return fail;
 
 end;
 
@@ -1356,13 +1355,13 @@ RECOG.NonGenericSymplectic := function(recognise, grp)
 
     if recognise.n <= 5 then
         return NotApplicable;
-    elif recognise.n = 6 then
+    elif recognise.n <= 6 and d <> 4 then
         recognise.needOrders := true;
-        if d = 4 then
-            recognise.needLB := true;
-            recognise.needE2 := true;
-        fi;
         return fail;
+    elif d = 4 then
+        recognise.needOrders := true;
+        recognise.needLB := true;
+        recognise.needE2 := true;
     fi;
 
 
@@ -1671,13 +1670,13 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
        return false;
     fi;
 
+   if d = 8  then
+       recognise.needE2 := true;
+    fi;
     if recognise.n <= 5 then
         return NotApplicable;
     elif recognise.n = 6 then
         recognise.needOrders := true;
-        if d = 8 then
-           recognise.needE2 := true;
-        fi;
         return fail;
     fi;
 
@@ -2188,7 +2187,12 @@ function( arg )
       return;
   fi;
   grp := arg[1];
-  nrrandels := 20;
+  nrrandels := 30;
+  if DimensionOfMatrixGroup(grp) = 8 then 
+     nrrandels := 200;
+  elif DimensionOfMatrixGroup(grp) <= 10 then 
+      nrrandels := 50;
+  fi;
   case := "unknown";
   for i in [2..Length(arg)] do
       if IsInt(arg[i]) then
