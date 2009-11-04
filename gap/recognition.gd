@@ -34,15 +34,15 @@ DeclareAttribute( "Grp", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "Homom", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "StdGens", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "NiceGens", IsRecognitionInfo, "mutable" );
-DeclareAttribute( "factor", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "RIFac", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "kernel", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "parent", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "presentation", IsRecognitionInfo, "mutable" );
 
 DeclareAttribute( "pregensfac", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "calcnicegens", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "slptonice", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "slptostd", IsRecognitionInfo, "mutable" );
-DeclareAttribute( "parent", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "fhmethsel", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "methodsforfactor", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "slpforelement", IsRecognitionInfo, "mutable" );

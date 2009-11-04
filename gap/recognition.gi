@@ -64,8 +64,8 @@ InstallMethod( ViewObj, "for recognition infos", [IsRecognitionInfo],
     if not(IsLeaf(ri)) then
         Print("\n",String("",RECINFORECURLEVEL)," F:"); 
         RECINFORECURLEVEL := RECINFORECURLEVEL+3;
-        if Hasfactor(ri) then
-            ViewObj(factor(ri));
+        if HasRIFac(ri) then
+            ViewObj(RIFac(ri));
         else
             Print("has no factor");
         fi;
@@ -487,7 +487,7 @@ InstallGlobalFunction( RecogniseGeneric,
                   methodsforfactor(ri), depth, forfactor(ri) );
         Remove(depth);
         PrintTreePos("F",depth,H);
-        Setfactor(ri,rifac);
+        SetRIFac(ri,rifac);
         Setparent(rifac,ri);
 
         if IsMatrixGroup(H) then
@@ -644,7 +644,7 @@ InstallGlobalFunction( CalcNiceGensHomNode,
   function(ri,origgens)
     local origkergens,rifac,riker,pregensfactor;
     # Is there a non-trivial kernel?
-    rifac := factor(ri);
+    rifac := RIFac(ri);
     if Haskernel(ri) and kernel(ri) <> fail then
         pregensfactor := CalcNiceGens(rifac,origgens);
         riker := kernel(ri);
@@ -670,7 +670,7 @@ InstallGlobalFunction( SLPforElementGeneric,
   # generic method for a non-leaf node
   function(ri,g)
     local gg,n,rifac,riker,s,s1,s2,y,nr1,nr2;
-    rifac := factor(ri);
+    rifac := RIFac(ri);
     riker := kernel(ri);   # note: might be fail
     gg := ImageElm(Homom(ri),g);
     if gg = fail then
@@ -710,7 +710,7 @@ InstallGlobalFunction( FindKernelRandom,
     local i,l,rifac,s,x,y;
     Info(InfoRecog,2,"Creating ",n," random generators for kernel.");
     l := gensN(ri);
-    rifac := factor(ri);
+    rifac := RIFac(ri);
     for i in [1..n] do
         x := RandomElm(ri,"KERNELANDVERIFY",true).el;
         s := SLPforElement(rifac,ImageElm( Homom(ri), x!.el ));
@@ -818,7 +818,7 @@ InstallOtherMethod( Size, "for a recognition info record",
         #       of the recognition info record!
         return Size(Grp(ri));
     else
-        size := Size(factor(ri));
+        size := Size(RIFac(ri));
         if kernel(ri) <> fail then
             return Size(kernel(ri)) * size;
         else
@@ -887,11 +887,11 @@ InstallGlobalFunction( "DisplayCompositionFactors", function(arg)
       od;
   else
       if Haskernel(ri) and kernel(ri) <> fail then
-          DisplayCompositionFactors(factor(ri),depth+1,homs+1,
+          DisplayCompositionFactors(RIFac(ri),depth+1,homs+1,
                                     ksize*Size(kernel(ri)));
           DisplayCompositionFactors(kernel(ri),depth+1,homs,ksize);
       else
-          DisplayCompositionFactors(factor(ri),depth+1,homs+1,ksize);
+          DisplayCompositionFactors(RIFac(ri),depth+1,homs+1,ksize);
       fi;
   fi;
   if depth = 0 then
@@ -916,7 +916,7 @@ InstallGlobalFunction( "GetCompositionTreeNode",
     local r,c;
     r := ri;
     for c in what do
-      if c in "fF" then r := factor(r); 
+      if c in "fF" then r := RIFac(r); 
       elif c in "kK" then r := kernel(r); fi;
     od;
     return r;
@@ -987,7 +987,7 @@ RECOG.TestRecognitionNode := function(ri,stop,recurse)
       if IsLeaf(ri) then
           return rec(err := err, badnode := ri);
       fi;
-      ef := RECOG.TestRecognitionNode(factor(ri),stop,recurse);
+      ef := RECOG.TestRecognitionNode(RIFac(ri),stop,recurse);
       if IsRecord(ef) then return ef; fi;
       if kernel(ri) <> fail then
           ek := RECOG.TestRecognitionNode(kernel(ri),stop,recurse);

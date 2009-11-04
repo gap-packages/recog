@@ -398,7 +398,7 @@ and is in the category
 and is <Ref Filt="IsAttributeStoringRep" BookName="Prg"/>, such that we can
 define attributes for it, the values of which are stored once they are 
 known. A recognition info record always represents a whole binary tree of such
-records, see the attributes <Ref Attr="factor"/> and <Ref Attr="kernel"/>
+records, see the attributes <Ref Attr="RIFac"/> and <Ref Attr="kernel"/>
 below. <P/>
 
 The following filters are defined for recognition info records:
@@ -408,7 +408,7 @@ The following filters are defined for recognition info records:
 <Description>
 This flag indicates, whether or not a recognition info record represents a leaf
 in the recognition tree. If it is not set, one finds at least one of
-the attributes <Ref Attr="factor"/> and <Ref Attr="kernel"/> set for
+the attributes <Ref Attr="RIFac"/> and <Ref Attr="kernel"/> set for
 the corresponding node. This flag is normally reset and has to be set
 by a find homomorphism method to indicate a leaf.
 </Description>
@@ -489,7 +489,7 @@ elements that are generated from them remember, how they were acquired.
 </ManSection>
 
 <ManSection>
-<Attr Name="factor" Arg="ri"/>
+<Attr Name="RIFac" Arg="ri"/>
 <Description>
     The value of this attribute is the recognition info record of the
     image of the homomorphism that was found from the group described by
