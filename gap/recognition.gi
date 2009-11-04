@@ -70,11 +70,11 @@ InstallMethod( ViewObj, "for recognition infos", [IsRecognitionInfo],
             Print("has no factor");
         fi;
         Print("\n",String("",RECINFORECURLEVEL-3), " K:");
-        if Haskernel(ri) then
-            if kernel(ri) = fail then
+        if HasRIKer(ri) then
+            if RIKer(ri) = fail then
                 Print("<trivial kernel");
             else
-                ViewObj(kernel(ri));
+                ViewObj(RIKer(ri));
             fi;
         else
             Print("has no kernel");
@@ -541,7 +541,7 @@ InstallGlobalFunction( RecogniseGeneric,
         # We found out that N is the trivial group!
         # In this case we do nothing, kernel is fail indicating this.
         Info(InfoRecog,2,"Found trivial kernel (depth=",Length(depth),").");
-        Setkernel(ri,fail);
+        SetRIKer(ri,fail);
         # We have to learn from the factor, what our nice generators are:
         SetNiceGens(ri,pregensfac(ri));
         SetFilterObj(ri,IsReady);
@@ -564,7 +564,7 @@ InstallGlobalFunction( RecogniseGeneric,
         riker := RecogniseGeneric( N, methoddb, depth, forkernel(ri) );
         Remove(depth);
         PrintTreePos("K",depth,H);
-        Setkernel(ri,riker);
+        SetRIKer(ri,riker);
         Setparent(riker,ri);
         Info(InfoRecog,2,"Back from kernel (depth=",Length(depth),").");
 
@@ -645,9 +645,9 @@ InstallGlobalFunction( CalcNiceGensHomNode,
     local origkergens,rifac,riker,pregensfactor;
     # Is there a non-trivial kernel?
     rifac := RIFac(ri);
-    if Haskernel(ri) and kernel(ri) <> fail then
+    if HasRIKer(ri) and RIKer(ri) <> fail then
         pregensfactor := CalcNiceGens(rifac,origgens);
-        riker := kernel(ri);
+        riker := RIKer(ri);
         origkergens := ResultOfStraightLineProgram( gensNslp(ri), origgens );
         return Concatenation( pregensfactor,
                               CalcNiceGens(riker,origkergens) );
@@ -671,7 +671,7 @@ InstallGlobalFunction( SLPforElementGeneric,
   function(ri,g)
     local gg,n,rifac,riker,s,s1,s2,y,nr1,nr2;
     rifac := RIFac(ri);
-    riker := kernel(ri);   # note: might be fail
+    riker := RIKer(ri);   # note: might be fail
     gg := ImageElm(Homom(ri),g);
     if gg = fail then
         return fail;
@@ -819,8 +819,8 @@ InstallOtherMethod( Size, "for a recognition info record",
         return Size(Grp(ri));
     else
         size := Size(RIFac(ri));
-        if kernel(ri) <> fail then
-            return Size(kernel(ri)) * size;
+        if RIKer(ri) <> fail then
+            return Size(RIKer(ri)) * size;
         else
             return size;   # trivial kernel
         fi;
@@ -886,10 +886,10 @@ InstallGlobalFunction( "DisplayCompositionFactors", function(arg)
           Print(IsomorphismTypeInfoFiniteSimpleGroup( f ).name, "\n" );
       od;
   else
-      if Haskernel(ri) and kernel(ri) <> fail then
+      if HasRIKer(ri) and RIKer(ri) <> fail then
           DisplayCompositionFactors(RIFac(ri),depth+1,homs+1,
-                                    ksize*Size(kernel(ri)));
-          DisplayCompositionFactors(kernel(ri),depth+1,homs,ksize);
+                                    ksize*Size(RIKer(ri)));
+          DisplayCompositionFactors(RIKer(ri),depth+1,homs,ksize);
       else
           DisplayCompositionFactors(RIFac(ri),depth+1,homs+1,ksize);
       fi;
@@ -917,7 +917,7 @@ InstallGlobalFunction( "GetCompositionTreeNode",
     r := ri;
     for c in what do
       if c in "fF" then r := RIFac(r); 
-      elif c in "kK" then r := kernel(r); fi;
+      elif c in "kK" then r := RIKer(r); fi;
     od;
     return r;
   end );
@@ -989,8 +989,8 @@ RECOG.TestRecognitionNode := function(ri,stop,recurse)
       fi;
       ef := RECOG.TestRecognitionNode(RIFac(ri),stop,recurse);
       if IsRecord(ef) then return ef; fi;
-      if kernel(ri) <> fail then
-          ek := RECOG.TestRecognitionNode(kernel(ri),stop,recurse);
+      if RIKer(ri) <> fail then
+          ek := RECOG.TestRecognitionNode(RIKer(ri),stop,recurse);
           if IsRecord(ek) then return ek; fi;
       fi;
       return rec( err := err, badnode := ri, factorkernelok := true );

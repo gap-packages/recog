@@ -35,7 +35,7 @@ DeclareAttribute( "Homom", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "StdGens", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "NiceGens", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "RIFac", IsRecognitionInfo, "mutable" );
-DeclareAttribute( "kernel", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "RIKer", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "parent", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "presentation", IsRecognitionInfo, "mutable" );
 
