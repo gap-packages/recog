@@ -57,7 +57,7 @@ InstallMethod( ViewObj, "for recognition infos", [IsRecognitionInfo],
     if HasSize(ri) then
         Print(" Size=",Size(ri));
     fi;
-    if Hasgroup(ri) and IsMatrixGroup(group(ri)) then
+    if HasGrp(ri) and IsMatrixGroup(Grp(ri)) then
         Print(" Dim=",ri!.dimension);
         Print(" Field=",Size(ri!.field));
     fi;
@@ -129,7 +129,7 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     ri := ShallowCopy(r);
     Objectify( RecognitionInfoType, ri );
     ri!.nrgensH := Length(GeneratorsOfGroup(H));
-    Setgroup(ri,H);
+    SetGrp(ri,H);
     Setslpforelement(ri,SLPforElementGeneric);
     SetgensN(ri,[]);       # this will grow over time
     Setimmediateverification(ri,false);
@@ -425,7 +425,7 @@ InstallGlobalFunction( RecogniseGeneric,
         Setfhmethsel(ri,CallMethods( methoddb, 10, ri, H ));
     fi;
     # Reset the pseudo random stamp:
-    RECOG.SetPseudoRandomStamp(group(ri),"PseudoRandom");
+    RECOG.SetPseudoRandomStamp(Grp(ri),"PseudoRandom");
     if fhmethsel(ri).result = fail then
         SetFilterObj(ri,IsLeaf);
         if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
@@ -816,7 +816,7 @@ InstallOtherMethod( Size, "for a recognition info record",
     if IsLeaf(ri) then
         # Note: A leaf in projective recognition *has* to set the size
         #       of the recognition info record!
-        return Size(group(ri));
+        return Size(Grp(ri));
     else
         size := Size(factor(ri));
         if kernel(ri) <> fail then
@@ -874,7 +874,7 @@ InstallGlobalFunction( "DisplayCompositionFactors", function(arg)
       return;
   fi;
   if IsLeaf(ri) then
-      c := CompositionSeries(group(ri));
+      c := CompositionSeries(Grp(ri));
       for i in [1..Length(c)-1] do
           if homs > 0 then
               Print("Group with Size ",ksize*Size(c[i]));
@@ -901,7 +901,7 @@ end );
 
 BindGlobal( "SLPforNiceGens", function(ri)
   local l,ll,s;
-  l := List( [1..Length(GeneratorsOfGroup(group(ri)))], x->() );
+  l := List( [1..Length(GeneratorsOfGroup(Grp(ri)))], x->() );
   l := GeneratorsWithMemory(l);
   ll := CalcNiceGens(ri,l);
   s := SLPOfElms(ll);
@@ -967,7 +967,7 @@ end;
 RECOG.TestRecognitionNode := function(ri,stop,recurse)
   local err, grp, x, slp, y, ef, ek, i;
   err := 0;
-  grp := group(ri);
+  grp := Grp(ri);
   for i in [1..100] do
       x := PseudoRandom(grp);
       slp := SLPforElement(ri,x);
