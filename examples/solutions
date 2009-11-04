@@ -51,7 +51,7 @@ Example 11:
   --> works, involution jumper takes it apart
 
 Example 12:
-  2^(1+17).U(8,2).3.2 
+  3^(1+17).U(8,2).3.2 
   with size: 396361728
   --> works?
 
@@ -108,18 +108,25 @@ Challenge 10:
 Challenge 11:
   This is SL(80,71).
   --> works perfectly, preimages of nice generators always problematic
+                       here also kernel gens and sifting
 
 Challenge 12:
-  - 
+  Size is 8412055600858398720, this is 2^35.M24.
+  Imprimitive D2, D247 finds it readily.
+  --> works perfectly
 
 Challenge 13:
-  - 
+  Imprimitive, 21 blocks, L2(7) acting on top, below are 7 copies of
+  L2(7), size is 649791775986809831424.
+  --> works perfectly
 
 Challenge 14:
-  - 
+  This is SL(8,251) tensor SL(9,251) (tensor decomposable D4).
+  --> works perfectly
 
 Challenge 15:
-  - 
+  SL(5,625) blown up to GL(20,5), is recognised but then
+  classicalnatural does not work because field GF(625) not compressed.
 
 
 
