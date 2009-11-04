@@ -301,7 +301,7 @@ FindHomMethodsPerm.StabilizerChain := function(ri,G)
      args := [ri])];
   S := StabilizerChain(Gm);
   SetSize(ri,Size(S));
-  SetSize(group(ri),Size(S));
+  SetSize(Grp(ri),Size(S));
   ri!.stabilizerchain := S;
   Setslptonice(ri,SLPOfElms(StrongGenerators(S)));
   ForgetMemory(S);
@@ -365,10 +365,10 @@ end;
 
 SLPforElementFuncsPerm.StabChain :=
   function( ri, g )
-    # we know that g is an element of group(ri) all without memory.
-    # we know that group(ri) has an immutable StabChain and
+    # we know that g is an element of Grp(ri) all without memory.
+    # we know that Grp(ri) has an immutable StabChain and
     # ri!.stronggensslp is bound to a slp that expresses the strong generators
-    # in that StabChain in terms of the GeneratorsOfGroup(group(ri)).
+    # in that StabChain in terms of the GeneratorsOfGroup(Grp(ri)).
     local G,S,s;
     G := ri!.Gnomem;
     S := StabChainImmutable(G);

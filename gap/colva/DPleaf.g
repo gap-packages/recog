@@ -279,11 +279,11 @@ SolveLeafDP := function(ri,rifac,name)
        H1,H1toblk,riH1,blkdata,invims,Yhat,blktoH1,Y,YY,r,i,
        j,t,mat,qr,gamma,gammainv,list,e,h,z,y;
 
- I := group(rifac);
+ I := Grp(rifac);
  phi := homom(ri);
- R := RefineMap(group(ri),phi,I);
+ R := RefineMap(Grp(ri),phi,I);
  phi := R[1]; I := R[2];
- Sethomom(ri,phi); Setgroup(rifac,I);
+ Sethomom(ri,phi); SetGrp(rifac,I);
 
  k := NumberOfDPComponents(I);
  projs := List([1..k],i->MyProjection(I,i));
@@ -294,7 +294,7 @@ SolveLeafDP := function(ri,rifac,name)
    #**error here - was only two parameters, tried to fix it by adding ri as first.
    rifac := RecogniseLeaf(ri,blk,name[1]);
    if not bool then return fail; fi;
-   Sethomom(ri,GroupHomomorphismByFunction(group(ri),blk,g->ImageElm(projs[1],ImageElm(homom(ri),g))));
+   Sethomom(ri,GroupHomomorphismByFunction(Grp(ri),blk,g->ImageElm(projs[1],ImageElm(homom(ri),g))));
    return true;
  fi;
 
@@ -302,13 +302,13 @@ SolveLeafDP := function(ri,rifac,name)
 # Need SLP's in G for generators of H 
 
 
- permrep := PermAction(overgroup(ri),group(ri),phi,I);
+ permrep := PermAction(overgroup(ri),Grp(ri),phi,I);
  invhom := GroupHomomorphismByImagesNC(permrep,overgroup(ri),GeneratorsOfGroup(permrep),GeneratorsOfGroup(overgroup(ri)));
  e := List([1..k],i-> ImageElm(invhom,RepresentativeAction(permrep,1,i)));
- econj := List([1..Size(e)],i->GroupHomomorphismByFunction(group(ri),group(ri),g->g^e[i]));
+ econj := List([1..Size(e)],i->GroupHomomorphismByFunction(Grp(ri),Grp(ri),g->g^e[i]));
 
- gens := List([1..3],i->FindPoint(group(ri),phi,1,I));  
- H1 := SubgroupNC(group(ri),FastNormalClosure(GeneratorsOfGroup(group(ri)),gens,1));
+ gens := List([1..3],i->FindPoint(Grp(ri),phi,1,I));  
+ H1 := SubgroupNC(Grp(ri),FastNormalClosure(GeneratorsOfGroup(Grp(ri)),gens,1));
  H1toblk := phi*projs[1];
  H1toblk!.Source := H1;
  blk := GroupWithGenerators(List(GeneratorsOfGroup(H1),x->ImageElm(H1toblk,x)));
@@ -316,13 +316,13 @@ SolveLeafDP := function(ri,rifac,name)
  riH1 := rec();
  Objectify(RecognitionInfoType,riH1);;
  
- Setgroup(riH1,H1);
+ SetGrp(riH1,H1);
  blkdata := RecogniseLeaf(riH1,blk,name);;
 
 # Get the inverse images of the nice generators of blk in H1
  invims := CalcNiceGens(blkdata,GeneratorsOfGroup(H1));
  Yhat := ShallowCopy(invims);
- blktoH1 := GroupHomomorphismByFunction(blk,group(ri),g->
+ blktoH1 := GroupHomomorphismByFunction(blk,Grp(ri),g->
 ResultOfStraightLineProgram( SLPforElement(blkdata,g),invims));
  
  Y := nicegens(blkdata);

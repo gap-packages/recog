@@ -102,12 +102,12 @@ PastNonAb := function(ri)
 
  
  x := pregensfac(ri)[1];
- if IsDirectProduct(group(factor(kernel(ri)))) and not IsTrivial(PermAction(GroupWithGenerators([x]),group(kernel(ri)),homom(kernel(ri)),group(factor(kernel(ri))))) then return false;
+ if IsDirectProduct(Grp(factor(kernel(ri)))) and not IsTrivial(PermAction(GroupWithGenerators([x]),Grp(kernel(ri)),homom(kernel(ri)),Grp(factor(kernel(ri))))) then return false;
  fi;
 
  riker := kernel(ri);
 # Consider the automorphism of factor(riker) induced by x
- aut := GroupHomomorphismByFunction(group(factor(riker)),group(factor(riker)),
+ aut := GroupHomomorphismByFunction(Grp(factor(riker)),Grp(factor(riker)),
 function(g)
  local w,preim;
  w := slpforelement(factor(riker))(factor(riker),g); 
@@ -116,21 +116,21 @@ function(g)
 end);
 # Is aut inner? - tell it that it's an automorphism.
  SetIsBijective(aut, true);
- t := MyIsInnerAutomorphism(group(factor(riker)),Name(factor(riker)),aut,g->slpforelement(factor(riker))(factor(riker),g));
+ t := MyIsInnerAutomorphism(Grp(factor(riker)),Name(factor(riker)),aut,g->slpforelement(factor(riker))(factor(riker),g));
  if t=false then return false; fi;
 
 # Check that all automorphisms induced by prefacgens induce inner auto's
  inns := [t];
  for i in [2..Length(pregensfac(ri))] do
    x := pregensfac(ri)[i];
-   aut := GroupHomomorphismByFunction(group(factor(riker)),group(factor(riker)),
+   aut := GroupHomomorphismByFunction(Grp(factor(riker)),Grp(factor(riker)),
 function(g)
  local w,preim;
  w := slpforelement(factor(riker))(factor(riker),g); 
  preim := ResultOfStraightLineProgram(w,pregensfac(riker));
  return ImageElm(homom(riker),preim^x);
 end);
-   conj_elt:= MyIsInnerAutomorphism(group(factor(riker)),Name(factor(riker)),aut,g->slpforelement(factor(riker))(factor(riker),g));
+   conj_elt:= MyIsInnerAutomorphism(Grp(factor(riker)),Name(factor(riker)),aut,g->slpforelement(factor(riker))(factor(riker),g));
    if conj_elt = false then return false; fi;
    Add(inns, conj_elt);
  od;
@@ -146,7 +146,7 @@ end);
 
  rihom := StructuralCopy(homom(ri));
  kerhom := StructuralCopy(homom(riker));
- zeta := GroupHomomorphismByFunction(group(ri),group(factor(riker)),function(g)
+ zeta := GroupHomomorphismByFunction(Grp(ri),Grp(factor(riker)),function(g)
  local g1;
  g1 := l(ImageElm(rihom,g));
  return ImageElm(kerhom,g*g1^-1);
@@ -155,7 +155,7 @@ end);
  return zeta;
 end;
 
-#returns a function from group(ri) to group(factor(kernel(ri))) if can do so, 
+#returns a function from Grp(ri) to Grp(factor(kernel(ri))) if can do so, 
 #otherwise returns false.
 AbPastAb := function(ri)
 ## Tries to push an abelian layer past another abelian layer where the layers are over different primes
@@ -173,11 +173,11 @@ AbPastAb := function(ri)
 
 # Now we know x acts trivially on factor(riker)
 # Construct the new lifting
- q := group(factor(riker))!.Pcgs!.RelativeOrders[1];
- l := GroupHomomorphismByImagesNC(group(factor(ri)),group(ri),List(nicegens(factor(ri)),x->x^q),List(pregensfac(ri),x->x^q));  
+ q := Grp(factor(riker))!.Pcgs!.RelativeOrders[1];
+ l := GroupHomomorphismByImagesNC(Grp(factor(ri)),Grp(ri),List(nicegens(factor(ri)),x->x^q),List(pregensfac(ri),x->x^q));  
  
 # Construct the new map
- zeta := GroupHomomorphismByFunction(group(ri),group(factor(riker)),g->ImageElm(homom(riker),g*ImageElm(homom(ri)*l,g)^-1));
+ zeta := GroupHomomorphismByFunction(Grp(ri),Grp(factor(riker)),g->ImageElm(homom(riker),g*ImageElm(homom(ri)*l,g)^-1));
  return zeta;
 end;   
        
@@ -201,17 +201,17 @@ AbPastAbSamePrime := function(ri)
  od;
 
 # Construct a map down onto the direct product of the two factor groups
- p := group(factor(riker))!.Pcgs!.RelativeOrders[1];
- l := GroupHomomorphismByImagesNC(group(factor(ri)),group(ri),nicegens(factor(ri)),pregensfac(ri));  
- psi := GroupHomomorphismByFunction(group(ri),group(factor(riker)),g->ImageElm(homom(riker),g*ImageElm(l,ImageElm(homom(ri),g))^-1));
+ p := Grp(factor(riker))!.Pcgs!.RelativeOrders[1];
+ l := GroupHomomorphismByImagesNC(Grp(factor(ri)),Grp(ri),nicegens(factor(ri)),pregensfac(ri));  
+ psi := GroupHomomorphismByFunction(Grp(ri),Grp(factor(riker)),g->ImageElm(homom(riker),g*ImageElm(l,ImageElm(homom(ri),g))^-1));
 # check generators and relations of facto(ri) map to 1 under psi
  checkelts1 := List(pregensfac(ri),x->x^p);
  if not ForAll(checkelts1,x->IsOne(ImageElm(psi,x))) then return [false]; fi;
  checkelts2 := Concatenation(List([1..Length(pregensfac(ri))],i->List([(i+1)..Length(pregensfac(ri))],j->Comm(pregensfac(ri)[i],pregensfac(ri)[j]))));
  if not ForAll(checkelts2,x->IsOne(ImageElm(psi,x))) then return [false]; fi;
  
- D := DirectProduct(group(factor(ri)),group(factor(riker)));  
- phi := GroupHomomorphismByFunction(group(ri),D,g->ImageElm(homom(ri)*Embedding(D,1),g)*ImageElm(psi*Embedding(D,2),g));
+ D := DirectProduct(Grp(factor(ri)),Grp(factor(riker)));  
+ phi := GroupHomomorphismByFunction(Grp(ri),D,g->ImageElm(homom(ri)*Embedding(D,1),g)*ImageElm(psi*Embedding(D,2),g));
  pregens := Concatenation(pregensfac(ri),pregensfac(riker));
 # Construct the action of G on D
  AcGens := [];
@@ -233,10 +233,10 @@ SubgroupNC(D,List(x,v->VectortoPc(v,D))));
 
 
  maps := List(L,x->NaturalHomomorphismByNormalSubgroupNC(D,x));
- intorikerfac := List(maps,x->IsomorphismGroups(Range(x),group(factor(riker))));
+ intorikerfac := List(maps,x->IsomorphismGroups(Range(x),Grp(factor(riker))));
 
 
- zeta := List([1..Length(L)],i->GroupHomomorphismByFunction(group(ri),group(factor(riker)),g->ImageElm(intorikerfac[i],ImageElm(maps[i],ImageElm(phi,g)))));
+ zeta := List([1..Length(L)],i->GroupHomomorphismByFunction(Grp(ri),Grp(factor(riker)),g->ImageElm(intorikerfac[i],ImageElm(maps[i],ImageElm(phi,g)))));
  return zeta;
 end;
 
@@ -246,7 +246,7 @@ NonAbPastAb := function(ri)
  local x,riker,i,target_size,s,im,gens,g,p,words,invims,invims1,gens2,
     zeta,h,lift,g1;
 
- if not IsPermGroup(group(factor(ri))) then return false; fi;
+ if not IsPermGroup(Grp(factor(ri))) then return false; fi;
  x := pregensfac(ri)[1];
  riker := kernel(ri);;
 # Does x act trivially on factor(riker)
@@ -259,13 +259,13 @@ NonAbPastAb := function(ri)
  
 # construct a new generating set of elts coprime to p
 
-  p := group(factor(riker))!.Pcgs!.RelativeOrders[1];
+  p := Grp(factor(riker))!.Pcgs!.RelativeOrders[1];
   target_size:= Size(factor(ri));
   gens := [];
   #first see if just 4 generators will suffice
   for i in [1..4] do
     repeat
-      g := PseudoRandom(group(factor(ri)));
+      g := PseudoRandom(Grp(factor(ri)));
       g := g^(p^Valuation(Order(g),p));
     until not IsOne(g);
     Add(gens,g);
@@ -277,7 +277,7 @@ NonAbPastAb := function(ri)
   #one-by-one and check each time.
   while SizeStabChain(s) < target_size do
     repeat
-      g := PseudoRandom(group(factor(ri)));
+      g := PseudoRandom(Grp(factor(ri)));
       g := g^(p^Valuation(Order(g),p));
     until not IsOne(g);
     Add(gens, g);
@@ -285,34 +285,34 @@ NonAbPastAb := function(ri)
                 limit:= target_size));
   od;
   
- #all of these were PseudoRandom(group(ri)) but since that's a matrix
+ #all of these were PseudoRandom(Grp(ri)) but since that's a matrix
  #group i presume should be conjugating in factor(ri) - Colva.
- #Add(gens,g^PseudoRandom(group(factor(ri))));  
- #Add(gens,g^PseudoRandom(group(factor(ri)))); 
- #Add(gens,g^PseudoRandom(group(factor(ri))));
+ #Add(gens,g^PseudoRandom(Grp(factor(ri))));  
+ #Add(gens,g^PseudoRandom(Grp(factor(ri)))); 
+ #Add(gens,g^PseudoRandom(Grp(factor(ri))));
  #repeat
- #  g := PseudoRandom(group(factor(ri)));
+ #  g := PseudoRandom(Grp(factor(ri)));
  #  g := g^(p^Valuation(Order(g),p));
  #until not IsOne(g);
  #Add(gens,g);  
- #Add(gens,g^PseudoRandom(group(factor(ri))));  
- #Add(gens,g^PseudoRandom(group(factor(ri)))); 
- #Add(gens,g^PseudoRandom(group(factor(ri))));
+ #Add(gens,g^PseudoRandom(Grp(factor(ri))));  
+ #Add(gens,g^PseudoRandom(Grp(factor(ri)))); 
+ #Add(gens,g^PseudoRandom(Grp(factor(ri))));
 
  words := List(gens,x->SLPforElement(factor(ri),x));
  invims1 := List(words,w->ResultOfStraightLineProgram(w,pregensfac(ri)));
  invims := List(invims1,x->x^(p^Valuation(Order(x),p)));
  #should this be invims1 or invims in next line???
  gens2 := List(invims, x->ImageElm(homom(ri),x));
- lift := GroupHomomorphismByImagesNC(group(factor(ri)),group(ri),gens2,invims);
- zeta := GroupHomomorphismByFunction(group(ri),group(factor(riker)),g->ImageElm(homom(riker),g*ImageElm(lift, ImageElm(homom(ri),g))^-1));
+ lift := GroupHomomorphismByImagesNC(Grp(factor(ri)),Grp(ri),gens2,invims);
+ zeta := GroupHomomorphismByFunction(Grp(ri),Grp(factor(riker)),g->ImageElm(homom(riker),g*ImageElm(lift, ImageElm(homom(ri),g))^-1));
 
 
 # Do some random testing of elts to check that zeta is a hom
  for i in [1..20] do
-   g := PseudoRandom(group(ri));   
+   g := PseudoRandom(Grp(ri));   
    g1:= ImageElm(zeta, g);
-   h := PseudoRandom(group(ri));
+   h := PseudoRandom(Grp(ri));
    if g1*ImageElm(zeta,h)<>ImageElm(zeta,g*h) then 
      return false; 
    fi;
@@ -322,15 +322,15 @@ end;
 
 
 PushIntoSocle := function(ri,zeta)
-# ri is the layer of the tree just above the socle. riker maps into the socle and zeta is a map from group(ri) ino the socle
+# ri is the layer of the tree just above the socle. riker maps into the socle and zeta is a map from Grp(ri) ino the socle
  local riker,D,phi,im1,im2,nri,nrifac,list,g,overgp;
 
 
  riker := kernel(ri);;
 # Form the direct product of the socle
- D := DirectProduct(group(factor(ri)),group(factor(riker)));
-# and the new map phi from group(ri) -> D
- phi := GroupHomomorphismByFunction(group(ri),D,function(g)
+ D := DirectProduct(Grp(factor(ri)),Grp(factor(riker)));
+# and the new map phi from Grp(ri) -> D
+ phi := GroupHomomorphismByFunction(Grp(ri),D,function(g)
 local im1,im2;
 im1 := ImageElm(homom(ri),g);
 im2 := ImageElm(zeta,g);
@@ -345,7 +345,7 @@ end);
  Objectify( RecognitionInfoType, nrifac );;
 
 #new factor group is direct product of old factor groups, both are now in the socle.
- Setgroup(nrifac,D);
+ SetGrp(nrifac,D);
 
 #map the nicegens for each factor into the direct product, and take both sets of nicegens.
  Setnicegens(nrifac,Concatenation(List(nicegens(factor(ri)),x->ImageElm(MyEmbedding(D,1),x)),List(nicegens(factor(riker)),x->ImageElm(MyEmbedding(D,2),x))));
@@ -368,7 +368,7 @@ end);
  nri := rec();
  Objectify( RecognitionInfoType, nri );;
  Setfactor(nri,nrifac);
- Setgroup(nri,group(ri));
+ SetGrp(nri,Grp(ri));
  if Hasparent(ri) then
    Setparent(nri,parent(ri));
    Setkernel(parent(nri),nri);
@@ -414,7 +414,7 @@ end;
 #into the socle.
 SwapFactors := function(ri,zeta)
 # Swaps the layers of the tree at ri using the map
-# zeta : group(ri) -> group(factor(kernel(ri)))
+# zeta : Grp(ri) -> Grp(factor(kernel(ri)))
 
 
  local riker,rifac,rikerfac,nri,nriker,overgp;
@@ -468,12 +468,12 @@ SwapFactors := function(ri,zeta)
  Setnicegens(nri,Concatenation(pregensfac(nri),nicegens(nriker)));
  Setcalcnicegens(nri,CalcNiceGensHomNode);
  Setcalcnicegens(nriker,CalcNiceGensHomNode);
- Setgroup(nri,StructuralCopy(group(ri)));
+ SetGrp(nri,StructuralCopy(Grp(ri)));
  #the group of nriker is the generators of the group of its kernel(if nontrivial) plus the preimages of the factor.
  if Haskernel(nriker) and not kernel(nriker) = fail then
-   Setgroup(nriker,GroupWithGenerators(Concatenation(GeneratorsOfGroup(group(kernel(nriker))),pregensfac(nriker))));
+   SetGrp(nriker,GroupWithGenerators(Concatenation(GeneratorsOfGroup(Grp(kernel(nriker))),pregensfac(nriker))));
  elif Haskernel(nriker) then
-   Setgroup(nriker,GroupWithGenerators(pregensfac(nriker)));
+   SetGrp(nriker,GroupWithGenerators(pregensfac(nriker)));
  fi;
  Setslpforelement(nri,SLPforElementGeneric);
  Setslpforelement(nriker,SLPforElementGeneric);   
@@ -492,7 +492,7 @@ end;
 #this checks that every factor group in the chief tree is polycyclic, if
 #so then group is soluble.
 IsSolubleTree := function(ri)
- if not IsBound(group(factor(ri))!.Pcgs) then return false; fi;
+ if not IsBound(Grp(factor(ri))!.Pcgs) then return false; fi;
  if ri!.kernel <> fail then return IsSolubleTree(kernel(ri));
  else
    return true;
@@ -513,17 +513,17 @@ PushDown := function(pri)
 
 # Compute the push down maps - they depend on which groups are abelian.
 
- if not IsBound(group(prikerfac)!.Pcgs) then
+ if not IsBound(Grp(prikerfac)!.Pcgs) then
 # prikerfac is nonabelian
    Print("Calling PastNonAb(pri)\n");
    zeta := [PastNonAb(pri)]; 
 
- elif not IsBound(group(prifac)!.Pcgs) then
+ elif not IsBound(Grp(prifac)!.Pcgs) then
 # prikerfac is abelian and priker is nonabelian
    Print("Calling NonAbPastAb(pri)\n");
    zeta := [NonAbPastAb(pri)];   
 
- elif group(prifac)!.Pcgs!.RelativeOrders[1] = group(prikerfac)!.Pcgs!.RelativeOrders[1] then
+ elif Grp(prifac)!.Pcgs!.RelativeOrders[1] = Grp(prikerfac)!.Pcgs!.RelativeOrders[1] then
 # prifac and prikerfac are abelian over the same prime, this function returns a list of maps.
   Print("doing AbPastAbSamePrime\n"); 
   zeta := AbPastAbSamePrime(pri);
@@ -545,7 +545,7 @@ PushDown := function(pri)
  if IsBound(prikerfac!.TFordered) and prikerfac!.TFordered="Socle" then
    zeta := zeta[1];
  #if both groups are insoluble then they should both be in the socle together.
-   if not IsBound(group(prifac)!.Pcgs) then
+   if not IsBound(Grp(prifac)!.Pcgs) then
      npri := PushIntoSocle(pri,zeta);;
      SetTFordered(factor(npri),"Socle"); 
    else

@@ -20,7 +20,7 @@ SolveLeafPc := function(ri,rifac)
 # Performs constructive recognition of a PC group
  local I,gens,n,trivgens,T,rho,P,mems,T2,ItoT2;
 
- I := group(rifac);
+ I := Grp(rifac);
 
  if IsTrivial(I) then
    SetName(rifac,"Trivial Group");
@@ -64,13 +64,13 @@ SolveLeafTrivial := function(ri,rifac)
 # Performs constructive recognition of a trivial group
 # redfines homom ri
  local I,T,x,oldmap;
- I := ShallowCopy(group(rifac));
+ I := ShallowCopy(Grp(rifac));
  T := CyclicGroup(1);
- Setgroup(rifac,T);
+ SetGrp(rifac,T);
  SetName(rifac,"trivial");
  oldmap := StructuralCopy(homom(ri));
  if IsPermGroup(I) then
-   Sethomom(ri,GroupHomomorphismByFunction(group(ri),T,
+   Sethomom(ri,GroupHomomorphismByFunction(Grp(ri),T,
 function(g)
 local x;
  x := ImageElm(oldmap,g);
@@ -79,7 +79,7 @@ local x;
 end));      
  
  elif IsMatrixGroup(I) then
-   Sethomom(ri,GroupHomomorphismByFunction(group(ri),T,
+   Sethomom(ri,GroupHomomorphismByFunction(Grp(ri),T,
 function(g)
 local x;
  x := ImageElm(oldmap,g);
@@ -88,7 +88,7 @@ local x;
 end));      
  
  else
-   Sethomom(ri, GroupHomomorphismByFunction(group(ri),T,
+   Sethomom(ri, GroupHomomorphismByFunction(Grp(ri),T,
 function(g)
 local x,n;
  x := ImageElm(oldmap,g);
@@ -126,7 +126,7 @@ function(ri,I,name)
  SetFilterObj(rifac,IsLeaf);
  Setparent(rifac,ri);
  Setfactor(ri,rifac);
- Setgroup(rifac,I);
+ SetGrp(rifac,I);
  if IsPcGroup(I) then 
    bool := SolveLeafPc(ri,rifac);
    Setfhmethsel(rifac,"Pc group"); 

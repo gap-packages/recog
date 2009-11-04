@@ -1,7 +1,7 @@
 SolvePcWord := function(rri,g)
  local T,PtoT;
- T := GroupWithMemory(GroupWithGenerators(List(AsList(Pcgs(group(rri))),x->())));
- PtoT := GroupHomomorphismByImages(group(rri),T,AsList(Pcgs(group(rri))),GeneratorsOfGroup(T)); 
+ T := GroupWithMemory(GroupWithGenerators(List(AsList(Pcgs(Grp(rri))),x->())));
+ PtoT := GroupHomomorphismByImages(Grp(rri),T,AsList(Pcgs(Grp(rri))),GeneratorsOfGroup(T)); 
   
  return SLPOfElm(ImageElm(PtoT,g));
 end;
@@ -10,7 +10,7 @@ end;
 
 
 InsertSubTree := function(ri,rifac,maps)
-# insert a subtree in ri where maps is a sequence of normal series maps for group(rifacs)
+# insert a subtree in ri where maps is a sequence of normal series maps for Grp(rifacs)
  local kerfac,phi,Q,GtoQ,lri,rri,ripregensfac,overgp,i,kgens;
 
  # remember the kernel of ri!
@@ -19,14 +19,14 @@ InsertSubTree := function(ri,rifac,maps)
  # construct maps from ri -> new groups
  phi := StructuralCopy(homom(ri));
  Q := List(maps,x->Image(x));
- GtoQ := List([1..Length(Q)],i->GroupHomomorphismByFunction(group(ri),Q[i],g->ImageElm(maps[i],ImageElm(phi,g))));
+ GtoQ := List([1..Length(Q)],i->GroupHomomorphismByFunction(Grp(ri),Q[i],g->ImageElm(maps[i],ImageElm(phi,g))));
 
 
  lri := []; rri := [];
  lri[1] := rec();
  Objectify(RecognitionInfoType,lri[1]);;
   
- Setgroup(lri[1],group(ri));
+ SetGrp(lri[1],Grp(ri));
 
  ripregensfac := ShallowCopy(pregensfac(ri));
  overgp := ShallowCopy(overgroup(ri));
@@ -35,13 +35,13 @@ InsertSubTree := function(ri,rifac,maps)
  for i in [1..Length(Q)] do
    rri[i] := rec();
    Objectify(RecognitionInfoType,rri[i]);;
-   Setgroup(rri[i],Q[i]);
+   SetGrp(rri[i],Q[i]);
    Sethomom(lri[i],GtoQ[i]);
    Setnicegens(rri[i],AsList(Pcgs(Q[i])));
    Setslpforelement(rri[i],SolvePcWord);
    Setpregensfac(lri[i],List(nicegens(rri[i]),x-> ResultOfStraightLineProgram(slpforelement(rifac)(rifac,PreImagesRepresentative(maps[i],x)),ripregensfac)));
    Setcalcnicegens(lri[i],CalcNiceGensHomNode);
-   lri[i]!.nrgensH := Length(GeneratorsOfGroup(group(lri[i])));
+   lri[i]!.nrgensH := Length(GeneratorsOfGroup(Grp(lri[i])));
    Setovergroup(lri[i],overgp);
    Setcalcnicegens(lri[i],CalcNiceGensGeneric);
    Setslpforelement(lri[i],SLPforElementGeneric);
@@ -50,7 +50,7 @@ InsertSubTree := function(ri,rifac,maps)
    SetFilterObj(lri[i],IsReady);
 
    lri[i]!.genswithmem := GeneratorsWithMemory(
-            Concatenation(GeneratorsOfGroup(group(lri[i])),pregensfac(lri[i])));
+            Concatenation(GeneratorsOfGroup(Grp(lri[i])),pregensfac(lri[i])));
    lri[i]!.groupmem := Group(lri[i]!.genswithmem{[1..lri[i]!.nrgensH]});
    # FIXME: This is broken due to the new random element infrastructure!
 
@@ -58,7 +58,7 @@ InsertSubTree := function(ri,rifac,maps)
 # Setup the kernel
 
    if kerfac <> fail then
-     kgens := Concatenation(GeneratorsOfGroup(group(kerfac)),List(GeneratorsOfGroup(Kernel(maps[i])),x->ResultOfStraightLineProgram(slpforelement(rifac)(rifac,x),ripregensfac)));   
+     kgens := Concatenation(GeneratorsOfGroup(Grp(kerfac)),List(GeneratorsOfGroup(Kernel(maps[i])),x->ResultOfStraightLineProgram(slpforelement(rifac)(rifac,x),ripregensfac)));   
    else
      kgens := List(GeneratorsOfGroup(Kernel(maps[i])),x->ResultOfStraightLineProgram(slpforelement(rifac)(rifac,x),ripregensfac));   
    fi;
@@ -67,7 +67,7 @@ InsertSubTree := function(ri,rifac,maps)
    fi;
    lri[i+1] := rec();
    Objectify(RecognitionInfoType,lri[i+1]);;
-   Setgroup(lri[i+1],GroupWithGenerators(kgens));
+   SetGrp(lri[i+1],GroupWithGenerators(kgens));
    Setkernel(lri[i],lri[i+1]);
    Setfactor(lri[i],rri[i]);	
    Setparent(lri[i+1],lri[i]);
@@ -107,7 +107,7 @@ RefineSolubleLayers := function(ri)
 
  rifac := factor(ri);;
  phi := homom(ri);
- I := group(rifac);
+ I := Grp(rifac);
 
  if not IsPcGroup(I) or IsElementaryAbelian(I) then 
    riker := kernel(ri);
@@ -159,7 +159,7 @@ RefineElementaryAbelianLayers := function(ri)
 
  rifac := factor(ri);;
  phi := homom(ri);
- I := group(rifac);
+ I := Grp(rifac);
 
  if not IsPcGroup(I) or IsCyclic(I) then 
    riker := kernel(ri);
@@ -195,7 +195,7 @@ RefineElementaryAbelianLayers := function(ri)
 # get the list of normal subgroups
   
   L := List([Length(CS),Length(CS)-1..1],i->
-SubgroupNC(group(factor(ri)),List(CS[i],v->VectortoPc(v,group(factor(ri))))));
+SubgroupNC(Grp(factor(ri)),List(CS[i],v->VectortoPc(v,Grp(factor(ri))))));
   
   maps := List([1..Length(L)-1],i->NaturalHomomorphismByNormalSubgroupNC(L[i],L[i+1]));
   ri := InsertSubTree(ri, rifac, maps);;
@@ -219,7 +219,7 @@ RemoveTrivialLayers := function(ri)
 
  rifac := factor(ri);;
  riker := kernel(ri);;
- I := group(rifac);
+ I := Grp(rifac);
  if IsPcGroup(I) and IsTrivial(I) then
 # I is trivial!!
    if Hasparent(ri) then

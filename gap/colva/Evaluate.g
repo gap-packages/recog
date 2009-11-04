@@ -9,7 +9,7 @@ AddScalarstoKernel := function(ri,rifac,Z)
  l := gensN(ri);
  if IsTrivial(Z) then return true; fi;
  z := GeneratorsOfGroup(Z)[1];
- if not IsDirectProduct(group(rifac)) then
+ if not IsDirectProduct(Grp(rifac)) then
    s := SLPforElement(rifac,z);
    y := ResultOfStraightLineProgram(s,
                  ri!.genswithmem{[ri!.nrgensH+1..Length(ri!.genswithmem)]});
@@ -17,10 +17,10 @@ AddScalarstoKernel := function(ri,rifac,Z)
    return true;
  fi;
        
- if IsDirectProduct(group(rifac)) then
-   n := NumberOfDPComponents(group(rifac));
+ if IsDirectProduct(Grp(rifac)) then
+   n := NumberOfDPComponents(Grp(rifac));
    for i in [1..n] do
-     s := SLPforElement(rifac,ImageElm(MyEmbedding(group(rifac),i),z));
+     s := SLPforElement(rifac,ImageElm(MyEmbedding(Grp(rifac),i),z));
      y := ResultOfStraightLineProgram(s,
                  ri!.genswithmem{[ri!.nrgensH+1..Length(ri!.genswithmem)]});
      Add(l,y);
@@ -51,7 +51,7 @@ end;
 # lri[1] := rec();
 # Objectify(RecognitionInfoType,lri[1]);;
   
-# Setgroup(lri[1],group(ri));
+# SetGrp(lri[1],Grp(ri));
 
 # overgp := ShallowCopy(overgroup(ri));
 # Setovergroup(lri[1],overgp);
@@ -60,7 +60,7 @@ end;
 # for i in [1..(Length(dims)-1)] do
 #   for j in [1..(Length(dims)-i)] do
 #   i1 := j; j1 := i + j;
-#   Ugens := GeneratorsOfGroup(group(lri[count]));
+#   Ugens := GeneratorsOfGroup(Grp(lri[count]));
 #   Vq := FullRowSpace(F,(dims[i1+1]-dims[i1])*(dims[j1+1]-dims[j1]));
 #   Vp := FullRowSpace(Fprime,(dims[i1+1]-dims[i1])*(dims[j1+1]-dims[j1])*e);
 #   GtoVp := function(g)
@@ -126,7 +126,7 @@ end;
 #     VPc := ElementaryAbelianGroup(p^Length(b));
 #     rri[count] := rec();
 #     Objectify(RecognitionInfoType,rri[count]);;
-#     Setgroup(rri[count],VPc);
+#     SetGrp(rri[count],VPc);
 # Solve the rewriting problem with these gens
 #     P := Pcgs(VPc);
 #     Triv := GroupWithMemory(GroupWithGenerators(List(AsList(P),x->())));
@@ -139,7 +139,7 @@ end;
 #     return SLPOfElm(ImageElm(VPctoTriv,g));
 #   end);  
 #     Setpregensfac(lri[count],Bpreims);
-#     Sethomom(lri[count],GroupHomomorphismByFunction(group(lri[count]),VPc,function(g)
+#     Sethomom(lri[count],GroupHomomorphismByFunction(Grp(lri[count]),VPc,function(g)
 #  local v;
 #  v := GtoVp(g);
 #  return PcElementByExponents(Pcgs(VPc),List(v,x->IntFFE(x)));
@@ -191,7 +191,7 @@ InstallGlobalFunction( NormalTree,
     ri!.nrgensH := Length(GeneratorsOfGroup(H));
     Setovergroup(ri,nsm!.Group);
 
-    Setgroup(ri,H);
+    SetGrp(ri,H);
     Setcalcnicegens(ri,CalcNiceGensGeneric);
     Setslpforelement(ri,SLPforElementGeneric);
     SetgensN(ri,[]);       # this will grow over time
@@ -211,10 +211,10 @@ InstallGlobalFunction( NormalTree,
       OverI := nsm!.MapImages[depth+1];
     else
 # We are now in Op(G)
-#      map1 := IsomorphismPcPGroup(group(ri));
+#      map1 := IsomorphismPcPGroup(Grp(ri));
 #      map2 := IsomorphismPcGroup(Image(map1));
 #  Should have some good spinning up property and a better way of handling this!       
-      Sethomom(ri,IsomorphismPcGroup(group(ri)));
+      Sethomom(ri,IsomorphismPcGroup(Grp(ri)));
       OverI := Image(homom(ri));
       name := "";
     fi;     

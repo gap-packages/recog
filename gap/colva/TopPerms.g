@@ -3,7 +3,7 @@
 
 MySocleAction:= function(soc, g)
 local grp;
-grp:= PermAction(GroupWithGenerators([g]), group(soc), homom(soc), group(factor(soc)));
+grp:= PermAction(GroupWithGenerators([g]), Grp(soc), homom(soc), Grp(factor(soc)));
 if not Size(GeneratorsOfGroup(grp)) = 1 then
   return fail;
 fi;
@@ -37,17 +37,17 @@ fi;
 #was hoping to use this a short-cut, but it seems that 
 #groups in the socle are not necessarily represented as explicit direct
 #products. 
-if not IsDirectProduct(group(factor(nri))) then 
+if not IsDirectProduct(Grp(factor(nri))) then 
   SetTFordered(ri, "Pker");
   return ri;
 fi;
 
 soc:= nri;
-R:= RefineMap(group(soc), homom(soc), group(factor(soc)));
+R:= RefineMap(Grp(soc), homom(soc), Grp(factor(soc)));
 phi:= R[1];
 I:= R[2];
 Sethomom(soc, phi);
-Setgroup(factor(soc), I);
+SetGrp(factor(soc), I);
 
 #now we find the degree of the permutation action.
 Pgens:= [Identity(SymmetricGroup(2))];
@@ -79,11 +79,11 @@ while (Hasparent(nri)) do
       #have to move down below all bits that act nontrivially on socle.
       while not (HasTFordered(factor(kernel(nri))) and 
                 factor(kernel(nri))!.TFordered = "Socle") do
-          if IsBound(group(factor(kernel(nri)))!.Pcgs) then 
+          if IsBound(Grp(factor(kernel(nri)))!.Pcgs) then 
             #move past a (soluble) PC group
             pgs:= pregensfac(kernel(nri));
             pgs_ims:= List(pgs, x->x*Image(ki,MySocleAction(soc, x))^-1);
-            alpha:= GroupHomomorphismByImagesNC(group(factor(kernel(nri))), overgroup(nri), pgs, pgs_ims);
+            alpha:= GroupHomomorphismByImagesNC(Grp(factor(kernel(nri))), overgroup(nri), pgs, pgs_ims);
             zeta:= function(g)
                return Image(homom(kernel(nri)),(g*Image(alpha, 
                     Image(homom(kernel(nri)), g))^-1));
