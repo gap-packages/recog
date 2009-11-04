@@ -21,7 +21,7 @@ just by looking at the stored attribute values. Moreover, constructive
 membership tests can be performed using the function 
 <Ref Func="SLPforElement"/>, thereby writing an arbitrary element
 in terms of the nice generators, which are stored in the attribute
-<Ref Attr="nicegens"/>. If <C>fail</C> is returned, then the
+<Ref Attr="NiceGens"/>. If <C>fail</C> is returned, then the
 element in question does not lie in the recognised group or
 the recognition made an error.<P/>
 
@@ -62,7 +62,7 @@ gap> x := PseudoRandom(g);
 (1,12)(2,5,9,11,10,3,4)(7,8)(13,14,16,15,17)
 gap> slp := SLPforElement(ri,x);
 <straight line program>
-gap> ResultOfStraightLineProgram(slp,nicegens(ri));
+gap> ResultOfStraightLineProgram(slp,NiceGens(ri));
 (1,12)(2,5,9,11,10,3,4)(7,8)(13,14,16,15,17)]]>
 </Log>
 

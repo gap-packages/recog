@@ -443,12 +443,12 @@ InstallGlobalFunction( RecogniseGeneric,
             SlotUsagePattern(slptonice(ri));
         fi;
         # Handle the case that nobody set nice generators:
-        if not(Hasnicegens(ri)) then
+        if not(HasNiceGens(ri)) then
             if Hasslptonice(ri) then
-                Setnicegens(ri,ResultOfStraightLineProgram(slptonice(ri),
+                SetNiceGens(ri,ResultOfStraightLineProgram(slptonice(ri),
                                             GeneratorsOfGroup(H)));
             else
-                Setnicegens(ri,GeneratorsOfGroup(H));
+                SetNiceGens(ri,GeneratorsOfGroup(H));
             fi;
         fi;
         # these two were set correctly by FindHomomorphism
@@ -543,7 +543,7 @@ InstallGlobalFunction( RecogniseGeneric,
         Info(InfoRecog,2,"Found trivial kernel (depth=",Length(depth),").");
         Setkernel(ri,fail);
         # We have to learn from the factor, what our nice generators are:
-        Setnicegens(ri,pregensfac(ri));
+        SetNiceGens(ri,pregensfac(ri));
         SetFilterObj(ri,IsReady);
         if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
         # StopStoringRandEls(ri);
@@ -611,12 +611,12 @@ InstallGlobalFunction( RecogniseGeneric,
 
     if IsReady(riker) then    # we are only ready when the kernel is
         # Now make the two projection slps:
-        Setnicegens(ri,Concatenation(pregensfac(ri), nicegens(riker)));
-        #ll := List([1..Length(nicegens(rifac))],i->[i,1]);
-        #ri!.proj1 := StraightLineProgramNC([ll],Length(nicegens(ri)));
-        #ll := List([1..Length(nicegens(riker))],
-        #           i->[i+Length(nicegens(rifac)),1]);
-        #ri!.proj2 := StraightLineProgramNC([ll],Length(nicegens(ri)));
+        SetNiceGens(ri,Concatenation(pregensfac(ri), NiceGens(riker)));
+        #ll := List([1..Length(NiceGens(rifac))],i->[i,1]);
+        #ri!.proj1 := StraightLineProgramNC([ll],Length(NiceGens(ri)));
+        #ll := List([1..Length(NiceGens(riker))],
+        #           i->[i+Length(NiceGens(rifac)),1]);
+        #ri!.proj2 := StraightLineProgramNC([ll],Length(NiceGens(ri)));
         SetFilterObj(ri,IsReady);
     fi;
     if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
@@ -841,7 +841,7 @@ InstallOtherMethod( \in, "for a group element and a recognition info record",
     if slp = fail then
         return false;
     else
-        gens := nicegens(ri);
+        gens := NiceGens(ri);
         if IsObjWithMemory(gens[1]) then
             gens := StripMemory(gens);
         fi;
@@ -972,7 +972,7 @@ RECOG.TestRecognitionNode := function(ri,stop,recurse)
       x := PseudoRandom(grp);
       slp := SLPforElement(ri,x);
       if slp <> fail then
-          y := ResultOfStraightLineProgram(slp,nicegens(ri));
+          y := ResultOfStraightLineProgram(slp,NiceGens(ri));
       fi;
       if slp = fail or not(ri!.isone(x/y)) then
           if stop then Error("Error found, look at x, slp and y"); fi;

@@ -455,21 +455,21 @@ elements that are generated from them remember, how they were acquired.
 </ManSection>
 
 <ManSection>
-<Attr Name="nicegens" Arg="ri"/>
+<Attr Name="NiceGens" Arg="ri"/>
 <Description>
     The value of this attribute must be set for all nodes and contains
     the nice generators. The <Ref Func="SLPforElement"/> function of the
     node will write its straight line program in terms of these nice
     generators. For leaf nodes, the find homomorphism method is responsible
-    to set the value of <Ref Attr="nicegens"/>. By default, the original
+    to set the value of <Ref Attr="NiceGens"/>. By default, the original
     generators of the group at this node are taken. For a homomorphism
-    (or isomorphism), the <Ref Attr="nicegens"/> will be the concatenation
-    of preimages of the <Ref Attr="nicegens"/> of the factor group 
+    (or isomorphism), the <Ref Attr="NiceGens"/> will be the concatenation
+    of preimages of the <Ref Attr="NiceGens"/> of the factor group 
     (see <Ref Attr="pregensfac"/>) and
-    the <Ref Attr="nicegens"/> of the kernel. A find homomorphism method
-    does not have to set <Ref Attr="nicegens"/> if it finds a homomorphism.
+    the <Ref Attr="NiceGens"/> of the kernel. A find homomorphism method
+    does not have to set <Ref Attr="NiceGens"/> if it finds a homomorphism.
     Note however, that such a find homomorphism method has to ensure somehow,
-    that preimages of the <Ref Attr="nicegens"/> of the factor group
+    that preimages of the <Ref Attr="NiceGens"/> of the factor group
     can be acquired. See <Ref Attr="calcnicegens"/>, <Ref Func="CalcNiceGens"/>
     and <Ref Attr="slptonice"/>
     for instructions.
@@ -542,7 +542,7 @@ elements that are generated from them remember, how they were acquired.
     After the recognition phase is completed for the node <A>ri</A>, we
     are by definition able to write arbitrary elements in the group described
     by this node as a straight line program (SLP) in terms of the nice 
-    generators stored in <Ref Attr="nicegens"/>.
+    generators stored in <Ref Attr="NiceGens"/>.
     This attribute value is a function taking the node <A>ri</A> and a
     group element as its arguments and returning the above mentioned
     straight line program. For the case that a find homomorphism method
