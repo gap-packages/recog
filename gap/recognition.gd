@@ -34,15 +34,16 @@ DeclareAttribute( "group", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "homom", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "stdgens", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "nicegens", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "factor", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "kernel", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "presentation", IsRecognitionInfo, "mutable" );
+
 DeclareAttribute( "pregensfac", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "calcnicegens", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "slptonice", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "slptostd", IsRecognitionInfo, "mutable" );
-DeclareAttribute( "factor", IsRecognitionInfo, "mutable" );
-DeclareAttribute( "kernel", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "parent", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "fhmethsel", IsRecognitionInfo, "mutable" );
-DeclareAttribute( "presentation", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "methodsforfactor", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "slpforelement", IsRecognitionInfo, "mutable" );
 # Here we collect generators of the kernel:
