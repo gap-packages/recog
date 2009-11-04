@@ -9,6 +9,13 @@
 ##  With a new release of the package at least the entries .Version, .Date and
 ##  .ArchiveURL must be updated.
 
+RecogsFunnyNameFormatterFunction := function(st)
+  if Length(st) = 0 then 
+      return st;
+  else
+      return Concatenation(" (",st,")");
+  fi;
+end;
 SetPackageInfo( rec(
 
 ##  This is case sensitive, use your preferred spelling.
@@ -91,13 +98,13 @@ Persons := [
     Place         := "Aachen",
     Institution   := "Lehrstuhl D fuer Mathematik, RWTH Aachen",
   ),
-  #rec(
-  #  LastName      := "Howe",
-  #  FirstNames    := "Stephen",
-  #  IsAuthor      := true,
-  #  IsMaintainer  := false,
-  #  WWWHome       := "",
-  #),
+  rec(
+    LastName      := "Howe",
+    FirstNames    := "Stephen",
+    IsAuthor      := true,
+    IsMaintainer  := false,
+    WWWHome       := "",
+  ),
   rec( 
     LastName      := "Law",
     FirstNames    := "Maska",
@@ -268,10 +275,11 @@ BannerString := Concatenation(
         " (", ~.Persons[2].WWWHome, ")\n",
   "with contributed code by:\n",
   Concatenation(Concatenation(List(~.Persons{[3..Length(~.Persons)-1]},
-       p->["     ",p.FirstNames," ",p.LastName," (",p.WWWHome,"),\n"]))),
+       p->["     ",p.FirstNames," ",p.LastName,
+       RecogsFunnyNameFormatterFunction(p.WWWHome),",\n"]))),
   " and ",~.Persons[Length(~.Persons)].FirstNames," ",
-  ~.Persons[Length(~.Persons)].LastName," (",
-  ~.Persons[Length(~.Persons)].WWWHome,").\n",
+  ~.Persons[Length(~.Persons)].LastName,
+  RecogsFunnyNameFormatterFunction(~.Persons[Length(~.Persons)].WWWHome),".\n",
   "-----------------------------------------------------------------------",
   "------\n"
 ),
@@ -288,5 +296,5 @@ TestFile := "tst/TestAll.g",
 Keywords := []
 
 ));
-
+Unbind(RecogsFunnyNameFormatterFunction);
 
