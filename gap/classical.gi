@@ -599,11 +599,11 @@ RECOG.TestRandomElement := function (recognise, grp)
     cpol := recognise.cpol;
 
     if recognise.needOrders then
-        Print(".");
+        if InfoLevel(InfoClassical) >= 2 then Print("."); fi;
         ord := Order(g);
         recognise.ord := ord;
         AddSet( recognise.orders, ord );
-    else Print(",");
+    else if InfoLevel(InfoClassical) >= 2 then Print(","); fi;
     fi;
     if recognise.needPOrders then
         ord := ProjectiveOrder(g);
