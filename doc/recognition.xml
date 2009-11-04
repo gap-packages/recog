@@ -433,7 +433,7 @@ corresponding subtree upon completion.
 The following attributes are defined for recognition info records:
 
 <ManSection>
-<Attr Name="group" Arg="ri"/>
+<Attr Name="Grp" Arg="ri"/>
 <Description>
 The value of this attribute is the group that is to be recognised by this
 recognition info record <A>ri</A>. This attribute is always present during
@@ -747,7 +747,7 @@ find kernel methods.
 <Func Name="FindKernelFastNormalClosure" Arg="ri, nr"/>
 <Returns>a probable generating set for the normal closure</Returns>
 <Description>
-    This function takes the group <M>G</M> in the <Ref Attr="group"/> attribute
+    This function takes the group <M>G</M> in the <Ref Attr="Grp"/> attribute
     in <A>ri</A> and the list of generators <M>gens</M> of the kernel in
     <Ref Attr="gensN"/> and the positive integer <A>nr</A>.
     This function computes a probable generating
