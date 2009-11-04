@@ -189,7 +189,7 @@ RecogniseQuasiSimple := function(G,name)
    Objectify(RecognitionInfoType,re);;
    FindHomMethodsMatrix.ShortOrbits(re,G);
 # Perm Image
-   GtoP := homom(re);
+   GtoP := Homom(re);
 #   GtoP := re!.homom;
    P := Image(GtoP);
 Print(String(Size(G)));

@@ -80,7 +80,7 @@ FindHomMethodsMatrix.DiagonalMatrices := function(ri, G)
   newgens := List(gens,x->ExtractSubMatrix(x,[1],[1]));
   H := Group(newgens);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomToScalars,rec(poss := [1]));
-  Sethomom(ri,hom);
+  SetHomom(ri,hom);
   findgensNmeth(ri).method := FindKernelDoNothing;
 
   # Hint to the factor:
@@ -120,7 +120,7 @@ end;
 #  H := GroupWithGenerators(dets);
 #  hom := GroupHomomorphismByFunction(G,H,RECOG.DetWrapper);
 #
-#  Sethomom(ri,hom);
+#  SetHomom(ri,hom);
 #
 #  # Hint to the kernel:
 #  forkernel(ri).containedinsl := true;
@@ -194,7 +194,7 @@ FindHomMethodsMatrix.BlockScalar := function(ri,G)
       newgens := List(GeneratorsOfGroup(G),x->RECOG.HomToDiagonalBlock(data,x));
       H := GroupWithGenerators(newgens);
       hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
-      Sethomom(ri,hom);
+      SetHomom(ri,hom);
       Add(forfactor(ri).hints,
           rec( method := FindHomMethodsMatrix.Scalar, rank := 2000,
                stamp := "Scalar" ),1);
@@ -222,7 +222,7 @@ FindHomMethodsMatrix.BlockScalar := function(ri,G)
   newgens := List(GeneratorsOfGroup(G),x->RECOG.HomToDiagonalBlock(data,x));
   H := GroupWithGenerators(newgens);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
-  Sethomom(ri,hom);
+  SetHomom(ri,hom);
 
   # the factor are the last few blocks:
   forfactor(ri).blocks := List(ri!.blocks{[middle..nrblocks]},
@@ -390,7 +390,7 @@ FindHomMethodsMatrix.ReducibleIso := function(ri,G)
                                 rec(t := bc.base,ti := bc.baseinv));
 
   # Now report back:
-  Sethomom(ri,hom);
+  SetHomom(ri,hom);
   findgensNmeth(ri).method := FindKernelDoNothing;
 
   # Inform authorities that the factor can be recognised easily:
@@ -423,7 +423,7 @@ FindHomMethodsMatrix.BlockLowerTriangular := function(ri,G)
                   x->RECOG.HomOntoBlockDiagonal(data,x));
   H := GroupWithGenerators(newgens);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomOntoBlockDiagonal,data);
-  Sethomom(ri,hom);
+  SetHomom(ri,hom);
 
   # Now give hints downward:
   forfactor(ri).blocks := ri!.blocks;
@@ -445,7 +445,7 @@ FindHomMethodsMatrix.BlockDiagonal := function(ri,G)
   # will automatically take care of the projectiveness!
   local hom;
   hom := IdentityMapping(G);
-  Sethomom(ri,hom);
+  SetHomom(ri,hom);
   # Now give hints downward:
   forfactor(ri).blocks := ri!.blocks;
   Add(forfactor(ri).hints, 
@@ -498,7 +498,7 @@ end;
 #  hom := GroupHomByFuncWithData(G,H,RECOG.HomInducedOnFactor,data); 
 #
 #  # Now report back:
-#  Sethomom(ri,hom);
+#  SetHomom(ri,hom);
 #
 #  # Inform authorities that the kernel can be recognised easily:
 #  forkernel(ri).subdim := ri!.subdim;
@@ -570,7 +570,7 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
     rifac := factor(ri);
     while nothingnew < 10 do
         x := RandomElm(ri,"KERNEL",true).el;
-        s := SLPforElement(rifac,ImageElm( homom(ri), x!.el ));
+        s := SLPforElement(rifac,ImageElm( Homom(ri), x!.el ));
         y := ResultOfStraightLineProgram(s,
                  ri!.genswithmem{[ri!.nrgensH+1..Length(ri!.genswithmem)]});
         x := x^-1 * y;   # this is in the kernel
@@ -704,7 +704,7 @@ FindHomMethodsMatrix.GoProjective := function(ri,G)
   local hom,q;
   Info(InfoRecog,2,"Going projective...");
   hom := IdentityMapping(G);
-  Sethomom(ri,hom);
+  SetHomom(ri,hom);
   # Now give hints downward:
   Setmethodsforfactor(ri,FindHomDbProjective);
 
@@ -746,13 +746,13 @@ end;
 #      fi;
 #  fi;
 #
-#  Sethomom(ri,hom);
+#  SetHomom(ri,hom);
 #  Setmethodsforfactor(ri,FindHomDbPerm);
 #  return true;
 #end;
 #  
 #FindHomMethodsMatrix.IsomorphismPermGroup := function(ri,G)
-#  Sethomom(ri,IsomorphismPermGroup(G));
+#  SetHomom(ri,IsomorphismPermGroup(G));
 #  findgensNmeth(ri).method := FindKernelDoNothing;
 #  Setmethodsforfactor(ri,FindHomDbPerm);
 #  return true;

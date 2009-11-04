@@ -346,7 +346,7 @@ FindHomMethodsProjective.TensorDecomposable := function(ri,G)
       # We did not find a tensor decomposition, but a relatively short orbit:
       hom := ActionHomomorphism(G,r.orbit,OnSubspacesByCanonicalBasis,
                                 "surjective");
-      Sethomom(ri,hom);
+      SetHomom(ri,hom);
       Setmethodsforfactor(ri,FindHomDbPerm);
       return true;
   fi;
@@ -363,14 +363,14 @@ FindHomMethodsProjective.TensorDecomposable := function(ri,G)
            " Found at least a perm action.");
       hom := ActionHomomorphism(G,r.spaces,OnSubspacesByCanonicalBasis,
                                 "surjective");
-      Sethomom(ri,hom);
+      SetHomom(ri,hom);
       Setmethodsforfactor(ri,FindHomDbPerm);
       return true;
   fi;
 
   H := GroupWithGenerators(conjgensG);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomDoBaseChange,r);
-  Sethomom(ri,hom);
+  SetHomom(ri,hom);
 
   # Hand down information:
   forfactor(ri).blocksize := r.blocksize;
@@ -399,7 +399,7 @@ FindHomMethodsProjective.KroneckerProduct := function(ri,G)
   H := GroupWithGenerators(newgens);
   data := rec(blocksize := ri!.blocksize);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomTensorFactor,data);
-  Sethomom(ri,hom);
+  SetHomom(ri,hom);
 
   # Tell the kernel that it is block diagonal projectively:
   bl := [];

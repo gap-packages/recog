@@ -280,10 +280,10 @@ SolveLeafDP := function(ri,rifac,name)
        j,t,mat,qr,gamma,gammainv,list,e,h,z,y;
 
  I := Grp(rifac);
- phi := homom(ri);
+ phi := Homom(ri);
  R := RefineMap(Grp(ri),phi,I);
  phi := R[1]; I := R[2];
- Sethomom(ri,phi); SetGrp(rifac,I);
+ SetHomom(ri,phi); SetGrp(rifac,I);
 
  k := NumberOfDPComponents(I);
  projs := List([1..k],i->MyProjection(I,i));
@@ -294,7 +294,7 @@ SolveLeafDP := function(ri,rifac,name)
    #**error here - was only two parameters, tried to fix it by adding ri as first.
    rifac := RecogniseLeaf(ri,blk,name[1]);
    if not bool then return fail; fi;
-   Sethomom(ri,GroupHomomorphismByFunction(Grp(ri),blk,g->ImageElm(projs[1],ImageElm(homom(ri),g))));
+   SetHomom(ri,GroupHomomorphismByFunction(Grp(ri),blk,g->ImageElm(projs[1],ImageElm(Homom(ri),g))));
    return true;
  fi;
 

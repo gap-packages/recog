@@ -336,7 +336,7 @@ FindHomMethodsMatrix.ShortOrbits := function(ri,g)
   hom := GroupHomByFuncWithData(g,imggrp,RECOG.ShortOrbitsHomFunc, data);
   Info(InfoRecog,3,"Finished building homomorphism.");
 
-  Sethomom(ri,hom);
+  SetHomom(ri,hom);
   Setmethodsforfactor(ri,FindHomDbPerm);
   
   return true;

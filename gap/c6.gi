@@ -738,7 +738,7 @@ FindHomMethodsProjective.C6 := function(ri,G)
         Setimmediateverification(ri,true);
         Setmethodsforfactor(ri,FindHomDbMatrix);
     fi;
-    Sethomom(ri,hom);
+    SetHomom(ri,hom);
 
     return true;
 end;

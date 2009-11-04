@@ -17,7 +17,7 @@ InsertSubTree := function(ri,rifac,maps)
  kerfac := kernel(ri);;
  
  # construct maps from ri -> new groups
- phi := StructuralCopy(homom(ri));
+ phi := StructuralCopy(Homom(ri));
  Q := List(maps,x->Image(x));
  GtoQ := List([1..Length(Q)],i->GroupHomomorphismByFunction(Grp(ri),Q[i],g->ImageElm(maps[i],ImageElm(phi,g))));
 
@@ -36,7 +36,7 @@ InsertSubTree := function(ri,rifac,maps)
    rri[i] := rec();
    Objectify(RecognitionInfoType,rri[i]);;
    SetGrp(rri[i],Q[i]);
-   Sethomom(lri[i],GtoQ[i]);
+   SetHomom(lri[i],GtoQ[i]);
    Setnicegens(rri[i],AsList(Pcgs(Q[i])));
    Setslpforelement(rri[i],SolvePcWord);
    Setpregensfac(lri[i],List(nicegens(rri[i]),x-> ResultOfStraightLineProgram(slpforelement(rifac)(rifac,PreImagesRepresentative(maps[i],x)),ripregensfac)));
@@ -106,7 +106,7 @@ RefineSolubleLayers := function(ri)
  if ri=fail then return ri; fi;
 
  rifac := factor(ri);;
- phi := homom(ri);
+ phi := Homom(ri);
  I := Grp(rifac);
 
  if not IsPcGroup(I) or IsElementaryAbelian(I) then 
@@ -142,7 +142,7 @@ ConstructActionMatrices := function(ri)
 
  AcGens := [];
  for g in GeneratorsOfGroup(overgroup(ri)) do
-   Add(AcGens,List(pregensfac(ri),x->ExponentsOfPcElement(Pcgs(factor(ri)!.group),ImageElm(homom(ri),x^g))));
+   Add(AcGens,List(pregensfac(ri),x->ExponentsOfPcElement(Pcgs(factor(ri)!.group),ImageElm(Homom(ri),x^g))));
  od;
 
  return AcGens;
@@ -158,7 +158,7 @@ RefineElementaryAbelianLayers := function(ri)
  if ri=fail then return ri; fi;
 
  rifac := factor(ri);;
- phi := homom(ri);
+ phi := Homom(ri);
  I := Grp(rifac);
 
  if not IsPcGroup(I) or IsCyclic(I) then 

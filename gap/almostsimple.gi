@@ -287,7 +287,7 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
                       Info(InfoRecog,2,"Found orbit of length ",
                            Length(orb)," - not a block system.");
                   fi;
-                  Sethomom(ri,hom);
+                  SetHomom(ri,hom);
                   Setmethodsforfactor(ri,FindHomDbPerm);
                   return true;
               fi;
@@ -6016,7 +6016,7 @@ FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
               GG := GroupWithGenerators(newgens);
               hom := GroupHomByFuncWithData(G,GG,RECOG.HomFDPM,r);
 
-              Sethomom(ri,hom);
+              SetHomom(ri,hom);
               Setmethodsforfactor(ri,FindHomDbPerm);
 
               ri!.comment := "_FDPM";

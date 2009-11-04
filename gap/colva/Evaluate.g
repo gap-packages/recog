@@ -139,7 +139,7 @@ end;
 #     return SLPOfElm(ImageElm(VPctoTriv,g));
 #   end);  
 #     Setpregensfac(lri[count],Bpreims);
-#     Sethomom(lri[count],GroupHomomorphismByFunction(Grp(lri[count]),VPc,function(g)
+#     SetHomom(lri[count],GroupHomomorphismByFunction(Grp(lri[count]),VPc,function(g)
 #  local v;
 #  v := GtoVp(g);
 #  return PcElementByExponents(Pcgs(VPc),List(v,x->IntFFE(x)));
@@ -205,7 +205,7 @@ InstallGlobalFunction( NormalTree,
 
     # Use the homomorphism defined by nsm!.Maps[depth+1];
     if IsBound(nsm!.Maps[depth+1]) then
-      Sethomom(ri,nsm!.Maps[depth+1]);
+      SetHomom(ri,nsm!.Maps[depth+1]);
       name := nsm!.Names[depth+1]; 
       Setfhmethsel(ri,"Hom from NSM"); 
       OverI := nsm!.MapImages[depth+1];
@@ -214,8 +214,8 @@ InstallGlobalFunction( NormalTree,
 #      map1 := IsomorphismPcPGroup(Grp(ri));
 #      map2 := IsomorphismPcGroup(Image(map1));
 #  Should have some good spinning up property and a better way of handling this!       
-      Sethomom(ri,IsomorphismPcGroup(Grp(ri)));
-      OverI := Image(homom(ri));
+      SetHomom(ri,IsomorphismPcGroup(Grp(ri)));
+      OverI := Image(Homom(ri));
       name := "";
     fi;     
       
@@ -225,7 +225,7 @@ InstallGlobalFunction( NormalTree,
     
     Info(InfoRecognition,1,"Going to the factor (depth=",depth,")");
 
-    I := SubgroupNC(OverI,List(GeneratorsOfGroup(H), x->ImageElm(homom(ri),x)));
+    I := SubgroupNC(OverI,List(GeneratorsOfGroup(H), x->ImageElm(Homom(ri),x)));
 
     rifac := RecogniseLeaf(ri,I,name);;
 

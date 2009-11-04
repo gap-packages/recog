@@ -151,7 +151,7 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
                               # groups, it is an isomorphism.
   
   # Now report back:
-  Sethomom(ri,hom);
+  SetHomom(ri,hom);
 
   # Hand down hint that no MeatAxe run can help:
   forfactor(ri).isabsolutelyirred := true;
@@ -187,7 +187,7 @@ FindHomMethodsProjective.BiggerScalarsOnly := function(ri,G)
   newgens := List(GeneratorsOfGroup(G),x->RECOG.HomBCToDiagonalBlock(data,x));
   H := Group(newgens);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomBCToDiagonalBlock,data);
-  Sethomom(ri,hom);
+  SetHomom(ri,hom);
 
   Add(forfactor(ri).hints,
       rec( method := FindHomMethodsProjective.StabilizerChain, rank := 4000,
@@ -380,7 +380,7 @@ FindHomMethodsProjective.Subfield :=
         SetIsInjective(hom,true);
         SetIsSurjective(hom,true);
         # Now report back, it is an isomorphism:
-        Sethomom(ri,hom);
+        SetHomom(ri,hom);
         findgensNmeth(ri).method := FindKernelDoNothing;
         return true;
     fi;
@@ -491,7 +491,7 @@ FindHomMethodsProjective.KnownNilpotent := function(ri,G)
   ri!.waytonice := List(gens2,x->x{[3,4]});
   H := GroupWithGenerators(gensfac);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomForNilpotent,data);
-  Sethomom(ri,hom);
+  SetHomom(ri,hom);
   forfactor(ri).primes := primes{[1..cut]};
   forkernel(ri).primes := primes{[cut+1..Length(primes)]};
   Add(forfactor(ri).hints,
@@ -591,7 +591,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
           gensim := List(gens,x->RECOG.HomCommutator(r,x));
           H := GroupWithGenerators(gensim);
           hom := GroupHomByFuncWithData(G,H,RECOG.HomCommutator,r);
-          Sethomom(ri,hom);
+          SetHomom(ri,hom);
           Setmethodsforfactor(ri,FindHomDbMatrix);
           poss := Filtered([1..Length(gensim)],i->IsOne(gensim[i]));
           Append(gensN(ri),ri!.gensHmem{poss});
@@ -646,7 +646,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
                            RECOG.HomDoBaseAndFieldChangeWithScalarFinding,b);
                   # Now report back, it is an isomorphism, because this is a 
                   # projective method:
-                  Sethomom(ri,hom);
+                  SetHomom(ri,hom);
                   findgensNmeth(ri).method := FindKernelDoNothing;
                   return true;
               fi;
@@ -696,7 +696,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
       HH := GroupWithGenerators(gensim);
       hom := GroupHomByFuncWithData(G,HH,RECOG.HomActionFieldAuto,
                   rec( c := c,cc := cc,cgen := cgen, cyc := cyc ) );
-      Sethomom(ri,hom);
+      SetHomom(ri,hom);
       Setmethodsforfactor(ri,FindHomDbPerm);
       return true;
 
@@ -746,7 +746,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
     
           H := GroupWithGenerators(conjgensG);
           hom := GroupHomByFuncWithData(G,H,RECOG.HomDoBaseChange,r);
-          Sethomom(ri,hom);
+          SetHomom(ri,hom);
     
           # Hand down information:
           forfactor(ri).blocksize := r.blocksize;
@@ -770,7 +770,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
       o := Orb(G,homcomp,OnSubspacesByCanonicalBasis,rec(storenumbers := true));
       Enumerate(o);
       a := OrbActionHomomorphism(G,o);
-      Sethomom(ri,a);
+      SetHomom(ri,a);
       Setmethodsforfactor(ri,FindHomDbPerm);
     
       return true;

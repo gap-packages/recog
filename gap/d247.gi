@@ -234,7 +234,7 @@ RECOG.SortOutReducibleNormalSubgroup :=
     
         H := GroupWithGenerators(conjgensG);
         hom := GroupHomByFuncWithData(G,H,RECOG.HomDoBaseChange,r);
-        Sethomom(ri,hom);
+        SetHomom(ri,hom);
     
         # Hand down information:
         forfactor(ri).blocksize := r.blocksize;
@@ -267,7 +267,7 @@ ConvertToMatrixRep(homcomp,Size(f));
         return fail;
     fi;
     a := OrbActionHomomorphism(G,o);
-    Sethomom(ri,a);
+    SetHomom(ri,a);
     Setmethodsforfactor(ri,FindHomDbPerm);
     ri!.comment := "_D2Imprimitive";
     Setimmediateverification(ri,true);
@@ -302,7 +302,7 @@ RECOG.SortOutReducibleSecondNormalSubgroup :=
                 hom := GroupHomByFuncWithData(G,H,
                            RECOG.DirectFactorsAction,
                            rec( o := orb[1], eq := ri!.isequal) );
-                Sethomom(ri,hom);
+                SetHomom(ri,hom);
                 Setmethodsforfactor(ri,FindHomDbPerm);
                 Info(InfoRecog,2,"D247: Success, found D7 with action",
                      " on ",mult," direct factors.");

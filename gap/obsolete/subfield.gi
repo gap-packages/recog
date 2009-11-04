@@ -673,7 +673,7 @@ FindHomMethodsProjective.Subfield :=
         H := GroupWithGenerators(b.newgens);
         hom := GroupHomByFuncWithData(G,H,SUBFIELD.HomDoBaseAndFieldChange,b);
         # Now report back, it is an isomorphism:
-        Sethomom(ri,hom);
+        SetHomom(ri,hom);
         findgensNmeth(ri).method := FindKernelDoNothing;
         return true;
     fi;
@@ -708,7 +708,7 @@ FindHomMethodsProjective.Subfield :=
                       SUBFIELD.HomDoBaseAndFieldChangeWithScalarFinding,b);
         # Now report back, it is an isomorphism, because this is a projective
         # method:
-        Sethomom(ri,hom);
+        SetHomom(ri,hom);
         findgensNmeth(ri).method := FindKernelDoNothing;
         return true;
     fi;

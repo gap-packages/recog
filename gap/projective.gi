@@ -60,7 +60,7 @@ FindHomMethodsProjective.BlocksModScalars := function(ri,G)
       newgens := List(GeneratorsOfGroup(G),x->RECOG.HomToDiagonalBlock(data,x));
       H := GroupWithGenerators(newgens);
       hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
-      Sethomom(ri,hom);
+      SetHomom(ri,hom);
       # The following is already be set, but make it explicit here:
       Setmethodsforfactor(ri,FindHomDbProjective);
       # no kernel:
@@ -74,7 +74,7 @@ FindHomMethodsProjective.BlocksModScalars := function(ri,G)
   newgens := List(GeneratorsOfGroup(G),x->RECOG.HomToDiagonalBlock(data,x));
   H := GroupWithGenerators(newgens);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
-  Sethomom(ri,hom);
+  SetHomom(ri,hom);
 
   # the factor are the last few blocks:
   # The following is already be set, but make it explicit here:
@@ -147,7 +147,7 @@ FindHomMethodsProjective.ProjDeterminant := function(ri,G)
   H := GroupWithGenerators(newgens);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomProjDet,
                                 rec(c := c, z := z, gcd := gcd));
-  Sethomom(ri,hom);
+  SetHomom(ri,hom);
   Setmethodsforfactor(ri,FindHomDbPerm);
   findgensNmeth(ri).args[1] := 8;
   findgensNmeth(ri).args[2] := 5;
@@ -171,7 +171,7 @@ FindHomMethodsProjective.BlockScalarProj := function(ri,G)
   newgens := List(GeneratorsOfGroup(G),x->RECOG.HomNormLastBlock(data,x));
   H := GroupWithGenerators(newgens);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomNormLastBlock,data);
-  Sethomom(ri,hom);
+  SetHomom(ri,hom);
 
   findgensNmeth(ri).method := FindKernelDoNothing;  # This is an iso
 

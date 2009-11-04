@@ -142,7 +142,7 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
   SetIsSurjective(hom,true);  # projective groups!
   
   # Now report back:
-  Sethomom(ri,hom);
+  SetHomom(ri,hom);
 
   # Hand down hint that no MeatAxe run can help:
   forfactor(ri).isabsolutelyirred := true;
@@ -169,7 +169,7 @@ FindHomMethodsProjective.BiggerScalarsOnly := function(ri,G)
   newgens := List(GeneratorsOfGroup(G),x->RECOG.HomToDiagonalBlock(data,x));
   H := Group(newgens);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
-  Sethomom(ri,hom);
+  SetHomom(ri,hom);
 
   Add(forfactor(ri).hints,
       rec( method := FindHomMethodsProjective.StabilizerChain, rank := 4000,

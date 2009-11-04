@@ -129,7 +129,7 @@ FindHomMethodsPerm.NonTransitiveByFoot :=
 
     # Build the homomorphism:
     hom := GroupHomByFuncWithData(G,Group(imgens),RestrictToOrbitHomFunc,data);
-    Sethomom(ri,hom);
+    SetHomom(ri,hom);
 
     return true;
   end;
@@ -147,7 +147,7 @@ FindHomMethodsPerm.NonTransitive :=
     o := Orb(G,la,OnPoints);
     Enumerate(o);
     hom := OrbActionHomomorphism(G,o);
-    Sethomom(ri,hom);
+    SetHomom(ri,hom);
     return true;
   end;
 
@@ -177,7 +177,7 @@ FindHomMethodsPerm.Imprimitive :=
 
     # Find the homomorphism:
     hom := ActionHomomorphism(G,blocks,OnSets);
-    Sethomom(ri,hom);
+    SetHomom(ri,hom);
 
     # Now we want to help recognising the kernel, we first check, whether
     # the restriction to one block is solvable, which would mean, that
@@ -226,7 +226,7 @@ FindHomMethodsPerm.BalTreeForBlocks := function(ri,G)
   upperhalf := blocks{[cut+1..nrblocks]};
   o := Concatenation(upperhalf);
   hom := ActionHomomorphism(G,o);
-  Sethomom(ri,hom);
+  SetHomom(ri,hom);
   Setimmediateverification(ri,true);
   findgensNmeth(ri).args[1] := 3+cut;
   findgensNmeth(ri).args[2] := 5;
@@ -399,7 +399,7 @@ FindHomMethodsPerm.ThrowAwayFixedPoints :=
       fi;
       o := MovedPoints(G);
       hom := ActionHomomorphism(G,o);
-      Sethomom(ri,hom);
+      SetHomom(ri,hom);
 
       # Initialize the rest of the record:
       findgensNmeth(ri).method := FindKernelDoNothing;

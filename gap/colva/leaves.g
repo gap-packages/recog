@@ -68,9 +68,9 @@ SolveLeafTrivial := function(ri,rifac)
  T := CyclicGroup(1);
  SetGrp(rifac,T);
  SetName(rifac,"trivial");
- oldmap := StructuralCopy(homom(ri));
+ oldmap := StructuralCopy(Homom(ri));
  if IsPermGroup(I) then
-   Sethomom(ri,GroupHomomorphismByFunction(Grp(ri),T,
+   SetHomom(ri,GroupHomomorphismByFunction(Grp(ri),T,
 function(g)
 local x;
  x := ImageElm(oldmap,g);
@@ -79,7 +79,7 @@ local x;
 end));      
  
  elif IsMatrixGroup(I) then
-   Sethomom(ri,GroupHomomorphismByFunction(Grp(ri),T,
+   SetHomom(ri,GroupHomomorphismByFunction(Grp(ri),T,
 function(g)
 local x;
  x := ImageElm(oldmap,g);
@@ -88,7 +88,7 @@ local x;
 end));      
  
  else
-   Sethomom(ri, GroupHomomorphismByFunction(Grp(ri),T,
+   SetHomom(ri, GroupHomomorphismByFunction(Grp(ri),T,
 function(g)
 local x,n;
  x := ImageElm(oldmap,g);
@@ -118,7 +118,7 @@ end;
 
 InstallGlobalFunction(RecogniseLeaf,
 function(ri,I,name)
-# Recognises I which is the image of homom(ri)
+# Recognises I which is the image of Homom(ri)
  local rifac,bool;
 
  rifac := rec();

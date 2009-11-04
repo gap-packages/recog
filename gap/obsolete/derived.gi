@@ -71,7 +71,7 @@ FindHomMethodsProjective.Derived :=
 
         H := GroupWithGenerators(conjgensG);
         hom := GroupHomByFuncWithData(G,H,RECOG.HomDoBaseChange,r);
-        Sethomom(ri,hom);
+        SetHomom(ri,hom);
 
         # Hand down information:
         forfactor(ri).blocksize := r.blocksize;
@@ -95,7 +95,7 @@ FindHomMethodsProjective.Derived :=
     o := Orb(G,homcomp,OnSubspacesByCanonicalBasis,rec(storenumbers := true));
     Enumerate(o);
     a := OrbActionHomomorphism(G,o);
-    Sethomom(ri,a);
+    SetHomom(ri,a);
     Setmethodsforfactor(ri,FindHomDbPerm);
 
     return true;

@@ -102,7 +102,7 @@ PastNonAb := function(ri)
 
  
  x := pregensfac(ri)[1];
- if IsDirectProduct(Grp(factor(kernel(ri)))) and not IsTrivial(PermAction(GroupWithGenerators([x]),Grp(kernel(ri)),homom(kernel(ri)),Grp(factor(kernel(ri))))) then return false;
+ if IsDirectProduct(Grp(factor(kernel(ri)))) and not IsTrivial(PermAction(GroupWithGenerators([x]),Grp(kernel(ri)),Homom(kernel(ri)),Grp(factor(kernel(ri))))) then return false;
  fi;
 
  riker := kernel(ri);
@@ -112,7 +112,7 @@ function(g)
  local w,preim;
  w := slpforelement(factor(riker))(factor(riker),g); 
  preim := ResultOfStraightLineProgram(w,pregensfac(riker));
- return ImageElm(homom(riker),preim^x);
+ return ImageElm(Homom(riker),preim^x);
 end);
 # Is aut inner? - tell it that it's an automorphism.
  SetIsBijective(aut, true);
@@ -128,7 +128,7 @@ function(g)
  local w,preim;
  w := slpforelement(factor(riker))(factor(riker),g); 
  preim := ResultOfStraightLineProgram(w,pregensfac(riker));
- return ImageElm(homom(riker),preim^x);
+ return ImageElm(Homom(riker),preim^x);
 end);
    conj_elt:= MyIsInnerAutomorphism(Grp(factor(riker)),Name(factor(riker)),aut,g->slpforelement(factor(riker))(factor(riker),g));
    if conj_elt = false then return false; fi;
@@ -144,8 +144,8 @@ end);
  l := x->ResultOfStraightLineProgram(slpforelement(factor(ri))(factor(ri),x),y);
 
 
- rihom := StructuralCopy(homom(ri));
- kerhom := StructuralCopy(homom(riker));
+ rihom := StructuralCopy(Homom(ri));
+ kerhom := StructuralCopy(Homom(riker));
  zeta := GroupHomomorphismByFunction(Grp(ri),Grp(factor(riker)),function(g)
  local g1;
  g1 := l(ImageElm(rihom,g));
@@ -165,7 +165,7 @@ AbPastAb := function(ri)
  riker := kernel(ri);;
 # Does x act trivially on factor(riker)
  for i in [1..Length(nicegens(factor(riker)))] do
-   im := ImageElm(homom(riker),pregensfac(riker)[i]^x);
+   im := ImageElm(Homom(riker),pregensfac(riker)[i]^x);
    if im <> nicegens(factor(riker))[i] then
      return false; 
    fi;
@@ -177,7 +177,7 @@ AbPastAb := function(ri)
  l := GroupHomomorphismByImagesNC(Grp(factor(ri)),Grp(ri),List(nicegens(factor(ri)),x->x^q),List(pregensfac(ri),x->x^q));  
  
 # Construct the new map
- zeta := GroupHomomorphismByFunction(Grp(ri),Grp(factor(riker)),g->ImageElm(homom(riker),g*ImageElm(homom(ri)*l,g)^-1));
+ zeta := GroupHomomorphismByFunction(Grp(ri),Grp(factor(riker)),g->ImageElm(Homom(riker),g*ImageElm(Homom(ri)*l,g)^-1));
  return zeta;
 end;   
        
@@ -194,7 +194,7 @@ AbPastAbSamePrime := function(ri)
  fi;
 # Does x act trivially on factor(riker)
  for i in [1..Length(nicegens(factor(riker)))] do
-   im := ImageElm(homom(riker),pregensfac(riker)[i]^x);
+   im := ImageElm(Homom(riker),pregensfac(riker)[i]^x);
    if im <> nicegens(factor(riker))[i] then
      return [false]; 
    fi;
@@ -203,7 +203,7 @@ AbPastAbSamePrime := function(ri)
 # Construct a map down onto the direct product of the two factor groups
  p := Grp(factor(riker))!.Pcgs!.RelativeOrders[1];
  l := GroupHomomorphismByImagesNC(Grp(factor(ri)),Grp(ri),nicegens(factor(ri)),pregensfac(ri));  
- psi := GroupHomomorphismByFunction(Grp(ri),Grp(factor(riker)),g->ImageElm(homom(riker),g*ImageElm(l,ImageElm(homom(ri),g))^-1));
+ psi := GroupHomomorphismByFunction(Grp(ri),Grp(factor(riker)),g->ImageElm(Homom(riker),g*ImageElm(l,ImageElm(Homom(ri),g))^-1));
 # check generators and relations of facto(ri) map to 1 under psi
  checkelts1 := List(pregensfac(ri),x->x^p);
  if not ForAll(checkelts1,x->IsOne(ImageElm(psi,x))) then return [false]; fi;
@@ -211,7 +211,7 @@ AbPastAbSamePrime := function(ri)
  if not ForAll(checkelts2,x->IsOne(ImageElm(psi,x))) then return [false]; fi;
  
  D := DirectProduct(Grp(factor(ri)),Grp(factor(riker)));  
- phi := GroupHomomorphismByFunction(Grp(ri),D,g->ImageElm(homom(ri)*Embedding(D,1),g)*ImageElm(psi*Embedding(D,2),g));
+ phi := GroupHomomorphismByFunction(Grp(ri),D,g->ImageElm(Homom(ri)*Embedding(D,1),g)*ImageElm(psi*Embedding(D,2),g));
  pregens := Concatenation(pregensfac(ri),pregensfac(riker));
 # Construct the action of G on D
  AcGens := [];
@@ -251,7 +251,7 @@ NonAbPastAb := function(ri)
  riker := kernel(ri);;
 # Does x act trivially on factor(riker)
  for i in [1..Length(nicegens(factor(riker)))] do
-   im := ImageElm(homom(riker),pregensfac(riker)[i]^x);
+   im := ImageElm(Homom(riker),pregensfac(riker)[i]^x);
    if im <> nicegens(factor(riker))[i] then
      return false; 
    fi;
@@ -303,9 +303,9 @@ NonAbPastAb := function(ri)
  invims1 := List(words,w->ResultOfStraightLineProgram(w,pregensfac(ri)));
  invims := List(invims1,x->x^(p^Valuation(Order(x),p)));
  #should this be invims1 or invims in next line???
- gens2 := List(invims, x->ImageElm(homom(ri),x));
+ gens2 := List(invims, x->ImageElm(Homom(ri),x));
  lift := GroupHomomorphismByImagesNC(Grp(factor(ri)),Grp(ri),gens2,invims);
- zeta := GroupHomomorphismByFunction(Grp(ri),Grp(factor(riker)),g->ImageElm(homom(riker),g*ImageElm(lift, ImageElm(homom(ri),g))^-1));
+ zeta := GroupHomomorphismByFunction(Grp(ri),Grp(factor(riker)),g->ImageElm(Homom(riker),g*ImageElm(lift, ImageElm(Homom(ri),g))^-1));
 
 
 # Do some random testing of elts to check that zeta is a hom
@@ -332,7 +332,7 @@ PushIntoSocle := function(ri,zeta)
 # and the new map phi from Grp(ri) -> D
  phi := GroupHomomorphismByFunction(Grp(ri),D,function(g)
 local im1,im2;
-im1 := ImageElm(homom(ri),g);
+im1 := ImageElm(Homom(ri),g);
 im2 := ImageElm(zeta,g);
 return ImageElm(MyEmbedding(D,1),im1)*ImageElm(MyEmbedding(D,2),im2);
 end);
@@ -385,7 +385,7 @@ end);
      Error(2);
    fi;
  fi;
- Sethomom(nri,phi);
+ SetHomom(nri,phi);
 ## Construct the preimages
  Setpregensfac(nri,Concatenation(
 List(pregensfac(ri),g->
@@ -429,8 +429,8 @@ SwapFactors := function(ri,zeta)
  nriker := rec();
  Objectify( RecognitionInfoType, nriker );;
 
- Sethomom(nriker,StructuralCopy(homom(ri)));
- Sethomom(nri,zeta);
+ SetHomom(nriker,StructuralCopy(Homom(ri)));
+ SetHomom(nri,zeta);
  Setpregensfac(nri,StructuralCopy(pregensfac(riker)));
  Setpregensfac(nriker,List(pregensfac(ri),x->x*ResultOfStraightLineProgram(SLPforElement(rikerfac,ImageElm(zeta,x)),pregensfac(riker))^-1));  
  Setkernel(nriker,StructuralCopy(kernel(riker)));

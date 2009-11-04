@@ -487,7 +487,7 @@ FindHomMethodsPerm.SnkSetswrSr :=
                    x->RECOG.FindImageJellyfish(x,T,seen));
     hom := GroupHomByFuncWithData(grp,Group(imgens),RECOG.JellyHomFunc,
                                   rec(T := T,seen := seen));
-    Sethomom(ri,hom);
+    SetHomom(ri,hom);
 
     return true;
   end;

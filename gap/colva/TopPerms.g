@@ -3,7 +3,7 @@
 
 MySocleAction:= function(soc, g)
 local grp;
-grp:= PermAction(GroupWithGenerators([g]), Grp(soc), homom(soc), Grp(factor(soc)));
+grp:= PermAction(GroupWithGenerators([g]), Grp(soc), Homom(soc), Grp(factor(soc)));
 if not Size(GeneratorsOfGroup(grp)) = 1 then
   return fail;
 fi;
@@ -43,10 +43,10 @@ if not IsDirectProduct(Grp(factor(nri))) then
 fi;
 
 soc:= nri;
-R:= RefineMap(Grp(soc), homom(soc), Grp(factor(soc)));
+R:= RefineMap(Grp(soc), Homom(soc), Grp(factor(soc)));
 phi:= R[1];
 I:= R[2];
-Sethomom(soc, phi);
+SetHomom(soc, phi);
 SetGrp(factor(soc), I);
 
 #now we find the degree of the permutation action.
@@ -85,8 +85,8 @@ while (Hasparent(nri)) do
             pgs_ims:= List(pgs, x->x*Image(ki,MySocleAction(soc, x))^-1);
             alpha:= GroupHomomorphismByImagesNC(Grp(factor(kernel(nri))), overgroup(nri), pgs, pgs_ims);
             zeta:= function(g)
-               return Image(homom(kernel(nri)),(g*Image(alpha, 
-                    Image(homom(kernel(nri)), g))^-1));
+               return Image(Homom(kernel(nri)),(g*Image(alpha, 
+                    Image(Homom(kernel(nri)), g))^-1));
             end;
           else
             #should have a nonabelian group to move past here, 

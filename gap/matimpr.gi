@@ -190,7 +190,7 @@ FindHomMethodsProjective.LowIndex := function(ri,G)
       fi;
 
       # we are done, report the hom:
-      Sethomom(ri,res.hom);
+      SetHomom(ri,res.hom);
       Setmethodsforfactor(ri,FindHomDbPerm);
 
       return true;
@@ -208,7 +208,7 @@ FindHomMethodsProjective.DoBaseChangeForBlocks := function(ri,G)
                                 rec(t := ri!.t,ti := ti));
 
   # Now report back:
-  Sethomom(ri,iso);
+  SetHomom(ri,iso);
   findgensNmeth(ri).method := FindKernelDoNothing;
 
   # Inform authorities that the factor can be recognised easily:
@@ -225,7 +225,7 @@ FindHomMethodsProjective.Blocks := function(ri,G)
   # altogether mod scalars.
   local blocks,d,hom,i;
   hom := IdentityMapping(G);
-  Sethomom(ri,hom);
+  SetHomom(ri,hom);
   blocks := [];
   d := ri!.dimension;
   for i in [1..d/ri!.blocksize] do
@@ -259,7 +259,7 @@ FindHomMethodsProjective.BlocksBackToMats := function(ri,G)
   newgens := List(GeneratorsOfGroup(G),RECOG.HomBackToMats);
   H := Group(newgens);
   hom := GroupHomomorphismByFunction(G,H,RECOG.HomBackToMats);
-  Sethomom(ri,hom);
+  SetHomom(ri,hom);
   
   # hints for the factor:
   Setmethodsforfactor(ri,FindHomDbMatrix);
@@ -293,7 +293,7 @@ end;
 #  H := GroupWithGenerators(newgens);
 #  hom := GroupHomByFuncWithData(G,H,RECOG.HomInducedOnFactor,
 #                                rec(subdim := subdim));
-#  Sethomom(ri,hom);
+#  SetHomom(ri,hom);
 #
 #  # Create some more kernel generators:
 #  findgensNmeth(ri).args[1] := 20 + nrblocks;
@@ -340,7 +340,7 @@ end;
 #  hom := GroupHomByFuncWithData(G,H,RECOG.HomInducedOnSubspace,data);
 #
 #  # Now report back:
-#  Sethomom(ri,hom);
+#  SetHomom(ri,hom);
 #
 #  # We know that the kernel is a GF(p) vectorspace and thus may need
 #  # quite some generators. Therefore we generate them in a non-standard
@@ -365,7 +365,7 @@ end;
 #  H := Group(newgens);
 #  hom := GroupHomByFuncWithData(G,H,RECOG.HomInducedOnSubspace,
 #                                rec(subdim := ri!.subdim));
-#  Sethomom(ri,hom);
+#  SetHomom(ri,hom);
 #
 #  findgensNmeth(ri).method := FindKernelDoNothing;
 #
