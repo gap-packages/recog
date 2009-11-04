@@ -554,6 +554,9 @@ InstallGlobalFunction( RecogniseGeneric,
     repeat
         # Now we go on as usual:
         SetgensNslp(ri,SLPOfElms(gensN(ri)));
+        if IsBound(SlotUsagePattern) then
+            SlotUsagePattern(gensNslp(ri));
+        fi;
         # This is now in terms of the generators of H!
         N := Group(StripMemory(gensN(ri)));
         
@@ -902,6 +905,9 @@ BindGlobal( "SLPforNiceGens", function(ri)
   l := GeneratorsWithMemory(l);
   ll := CalcNiceGens(ri,l);
   s := SLPOfElms(ll);
+  if IsBound(SlotUsagePattern) then
+      SlotUsagePattern(s);
+  fi;
   return s;
 end );
 
