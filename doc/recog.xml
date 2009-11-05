@@ -39,10 +39,19 @@ Columbus, OH 43210 USA
     <Homepage>http://www.math.ohio-state.edu/people/display/display.php?ID=302
     </Homepage>
     </Author>
-    <Date>March 2008</Date>
+<Author>Peter Brooksbank</Author>
+<Author>Frank Celler</Author>
+<Author>Stephen Howe</Author>
+<Author>Maska Law</Author>
+<Author>Stephen Linton</Author>
+<Author>Gunter Malle</Author>
+<Author>Eamonn O'Brien</Author>
+<Author>Colva Roney-Dougal</Author>
+
+    <Date>November 2009</Date>
 
 <Copyright>
-  &copyright; 2005-2008 by Max Neunhöffer and Ákos Seress<P/>
+  &copyright; 2005-2009 by Max Neunhöffer and Ákos Seress<P/>
 
   This package may be distributed under the terms and conditions of the
   GNU Public License Version 3 or (at your option) any later version.

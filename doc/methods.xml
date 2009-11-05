@@ -204,6 +204,9 @@ only with small-base inputs, where the method works efficiently.
 <Section Label="matrixmethods">
 <Heading>Methods for matrix groups</Heading>
 
+THIS CHAPTER IS CURRENTLY A BIT OUT OF DATE!
+<P/>
+
 The following table gives an overview over the installed methods and their
 rank (higher rank means higher priority, the method is tried earlier, see
 Chapter <Ref Chap="method selection" BookName="recogbase"/>). Note
@@ -361,6 +364,9 @@ and a method to express group elements in terms of these.
 
 <Section Label="projmethods">
 <Heading>Methods for projective groups</Heading>
+
+THIS CHAPTER IS CURRENTLY A BIT OUT OF DATE!
+<P/>
 
 The following table gives an overview over the installed methods and their
 rank (higher rank means higher priority, the method is tried earlier, see
