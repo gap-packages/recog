@@ -29,7 +29,7 @@ Version := "1.0",
 ##  changing this.
 
 ##  Release date of the current version in dd/mm/yyyy format.
-#Date := "20/06/2003",  # not yet released
+Date := "05/11/2009",  # not yet released
 
 ArchiveURL := "http://www.math.rwth-aachen.de/~Max.Neunhoeffer/Computer/Software/Gap/recog/recog-1.0",
 
@@ -78,7 +78,7 @@ Persons := [
     IsAuthor      := true,
     IsMaintainer  := false,
     Email         := "pbrooksb@bucknell.edu",
-    WWWHome       := "http://www.facstaff.bucknell.edu/pbrooksb/",
+    WWWHome       := "http://www.facstaff.bucknell.edu/pbrooksb/index.html",
     PostalAddress := Concatenation( [
                        "Peter A. Brooksbank\n",
                        "Mathematics Department\n",
@@ -103,7 +103,6 @@ Persons := [
     FirstNames    := "Stephen",
     IsAuthor      := true,
     IsMaintainer  := false,
-    WWWHome       := "",
   ),
   rec( 
     LastName      := "Law",
@@ -111,7 +110,7 @@ Persons := [
     IsAuthor      := true,
     IsMaintainer  := false,
     Email         := "maska@maths.uwa.edu.au",
-    WWWHome       := "http://www.maths.uwa.edu.au/~maska/",
+    #WWWHome       := "http://www.maths.uwa.edu.au/~maska/",
     PostalAddress := Concatenation( [
                        "Maska Law\n",
                        "University of Western Australia\n",
@@ -128,7 +127,7 @@ Persons := [
     IsAuthor      := true,
     IsMaintainer  := false,
     Email         := "sal@cs.st-andrews.ac.uk",
-    WWWHome       := "http://www-circa.mcs.st-and.ac.uk/~sal/",
+    WWWHome       := "http://www-circa.mcs.st-and.ac.uk/~sal/index.html",
     PostalAddress := Concatenation( [
                        "School of Computer Science\n",
                        "Jack Cole Building\n",
@@ -232,20 +231,23 @@ PackageInfoURL :=
 #  "The <span class=\"pkgname\">Example</span> package, as its name suggests, \
 #   is an example of how to create a <span class=\"pkgname\">GAP</span> \
 #   package. It has little functionality except for being a package",
+AbstractHTML := 
+  "This packages contains a collection of methods for the \
+   constructive recognition of groups. It is mostly intended for \
+   permutation groups, matrix groups and projective groups.",
 #
 PackageWWWHome := "http://www.math.rwth-aachen.de/~Max.Neunhoeffer/Computer/Software/Gap/recog.html",
 #               
 PackageDoc := rec(
   BookName  := "recog",
   Archive := "http://www.math.rwth-aachen.de/~Max.Neunhoeffer/Computer/Software/Gap/recog/recogdoc.tar.gz",
-  ArchiveURLSubset := ["doc", "htm"],
-  HTMLStart := "htm/chapters.htm",
+  ArchiveURLSubset := ["doc"],
+  HTMLStart := "doc/chap0.html",
   PDFFile   := "doc/manual.pdf",
   SixFile   := "doc/manual.six",
   LongTitle := "recog - a collection of group recognition methods",
   Autoload  := true
 ),
-
 
 Dependencies := rec(
   GAP := ">=4.4.12",
@@ -288,12 +290,14 @@ Autoload := false,
 
 ##  *Optional*, but recommended: path relative to package root to a file which 
 ##  contains as many tests of the package functionality as sensible.
-TestFile := "tst/TestAll.g",
+## TestFile := "tst/TestAll.g",
+## Currently, due to the Monte-Carlo nature of our algorithms and other
+## technical details, this is not a proper GAP test file.
 
 ##  *Optional*: Here you can list some keyword related to the topic 
 ##  of the package.
 # Keywords := ["Smith normal form", "p-adic", "rational matrix inversion"]
-Keywords := []
+Keywords := ["matrix group recognition", "group recognition", "methods"]
 
 ));
 Unbind(RecogsFunnyNameFormatterFunction);
