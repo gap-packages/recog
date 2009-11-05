@@ -587,10 +587,17 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
               fi;
               invgrp := GroupWithGenerators(invols);
               Info(InfoFindEvenNormal,3,"Computing stabiliser chain...");
-              S := StabilizerChain(invgrp,rec( Projective := opt.Projective,
-                                               IsOne := opt.IsOne ) );
-              Info(InfoFindEvenNormal,3,"...done, size is ",Size(S),".");
-              if Size(S) <= opt.SizeLimitAllInvols then
+              S := StabilizerChain(invgrp,
+                         rec( Projective := opt.Projective,
+                              IsOne := opt.IsOne,
+                              OrbitLengthLimit := 1000,
+                              FailInsteadOfError := true ) );
+              if IsString(S) then
+                  Info(InfoFindEvenNormal,3,"...failed.");
+              else
+                  Info(InfoFindEvenNormal,3,"...done, size is ",Size(S),".");
+              fi;
+              if not(IsString(S)) and Size(S) <= opt.SizeLimitAllInvols then
                   iter := GroupIteratorByStabilizerChain(S);
                   Info(InfoFindEvenNormal,2,"Looking through ",Size(S),
                        " central involutions...");
@@ -606,7 +613,11 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
                   return blindr;
               else
                   for i in [1..20] do
-                      y := Random(S);
+                      if IsString(S) then
+                          y := RandomSubproduct(invols);
+                      else
+                          y := Random(S);
+                      fi;
                       if not(opt.IsOne(y)) then
                           UseElement(y);
                           if blindr.isknownproper then return blindr; fi;
