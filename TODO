@@ -1,144 +1,52 @@
 Today:
 
-  - look at AltSymBB for next rep up if deleted perm went wrong?
-  - balanced trees
   - do something about long StabChain computations in FindElmOfEvenNormal
-  - Make sure that projective leaf nodes do report "Size" correctly!
-  - Investigate maxdepth behaviour
   - Look at documentation: StdGens, StdPresentation
   - Finish web pages
 
 Bugs:
 
-  - SL(n,3) going up does no longer work!
-  - SL(6,5) and SL(4,9) do not work (FindSL2)
-  - GL(6,4) and GL(9,4)
-  - GL(2,5)
-  - SL(3,7) FindSL2
-  - Tensor und Subfield tests fail because SL(4,5) does not find an SL2
-    -> work now but only by avoiding ClassicalNatural native methods.
-  - DisplayCompositionFactors is seriously broken e.g. in the projective
-    case
 
 Later TODO list:
 
   - implement sl2 natural for odd characteristic
   - early cheap stabchain method? --> first groundwork in genss
   - look at Pete's code (blackbox classical)
-
-Local TODO list:
-
+  - balanced trees
+  - Investigate maxdepth behaviour and length of SLPs, sensible?
+  - FindSL2 does not work for q=5, ==> SL(6,5) does not work (FindSL2)
+    reason: we power up to order 4, square of y is -1 thus y and z=y^x
+            mod -1 is dihedral rather than SL(2,5)
+  - DisplayCompositionFactors is seriously broken e.g. in the projective
+    case
+  - look at AltSymBB for next rep up if deleted perm went wrong?
   - Look at Product Replacers again (--> orb): no need for accus during mixing
   - implement classical natural for odd case (--> LG OB)
   - genss: Make call to StabilizerChain which is guaranteed to be quick
     possible
   - more reps for specific hint (-> covers and non-atlasrep reps)
   - think about BrauerCharacterValue method
-  - general tuning
-  - balanced trees?
-  - a_n in deleted perm rep
   - adjoint rep of sl_n
-
-Tomorrow:
-
-  - decide whether new classical natural method is possible
-  - some tuning
-  - revisit challenges
-  - early sporadics methods?
   - verification/presentations
-
-Do soonish:
-
-  - Look at random sources in recog?
-Investigate bug in DisplayCompositionFactors for ex9 in talk
-Put Eamonn and Gunter as authors
-Put Akos and me as main authors.
-Investigate MatC6 errors
-Print error found and where!
-example12 no longer seems to work, why?
-Cleanup tensor.gd  (still needed) and tensor.gi
-Cleanup matrix.gi (e.g. remove det code)
-Native quick genss method?
-
-
-Soonest:
-
+  - example12 needs extremely long, why?
+  - Cleanup matrix.gi (e.g. remove det code)
  - Pete Sp -> send mail
  - PCGS with memory: Luks, Murray, Cooperman implementation
  - Hash functions for vectors over finite fields 257 <= q <= 65536 
    -> NumberFFVector
- - GenSS: Handle "small" cases quick
- - Quick stabchain access for small cases
- - ?At the same time use found normal subgroup to find action if possible
- - Finish derived case for only one homogeneous component (-> tensor)
- - Finish semilinear by looking for field automorphisms in derived
- - Make NaturalSL a projective method -> polish l(2,q), use bb-l(2,q)
- - Make TwoLargeElOrds a projective method, polish databases setup
- - Implement constructive classical in natural rep ->O'Brien/Leedham-Green
- - TwoElementOrds: Ignore degree bound if in defining characteristic
-
-Sooner:
- - Get ActionHomomorphism behaviour fixed -> gap-dev
- - more Tests for tensor decomposable
- - O'Brien/Malle recognition?
- - SGS Matrix verification
-
-Soon:
- - MinBlocks from Steve?
- - Lowindex using derived subgroup?
- - Do something if LowIndex stumbles on non-Absolute irreducible restriction
- - Find Tiep's paper with exception lists
- - Change message to something about "defining characteristic".
- - add Steve's Simple recognition
- - do more C9 cases by collecting hints
  - do more C9 cases
- - do more C9 cases
-
-
-Talk with Akos:
-
- - new stuff with two largest element orders
- - separate?
- - bug in BB alternating
- - do we want to do BB alternating???
- - bug in C6 ruining challenge5
 
 ========================================================================
 
 Future: 
-
-Cleanup and complete the code for using blackbox and gensift
-
-Do we have something better for diagonal matrices???
 
 make New...StraightLineProgram official, throw old stuff out
 slp code into main library
 
 improvements of library in library
 
- - Replace PseudoRandom with product replacer objects  --> eigenes
-
-========================================================================
-
 to change once the new vector/matrix interface is in place:
 
   FieldOfMatrixGroup/DefaultFieldOfMatrixGroup
   
-
-Lie:
-
-A,l,q   ->   Darstellungen SL(l+1,q) = proj. Darstellungen PSL(l+1,q)
-B,l,q   ->   Spin(2l+1,q)      PSpin , Omega in SO(2l+1,q)
-C,l,q   ->   Sp(2l,q)                  PSp(2l,q)
-D,l,q   ->   Spin(2l,q)        
-E,6-8,
-F,4
-G,2
-2A,l,q  ->   SU(l+1,q)
-2D,l,q  ->   Spin^-(2l,q)
-3D,4,q
-2E,6,q
-2B,2,q=2^*   (* ist ungerade)
-2F,2,q=2^*   (* ist ungerade)
-2G,2,q=3^*   (* ist ungerade)
 

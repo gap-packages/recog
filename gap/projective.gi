@@ -112,9 +112,6 @@ FindHomMethodsProjective.StabilizerChain := function(ri,G)
   q := Size(f);
   fu := function() return RandomElm(ri,"StabilizerChain",true).el; end;
   opt := rec( Projective := true, RandomElmFunc := fu );
-  #if q^(d-1) > 100000 then
-  #    opt.TryShortOrbit := 5;
-  #fi;
   Gm := GroupWithGenerators(ri!.gensHmem);
   S := StabilizerChain(Gm,opt);
   SetSize(ri,Size(S));

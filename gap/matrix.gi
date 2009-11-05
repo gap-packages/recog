@@ -716,17 +716,16 @@ InstallGlobalFunction( FindKernelGoProjective, function(ri,n)
      gcd := GcdInt(q-1,d);
      if fhmethsel(RIFac(ri)).successmethod = "ProjDeterminant" then
          moregroup := Size(RIFac(RIFac(ri)));
+     else
+         moregroup := 1;
      fi;
-     m := IdentityMat(d,f)*Z(q)^(gcd/moregroup);  # this has det 1
-     slp := SLPforElement(RIFac(ri),m);
-     mm := ResultOfStraightLineProgram(slp,
-                ri!.genswithmem{[ri!.nrgensH+1..Length(ri!.genswithmem)]});
-     m[1] := m[1] * Z(q);
+     m := IdentityMat(d,f)*Z(q)^(((q-1)/gcd));  # this has det 1
      slp := SLPforElement(RIFac(ri),m);
      mm := ResultOfStraightLineProgram(slp,
                 ri!.genswithmem{[ri!.nrgensH+1..Length(ri!.genswithmem)]});
      Add(gensN(ri),mm);
-     return true;
+     # A shortcut:
+     if gcd > 1 and moregroup = 1 and m = mm!.el then return true; fi;
   fi;
   return FindKernelRandom(ri,n);
 end);

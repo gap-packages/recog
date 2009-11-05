@@ -1537,7 +1537,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
           ri!.comment := "_PSL2Odd";
           ri!.gcd := gcd;
           SetFilterObj(ri,IsLeaf);
-          SetSize(ri,(q+1)*(q-1)*q);
+          SetSize(ri,(q+1)*(q-1)*q/Gcd(2,q-1));
           Setslpforelement(ri,SLPforElementFuncsProjective.PSL2);
           return true;
       fi;
@@ -1545,7 +1545,8 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
       classical := RecogniseClassical(gg);
       if classical.IsSLContained = true then
           # Do not run the generic code in small cases:
-          if (q^d-1)/(q-1) <= 1000 then
+          if (q^d-1)/(q-1) <= 1000 or q=5 then  
+              # FIXME: We do not have a FindSL2 for this case!
               Info(InfoRecog,2,"Classical natural: SL(",d,",",q,"): small ",
                    "case, handing over to Schreier-Sims.");
               ri!.comment := Concatenation("_SL(",String(d),",",String(q),")",
