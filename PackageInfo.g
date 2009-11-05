@@ -16,6 +16,14 @@ RecogsFunnyNameFormatterFunction := function(st)
       return Concatenation(" (",st,")");
   fi;
 end;
+RecogsFunnyWWWURLFunction := function(re)
+  if IsBound(re.WWWHome) then
+      return re.WWWHome;
+  else
+      return "";
+  fi;
+end;
+
 SetPackageInfo( rec(
 
 ##  This is case sensitive, use your preferred spelling.
@@ -278,10 +286,12 @@ BannerString := Concatenation(
   "with contributed code by:\n",
   Concatenation(Concatenation(List(~.Persons{[3..Length(~.Persons)-1]},
        p->["     ",p.FirstNames," ",p.LastName,
-       RecogsFunnyNameFormatterFunction(p.WWWHome),",\n"]))),
+       RecogsFunnyNameFormatterFunction(
+         RecogsFunnyWWWURLFunction(p)),",\n"]))),
   " and ",~.Persons[Length(~.Persons)].FirstNames," ",
   ~.Persons[Length(~.Persons)].LastName,
-  RecogsFunnyNameFormatterFunction(~.Persons[Length(~.Persons)].WWWHome),".\n",
+  RecogsFunnyNameFormatterFunction(
+    RecogsFunnyWWWURLFunction(~.Persons[Length(~.Persons)])),".\n",
   "-----------------------------------------------------------------------",
   "------\n"
 ),
@@ -301,4 +311,5 @@ Keywords := ["matrix group recognition", "group recognition", "methods"]
 
 ));
 Unbind(RecogsFunnyNameFormatterFunction);
+Unbind(RecogsFunnyWWWURLFunction);
 
