@@ -86,7 +86,7 @@ Persons := [
     IsAuthor      := true,
     IsMaintainer  := false,
     Email         := "pbrooksb@bucknell.edu",
-    WWWHome       := "http://www.facstaff.bucknell.edu/pbrooksb/index.html",
+    WWWHome       := "http://www.facstaff.bucknell.edu/pbrooksb/",
     PostalAddress := Concatenation( [
                        "Peter A. Brooksbank\n",
                        "Mathematics Department\n",
@@ -136,7 +136,7 @@ Persons := [
     IsAuthor      := true,
     IsMaintainer  := false,
     Email         := "sal@cs.st-andrews.ac.uk",
-    WWWHome       := "http://www-circa.mcs.st-and.ac.uk/~sal/index.html",
+    WWWHome       := "http://www-circa.mcs.st-and.ac.uk/~sal/",
     PostalAddress := Concatenation( [
                        "School of Computer Science\n",
                        "Jack Cole Building\n",
@@ -245,7 +245,7 @@ AbstractHTML :=
    constructive recognition of groups. It is mostly intended for \
    permutation groups, matrix groups and projective groups.",
 #
-PackageWWWHome := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Commputer/Software/Gap/recog.html",
+PackageWWWHome := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recog.html",
 #               
 PackageDoc := rec(
   BookName  := "recog",
