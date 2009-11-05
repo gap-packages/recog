@@ -119,7 +119,8 @@ generators, you can use the following function:
     This function displays a composition series by using the recursive
     recognition tree. It only works, if the usual operation
     <Ref Oper="CompositionSeries" BookName="ref"/> works for all
-    leaves.
+    leaves. THIS DOES CURRENTLY NOT WORK FOR PROJECTIVE GROUPS AND
+    THUS FOR MATRIX GROUPS!
 </Description>
 </ManSection>
 
