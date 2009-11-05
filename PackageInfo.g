@@ -39,7 +39,7 @@ Version := "1.0",
 ##  Release date of the current version in dd/mm/yyyy format.
 Date := "05/11/2009",  # not yet released
 
-ArchiveURL := "http://www.math.rwth-aachen.de/~Max.Neunhoeffer/Computer/Software/Gap/recog/recog-1.0",
+ArchiveURL := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recog/recog-1.0",
 
 ArchiveFormats := ".tar.gz",
 
@@ -222,9 +222,9 @@ Status := "dev",
 #AcceptDate := "",
 
 README_URL := 
-  "http://www.math.rwth-aachen.de/~Max.Neunhoeffer/Computer/Software/Gap/recog/README.recog",
+  "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recog/README.recog",
 PackageInfoURL := 
-  "http://www.math.rwth-aachen.de/~Max.Neunhoeffer/Computer/Software/Gap/recog/PackageInfo.g",
+  "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recog/PackageInfo.g",
 
 ##  Here you  must provide a short abstract explaining the package content 
 ##  in HTML format (used on the package overview Web page) and an URL 
@@ -245,11 +245,10 @@ AbstractHTML :=
    constructive recognition of groups. It is mostly intended for \
    permutation groups, matrix groups and projective groups.",
 #
-PackageWWWHome := "http://www.math.rwth-aachen.de/~Max.Neunhoeffer/Computer/Software/Gap/recog.html",
+PackageWWWHome := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Commputer/Software/Gap/recog.html",
 #               
 PackageDoc := rec(
   BookName  := "recog",
-  Archive := "http://www.math.rwth-aachen.de/~Max.Neunhoeffer/Computer/Software/Gap/recog/recogdoc.tar.gz",
   ArchiveURLSubset := ["doc"],
   HTMLStart := "doc/chap0.html",
   PDFFile   := "doc/manual.pdf",
