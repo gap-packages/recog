@@ -251,7 +251,7 @@ Dependencies := rec(
   GAP := ">=4.4.12",
   NeededOtherPackages := [["GAPDoc", ">= 1.2"],["recogbase", ">= 1.0"],
                           ["Forms", ">= 1.2"],["genss", ">= 1.3"],
-                          ["Orb", ">= 3.3"], ["FactInt", ">= 1.5.2"],
+                          ["Orb", ">= 3.4"], ["FactInt", ">= 1.5.2"],
                           ["AtlasRep", ">= 1.4.0"]],
   SuggestedOtherPackages := [],
   ExternalConditions := []
