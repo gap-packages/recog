@@ -5810,6 +5810,20 @@ RECOG.RandElFuncSimpleSocle := function(ri)
   return rec( el := el, order := ord );
 end;
 
+# A hack to please gap4r4p12:
+if not(IsBound(UppercaseString)) then
+    UppercaseString := function(st)
+      local i;
+      st := ShallowCopy(st);
+      for i in [1..Length(st)] do
+          if st[i] >= 'a' and st[i] <= 'z' then
+              st[i] := CHAR_INT(INT_CHAR(st[i])-INT_CHAR('a')+INT_CHAR('A'));
+          fi;
+      od;
+      return st;
+    end;
+fi;
+
 FindHomMethodsProjective.ThreeLargeElOrders := function(ri,G)
   local hint,name,namecat,p,res;
   RECOG.SetPseudoRandomStamp(G,"ThreeLargeElOrders");
