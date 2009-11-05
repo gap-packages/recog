@@ -11,8 +11,8 @@ SetPackageInfo( rec(
 PackageName := "recogbase",
 Subtitle := "A framework for group recognition",
 Version := "1.0",
-#Date := "20/06/2003",  # not yet released
-ArchiveURL := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recogbase/recogbase",
+Date := "05/11/2009",  # not yet released
+ArchiveURL := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recogbase/recogbase-1.0",
 ArchiveFormats := ".tar.gz",
 Persons := [
   rec( 
