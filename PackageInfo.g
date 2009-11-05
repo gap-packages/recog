@@ -111,6 +111,7 @@ Persons := [
     FirstNames    := "Stephen",
     IsAuthor      := true,
     IsMaintainer  := false,
+    PostalAddress := ["Unknown"],
   ),
   rec( 
     LastName      := "Law",
