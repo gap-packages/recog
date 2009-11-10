@@ -56,7 +56,7 @@ Persons := [
 ##    "dev"           for development versions of packages 
 ##    "other"         for all other packages
 ##
-Status := "dev",
+Status := "deposited",
 ##  You must provide the next two entries if and only if the status is 
 ##  "accepted" because is was successfully refereed:
 # format: 'name (place)'
@@ -69,7 +69,9 @@ README_URL :=
   "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recogbase/README.recogbase",
 PackageInfoURL := 
   "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recogbase/PackageInfo.g",
-AbstractHTML := "This package provides a framework to implement group \
+AbstractHTML := "<b>Warning:</b> This package is still under development and \
+this version is to be considered a working, but preliminary one. <p/> \
+This package provides a framework to implement group \
 recognition methods in a generic way. In particular, it is suitable \
 for permutation groups, matrix groups, projective groups and blackbox \
 groups. The accompanying <span class=\"pkgname\">recog</span> package \
