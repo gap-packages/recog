@@ -241,7 +241,9 @@ PackageInfoURL :=
 #   is an example of how to create a <span class=\"pkgname\">GAP</span> \
 #   package. It has little functionality except for being a package",
 AbstractHTML := 
-  "This packages contains a collection of methods for the \
+  "<b>Warning:</b> This package is still under development and \
+   this version is to be considered a working, but preliminary one. <p/> \
+   This packages contains a collection of methods for the \
    constructive recognition of groups. It is mostly intended for \
    permutation groups, matrix groups and projective groups.",
 #
