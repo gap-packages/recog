@@ -599,11 +599,9 @@ RECOG.TestRandomElement := function (recognise, grp)
     cpol := recognise.cpol;
 
     if recognise.needOrders then
-        if InfoLevel(InfoClassical) >= 2 then Print("."); fi;
         ord := Order(g);
         recognise.ord := ord;
         AddSet( recognise.orders, ord );
-    else if InfoLevel(InfoClassical) >= 2 then Print(","); fi;
     fi;
     if recognise.needPOrders then
         ord := ProjectiveOrder(g);
@@ -1463,6 +1461,8 @@ RECOG.NonGenericUnitary := function(recognise, grp)
        First( recognise.ClassicalForms, isHermForm )=fail then
        return false;
     fi;
+    
+    if recognise.maybeFrobenius = false then return false; fi;
 
     if recognise.n <= 5 then
         return NotApplicable;
