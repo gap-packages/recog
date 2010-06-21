@@ -745,6 +745,29 @@ FindHomMethodsMatrix.GoProjective := function(ri,G)
   return true;
 end;
   
+FindHomMethodsMatrix.KnownStabilizerChain := function(ri,G)
+  local S,hom;
+  if HasStoredStabilizerChain(G) then
+      Info(InfoRecog,2,"Already know stabilizer chain, using 1st orbit.");
+      S := StoredStabilizerChain(G);
+      hom := OrbActionHomomorphism(G,S!.orb);
+      SetHomom(ri,hom);
+      Setmethodsforfactor(ri,FindHomDbPerm);
+      forkernel(ri).StabilizerChainFromAbove := S;
+      return true;
+  elif IsBound(ri!.StabilizerChainFromAbove) then
+      Info(InfoRecog,2,"Know stabilizer chain for super group, using base.");
+      S := StabilizerChain(G,rec( Base := ri!.StabilizerChainFromAbove ));
+      Info(InfoRecog,2,"Computed stabilizer chain, size=",Size(S));
+      hom := OrbActionHomomorphism(G,S!.orb);
+      SetHomom(ri,hom);
+      Setmethodsforfactor(ri,FindHomDbPerm);
+      forkernel(ri).StabilizerChainFromAbove := S;
+      return true;
+  fi;
+  return false;
+end;
+
 #FindHomMethodsMatrix.SmallVectorSpace := function(ri,G)
 #  local d,f,hom,l,method,o,q,r,v,w;
 #  d := ri!.dimension;
@@ -794,6 +817,9 @@ AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.TrivialMatrixGroup,
 AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.DiagonalMatrices,
   1100, "DiagonalMatrices",
         "check whether all generators are multiples of the identity" );
+AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.KnownStabilizerChain,
+  1175, "KnownStabilizerChain",
+        "use an already known stabilizer chain for this group" );
 AddMethod( FindHomDbMatrix, FindHomMethodsProjective.FewGensAbelian,
   1050, "FewGensAbelian",
      "if very few generators, check IsAbelian and if yes, do KnownNilpotent");
