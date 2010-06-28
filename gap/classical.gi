@@ -118,7 +118,7 @@ FindBase := function( field, phi )
           [[ 0,0,0,-1],[ 0,0,1,0],[0,1,0,0],[-1,0,0,0]]*One(field), field);
      mat1 := BaseChangeToCanonical(phi);
      mat2 := BaseChangeToCanonical(form);
-     mat := mat2 * mat1^-1;
+     mat := mat2^-1 * mat1;
      return mat;
 
 end;
@@ -127,7 +127,8 @@ FindBaseC2 := function( field, qf )
 
      local form2, mat, mat2;
 
-     form2 := [[0,0,0,-1],[0,0,1,0],[0,0,0,0],[0,0,0,0]]*One(field);
+     form2 := QuadraticFormByMatrix(
+             [[0,0,0,-1],[0,0,1,0],[0,0,0,0],[0,0,0,0]]*One(field), field);
      mat := BaseChangeToCanonical(qf);
      mat2 := BaseChangeToCanonical(form2);
      mat := mat2 * mat^-1;
@@ -135,10 +136,6 @@ FindBaseC2 := function( field, qf )
 
 end;
 
-
-###################################
-### The ppd stuff up there should go in the package
-####################################
 
 
 # Test to check whether the group contains both a large ppd element
@@ -653,21 +650,21 @@ RECOG.TestRandomElement := function (recognise, grp)
             deg := List(facs, EuclideanDegree );
             if Length(deg) = 2 and deg[1] = deg[2] and deg[1] = d/2 then
 
-            ## Bug fix 29.10.09
-            ## Now we compute the r-part h of g
-            s := Order(g);
-            s := Gcd(s, ppd[3]);
-            h := g^s;
-            ## now order(h) is the product of all ppds dividing |g|, see
-            ##  Section 6.1 page 250 of [3]
-            if IsOne(h) then return false; fi;
-            gmod := GModuleByMats([h], recognise.field);
-            cf := MTX.CollectedFactors(gmod);
-            if Length(cf) = 2 and cf[1][2] = cf[2][2] then
+              ## Bug fix 29.10.09
+              ## Now we compute the r-part h of g
+              s := Order(g);
+              s := Gcd(s, ppd[3]);
+              h := g^s;
+              ## now order(h) is the product of all ppds dividing |g|, see
+              ##  Section 6.1 page 250 of [3]
+              if IsOne(h) then return false; fi;
+              gmod := GModuleByMats([h], recognise.field);
+              cf := MTX.CollectedFactors(gmod);
+              if Length(cf) = 2 and cf[1][2] = cf[2][2] then
                 # we have two non-isomorphic composition factors
                 Info(InfoClassical,2, str );
                 AddSet(recognise.LS, ppd[1] );
-            fi;
+              fi;
 
             fi;
           fi;
@@ -691,16 +688,17 @@ RECOG.TestRandomElement := function (recognise, grp)
         i := 1;  found := false;
         while not found and  i <= Length(recognise.ClassicalForms) do
            phi := recognise.ClassicalForms[i];
-           if IsSesquilinearForm(phi) and IsHyperbolicForm(phi) then
-                found := true;
-                if IsOddInt (q) then 
+           if IsSesquilinearForm(phi)  then
+                if IsOddInt (q) and IsHyperbolicForm(phi) then 
                     Info(InfoClassical, 2,"Performing base change");
+                    found := true;
                     bc := FindBase (f, phi);
                     Info(InfoClassical, 2,"Computed base change matrix");
                     bc := bc^-1;
                     recognise.bc := bc;
-                else 
+                elif IsEvenInt(q) and recognise.QuadraticForm <> false then
                     bc := FindBaseC2 (f, recognise.QuadraticForm);
+                    found := true;
                     Info(InfoClassical,2,
                      "Computed base change matrix for char 2");
                     bc := bc^-1;
@@ -1060,7 +1058,7 @@ end;
 ## Main function to test whether group contains SU
 RECOG.IsSUContained := function( recognise, grp )
 
-    local f, isHermForm;
+    local f, isHermForm, q0;
 
     isHermForm := function(f)
         if not IsSesquilinearForm(f) then return false; fi;
@@ -1077,7 +1075,10 @@ RECOG.IsSUContained := function( recognise, grp )
         return false;
     fi;
  
-
+    q0 := Characteristic(recognise.field)^
+         (LogInt(recognise.q,Characteristic(recognise.field))/2);
+    
+        
 
     if recognise.IsSUContained = false then
         return false;
@@ -1111,16 +1112,15 @@ RECOG.IsSUContained := function( recognise, grp )
     if First(recognise.ClassicalForms,isHermForm)<> fail then
         recognise.IsSUContained := true;
         Info(InfoClassical,2,"The group contains SU(", recognise.d, ", ",
-             recognise.q, ");");
+             q0, ");");
         return true;
     else
         recognise.IsSUContained := false;
         Info(InfoClassical,2,"The group does not contain SU(", 
-             recognise.d, ", ", recognise.q, ");");
+             recognise.d, ", ", q0, ");");
         return false;
     fi;
 end;
-
 
 
 ## Main function to test whether group contains SO
@@ -1423,7 +1423,7 @@ end;
 ##
 RECOG.NonGenericUnitary := function(recognise, grp)
 
-    local d, q, q0, g, f1, f2, o, CheckFlag, isHermForm;
+    local d, q,  g, f1, f2, o, CheckFlag, isHermForm, str;
 
     isHermForm := function(f)
         if not IsSesquilinearForm(f) then return false; fi;
@@ -1597,24 +1597,18 @@ RECOG.NonGenericUnitary := function(recognise, grp)
             return fail; 
         fi;
         if recognise.hasSpecialEle = false then
-            g := recognise.g;
-            o := Order(g);
-            q0 := Characteristic(recognise.field)^
-             (LogInt(q,Characteristic(recognise.field))/2);
-            if not ((q0^2 - q0 + 1)/Gcd(3,q0+1)) mod o = 0 then
-                return fail;
-            fi;
-            if not o > 7* Gcd(3,q0+1) then
-                return fail;
-            fi;
-            if PositionProperty(recognise.porders,
-               i->(i[1]>3 and q mod i[1]=1))=fail then
-                return fail;
-            fi;
-            recognise.hasSpeccialEle := true;
-            return CheckFlag();
+             str := "Searching for elements of order > 3 mod scalars";
+             str := Concatenation( str,  " and dividing ");
+             str := Concatenation( str,  String(q-1) );
+             Info(InfoClassical,2, str );
+             if PositionProperty(recognise.porders,
+                i->(i[1]>3 and q mod i[1]=1))=fail then
+                 return fail;
+             fi;
+             recognise.hasSpeccialEle := true;
+             return CheckFlag();
          else 
-            return CheckFlag();
+             return CheckFlag();
          fi;
     else
         Info(InfoClassical,2, 
@@ -1670,9 +1664,11 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
        return false;
     fi;
 
-   if d = 8  then
+    if d = 6 or d = 8 then
        recognise.needE2 := true;
+       recognise.needLB := true;
     fi;
+
     if recognise.n <= 5 then
         return NotApplicable;
     elif recognise.n = 6 then
@@ -1987,7 +1983,7 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
 
     if recognise.isReducible = true then
        return false;
-    fi;
+   fi;
 
     if (Length( recognise.ClassicalForms ) > 0 and 
        First(recognise.ClassicalForms, isParForm)=fail) and
@@ -2003,6 +1999,8 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
         recognise.needOrders := true;
         return fail;
     fi;
+    
+    if d = 3 then recognise.needLB := true; fi;
 
 
     if d = 7 and q = 3 then
@@ -2274,7 +2272,9 @@ function( arg )
 end);
 
 DisplayRecog := function( r )
-
+    
+    local q0;
+    
            Print("Reducible : ", r.isReducible, "\n" );
            Print("Forms : " );
            if Length(r.ClassicalForms)<> 1 then
@@ -2348,7 +2348,9 @@ DisplayRecog := function( r )
 
 
             if r.IsSUContained = true then
-                Print("--------> contains SU(", r.d, ",", r.q, ")\n");
+                q0 := Characteristic(r.field)^
+               (LogInt(r.q,Characteristic(r.field))/2);
+                Print("--------> contains SU(", r.d, ",", q0, ")\n");
             fi;
 
             if r.IsSOContained = true then
