@@ -578,12 +578,33 @@ RECOG.IsNotPSL := function (recognise, grp)
    return fail;
 end;
 
+#############################################################################
+##
+## IsPrimitivePrimeDivisor . . . . . . . . . . . . . . ( b, a, p )
+## 
+## Test whether p is a primitive prime divisor of b^a-1.
+##
+IsPrimitivePrimeDivisor := function( b, a, p )
+    
+    local i;
+    
+    if not IsPrimeInt(p) then return false; fi;
+    if not IsInt(b) or b <= 1 then return false; fi;
+    if not IsInt(a) or a <= 1 then return false; fi;
+    
+    if (b^a-1) mod p <> 0 then return false; fi;
+    for i in [ 1 .. a-1 ] do
+        if (b^i-1) mod p = 0 then return false; fi;
+    od;
+    
+    return true;
+end;
 
 # generate the next random element and its char polynomial
 RECOG.TestRandomElement := function (recognise, grp)
 
     local g, ppd, bppd, d, q, cpol, f, deg, facs, r, s, h, gmod, str,
-    ord, bc, phi, kf, o1, o2, cf, i, found;
+    ord, bc, phi, kf, o1, o2, cf, i, found, p;
 
     recognise.g := PseudoRandom(grp);
     recognise.cpol := CharacteristicPolynomial(recognise.g); 
@@ -591,6 +612,7 @@ RECOG.TestRandomElement := function (recognise, grp)
 
     d := recognise.d;
     q := recognise.q;
+    p := recognise.p;
     f := recognise.field;
     g := recognise.g;
     cpol := recognise.cpol;
@@ -736,25 +758,47 @@ RECOG.TestRandomElement := function (recognise, grp)
             kf := recognise.kf;
             o1 := ProjectiveOrder( kf[1] )[1];
             o2 := ProjectiveOrder( kf[2] )[1];
+            #o1 := Order( kf[1] );
+            #o2 := Order( kf[2] );
             Info(InfoClassical,2,o1, " ", o2);
             ### ACN March 2007 needed Projective order
-            ### and test that orders are bigger than 2 or 4
             if  q mod 2 = 0 and (o1 <= 2 or o2 <= 2) then 
 	        return fail;
             elif q mod 2 <> 0 and (o1 <= 4 or o2 <= 4) then
 	        return fail;
             fi;
             if ( (q+1) mod o1 = 0 and (q+1) mod o2 = 0) then 
-                Add( recognise.plusminus, [1,1] );
+                if not IsPowerOfPrime(q+1,2) and q <> 8 then
+                    Print("AA", o1, "  ", o2, "  \n");
+                    if not ForAny( Unique(FactorsInt(o1)), r ->
+                      IsPrimitivePrimeDivisor(p,2*recognise.a,r)) then
+                        return false;
+                    fi;
+                    if not ForAny( Unique(FactorsInt(o2)), r ->
+                      IsPrimitivePrimeDivisor(p,2*recognise.a,r)) then
+                        return false;
+                    fi;
+                elif q = 8 then
+                    if not o1 mod 9 = 0 or not o2 mod 9 = 0 then
+                        return false;
+                    fi;
+                else
+                    if o1 < (q+1)/2 or o2 < (q+1)/2 then return false; fi;
+                fi;
+            Print("A ");
+                AddSet( recognise.plusminus, [1,1] );
             fi;
             if ( (q+1) mod o1 = 0 and (q-1) mod o2 = 0) then 
-                Add( recognise.plusminus, [1,-1] );
+            Print("B ");
+                AddSet( recognise.plusminus, [1,-1] );
             fi;
             if ( (q-1) mod o1 = 0 and (q+1) mod o2 = 0) then 
-                Add( recognise.plusminus, [1,-1] );
+            Print("C ");
+                AddSet( recognise.plusminus, [1,-1] );
             fi;
             if ( (q-1) mod o1 = 0 and (q-1) mod o2 = 0) then 
-                Add( recognise.plusminus, [-1,-1] );
+            Print("D ");
+                AddSet( recognise.plusminus, [-1,-1] );
             fi;
         fi;
 
@@ -2188,6 +2232,9 @@ function( arg )
   nrrandels := 30;
   if DimensionOfMatrixGroup(grp) = 8 then 
      nrrandels := 200;
+  elif DimensionOfMatrixGroup(grp) = 4 and
+      Size(FieldOfMatrixGroup(grp)) = 8 then 
+     nrrandels := 300;
   elif DimensionOfMatrixGroup(grp) <= 10 then 
       nrrandels := 50;
   fi;
@@ -2236,7 +2283,7 @@ function( arg )
                    hasSpecialEle := false,
                    bc := "unknown",
                    kf := "unknown",
-                   plusminus := [],
+                   plusminus := Set([]),
                    sq1 := [Z(q)*One(GL(2,q))],
                    sq2 := [Z(q)*One(GL(2,q))],
                    scalars := Group(Z(q)*One(GL(2,q))),
