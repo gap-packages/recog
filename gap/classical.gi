@@ -769,7 +769,6 @@ RECOG.TestRandomElement := function (recognise, grp)
             fi;
             if ( (q+1) mod o1 = 0 and (q+1) mod o2 = 0) then 
                 if not IsPowerOfPrime(q+1,2) and q <> 8 then
-                    Print("AA", o1, "  ", o2, "  \n");
                     if not ForAny( Unique(FactorsInt(o1)), r ->
                       IsPrimitivePrimeDivisor(p,2*recognise.a,r)) then
                         return false;
@@ -785,19 +784,15 @@ RECOG.TestRandomElement := function (recognise, grp)
                 else
                     if o1 < (q+1)/2 or o2 < (q+1)/2 then return false; fi;
                 fi;
-            Print("A ");
                 AddSet( recognise.plusminus, [1,1] );
             fi;
             if ( (q+1) mod o1 = 0 and (q-1) mod o2 = 0) then 
-            Print("B ");
                 AddSet( recognise.plusminus, [1,-1] );
             fi;
             if ( (q-1) mod o1 = 0 and (q+1) mod o2 = 0) then 
-            Print("C ");
                 AddSet( recognise.plusminus, [1,-1] );
             fi;
             if ( (q-1) mod o1 = 0 and (q-1) mod o2 = 0) then 
-            Print("D ");
                 AddSet( recognise.plusminus, [-1,-1] );
             fi;
         fi;
