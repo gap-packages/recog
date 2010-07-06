@@ -13,34 +13,45 @@
 ##
 #############################################################################
 ##
-#F  PPDPartPDM1( <d>, <p> ) . . . . . . . . compute the ppd part in <p>^<d>-1
+#F  PrimitivePrimeDivisors( <d>, <p> ) . . . . compute the ppds of  <p>^<d>-1
 ##
-## Phi will be the product of all primitive prime divisors counting 
-## multiplicities of p^d-1 and Psi will be p^d-1/Phi.
+## ppds will be the product of all primitive prime divisors counting 
+## multiplicities of p^d-1 and noppds will be p^d-1/ppds.
+## 
+##  cf. Neumann & Praeger, p 578/579 Procedure Psi(d,q) in 
+##  ``A Recognition Algorithm for special linear groups"
+##  Proc. Lond. Math. Soc. (3) 65, 1992, pp 555-603.
 ##
-PPDPartPDM1B := function( d, p )
-    local   Phi,  q,  i,  a,  Psi,  y;
 
-    # compute the (repeated) gcd with p^d-1
-    Psi := 1;
-    Phi := p^d - 1;
-    q := 1;
-    for i  in [ 1 .. d-1 ]  do
-        q := q * p; # q = p^i
-        if d mod i = 0  then
-            repeat
-                a := GcdInt( Phi, q-1 );
-                Phi := Phi / a;
-                Psi := Psi * a;
-            until a = 1;
-        fi;
+PrimitivePrimeDivisors := function(d, q)
+    
+    local ddivs, c, a, ppds, noppds;
+    
+    if d < 2 or q < 2 then return fail; fi;
+    
+    noppds  := 1; ppds := q^d-1;
+    
+    # Throughout the loop ppds * noppds = q^d-1;
+    # Eventually ppds will contain the ppds and noppds the others
+    ddivs :=  Unique(FactorsInt(d));
+    for c in ddivs do
+        a := Gcd( ppds, q^(d/c)-1);
+         # all primes in a are not ppds
+        while a > 1 do
+            noppds := a * noppds;
+            ppds := ppds/a;
+            a := Gcd(ppds, a);
+        od;
     od;
-
+    
     ## and return as ppds the product of all ppds and as
     ## noppds the quotient p^d-1/ppds
-    return rec( noppds := Psi, ppds := Phi );
+    return rec( ppds  := ppds, noppds := noppds );
+    
 end;
 
+    
+    
 
 
 #############################################################################
@@ -144,12 +155,13 @@ InstallGlobalFunction( IsPpdElement, function( F, m, d, p, a )
 
     # return if we failed to find one
     if c = false  then
+        Error("a1");
         return false;
     fi;
 
     e  := Degree(c);
     ## find the noppds and ppds parts
-    pm := PPDPartPDM1B( e*a, p );
+    pm := PrimitivePrimeDivisors( e*a, p );
     ## pm contains two fields, noppds and ppds.
     ## ppds is the product of all ppds of p^(ae)-1
     ## and noppds is p^(ae)-1/ppds.
@@ -160,6 +172,7 @@ InstallGlobalFunction( IsPpdElement, function( F, m, d, p, a )
 
     ## if g is one there is no ppd involved
     if IsOne(g) then
+        Error("a2");
         return false;
     fi;
 
@@ -170,6 +183,7 @@ InstallGlobalFunction( IsPpdElement, function( F, m, d, p, a )
         ## we know that all primes dividing pm.ppds are large
         ## and hence we know <m> is a large ppd-element
         islarge := true;
+                Error("a3");
         return [e, islarge];
     fi;
 
@@ -185,11 +199,13 @@ InstallGlobalFunction( IsPpdElement, function( F, m, d, p, a )
     if IsOne(g)  then
         ## (e+1) is the only ppd dividing |<m>| and only once
         islarge := false;
+                Error("a4");
         return [ e, islarge ];
     else
         ## Either another ppd also divides |<m>| and this one is large or
         ## (e+1)^2 divides |<m>| and hence still large
         islarge := true;
+                Error("a5");
         return [ e, islarge  ];
     fi;
 
@@ -240,7 +256,7 @@ end;
 ##  the first being e=d/2; the second being a boolean islarge, where
 ##  islarge is true if the order of <m> is divisible by a large ppd of
 ##  p^(e*a)-1 and false otherwise; and the third is noppds (the first
-##  return value of PPDPartPDM1B).
+##  return value of PrimitivePrimeDivisors).
 ##
 ##  Note that if q = p^a then a call to
 ##  IsPpdElement( <F>, <m>, <d>, <q>, 1 ) will test whether m is a
@@ -267,7 +283,7 @@ InstallGlobalFunction( IsPpdElementD2, function( F, m, e, p, a )
     fi;
 
     ## find the nonppds and ppds parts
-    pm := PPDPartPDM1B( Degree(c)*a, p );
+    pm := PrimitivePrimeDivisors( Degree(c)*a, p );
     ## pm contains two fields, noppds and ppds.
     ## ppds is the product of all ppds of p^(ad/2)-1
     ## and noppds is p^(ad/2)-1/ppds.

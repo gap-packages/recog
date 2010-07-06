@@ -578,6 +578,7 @@ RECOG.IsNotPSL := function (recognise, grp)
    return fail;
 end;
 
+    
 #############################################################################
 ##
 ## IsPrimitivePrimeDivisor . . . . . . . . . . . . . . ( b, a, p )
@@ -769,7 +770,7 @@ RECOG.TestRandomElement := function (recognise, grp)
             fi;
             if ( (q+1) mod o1 = 0 and (q+1) mod o2 = 0) then 
                 if not IsPowerOfPrime(q+1,2) and q <> 8 then
-                    if not ForAny( Unique(FactorsInt(o1)), r ->
+                    if  not ForAny( Unique(FactorsInt(o1)), r ->
                       IsPrimitivePrimeDivisor(p,2*recognise.a,r)) then
                         return false;
                     fi;
