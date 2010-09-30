@@ -781,6 +781,11 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
   std := RECOG.InitSLstd(f,d,sl2stdf{[1..ext]},sl2stdf{[ext+1..2*ext]},
                          sl2stdf[2*ext+1],sl2stdf[2*ext+2]);
 
+  workrec := rec( n := 2, slnstdf := sl2stdf, bas := bas, basi := basi,
+                  std := std, sld := sld, sldf := fakegens, f := f );
+
+Error("... now go on with alternative going up...");
+
   Info(InfoRecog,2,"Going up to SL_d again...");
   for n in [Dimension(data[2])..d-1] do
       if InfoLevel(InfoRecog) >= 3 then Print(n," \c"); fi;
