@@ -43,16 +43,20 @@ end;
 
 RECOG.BinomialTab := [];
 
-for i in [1..100] do
-    RECOG.BinomialTab[i] := EmptyPlist(i);
-    Add(RECOG.BinomialTab[i],1);
-    s := 0;
-    for j in [1..i] do
-        s := s + Binomial(i,j);
-        Add(RECOG.BinomialTab[i],s);
+RECOG.InitBinomialTab := function()
+    local i,j,s;
+    for i in [1..100] do
+        RECOG.BinomialTab[i] := EmptyPlist(i);
+        Add(RECOG.BinomialTab[i],1);
+        s := 0;
+        for j in [1..i] do
+            s := s + Binomial(i,j);
+            Add(RECOG.BinomialTab[i],s);
+        od;
     od;
-od;
-
+end;
+RECOG.InitBinomialTab();
+Unbind(RECOG.InitBinomialTab);
       
 RECOG.CheckFingerPrint := function(fp,orders)
     local count,i;

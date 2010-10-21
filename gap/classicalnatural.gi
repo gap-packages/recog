@@ -1033,9 +1033,9 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   # of order p = Characteristic(f) or false.
   # Returns a set of standard generators for SL_2 and the base change
   # to expose it. Works with memory. Uses PseudoRandom.
-  local a,actpos,am,b,bas,bm,c,can,ch,cm,co,co2,ext,el,ev,eva,evb,evbi,
-        gens,i,j,k,kk,mas,masi,mat,mati,mb,o,one,os,p,pos,q,res,ss,ssm,t,tb,
-        tm,tt,ttm,u,v,x,xb,xm;
+  local a,actpos,am,b,bas,bm,c,can,ch,cm,co,co2,el,ev,eva,evb,evbi,ext,gens,
+        i,j,k,kk,mas,masi,mat,mati,mb,o,one,os,p,pos,q,res,s,ss,ssm,t,tb,tm,
+        tt,ttm,u,v,x,xb,xm;
   q := Size(f);
   p := Characteristic(f);
   ext := DegreeOverPrimeField(f);
