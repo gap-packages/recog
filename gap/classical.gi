@@ -79,6 +79,40 @@ IsPowerOfPrime := function( n, p )
 
 end;
 
+
+# Check if m > 5 and the order of a basic lppd(d,q;e)
+
+HasLBGgt5 := function( m, p, a, e )
+    
+    local pm, i,  ppds;
+    
+    if m <= 5 then return false; fi;
+
+    # Find the basic ppds of p^(ae)-1
+    pm := PrimitivePrimeDivisors(a*e, p);
+    # find the ppds in m
+    ppds := Gcd(pm.ppds, m);
+    
+    # There are no ppds
+    if ppds = 1 then return false; fi;
+
+    ## if e+1 does not divide ppds then 
+    ## we know that all primes dividing ppds are large
+    ## and hence we know <m> is a large ppd-element
+    if ppds mod (e+1) = 0 then
+        ## Now we know (e+1) divides ppds and (e+1) has to be
+        ## a prime since all ppds are at least (e+1)
+        if not IsPrimeInt (e+1) then
+             return false;
+         fi;
+         # if (e+1)^2 does not divide m, then not large
+         if not (m mod (e+1)^2) = 0 then return false; fi;
+     fi;
+ 
+     return true;
+end;
+
+
 KroneckerFactors := function(g)
 
     local a, b, c, d, A, B, C, D, I;
@@ -2091,7 +2125,7 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
             return fail; 
         fi; 
     elif d = 3 and q >=31 and IsPowerOfPrime(q+1,2) then 
-        s := LogInt(q+1,2);
+        s := Log2Int(q+1);
         if PositionProperty(recognise.orders,
             i->(i > 2 and (q-1) mod i = 0))=fail then 
             return fail; 
@@ -2102,8 +2136,7 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
         fi; 
     elif d = 3 and q>11 and ((q+1) mod 3=0 and
         IsPowerOfPrime((q+1)/3,2)) then 
-        # TO DO Check this in Magma
-        s := LogInt( (q+1)/3, 2);
+        s := Log2Int((q+1)/3);
         if PositionProperty(recognise.orders, 
             i-> i mod (3*2^(s-1)) = 0 ) = fail then
             return fail; 
@@ -2117,6 +2150,12 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
         if not 2 in recognise.LB then return fail; fi;
         if PositionProperty(recognise.orders,
             i->(i > 2 and (q-1) mod i = 0))=fail then 
+            return fail; 
+        fi; 
+        ## need to check that the basic lppd( 3,q;2) elements have order
+        ## greater than 5.
+        if PositionProperty(recognise.orders, i->
+          HasLBGgt5(i,recognise.p,LogInt(q,recognise.p),2))=fail then 
             return fail; 
         fi; 
     else
