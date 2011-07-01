@@ -1,3 +1,23 @@
+Bug report:
+
+Hi Max,
+
+interessiert an bug reports zu recog*? Falls ja, gehen die an Dich?
+
+Etwa:
+
+g := DirectProduct(SymmetricGroup(12),SymmetricGroup(5));
+repeat
+  h:=g^Random(SymmetricGroup(37));
+  r:=RecogniseGroup(h);
+until Size(h) <> Size(r);
+
+stoppt bei mir immer recht schnell, dann ist Size(r) einen Faktor 2 zu
+klein.
+
+Viele Grüße,
+  Frank
+
 Today:
 
   - Look at documentation: StdGens, StdPresentation
