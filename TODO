@@ -1,3 +1,33 @@
+Hi Max,
+
+wenn man im aktuellen GAP mit packages sagt:
+
+gap> LoadPackage("recogbase");
+[...]
+-----------------------------------------------------------------------------
+Syntax error: warning: unbound global variable in
+/usr/local/ca/gap4r4/gapsync\
+/../pkg/recog/gap/classical.gi line 884
+            form := ClassicalForms_InvariantFormDual(module,dmodule);
+                                                    ^
+Syntax error: warning: unbound global variable in
+/usr/local/ca/gap4r4/gapsync\
+/../pkg/recog/gap/classical.gi line 902
+            form :=
+ClassicalForms_InvariantFormFrobenius(module,fmodule);
+                                                         ^
+true
+
+
+dann fliegt auf, dass hier nicht-dokumentierte Funktionen aus dem
+'forms' package benutzt werden (und diese Funktionsnamen stehen auch
+nicht
+in den Deklarationsdateien von 'forms'.
+
+Viele Grüße,
+  Frank
+
+
 If isomorphism: calc preimages "rascher"
 Calculating preimages: Bessere Anzeige wie viele...
 
