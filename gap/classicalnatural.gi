@@ -1550,7 +1550,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
       classical := RecogniseClassical(gg);
       if classical.IsSLContained = true then
           # Do not run the generic code in small cases:
-          FIXME: Switch off code temporarily:
+          # FIXME: Switch off code temporarily:
           if true or (q^d-1)/(q-1) <= 1000 or q=5 then  
               # FIXME: We do not have a FindSL2 for this case!
               Info(InfoRecog,2,"Classical natural: SL(",d,",",q,"): small ",
