@@ -31,9 +31,10 @@ TensorProductOfMatrixGroup := function(G,H)
 
  gens := [];
  for g in GeneratorsOfGroup(G) do
-   for h in GeneratorsOfGroup(H) do
-     Add(gens,KroneckerProduct(g,h));
-   od;
+   Add(gens,KroneckerProduct(g,One(H)));
+ od;
+ for h in GeneratorsOfGroup(H) do
+   Add(gens,KroneckerProduct(One(G),h));
  od;
 
  return GroupWithGenerators(gens);
