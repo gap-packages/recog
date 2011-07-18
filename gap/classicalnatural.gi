@@ -781,10 +781,10 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
   std := RECOG.InitSLstd(f,d,sl2stdf{[1..ext]},sl2stdf{[ext+1..2*ext]},
                          sl2stdf[2*ext+1],sl2stdf[2*ext+2]);
 
-  workrec := rec( n := 2, slnstdf := sl2stdf, bas := bas, basi := basi,
-                  std := std, sld := sld, sldf := fakegens, f := f );
-
-Error("... now go on with alternative going up...");
+#  workrec := rec( n := 2, slnstdf := sl2stdf, bas := bas, basi := basi,
+#                  std := std, sld := sld, sldf := fakegens, f := f );
+#
+#Error("... now go on with alternative going up...");
 
   Info(InfoRecog,2,"Going up to SL_d again...");
   for n in [Dimension(data[2])..d-1] do
@@ -1550,7 +1550,8 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
       classical := RecogniseClassical(gg);
       if classical.IsSLContained = true then
           # Do not run the generic code in small cases:
-          if (q^d-1)/(q-1) <= 1000 or q=5 then  
+          FIXME: Switch off code temporarily:
+          if true or (q^d-1)/(q-1) <= 1000 or q=5 then  
               # FIXME: We do not have a FindSL2 for this case!
               Info(InfoRecog,2,"Classical natural: SL(",d,",",q,"): small ",
                    "case, handing over to Schreier-Sims.");
