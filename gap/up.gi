@@ -17,7 +17,7 @@ SL2UpStep := function(w)
   #   bas, basi is a base change to the target base
   #   slnstdf are SLPs to reach standard generators of SL_n from the
   #       generators of sld
-local ActHn,FixHn,I1,I2,c,c1,c1f,cf,i,id,int1,int3,int4,int5,newbas,newbasi,s,sc1,sc1f,sf,slp,std,sum2;
+local ActHn,FixHn,I1,I2,c,c1,c1f,cf,i,id,int1,int3,int4,int5,newbas,newbasi,s,sc1,sc1f,sf,slp,std,sum2,v,ww;
 
   Info(InfoRecog,3,"Going up: ",w.n," (",w.d,")...");
 
