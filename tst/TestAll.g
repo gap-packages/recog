@@ -35,4 +35,6 @@ ReadPackage("recog","tst/ProjTensorInduced.g");
 ReadPackage("recog","tst/MatSn.g");
 ReadPackage("recog","tst/MatAn.g");
 ReadPackage("recog","tst/MatFDPM.g");
+ReadPackage("recog","tst/PermDirProd.g");
+ReadPackage("recog","tst/MatTensor.g");
 # Note that this intentionally does not do the ClassicalNatural tests!
