@@ -146,7 +146,7 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     fi;
     ri!.projective := projective;
     SetfindgensNmeth(ri,rec(method := FindKernelFastNormalClosure, 
-                            args := [3,3]));
+                            args := [6,3]));
     if IsMatrixGroup(H) then
         ri!.field := FieldOfMatrixGroup(H);
         ri!.dimension := DimensionOfMatrixGroup(H);
