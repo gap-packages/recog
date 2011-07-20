@@ -17,7 +17,7 @@ SL2UpStep := function(w)
   #   bas, basi is a base change to the target base
   #   slnstdf are SLPs to reach standard generators of SL_n from the
   #       generators of sld
-local ActHn,FixHn,I1,I2,c,c1,c1f,cf,i,id,int1,int3,int4,int5,newbas,newbasi,s,sc1,sc1f,sf,slp,std,sum2,v,ww;
+local Vn,FixHn,Vnc,I2,c,c1,c1f,cf,i,id,int1,int3,int4,int5,newbas,newbasf,newbasfi,newbasi,s,sc1,sc1f,sf,slp,std,sum2,v,ww;
 
   Info(InfoRecog,3,"Going up: ",w.n," (",w.d,")...");
 
@@ -28,7 +28,7 @@ local ActHn,FixHn,I1,I2,c,c1,c1f,cf,i,id,int1,int3,int4,int5,newbas,newbasi,s,sc
   # identity matrix:
   id := IdentityMat(w.d,w.f);
   FixHn := VectorSpace(w.f,id{[w.n+1..w.d]});
-  ActHn := VectorSpace(w.f,id{[1..w.n]});
+  Vn := VectorSpace(w.f,id{[1..w.n]});
 
   # Find a good random element:
   while true do    # will be left by break
@@ -38,22 +38,22 @@ local ActHn,FixHn,I1,I2,c,c1,c1f,cf,i,id,int1,int3,int4,int5,newbas,newbasi,s,sc
       c1f := ResultOfStraightLineProgram(slp,w.sldf);
       # Do the base change into our basis:
       c1 := w.bas * c1 * w.basi;
-      I1 := VectorSpace(w.f,c1{Concatenation([1],[w.n+1..w.d])});
+      Vnc := VectorSpace(w.f,c1{Concatenation([1],[w.n+1..w.d])});
       I2 := VectorSpace(w.f,c1{[2..w.n]});
-      int1 := Intersection(I1,FixHn);
+      int1 := Intersection(Vnc,FixHn);
       if not(Dimension(int1) = w.d - (2 * w.n - 1)) then 
           Print("1\c"); continue;
       fi;
-      sum2 := ClosureLeftModule(I2,ActHn);
+      sum2 := ClosureLeftModule(I2,Vn);
       if not(Dimension(sum2) = 2 * w.n - 1) then 
           Print("2\c"); continue;
       fi;
-      int3 := Intersection(I1,ActHn);   # necessary???
+      int3 := Intersection(Vnc,Vn);   # necessary???
       if not(Dimension(int3) = 1) then 
           Print("3\c"); continue;
       fi;
       int4 := Intersection(FixHn,sum2);
-      int5 := Intersection(int4,I1);
+      int5 := Intersection(int4,Vnc);
       if not(Dimension(int5) = 0) then 
           Print("4\c"); continue;
       fi;
@@ -79,6 +79,7 @@ local ActHn,FixHn,I1,I2,c,c1,c1f,cf,i,id,int1,int3,int4,int5,newbas,newbasi,s,sc
   # Find good short word:
   if w.n > 2 then
       s := id{Concatenation([1],[3..w.n],[2],[w.n+1..w.d])};
+      ConvertToMatrixRepNC(s,w.f);
       if IsOddInt(w.n) then s[w.n] := -s[w.n]; fi;
       sf := w.slnstdf[2*w.ext+2];
   else
@@ -90,7 +91,8 @@ local ActHn,FixHn,I1,I2,c,c1,c1f,cf,i,id,int1,int3,int4,int5,newbas,newbasi,s,sc
   sc1 := s^c1;
   sc1f := sf^c1f;
   c := sc1;
-  cf := sf^c1f;
+  cf := sc1f;
+  Error(-1);
   while true do   # will be left by break
       Print("#\c");
       int1 := SumIntersectionMat(id{[1..w.n]},c{[1..w.n]})[2];
@@ -103,17 +105,194 @@ local ActHn,FixHn,I1,I2,c,c1,c1f,cf,i,id,int1,int3,int4,int5,newbas,newbasi,s,sc
 
   # Now we have our conjugating element, it maps some vector in the
   # original acting space back into that space.
-  v := int1[1];
+  v := int1[1]/int1[1][w.n];   # normalize to 1 in position n
   ww := v*c^-1;
   
+  Error(0);
   # Replace the n-th basis vector in the basis by v:
   newbas := MutableCopyMat(id);
   newbas[w.n] := v;
   newbasi := newbas^-1;
+  # Now write this matrix newbas as an SLP in the standard generators
+  # of our SL_n. Then we know which generators to take for our new
+  # standard generators, namely newbas^-1 * std * newbas.
+  newbasf := RECOG.InitSLfake(w.f,w.n);
+  for i in [1..w.n-1] do
+      if not(IsZero(v[i])) then
+          RECOG.DoColOp_SL(false,w.n,i,v[i],newbasf);
+      fi;
+  od;
+  newbasf := ResultOfStraightLineProgram(SLPOfElm(newbasf.right),
+                                         w.slnstdf);
+  newbasfi := newbasf^-1;
+  w.slnstdf := List(w.slnstdf,x->newbasfi * x * newbasf);
   w.bas := newbas * w.bas;
   w.basi := w.basi * newbasi;
   c := newbas * c * newbasi;
+  # Now consider the transvections t_i:
+  # t_i : w.bas[j] -> w.bas[j]        for j <> i and
+  # t_i : w.bas[i] -> w.bas[i] + ww
+  # We want to modify (t_i)^c such that it fixes w.bas{[1..w.n]}:
+  ci := c^-1;   # this tells us 
+  #
 
+Error(1);
+
+  return w;
+end;
+
+SL2UpStepTry2 := function(w)
+  # w has components:
+  #   d       : size of big SL
+  #   n       : size of small SL
+  #   slnstdf : fakegens for SL_n standard generators
+  #   bas     : current base change, first n vectors are where SL_n acts
+  #             rest of vecs are invariant under SL_n
+  #   basi    : current inverse of bas
+  #   sld     : original group with memory generators, PseudoRandom
+  #             delivers random elements
+  #   sldf    : fake generators to keep track of what we are doing
+  #   f       : field
+  #   p       : characteristic
+  #   ext     : q=p^ext
+  #
+  # We keep the following invariants (going from n -> n':=2n-1)
+  #   bas, basi is a base change to the target base
+  #   slnstdf are SLPs to reach standard generators of SL_n from the
+  #       generators of sld
+local Vn,FixHn,Vnc,MB,c,c1,c1f,can,cf,ci,cii,i,id,int1,int2,j,lambda,newbas,newbasf,newbasfi,newbasi,newpart,s,sf,slp,std,sum1,tf,trans,v;
+
+  Info(InfoRecog,3,"Going up: ",w.n," (",w.d,")...");
+
+  # We compute exclusively in our basis, so we occasionally need an
+  # identity matrix:
+  id := IdentityMat(w.d,w.f);
+  FixHn := VectorSpace(w.f,id{[w.n+1..w.d]});
+  Vn := VectorSpace(w.f,id{[1..w.n]});
+
+  # First pick an element in SL_n with fixed space of dimension d-n+1:
+  # We already have an SLP for an n-1-cycle: it is one of the std gens.
+  # For n=2 we use a transvection for this purpose.
+  if w.n > 2 then
+    if w.p > 2 then
+      s := id{Concatenation([1],[3..w.n],[2],[w.n+1..w.d])};
+      ConvertToMatrixRepNC(s,w.f);
+      if IsOddInt(w.n) then s[w.n] := -s[w.n]; fi;
+      sf := w.slnstdf[2*w.ext+2];
+    else   # in even characteristic we take the n-cycle:
+      s := id{Concatenation([2..w.n],[1],[w.n+1..w.d])};
+      ConvertToMatrixRepNC(s,w.f);
+      sf := w.slnstdf[2*w.ext+1];
+    fi;
+  else
+      # In this case the n-1-cycle is the identity, so we take a transvection:
+      s := MutableCopyMat(id);
+      s[1][2] := One(w.f);
+      sf := w.slnstdf[1];
+  fi;
+
+  # Find a good random element:
+  while true do    # will be left by break
+      Print(".\c");
+      c1 := PseudoRandom(w.sld);
+      slp := SLPOfElm(c1);
+      c1f := ResultOfStraightLineProgram(slp,w.sldf);
+      # Do the base change into our basis:
+      c1 := w.bas * c1 * w.basi;
+      c := s^c1;
+      cf := sf^c1f;
+      # Now check that Vn + Vn*s^c1 has dimension 2n-1:
+      Vnc := VectorSpace(w.f,c{[1..w.n]});
+      sum1 := ClosureLeftModule(Vn,Vnc);
+      if Dimension(sum1) = 2*w.n - 1 then 
+          int1 := Intersection(Vnc,Vn);
+          Assert(0,Dimension(int1)=1);
+          v := Basis(int1)[1];
+          if IsZero(v[w.n]) then continue; fi;
+          v := v / v[w.n];   # normalize to 1 in position n
+          Assert(0,v*c=v);
+          ci := c^-1;
+          cii := ExtractSubMatrix(ci,[w.n+1..2*w.n-1],[1..w.n-1]);
+          ConvertToMatrixRep(cii,Size(w.f));
+          cii := cii^-1;
+          if cii <> fail then 
+              break; 
+          fi;
+          # Otherwise try again, this is needed later on
+      fi;
+  od;
+  Print(" found c1 and c.\n");
+
+  # Now we found our 2n-1-dimensional space W. Since SL_n
+  # has a d-n-dimensional fixed space W_{d-n} and W contains a complement
+  # of that fixed space, the intersection of W and W_{d-n} has dimension n-1.
+  # Change basis:
+  int2 := Intersection(FixHn, sum1);
+  newpart := BasisVectors(Basis(int2));
+  newbas := Concatenation(id{[1..w.n-1]},[v],newpart);
+  MB := MutableBasis(w.f,newbas);
+  i := w.d;
+  while NrBasisVectors(MB) < w.d do
+      if not(IsContainedInSpan(MB,id[i])) then
+          Add(newbas,id[i]);
+          CloseMutableBasis(MB,id[i]);
+      fi;
+      i := i - 1;
+  od;
+  ConvertToMatrixRep(newbas,Size(w.f));
+  newbasi := newbas^-1;
+
+  # Now SL_n has to be repaired according to the base change newbas:
+
+  # Make some standard generators to compute:
+  std := RECOG.MakeSL_StdGens(w.p,w.ext,w.n,w.d).all;
+
+  # Now write this matrix newbas as an SLP in the standard generators
+  # of our SL_n. Then we know which generators to take for our new
+  # standard generators, namely newbas^-1 * std * newbas.
+  newbasf := RECOG.InitSLfake(w.f,w.n);
+  for i in [1..w.n-1] do
+      if not(IsZero(v[i])) then
+          RECOG.DoColOp_SL(false,w.n,i,v[i],newbasf);
+      fi;
+  od;
+  newbasf := ResultOfStraightLineProgram(SLPOfElm(newbasf.right),
+                                         w.slnstdf);
+  newbasfi := newbasf^-1;
+  w.slnstdf := List(w.slnstdf,x->newbasfi * x * newbasf);
+  w.bas := newbas * w.bas;
+  w.basi := w.basi * newbasi;
+  c := newbas * c * newbasi;
+  ci := newbas * ci * newbasi;
+  #Unbind(newbasf); Unbind(newbasfi); Unbind(newbas); Unbind(newbasi);
+
+  # Now consider the transvections t_i:
+  # t_i : w.bas[j] -> w.bas[j]        for j <> i and
+  # t_i : w.bas[i] -> w.bas[i] + ww
+  # We want to modify (t_i)^c such that it fixes w.bas{[1..w.n]}:
+  trans := [];
+  can := BasisVectors(CanonicalBasis(w.f));
+  for i in [1..w.n-1] do
+      # This does t_i
+      for lambda in can do
+          # This does t_i : v_j -> v_j + lambda * v_n
+          std := RECOG.InitSLfake(w.f,w.n);
+          RECOG.DoRowOp_SL(false,1,w.n,lambda,std);
+          tf := ResultOfStraightLineProgram(SLPOfElm(std.left),w.slnstdf);
+          Error(1);
+          # Now conjugate with c:
+          tf := tf^cf;
+          Error(2);
+          # Now cleanup in column n above row n, the entries there
+          # are lambda times the stuff in column i of ci:
+          RECOG.ResetSLstd(std);
+          for j in [1..w.n-1] do
+              RECOG.DoRowOp_SL(false,j,w.n,ci[j][i],std);
+          od;
+          tf := ResultOfStraightLineProgram(SLPOfElm(std.left),w.slnstdf)*tf;
+          Add(trans,tf);
+      od;
+  od;
 
 Error(1);
 
