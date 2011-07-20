@@ -17,7 +17,7 @@ SL2UpStep := function(w)
   #   bas, basi is a base change to the target base
   #   slnstdf are SLPs to reach standard generators of SL_n from the
   #       generators of sld
-local Vn,FixHn,Vnc,I2,c,c1,c1f,cf,i,id,int1,int3,int4,int5,newbas,newbasf,newbasfi,newbasi,s,sc1,sc1f,sf,slp,std,sum2,v,ww;
+local FixHn,I2,Vn,Vnc,c,c1,c1f,cf,ci,i,id,int1,int3,int4,int5,newbas,newbasf,newbasfi,newbasi,s,sc1,sc1f,sf,slp,std,sum2,v,ww;
 
   Info(InfoRecog,3,"Going up: ",w.n," (",w.d,")...");
 
@@ -160,7 +160,7 @@ SL2UpStepTry2 := function(w)
   #   bas, basi is a base change to the target base
   #   slnstdf are SLPs to reach standard generators of SL_n from the
   #       generators of sld
-local Vn,FixHn,Vnc,MB,c,c1,c1f,can,cf,ci,cii,i,id,int1,int2,j,lambda,newbas,newbasf,newbasfi,newbasi,newpart,s,sf,slp,std,sum1,tf,trans,v;
+local FixHn,Fixc,Vn,Vnc,c,c1,c1f,can,cf,ci,cii,i,id,int1,int2,int3,int4,j,lambda,newbas,newbasf,newbasfi,newbasi,newpart,s,sf,slp,std,sum1,tf,trans,trans2,v,vals;
 
   Info(InfoRecog,3,"Going up: ",w.n," (",w.d,")...");
 
@@ -175,12 +175,12 @@ local Vn,FixHn,Vnc,MB,c,c1,c1f,can,cf,ci,cii,i,id,int1,int2,j,lambda,newbas,newb
   # For n=2 we use a transvection for this purpose.
   if w.n > 2 then
     if w.p > 2 then
-      s := id{Concatenation([1],[3..w.n],[2],[w.n+1..w.d])};
+      s := id{Concatenation([1,w.n],[2..w.n-1],[w.n+1..w.d])};
       ConvertToMatrixRepNC(s,w.f);
-      if IsOddInt(w.n) then s[w.n] := -s[w.n]; fi;
+      if IsOddInt(w.n) then s[2] := -s[2]; fi;
       sf := w.slnstdf[2*w.ext+2];
     else   # in even characteristic we take the n-cycle:
-      s := id{Concatenation([2..w.n],[1],[w.n+1..w.d])};
+      s := id{Concatenation([w.n],[1..w.n-1],[w.n+1..w.d])};
       ConvertToMatrixRepNC(s,w.f);
       sf := w.slnstdf[2*w.ext+1];
     fi;
@@ -192,56 +192,65 @@ local Vn,FixHn,Vnc,MB,c,c1,c1f,can,cf,ci,cii,i,id,int1,int2,j,lambda,newbas,newb
   fi;
 
   # Find a good random element:
-  while true do    # will be left by break
-      Print(".\c");
-      c1 := PseudoRandom(w.sld);
-      slp := SLPOfElm(c1);
-      c1f := ResultOfStraightLineProgram(slp,w.sldf);
-      # Do the base change into our basis:
-      c1 := w.bas * c1 * w.basi;
-      c := s^c1;
-      cf := sf^c1f;
-      # Now check that Vn + Vn*s^c1 has dimension 2n-1:
-      Vnc := VectorSpace(w.f,c{[1..w.n]});
-      sum1 := ClosureLeftModule(Vn,Vnc);
-      if Dimension(sum1) = 2*w.n - 1 then 
-          int1 := Intersection(Vnc,Vn);
-          Assert(0,Dimension(int1)=1);
-          v := Basis(int1)[1];
-          if IsZero(v[w.n]) then continue; fi;
-          v := v / v[w.n];   # normalize to 1 in position n
-          Assert(0,v*c=v);
-          ci := c^-1;
-          cii := ExtractSubMatrix(ci,[w.n+1..2*w.n-1],[1..w.n-1]);
-          ConvertToMatrixRep(cii,Size(w.f));
-          cii := cii^-1;
-          if cii <> fail then 
-              break; 
+  w.count := 0;
+  while true do   # will be left by break
+      while true do    # will be left by break
+          Print(".\c");
+          w.count := w.count + 1;
+          c1 := PseudoRandom(w.sld);
+          slp := SLPOfElm(c1);
+          c1f := ResultOfStraightLineProgram(slp,w.sldf);
+          # Do the base change into our basis:
+          c1 := w.bas * c1 * w.basi;
+          c := s^c1;
+          cf := sf^c1f;
+          # Now check that Vn + Vn*s^c1 has dimension 2n-1:
+          Vnc := VectorSpace(w.f,c{[1..w.n]});
+          sum1 := ClosureLeftModule(Vn,Vnc);
+          if Dimension(sum1) = 2*w.n - 1 then 
+              int1 := Intersection(Vnc,Vn);
+              Assert(0,Dimension(int1)=1);
+              v := Basis(int1)[1];
+              if IsZero(v[w.n]) then continue; fi;
+              v := v / v[w.n];   # normalize to 1 in position n
+              Assert(0,v*c=v);
+              ci := c^-1;
+              break;
           fi;
-          # Otherwise try again, this is needed later on
+      od;
+
+      # Now we found our 2n-1-dimensional space W. Since SL_n
+      # has a d-n-dimensional fixed space W_{d-n} and W contains a complement
+      # of that fixed space, the intersection of W and W_{d-n} has dimension n-1.
+      # Change basis:
+      int2 := Intersection(FixHn, sum1);
+      Fixc := VectorSpace(w.f,NullspaceMat(c-One(c)));
+      int4 := Intersection(Fixc,int2);
+      if Dimension(int4) > 0 then
+          Print("Ooops, Fixc intersects int2!\n");
+          continue;
       fi;
+      newpart := BasisVectors(Basis(int2));
+      newbas := Concatenation(id{[1..w.n-1]},[v],newpart);
+      int3 := Intersection(FixHn,Fixc);
+      Assert(0,Dimension(int3)=w.d-2*w.n+1);
+      Append(newbas,BasisVectors(Basis(int3)));
+      ConvertToMatrixRep(newbas,Size(w.f));
+      newbasi := newbas^-1;
+      ci := newbas * ci * newbasi;
+      cii := ExtractSubMatrix(ci,[w.n+1..2*w.n-1],[1..w.n-1]);
+      ConvertToMatrixRep(cii,Size(w.f));
+      cii := cii^-1;
+      if cii <> fail then 
+          c := newbas * c * newbasi;
+          w.bas := newbas * w.bas;
+          w.basi := w.basi * newbasi;
+          break; 
+      fi;
+      Print("Ooops, no nice bottom...\n");
+      # Otherwise simply try again
   od;
   Print(" found c1 and c.\n");
-
-  # Now we found our 2n-1-dimensional space W. Since SL_n
-  # has a d-n-dimensional fixed space W_{d-n} and W contains a complement
-  # of that fixed space, the intersection of W and W_{d-n} has dimension n-1.
-  # Change basis:
-  int2 := Intersection(FixHn, sum1);
-  newpart := BasisVectors(Basis(int2));
-  newbas := Concatenation(id{[1..w.n-1]},[v],newpart);
-  MB := MutableBasis(w.f,newbas);
-  i := w.d;
-  while NrBasisVectors(MB) < w.d do
-      if not(IsContainedInSpan(MB,id[i])) then
-          Add(newbas,id[i]);
-          CloseMutableBasis(MB,id[i]);
-      fi;
-      i := i - 1;
-  od;
-  ConvertToMatrixRep(newbas,Size(w.f));
-  newbasi := newbas^-1;
-
   # Now SL_n has to be repaired according to the base change newbas:
 
   # Make some standard generators to compute:
@@ -260,10 +269,6 @@ local Vn,FixHn,Vnc,MB,c,c1,c1f,can,cf,ci,cii,i,id,int1,int2,j,lambda,newbas,newb
                                          w.slnstdf);
   newbasfi := newbasf^-1;
   w.slnstdf := List(w.slnstdf,x->newbasfi * x * newbasf);
-  w.bas := newbas * w.bas;
-  w.basi := w.basi * newbasi;
-  c := newbas * c * newbasi;
-  ci := newbas * ci * newbasi;
   #Unbind(newbasf); Unbind(newbasfi); Unbind(newbas); Unbind(newbasi);
 
   # Now consider the transvections t_i:
@@ -271,26 +276,39 @@ local Vn,FixHn,Vnc,MB,c,c1,c1f,can,cf,ci,cii,i,id,int1,int2,j,lambda,newbas,newb
   # t_i : w.bas[i] -> w.bas[i] + ww
   # We want to modify (t_i)^c such that it fixes w.bas{[1..w.n]}:
   trans := [];
-  can := BasisVectors(CanonicalBasis(w.f));
+  can := CanonicalBasis(w.f);
   for i in [1..w.n-1] do
+      trans2 := [];
       # This does t_i
-      for lambda in can do
+      for lambda in BasisVectors(can) do
           # This does t_i : v_j -> v_j + lambda * v_n
           std := RECOG.InitSLfake(w.f,w.n);
-          RECOG.DoRowOp_SL(false,1,w.n,lambda,std);
+          RECOG.DoRowOp_SL(false,i,w.n,lambda,std);
           tf := ResultOfStraightLineProgram(SLPOfElm(std.left),w.slnstdf);
-          Error(1);
           # Now conjugate with c:
           tf := tf^cf;
-          Error(2);
           # Now cleanup in column n above row n, the entries there
           # are lambda times the stuff in column i of ci:
           RECOG.ResetSLstd(std);
           for j in [1..w.n-1] do
-              RECOG.DoRowOp_SL(false,j,w.n,ci[j][i],std);
+              RECOG.DoRowOp_SL(false,j,w.n,-ci[j][i]*lambda,std);
           od;
           tf := ResultOfStraightLineProgram(SLPOfElm(std.left),w.slnstdf)*tf;
           Add(trans,tf);
+      od;
+  od;
+  # Now put together the clean ones by our knowledge of c^-1:
+  cii := TransposedMat(cii);
+  trans2 := [];
+  for i in [1..w.n-1] do
+      for lambda in BasisVectors(can) do
+          tf := trans[1]^0;
+          vals := BlownUpVector(can,cii[i]*lambda);
+          Error(2);
+          for j in [1..w.ext * (w.n-1)] do
+              tf := tf * trans[j]^IntFFE(vals[j]);
+          od;
+          Add(trans2,tf);
       od;
   od;
 
