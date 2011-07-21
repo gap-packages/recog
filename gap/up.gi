@@ -1,4 +1,4 @@
-SL2UpStep := function(w)
+SLnUpStep := function(w)
   # w has components:
   #   d       : size of big SL
   #   n       : size of small SL
@@ -141,7 +141,7 @@ Error(1);
   return w;
 end;
 
-SL2UpStepTry2 := function(w)
+SLnUpStepTry2 := function(w)
   # w has components:
   #   d       : size of big SL
   #   n       : size of small SL
@@ -160,7 +160,7 @@ SL2UpStepTry2 := function(w)
   #   bas, basi is a base change to the target base
   #   slnstdf are SLPs to reach standard generators of SL_n from the
   #       generators of sld
-local FixHn,Fixc,Vn,Vnc,c,c1,c1f,can,cf,ci,cii,i,id,int1,int2,int3,int4,j,lambda,newbas,newbasf,newbasfi,newbasi,newpart,s,sf,slp,std,sum1,tf,trans,trans2,v,vals;
+local FixHn,Fixc,Vn,Vnc,c,c1,c1f,can,cf,ci,cii,coeffs,i,id,int1,int2,int3,int4,j,k,lambda,newbas,newbasf,newbasfi,newbasi,newpart,s,sf,slp,std,sum1,tf,trans,trans2,v,vals;
 
   Info(InfoRecog,3,"Going up: ",w.n," (",w.d,")...");
 
@@ -230,7 +230,11 @@ local FixHn,Fixc,Vn,Vnc,c,c1,c1f,can,cf,ci,cii,i,id,int1,int2,int3,int4,j,lambda
           Print("Ooops, Fixc intersects int2!\n");
           continue;
       fi;
-      newpart := BasisVectors(Basis(int2));
+      # newpart := BasisVectors(Basis(int2));
+      newpart := ExtractSubMatrix(c,[1..w.n-1],[1..w.d]);
+      # Clean out the first n entries to go to the fixed space of SL_n:
+      CopySubMatrix(id,newpart,[w.n+1..2*w.n-1],[1..w.n-1],
+                               [1..w.n],[1..w.n]);
       newbas := Concatenation(id{[1..w.n-1]},[v],newpart);
       int3 := Intersection(FixHn,Fixc);
       Assert(0,Dimension(int3)=w.d-2*w.n+1);
@@ -277,12 +281,12 @@ local FixHn,Fixc,Vn,Vnc,c,c1,c1f,can,cf,ci,cii,i,id,int1,int2,int3,int4,j,lambda
   # We want to modify (t_i)^c such that it fixes w.bas{[1..w.n]}:
   trans := [];
   can := CanonicalBasis(w.f);
+  std := RECOG.InitSLfake(w.f,w.n);
   for i in [1..w.n-1] do
-      trans2 := [];
       # This does t_i
       for lambda in BasisVectors(can) do
           # This does t_i : v_j -> v_j + lambda * v_n
-          std := RECOG.InitSLfake(w.f,w.n);
+          RECOG.ResetSLstd(std);
           RECOG.DoRowOp_SL(false,i,w.n,lambda,std);
           tf := ResultOfStraightLineProgram(SLPOfElm(std.left),w.slnstdf);
           # Now conjugate with c:
@@ -304,7 +308,6 @@ local FixHn,Fixc,Vn,Vnc,c,c1,c1f,can,cf,ci,cii,i,id,int1,int2,int3,int4,j,lambda
       for lambda in BasisVectors(can) do
           tf := trans[1]^0;
           vals := BlownUpVector(can,cii[i]*lambda);
-          Error(2);
           for j in [1..w.ext * (w.n-1)] do
               tf := tf * trans[j]^IntFFE(vals[j]);
           od;
@@ -312,7 +315,57 @@ local FixHn,Fixc,Vn,Vnc,c,c1,c1f,can,cf,ci,cii,i,id,int1,int2,int3,int4,j,lambda
       od;
   od;
 
-Error(1);
+  # Now to the "horizontal" transvections, first create them as SLPs:
+  trans := [];
+  for i in [1..w.n-1] do
+      # This does u_i
+      for lambda in BasisVectors(can) do
+          # This does t_i : v_j -> v_j + lambda * v_n
+          RECOG.ResetSLstd(std);
+          RECOG.DoColOp_SL(false,w.n,i,lambda,std);
+          tf := ResultOfStraightLineProgram(SLPOfElm(std.right),w.slnstdf);
+          # Now conjugate with c:
+          tf := tf^cf;
+          # Now cleanup in rows above row n:
+          RECOG.ResetSLstd(std);
+          for j in [1..w.n-1] do
+              RECOG.DoRowOp_SL(false,j,w.n,-ci[j][w.n],std);
+          od;
+          tf := ResultOfStraightLineProgram(SLPOfElm(std.left),w.slnstdf)*tf;
+          # Now cleanup in rows below row n:
+          for j in [1..w.n-1] do
+              coeffs := RECOG.FindFFCoeffs(std,-ci[w.n+j][w.n]);
+              for k in [1..w.ext] do
+                  if not(IsZero(coeffs[k])) then
+                      tf := trans2[(j-1)*w.ext + k]^coeffs[k] * tf;
+                  fi;
+              od;
+          od;
+          # Now cleanup column n above row n:
+          RECOG.ResetSLstd(std);
+          for j in [1..w.n-1] do
+              RECOG.DoColOp_SL(false,j,w.n,ci[j][w.n],std);
+          od;
+          tf := tf*ResultOfStraightLineProgram(SLPOfElm(std.right),w.slnstdf);
+          # Now cleanup row n left of column n:
+          RECOG.ResetSLstd(std);
+          for j in [1..w.n-1] do
+              RECOG.DoRowOp_SL(false,w.n,j,-c[i][j]*lambda,std);
+          od;
+          tf := ResultOfStraightLineProgram(SLPOfElm(std.left),w.slnstdf)*tf;
+          # Now cleanup column n below row n:
+          for j in [1..w.n-1] do
+              coeffs := RECOG.FindFFCoeffs(std,ci[w.n+j][w.n]);
+              for k in [1..w.ext] do
+                  if not(IsZero(coeffs[k])) then
+                      tf := tf * trans2[(j-1)*w.ext + k]^coeffs[k];
+                  fi;
+              od;
+          od;
+          Add(trans,tf);
+      od;
+  od;
+
 
   return w;
 end;

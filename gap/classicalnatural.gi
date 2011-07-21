@@ -445,7 +445,7 @@ end;
 RECOG.ResetSLstd := function(r)
   r.left := One(r.a);
   r.right := One(r.a);
-  r.cache := [EmptyPlist(100),EmptyPlist(100)];
+  #r.cache := [EmptyPlist(100),EmptyPlist(100)];
   return r;
 end;
   
