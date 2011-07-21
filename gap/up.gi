@@ -160,7 +160,7 @@ SLnUpStepTry2 := function(w)
   #   bas, basi is a base change to the target base
   #   slnstdf are SLPs to reach standard generators of SL_n from the
   #       generators of sld
-local FixHn,Fixc,Vn,Vnc,c,c1,c1f,can,cf,ci,cii,coeffs,i,id,int1,int2,int3,int4,j,k,lambda,newbas,newbasf,newbasfi,newbasi,newpart,s,sf,slp,std,sum1,tf,trans,trans2,v,vals;
+  local FixHn,Fixc,Vn,Vnc,c,c1,c1f,can,cf,ci,cii,coeffs,flag,i,id,int1,int2,int3,int4,j,k,lambda,newbas,newbasf,newbasfi,newbasi,newpart,s,sf,slp,std,sum1,tf,trans,transh,transv,v,vals;
 
   Info(InfoRecog,3,"Going up: ",w.n," (",w.d,")...");
 
@@ -174,16 +174,20 @@ local FixHn,Fixc,Vn,Vnc,c,c1,c1f,can,cf,ci,cii,coeffs,i,id,int1,int2,int3,int4,j
   # We already have an SLP for an n-1-cycle: it is one of the std gens.
   # For n=2 we use a transvection for this purpose.
   if w.n > 2 then
-    if w.p > 2 then
-      s := id{Concatenation([1,w.n],[2..w.n-1],[w.n+1..w.d])};
-      ConvertToMatrixRepNC(s,w.f);
-      if IsOddInt(w.n) then s[2] := -s[2]; fi;
-      sf := w.slnstdf[2*w.ext+2];
-    else   # in even characteristic we take the n-cycle:
-      s := id{Concatenation([w.n],[1..w.n-1],[w.n+1..w.d])};
-      ConvertToMatrixRepNC(s,w.f);
-      sf := w.slnstdf[2*w.ext+1];
-    fi;
+      if IsOddInt(w.n) then
+          if w.p > 2 then
+            s := id{Concatenation([1,w.n],[2..w.n-1],[w.n+1..w.d])};
+            ConvertToMatrixRepNC(s,w.f);
+            if IsOddInt(w.n) then s[2] := -s[2]; fi;
+            sf := w.slnstdf[2*w.ext+2];
+          else   # in even characteristic we take the n-cycle:
+            s := id{Concatenation([w.n],[1..w.n-1],[w.n+1..w.d])};
+            ConvertToMatrixRepNC(s,w.f);
+            sf := w.slnstdf[2*w.ext+1];
+          fi;
+      else
+          Error("this program only works for odd n or n=2");
+      fi;
   else
       # In this case the n-1-cycle is the identity, so we take a transvection:
       s := MutableCopyMat(id);
@@ -273,7 +277,6 @@ local FixHn,Fixc,Vn,Vnc,c,c1,c1f,can,cf,ci,cii,coeffs,i,id,int1,int2,int3,int4,j
                                          w.slnstdf);
   newbasfi := newbasf^-1;
   w.slnstdf := List(w.slnstdf,x->newbasfi * x * newbasf);
-  #Unbind(newbasf); Unbind(newbasfi); Unbind(newbas); Unbind(newbasi);
 
   # Now consider the transvections t_i:
   # t_i : w.bas[j] -> w.bas[j]        for j <> i and
@@ -303,7 +306,7 @@ local FixHn,Fixc,Vn,Vnc,c,c1,c1f,can,cf,ci,cii,coeffs,i,id,int1,int2,int3,int4,j
   od;
   # Now put together the clean ones by our knowledge of c^-1:
   cii := TransposedMat(cii);
-  trans2 := [];
+  transv := [];
   for i in [1..w.n-1] do
       for lambda in BasisVectors(can) do
           tf := trans[1]^0;
@@ -311,61 +314,77 @@ local FixHn,Fixc,Vn,Vnc,c,c1,c1f,can,cf,ci,cii,coeffs,i,id,int1,int2,int3,int4,j
           for j in [1..w.ext * (w.n-1)] do
               tf := tf * trans[j]^IntFFE(vals[j]);
           od;
-          Add(trans2,tf);
+          Add(transv,tf);
       od;
   od;
 
   # Now to the "horizontal" transvections, first create them as SLPs:
-  trans := [];
+  transh := [];
   for i in [1..w.n-1] do
-      # This does u_i
-      for lambda in BasisVectors(can) do
-          # This does t_i : v_j -> v_j + lambda * v_n
-          RECOG.ResetSLstd(std);
-          RECOG.DoColOp_SL(false,w.n,i,lambda,std);
-          tf := ResultOfStraightLineProgram(SLPOfElm(std.right),w.slnstdf);
-          # Now conjugate with c:
-          tf := tf^cf;
-          # Now cleanup in rows above row n:
-          RECOG.ResetSLstd(std);
-          for j in [1..w.n-1] do
-              RECOG.DoRowOp_SL(false,j,w.n,-ci[j][w.n],std);
-          od;
-          tf := ResultOfStraightLineProgram(SLPOfElm(std.left),w.slnstdf)*tf;
-          # Now cleanup in rows below row n:
-          for j in [1..w.n-1] do
-              coeffs := RECOG.FindFFCoeffs(std,-ci[w.n+j][w.n]);
-              for k in [1..w.ext] do
-                  if not(IsZero(coeffs[k])) then
-                      tf := trans2[(j-1)*w.ext + k]^coeffs[k] * tf;
-                  fi;
-              od;
-          od;
-          # Now cleanup column n above row n:
-          RECOG.ResetSLstd(std);
-          for j in [1..w.n-1] do
-              RECOG.DoColOp_SL(false,j,w.n,ci[j][w.n],std);
-          od;
-          tf := tf*ResultOfStraightLineProgram(SLPOfElm(std.right),w.slnstdf);
-          # Now cleanup row n left of column n:
-          RECOG.ResetSLstd(std);
-          for j in [1..w.n-1] do
-              RECOG.DoRowOp_SL(false,w.n,j,-c[i][j]*lambda,std);
-          od;
-          tf := ResultOfStraightLineProgram(SLPOfElm(std.left),w.slnstdf)*tf;
-          # Now cleanup column n below row n:
-          for j in [1..w.n-1] do
-              coeffs := RECOG.FindFFCoeffs(std,ci[w.n+j][w.n]);
-              for k in [1..w.ext] do
-                  if not(IsZero(coeffs[k])) then
-                      tf := tf * trans2[(j-1)*w.ext + k]^coeffs[k];
-                  fi;
-              od;
-          od;
-          Add(trans,tf);
+      # This does u_i : v_j -> v_j + v_n
+      RECOG.ResetSLstd(std);
+      RECOG.DoColOp_SL(false,w.n,i,One(w.f),std);
+      tf := ResultOfStraightLineProgram(SLPOfElm(std.right),w.slnstdf);
+      # Now conjugate with c:
+      tf := tf^cf;
+      # Now cleanup in rows above row n:
+      RECOG.ResetSLstd(std);
+      for j in [1..w.n-1] do
+          RECOG.DoRowOp_SL(false,j,w.n,-ci[j][w.n],std);
       od;
+      tf := ResultOfStraightLineProgram(SLPOfElm(std.left),w.slnstdf)*tf;
+      # Now cleanup in rows below row n:
+      for j in [1..w.n-1] do
+          coeffs := RECOG.FindFFCoeffs(std,-ci[w.n+j][w.n]);
+          for k in [1..w.ext] do
+              if not(IsZero(coeffs[k])) then
+                  tf := transv[(j-1)*w.ext + k]^coeffs[k] * tf;
+              fi;
+          od;
+      od;
+      # Now cleanup column n above row n:
+      RECOG.ResetSLstd(std);
+      for j in [1..w.n-1] do
+          RECOG.DoColOp_SL(false,j,w.n,ci[j][w.n],std);
+      od;
+      tf := tf*ResultOfStraightLineProgram(SLPOfElm(std.right),w.slnstdf);
+      # Now cleanup row n left of column n:
+      RECOG.ResetSLstd(std);
+      for j in [1..w.n-1] do
+          RECOG.DoRowOp_SL(false,w.n,j,-c[i][j],std);
+      od;
+      tf := ResultOfStraightLineProgram(SLPOfElm(std.left),w.slnstdf)*tf;
+      # Now cleanup column n below row n:
+      for j in [1..w.n-1] do
+          coeffs := RECOG.FindFFCoeffs(std,ci[w.n+j][w.n]);
+          for k in [1..w.ext] do
+              if not(IsZero(coeffs[k])) then
+                  tf := tf * transv[(j-1)*w.ext + k]^coeffs[k];
+              fi;
+          od;
+      od;
+      Add(transh,tf);
   od;
 
+  # Now put together the n-cycle:
+  # 2n-1 -> 2n-2 -> ... -> n+1 -> n -> 2n-1
+  flag := false;
+  s := One(w.slnstdf[1]);
+  for i in [w.n-1,w.n-2..1] do
+      if flag then
+          # Make [[0,-1],[1,0]] in coordinates w.n and w.n+i:
+          tf := transv[(i-1)*w.ext+1]*transh[i]^-1*transv[(i-1)*w.ext+1];
+      else
+          # Make [[0,1],[-1,0]] in coordinates w.n and w.n+i:
+          tf := transv[(i-1)*w.ext+1]^-1*transh[i]*transv[(i-1)*w.ext+1]^-1;
+      fi;
+      s := s * tf;
+      flag := not(flag);
+  od;
+
+  # Finally put together the new 2n-1-cycle and 2n-2-cycle:
+  w.slnstdf[2*w.ext+1] := w.slnstdf[2*w.ext+1] * s;
+  w.slnstdf[2*w.ext+2] := w.slnstdf[2*w.ext+2] * s;
 
   return w;
 end;
@@ -379,6 +398,19 @@ MakeSituation := function(p,e,n,d)
   r := rec( f := GF(q), d := d, n := n, bas := IdentityMat(d,GF(q)),
             basi := IdentityMat(d,GF(q)), sld := Group(a),
             sldf := a, slnstdf := a{[1..2*e+2]}, p := p, ext := e );
+  return r;
+end;
+
+MakeTest := function(p,e,n,d)
+  local a,fake,q,r;
+  q := p^e;
+  a := RECOG.MakeSL_StdGens(p,e,n,d).all;
+  Append(a,GeneratorsOfGroup(SL(d,q)));
+  a := GeneratorsWithMemory(a);
+  fake := GeneratorsWithMemory(List([1..Length(a)],i->()));
+  r := rec( f := GF(q), d := d, n := n, bas := IdentityMat(d,GF(q)),
+            basi := IdentityMat(d,GF(q)), sld := Group(a),
+            sldf := fake, slnstdf := fake{[1..2*e+2]}, p := p, ext := e );
   return r;
 end;
 

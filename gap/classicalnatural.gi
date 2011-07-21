@@ -445,7 +445,9 @@ end;
 RECOG.ResetSLstd := function(r)
   r.left := One(r.a);
   r.right := One(r.a);
-  #r.cache := [EmptyPlist(100),EmptyPlist(100)];
+  if not(IsBound(r.cache)) then
+      r.cache := [EmptyPlist(100),EmptyPlist(100)];
+  fi;
   return r;
 end;
   
@@ -473,8 +475,8 @@ end;
 RECOG.DoRowOp_SL := function(m,i,j,lambda,std)
   # add lambda times j-th row to i-th row, i<>j
   # by left-multiplying with an expression in the standard generators:
-  #   a : e_n -> e_{n-1} -> ... -> e_1 -> e_n
-  #   b : e_n -> e_{n-1} -> ... -> e_2 -> e_n and e_1 -> e_1
+  #   a : e_n -> e_{n-1} -> ... -> e_1 -> (-1)^(n+1) e_n
+  #   b : e_n -> e_{n-1} -> ... -> e_2 -> (-1)^n e_n and e_1 -> e_1
   #   s : e_1 -> e_1+ * e_2, e_i -> e_i   for i > 1
   #   t : e_2 -> e_1+ * e_2, e_i -> e_i   for i <> 2
   # s and t are lists of length ext to span over GF(p) all the scalars
@@ -531,8 +533,8 @@ end;
 RECOG.DoColOp_SL := function(m,i,j,lambda,std)
   # add lambda times i-th column to j-th column, i<>j
   # by left-multiplying with an expression in the standard generators:
-  #   a : e_n -> e_{n-1} -> ... -> e_1 -> e_n
-  #   b : e_n -> e_{n-1} -> ... -> e_2 -> e_n and e_1 -> e_1
+  #   a : e_n -> e_{n-1} -> ... -> e_1 -> (-1)^(n+1) e_n
+  #   b : e_n -> e_{n-1} -> ... -> e_2 -> (-1)^n e_n and e_1 -> e_1
   #   s : e_1 -> e_1+ * e_2, e_i -> e_i   for i > 1
   #   t : e_2 -> e_1+ * e_2, e_i -> e_i   for i <> 2
   # s and t are lists of length ext to span over GF(p) all the scalars
