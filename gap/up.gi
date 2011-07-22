@@ -1,8 +1,8 @@
-RECOG.LinearAction := function(bas,el)
+RECOG.LinearAction := function(bas,field,el)
   local mat,vecs;
   vecs := BasisVectors(bas);
   mat := List(vecs,v->Coefficients(bas,v*el));
-  ConvertToMatrixRep(mat,BaseDomain(el));
+  ConvertToMatrixRep(mat,field);
   return mat;
 end;
 
