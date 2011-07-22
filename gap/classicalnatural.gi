@@ -490,16 +490,24 @@ RECOG.DoRowOp_SL := function(m,i,j,lambda,std)
   local Getai,Getbj,coeffs,k,new,newnew;
   
   Getai := function(l)
-      if not IsBound(std.cache[1][l]) then
-          std.cache[1][l] := std.a^(l);
+      local pos;
+      if l < 0 then pos := std.d - l;
+               else pos := l;
       fi;
-      return std.cache[1][l];
+      if not IsBound(std.cache[1][pos]) then
+          std.cache[1][pos] := std.a^l;
+      fi;
+      return std.cache[1][pos];
   end;
   Getbj := function(l)
-      if not IsBound(std.cache[2][l]) then
-          std.cache[2][l] := std.b^l;
+      local pos;
+      if l < 0 then pos := std.d - l;
+               else pos := l;
       fi;
-      return std.cache[2][l];
+      if not IsBound(std.cache[2][pos]) then
+          std.cache[2][pos] := std.b^l;
+      fi;
+      return std.cache[2][pos];
   end;
 
   newnew := std.One;
@@ -515,8 +523,8 @@ RECOG.DoRowOp_SL := function(m,i,j,lambda,std)
                   # We need to multiply from the left with the element
                   #    a^(i-1) * b^(j-i-1) * s_k * b^-(j-i-1) * a^-(i-1)
                   # from the left.
-                  if i > 1 then new := Getai(i-1)^-1 * new; fi;
-                  if j > i+1 then new := Getbj(j-i-1)^-1 * new; fi;
+                  if i > 1 then new := Getai(-(i-1)) * new; fi;
+                  if j > i+1 then new := Getbj(-(j-i-1)) * new; fi;
                   new := std.s[k] * new;
                   if j > i+1 then new := Getbj(j-i-1) * new; fi;
                   if i > 1 then new := Getai(i-1) * new; fi;
@@ -524,8 +532,8 @@ RECOG.DoRowOp_SL := function(m,i,j,lambda,std)
                   # We need to multiply from the left with the element
                   #    a^(j-1) * b^(i-j-1) * t_k * b^-(i-j-1) * a^-(j-1)
                   # from the left.
-                  if j > 1 then new := Getai(j-1)^-1 * new; fi;
-                  if i > j+1 then new := Getbj(i-j-1)^-1 * new; fi;
+                  if j > 1 then new := Getai(-(j-1)) * new; fi;
+                  if i > j+1 then new := Getbj(-(i-j-1)) * new; fi;
                   new := std.t[k] * new;
                   if i > j+1 then new := Getbj(i-j-1) * new; fi;
                   if j > 1 then new := Getai(j-1) * new; fi;
@@ -559,16 +567,24 @@ RECOG.DoColOp_SL := function(m,i,j,lambda,std)
   local Getai,Getbj,coeffs,k,new,newnew;
   
   Getai := function(l)
-      if not IsBound(std.cache[1][l]) then
-          std.cache[1][l] := std.a^(l);
+      local pos;
+      if l < 0 then pos := std.d - l;
+               else pos := l;
       fi;
-      return std.cache[1][l];
+      if not IsBound(std.cache[1][pos]) then
+          std.cache[1][pos] := std.a^l;
+      fi;
+      return std.cache[1][pos];
   end;
   Getbj := function(l)
-      if not IsBound(std.cache[2][l]) then
-          std.cache[2][l] := std.b^l;
+      local pos;
+      if l < 0 then pos := std.d - l;
+               else pos := l;
       fi;
-      return std.cache[2][l];
+      if not IsBound(std.cache[2][pos]) then
+          std.cache[2][pos] := std.b^l;
+      fi;
+      return std.cache[2][pos];
   end;
 
   newnew := std.One;
