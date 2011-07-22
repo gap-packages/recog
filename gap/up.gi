@@ -11,10 +11,6 @@ SLnUpStep := function(w)
   #   d       : size of big SL
   #   n       : size of small SL
   #   slnstdf : fakegens for SL_n standard generators
-  #   transh  : fakegens for the "horizontal" transvections n,i for 1<=i<=n-1
-  #             entries can be unbound in which case they are made from slnstdf
-  #   transv  : fakegens for the "vertical" transvections i,n for 1<=i<=n-1
-  #             entries can be unbound in which case they are made from slnstdf
   #   bas     : current base change, first n vectors are where SL_n acts
   #             rest of vecs are invariant under SL_n
   #   basi    : current inverse of bas
@@ -28,12 +24,16 @@ SLnUpStep := function(w)
   #   One     : One(slnstdf[1])
   #   can     : CanonicalBasis(f)
   #   canb    : BasisVectors(can)
+  #   transh  : fakegens for the "horizontal" transvections n,i for 1<=i<=n-1
+  #             entries can be unbound in which case they are made from slnstdf
+  #   transv  : fakegens for the "vertical" transvections i,n for 1<=i<=n-1
+  #             entries can be unbound in which case they are made from slnstdf
   #
   # We keep the following invariants (going from n -> n':=2n-1)
   #   bas, basi is a base change to the target base
   #   slnstdf are SLPs to reach standard generators of SL_n from the
   #       generators of sld
-  local DoColOp_n,DoRowOp_n,FixSLn,Fixc,Vn,Vnc,c,c1,c1f,cf,cfi,ci,cii,coeffs,flag,i,id,int1,int2,int3,int4,j,k,lambda,newbas,newbasf,newbasfi,newbasi,newpart,pos,pow,s,sf,slp,std,sum1,tf,trans,transd,transr,v,vals;
+  local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,ci,cii,coeffs,flag,i,id,int1,int3,j,k,lambda,newbas,newbasf,newbasfi,newbasi,newdim,newpart,pivots,pivots2,pos,pow,s,sf,slp,std,sum1,tf,trans,transd,transr,v,vals,zerovec;
 
   Info(InfoRecog,3,"Going up: ",w.n," (",w.d,")...");
 
@@ -68,7 +68,6 @@ SLnUpStep := function(w)
       od;
   od;
   Unbind(std);
-Error(0);
 
   # Now we can define two helper functions:
   DoColOp_n := function(el,i,j,lambda,w)
@@ -167,6 +166,8 @@ Error(0);
 
   # Find a good random element:
   w.count := 0;
+  aimdim := Minimum(2*w.n-1,w.d);
+  newdim := aimdim - w.n;
   while true do   # will be left by break
       while true do    # will be left by break
           Print(".\c");
@@ -182,11 +183,14 @@ Error(0);
           # Now check that Vn + Vn*s^c1 has dimension 2n-1:
           Vnc := VectorSpace(w.f,c{[1..w.n]});
           sum1 := ClosureLeftModule(Vn,Vnc);
-          if Dimension(sum1) = 2*w.n - 1 then 
-              int1 := Intersection(Vnc,Vn);
-              Assert(0,Dimension(int1)=1);
-              v := Basis(int1)[1];
-              if IsZero(v[w.n]) then 
+          if Dimension(sum1) = aimdim then 
+              Fixc := VectorSpace(w.f,NullspaceMat(c-One(c)));
+              int1 := Intersection(Fixc,Vn);
+              for i in [1..Dimension(int1)] do
+                  v := Basis(int1)[i];
+                  if not(IsZero(v[w.n])) then break; fi;
+              od;
+              if IsZero(v[w.n]) then
                   Print("Ooops: Component n was zero!\n");
                   continue; 
               fi;
@@ -197,33 +201,62 @@ Error(0);
           fi;
       od;
 
-      # Now we found our 2n-1-dimensional space W. Since SL_n
+      # Now we found our aimdim-dimensional space W. Since SL_n
       # has a d-n-dimensional fixed space W_{d-n} and W contains a complement
-      # of that fixed space, the intersection of W and W_{d-n} has dimension n-1.
+      # of that fixed space, the intersection of W and W_{d-n} has dimension 
+      # newdim.
+
       # Change basis:
-      int2 := Intersection(FixSLn, sum1);
-      Fixc := VectorSpace(w.f,NullspaceMat(c-One(c)));
-      int4 := Intersection(Fixc,int2);
-      if Dimension(int4) > 0 then
-          Print("Ooops, Fixc intersects int2!\n");
-          continue;
-      fi;
-      # newpart := BasisVectors(Basis(int2));
       newpart := ExtractSubMatrix(c,[1..w.n-1],[1..w.d]);
       # Clean out the first n entries to go to the fixed space of SL_n:
-      CopySubMatrix(id,newpart,[w.n+1..2*w.n-1],[1..w.n-1],
-                               [1..w.n],[1..w.n]);
+      zerovec := Zero(newpart[1]);
+      for i in [1..w.n-1] do
+          CopySubVector(zerovec,newpart[i],[1..w.n],[1..w.n]);
+      od;
+      MB := MutableBasis(w.f,[],zerovec);
+      i := 1;
+      pivots := EmptyPlist(newdim);
+      while i <= Length(newpart) and NrBasisVectors(MB) < newdim do
+          if not(IsContainedInSpan(MB,newpart[i])) then
+              Add(pivots,i);
+              CloseMutableBasis(MB,newpart[i]);
+          fi;
+          i := i + 1;
+      od;
+      newpart := newpart{pivots};
       newbas := Concatenation(id{[1..w.n-1]},[v],newpart);
-      int3 := Intersection(FixSLn,Fixc);
-      Assert(0,Dimension(int3)=w.d-2*w.n+1);
-      Append(newbas,BasisVectors(Basis(int3)));
+      if 2*w.n-1 < w.d then
+          int3 := Intersection(FixSLn,Fixc);
+          Assert(0,Dimension(int3)=w.d-2*w.n+1);
+          Append(newbas,BasisVectors(Basis(int3)));
+      fi;
       ConvertToMatrixRep(newbas,Size(w.f));
       newbasi := newbas^-1;
+      if newbasi = fail then
+          Print("Ooops, Fixc intersected too much, we try again\n");
+          continue;
+      fi;
       ci := newbas * ci * newbasi;
-      cii := ExtractSubMatrix(ci,[w.n+1..2*w.n-1],[1..w.n-1]);
+      cii := ExtractSubMatrix(ci,[w.n+1..aimdim],[1..w.n-1]);
       ConvertToMatrixRep(cii,Size(w.f));
-      cii := cii^-1;
-      if cii <> fail then 
+      cii := TransposedMat(cii);
+      # The rows of cii are now what used to be the columns,
+      # their length is newdim, we need to span the full newdim-dimensional
+      # row space and need to remember how:
+      zerovec := Zero(cii[1]);
+      MB := MutableBasis(w.f,[],zerovec);
+      i := 1;
+      pivots2 := EmptyPlist(newdim);
+      while i <= Length(cii) and NrBasisVectors(MB) < newdim do
+          if not(IsContainedInSpan(MB,cii[i])) then
+              Add(pivots2,i);
+              CloseMutableBasis(MB,cii[i]);
+          fi;
+          i := i + 1;
+      od;
+      if Length(pivots2) = newdim then 
+          cii := cii{pivots2}^-1;
+          ConvertToMatrixRep(cii,w.f);
           c := newbas * c * newbasi;
           w.bas := newbas * w.bas;
           w.basi := w.basi * newbasi;
@@ -235,7 +268,7 @@ Error(0);
   Print(" found c1 and c.\n");
   # Now SL_n has to be repaired according to the base change newbas:
 
-Error(1);
+# Error(1);
 
   # Now write this matrix newbas as an SLP in the standard generators
   # of our SL_n. Then we know which generators to take for our new
@@ -244,59 +277,47 @@ Error(1);
   for i in [1..w.n-1] do
       if not(IsZero(v[i])) then
           newbasf := DoColOp_n(newbasf,w.n,i,v[i],w);
-          # was: RECOG.DoColOp_SL(false,w.n,i,v[i],newbasf);
       fi;
   od;
-  # was: newbasf := ResultOfStraightLineProgram(SLPOfElm(newbasf.right),
-  #                                             w.slnstdf);
   newbasfi := newbasf^-1;
   w.slnstdf := List(w.slnstdf,x->newbasfi * x * newbasf);
   # Now update caches:
   w.transh := List(w.transh,x->newbasfi * x * newbasf);
   w.transv := List(w.transv,x->newbasfi * x * newbasf);
 
-Error(2);
+# Error(2);
 
   # Now consider the transvections t_i:
   # t_i : w.bas[j] -> w.bas[j]        for j <> i and
   # t_i : w.bas[i] -> w.bas[i] + ww
   # We want to modify (t_i)^c such that it fixes w.bas{[1..w.n]}:
   trans := [];
-  # was: std := RECOG.InitSLfake(w.f,w.n);
-  for i in [1..w.n-1] do
+  for i in pivots2 do
       # This does t_i
       for lambda in w.canb do
-          # This does t_i : v_j -> v_j + lambda * v_n
+          # This does t_pivots2[i] : v_j -> v_j + lambda * v_n
           tf := w.One;
-          tf := DoRowOp_n(tf,i,w.n,lambda,w);
-          # was: RECOG.ResetSLstd(std);
-          # was: RECOG.DoRowOp_SL(false,i,w.n,lambda,std);
-          # was: tf:=ResultOfStraightLineProgram(SLPOfElm(std.left),w.slnstdf);
+          tf := DoRowOp_n(tf,pivots2[i],w.n,lambda,w);
           # Now conjugate with c:
           tf := cfi*tf*cf;
           # Now cleanup in column n above row n, the entries there
-          # are lambda times the stuff in column i of ci:
-          # was: RECOG.ResetSLstd(std);
+          # are lambda times the stuff in column pivots2[i] of ci:
           for j in [1..w.n-1] do
-              tf := DoRowOp_n(tf,j,w.n,-ci[j][i]*lambda,w);
-              # was: RECOG.DoRowOp_SL(false,j,w.n,-ci[j][i]*lambda,std);
+              tf := DoRowOp_n(tf,j,w.n,-ci[j][pivots2[i]]*lambda,w);
           od;
-          # was: 
-          # tf:=ResultOfStraightLineProgram(SLPOfElm(std.left),w.slnstdf)*tf;
           Add(trans,tf);
       od;
   od;
 
-Error(3);
+# Error(3);
 
   # Now put together the clean ones by our knowledge of c^-1:
-  cii := TransposedMat(cii);
   transd := [];
-  for i in [1..w.n-1] do
+  for i in pivots2 do
       for lambda in w.canb do
           tf := w.One;
           vals := BlownUpVector(w.can,cii[i]*lambda);
-          for j in [1..w.ext * (w.n-1)] do
+          for j in [1..w.ext * newdim] do
               pow := IntFFE(vals[j]);
               if not(IsZero(pow)) then
                   if IsOne(pow) then
@@ -311,33 +332,23 @@ Error(3);
   od;
   Unbind(trans);
 
-Error(4);
+# Error(4);
 
   # Now to the "horizontal" transvections, first create them as SLPs:
   transr := [];
-  for i in [1..w.n-1] do
-      # This does u_i : v_j -> v_j + v_n
+  for i in pivots do
+      # This does u_pivots[i] : v_pivots[i] -> v_pivots[i] + v_n
       tf := w.One;
-      tf := DoColOp_n(tf,w.n,i,One(w.f),w);
-      # was: RECOG.ResetSLstd(std);
-      # was: RECOG.DoColOp_SL(false,w.n,i,One(w.f),std);
-      # was: tf := ResultOfStraightLineProgram(SLPOfElm(std.right),w.slnstdf);
+      tf := DoColOp_n(tf,w.n,pivots[i],One(w.f),w);
       # Now conjugate with c:
-      #Error("A");
       tf := cfi*tf*cf;
-      #Error("a");
       # Now cleanup in rows above row n:
-      # was: RECOG.ResetSLstd(std);
       for j in [1..w.n-1] do
           tf := DoRowOp_n(tf,j,w.n,-ci[j][w.n],w);
-          # was: RECOG.DoRowOp_SL(false,j,w.n,-ci[j][w.n],std);
       od;
-      #Error("b");
-      # was: tf := ResultOfStraightLineProgram(SLPOfElm(std.left),w.slnstdf)*tf;
       # Now cleanup in rows below row n:
-      for j in [1..w.n-1] do
+      for j in [1..newdim] do
           coeffs := IntVecFFE(Coefficients(w.can,-ci[w.n+j][w.n]));
-          # was: coeffs := RECOG.FindFFCoeffs(std,-ci[w.n+j][w.n]);
           for k in [1..w.ext] do
               if not(IsZero(coeffs[k])) then
                   if IsOne(coeffs[k]) then
@@ -348,28 +359,17 @@ Error(4);
               fi;
           od;
       od;
-      #Error("c");
       # Now cleanup column n above row n:
-      # was: RECOG.ResetSLstd(std);
       for j in [1..w.n-1] do
           tf := DoColOp_n(tf,j,w.n,ci[j][w.n],w);
-          # was: RECOG.DoColOp_SL(false,j,w.n,ci[j][w.n],std);
       od;
-      # was: 
-      # tf := tf*ResultOfStraightLineProgram(SLPOfElm(std.right),w.slnstdf);
-      #Error("d");
       # Now cleanup row n left of column n:
-      # was: RECOG.ResetSLstd(std);
       for j in [1..w.n-1] do
           tf := DoRowOp_n(tf,w.n,j,-c[i][j],w);
-          # was: RECOG.DoRowOp_SL(false,w.n,j,-c[i][j],std);
       od;
-      # was: tf := ResultOfStraightLineProgram(SLPOfElm(std.left),w.slnstdf)*tf;
-      #Error("e");
       # Now cleanup column n below row n:
-      for j in [1..w.n-1] do
+      for j in [1..newdim] do
           coeffs := IntVecFFE(Coefficients(w.can,ci[w.n+j][w.n]));
-          # was: coeffs := RECOG.FindFFCoeffs(std,ci[w.n+j][w.n]);
           for k in [1..w.ext] do
               if not(IsZero(coeffs[k])) then
                   if IsOne(coeffs[k]) then
@@ -380,17 +380,16 @@ Error(4);
               fi;
           od;
       od;
-      #Error("f");
       Add(transr,tf);
   od;
 
-Error(5);
+# Error(5);
 
-  # Now put together the n-cycle:
-  # 2n-1 -> 2n-2 -> ... -> n+1 -> n -> 2n-1
+  # Now put together the (newdim+1)-cycle:
+  # n+newdim -> n+newdim-1 -> ... -> n+1 -> n -> n+newdim
   flag := false;
   s := One(w.slnstdf[1]);
-  for i in [w.n-1,w.n-2..1] do
+  for i in [1..newdim] do
       if flag then
           # Make [[0,-1],[1,0]] in coordinates w.n and w.n+i:
           tf := transd[(i-1)*w.ext+1]*transr[i]^-1*transd[(i-1)*w.ext+1];
@@ -402,9 +401,10 @@ Error(5);
       flag := not(flag);
   od;
 
-Error(6);
+# Error(6);
 
   # Finally put together the new 2n-1-cycle and 2n-2-cycle:
+  s := s^-1;
   w.slnstdf[2*w.ext+1] := w.slnstdf[2*w.ext+1] * s;
   w.slnstdf[2*w.ext+2] := w.slnstdf[2*w.ext+2] * s;
 
