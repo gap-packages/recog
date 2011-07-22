@@ -446,7 +446,9 @@ RECOG.ResetSLstd := function(r)
   r.left := One(r.a);
   r.right := One(r.a);
   if not(IsBound(r.cache)) then
-      r.cache := [EmptyPlist(100),EmptyPlist(100)];
+      r.cache := [EmptyPlist(100),EmptyPlist(100),
+                  List([1..r.ext],i->[]),     # rowopcache
+                  List([1..r.ext],i->[])];    # colopcache
   fi;
   return r;
 end;
@@ -485,7 +487,7 @@ RECOG.DoRowOp_SL := function(m,i,j,lambda,std)
   # So <s,t> is an SL_2 in the upper left corner, a is an n-cycle
   # b is an n-1 cycle with garbage fixing the first vector
   # This only modifies the record std collecting a straight line program.
-  local Getai,Getbj,coeffs,k,new;
+  local Getai,Getbj,coeffs,k,new,newnew;
   
   Getai := function(l)
       if not IsBound(std.cache[1][l]) then
@@ -500,34 +502,45 @@ RECOG.DoRowOp_SL := function(m,i,j,lambda,std)
       return std.cache[2][l];
   end;
 
-  new := std.One;
+  newnew := std.One;
   coeffs := RECOG.FindFFCoeffs(std,lambda);
   for k in [1..std.ext] do
-    if not(IsZero(coeffs[k])) then
-      if i < j then
-          # We need to multiply from the left with the element
-          #    a^(i-1) * b^(j-i-1) * s_k * b^-(j-i-1) * a^-(i-1)
-          # from the left.
-          if i > 1 then new := Getai(i-1)^-1 * new; fi;
-          if j > i+1 then new := Getbj(j-i-1)^-1 * new; fi;
-          new := std.s[k]^coeffs[k] * new;
-          if j > i+1 then new := Getbj(j-i-1) * new; fi;
-          if i > 1 then new := Getai(i-1) * new; fi;
-      elif i > j then
-          # We need to multiply from the left with the element
-          #    a^(j-1) * b^(i-j-1) * t_k * b^-(i-j-1) * a^-(j-1)
-          # from the left.
-          if j > 1 then new := Getai(j-1)^-1 * new; fi;
-          if i > j+1 then new := Getbj(i-j-1)^-1 * new; fi;
-          new := std.t[k]^coeffs[k] * new;
-          if i > j+1 then new := Getbj(i-j-1) * new; fi;
-          if j > 1 then new := Getai(j-1) * new; fi;
+      if not(IsZero(coeffs[k])) then
+          if IsBound(std.cache[3][k][i]) and
+             IsBound(std.cache[3][k][i][j]) then
+              new := std.cache[3][k][i][j];
+          else;
+              new := std.One;
+              if i < j then
+                  # We need to multiply from the left with the element
+                  #    a^(i-1) * b^(j-i-1) * s_k * b^-(j-i-1) * a^-(i-1)
+                  # from the left.
+                  if i > 1 then new := Getai(i-1)^-1 * new; fi;
+                  if j > i+1 then new := Getbj(j-i-1)^-1 * new; fi;
+                  new := std.s[k] * new;
+                  if j > i+1 then new := Getbj(j-i-1) * new; fi;
+                  if i > 1 then new := Getai(i-1) * new; fi;
+              elif i > j then
+                  # We need to multiply from the left with the element
+                  #    a^(j-1) * b^(i-j-1) * t_k * b^-(i-j-1) * a^-(j-1)
+                  # from the left.
+                  if j > 1 then new := Getai(j-1)^-1 * new; fi;
+                  if i > j+1 then new := Getbj(i-j-1)^-1 * new; fi;
+                  new := std.t[k] * new;
+                  if i > j+1 then new := Getbj(i-j-1) * new; fi;
+                  if j > 1 then new := Getai(j-1) * new; fi;
+              fi;
+              if not(IsBound(std.cache[3][k][i])) then
+                  std.cache[3][k][i] := [];
+              fi;
+              std.cache[3][k][i][j] := new;
+          fi;
+          std.left := new^coeffs[k] * std.left;
+          newnew := new^coeffs[k] * newnew;
       fi;
-    fi;
   od;
-  std.left := new * std.left;
   if m <> false and not(IsZero(lambda)) then m[i] := m[i] + m[j] * lambda; fi;
-  return new;
+  return newnew;
 end;
 
 RECOG.DoColOp_SL := function(m,i,j,lambda,std)
@@ -543,7 +556,7 @@ RECOG.DoColOp_SL := function(m,i,j,lambda,std)
   # So <s,t> is an SL_2 in the upper left corner, a is an n-cycle
   # b is an n-1 cycle with garbage fixing the first vector
   # This only modifies the record std collecting a straight line program.
-  local Getai,Getbj,coeffs,k,new;
+  local Getai,Getbj,coeffs,k,new,newnew;
   
   Getai := function(l)
       if not IsBound(std.cache[1][l]) then
@@ -558,39 +571,50 @@ RECOG.DoColOp_SL := function(m,i,j,lambda,std)
       return std.cache[2][l];
   end;
 
-  new := std.One;
+  newnew := std.One;
   coeffs := RECOG.FindFFCoeffs(std,lambda);
   for k in [1..std.ext] do
-    if not(IsZero(coeffs[k])) then
-      if i < j then
-          # We need to multiply from the right with the element
-          #    a^(i-1) * b^(j-i-1) * s_k * b^-(j-i-1) * a^-(i-1)
-          # from the left.
-          if i > 1 then new := Getai(i-1)^-1 * new; fi;
-          if j > i+1 then new := Getbj(j-i-1)^-1 * new; fi;
-          new := std.s[k]^coeffs[k] * new;
-          if j > i+1 then new := Getbj(j-i-1) * new; fi;
-          if i > 1 then new := Getai(i-1) * new; fi;
-      elif i > j then
-          # We need to multiply from the right with the element
-          #    a^(j-1) * b^(i-j-1) * t_k * b^-(i-j-1) * a^-(j-1)
-          # from the left.
-          if j > 1 then new := Getai(j-1)^-1 * new; fi;
-          if i > j+1 then new := Getbj(i-j-1)^-1 * new; fi;
-          new := std.t[k]^coeffs[k] * new;
-          if i > j+1 then new := Getbj(i-j-1) * new; fi;
-          if j > 1 then new := Getai(j-1) * new; fi;
+      if not(IsZero(coeffs[k])) then
+          if IsBound(std.cache[4][k][i]) and
+             IsBound(std.cache[4][k][i][j]) then
+              new := std.cache[4][k][i][j];
+          else;
+              new := std.One;
+              if i < j then
+                  # We need to multiply from the right with the element
+                  #    a^(i-1) * b^(j-i-1) * s_k * b^-(j-i-1) * a^-(i-1)
+                  # from the right.
+                  if i > 1 then new := Getai(i-1)^-1 * new; fi;
+                  if j > i+1 then new := Getbj(j-i-1)^-1 * new; fi;
+                  new := std.s[k] * new;
+                  if j > i+1 then new := Getbj(j-i-1) * new; fi;
+                  if i > 1 then new := Getai(i-1) * new; fi;
+              elif i > j then
+                  # We need to multiply from the right with the element
+                  #    a^(j-1) * b^(i-j-1) * t_k * b^-(i-j-1) * a^-(j-1)
+                  # from the left.
+                  if j > 1 then new := Getai(j-1)^-1 * new; fi;
+                  if i > j+1 then new := Getbj(i-j-1)^-1 * new; fi;
+                  new := std.t[k] * new;
+                  if i > j+1 then new := Getbj(i-j-1) * new; fi;
+                  if j > 1 then new := Getai(j-1) * new; fi;
+              fi;
+              if not(IsBound(std.cache[4][k][i])) then
+                  std.cache[4][k][i] := [];
+              fi;
+              std.cache[4][k][i][j] := new;
+          fi;
+          std.right := std.right * new^coeffs[k];
+          newnew := newnew * new^coeffs[k];
       fi;
-    fi;
   od;
-  std.right := std.right * new;
   if m <> false and not(IsZero(lambda)) then 
       for k in [1..Length(m)] do
           m[k][j] := m[k][j] + m[k][i] * lambda; 
       od;
   fi;
 
-  return new;
+  return newnew;
 end;
 
 RECOG.MakeSL_StdGens := function(p,ext,n,d)
