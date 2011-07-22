@@ -600,8 +600,8 @@ RECOG.DoColOp_SL := function(m,i,j,lambda,std)
                   # We need to multiply from the right with the element
                   #    a^(i-1) * b^(j-i-1) * s_k * b^-(j-i-1) * a^-(i-1)
                   # from the right.
-                  if i > 1 then new := Getai(i-1)^-1 * new; fi;
-                  if j > i+1 then new := Getbj(j-i-1)^-1 * new; fi;
+                  if i > 1 then new := Getai(-(i-1)) * new; fi;
+                  if j > i+1 then new := Getbj(-(j-i-1)) * new; fi;
                   new := std.s[k] * new;
                   if j > i+1 then new := Getbj(j-i-1) * new; fi;
                   if i > 1 then new := Getai(i-1) * new; fi;
@@ -609,8 +609,8 @@ RECOG.DoColOp_SL := function(m,i,j,lambda,std)
                   # We need to multiply from the right with the element
                   #    a^(j-1) * b^(i-j-1) * t_k * b^-(i-j-1) * a^-(j-1)
                   # from the left.
-                  if j > 1 then new := Getai(j-1)^-1 * new; fi;
-                  if i > j+1 then new := Getbj(i-j-1)^-1 * new; fi;
+                  if j > 1 then new := Getai(-(j-1)) * new; fi;
+                  if i > j+1 then new := Getbj(-(i-j-1)) * new; fi;
                   new := std.t[k] * new;
                   if i > j+1 then new := Getbj(i-j-1) * new; fi;
                   if j > 1 then new := Getai(j-1) * new; fi;
