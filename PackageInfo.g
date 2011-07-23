@@ -32,14 +32,14 @@ PackageName := "recog",
 ##  This may be used by a default banner or on a Web page, should fit on
 ##  one line.
 Subtitle := "A collection of group recognition methods",
-Version := "1.0",
+Version := "1.1",
 ##  Please adjust also the VERSION file in the package directory when
 ##  changing this.
 
 ##  Release date of the current version in dd/mm/yyyy format.
-Date := "05/11/2009",  # not yet released
+Date := "23/07/2011",  # not yet released
 
-ArchiveURL := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recog/recog-1.0",
+ArchiveURL := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recog/recog-1.1",
 
 ArchiveFormats := ".tar.gz",
 
