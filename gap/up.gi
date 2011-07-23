@@ -33,7 +33,7 @@ SLnUpStep := function(w)
   #   bas, basi is a base change to the target base
   #   slnstdf are SLPs to reach standard generators of SL_n from the
   #       generators of sld
-  local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,ci,cii,coeffs,flag,i,id,int1,int3,j,k,lambda,newbas,newbasf,newbasfi,newbasi,newdim,newpart,pivots,pivots2,pos,pow,s,sf,slp,std,sum1,tf,trans,transd,transr,v,vals,zerovec;
+  local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,ci,cii,coeffs,flag,i,id,int1,int3,j,k,lambda,list,mat,newbas,newbasf,newbasfi,newbasi,newdim,newpart,perm,pivots,pivots2,pos,pow,s,sf,slp,std,sum1,tf,trans,transd,transr,v,vals,zerovec;
 
   Info(InfoRecog,3,"Going up: ",w.n," (",w.d,")...");
 
@@ -295,15 +295,15 @@ SLnUpStep := function(w)
   for i in pivots2 do
       # This does t_i
       for lambda in w.canb do
-          # This does t_pivots2[i] : v_j -> v_j + lambda * v_n
+          # This does t_i : v_j -> v_j + lambda * v_n
           tf := w.One;
-          tf := DoRowOp_n(tf,pivots2[i],w.n,lambda,w);
+          tf := DoRowOp_n(tf,i,w.n,lambda,w);
           # Now conjugate with c:
           tf := cfi*tf*cf;
           # Now cleanup in column n above row n, the entries there
-          # are lambda times the stuff in column pivots2[i] of ci:
+          # are lambda times the stuff in column i of ci:
           for j in [1..w.n-1] do
-              tf := DoRowOp_n(tf,j,w.n,-ci[j][pivots2[i]]*lambda,w);
+              tf := DoRowOp_n(tf,j,w.n,-ci[j][i]*lambda,w);
           od;
           Add(trans,tf);
       od;
@@ -337,9 +337,9 @@ SLnUpStep := function(w)
   # Now to the "horizontal" transvections, first create them as SLPs:
   transr := [];
   for i in pivots do
-      # This does u_pivots[i] : v_pivots[i] -> v_pivots[i] + v_n
+      # This does u_i : v_i -> v_i + v_n
       tf := w.One;
-      tf := DoColOp_n(tf,w.n,pivots[i],One(w.f),w);
+      tf := DoColOp_n(tf,w.n,i,One(w.f),w);
       # Now conjugate with c:
       tf := cfi*tf*cf;
       # Now cleanup in rows above row n:
@@ -385,11 +385,58 @@ SLnUpStep := function(w)
 
 # Error(5);
 
-  # Now put together the (newdim+1)-cycle:
-  # n+newdim -> n+newdim-1 -> ... -> n+1 -> n -> n+newdim
+  # From here on we distinguish three cases:
+  #   * w.n = 2
+  #   * we finish off the constructive recognition 
+  #   * we have to do another step as the next thing
+  if w.n = 2 then
+      w.slnstdf[2*w.ext+2] := transd[1]*transr[1]^-1*transd[1];
+      w.slnstdf[2*w.ext+1] := w.transh[1]*w.transv[1]^-1*w.transh[1]
+                              *w.slnstdf[2*w.ext+2];
+      Unbind(w.transh);
+      Unbind(w.transv);
+      w.n := 3;
+      return w;
+  fi;
+  # We can finish off:
+  if aimdim = w.d then
+      # In this case we just finish off and do not bother with
+      # the transvections, we will only need the standard gens:
+      # Now put together the (newdim+1)-cycle:
+      # n+newdim -> n+newdim-1 -> ... -> n+1 -> n -> n+newdim
+      flag := false;
+      s := w.One;
+      for i in [1..newdim] do
+          if flag then
+              # Make [[0,-1],[1,0]] in coordinates w.n and w.n+i:
+              tf:=transd[(i-1)*w.ext+1]*transr[i]^-1*transd[(i-1)*w.ext+1];
+          else
+              # Make [[0,1],[-1,0]] in coordinates w.n and w.n+i:
+              tf:=transd[(i-1)*w.ext+1]^-1*transr[i]*transd[(i-1)*w.ext+1]^-1;
+          fi;
+          s := s * tf;
+          flag := not(flag);
+      od;
+
+      # Finally put together the new 2n-1-cycle and 2n-2-cycle:
+      s := s^-1;
+      w.slnstdf[2*w.ext+1] := w.slnstdf[2*w.ext+1] * s;
+      w.slnstdf[2*w.ext+2] := w.slnstdf[2*w.ext+2] * s;
+      Unbind(w.transv);
+      Unbind(w.transh);
+      w.n := aimdim;
+      return w;
+  fi;
+
+  # Otherwise we do want to go on as the next thing, so we want to
+  # keep our transvections. This is easily done if we change the
+  # basis one more time. Note that we know that n is odd here!
+
+  # Put together the n-cycle:
+  # 2n-1 -> 2n-2 -> ... -> n+1 -> n -> 2n-1
   flag := false;
-  s := One(w.slnstdf[1]);
-  for i in [1..newdim] do
+  s := w.One;
+  for i in [w.n-1,w.n-2..1] do
       if flag then
           # Make [[0,-1],[1,0]] in coordinates w.n and w.n+i:
           tf := transd[(i-1)*w.ext+1]*transr[i]^-1*transd[(i-1)*w.ext+1];
@@ -401,13 +448,23 @@ SLnUpStep := function(w)
       flag := not(flag);
   od;
 
-# Error(6);
-
   # Finally put together the new 2n-1-cycle and 2n-2-cycle:
-  s := s^-1;
-  w.slnstdf[2*w.ext+1] := w.slnstdf[2*w.ext+1] * s;
-  w.slnstdf[2*w.ext+2] := w.slnstdf[2*w.ext+2] * s;
+  w.slnstdf[2*w.ext+1] := s * w.slnstdf[2*w.ext+1];
+  w.slnstdf[2*w.ext+2] := s * w.slnstdf[2*w.ext+2];
 
+  list := Concatenation([1..w.n-1],[w.n+1..2*w.n-1],[w.n],[2*w.n..w.d]);
+  perm := PermList(list);
+  mat := PermutationMat(perm^-1,w.d,w.f);
+  w.bas := w.bas{list};
+  ConvertToMatrixRep(w.bas,w.f);
+  w.basi := w.basi*mat;
+
+  # Now add the new transvections:
+  for i in [1..w.n-1] do
+      w.transh[w.ext*(w.n-1)+w.ext*(i-1)+1] := transr[i];
+  od;
+  Append(w.transv,transd);
+  w.n := 2*w.n-1;
   return w;
 end;
 
@@ -434,5 +491,30 @@ MakeTest := function(p,e,n,d)
             basi := IdentityMat(d,GF(q)), sld := Group(a),
             sldf := fake, slnstdf := fake{[1..2*e+2]}, p := p, ext := e );
   return r;
+end;
+
+guck := 
+function ( w )
+    local  i;
+    for i  in w.slnstdf  do
+        Display( w.bas * i * w.basi );
+    od;
+    if IsBound( w.transh )  then
+        for i  in [ 1 .. Length( w.transh ) ]  do
+            Print( i, "\n" );
+            if IsBound(w.transh[i]) then
+                Display( w.bas * w.transh[i] * w.basi );
+            fi;
+        od;
+    fi;
+    if IsBound( w.transv )  then
+        for i  in [ 1 .. Length( w.transv ) ]  do
+            Print( i, "\n" );
+            if IsBound(w.transv[i]) then
+                Display( w.bas * w.transv[i] * w.basi );
+            fi;
+        od;
+    fi;
+    return;
 end;
 
