@@ -22,6 +22,24 @@ Today:
 
   - Look at documentation: StdGens, StdPresentation
   - Finish web pages
+  - Bug with loading of single packages
+  - Systematic test of classical natural
+  - Tensor und Subfield tests fail because SL(4,5) does not find an SL2
+  - Use RECOG.RandomSubProduct everywhere
+  - eMail Alice because of deleted perm rep A_n
+  - Look at all PseudoRandoms (still TODO)
+  - nonconstructive Lie type
+  - decide about names for attributes
+  - revisit examples/challenges
+  - balanced trees
+  - fix new FindElmOf method with respect to PseudoRandom
+  - implement sl2 natural
+  - look at Pete's code (blackbox classical)
+  - create Makefile
+  - do not ship contrib
+  - do not ship named subdirs in gap
+  - DisplayCompositionFactors is seriously broken e.g. in the projective
+    case
 
 
   - Alice+Steve fuer Sn auf k-sets
