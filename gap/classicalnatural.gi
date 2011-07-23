@@ -1581,7 +1581,7 @@ RECOG.SLn_godown:=function(list)
   q:=list[3];
   gg:=list[4];
 
-  Print(d,"\c");
+  Info(InfoRecog,2,"Dimension: ",d);
   #find an element with irreducible action of relative prime dimension to 
   #all other invariant subspaces
   #count is just safety, if things go very bad
@@ -1589,7 +1589,7 @@ RECOG.SLn_godown:=function(list)
 
   repeat 
      count:=count+1;
-  Print(".\c");
+  if InfoLevel(InfoRecog) >= 3 then Print(".\c"); fi;
      r:=PseudoRandom(g);
      pol:=CharacteristicPolynomial(r);
      factors:=Factors(pol);
@@ -1631,7 +1631,7 @@ RECOG.SLn_constructppd2:=function(g,dim,q)
   repeat
      out:=RECOG.SLn_godown(list);
      if out=fail or out[1]*out[1]=One(out[1]) then 
-        Print("B\c");
+        if InfoLevel(InfoRecog) >= 3 then Print("B\c"); fi;
         list:=[g,dim,q,g];
         out:=fail;
      else
@@ -1790,14 +1790,14 @@ RECOG.SLn_exceptionalgodown:=function(h,q,dim)
   vs:=VectorSpace(GF(q),One(h));
   basis:=[];
   repeat 
-     Print("C");
+     if InfoLevel(InfoRecog) >= 3 then Print("C"); fi;
      for i in [1..4] do 
         v:=PseudoRandom(vs);
         for gen in GeneratorsOfGroup(h) do
            Add(basis,v*gen-v);
         od;
      od;
-     basis:=SemiEchelonMat(basis).vectors;
+     basis:=ShallowCopy(SemiEchelonMat(basis).vectors);
   until Length(basis)=4;
   return [h,VectorSpace(GF(q),basis)];
 end;
@@ -1993,7 +1993,7 @@ RECOG.SLn_UpStep := function(w)
   newdim := aimdim - w.n;
   while true do   # will be left by break
       while true do    # will be left by break
-          Print(".\c");
+          if InfoLevel(InfoRecog) >= 3 then Print(".\c"); fi;
           w.count := w.count + 1;
           c1 := PseudoRandom(w.sld);
           slp := SLPOfElm(c1);
@@ -2014,7 +2014,7 @@ RECOG.SLn_UpStep := function(w)
                   if not(IsZero(v[w.n])) then break; fi;
               od;
               if IsZero(v[w.n]) then
-                  Print("Ooops: Component n was zero!\n");
+                  Info(InfoRecog,2,"Ooops: Component n was zero!");
                   continue; 
               fi;
               v := v / v[w.n];   # normalize to 1 in position n
@@ -2050,13 +2050,16 @@ RECOG.SLn_UpStep := function(w)
       newbas := Concatenation(id{[1..w.n-1]},[v],newpart);
       if 2*w.n-1 < w.d then
           int3 := Intersection(FixSLn,Fixc);
-          Assert(0,Dimension(int3)=w.d-2*w.n+1);
+          if Dimension(int3) <> w.d-2*w.n+1 then
+              Info(InfoRecog,2,"Ooops, FixSLn \cap Fixc wrong dimension");
+              continue;
+          fi;
           Append(newbas,BasisVectors(Basis(int3)));
       fi;
       ConvertToMatrixRep(newbas,Size(w.f));
       newbasi := newbas^-1;
       if newbasi = fail then
-          Print("Ooops, Fixc intersected too much, we try again\n");
+          Info(InfoRecog,2,"Ooops, Fixc intersected too much, we try again");
           continue;
       fi;
       ci := newbas * ci * newbasi;
@@ -2085,10 +2088,10 @@ RECOG.SLn_UpStep := function(w)
           w.basi := w.basi * newbasi;
           break; 
       fi;
-      Print("Ooops, no nice bottom...\n");
+      Info(InfoRecog,2,"Ooops, no nice bottom...");
       # Otherwise simply try again
   od;
-  Print(" found c1 and c.\n");
+  Info(InfoRecog,2," found c1 and c.");
   # Now SL_n has to be repaired according to the base change newbas:
 
   # Now write this matrix newbas as an SLP in the standard generators
@@ -2130,7 +2133,7 @@ RECOG.SLn_UpStep := function(w)
 
   # Now put together the clean ones by our knowledge of c^-1:
   transd := [];
-  for i in pivots2 do
+  for i in [1..Length(pivots2)] do
       for lambda in w.canb do
           tf := w.One;
           vals := BlownUpVector(w.can,cii[i]*lambda);
