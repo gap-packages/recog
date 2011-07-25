@@ -2271,6 +2271,7 @@ RECOG.SLn_UpStep := function(w)
   list := Concatenation([1..w.n-1],[w.n+1..2*w.n-1],[w.n],[2*w.n..w.d]);
   perm := PermList(list);
   mat := PermutationMat(perm^-1,w.d,w.f);
+  ConvertToMatrixRep(mat,w.f);
   w.bas := w.bas{list};
   ConvertToMatrixRep(w.bas,w.f);
   w.basi := w.basi*mat;
