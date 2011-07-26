@@ -2354,7 +2354,7 @@ SLPforElementFuncsProjective.PSL2 := function(ri,x)
   return slp;
 end;
 
-SLPforElementFuncsProjective.PSLdEven := function(ri,x)
+SLPforElementFuncsProjective.PSLd := function(ri,x)
   local det,log,slp,y,z;
   ri!.fakegens.count := ri!.fakegens.count + 1;
   if ri!.fakegens.count > 1000 then
@@ -2459,8 +2459,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
       classical := RecogniseClassical(gg);
       if classical.IsSLContained = true then
           # Do not run the generic code in small cases:
-          # FIXME: Switch off code temporarily:
-          if (q^d-1)/(q-1) <= 1000 or q=5 then  
+          if (q^d-1)/(q-1) <= 1000 then  
               # FIXME: We do not have a FindSL2 for this case!
               Info(InfoRecog,2,"Classical natural: SL(",d,",",q,"): small ",
                    "case, handing over to Schreier-Sims.");
@@ -2469,7 +2468,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
               return FindHomMethodsProjective.StabilizerChain(ri,g);
           fi;
           Info(InfoRecog,2,"ClassicalNatural: this is PSL_n!");
-          std := RECOG.FindStdGens_SL_EvenChar(gm,f);
+          std := RECOG.FindStdGens_SL(gm,f);
           Setslptonice(ri,std.slpstd);
           ri!.nicebas := std.bas;
           ri!.nicebasi := std.basi;
@@ -2479,11 +2478,11 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
                       x->std.basi*x*std.bas));
           ri!.fakegens := RECOG.InitSLfake(f,d);
           ri!.fakegens.count := 0;
-          ri!.comment := "_PSLdEven";
+          ri!.comment := "_PSLd";
           ri!.gcd := gcd;
           SetFilterObj(ri,IsLeaf);
           SetSize(ri,Product([0..d-1],i->(q^d-q^i))/((q-1)*gcd.gcd));
-          Setslpforelement(ri,SLPforElementFuncsProjective.PSLdEven);
+          Setslpforelement(ri,SLPforElementFuncsProjective.PSLd);
           return true;
       else
           Info(InfoRecog,2,"ClassicalNatural: Is not PSL.");

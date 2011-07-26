@@ -17,7 +17,7 @@ clean:
 	(cd doc ; ./clean)
 
 archive: doc
-	(cd .. ; tar czvf recog-`cat recog/VERSION`.tar.gz --exclude ".svn" --exclude .git --exclude contrib --exclude steve --exclude colva --exclude bbox --exclude obsolete --exclude work --exclude NOTES recog)
+	(cd .. ; tar czvf recog-`cat recog/VERSION`.tar.gz --exclude ".svn" --exclude .git --exclude contrib --exclude steve --exclude colva --exclude bbox --exclude obsolete --exclude work --exclude NOTES --exclude c3c5benchmarks_mats.g recog)
 
 WEBPOS=/scratch/neunhoef/mywebpage.pub/Computer/Software/Gap/recog
 
