@@ -40,6 +40,7 @@ DeclareAttribute( "RIParent", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "StdPresentation", IsRecognitionInfo, "mutable" );
 DeclareProperty( "IsSimpleGroup", IsRecognitionInfo );
 DeclareProperty( "IsAlmostSimpleGroup", IsRecognitionInfo );
+InstallTrueMethod( IsAlmostSimpleGroup, IsSimpleGroup );
 
 DeclareAttribute( "pregensfac", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "calcnicegens", IsRecognitionInfo, "mutable" );
