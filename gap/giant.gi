@@ -750,8 +750,10 @@ FindHomMethodsPerm.Giant :=
     SetFilterObj(ri,IsLeaf);
     if res.stamp = "An" then
         SetSize(ri,Factorial(Length(mp))/2);
+        SetIsSimpleGroup(ri,true);
     else
         SetSize(ri,Factorial(Length(mp)));
+        SetIsAlmostSimpleGroup(ri,true);
     fi;
     SetNiceGens(ri,StripMemory(res.gens));
     Setslptonice(ri,res.slpnice);

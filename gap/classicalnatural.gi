@@ -2433,6 +2433,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
           SetFilterObj(ri,IsLeaf);
           SetSize(ri,(q+1)*(q-1)*q);
           Setslpforelement(ri,SLPforElementFuncsProjective.PSL2);
+          SetIsSimpleGroup(ri,true);
           return true;
       else   # odd case
           if not(RECOG.IsThisSL2Natural(GeneratorsOfGroup(gg),f)) then
@@ -2452,6 +2453,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
           ri!.gcd := gcd;
           SetFilterObj(ri,IsLeaf);
           SetSize(ri,(q+1)*(q-1)*q/Gcd(2,q-1));
+          SetIsSimpleGroup(ri,true);
           Setslpforelement(ri,SLPforElementFuncsProjective.PSL2);
           return true;
       fi;
@@ -2482,6 +2484,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
           ri!.gcd := gcd;
           SetFilterObj(ri,IsLeaf);
           SetSize(ri,Product([0..d-1],i->(q^d-q^i))/((q-1)*gcd.gcd));
+          SetIsSimpleGroup(ri,true);
           Setslpforelement(ri,SLPforElementFuncsProjective.PSLd);
           return true;
       else

@@ -38,6 +38,7 @@ FindHomMethodsPerm.Cyclic2 :=
          Setslptonice(StraightLineProgramNC([[[i,1]]],Length(gens)));
          Setslpforelement(ri,SLPforElementFuncsPerm.Cyclic2);
          SetFilterObj(ri,IsLeaf);
+         SetIsSimpleGroup(ri,true);
          return true;     # this indicates success
      else
          return false;    # do not call us again
