@@ -12,4 +12,7 @@
   - Fixed global namespace polution.
   - Fixed too lazy generation of kernel.
   - New SL_n natural rep method.
+  - Note IsSimpleGroup and IsAlmostSimpleGroup whenever known.
+  - Guarantee that StabilizerChain leaf method has a faithful
+    action on the first orbit.
 

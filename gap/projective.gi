@@ -106,7 +106,7 @@ SLPforElementFuncsProjective.StabilizerChain := function(ri,x)
 end;
 
 FindHomMethodsProjective.StabilizerChain := function(ri,G)
-  local Gm,S,d,f,opt,q,fu;
+  local Gm,S,SS,d,f,fu,opt,perms,q;
   d := ri!.dimension;
   f := ri!.field;
   q := Size(f);
@@ -114,14 +114,23 @@ FindHomMethodsProjective.StabilizerChain := function(ri,G)
   opt := rec( Projective := true, RandomElmFunc := fu );
   Gm := GroupWithGenerators(ri!.gensHmem);
   S := StabilizerChain(Gm,opt);
-  SetSize(ri,Size(S));
-  ri!.stabilizerchain := S;
-  Setslptonice(ri,SLPOfElms(StrongGenerators(S)));
-  ForgetMemory(S);
-  Unbind(S!.opt.RandomElmFunc);
-  Setslpforelement(ri,SLPforElementFuncsProjective.StabilizerChain);
-  SetFilterObj(ri,IsLeaf);
-  return true;
+  perms := ActionOnOrbit(S!.orb,ri!.gensHmem);
+  SS := StabilizerChain(Group(perms));
+  if Size(SS) = Size(S) then
+      SetSize(ri,Size(S));
+      ri!.stabilizerchain := S;
+      Setslptonice(ri,SLPOfElms(StrongGenerators(S)));
+      ForgetMemory(S);
+      Unbind(S!.opt.RandomElmFunc);
+      Setslpforelement(ri,SLPforElementFuncsProjective.StabilizerChain);
+      SetFilterObj(ri,IsLeaf);
+      return true;
+  else
+      ForgetMemory(S);
+      SetHomom(ri,OrbActionHomomorphism(G,S!.orb));
+      Setmethodsforfactor(ri,FindHomDbPerm);
+      return true;
+  fi;
 end;
 
 RECOG.HomProjDet := function(data,m)
