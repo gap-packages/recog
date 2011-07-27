@@ -24,6 +24,10 @@ BindGlobal( "RecognitionInfoFamily",
 DeclareInfoClass( "InfoRecog" );
 SetInfoLevel(InfoRecog,1);
 
+if IsBound(InfoSLP) then
+    SetInfoLevel(InfoSLP,0);
+fi;
+
 # A place for package-local functions:
 BindGlobal( "RECOG", rec() );
 

@@ -8,4 +8,5 @@
 
   - Fixed a bug with too lazy generation of kernel.
   - Add properties IsKnownSimple and IsKnownAlmostSimple.
+  - Set InfoLevel(InfoSLP) to 0 to avoid warning.
 
