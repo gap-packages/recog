@@ -54,6 +54,11 @@ InstallMethod( ViewObj, "for recognition infos", [IsRecognitionInfo],
             Print(ri!.comment);
         fi;
     fi;
+    if HasIsKnownSimple(ri) and IsKnownSimple(ri) then
+        Print(" KnownSimple");
+    elif HasIsKnownAlmostSimple(ri) and IsKnownAlmostSimple(ri) then
+        Print(" KnownAlmostSimple");
+    fi;
     if HasSize(ri) then
         Print(" Size=",Size(ri));
     fi;

@@ -7,4 +7,5 @@
 ==========================
 
   - Fixed a bug with too lazy generation of kernel.
+  - Add properties IsKnownSimple and IsKnownAlmostSimple.
 

@@ -38,6 +38,8 @@ DeclareAttribute( "RIFac", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "RIKer", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "RIParent", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "StdPresentation", IsRecognitionInfo, "mutable" );
+DeclareProperty( "IsKnownSimple", IsRecognitionInfo );
+DeclareProperty( "IsKnownAlmostSimple", IsRecognitionInfo );
 
 DeclareAttribute( "pregensfac", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "calcnicegens", IsRecognitionInfo, "mutable" );
