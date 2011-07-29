@@ -81,6 +81,13 @@ Persons := [
     Institution   := "Ohio-state University at Columbus"
   ),
   rec( 
+    LastName      := "Ankaralioglu",
+    FirstNames    := "Nurullah",
+    IsAuthor      := true,
+    IsMaintainer  := false,
+    Email         := "ankarali@atauni.edu.tr",
+  ),
+  rec( 
     LastName      := "Brooksbank",
     FirstNames    := "Peter",
     IsAuthor      := true,
