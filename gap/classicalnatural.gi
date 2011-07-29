@@ -1728,9 +1728,13 @@ RECOG.SLn_godownfromd:=function(g,q,d,dim)
        if not IsOne(yy) then 
             es:= Eigenspaces(GF(q),yy);
             dims:=List(es,Dimension);
-            if IsSubset(Set([1,d-1,dim-d]),Set(dims)) then
+            if IsSubset(Set([1,d-1,dim-d]),Set(dims)) and
+               (1 in Set(dims)) then
                es:=Filtered(es,x->Dimension(x)=1);
                vec:=Basis(es[1])[1];
+               if vec*yy=vec then
+                  vec:=Basis(es[2])[1];
+               fi;
                repeat 
                   z:=PseudoRandom(g);
                   x:=yy^z;
