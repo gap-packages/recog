@@ -394,27 +394,39 @@ FindHomMethodsProjective.KroneckerProduct := function(ri,G)
   # We got the hint that this is a Kronecker product, let's take it apart.
   # We first recognise projectively in one tensor factor and then in the
   # other, life is easy because of projectiveness!
-  local H,bl,d,data,hom,i,newgens;
+  local H,data,hom,newgens;
   newgens := List(ri!.generatorskronecker,x->x[3]);
   H := GroupWithGenerators(newgens);
   data := rec(blocksize := ri!.blocksize);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomTensorFactor,data);
   SetHomom(ri,hom);
 
-  # Tell the kernel that it is block diagonal projectively:
-  bl := [];
-  d := ri!.dimension;
-  for i in [1,1+ri!.blocksize..d-ri!.blocksize+1] do
-      Add(bl,[i..i+ri!.blocksize-1]);
-  od;
-  forkernel(ri).blocks := bl;
-  # Note that we can delegate to the matrix method since the general
-  # methods database is handed down and the recursion will again work
-  # projectively:
   Add( forkernel(ri).hints,
-       rec( method := FindHomMethodsMatrix.BlockDiagonal, rank := 2000,
-            stamp := "BlockDiagonal" ), 1);
+       rec( method := FindHomMethodsProjective.KroneckerKernel, rank := 2000,
+            stamp := "KroneckerKernel" ), 1);
+  forkernel(ri).blocksize := ri!.blocksize;
+  return true;
+end;
 
+RECOG.HomTensorKernel := function(data,m)
+  local mm;
+  mm := ExtractSubMatrix(m,[1..data.blocksize],[1..data.blocksize]);
+  MakeImmutable(mm);
+  return mm;
+end;
+
+FindHomMethodsProjective.KroneckerKernel := function(ri,G)
+  # One up in the tree we got the hint about a Kronecker product, this 
+  # method is called when we have gone to one factor and now are in the
+  # kernel. So we know that we are a block diagonal matrix with identical
+  # diagonal blocks. All we do is to project down to one of the blocks.
+  local H,data,hom,newgens;
+  data := rec(blocksize := ri!.blocksize);
+  newgens := List(GeneratorsOfGroup(G),x->RECOG.HomTensorKernel(data,x));
+  H := GroupWithGenerators(newgens);
+  hom := GroupHomByFuncWithData(G,H,RECOG.HomTensorKernel,data);
+  SetHomom(ri,hom);
+  findgensNmeth(ri).method := FindKernelDoNothing;
   return true;
 end;
 
