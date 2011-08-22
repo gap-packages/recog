@@ -700,36 +700,6 @@ FindHomMethodsMatrix.LowerLeftPGroup := function(ri,G)
   return true;
 end;
 
-InstallGlobalFunction( FindKernelGoProjective, function(ri,n)
-  local d,f,gcd,m,mm,moregroup,q,slp;
-  if fhmethsel(RIFac(ri)).successmethod = "ClassicalNatural" or
-     (fhmethsel(RIFac(ri)).successmethod = "ProjDeterminant" and
-      fhmethsel(RIKer(RIFac(ri))).successmethod = "ClassicalNatural") then
-     # The problem here is that the classical natural methods are actually
-     # not projective methods and therefore the normal kernel generation
-     # does not work. On the other hand, we can immediately write down
-     # a generator for the kernel:
-     Info(InfoRecog,2,"Computing kernel for ClassicalNatural factor...");
-     f := ri!.field;
-     d := ri!.dimension;
-     q := Size(f);
-     gcd := GcdInt(q-1,d);
-     if fhmethsel(RIFac(ri)).successmethod = "ProjDeterminant" then
-         moregroup := Size(RIFac(RIFac(ri)));
-     else
-         moregroup := 1;
-     fi;
-     m := IdentityMat(d,f)*Z(q)^(((q-1)/gcd));  # this has det 1
-     slp := SLPforElement(RIFac(ri),m);
-     mm := ResultOfStraightLineProgram(slp,
-                ri!.genswithmem{[ri!.nrgensH+1..Length(ri!.genswithmem)]});
-     Add(gensN(ri),mm);
-     # A shortcut:
-     if gcd > 1 and moregroup = 1 and m = mm!.el then return true; fi;
-  fi;
-  return FindKernelRandom(ri,n);
-end);
-
 FindHomMethodsMatrix.GoProjective := function(ri,G)
   local hom,q;
   Info(InfoRecog,2,"Going projective...");
@@ -740,7 +710,7 @@ FindHomMethodsMatrix.GoProjective := function(ri,G)
 
   # the kernel:
   q := Size(ri!.field);
-  findgensNmeth(ri).method := FindKernelGoProjective;
+  findgensNmeth(ri).method := FindKernelRandom;
   findgensNmeth(ri).args := [Length(Factors(q-1))+5];
   return true;
 end;

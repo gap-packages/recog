@@ -2358,8 +2358,34 @@ SLPforElementFuncsProjective.PSL2 := function(ri,x)
   return slp;
 end;
 
+RECOG.NormaliseScalarForPSLd := function(s,list)
+  local min,minmul,t,u;
+  min := s;
+  minmul := s^0;
+  for t in list do
+      u := s*t;
+      if u < min then 
+          min := u; 
+          minmul := t;
+      fi;
+  od;
+  return minmul;
+end;
+
+RECOG.SetupNormalisationListForPSLd := function(d,gf,gcd)
+  local e,i,list,z;
+  list := EmptyPlist(gcd);
+  z := PrimitiveRoot(gf);
+  e := z;
+  for i in [1..gcd-1] do
+      Add(list,e);
+      e := e * z;
+  od;
+  return list;
+end;
+
 SLPforElementFuncsProjective.PSLd := function(ri,x)
-  local det,log,slp,y,z;
+  local det,log,pos,s,slp,y,z;
   ri!.fakegens.count := ri!.fakegens.count + 1;
   if ri!.fakegens.count > 1000 then
       ri!.fakegens := RECOG.InitSLfake(ri!.field,ri!.dimension);
@@ -2368,11 +2394,19 @@ SLPforElementFuncsProjective.PSLd := function(ri,x)
   y := ri!.nicebas * x * ri!.nicebasi;
   det := DeterminantMat(y);
   if not(IsOne(det)) then
-      z := PrimitiveRoot(ri!.field);
-      log := LogFFE(det,z);
-      y := y * z^(-log*ri!.gcd.coeff1/ri!.gcd.gcd);
+      Error("This should not have happened, 17564, tell Max.");
+      #z := PrimitiveRoot(ri!.field);
+      #log := LogFFE(det,z);
+      #y := y * z^(-log*ri!.gcd.coeff1/ri!.gcd.gcd);
   fi;
-  slp := RECOG.ExpressInStd_SL(y,ri!.fakegens);
+  # Now normalise to make sure that different coset reps behave the same:
+  if not(IsBound(ri!.normlist)) then
+      ri!.normlist := RECOG.SetupNormalisationListForPSLd(Length(y),ri!.field,
+                                                          ri!.gcd.gcd);
+  fi;
+  pos := PositionNonZero(y[1]);
+  s := RECOG.NormaliseScalarForPSLd(y[1][pos],ri!.normlist);
+  slp := RECOG.ExpressInStd_SL(s * y,ri!.fakegens);
   return slp;
 end;
 
