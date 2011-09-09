@@ -205,3 +205,113 @@
 #AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.TensorDecomposable,
 #           550, "TensorDecomposable",
 #           "tries to find a tensor decomposition" );
+
+  v := ZeroMutable(int[1]);
+  w := ZeroMutable(int[2]);
+  one := One(r.f);
+  v[2*r.n-1] := one;
+  w[2*r.n]   := one;
+  vorig := ShallowCopy(v);
+  worig := ShallowCopy(w);
+  vv := int[1];
+  ww := int[2];
+  n := r.n;
+  # We want to put together an element that maps e_n to vv and f_n to ww:
+  # We start with (v,w)=(e_n,f_n) and apply transvections...
+  t := One(r.g);
+  for i in [1..r.n-1] do
+    ei := 2*i-1;  # these are the coordinates to modify
+    fI := 2*i;
+    if IsZero(vv[ei]) then
+      if not(IsZero(vv[fI])) then
+        s := vv[fI];
+        si := IntFFE(s);
+        t := t * fnfi[i]^si;
+        v[fI] := vv[fI];
+        v[2*n] := v[2*n] + s;
+        Assert(0,v=vorig*t and w = worig*t);
+        Print("Hallo1\n");
+      fi;
+    elif not(IsZero(vv[ei] + one)) then   
+      # one easy case:
+      # we know that v[pos+1] = 0 and v[2*n-1] = 1 and
+      #              w[pos+1] = 0 and w[2*n-1] = 0
+      s := vv[ei];
+      si := IntFFE(s);
+      t := t * fnei[i]^si;
+      v[ei] := vv[ei];
+      v[2*n] := v[2*n] + s;
+      Assert(0,v=vorig*t and w = worig*t);
+      Print("Hallo2\n");
+      if not(IsZero(vv[fI])) then
+        s := vv[fI]/(one+vv[ei]);
+        si := IntFFE(s);
+        t := t * fnfi[i]^si;
+        v[fI] := vv[fI];
+        v[2*n] := v[2*n] + vv[fI];
+        Assert(0,v=vorig*t and w = worig*t);
+        Print("Hallo3\n");
+      fi;
+    elif not(IsZero(vv[fI] - one)) then
+      # another easy case:
+      # we know that v[pos+1] = 0 and v[2*n-1] = 1 and
+      #              w[pos+1] = 0 and w[2*n-1] = 0
+      s := vv[fI];
+      si := IntFFE(s);
+      t := t * fnfi[i]^si;
+      v[fI] := vv[fI];
+      v[2*n] := v[2*n] + s;
+      Assert(0,v=vorig*t and w = worig*t);
+      Print("Hallo4\n");
+      s := vv[ei]/(one-vv[fI]);
+      si := IntFFE(s);
+      t := t * fnei[i]^si;
+      v[ei] := vv[ei];
+      v[2*n] := v[2*n] + vv[ei];
+      Assert(0,v=vorig*t and w = worig*t);
+      Print("Hallo5\n");
+    else
+      # now the difficult case vv[ei] = -one and vv[fI] = one
+      # multiply by [[a,0],[0,a^-1]], then standard case, then back...
+      if Size(r.f) = 2 then
+          Error("Does not work for GF(2).");
+      fi;
+      t := t * zn;
+      v[2*n-1] := v[2*n-1] * zeta;
+      v[2*n] := v[2*n] * zeta^-1;
+      w[2*n-1] := w[2*n-1] * zeta;
+      w[2*n] := w[2*n] * zeta^-1;
+      Assert(0,v=vorig*t and w = worig*t);
+      Print("Hallo6\n");
+      s := vv[ei]/zeta;
+      si := IntFFE(s);
+      t := t * fnei[i]^si;
+      v[ei] := vv[ei];
+      v[2*n] := v[2*n] + vv[ei];
+      Assert(0,v=vorig*t and w = worig*t);
+      Print("Hallo7\n");
+      s := vv[fI]/(zeta+vv[ei]);
+      si := IntFFE(s);
+      t := t * fnfi[i]^si;
+      v[fI] := vv[fI];
+      v[2*n] := v[2*n] + vv[fI];
+      Assert(0,v=vorig*t and w = worig*t);
+      Print("Hallo8\n");
+      t := t * zn^-1;
+      v[2*n-1] := v[2*n-1] * zeta^-1;
+      v[2*n] := v[2*n] * zeta;
+      w[2*n-1] := w[2*n-1] * zeta^-1;
+      w[2*n] := w[2*n] * zeta;
+      Assert(0,v=vorig*t and w = worig*t);
+      Print("Hallo9\n");
+    fi;
+  od;
+  # Finally arrange fn component to what it ought to be:
+  if not(IsZero(vv[2*n]-v[2*n])) then
+      s := vv[2*n]-v[2*n];
+      si := IntFFE(s);
+      t := t * fn^si;
+      v[2*n] := vv[2*n];
+      Assert(0,v=vorig*t and w = worig*t);
+      Print("Hallo10\n");
+  fi;

@@ -2821,6 +2821,492 @@ RECOG.MakeSpnTransvection := function(g,type,i,lambda)
   return id;
 end;
 
+RECOG.ComputeGramSymplecticStandardForm := function(vecs)
+  # vecs a matrix of vectors of length 2*n interpreted as written in 
+  # the standard symplectic form below.
+  # This computes the Gram matrix of the vectors vecs using the
+  # standard symplectic form, which is defined for the standard
+  # basis e_1, f_1, ... e_n, f_n to be
+  # (e_i|e_j) = 0, (f_i, f_j) = 0, (e_i,f_j) = \delta_{i,j}
+  local f,gram,i,j,k,l,n,one,v,zero;
+  l := Length(vecs);
+  f := BaseDomain(vecs);
+  zero := Zero(f);
+  one := One(f);
+  gram := ZeroMatrix(l,l,vecs);
+  n := RowLength(vecs)/2;
+  Assert(1,IsInt(n),Error("RowLength must be even"));
+  for i in [1..l] do
+    for j in [i+1..l] do
+      v := zero;
+      for k in [1,3..2*n-1] do
+        v := v + vecs[i][k]*vecs[j][k+1] - vecs[i][k+1]*vecs[j][k];
+      od;
+      gram[i][j] := v;
+      gram[j][i] := -v;
+    od;
+  od;
+  return gram;
+end;
+
+RECOG.FindSymplecticPairBasis := function(vecs)
+  local bas,d,dummy,gram,i,j,k,s;
+  d := Length(vecs);
+  if IsOddInt(d) then 
+    return [fail,"odd dimension"]; 
+  fi;
+  gram := RECOG.ComputeGramSymplecticStandardForm(vecs);
+  bas := IdentityMatrix(d,vecs);
+  for i in [1,3..d-1] do
+    j := i+1;
+    while j <= d do
+      if not(IsZero(gram[i][j])) then
+        s := gram[i][j]^-1;
+        MultRowVector(bas[j],s);
+        MultRowVector(gram[j],s);
+        for k in [1..d] do gram[k][j] := gram[k][j]*s; od;
+        Assert(1,gram = RECOG.ComputeGramSymplecticStandardForm(bas*vecs));
+        # Now exchange vectors i+1 and j:
+        if i+1 <> j then
+          bas{[i+1,j]} := bas{[j,i+1]};
+          gram{[i+1,j]} := gram{[j,i+1]};
+          for k in [1..d] do
+            dummy := gram[k][i+1];
+            gram[k][i+1] := gram[k][j];
+            gram[k][j] := dummy;
+          od;
+          Assert(1,gram = RECOG.ComputeGramSymplecticStandardForm(bas*vecs));
+        fi;
+        break;
+      fi;
+      j := j + 1;
+    od;
+    if j > d then return [fail,"degenerate"]; fi;
+    # Now i,i+1 is a symplectic pair, clean out the rest:
+    for j in [i+2..d] do
+      if not(IsZero(gram[i][j])) then
+        s := gram[i][j];
+        AddRowVector(bas[j],bas[i+1],-s);
+        AddRowVector(gram[j],gram[i+1],-s);
+        for k in [1..d] do
+          gram[k][j] := gram[k][j] - s*gram[k][i+1];
+        od;
+        Assert(1,gram = RECOG.ComputeGramSymplecticStandardForm(bas*vecs));
+      fi;
+      if not(IsZero(gram[i+1][j])) then
+        s := gram[i+1][j];
+        AddRowVector(bas[j],bas[i],s);
+        AddRowVector(gram[j],gram[i],s);
+        for k in [1..d] do
+          gram[k][j] := gram[k][j] + s*gram[k][i];
+        od;
+        Assert(1,gram = RECOG.ComputeGramSymplecticStandardForm(bas*vecs));
+      fi;
+    od;
+    # Now all further vectors are perpendicular to vecs i and i+1
+  od;
+  return bas;
+end;
+
+RECOG.SetupSpExperiment := function(n,d,f)
+  local em,formg,formh,g,h,ncycle;
+  Assert(0,n < d);
+  g := RECOG.MakeSp2n(d,Characteristic(f),DegreeOverPrimeField(f));
+  formg := g[2];
+  g := g[1];
+  h := RECOG.MakeSp2n(n,Characteristic(f),DegreeOverPrimeField(f));
+  formh := h[2];
+  h := h[1];
+  em := GroupHomomorphismByFunction(g,h,
+          function(x)
+            local i;
+            i := IdentityMatrix(2*d,formg);
+            CopySubMatrix(x,i,[1..2*n],[1..2*n],[1..2*n],[1..2*n]);
+            return i;
+          end);
+  ncycle := PermutationMat(PermList(Concatenation([3,4..2*n],[1,2])),2*d,f);
+  return rec(g := g,formg := formg,h := h,formh := formh,em := em,
+             ncycle := ncycle, p := Characteristic(f),
+             ext := DegreeOverPrimeField(f), d := d, n := n, f := f, 
+             q := Size(f), id := IdentityMat(2*d,f));
+end;
+
+# Standard generators of Sp(2n,q) are given by a record with:
+#   n           n
+#   q           q=p^e
+#   p           p
+#   ext         e
+#   f           GF(q)
+#   can         CanonicalBasis(GF(q))
+#   s           the element [[0,1],[-1,0]] on <e_n,f_n>
+#   delta       the element [[zeta,0],[0,zeta^-1]] on <e_n,f_n>
+#   v           the double-n-cycle (e_1,e_2,...,e_n)(f_1,f_2,...,f_n)
+#   ten         transvections t_{e_n}
+#               a list of ext elements
+#   tfn         transvections t_{f_n}
+#               a list of ext elements
+#   tfnei       transvections t_{f_n+e_i} (1 <= i <= n-1)
+#               each entry is a list of ext elements
+#   tfnfi       transvections t_{f_n+e_i} (1 <= i <= n-1)
+#               each entry is a list of ext elements
+
+RECOG.MakeSpnTfn := function(n,d,f,lambda)
+  local t;
+  t := IdentityMat(2*d,f);
+  t[2*n-1][2*n] := lambda;
+  return t;
+end;
+
+RECOG.MakeSpnTfnei := function(n,d,f,i,lambda)
+  local t;
+  t := IdentityMat(2*d,f);
+  t[2*i][2*i-1] := -lambda;
+  t[2*i][2*n] := -lambda;
+  t[2*n-1][2*i-1] := lambda;
+  t[2*n-1][2*n] := lambda;
+  return t;
+end;
+
+RECOG.MakeSpnTfnfi := function(n,d,f,i,lambda)
+  local t;
+  t := IdentityMat(2*d,f);
+  t[2*i-1][2*i] := lambda;
+  t[2*i-1][2*n] := lambda;
+  t[2*n-1][2*i] := lambda;
+  t[2*n-1][2*n] := lambda;
+  return t;
+end;
+
+RECOG.MakeSpnTen := function(n,d,f,lambda)
+  local t;
+  t := IdentityMat(2*d,f);
+  t[2*n][2*n-1] := -lambda;
+  return t;
+end;
+
+RECOG.MakeSpnTenei := function(n,d,f,i,lambda)
+  local t;
+  t := IdentityMat(2*d,f);
+  t[2*i][2*i-1] := -lambda;
+  t[2*i][2*n-1] := -lambda;
+  t[2*n][2*i-1] := -lambda;
+  t[2*n][2*n-1] := -lambda;
+  return t;
+end;
+
+RECOG.MakeSpnTenfi := function(n,d,f,i,lambda)
+  local t;
+  t := IdentityMat(2*d,f);
+  t[2*i-1][2*i] := lambda;
+  t[2*i-1][2*n-1] := lambda;
+  t[2*n][2*i] := -lambda;
+  t[2*n][2*n-1] := -lambda;
+  return t;
+end;
+
+RECOG.MakeSp_StdGens := function(p,ext,n,d)
+  local f,g,id,l,one,q,res,zero,zeta;
+  q := p^ext;
+  f := GF(p,ext);
+  res := rec( q := q, p := p, ext := ext, f := f, n := n,
+              can := CanonicalBasis(f) );
+  zero := Zero(f);
+  one := One(f);
+  zeta := PrimitiveRoot(f);
+  id := IdentityMat(2*d,f);
+  res.s := MutableCopyMat(id);
+  res.s[2*n-1][2*n-1] := zero;
+  res.s[2*n-1][2*n] := one;
+  res.s[2*n][2*n-1] := -one;
+  res.s[2*n][2*n] := zero;
+  res.delta := MutableCopyMat(id);
+  res.delta[2*n-1][2*n-1] := zeta;
+  res.delta[2*n][2*n] := zeta^-1;
+  l := Concatenation([3..2*n],[1,2]);
+  res.v := PermutationMat(PermList(l),2*d,f);
+  res.tfn := List([0..ext-1],
+                  k->RECOG.MakeSpnTfn(n,d,f,zeta^k));
+  res.ten := List([0..ext-1],
+                  k->RECOG.MakeSpnTen(n,d,f,zeta^k));
+  res.tfnei := List([1..n-1],i->
+                    List([0..ext-1],
+                         k->RECOG.MakeSpnTfnei(n,d,f,i,zeta^k)));
+  res.tfnfi := List([1..n-1],i->
+                    List([0..ext-1],
+                         k->RECOG.MakeSpnTfnfi(n,d,f,i,zeta^k)));
+  return res;
+end;
+
+RECOG.SpMakeImage_en :=
+  function(v,s,M)
+    # v is a vector over F_q of length at least 2n and v[2n-1]=1.
+    # s is a set of standard generators of Sp(2n,q) (see above).
+    # This func. makes an element t of Sp(2n,q) that maps v to e_n and fixes
+    # f_n. The result t is expressed as a product in the standard generators
+    # of Sp(2n,q) in s (see above). If M is not equal to fail then it must
+    # be a matrix of mutable vectors over F_q of at least length 2n and it is
+    # modified as if it were multiplied by t. This means that if M is
+    # a mutable identity matrix of size at least 2n x 2n, then it will
+    # contain the matrix of t after the operation in its upper left corner.
+    # The function returns t and changes M if not equal to fail.
+    local coeff,ei,ext,fI,i,k,l,n,one,sc,sc2,si,t,vorig,Morig,zero,zeta;
+
+    # We want to put together an element that maps v to e_n and fixes f_n:
+    # At the same time we map M under the result whilst building it up.
+    # We start with (v,M) and apply transvections...
+    t := s.tfn[1]^0;   # start here
+    n := s.n;
+    zero := Zero(s.f);
+    one := One(s.f);
+    zeta := PrimitiveRoot(s.f);
+    ext := s.ext;
+    Assert(0,IsOne(v[2*n-1]));
+    vorig := ShallowCopy(v);
+    if M <> fail then Morig := MutableCopyMat(M); fi;
+    for i in [1..s.n-1] do
+      ei := 2*i-1;  # these are the coordinates to modify
+      fI := 2*i;
+      coeff := one;
+      if IsZero(one+v[ei]) and IsZero(one-v[fI]) then
+        t := t * s.tfn[1]^(s.v^i);
+        v[fI] := v[fI] + v[ei];
+        if M <> fail then
+          for l in [1..Length(M)] do
+            M[l][fI] := M[l][fI] + M[l][ei];
+          od;
+        fi;
+        # if Size(r.f) = 2 then
+        #   Error("This does not work for GF(2).");
+        # fi;
+        # t := t * s.delta;
+        # v[2*n-1] := v[2*n-1] * zeta;
+        # v[2*n] := v[2*n] * zeta^-1;
+        # if M <> fail then
+        #   for l in [1..Length(M)] do
+        #     M[l][2*n-1] := M[l][2*n-1] * zeta;
+        #     M[l][2*n] := M[l][2*n] * zeta^-1;
+        #   od;
+        # fi;
+        Assert(0,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 0"));
+        # coeff := zeta;
+      fi;
+      if IsZero(v[ei]) or not(IsZero(coeff-v[fI])) then
+        # The first easy case:
+        # First kill v[ei] if need be:
+        if not(IsZero(v[ei])) then
+          sc := -v[ei]/(coeff-v[fI]);
+          si := IntVecFFE(Coefficients(s.can,sc));
+          for k in [1..ext] do
+            t := t * s.tfnei[i][k]^si[k];
+          od;
+          v[2*n] := v[2*n] - v[ei];
+          v[ei] := zero;
+          if M <> fail then
+            for l in [1..Length(M)] do
+              sc2 := sc * (M[l][2*n-1]-M[l][fI]);
+              M[l][ei] := M[l][ei] + sc2;
+              M[l][2*n] := M[l][2*n] + sc2;
+            od;
+          fi;
+          Assert(0,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 1"));
+        fi;
+        # Now kill v[fI] if need be:
+        if not(IsZero(v[fI])) then
+          sc := -v[fI]/coeff;
+          si := IntVecFFE(Coefficients(s.can,sc));
+          for k in [1..ext] do
+            t := t * s.tfnfi[i][k]^si[k];
+          od;
+          v[2*n] := v[2*n] - v[fI];
+          v[fI] := zero;
+          if M <> fail then
+            for l in [1..Length(M)] do
+              sc2 := sc * (M[l][2*n-1]+M[l][ei]);
+              M[l][fI] := M[l][fI] + sc2;
+              M[l][2*n] := M[l][2*n] + sc2;
+            od;
+          fi;
+          Assert(0,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 2"));
+        fi;
+      elif not(IsZero(one+v[ei])) then
+        # The second easy case:
+        # Here v[fI] = 1 and v[ei] <> 0:
+        # First kill v[fI]:
+        sc := -v[fI]/(coeff+v[ei]);
+        si := IntVecFFE(Coefficients(s.can,sc));
+        for k in [1..ext] do
+          t := t * s.tfnfi[i][k]^si[k];
+        od;
+        v[2*n] := v[2*n] - v[fI];
+        v[fI] := zero;
+        if M <> fail then
+          for l in [1..Length(M)] do
+            sc2 := sc * (M[l][2*n-1]+M[l][ei]);
+            M[l][fI] := M[l][fI] + sc2;
+            M[l][2*n] := M[l][2*n] + sc2;
+          od;
+        fi;
+        Assert(0,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 3"));
+        # Now kill v[ei] if need be:
+        sc := -v[ei]/coeff;
+        si := IntVecFFE(Coefficients(s.can,sc));
+        for k in [1..ext] do
+          t := t * s.tfnei[i][k]^si[k];
+        od;
+        v[2*n] := v[2*n] - v[ei];
+        v[ei] := zero;
+        if M <> fail then
+          for l in [1..Length(M)] do
+            sc2 := sc * (M[l][2*n-1]-M[l][fI]);
+            M[l][ei] := M[l][ei] + sc2;
+            M[l][2*n] := M[l][2*n] + sc2;
+          od;
+        fi;
+        Assert(0,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 4"));
+      fi;
+      if coeff = zeta then
+        # Fix the e_n coefficient again:
+        t := t * s.delta^-1;
+        v[2*n-1] := v[2*n-1] * zeta^-1;
+        v[2*n] := v[2*n] * zeta;
+        if M <> fail then
+          for l in [1..Length(M)] do
+            M[l][2*n-1] := M[l][2*n-1] * zeta^-1;
+            M[l][2*n] := M[l][2*n] * zeta;
+          od;
+        fi;
+        Assert(0,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 6"));
+      fi;
+    od;
+    # Finally arrange fn component to 0:
+    if not(IsZero(v[2*n])) then
+      sc := -v[2*n];
+      si := IntVecFFE(Coefficients(s.can,sc));
+      for k in [1..ext] do
+        t := t * s.tfn[k]^si[k];
+      od;
+      v[2*n] := zero;
+      if M <> fail then
+        for l in [1..Length(M)] do
+          M[l][2*n] := M[l][2*n] + M[l][2*n-1] * sc;
+        od;
+      fi;
+      Assert(0,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 7"));
+    fi;
+    return t;
+  end;
+
+
+RECOG.DoSpExperiment := function(r)
+  local Vn,Vnc,bas,bigbas,bigbasi,c,c1,fixc,i,int,int2,int3,perp,s,sum,suminter,suminter2,suminter3,t,tt,ttt,u,v,vecs,w,zeta;
+  c1 := PseudoRandom(r.g);
+  c := r.ncycle^c1;
+  Vn := ExtractSubMatrix(r.id,[1..2*r.n],[1..2*r.d]);
+  Vnc := ExtractSubMatrix(c,[1..2*r.n],[1..2*r.d]);
+  suminter := SumIntersectionMat(Vn,Vnc);
+  sum := suminter[1];
+  ConvertToMatrixRep(sum,r.f);
+  vecs := suminter[2];
+  ConvertToMatrixRep(vecs,r.f);
+  if Length(vecs) <> 2 then
+    return ["Vn \cap Vnc not 2-dim",c1];
+  fi;
+  if RankMat(ExtractSubMatrix(vecs,[1,2],[2*r.n-1,2*r.n])) < 2 then
+    return ["Vn \cap Vnc cannot replace <e_n,f_n>",c1];
+  fi;
+  if IsZero(vecs[1][2*r.n-1]) then
+    vecs[1] := vecs[1]+vecs[2];
+  fi;
+  MultRowVector(vecs[1],vecs[1][2*r.n-1]^-1);
+  bas := RECOG.FindSymplecticPairBasis(vecs);
+  if bas[1] = fail then
+    return ["Vn \cap Vnc degenerate",c1];
+  fi;
+  int := bas*vecs;
+  perp := ExtractSubMatrix(r.id,[2*r.n+1..2*r.d],[1..2*r.d]);
+  suminter2 := SumIntersectionMat(sum,perp);
+  vecs := suminter2[2];
+  ConvertToMatrixRep(vecs,r.f);
+  if Length(vecs) <> 2*r.n-2 then
+    return ["(Vn + Vnc) \cap Vnperp not 2*n-2-dim",c1];
+  fi;
+  bas := RECOG.FindSymplecticPairBasis(vecs);
+  if bas[1] = fail then
+    return ["(Vn + Vnc) \cap Vnperp degenerate",c1];
+  fi;
+  int2 := bas * vecs;
+  if 2*r.n-1 < r.d then
+    fixc := NullspaceMat(c-One(c));
+    suminter3 := SumIntersectionMat(fixc,perp);
+    vecs := suminter3[2];
+    ConvertToMatrixRep(vecs);
+    if Length(vecs) <> 2*r.d - 4*r.n + 2 then
+      return ["Fixc \cap Vnperp not 2*d-4*n+2-dim",c1];
+    fi;
+    bas := RECOG.FindSymplecticPairBasis(vecs);
+    if bas[1] = fail then
+      return ["Fixc \cap Vnperp degenerate",c1];
+    fi;
+    int3 := bas*vecs;
+  else
+    int3 := [];
+  fi;
+  # Now we find a product of transvections mapping 
+  # int[1] to e_n and fixing f_n, we keep track where int[2] is going.
+  s := RECOG.MakeSp_StdGens(Characteristic(r.f),
+                            DegreeOverPrimeField(r.f),r.n,r.d);
+  zeta := PrimitiveRoot(r.f);
+  v := ShallowCopy(int[1]);
+  w := ShallowCopy(int[2]);
+  t := RECOG.SpMakeImage_en(v,s,[w]);
+  # We have achieved that t^-1*c*t fixes e_n and the new w=int[2]*t.
+  # Now we want to find a tt that maps w to f_n and fixes e_n, since
+  # we have s.s mapping e_n to f_n and f_n to -e_n, we can use a ttt
+  # mapping w*s.s^-1 to e_n and fixing f_n, and set tt := s.s^-1 * ttt * s.s.
+  # Recall that (e_n,w) is a symplectic pair since (int[1],int[2]) was.
+  Assert(0,IsOne(w[2*r.n]));
+  # Compute w*s.s^-1:
+  w[2*r.n] := -w[2*r.n-1];
+  w[2*r.n-1] := One(r.f);
+  ttt := RECOG.SpMakeImage_en(w,s,fail);
+  t := t * s.s^-1 * ttt * s.s;
+  # Finally, we have achieved that t^-1*c*t fixes e_n and f_n.
+  c := t^-1 * c * t;
+
+  # Now we need to find the new nice basis vectors n_1, ..., n_2*n-2
+  # they ought to be a symplectic basis when mapped with c and then
+  # truncated to coordinates 2*n+1..2*d
+  vecs := ExtractSubMatrix(c,[1..2*r.n-2],[2*r.n+1..2*r.d]);
+  bas := RECOG.FindSymplecticPairBasis(vecs);
+  vecs := bas * ExtractSubMatrix(c,[1..2*r.n-2],[1..2*r.d]);
+  # We shall clean out the first 2*n entries of these vectors later on,
+  # however, for the time being we keep them for cleaning purposes:
+  u := EmptyPlist(2*r.n-2);
+  for i in [1..2*r.n-2] do
+    v := ZeroMutable(v);
+    CopySubVector(bas[i],v,[1..2*r.n-2],[1..2*r.n-2]);
+    v[2*r.n-1] := One(r.f);
+    ttt := RECOG.SpMakeImage_en(v,s,fail);
+    # Now clean it in the upper right and lower left corner:
+    w := ZeroMutable(w);
+    CopySubVector(vecs[i],w,[1..2*r.n-2],[1..2*r.n-2]);
+    w[2*r.n-1] := One(r.f);
+    tt := RECOG.SpMakeImage_en(w,s,fail);
+    u[i] := List(s.ten,t->t^(ttt^-1*c*tt));
+  od;
+  CopySubMatrix(ZeroMatrix(2*r.n-2,2*r.n,vecs),vecs,
+                [1..2*r.n-2],[1..2*r.n-2],[1..2*r.n],[1..2*r.n]);
+  bigbas := Concatenation(ExtractSubMatrix(r.id,[1..2*r.n],[1..2*r.d]),
+                          vecs,
+                          int3);
+  bigbasi := bigbas^-1;
+  if bigbasi = fail then
+    return ["bigbas is singular",c1];
+  fi;
+  return rec( bigbas := bigbas, bigbasi := bigbasi, c := c, c1 := c1,
+              t := t, std := s, u := u );
+end;
+
 RECOG.guck := function ( w )
     local  i;
     for i  in w.slnstdf  do
