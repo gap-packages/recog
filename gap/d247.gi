@@ -387,6 +387,42 @@ FindHomMethodsProjective.D247 := function(ri,G)
   return fail;
 end;
 
+FindHomMethodsProjective.PrototypeForC2C4 := function(ri,G)
+  # We try to produce an element of a normal subgroup by playing 
+  # tricks.
+  local CheckNormalClosure,f,m,res,ngens,l;
+
+  RECOG.SetPseudoRandomStamp(G,"PrototypeForC2C4");
+  f := ri!.field;
+
+  CheckNormalClosure := function(x)
+    # This is called with an element that we hope lies in a normal subgroup.
+    local m,ngens;
+    ngens := FastNormalClosure(GeneratorsOfGroup(G),x,4);
+    m := GModuleByMats(ngens,f);
+    if not(IsIrreducible(m)) then
+        Info(InfoRecog,2,"Proto: Seem to have found something!");
+        return RECOG.SortOutReducibleNormalSubgroup(ri,G,ngens,m);
+    else
+        return fail;
+    fi;
+  end;   
+
+  Info(InfoRecog,2,"Proto: Starting to work...");
+
+  # Make some elements l which have good chances to be in a normal subgroup
+  # ...
+  # Then do:
+  res := CheckNormalClosure(l);
+  if res = true then
+      Info(InfoRecog,2,"Proto: Found a reduction.");
+      return true;
+  fi;
+
+  Info(InfoRecog,2,"Proto: Did not find normal subgroup, giving up.");
+  return fail;
+end;
+
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU General Public License as published by

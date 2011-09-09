@@ -2022,7 +2022,7 @@ RECOG.SLn_UpStep := function(w)
                   continue; 
               fi;
               v := v / v[w.n];   # normalize to 1 in position n
-              Assert(0,v*c=v);
+              Assert(1,v*c=v);
               ci := c^-1;
               break;
           fi;
@@ -2478,7 +2478,7 @@ RECOG.Sp2n_UpStep := function(w)
                   continue; 
               fi;
               v := v / v[w.n];   # normalize to 1 in position n
-              Assert(0,v*c=v);
+              Assert(1,v*c=v);
               ci := c^-1;
               break;
           fi;
@@ -2910,7 +2910,7 @@ end;
 
 RECOG.SetupSpExperiment := function(n,d,f)
   local em,formg,formh,g,h,ncycle;
-  Assert(0,n < d);
+  Assert(1,n < d);
   g := RECOG.MakeSp2n(d,Characteristic(f),DegreeOverPrimeField(f));
   formg := g[2];
   g := g[1];
@@ -3024,21 +3024,55 @@ RECOG.MakeSp_StdGens := function(p,ext,n,d)
   res.delta[2*n][2*n] := zeta^-1;
   l := Concatenation([3..2*n],[1,2]);
   res.v := PermutationMat(PermList(l),2*d,f);
-  res.tfn := List([0..ext-1],
-                  k->RECOG.MakeSpnTfn(n,d,f,zeta^k));
   res.ten := List([0..ext-1],
                   k->RECOG.MakeSpnTen(n,d,f,zeta^k));
+  res.tfn := List([0..ext-1],
+                  k->RECOG.MakeSpnTfn(n,d,f,zeta^k));
   res.tfnei := List([1..n-1],i->
                     List([0..ext-1],
                          k->RECOG.MakeSpnTfnei(n,d,f,i,zeta^k)));
   res.tfnfi := List([1..n-1],i->
                     List([0..ext-1],
                          k->RECOG.MakeSpnTfnfi(n,d,f,i,zeta^k)));
+  res.all := Concatenation([res.s,res.delta,res.v],
+                           res.ten,res.tfn,
+                           Concatenation(res.tfnei),
+                           Concatenation(res.tfnfi));
+  return res;
+end;
+
+RECOG.MakeSp_FakeGens := function(p,ext,n)
+  local count,f,fake,i,q,res;
+  q := p^ext;
+  f := GF(p,ext);
+  res := rec( q := q, p := p, ext := ext, f := f, n := n,
+              can := CanonicalBasis(f) );
+  fake := GeneratorsWithMemory(
+              ListWithIdenticalEntries(3+(2*n+2)*ext,1));
+  res.s := fake[1];
+  res.delta := fake[2];
+  res.v := fake[3];
+  count := 3;
+  res.tfn := fake{[count+1..count+ext]};
+  count := count + ext;
+  res.ten := fake{[count+1..count+ext]};
+  count := count + ext;
+  res.tfnei := EmptyPlist(n-1);
+  for i in [1..n-1] do
+      Add(res.tfnei,fake{[count+1..count+ext]});
+      count := count + ext;
+  od;
+  res.tfnfi := EmptyPlist(n-1);
+  for i in [1..n-1] do
+      Add(res.tfnfi,fake{[count+1..count+ext]});
+      count := count + ext;
+  od;
+  res.all := fake;
   return res;
 end;
 
 RECOG.SpMakeImage_en :=
-  function(v,s,M)
+  function(v,s,M,usencycle)
     # v is a vector over F_q of length at least 2n and v[2n-1]=1.
     # s is a set of standard generators of Sp(2n,q) (see above).
     # This func. makes an element t of Sp(2n,q) that maps v to e_n and fixes
@@ -3048,8 +3082,12 @@ RECOG.SpMakeImage_en :=
     # modified as if it were multiplied by t. This means that if M is
     # a mutable identity matrix of size at least 2n x 2n, then it will
     # contain the matrix of t after the operation in its upper left corner.
+    # usencycle must be either true or false. If it is set to true, 
+    # the n-cycle amongst the standard generators is used resulting
+    # in shorter products. If usencycle is false, then the n-cycle is
+    # not used, note that this does not work for q=2.
     # The function returns t and changes M if not equal to fail.
-    local coeff,ei,ext,fI,i,k,l,n,one,sc,sc2,si,t,vorig,Morig,zero,zeta;
+    local Morig,coeff,ei,ext,fI,i,k,l,n,one,sc,sc2,si,t,vorig,zero,zeta;
 
     # We want to put together an element that maps v to e_n and fixes f_n:
     # At the same time we map M under the result whilst building it up.
@@ -3060,7 +3098,7 @@ RECOG.SpMakeImage_en :=
     one := One(s.f);
     zeta := PrimitiveRoot(s.f);
     ext := s.ext;
-    Assert(0,IsOne(v[2*n-1]));
+    Assert(1,IsOne(v[2*n-1]));
     vorig := ShallowCopy(v);
     if M <> fail then Morig := MutableCopyMat(M); fi;
     for i in [1..s.n-1] do
@@ -3068,27 +3106,30 @@ RECOG.SpMakeImage_en :=
       fI := 2*i;
       coeff := one;
       if IsZero(one+v[ei]) and IsZero(one-v[fI]) then
-        t := t * s.tfn[1]^(s.v^i);
-        v[fI] := v[fI] + v[ei];
-        if M <> fail then
-          for l in [1..Length(M)] do
-            M[l][fI] := M[l][fI] + M[l][ei];
-          od;
+        if usencycle then
+          t := t * s.tfn[1]^(s.v^i);
+          v[fI] := v[fI] + v[ei];
+          if M <> fail then
+            for l in [1..Length(M)] do
+              M[l][fI] := M[l][fI] + M[l][ei];
+            od;
+          fi;
+        else
+          if Size(s.f) = 2 then
+            Error("This does not work for GF(2).");
+          fi;
+          t := t * s.delta;
+          v[2*n-1] := v[2*n-1] * zeta;
+          v[2*n] := v[2*n] * zeta^-1;
+          if M <> fail then
+            for l in [1..Length(M)] do
+              M[l][2*n-1] := M[l][2*n-1] * zeta;
+              M[l][2*n] := M[l][2*n] * zeta^-1;
+            od;
+          fi;
+          coeff := zeta;
         fi;
-        # if Size(r.f) = 2 then
-        #   Error("This does not work for GF(2).");
-        # fi;
-        # t := t * s.delta;
-        # v[2*n-1] := v[2*n-1] * zeta;
-        # v[2*n] := v[2*n] * zeta^-1;
-        # if M <> fail then
-        #   for l in [1..Length(M)] do
-        #     M[l][2*n-1] := M[l][2*n-1] * zeta;
-        #     M[l][2*n] := M[l][2*n] * zeta^-1;
-        #   od;
-        # fi;
-        Assert(0,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 0"));
-        # coeff := zeta;
+        Assert(1,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 0"));
       fi;
       if IsZero(v[ei]) or not(IsZero(coeff-v[fI])) then
         # The first easy case:
@@ -3108,7 +3149,7 @@ RECOG.SpMakeImage_en :=
               M[l][2*n] := M[l][2*n] + sc2;
             od;
           fi;
-          Assert(0,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 1"));
+          Assert(1,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 1"));
         fi;
         # Now kill v[fI] if need be:
         if not(IsZero(v[fI])) then
@@ -3126,7 +3167,7 @@ RECOG.SpMakeImage_en :=
               M[l][2*n] := M[l][2*n] + sc2;
             od;
           fi;
-          Assert(0,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 2"));
+          Assert(1,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 2"));
         fi;
       elif not(IsZero(one+v[ei])) then
         # The second easy case:
@@ -3146,7 +3187,7 @@ RECOG.SpMakeImage_en :=
             M[l][2*n] := M[l][2*n] + sc2;
           od;
         fi;
-        Assert(0,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 3"));
+        Assert(1,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 3"));
         # Now kill v[ei] if need be:
         sc := -v[ei]/coeff;
         si := IntVecFFE(Coefficients(s.can,sc));
@@ -3162,7 +3203,7 @@ RECOG.SpMakeImage_en :=
             M[l][2*n] := M[l][2*n] + sc2;
           od;
         fi;
-        Assert(0,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 4"));
+        Assert(1,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 4"));
       fi;
       if coeff = zeta then
         # Fix the e_n coefficient again:
@@ -3175,7 +3216,7 @@ RECOG.SpMakeImage_en :=
             M[l][2*n] := M[l][2*n] * zeta;
           od;
         fi;
-        Assert(0,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 6"));
+        Assert(1,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 5"));
       fi;
     od;
     # Finally arrange fn component to 0:
@@ -3191,11 +3232,34 @@ RECOG.SpMakeImage_en :=
           M[l][2*n] := M[l][2*n] + M[l][2*n-1] * sc;
         od;
       fi;
-      Assert(0,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 7"));
+      Assert(1,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 6"));
     fi;
     return t;
   end;
 
+RECOG.SpMakeImage_enfn := function(v,w,s,usencycle)
+  local t,ttt;
+  # This produces an element of Sp(2n,q) mapping v to e_n and w to f_n
+  # as a product of the standard generators. Obviously, the pair (v,w)
+  # must be a symplectic pair, furthermore, the e_n-component of v
+  # must be one.
+  # This function destroys v and w, it uses the ncycle if and only if
+  # usencycle is true.
+  t := RECOG.SpMakeImage_en(v,s,[w],usencycle);
+  # We have achieved that t maps v to e_n and w is changed according
+  # to the action to t on it.
+  # Now we want to find a tt that maps w to f_n and fixes e_n, since
+  # we have s.s mapping e_n to f_n and f_n to -e_n, we can use a ttt
+  # mapping w*s.s^-1 to e_n and fixing f_n, and set tt := s.s^-1 * ttt * s.s.
+  # Recall that (e_n,w) is a symplectic pair since (int[1],int[2]) was.
+  Assert(1,IsOne(w[2*s.n]));
+  # Compute w*s.s^-1:
+  w[2*s.n] := -w[2*s.n-1];
+  w[2*s.n-1] := One(s.f);
+  ttt := RECOG.SpMakeImage_en(w,s,fail,usencycle);
+  t := t * s.s^-1 * ttt * s.s;
+  return t;
+end;
 
 RECOG.DoSpExperiment := function(r)
   local Vn,Vnc,bas,bigbas,bigbasi,c,c1,fixc,i,int,int2,int3,perp,s,sum,suminter,suminter2,suminter3,t,tt,ttt,u,v,vecs,w,zeta;
@@ -3258,19 +3322,8 @@ RECOG.DoSpExperiment := function(r)
   zeta := PrimitiveRoot(r.f);
   v := ShallowCopy(int[1]);
   w := ShallowCopy(int[2]);
-  t := RECOG.SpMakeImage_en(v,s,[w]);
-  # We have achieved that t^-1*c*t fixes e_n and the new w=int[2]*t.
-  # Now we want to find a tt that maps w to f_n and fixes e_n, since
-  # we have s.s mapping e_n to f_n and f_n to -e_n, we can use a ttt
-  # mapping w*s.s^-1 to e_n and fixing f_n, and set tt := s.s^-1 * ttt * s.s.
-  # Recall that (e_n,w) is a symplectic pair since (int[1],int[2]) was.
-  Assert(0,IsOne(w[2*r.n]));
-  # Compute w*s.s^-1:
-  w[2*r.n] := -w[2*r.n-1];
-  w[2*r.n-1] := One(r.f);
-  ttt := RECOG.SpMakeImage_en(w,s,fail);
-  t := t * s.s^-1 * ttt * s.s;
-  # Finally, we have achieved that t^-1*c*t fixes e_n and f_n.
+  t := RECOG.SpMakeImage_enfn(v,w,s,true);
+  # We have achieved that t^-1*c*t fixes e_n and f_n.
   c := t^-1 * c * t;
 
   # Now we need to find the new nice basis vectors n_1, ..., n_2*n-2
@@ -3286,12 +3339,12 @@ RECOG.DoSpExperiment := function(r)
     v := ZeroMutable(v);
     CopySubVector(bas[i],v,[1..2*r.n-2],[1..2*r.n-2]);
     v[2*r.n-1] := One(r.f);
-    ttt := RECOG.SpMakeImage_en(v,s,fail);
+    ttt := RECOG.SpMakeImage_en(v,s,fail,true);
     # Now clean it in the upper right and lower left corner:
     w := ZeroMutable(w);
     CopySubVector(vecs[i],w,[1..2*r.n-2],[1..2*r.n-2]);
     w[2*r.n-1] := One(r.f);
-    tt := RECOG.SpMakeImage_en(w,s,fail);
+    tt := RECOG.SpMakeImage_en(w,s,fail,true);
     u[i] := List(s.ten,t->t^(ttt^-1*c*tt));
   od;
   CopySubMatrix(ZeroMatrix(2*r.n-2,2*r.n,vecs),vecs,
