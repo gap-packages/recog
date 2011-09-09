@@ -111,6 +111,7 @@ DeclareSynonym("RecognizeGroup", RecogniseGroup);
 DeclareGlobalFunction( "RecogniseGeneric" );
 DeclareSynonym("RecognizeGeneric", RecogniseGeneric);
 DeclareGlobalFunction( "PrintTreePos" );
+DeclareGlobalFunction( "TryFindHomMethod" );
 
 # Helper functions for the generic part:
 

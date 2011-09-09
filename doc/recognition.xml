@@ -377,6 +377,24 @@ black box groups, which is stored in the global variable
 </Description>
 </ManSection>
 
+<ManSection>
+<Func Name="TryFindHomMethod" Arg="H, method, projective"/>
+<Returns><C>fail</C> or <C>false</C> or a recognition info record.</Returns>
+<Description>
+Use this function to try to run a given find homomorphism method
+<A>method</A> on a group <A>H</A>. Indicate by the boolean <A>projective</A>
+whether or not the method works in projective mode. For permutation and
+black box groups give <C>false</C>. The result is either <C>fail</C> or 
+<C>false</C> if the method fails or a recognition info record <C>ri</C>.
+If the method created a leaf then <C>ri</C> will be a leaf, otherwise
+it will have the attribute <Ref Attr="Homom"/> set, but no factor or 
+kernel have been created or recognised yet. You can use for example
+the methods in <Ref Var="FindHomMethodsPerm"/> or 
+<Ref Var="FindHomMethodsMatrix"/> or <Ref Var="FindHomMethodsProjective"/>
+or <Ref Var="FindHomMethodsBB"/> as the <A>method</A> argument.
+</Description>
+</ManSection>
+
 </Section>
 
 <Section Label="rirecord">
@@ -395,7 +413,7 @@ and is in the category
     <Filt Name="IsRecognitionInfo" Type="Category"/>
 </ManSection>
 
-and is <Ref Filt="IsAttributeStoringRep" BookName="Prg"/>, such that we can
+and is <Ref Filt="IsAttributeStoringRep" BookName="Ref"/>, such that we can
 define attributes for it, the values of which are stored once they are 
 known. A recognition info record always represents a whole binary tree of such
 records, see the attributes <Ref Attr="RIFac"/> and <Ref Attr="RIKer"/>

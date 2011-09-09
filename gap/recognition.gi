@@ -128,6 +128,23 @@ InstallGlobalFunction( RecogniseGroup,
     #       objects here!
   end);
 
+InstallGlobalFunction( TryFindHomMethod,
+  function( g, method, projective )
+    local result,ri;
+    ri := EmptyRecognitionInfoRecord(rec(),g,projective);
+    if IsBound(g!.pseudorandomfunc) then
+        Unbind(g!.pseudorandomfunc);
+    fi;
+    result := method(ri,g);
+    if result in [fail,false] then
+        return result;
+    else
+        SetFilterObj(ri,IsReady);
+        Setfhmethsel(ri,"User");
+        return ri;
+    fi;
+  end );
+
 InstallGlobalFunction( EmptyRecognitionInfoRecord,
   function(r,H,projective)
     local ri;
@@ -174,7 +191,9 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
   end );
     
 RECOG.SetPseudoRandomStamp := function(g,st)
-  g!.pseudorandomfunc[Length(g!.pseudorandomfunc)].args[2] := st;
+  if IsBound(g!.pseudorandomfunc) then
+      g!.pseudorandomfunc[Length(g!.pseudorandomfunc)].args[2] := st;
+  fi;
 end;
 
 InstallMethod( RandomElm, "for a recognition info record, a string and a bool",
