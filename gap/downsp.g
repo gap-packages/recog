@@ -429,3 +429,37 @@ h:=Group(out,out2);
 s:=StabilizerChain(h);
 return Size(s)/Size(SP(4,q));
 end;
+
+experiment2 := function(g,x)
+  local bas,d,f,i,l,ll,lll,llll,q,r,s,y;
+  f := FieldOfMatrixGroup(g);
+  q := Size(f);
+  d := DimensionOfMatrixGroup(g);
+  y := RECOG.FindOrder3Element(g);
+  l := [x,x^y,x^(y^2)];
+  ll := List(l,a->SemiEchelonMat(a-One(a)).vectors);
+  lll := List(ll,m->VectorSpace(f,m));
+  s := Sum(lll);
+  if Dimension(s) = 6 then
+      Print("6\c");
+      return "dim6";
+  fi;
+  bas := Basis(s);
+  llll := List(l,x->RECOG.LinearAction(bas,f,x));
+  for i in [1..10] do
+      r := RecogniseClassical(Group(llll));
+      if r.IsSpContained <> "unknown" then break; fi;
+  od;
+  Print(r.IsSpContained);
+  return r.IsSpContained;
+end;
+
+experiment1 := function(g)
+  local d,f,q,x;
+  f := FieldOfMatrixGroup(g);
+  q := Size(f);
+  d := DimensionOfMatrixGroup(g);
+  x := constructppd2(g,d,q);
+  return x;
+end;
+  

@@ -1824,7 +1824,16 @@ end;
 
 RECOG.LinearAction := function(bas,field,el)
   local mat,vecs;
-  vecs := BasisVectors(bas);
+  if IsGroup(el) then
+      return Group(List(GeneratorsOfGroup(el),
+                        x->RECOG.LinearAction(bas,field,x)));
+  fi;
+  if IsBasis(bas) then
+      vecs := BasisVectors(bas);
+  else
+      vecs := bas;
+      bas := Basis(VectorSpace(field,bas),bas);
+  fi;
   mat := List(vecs,v->Coefficients(bas,v*el));
   ConvertToMatrixRep(mat,field);
   return mat;
@@ -3358,6 +3367,66 @@ RECOG.DoSpExperiment := function(r)
   fi;
   return rec( bigbas := bigbas, bigbasi := bigbasi, c := c, c1 := c1,
               t := t, std := s, u := u );
+end;
+
+RECOG.FindOrder3Element := function(g)
+  local a,f,fa,m,o,p,pp,ppp,q,x,y;
+  f := FieldOfMatrixGroup(g);
+  q := Size(f);
+  p := Characteristic(f);
+  while true do
+    Print(":\c");
+    x := PseudoRandom(g);
+    m := MinimalPolynomial(x);
+    fa := Collected(Factors(PolynomialRing(f),m));
+    o := Lcm(List(fa,p->q^Degree(p[1])-1));
+    pp := Maximum(List(fa,x->x[2]));
+    ppp := p;
+    while ppp < pp do
+       ppp := ppp * p;
+    od;
+    while true do
+      Print("-\c");
+      a := QuotientRemainder(Integers,o,3);
+      if a[2] <> 0 then break; fi;
+      o := a[1];
+    od;
+    x := x^(o*ppp);
+    if IsOne(x) then continue; fi;
+    while true do
+      Print("+\c");
+      y := x^3;
+      if IsOne(y) then break; fi;
+      x := y;
+    od;
+    break;
+  od;
+  Print("!\n");
+  # Now x is an element of Order 3
+  return x;
+end;
+
+RECOG.MovedSpace := function(g)
+  local gens,sp;
+  gens := GeneratorsOfGroup(g);
+  sp := SemiEchelonMat(Concatenation(List(gens,x->x-One(x)))).vectors;
+  return sp;
+end;
+
+RECOG.FixedSpace := function(g)
+  local gens,i,inter,sp;
+  gens := GeneratorsOfGroup(g);
+  sp := List(gens,x->NullspaceMat(x-One(x)));
+  if Length(sp) = 1 then 
+      ConvertToMatrixRep(sp[1],FieldOfMatrixGroup(g));
+      return sp[1]; 
+  fi;
+  inter := SumIntersectionMat(sp[1],sp[2])[2];
+  for i in [3..Length(sp)] do
+      inter := SumIntersectionMat(inter,sp[i])[2];
+  od;
+  ConvertToMatrixRep(inter,FieldOfMatrixGroup(g));
+  return inter;
 end;
 
 RECOG.guck := function ( w )
