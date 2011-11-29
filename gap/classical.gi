@@ -80,7 +80,7 @@ IsPowerOfPrime := function( n, p )
 end;
 
 
-# Check if m > 5 and the order of a basic lppd(d,q;e)
+# Check if m > 5 and the order of a basic lppd(d,q;e) element
 
 HasLBGgt5 := function( m, p, a, e )
     
@@ -1858,7 +1858,6 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
         orbs := Orbits( pgrp, MovedPointsPerms(
            GeneratorsOfGroup(pgrp)));   
-        # TODO Check this in MAGMA
         if Size(pgrp) mod 3600 <> 0 then 
              recognise.isSOContained := false;
              return false; 
@@ -2138,7 +2137,7 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
         IsPowerOfPrime((q+1)/3,2)) then 
         s := Log2Int((q+1)/3);
         if PositionProperty(recognise.orders, 
-            i-> i mod (3*2^(s-1)) = 0 ) = fail then
+            i-> (i mod (3*2^(s-1)) = 0)) = fail then
             return fail; 
         fi; 
         if PositionProperty(recognise.orders,
@@ -2358,7 +2357,7 @@ DisplayRecog := function( r )
     local q0;
     
            Print("Reducible : ", r.isReducible, "\n" );
-           Print("Forms : " );
+           Print("Forms: " );
            if Length(r.ClassicalForms)<> 1 then
               Print("Several Forms preserved\n");
            elif IsTrivialForm( r.ClassicalForms[1] ) then 
