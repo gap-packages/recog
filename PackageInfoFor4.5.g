@@ -12,7 +12,7 @@ PackageName := "recogbase",
 Subtitle := "A framework for group recognition",
 Version := "1.2",
 Date := "28/05/2012",  # not yet released
-ArchiveURL := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recogbasefor4.5/recogbase-1.2for4.5",
+ArchiveURL := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recogbasefor4.5/recogbase-1.2_for4.5",
 ArchiveFormats := ".tar.gz",
 Persons := [
   rec( 
