@@ -39,7 +39,7 @@ Version := "1.2",
 ##  Release date of the current version in dd/mm/yyyy format.
 Date := "28/05/2011",  # not yet released
 
-ArchiveURL := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recogfor4.5/recog-1.2for4.5",
+ArchiveURL := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recogfor4.5/recog-1.2_for4.5",
 
 ArchiveFormats := ".tar.gz",
 
