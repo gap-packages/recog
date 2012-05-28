@@ -12,7 +12,7 @@ PackageName := "recogbase",
 Subtitle := "A framework for group recognition",
 Version := "1.2",
 Date := "28/05/2012",  # not yet released
-ArchiveURL := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recogbase/recogbase-1.2",
+ArchiveURL := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recogbasefor4.5/recogbase-1.2",
 ArchiveFormats := ".tar.gz",
 Persons := [
   rec( 
@@ -68,7 +68,7 @@ Status := "deposited",
 README_URL := 
   "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recogbase/README.recogbase",
 PackageInfoURL := 
-  "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recogbase/PackageInfo.g",
+  "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recogbasefor4.5/PackageInfo.g",
 AbstractHTML := "<b>Warning:</b> This package is still under development and \
 this version is to be considered a working, but preliminary one. <p/> \
 This package provides a framework to implement group \
@@ -90,12 +90,12 @@ PackageDoc := rec(
 
 
 Dependencies := rec(
-  GAP := ">=4.4.12",
-  NeededOtherPackages := [["GAPDoc", ">= 1.2"],
+  GAP := ">=4.5",
+  NeededOtherPackages := [["GAPDoc", ">= 1.5"],
                           ["Forms", ">= 1.2"],["genss", ">= 1.3"],
-                          ["Orb", ">= 3.4"], ["FactInt", ">= 1.5.2"],
+                          ["Orb", ">= 4.3"], ["FactInt", ">= 1.5.2"],
                           ["AtlasRep", ">= 1.4.0"]],
-  SuggestedOtherPackages := [["recog", ">= 1.0"]],
+  SuggestedOtherPackages := [["recog", ">= 1.2"]],
   ExternalConditions := []
 ),
 
