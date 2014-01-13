@@ -22,9 +22,11 @@ LoadPackage("recogbase");
 
 MakeGAPDocDoc("doc", "recog", [], "recog");
 
+CopyHTMLStyleFiles("doc");
+
 GAPDocManualLab("recog");
 
-quit;
+QUIT;
 
 ##
 ##  This program is free software: you can redistribute it and/or modify
