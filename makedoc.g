@@ -15,13 +15,15 @@
 ##
 #############################################################################
 
-RequirePackage("GAPDoc");
+LoadPackage("GAPDoc");
 
 MakeGAPDocDoc("doc", "recogbase", [], "recogbase");
 
+CopyHTMLStyleFiles("doc");
+
 GAPDocManualLab("recogbase");
 
-quit;
+QUIT;
 
 ##
 ##  This program is free software: you can redistribute it and/or modify
