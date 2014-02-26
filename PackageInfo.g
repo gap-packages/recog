@@ -37,16 +37,9 @@ Version := "1.2",
 ##  changing this.
 
 ##  Release date of the current version in dd/mm/yyyy format.
-Date := "28/05/2011",  # not yet released
+Date := "28/05/2011",
 
-ArchiveURL := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recog/recog-1.2",
-
-ArchiveFormats := ".tar.gz",
-
-#TextFiles := ["init.g", ......],
-#BinaryFiles := ["doc/manual.dvi", ......],
-
-
+##  Information about authors and maintainers.
 Persons := [
   rec( 
     LastName      := "Neunhoeffer",
@@ -206,7 +199,6 @@ Persons := [
     Place         := "St Andrews",
     Institution   := "University of St Andrews"
   ),
-  
 ],
 
 ##  Status information. Currently the following cases are recognized:
@@ -228,10 +220,14 @@ Status := "deposited",
 # AcceptDate := "08/1999",
 #AcceptDate := "",
 
-README_URL := 
-  "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recog/README.recog",
-PackageInfoURL := 
-  "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recog/PackageInfo.g",
+BaseURL := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/",
+
+PackageWWWHome := Concatenation( ~.BaseURL, "recog.html" ),
+ArchiveURL     := Concatenation( ~.BaseURL, "recog/recog-", ~.Version ),
+README_URL     := Concatenation( ~.BaseURL, "recog/README.recog" ),
+PackageInfoURL := Concatenation( ~.BaseURL, "recog/PackageInfo.g" ),
+
+ArchiveFormats := ".tar.gz",
 
 ##  Here you  must provide a short abstract explaining the package content 
 ##  in HTML format (used on the package overview Web page) and an URL 
@@ -240,22 +236,13 @@ PackageInfoURL :=
 ##  Please, use '<span class="pkgname">GAP</span>' and
 ##  '<span class="pkgname">MyPKG</span>' for specifing package names.
 ##  
-# AbstractHTML := "This package provides  a collection of functions for \
-# computing the Smith normal form of integer matrices and some related \
-# utilities.",
-#AbstractHTML := 
-#  "The <span class=\"pkgname\">Example</span> package, as its name suggests, \
-#   is an example of how to create a <span class=\"pkgname\">GAP</span> \
-#   package. It has little functionality except for being a package",
 AbstractHTML := 
   "<b>Warning:</b> This package is still under development and \
    this version is to be considered a working, but preliminary one. <p/> \
    This packages contains a collection of methods for the \
    constructive recognition of groups. It is mostly intended for \
    permutation groups, matrix groups and projective groups.",
-#
-PackageWWWHome := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recog.html",
-#               
+
 PackageDoc := rec(
   BookName  := "recog",
   ArchiveURLSubset := ["doc"],
@@ -268,17 +255,18 @@ PackageDoc := rec(
 
 Dependencies := rec(
   GAP := ">=4.4.12",
-  NeededOtherPackages := [["GAPDoc", ">= 1.2"],["recogbase", ">= 1.0"],
-                          ["Forms", ">= 1.2"],["genss", ">= 1.3"],
-                          ["Orb", ">= 3.4"], ["FactInt", ">= 1.5.2"],
-                          ["AtlasRep", ">= 1.4.0"]],
+  NeededOtherPackages := [
+    ["GAPDoc", ">= 1.2"],
+    ["Forms", ">= 1.2"],
+    ["genss", ">= 1.3"],
+    ["Orb", ">= 3.4"],
+    ["FactInt", ">= 1.5.2"],
+    ["AtlasRep", ">= 1.4.0"],
+    ["recogbase", ">= 1.0"],
+  ],
   SuggestedOtherPackages := [],
   ExternalConditions := []
 ),
-
-AvailabilityTest := function()
-  return true;
-end,
 
 ##  The LoadPackage mechanism can produce a default banner from the info
 ##  in this file. If you are not happy with it, you can provide a string
@@ -305,17 +293,18 @@ BannerString := Concatenation(
   "------\n"
 ),
 
+AvailabilityTest := ReturnTrue,
+
 Autoload := false,
 
 ##  *Optional*, but recommended: path relative to package root to a file which 
 ##  contains as many tests of the package functionality as sensible.
-## TestFile := "tst/TestAll.g",
+#TestFile := "tst/TestAll.g",
 ## Currently, due to the Monte-Carlo nature of our algorithms and other
 ## technical details, this is not a proper GAP test file.
 
 ##  *Optional*: Here you can list some keyword related to the topic 
 ##  of the package.
-# Keywords := ["Smith normal form", "p-adic", "rational matrix inversion"]
 Keywords := ["matrix group recognition", "group recognition", "methods"]
 
 ));
