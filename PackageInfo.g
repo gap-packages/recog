@@ -249,7 +249,7 @@ PackageDoc := rec(
   HTMLStart := "doc/chap0.html",
   PDFFile   := "doc/manual.pdf",
   SixFile   := "doc/manual.six",
-  LongTitle := "recog - a collection of group recognition methods",
+  LongTitle := "A collection of group recognition methods",
   Autoload  := true
 ),
 
