@@ -1,6 +1,6 @@
 #############################################################################
 ##  
-##  PackageInfo.g for the package 'recogbase'
+##  PackageInfo.g for the package `recogbase'
 ##                                                            Max Neunhoeffer
 ##                                                                Akos Seress
 ##  (created from Frank Luebeck's PackageInfo.g template file)
@@ -8,12 +8,17 @@
 #############################################################################
 
 SetPackageInfo( rec(
+
 PackageName := "recogbase",
+
 Subtitle := "A framework for group recognition",
+
 Version := "1.2",
-Date := "28/05/2012",  # not yet released
-ArchiveURL := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recogbase/recogbase-1.2",
-ArchiveFormats := ".tar.gz",
+
+##  Release date of the current version in dd/mm/yyyy format.
+Date := "28/05/2012",
+
+##  Information about authors and maintainers.
 Persons := [
   rec( 
     LastName      := "Neunhoeffer",
@@ -46,7 +51,7 @@ Persons := [
                        "USA" ] ),
     Place         := "Columbus",
     Institution   := "Ohio-state University at Columbus"
-  )
+  ),
 ],
 
 ##  Status information. Currently the following cases are recognized:
@@ -56,7 +61,9 @@ Persons := [
 ##    "dev"           for development versions of packages 
 ##    "other"         for all other packages
 ##
+# Status := "accepted",
 Status := "deposited",
+
 ##  You must provide the next two entries if and only if the status is 
 ##  "accepted" because is was successfully refereed:
 # format: 'name (place)'
@@ -65,10 +72,16 @@ Status := "deposited",
 # format: mm/yyyy
 # AcceptDate := "08/1999",
 #AcceptDate := "",
-README_URL := 
-  "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recogbase/README.recogbase",
-PackageInfoURL := 
-  "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recogbase/PackageInfo.g",
+
+BaseURL := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/",
+
+PackageWWWHome := Concatenation( ~.BaseURL, "recogbase.html" ),
+ArchiveURL     := Concatenation( ~.BaseURL, "recogbase/recogbase-", ~.Version ),
+README_URL     := Concatenation( ~.BaseURL, "recogbase/README.recogbase" ),
+PackageInfoURL := Concatenation( ~.BaseURL, "recogbase/PackageInfo.g" ),
+
+ArchiveFormats := ".tar.gz",
+
 AbstractHTML := "<b>Warning:</b> This package is still under development and \
 this version is to be considered a working, but preliminary one. <p/> \
 This package provides a framework to implement group \
@@ -76,7 +89,6 @@ recognition methods in a generic way. In particular, it is suitable \
 for permutation groups, matrix groups, projective groups and blackbox \
 groups. The accompanying <span class=\"pkgname\">recog</span> package \
 contains the necessary methods for actual recognition.",
-PackageWWWHome := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/recogbase.html",
 
 PackageDoc := rec(
   BookName  := "recogbase",
@@ -88,19 +100,32 @@ PackageDoc := rec(
   Autoload  := true
 ),
 
-
 Dependencies := rec(
   GAP := ">=4.4.12",
-  NeededOtherPackages := [["GAPDoc", ">= 1.2"],
-                          ["Forms", ">= 1.2"],["genss", ">= 1.3"],
-                          ["Orb", ">= 3.4"], ["FactInt", ">= 1.5.2"],
-                          ["AtlasRep", ">= 1.4.0"]],
-  SuggestedOtherPackages := [["recog", ">= 1.0"]],
+  NeededOtherPackages := [
+    ["GAPDoc", ">= 1.2"],
+    ["Forms", ">= 1.2"],
+    ["genss", ">= 1.3"],
+    ["Orb", ">= 3.4"],
+    ["FactInt", ">= 1.5.2"],
+    ["AtlasRep", ">= 1.4.0"],
+  ],
+  SuggestedOtherPackages := [
+    ["recog", ">= 1.0"]
+  ],
   ExternalConditions := []
 ),
 
 AvailabilityTest := ReturnTrue,
+
 Autoload := false,
+
+##  *Optional*, but recommended: path relative to package root to a file which 
+##  contains as many tests of the package functionality as sensible.
+#TestFile := "tst/testall.g",
+
+##  *Optional*: Here you can list some keyword related to the topic 
+##  of the package.
 Keywords := ["group recognition", "matrix group recognition",
 "permutation group", "black box group", "composition tree", 
 "Aschbacher classes", "method selection"]
