@@ -96,7 +96,7 @@ PackageDoc := rec(
   HTMLStart := "doc/chap0.html",
   PDFFile   := "doc/manual.pdf",
   SixFile   := "doc/manual.six",
-  LongTitle := "recogbase - a framework for group recognition",
+  LongTitle := "A framework for group recognition",
   Autoload  := true
 ),
 
