@@ -250,7 +250,6 @@ PackageDoc := rec(
   PDFFile   := "doc/manual.pdf",
   SixFile   := "doc/manual.six",
   LongTitle := "A collection of group recognition methods",
-  Autoload  := true
 ),
 
 Dependencies := rec(
@@ -294,8 +293,6 @@ BannerString := Concatenation(
 ),
 
 AvailabilityTest := ReturnTrue,
-
-Autoload := false,
 
 ##  *Optional*, but recommended: path relative to package root to a file which 
 ##  contains as many tests of the package functionality as sensible.
