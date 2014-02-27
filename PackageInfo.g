@@ -97,7 +97,6 @@ PackageDoc := rec(
   PDFFile   := "doc/manual.pdf",
   SixFile   := "doc/manual.six",
   LongTitle := "A framework for group recognition",
-  Autoload  := true
 ),
 
 Dependencies := rec(
@@ -117,8 +116,6 @@ Dependencies := rec(
 ),
 
 AvailabilityTest := ReturnTrue,
-
-Autoload := false,
 
 ##  *Optional*, but recommended: path relative to package root to a file which 
 ##  contains as many tests of the package functionality as sensible.
