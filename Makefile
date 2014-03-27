@@ -9,9 +9,9 @@ default: doc
 
 doc: doc/manual.six
 
-doc/manual.six: doc/methsel.xml doc/intro.xml doc/install.xml VERSION \
+doc/manual.six: doc/methsel.xml doc/intro.xml doc/install.xml PackageInfo.g \
 		doc/recognition.xml doc/afterrecog.xml doc/recogbase.xml
-	($(GAPPATH)/bin/gap.sh makedoc.g)
+	($(GAPPATH)/bin/gap.sh -A makedoc.g)
 
 clean:
 	(cd doc ; ./clean)

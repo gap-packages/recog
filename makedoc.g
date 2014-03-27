@@ -15,12 +15,13 @@
 ##
 #############################################################################
 
+SetPackagePath("recogbase", ".");
+PrintTo("VERSION", PackageInfo("recogbase")[1].Version);
+
 LoadPackage("GAPDoc");
 
 MakeGAPDocDoc("doc", "recogbase", [], "recogbase");
-
 CopyHTMLStyleFiles("doc");
-
 GAPDocManualLab("recogbase");
 
 QUIT;
