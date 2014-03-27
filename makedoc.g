@@ -17,13 +17,14 @@
 ##
 #############################################################################
 
+SetPackagePath("recog", ".");
+PrintTo("VERSION", PackageInfo("recog")[1].Version);
+
 LoadPackage("GAPDoc");
 LoadPackage("recogbase");
 
 MakeGAPDocDoc("doc", "recog", [], "recog");
-
 CopyHTMLStyleFiles("doc");
-
 GAPDocManualLab("recog");
 
 QUIT;

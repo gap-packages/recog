@@ -10,8 +10,8 @@ default: doc
 doc: doc/manual.six
 
 doc/manual.six: doc/methods.xml doc/intro.xml doc/install.xml \
-		doc/recog.xml doc/examples.xml VERSION
-	($(GAPPATH)/bin/gap.sh makedoc.g)
+		doc/recog.xml doc/examples.xml PackageInfo.g
+	($(GAPPATH)/bin/gap.sh -A makedoc.g)
 
 clean:
 	(cd doc ; ./clean)
