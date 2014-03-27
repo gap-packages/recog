@@ -73,14 +73,13 @@ Status := "deposited",
 # AcceptDate := "08/1999",
 #AcceptDate := "",
 
-BaseURL := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/",
-
-PackageWWWHome := Concatenation( ~.BaseURL, "recogbase.html" ),
-ArchiveURL     := Concatenation( ~.BaseURL, "recogbase/recogbase-", ~.Version ),
-README_URL     := Concatenation( ~.BaseURL, "recogbase/README.recogbase" ),
-PackageInfoURL := Concatenation( ~.BaseURL, "recogbase/PackageInfo.g" ),
-
-ArchiveFormats := ".tar.gz",
+PackageWWWHome := "http://neunhoef.github.io/recogbase/",
+README_URL     := Concatenation(~.PackageWWWHome, "README"),
+PackageInfoURL := Concatenation(~.PackageWWWHome, "PackageInfo.g"),
+ArchiveURL     := Concatenation("https://github.com/neunhoef/recogbase/",
+                                "releases/download/v", ~.Version,
+                                "/recogbase-", ~.Version),
+ArchiveFormats := ".tar.gz .tar.bz2",
 
 AbstractHTML := "<b>Warning:</b> This package is still under development and \
 this version is to be considered a working, but preliminary one. <p/> \
