@@ -26,18 +26,10 @@ end;
 
 SetPackageInfo( rec(
 
-##  This is case sensitive, use your preferred spelling.
 PackageName := "recog",
-
-##  This may be used by a default banner or on a Web page, should fit on
-##  one line.
 Subtitle := "A collection of group recognition methods",
 Version := "1.2",
-##  Please adjust also the VERSION file in the package directory when
-##  changing this.
-
-##  Release date of the current version in dd/mm/yyyy format.
-Date := "28/05/2011",
+Date := "28/05/2011", # dd/mm/yyyy format
 
 ##  Information about authors and maintainers.
 Persons := [
