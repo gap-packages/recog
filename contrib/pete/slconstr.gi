@@ -9,8 +9,6 @@
 ##
 ##  Peter Brooksbank's code for constructive SL and PSL recognition.
 ##
-##  $Id: slconstr.gi,v 1.1 2006/10/25 12:07:12 gap Exp $
-##
 #############################################################################
 
 SLCR := rec();

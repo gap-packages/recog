@@ -9,8 +9,6 @@
 ##
 ##  The classical groups recognition.
 ##
-##  $Id: classical.gi,v 1.9 2006/10/06 14:03:25 gap Exp $
-##
 #############################################################################
 ##
 #F  PrimitivePrimeDivisors( <d>, <p> ) . . . . compute the ppds of  <p>^<d>-1

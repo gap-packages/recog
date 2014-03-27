@@ -9,8 +9,6 @@
 ##
 ##  The classical groups recognition.
 ##
-##  $Id: classical.gi,v 1.9 2006/10/06 14:03:25 gap Exp $
-##
 ##
 ##  This file contains  an implementation  of the recognition  algorithms for
 ##  classical groups by Niemeyer and Praeger.  A description  of them  can be 
