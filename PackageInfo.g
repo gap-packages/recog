@@ -11,8 +11,8 @@ SetPackageInfo( rec(
 
 PackageName := "recogbase",
 Subtitle := "A framework for group recognition",
-Version := "1.2",
-Date := "28/05/2012", # dd/mm/yyyy format
+Version := "1.2.1",
+Date := "31/04/2014", # dd/mm/yyyy format
 
 ##  Information about authors and maintainers.
 Persons := [
