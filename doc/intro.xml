@@ -49,6 +49,14 @@ recognition tree.
 
 </Section>
 
+<Section Label="feedback">
+<Heading>Feedback</Heading>
+
+For bug reports, feature requests and suggestions, please use our
+<URL Text="issue tracker">https://github.com/neunhoef/recogbase/issues</URL>.
+
+</Section>
+
 <!-- ############################################################ -->
 
 </Chapter>
