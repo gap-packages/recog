@@ -1,24 +1,14 @@
-==============================================================================
- This file describes changes in the recog package beginning from version 1.0:
-==============================================================================
+==================================================
+ This file describes changes in the recog package
+==================================================
 
-==========================
- Changes from 1.2 -> 1.2.1:
-==========================
-
+1.2.1 (2014-03-31)
   - Move package repository and website to GitHub
 
-
-==========================
- Changes from 1.1 -> 1.2:
-==========================
-
+1.2 (2012-05-28)
   - ???
 
-==========================
- Changes from 1.0 -> 1.1:
-==========================
-
+1.1 (2011-07-29)
   - Fixed some bugs in nonconstructive classical natural recognition.
   - Added method for known stabilizer chain.
   - Adapt to forms package.
@@ -29,3 +19,5 @@
   - Guarantee that StabilizerChain leaf method has a faithful
     action on the first orbit.
 
+1.0 (2009-11-05)
+  - Initial release
