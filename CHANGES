@@ -2,6 +2,11 @@
  This file describes changes in the recog package
 ==================================================
 
+1.2.2 (2014-04-04)
+  - Previous release had an invalid release date in
+    PackageInfo.g (2014-04-31 instead of 2014-03-31).
+  - Merge HISTORY and CHANGES files.
+
 1.2.1 (2014-03-31)
   - Move package repository and website to GitHub
 
