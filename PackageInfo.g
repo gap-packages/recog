@@ -28,19 +28,9 @@ Persons := [
   ),
   rec( 
     LastName      := "Seress",
-    FirstNames    := "Akos",
+    FirstNames    := "Ákos",
     IsAuthor      := true,
     IsMaintainer  := false,
-    Email         := "akos@math.ohio-state.edu",
-    WWWHome       := "http://www.math.ohio-state.edu/~akos/",
-    PostalAddress := Concatenation( [
-                       "Akos Seress\n",
-                       "714 Math Tower\n",
-                       "231 W 18th ave\n",
-                       "Columbus, OH  43210\n",
-                       "USA" ] ),
-    Place         := "Columbus",
-    Institution   := "Ohio-state University at Columbus"
   ),
 ],
 
