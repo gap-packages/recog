@@ -1,6 +1,8 @@
 This file describes changes in the recog package.
 
 X.Y (YYYY-MM-DD)
+  - Update Max Neunhoeffer's contact data
+  - Use AutoDoc to generate title page of the manual from PackageInfo.g
   - ...
 
 1.2.2 (2014-04-04)
