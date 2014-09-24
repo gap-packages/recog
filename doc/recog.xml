@@ -14,51 +14,7 @@ recog.xml          recog package documentation
 -->
 
 <Book Name="recog">
-
-<TitlePage>
-    <Title>GAP 4 Package <Package>recog</Package></Title>
-    <Subtitle>Group Recognition Methods</Subtitle>
-    <Version>
-      <#Include SYSTEM "../VERSION">
-    </Version>
-    <Author>Max Neunhöffer
-    <Address>School of Mathematics and Statistics, Mathematical
-        Institute, North Haugh, St Andrews,
-        Fife, KY16 9SS, Scotland, UK</Address>
-    <Email>neunhoef@mcs.st-and.ac.uk</Email>
-    <Homepage>http://www-groups.mcs.st-and.ac.uk/~neunhoef/</Homepage>
-    </Author>
-    <Author>Ákos Seress
-<Address>
-Department of Mathematics,
-The Ohio State University,
-231 W 18th Avenue,
-Columbus, OH 43210 USA 
-</Address>
-    <Email>akos@math.ohio-state.edu</Email>
-    <Homepage>http://www.math.ohio-state.edu/people/display/display.php?ID=302
-    </Homepage>
-    </Author>
-<Author>Nurullah Ankaralioglu</Author>
-<Author>Peter Brooksbank</Author>
-<Author>Frank Celler</Author>
-<Author>Stephen Howe</Author>
-<Author>Maska Law</Author>
-<Author>Stephen Linton</Author>
-<Author>Gunter Malle</Author>
-<Author>Eamonn O'Brien</Author>
-<Author>Colva Roney-Dougal</Author>
-
-    <Date>March 2014</Date>
-
-<Copyright>
-  &copyright; 2005-2009 by Max Neunhöffer and Ákos Seress<P/>
-
-  This package may be distributed under the terms and conditions of the
-  GNU Public License Version 3 or (at your option) any later version.
-</Copyright>
-
-</TitlePage>
+<#Include SYSTEM "title.xml">
 
 <!--  TableOfContents  . . . . . .  generate a table of contents   -->
 <TableOfContents/>

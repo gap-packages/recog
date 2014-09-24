@@ -17,15 +17,20 @@
 ##
 #############################################################################
 
-SetPackagePath("recog", ".");
-PrintTo("VERSION", PackageInfo("recog")[1].Version);
+PACKAGE := "recog";
+SetPackagePath(PACKAGE, ".");
+PrintTo("VERSION", PackageInfo(PACKAGE)[1].Version);
 
 LoadPackage("GAPDoc");
 LoadPackage("recogbase");
 
-MakeGAPDocDoc("doc", "recog", [], "recog");
-CopyHTMLStyleFiles("doc");
-GAPDocManualLab("recog");
+if fail <> LoadPackage("AutoDoc", ">= 2014.03.27") then
+    AutoDoc(PACKAGE : scaffold := rec( MainPage := false ));
+else
+    MakeGAPDocDoc("doc", PACKAGE, [], PACKAGE, "MathJax");
+    CopyHTMLStyleFiles("doc");
+    GAPDocManualLab(PACKAGE);
+fi;
 
 QUIT;
 
