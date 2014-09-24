@@ -7,8 +7,8 @@ SetPackageInfo( rec(
 
 PackageName := "recogbase",
 Subtitle := "A framework for group recognition",
-Version := "1.2.2",
-Date := "04/04/2014", # dd/mm/yyyy format
+Version := "1.2.3",
+Date := "24/09/2014", # dd/mm/yyyy format
 
 ##  Information about authors and maintainers.
 Persons := [
@@ -18,7 +18,7 @@ Persons := [
     IsAuthor      := true,
     IsMaintainer  := false,
     Email         := "max@9hoeffer.de",
-    WWWHome       := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/",
+    WWWHome       := "http://www-groups.mcs.st-and.ac.uk/~neunhoef",
     PostalAddress := Concatenation( [
                        "Gustav-Freytag-Straße 40\n",
                        "50354 Hürth\n",
@@ -70,10 +70,10 @@ Status := "deposited",
 # AcceptDate := "08/1999",
 #AcceptDate := "",
 
-PackageWWWHome := "http://neunhoef.github.io/recogbase/",
+PackageWWWHome := "http://gap-system.github.io/recogbase/",
 README_URL     := Concatenation(~.PackageWWWHome, "README"),
 PackageInfoURL := Concatenation(~.PackageWWWHome, "PackageInfo.g"),
-ArchiveURL     := Concatenation("https://github.com/neunhoef/recogbase/",
+ArchiveURL     := Concatenation("https://github.com/gap-system/recogbase/",
                                 "releases/download/v", ~.Version,
                                 "/recogbase-", ~.Version),
 ArchiveFormats := ".tar.gz .tar.bz2",
