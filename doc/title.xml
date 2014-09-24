@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- This is an automatically generated file. -->
+<TitlePage>
+  <Title>
+    recogbase
+  </Title>
+  <Subtitle>
+    A framework for group recognition
+  </Subtitle>
+  <Version>
+    1.2.2
+  </Version>
+  <Author>
+    Max Neunhöffer<Alt Only="LaTeX"><Br/></Alt>
+<Address>
+Gustav-Freytag-Straße 40<Br/>
+50354 Hürth<Br/>
+Germany<Br/>
+</Address>
+<Email>max@9hoeffer.de</Email>
+<Homepage>http://www-groups.mcs.st-and.ac.uk/~neunhoef/</Homepage>
+
+  </Author>
+  <Author>
+    Akos Seress<Alt Only="LaTeX"><Br/></Alt>
+<Address>
+Akos Seress<Br/>
+714 Math Tower<Br/>
+231 W 18th ave<Br/>
+Columbus, OH  43210<Br/>
+USA<Br/>
+</Address>
+<Email>akos@math.ohio-state.edu</Email>
+<Homepage>http://www.math.ohio-state.edu/~akos/</Homepage>
+
+  </Author>
+  <Date>
+    04/04/2014
+  </Date>
+  <Copyright>
+    &copyright; 2005-2011 by Max Neunhöffer and Ákos Seress<P/>
+
+This package may be distributed under the terms and conditions of the
+GNU Public License Version 3 or (at your option) any later version.
+
+  </Copyright>
+  </TitlePage>

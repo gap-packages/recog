@@ -114,7 +114,18 @@ AvailabilityTest := ReturnTrue,
 ##  of the package.
 Keywords := ["group recognition", "matrix group recognition",
 "permutation group", "black box group", "composition tree", 
-"Aschbacher classes", "method selection"]
+"Aschbacher classes", "method selection"],
+
+AutoDoc := rec(
+    TitlePage := rec(
+        Copyright := Concatenation(
+                    "&copyright; 2005-2011 by Max Neunhöffer and Ákos Seress<P/>\n",
+                    "\n",
+                    "This package may be distributed under the terms and conditions of the\n",
+                    "GNU Public License Version 3 or (at your option) any later version.\n"
+                ),
+    )
+),
 
 ));
 
