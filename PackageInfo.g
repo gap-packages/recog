@@ -43,19 +43,9 @@ Persons := [
   ),
   rec( 
     LastName      := "Seress",
-    FirstNames    := "Akos",
+    FirstNames    := "Ákos",
     IsAuthor      := true,
     IsMaintainer  := false,
-    Email         := "akos@math.ohio-state.edu",
-    WWWHome       := "http://www.math.ohio-state.edu/~akos/",
-    PostalAddress := Concatenation( [
-                       "Akos Seress\n",
-                       "714 Math Tower\n",
-                       "231 W 18th ave\n",
-                       "Columbus, OH  43210\n",
-                       "USA" ] ),
-    Place         := "Columbus",
-    Institution   := "Ohio-state University at Columbus"
   ),
   rec( 
     LastName      := "Ankaralioglu",
@@ -261,7 +251,7 @@ BannerString := Concatenation(
   "by ", ~.Persons[1].FirstNames, " ", ~.Persons[1].LastName,
         " (", ~.Persons[1].WWWHome, ") and\n",
   "   ", ~.Persons[2].FirstNames, " ", ~.Persons[2].LastName,
-        " (", ~.Persons[2].WWWHome, ")\n",
+        "\n",
   "with contributed code by:\n",
   Concatenation(Concatenation(List(~.Persons{[3..Length(~.Persons)-1]},
        p->["     ",p.FirstNames," ",p.LastName,
