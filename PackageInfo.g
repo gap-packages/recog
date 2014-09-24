@@ -290,7 +290,7 @@ Keywords := ["matrix group recognition", "group recognition", "methods"],
 AutoDoc := rec(
     TitlePage := rec(
         Copyright := Concatenation(
-                    "&copyright; 2005-2009 by Max Neunhöffer and Ákos Seress<P/>\n",
+                    "&copyright; 2005-2014 by Max Neunhöffer and Ákos Seress<P/>\n",
                     "\n",
                     "This package may be distributed under the terms and conditions of the\n",
                     "GNU Public License Version 3 or (at your option) any later version.\n"
