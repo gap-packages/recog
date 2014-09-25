@@ -1,11 +1,13 @@
 This file describes changes in the recogbase package.
 
+X.Y (YYYY-MM-DD)
+  - ...
+
 1.2.3 (2014-09-24)
   - Update Max Neunhoeffer's contact data
   - Use AutoDoc to generate title page of the manual from PackageInfo.g
   - Remove Akos' contact data
   - Add Max Horn as a maintainer
-  - ...
 
 1.2.2 (2014-04-04)
   - Previous release had an invalid release date in
