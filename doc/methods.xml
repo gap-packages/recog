@@ -225,9 +225,21 @@ installed es methods for projective groups.
 </Row>
 <HorLine/>
 <Row>
+<Item>1175</Item>
+<Item><C>KnownStabilizerChain</C></Item>
+<Item><Ref Subsect="KnownStabilizerChain"/></Item>
+</Row>
+<HorLine/>
+<Row>
 <Item>1100</Item>
 <Item><C>DiagonalMatrices</C></Item>
 <Item><Ref Subsect="DiagonalMatrices"/></Item>
+</Row>
+<HorLine/>
+<Row>
+<Item>1050</Item>
+<Item><C>FewGensAbelian</C></Item>
+<Item><Ref Subsect="FewGensAbelian"/></Item>
 </Row>
 <HorLine/>
 <Row>
@@ -252,11 +264,25 @@ This method is successful if and only if all generators of a matrix group
 
 </Subsection>
 
+<Subsection Label="KnownStabilizerChain">
+<Heading><C>KnownStabilizerChain</C></Heading>
+
+TODO. use an already known stabilizer chain for this group
+
+</Subsection>
+
 <Subsection Label="DiagonalMatrices">
 <Heading><C>DiagonalMatrices</C></Heading>
 
 This method is successful if and only if all generators of a matrix group
 <A>G</A> are diagonal matrices. Otherwise, it returns <K>false</K>.
+
+</Subsection>
+
+<Subsection Label="FewGensAbelian">
+<Heading><C>FewGensAbelian</C></Heading>
+
+TODO. if very few generators, check IsAbelian and if yes, do KnownNilpotent
 
 </Subsection>
 
