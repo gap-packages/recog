@@ -3456,7 +3456,7 @@ end;
 # Now the code for writing SLPs:
 
 SLPforElementFuncsProjective.PSL2 := function(ri,x)
-  local det,log,slp,y,z;
+  local det,log,slp,y,z,pos,s;
   ri!.fakegens.count := ri!.fakegens.count + 1;
   if ri!.fakegens.count > 1000 then
       ri!.fakegens := RECOG.InitSLfake(ri!.field,2);
@@ -3469,7 +3469,14 @@ SLPforElementFuncsProjective.PSL2 := function(ri,x)
       log := LogFFE(det,z);
       y := y * z^(-log*ri!.gcd.coeff1/ri!.gcd.gcd);
   fi;
-  slp := RECOG.ExpressInStd_SL2(y,ri!.fakegens);
+  # Now normalise to make sure that different coset reps behave the same:
+  if not(IsBound(ri!.normlist)) then
+      ri!.normlist := RECOG.SetupNormalisationListForPSLd(2,ri!.field,
+                                                          ri!.gcd.gcd);
+  fi;
+  pos := PositionNonZero(y[1]);
+  s := RECOG.NormaliseScalarForPSLd(y[1][pos],ri!.normlist);
+  slp := RECOG.ExpressInStd_SL2(s * y,ri!.fakegens);
   return slp;
 end;
 
