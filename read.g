@@ -11,8 +11,6 @@
 ##
 #############################################################################
 
-ReadPackage("recog","gap/libhacks.gi");   # This should go in the future!
-
 # Generic:
 ReadPackage("recogbase","gap/methsel.gi");
 ReadPackage("recogbase","gap/recognition.gi");
