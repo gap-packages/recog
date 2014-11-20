@@ -125,7 +125,6 @@ DeclareGlobalFunction( "FastNormalClosure" );
 DeclareGlobalFunction( "FindKernelFastNormalClosure" );
 DeclareGlobalFunction( "FindKernelRandom" );
 DeclareGlobalFunction( "FindKernelDoNothing" );
-DeclareGlobalFunction( "FindKernelLowerLeftPGroup" ); # defined in matrix.gi
 DeclareOperation( "RandomElm", [ IsRecognitionInfo, IsString, IsBool ] );
 DeclareOperation( "RandomElmOrd", [ IsRecognitionInfo, IsString, IsBool ] );
 DeclareOperation( "RandomElmPpd", [ IsRecognitionInfo, IsString, IsBool ] );

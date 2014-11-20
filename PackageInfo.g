@@ -7,7 +7,7 @@ SetPackageInfo( rec(
 
 PackageName := "recogbase",
 Subtitle := "A framework for group recognition",
-Version := "1.2.3",
+Version := "1.2.3.1",
 Date := "24/09/2014", # dd/mm/yyyy format
 
 ##  Information about authors and maintainers.
@@ -106,7 +106,7 @@ Dependencies := rec(
     ["AtlasRep", ">= 1.4.0"],
   ],
   SuggestedOtherPackages := [
-    ["recog", ">= 1.0"]
+    ["recog", ">= 1.2.3.1"]
   ],
   ExternalConditions := []
 ),
