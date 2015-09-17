@@ -38,3 +38,10 @@ ReadPackage("recog","tst/MatFDPM.g");
 ReadPackage("recog","tst/PermDirProd.g");
 ReadPackage("recog","tst/MatTensor.g");
 ReadPackage("recog","tst/TestClassicalNatural.g");
+
+# The following files from tst/ are NOT loaded by this test:
+# TestAll.g  (of course)
+# testsporadicrecog.g
+# Sporadics.g
+# products.g
+# pcgmemory.g
