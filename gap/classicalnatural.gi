@@ -3469,9 +3469,11 @@ SLPforElementFuncsProjective.PSL2 := function(ri,x)
       log := LogFFE(det,z);
       y := y * z^(-log*ri!.gcd.coeff1/ri!.gcd.gcd);
   fi;
-  # Now normalise to make sure that different coset reps behave the same:
+  # At this point, y has determinant 1; but we consider it modulo scalars.
+  # To make sure that different coset reps behave the same, we scale it
+  # with a suitable primitive d-th root of unity.
   if not(IsBound(ri!.normlist)) then
-      ri!.normlist := RECOG.SetupNormalisationListForPSLd(2,ri!.field,
+      ri!.normlist := RECOG.SetupNormalisationListForPSLd(ri!.field,
                                                           ri!.gcd.gcd);
   fi;
   pos := PositionNonZero(y[1]);
@@ -3480,6 +3482,13 @@ SLPforElementFuncsProjective.PSL2 := function(ri,x)
   return slp;
 end;
 
+# s: a non-zero scalar
+# list: a list of certain primitive roots of unity, as
+#       computed by SetupNormalisationListForPSLd
+#
+# This function considers s and all its multiples by the elements in
+# list, and picks the smallest of them. It returns the multiplicator
+# used to obtain that element from s.
 RECOG.NormaliseScalarForPSLd := function(s,list)
   local min,minmul,t,u;
   min := s;
@@ -3494,12 +3503,16 @@ RECOG.NormaliseScalarForPSLd := function(s,list)
   return minmul;
 end;
 
-RECOG.SetupNormalisationListForPSLd := function(d,gf,gcd)
+# f: a finite field 
+# d: a positive integer
+#
+# Returns a list of primitive d-th roots of unity.
+RECOG.SetupNormalisationListForPSLd := function(f,d)
   local e,i,list,z;
-  list := EmptyPlist(gcd);
-  z := PrimitiveRoot(gf)^((Size(gf)-1)/gcd);
+  list := EmptyPlist(d);
+  z := PrimitiveRoot(f)^((Size(f)-1)/d);
   e := z;
-  for i in [1..gcd-1] do
+  for i in [1..d-1] do
       Add(list,e);
       e := e * z;
   od;
@@ -3521,6 +3534,7 @@ RECOG.ComputeRootInFiniteField := function(el,d,f)
   return -coeffs[1];
 end;
 
+# Express an element of PSL_d as an slp in terms of standard generators.
 SLPforElementFuncsProjective.PSLd := function(ri,x)
   local det,pos,root,s,slp,y;
   ri!.fakegens.count := ri!.fakegens.count + 1;
@@ -3531,15 +3545,22 @@ SLPforElementFuncsProjective.PSLd := function(ri,x)
   y := ri!.nicebas * x * ri!.nicebasi;
   det := DeterminantMat(y);
   if not(IsOne(det)) then
+      # At this point, y is in the kernel of the determinant map *mod scalars*.
+      # That means that det may not be 1 -- it can be any d-th power.
+      # We thus can compute a d-th root of 1/det, and scale y with it,
+      # in order to obtain a matrix with determinant 1 in the same
+      # projective class.
       root := RECOG.ComputeRootInFiniteField(1/det,Length(y),ri!.field);
       if root = fail then
           Error("Should not have happened, 15634, tell Max!");
       fi;
       y := y * root;
   fi;
-  # Now normalise to make sure that different coset reps behave the same:
+  # At this point, y has determinant 1; but we consider it modulo scalars.
+  # To make sure that different coset reps behave the same, we scale it
+  # with a suitable primitive d-th root of unity.
   if not(IsBound(ri!.normlist)) then
-      ri!.normlist := RECOG.SetupNormalisationListForPSLd(Length(y),ri!.field,
+      ri!.normlist := RECOG.SetupNormalisationListForPSLd(ri!.field,
                                                           ri!.gcd.gcd);
   fi;
   pos := PositionNonZero(y[1]);
