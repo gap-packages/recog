@@ -3531,7 +3531,7 @@ SLPforElementFuncsProjective.PSLd := function(ri,x)
   y := ri!.nicebas * x * ri!.nicebasi;
   det := DeterminantMat(y);
   if not(IsOne(det)) then
-      root := RECOG.ComputeRootInFiniteField(det,ri!.gcd.gcd,ri!.field);
+      root := RECOG.ComputeRootInFiniteField(1/det,Length(y),ri!.field);
       if root = fail then
           Error("Should not have happened, 15634, tell Max!");
       fi;
