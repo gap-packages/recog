@@ -5676,107 +5676,107 @@ end;
 # attempt to guess the "natural" characteristic of the
 # group based on the two maximal orders of group elements.
 RECOG.findchar:=function(ri,G,randelfunc)
-  # randelfunc must be a function taking ri as one argument and returning
-  # uniformly distributed random elements in G together with its
-  # projective order (as for example below), or fail.
-local mat,vs,vec,bound,count,m1,m2,m3,g,order,list,last,r,p,d,pr;
+    # randelfunc must be a function taking ri as one argument and returning
+    # uniformly distributed random elements in G together with its
+    # projective order (as for example below), or fail.
+    local mat,vs,vec,bound,count,m1,m2,m3,g,order,list,last,r,p,d,pr;
 
-if randelfunc = fail then
-    pr := ProductReplacer(GeneratorsOfGroup(G));
-    randelfunc := function(ri)
-      local el;
-      el := Next(pr);
-      return rec( el := el, order := ProjectiveOrder(el)[1] );
-    end;
-fi;
+    if randelfunc = fail then
+        pr := ProductReplacer(GeneratorsOfGroup(G));
+        randelfunc := function(ri)
+          local el;
+          el := Next(pr);
+          return rec( el := el, order := ProjectiveOrder(el)[1] );
+        end;
+    fi;
 
-p := Characteristic(ri!.field);
-d := ri!.dimension;
-mat:=One(G);
-vs:=VectorSpace(GF(p),mat);
-repeat
-  vec:=Random(vs);
-until not(IsZero(vec));
+    p := Characteristic(ri!.field);
+    d := ri!.dimension;
+    mat:=One(G);
+    vs:=VectorSpace(GF(p),mat);
+    repeat
+        vec:=Random(vs);
+    until not(IsZero(vec));
 
-if RECOG.shortorbit(vec,Product(GeneratorsOfGroup(G)), 3*d) = 3*d then 
-   return p;
-fi;
+    if RECOG.shortorbit(vec,Product(GeneratorsOfGroup(G)), 3*d) = 3*d then 
+        return p;
+    fi;
 
-#find three largest element orders m1, m2, m3
-bound:=32*(LogInt(d,2))^2*6*4;
-count:=0;
-m1:=0;
-m2:=0;
-m3:=0;
-last:=0;
-repeat
-  count:=count+1;
-  r := randelfunc(ri);
-  g := r.el;
-  order:=r.order;
-  if order >= 3*d then 
-      return p;
-  elif order > m1 then
-      m3:=m2;
-      m2:=m1;
-      m1:=order;
-      last:=count;
-  elif order<m1 and order>m2 then 
-      m3:=m2;
-      m2:=order;
-      last:=count;
-  elif order<m2 and order>m3 then
-      m3:=order;
-      last:=count;
-  fi;
-until count=bound or count>=2*last+50;
+    #find three largest element orders m1, m2, m3
+    bound:=32*(LogInt(d,2))^2*6*4;
+    count:=0;
+    m1:=0;
+    m2:=0;
+    m3:=0;
+    last:=0;
+    repeat
+        count:=count+1;
+        r := randelfunc(ri);
+        g := r.el;
+        order:=r.order;
+        if order >= 3*d then 
+            return p;
+        elif order > m1 then
+            m3:=m2;
+            m2:=m1;
+            m1:=order;
+            last:=count;
+        elif order<m1 and order>m2 then 
+            m3:=m2;
+            m2:=order;
+            last:=count;
+        elif order<m2 and order>m3 then
+            m3:=order;
+            last:=count;
+        fi;
+    until count=bound or count>=2*last+50;
 
-#handle ambiguous cases
-if [m1,m2,m3] = [13,7,5] then 
-  return [[13,7, ["2B2",8]]];
-elif [m1,m2] = [13,8] then
-  return [[13,8, ["l",3,3]]];
-elif [m1,m2,m3] = [13,7,6] then
-  return [[13,7, ["l",2,13]]];
-elif [m1,m2,m3] = [13,12,6] then
-  return [[13,12,["l",2,5]]];
-elif [m1,m2,m3] = [13,12,9] then 
-  return [[13,12,["G2",3]]];
-elif [m1,m2,m3] = [12,9,6] then 
-  return [[12,9,["u",4,2]]];
-elif [m1,m2,m3] = [12,9,8] then 
-  return [[12,9,["u",4,3]]];
-elif [m1,m2] = [5,3] then
-  return [[ 5,3,["l",2,4]]];
-elif [m1,m2] = [5,4] then
-  return [[5,4,["l",2,9]]];
-elif [m1,m2] = [7,4] then
-  return [[7,4,["l",2,7]]];
-elif [m1,m2] = [15,13] then
-  return [[15,13,["u",3,4]]];
-elif [m1,m2] = [30,20] then
-  return [[30,20,["s",4,5]]];
-elif [m1,m2] = [30,24] then
-  return [[30,24,["s",8,2]]];
-elif [m1,m2] = [63,60] then 
-  return [[63,60,["u",4,5]]];
-elif [m1,m2] = [91,85] then
-  return [[91,85,["l",3,16]]];
-fi;
+    #handle ambiguous cases
+    if [m1,m2,m3] = [13,7,5] then 
+        return [[13,7, ["2B2",8]]];
+    elif [m1,m2] = [13,8] then
+        return [[13,8, ["l",3,3]]];
+    elif [m1,m2,m3] = [13,7,6] then
+        return [[13,7, ["l",2,13]]];
+    elif [m1,m2,m3] = [13,12,6] then
+        return [[13,12,["l",2,5]]];
+    elif [m1,m2,m3] = [13,12,9] then 
+        return [[13,12,["G2",3]]];
+    elif [m1,m2,m3] = [12,9,6] then 
+        return [[12,9,["u",4,2]]];
+    elif [m1,m2,m3] = [12,9,8] then 
+        return [[12,9,["u",4,3]]];
+    elif [m1,m2] = [5,3] then
+        return [[ 5,3,["l",2,4]]];
+    elif [m1,m2] = [5,4] then
+        return [[5,4,["l",2,9]]];
+    elif [m1,m2] = [7,4] then
+        return [[7,4,["l",2,7]]];
+    elif [m1,m2] = [15,13] then
+        return [[15,13,["u",3,4]]];
+    elif [m1,m2] = [30,20] then
+        return [[30,20,["s",4,5]]];
+    elif [m1,m2] = [30,24] then
+        return [[30,24,["s",8,2]]];
+    elif [m1,m2] = [63,60] then 
+        return [[63,60,["u",4,5]]];
+    elif [m1,m2] = [91,85] then
+        return [[91,85,["l",3,16]]];
+    fi;
 
-list:=Filtered(RECOG.grouplist, x->x[1]=m1 and x[2]=m2);
-#one more ambiguous case
-if  Length(list) >=2 and (
-    (list[1][3]{[1,2]}=["l",2] and list[2][3][1]="G2") or 
-    (list[2][3]{[1,2]}=["l",2] and list[1][3][1]="G2")) then
-   if m3>m1/2 then
-      return Filtered(list,x->x[3][1]="G2");
-   else 
-      return Filtered(list,x->x[3][1]="l");
-   fi;
-else
-   return list;
-fi;
+    list:=Filtered(RECOG.grouplist, x->x[1]=m1 and x[2]=m2);
+    #one more ambiguous case
+    if  Length(list) >=2 and (
+        (list[1][3]{[1,2]}=["l",2] and list[2][3][1]="G2") or 
+        (list[2][3]{[1,2]}=["l",2] and list[1][3][1]="G2")) then
+       if m3>m1/2 then
+           return Filtered(list,x->x[3][1]="G2");
+       else 
+           return Filtered(list,x->x[3][1]="l");
+       fi;
+    else
+        return list;
+    fi;
 
 end;
 
