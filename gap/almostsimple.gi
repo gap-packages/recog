@@ -208,7 +208,12 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
   fld := ri!.field;
   d := ri!.dimension;
   if IsBound(hint.elordersstart) then
+      i := 0;
       repeat
+          i := i + 1;
+          if i > 10000 then
+              Error("possible infinite loop in DoHintedLowIndex, wrong hints?");
+          fi;
           x := PseudoRandom(G);
       until Order(x) in hint.elordersstart;
       x := [x];
