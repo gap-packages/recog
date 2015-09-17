@@ -37,4 +37,4 @@ ReadPackage("recog","tst/MatAn.g");
 ReadPackage("recog","tst/MatFDPM.g");
 ReadPackage("recog","tst/PermDirProd.g");
 ReadPackage("recog","tst/MatTensor.g");
-ReadPackage("recog","tst/ClassicalNatural.g");
+ReadPackage("recog","tst/TestClassicalNatural.g");
