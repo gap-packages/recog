@@ -3506,6 +3506,11 @@ RECOG.SetupNormalisationListForPSLd := function(d,gf,gcd)
   return list;
 end;
 
+# el: a field element
+# d: a positive integer (typically ri!.gcd.gcd)
+# f: a galois field (typically ri!.field)
+#
+# Compute a primitive d-th roots of el in the field f.
 RECOG.ComputeRootInFiniteField := function(el,d,f)
   local coeffs,facs,i,x;
   x := Indeterminate(f);

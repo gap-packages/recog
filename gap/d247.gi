@@ -387,6 +387,7 @@ FindHomMethodsProjective.D247 := function(ri,G)
   return fail;
 end;
 
+# FIXME: PrototypeForC2C4 is not used anywhere
 FindHomMethodsProjective.PrototypeForC2C4 := function(ri,G)
   # We try to produce an element of a normal subgroup by playing 
   # tricks.
