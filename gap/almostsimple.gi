@@ -2530,10 +2530,15 @@ end;
 #        orblenlimit := "4d" )
 # is the standard low index.
 
-InstallAlmostSimpleHint( "L2(31)", "LowIndexHint",
-  rec( characteristics := [31], dimensions := [1,2,3],
-       elordersstart := [31], numberrandgens := 2, tries := 1,
-       triesforgens := 100, orblenlimit := 32, issimple := true ) );
+# BUG: The following hint was added a long time ago, but it
+# can lead to an infinite loop in DoHintedLowIndex, because
+# elordersstart suggests searching for elements of order 31,
+#  but no such elements are found.
+# See also https://github.com/gap-system/recog/issues/6
+# InstallAlmostSimpleHint( "L2(31)", "LowIndexHint",
+#   rec( characteristics := [31], dimensions := [1,2,3],
+#        elordersstart := [31], numberrandgens := 2, tries := 1,
+#        triesforgens := 100, orblenlimit := 32, issimple := true ) );
 
 InstallGlobalFunction( LookupHintForSimple, 
   function(ri,G,name)
