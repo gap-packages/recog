@@ -1446,6 +1446,9 @@ RECOG.IsThisSL2Natural := function(gens,f)
   # The answer is not guaranteed to be correct, this is Las Vegas.
   local CheckElm,a,b,clos,coms,i,isabelian,j,l,notA5,p,q,S,seenqm1,seenqp1,x;
 
+  # The following method does not work for q <= 11, as then
+  # the projective orders are either q+1, or else less than 5.
+  # Hence seenqm1 never gets set.
   CheckElm := function(x)
       local o;
       o := RECOG.GuessProjSL2ElmOrder(x,f);
@@ -1464,7 +1467,7 @@ RECOG.IsThisSL2Natural := function(gens,f)
           fi;
       else
           if not(seenqm1) then 
-              Info(InfoRecog,4,"SL2: Found element of order divising q-1.");
+              Info(InfoRecog,4,"SL2: Found element of order dividing q-1.");
               seenqm1 := true; 
               if seenqp1 and notA5 then return true; fi;
           fi;
@@ -1479,11 +1482,15 @@ RECOG.IsThisSL2Natural := function(gens,f)
   
   q := Size(f);
   p := Characteristic(f);
-  if q <= 32 then    # this could be increased if needed
+  # For small q, comput the order of the group via a stabilizer chain.
+  # Note that at this point we are usually working projective, and thus
+  # scalars are factored out "implicitly". Thus the generators we are
+  # looking at may generate a group which only contains SL2 as a subgroup.
+  if q <= 11 then    # this could be increased if needed
       Info(InfoRecog,4,"SL2: Computing stabiliser chain.");
       S := StabilizerChain(Group(gens));
       Info(InfoRecog,4,"SL2: size is ",Size(S));
-      return Size(S) = q*(q-1)*(q+1);
+      return Size(S) mod (q*(q-1)*(q+1)) = 0;
   fi;
 
   seenqp1 := false;
