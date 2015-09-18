@@ -190,7 +190,7 @@ FindHomMethodsMatrix.BlockScalar := function(ri,G)
   nrblocks := Length(ri!.blocks);  # this is always >= 1
   if nrblocks <= 2 then   # the factor is only one block
       # go directly to scalars in that case:
-      data := rec(poss := [ri!.blocks[nrblocks][1]]);
+      data := rec(poss := ri!.blocks[nrblocks]);
       newgens := List(GeneratorsOfGroup(G),x->RECOG.HomToDiagonalBlock(data,x));
       H := GroupWithGenerators(newgens);
       hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
