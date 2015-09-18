@@ -370,7 +370,7 @@ setting.
 
 This method is only called by a hint. Alongside with the hint it gets
 a block decomposition respected by the matrix group <A>G</A> to be recognised
-and the promise, that all diagonal blocks of all group elements
+and the promise that all diagonal blocks of all group elements
 will only be scalar matrices. This method recursively builds a balanced tree
 and does scalar recognition in each leaf.
 </Subsection>
@@ -648,7 +648,7 @@ the stabiliser chain.
 
 This method is only called by a hint. Alongside with the hint it gets
 a block decomposition respected by the matrix group <A>G</A> to be recognised
-and the promise, that all diagonal blocks of all group elements
+and the promise that all diagonal blocks of all group elements
 will only be scalar matrices. This method simply norms the last diagonal
 block in all generators by multiplying with a scalar and then
 delegates to <C>BlockScalar</C> (see <Ref Subsect="BlockScalar"/>) 
