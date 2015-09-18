@@ -1175,16 +1175,14 @@ end;
 
   
 RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
-  # f a finite field, g equal to SL(2,Size(f)), t either an element
-  # of order p = Characteristic(f) or false.
+  # f a finite field, g equal to SL(2,Size(f)), t either an involution
+  # or false.
   # Returns a set of standard generators for SL_2 and the base change
   # to expose it. Works with memory. Uses PseudoRandom.
   local a,actpos,am,b,bas,bm,c,can,ch,cm,co,co2,el,ev,eva,evb,evbi,ext,gens,
-        i,j,k,kk,mas,masi,mat,mati,mb,o,one,os,p,pos,q,res,s,ss,ssm,t,tb,tm,
+        i,j,k,kk,mas,masi,mat,mati,mb,o,one,os,pos,q,res,s,ss,ssm,t,tb,tm,
         tt,ttm,u,v,x,xb,xm;
   q := Size(f);
-  p := Characteristic(f);
-  ext := DegreeOverPrimeField(f);
   gens := GeneratorsOfGroup(g);
   if torig = false then
       i := 1;
@@ -1256,6 +1254,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   os := [gens[1]];
   actpos := 1;
   j := 1;
+  ext := DegreeOverPrimeField(f);
   while Length(tt) < ext do
       repeat
           repeat
@@ -1362,7 +1361,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
 
   res :=  rec( g := g, t := t, s := s, bas := bas, basi := bas^-1,
               one := One(f), a := s[1]*t[1]*s[1], b := One(s[1]),
-              One := One(s[1]), f := f, q := q, p := p, ext := ext,
+              One := One(s[1]), f := f, q := q, p := 2, ext := ext,
               d := 2 );
   res.all := Concatenation(res.s,res.t,[res.a],[res.b]);
   return res;
