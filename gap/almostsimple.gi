@@ -26,6 +26,7 @@ RECOG.ParseNumber := function( number, d, default )
   return default;
 end;
 
+# FIXME: unused?
 RECOG.MakeStabChainHint := function( chain, stdgens )
   local b,bb,choice,dims,f,gens,grpnum,grps,i,j,lens,llens,m,name,names,nams,nrs,o,orblens,pts,r,size,slps;
   f := FieldOfMatrixList(stdgens);
@@ -325,8 +326,7 @@ InstallGlobalFunction( InstallAlmostSimpleHint,
     Add( RECOG.AlmostSimpleHints.(name),re );
   end );
 
-# FIXME: This function is never called. Do we need it?
-# It seems to generate code for "hints" ?
+# FIXME: unused?
 RECOG.ProduceTrivialStabChainHint := function(name,reps,maxes)
   local bad,f,g,gens,hint,list,m,o,prevdim,prevfield,r,range,res,ri,
         size,success,t,values,x;
@@ -397,6 +397,7 @@ RECOG.ProduceTrivialStabChainHint := function(name,reps,maxes)
   od;
 end;
 
+# FIXME: unused?
 RECOG.DistinguishAtlasReps := function(name,rep1,rep2)
   local br1,br2,classes,gens1,gens2,guck1,guck2,l,lens,slps;
   classes := AtlasProgram(name,"cyclic").program;
@@ -421,8 +422,7 @@ if not(IsBound(AGR_TablesOfContents)) then
     AGR_InfoForName := fail;
 fi;
 
-# FIXME: This function is never called. Do we need it
-# It seems to generate code for "hints" ?
+# FIXME: unused?
 RECOG.PrintGenericStabChainHint := function ( n )
     local S,g,gens,nn,toc,tocs;
     tocs := AGR_TablesOfContents( "all" );
@@ -828,6 +828,7 @@ SLPforElementFuncsProjective.Symmetric := function(ri,x)
   return slp;
 end;
 
+# FIXME: unused?
 FindHomMethodsProjective.AlternatingBBByOrders := function(ri,G)
   local Gm,RecSnAnEq,RecSnAnIsOne,deg,limit,ordersseen,r;
   if IsBound(ri!.projordersseen) then
@@ -1177,6 +1178,7 @@ RECOG.SporadicsWorkers := [];
 #RECOG.SporadicsWorkers[2] := SporadicsWorkerGenSift;   # M11
 # and same for: M12, M22, J2, HS, Ly, Co3, Co2
 
+# FIXME: unused?
 RECOG.MakeSporadicsInfo := function(name)
   local ct,i,index,killers,o,orders,p,pos,prob,probs,probscopy,sum;
   ct := CharacterTable(name);

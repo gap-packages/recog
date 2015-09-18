@@ -776,6 +776,11 @@ InstallMethod( FunnyProductObj, "for two arbitrary objects",
     return Objectify(FunnyProductObjsType,[a,b]);
   end );
 
+# FIXME: unused? but see misc/work/DOWORK.
+# Perhaps this was / is meant as a replacement for RECOG.FindStdGens_SL
+# in even characteristic.
+# But in a quick test based on misc/work/DOWORK, the code there
+# seems to be faster.
 RECOG.FindStdGens_SL_EvenChar := function(sld,f)
   # gens of sld must be gens for SL(d,q) in its natural rep with memory
   # This function calls RECOG.SL_Even_constructdata and then extends 
@@ -1173,7 +1178,6 @@ RECOG.RecogniseSL2NaturalOddCharUsingBSGS := function(g,f)
   return res;
 end;
 
-  
 RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   # f a finite field, g equal to SL(2,Size(f)), t either an involution
   # or false.
@@ -1367,6 +1371,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   return res;
 end;
 
+# FIXME: unused?
 RECOG.GuessSL2ElmOrder := function(x,f)
   local facts,i,j,o,p,q,r,s,y,z;
   p := Characteristic(f);
@@ -2304,7 +2309,7 @@ RECOG.SLn_UpStep := function(w)
   return w;
 end;
 
-
+# FIXME: unused?
 RECOG.MakeSLSituation := function(p,e,n,d)
   local a,q,r;
   q := p^e;
@@ -2317,6 +2322,7 @@ RECOG.MakeSLSituation := function(p,e,n,d)
   return r;
 end;
 
+# FIXME: unused?
 RECOG.MakeSLTest := function(p,e,n,d)
   local a,fake,q,r;
   q := p^e;
@@ -2468,6 +2474,7 @@ RECOG.FindSymplecticPairBasis := function(vecs)
   return bas;
 end;
 
+# FIXME: unused?
 RECOG.SetupSpExperiment := function(n,d,f)
   local em,formg,formh,g,h,ncycle;
   Assert(1,n < d);
@@ -2601,6 +2608,7 @@ RECOG.MakeSp_StdGens := function(p,ext,n,d)
   return res;
 end;
 
+# FIXME: unused?
 RECOG.MakeSp_FakeGens := function(p,ext,n)
   local count,f,fake,i,q,res;
   q := p^ext;
@@ -2821,6 +2829,7 @@ RECOG.SpMakeImage_enfn := function(v,w,s,usencycle)
   return t;
 end;
 
+# FIXME: unused?
 RECOG.DoSpExperiment := function(r)
   local Vn,Vnc,bas,bigbas,bigbasi,c,c1,fixc,i,int,int2,int3,perp,s,sum,suminter,suminter2,suminter3,t,tt,ttt,u,v,vecs,w,zeta;
   c1 := PseudoRandom(r.g);
@@ -2920,6 +2929,7 @@ RECOG.DoSpExperiment := function(r)
               t := t, std := s, u := u );
 end;
 
+# FIXME: unused? but see misc/downsp.g
 RECOG.FindOrder3Element := function(g)
   local a,f,fa,m,o,p,pp,ppp,q,x,y;
   f := FieldOfMatrixGroup(g);
@@ -2957,6 +2967,7 @@ RECOG.FindOrder3Element := function(g)
   return x;
 end;
 
+# FIXME: unused? but see misc/ex.g, misc/spdownexperiment.log, misc/spdownexperiment2.log
 RECOG.MovedSpace := function(g)
   local gens,sp;
   gens := GeneratorsOfGroup(g);
@@ -2964,6 +2975,7 @@ RECOG.MovedSpace := function(g)
   return sp;
 end;
 
+# FIXME: unused? but see misc/spdownexperiment2.log
 RECOG.FixedSpace := function(g)
   local gens,i,inter,sp;
   gens := GeneratorsOfGroup(g);
@@ -2980,6 +2992,7 @@ RECOG.FixedSpace := function(g)
   return inter;
 end;
 
+# FIXME: unused?
 RECOG.guck := function ( w )
     local  i;
     for i  in w.slnstdf  do
