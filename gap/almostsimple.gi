@@ -493,27 +493,22 @@ InstallGlobalFunction( LookupHintForSimple,
     fi;
     Info(InfoRecog,2,"No hint worked, giving up.");
     return fail;
-  end );
+end );
 
 
-#checks whether the orbit of <vec> under g is not longer than bound
-RECOG.shortorbit:=function(vec,g,bound)
-local short, v, i, pos;
-
-v:=StructuralCopy(vec);
-short:=false;
-i:=0;
-pos:=First([1..Length(vec)],x->vec[x]<>0*vec[1]);
-repeat 
-  i:=i+1;
-  v:=v*g;
-  if v=(v[pos]/vec[pos])*vec then
-     short:=true;
-  fi;
-until short or i=bound;
-
-return i;
-
+# checks whether the orbit of <vec> under g is not longer than bound
+RECOG.shortorbit := function(vec,g,bound)
+    local v, i, pos;
+    v := StructuralCopy(vec);
+    pos := PositionNonZero(vec);
+    vec := vec / vec[pos];
+    for i in [1..bound] do
+        v := v * g;
+        if v = v[pos] * vec then
+            break;
+        fi;
+    od;
+    return i;
 end;
 
 
@@ -759,7 +754,7 @@ RECOG.DegreeAlternating := function (orders)
         fi; 
     od;
     return [degs, prims];
-end;    #  DegreeAlternating
+end;
 
 RECOG.RecognizeAlternating := function (orders)
     local   tmp,  degs,  prims,  mindeg,  p1,  p2,  i;
@@ -797,8 +792,8 @@ RECOG.RecognizeAlternating := function (orders)
            fi;
        fi;
    od;
-   return  mindeg;
-end;   # RecognizeAlternating
+   return mindeg;
+end;
 
 SLPforElementFuncsProjective.Alternating := function(ri,x)
   local y,slp;
