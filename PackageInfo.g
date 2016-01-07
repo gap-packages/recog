@@ -22,8 +22,8 @@ SetPackageInfo( rec(
 
 PackageName := "recog",
 Subtitle := "A collection of group recognition methods",
-Version := "1.2.3.1",
-Date := "24/09/2014", # dd/mm/yyyy format
+Version := "1.2.4",
+Date := "07/01/2016", # dd/mm/yyyy format
 
 ##  Information about authors and maintainers.
 Persons := [
@@ -211,10 +211,10 @@ Status := "deposited",
 # AcceptDate := "08/1999",
 #AcceptDate := "",
 
-PackageWWWHome := "http://gap-system.github.io/recog/",
+PackageWWWHome := "http://gap-packages.github.io/recog/",
 README_URL     := Concatenation(~.PackageWWWHome, "README"),
 PackageInfoURL := Concatenation(~.PackageWWWHome, "PackageInfo.g"),
-ArchiveURL     := Concatenation("https://github.com/gap-system/recog/",
+ArchiveURL     := Concatenation("https://github.com/gap-packages/recog/",
                                 "releases/download/v", ~.Version,
                                 "/recog-", ~.Version),
 ArchiveFormats := ".tar.gz .tar.bz2",

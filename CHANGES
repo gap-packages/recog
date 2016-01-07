@@ -1,7 +1,19 @@
 This file describes changes in the recog package.
 
-X.Y (YYYY-MM-DD)
-  - ...
+1.2.4 (2016-01-07)
+  - Fix bugs with handling of scalars in projective matrix groups (see issues #2 and #4)
+  - Fix misdetection of SL(2,q), odd q (see issue #3)
+  - Fix bug leading to "Error: Group() called with empty list of generators" (see issue #5)
+  - Workaround for problem with L2(31) (see issue #6)
+  - Fix endless loop when recognizing GL(2,q) with q <= 32 (see issue #9)
+  - Detect if DoHintedLowIndex runs into an infinite loop
+  - Add various source code comments
+  - Move FindKernelLowerLeftPGroup from recogbase to recog
+  - Move website to http://gap-packages.github.io/recog/
+  - Update documentation
+  - Splits some large source files into multiple
+  - Remove lots of unused code and files
+  - Remove GAP 4.4 compatibility code
 
 1.2.3 (2014-09-24)
   - Update Max Neunhoeffer's contact data
