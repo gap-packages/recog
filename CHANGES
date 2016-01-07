@@ -1,7 +1,10 @@
 This file describes changes in the recogbase package.
 
-X.Y (YYYY-MM-DD)
-  - ...
+1.2.4 (2016-01-07)
+  - Move website to http://gap-packages.github.io/recogbase/
+  - Suggest recog 1.2.4 or newer
+  - Require GAP 4.7.8 or newer
+  - Remove obsolete code patching issues in old GAP versions
 
 1.2.3 (2014-09-24)
   - Update Max Neunhoeffer's contact data

@@ -7,8 +7,8 @@ SetPackageInfo( rec(
 
 PackageName := "recogbase",
 Subtitle := "A framework for group recognition",
-Version := "1.2.3.1",
-Date := "24/09/2014", # dd/mm/yyyy format
+Version := "1.2.4",
+Date := "07/01/2016", # dd/mm/yyyy format
 
 ##  Information about authors and maintainers.
 Persons := [
@@ -70,10 +70,10 @@ Status := "deposited",
 # AcceptDate := "08/1999",
 #AcceptDate := "",
 
-PackageWWWHome := "http://gap-system.github.io/recogbase/",
+PackageWWWHome := "http://gap-packages.github.io/recogbase/",
 README_URL     := Concatenation(~.PackageWWWHome, "README"),
 PackageInfoURL := Concatenation(~.PackageWWWHome, "PackageInfo.g"),
-ArchiveURL     := Concatenation("https://github.com/gap-system/recogbase/",
+ArchiveURL     := Concatenation("https://github.com/gap-packages/recogbase/",
                                 "releases/download/v", ~.Version,
                                 "/recogbase-", ~.Version),
 ArchiveFormats := ".tar.gz .tar.bz2",
@@ -96,7 +96,7 @@ PackageDoc := rec(
 ),
 
 Dependencies := rec(
-  GAP := ">=4.6.3",
+  GAP := ">=4.7.8",
   NeededOtherPackages := [
     ["GAPDoc", ">= 1.2"],
     ["Forms", ">= 1.2"],
@@ -106,7 +106,7 @@ Dependencies := rec(
     ["AtlasRep", ">= 1.4.0"],
   ],
   SuggestedOtherPackages := [
-    ["recog", ">= 1.2.3.1"]
+    ["recog", ">= 1.2.4"]
   ],
   ExternalConditions := []
 ),
