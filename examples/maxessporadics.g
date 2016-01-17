@@ -1,7 +1,7 @@
 LoadPackage("atlasrep");
 AtlasOfGroupRepresentationsInfo.wget := true;
 
-RestoreStateRandom(
+Reset(GlobalRandomSource,
 [ 3, [ 52349192, 31282640, 121642702, 143650411, 82791369, 188184991, 
       109596351, 1676699, 227212123, 18775664, 128013466, 146544596, 
       191725122, 56159048, 15524557, 183293956, 264828058, 59362813, 
