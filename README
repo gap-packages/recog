@@ -6,14 +6,8 @@
 To get the newest version of this GAP 4 package download the
 archive file
     recog-x.x.tar.gz
-    recog-x.x.zoo
-    recog-x.x.tar.bz2
-    recog-x.x.zip
 and unpack it using 
-    gunzip recog-x.x.tar.gz; tar xvf recog-x.x.tar
-respectively
-    unzoo -x recog-x.x.zoo
-and so on.
+    tar xvf recog-x.x.tar.gz
 
 Do this in a directory called 'pkg', preferably (but not necessarily)
 in the 'pkg' subdirectory of your GAP 4 installation. It creates a
