@@ -7,8 +7,8 @@ SetPackageInfo( rec(
 
 PackageName := "recogbase",
 Subtitle := "A framework for group recognition",
-Version := "1.2.4",
-Date := "07/01/2016", # dd/mm/yyyy format
+Version := "1.2.5",
+Date := "08/03/2016", # dd/mm/yyyy format
 
 ##  Information about authors and maintainers.
 Persons := [
@@ -80,7 +80,7 @@ README_URL      := Concatenation( ~.PackageWWWHome, "/README" ),
 PackageInfoURL  := Concatenation( ~.PackageWWWHome, "/PackageInfo.g" ),
 ArchiveURL      := Concatenation( ~.SourceRepository.URL,
                                  "/releases/download/v", ~.Version,
-                                 "/", ~.PackageName ,"-", ~.Version ),
+                                 "/", ~.PackageName, "-", ~.Version ),
 ArchiveFormats := ".tar.gz .tar.bz2",
 
 AbstractHTML := "<b>Warning:</b> This package is still under development and \
