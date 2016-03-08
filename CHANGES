@@ -1,5 +1,8 @@
 This file describes changes in the recog package.
 
+1.2.5 (2016-03-08)
+  - Maintenance release
+
 1.2.4 (2016-01-07)
   - Fix bugs with handling of scalars in projective matrix groups (see issues #2 and #4)
   - Fix misdetection of SL(2,q), odd q (see issue #3)
