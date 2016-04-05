@@ -463,7 +463,7 @@ InstallGlobalFunction( RecogniseGeneric,
         if not(Hascalcnicegens(ri)) then
             Setcalcnicegens(ri,CalcNiceGensGeneric);
         fi;
-        if Hasslptonice(ri) and IsBound(SlotUsagePattern) then
+        if Hasslptonice(ri) then
             SlotUsagePattern(slptonice(ri));
         fi;
         # Handle the case that nobody set nice generators:
@@ -578,9 +578,8 @@ InstallGlobalFunction( RecogniseGeneric,
     repeat
         # Now we go on as usual:
         SetgensNslp(ri,SLPOfElms(gensN(ri)));
-        if IsBound(SlotUsagePattern) then
-            SlotUsagePattern(gensNslp(ri));
-        fi;
+        SlotUsagePattern(gensNslp(ri));
+
         # This is now in terms of the generators of H!
         N := Group(StripMemory(gensN(ri)));
         
@@ -684,7 +683,7 @@ InstallGlobalFunction( SLPforElement,
   function(ri,x)
     local slp;
     slp := slpforelement(ri)(ri,x);
-    if slp <> fail and IsBound(SlotUsagePattern) then
+    if slp <> fail then
         SlotUsagePattern(slp);
     fi;
     return slp;
@@ -929,7 +928,7 @@ BindGlobal( "SLPforNiceGens", function(ri)
   l := GeneratorsWithMemory(l);
   ll := CalcNiceGens(ri,l);
   s := SLPOfElms(ll);
-  if s <> fail and IsBound(SlotUsagePattern) then
+  if s <> fail then
       SlotUsagePattern(s);
   fi;
   return s;
