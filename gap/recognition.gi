@@ -457,8 +457,7 @@ InstallGlobalFunction( RecogniseGeneric,
     fi;
 
     # Handle the leaf case:
-    if IsLeaf(ri) or 
-       (IsBound(ri!.donotrecurse) and ri!.donotrecurse) then   
+    if IsLeaf(ri) then   
         # If nobody has set how we produce preimages of the nicegens:
         if not(Hascalcnicegens(ri)) then
             Setcalcnicegens(ri,CalcNiceGensGeneric);

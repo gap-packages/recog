@@ -440,11 +440,7 @@ the recognition tree is already completed or not. It is mainly set for
 debugging purposes during the recognition. However, if the recognition
 fails somewhere in a leaf, this flag is not set and all nodes above will
 also not have this flag set. In this way one can see whether the recognition
-failed and where the problem was. If a find homomorphism method
-uses <C>donotrecurse</C> (see <Ref Subsect="componentsri"/>)
-to avoid further recursion it acquires
-thereby responsibility to set the <Ref Filt="IsReady"/> flag in the
-corresponding subtree upon completion.
+failed and where the problem was.
 </Description>
 </ManSection>
 
@@ -898,14 +894,6 @@ set this attribute.
     of a recognition info record.
 
 <List>
-    <Mark><C>donotrecurse</C></Mark>
-<Item>
-    This component can be set to <C>true</C> 
-    by a find homomorphism method to indicate that the
-    generic recursive procedure should not recurse further down, even if
-    the corresponding node is not a leaf. It is then the responsibility of 
-    the find homomorphism method to complete the tree below.
-</Item>
 
 <Mark><C>leavegensNuntouched</C></Mark>
 <Item>If this component is bound to <C>true</C> by a find homomorphism
@@ -997,13 +985,6 @@ A successful find homomorphism method has the following duties:
     in case a leaf was found the method has to do
     <C>SetFilterObj(ri,IsLeaf);</C> thereby setting the <Ref Filt="IsLeaf"/>
     flag. <P/>
-    If the method for some reason chooses to finish the tree
-    below the current node on its own, it can set the component
-    <C>donotrecurse</C> to <C>true</C> (see <Ref
-    Subsect="componentsri"/>) to indicate that no further action is required
-    by the generic recognition function. The method is then responsible 
-    for correctly setting the <Ref Filt="IsLeaf"/> and <Ref Filt="IsReady"/>
-    flags in the whole subtree. <P/>
     A method finding a homomorphism which is not an isomorphism indicates
     so by not touching the flags.
 </Item>
