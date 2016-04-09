@@ -1190,16 +1190,15 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   local a,actpos,am,b,bas,bm,c,can,ch,cm,co,co2,el,ev,eva,evb,evbi,ext,gens,
         i,j,k,kk,mas,masi,mat,mati,mb,o,one,os,pos,q,res,s,ss,ssm,t,tb,tm,
         tt,ttm,u,v,x,xb,xm;
+
   q := Size(f);
   gens := GeneratorsOfGroup(g);
   if torig = false then
-      i := 1;
-      while i <= Length(gens) do
-          if not(IsOne(gens[i])) and IsOne(gens[i]^2) then
-              torig := gens[i];
+      for a in gens do
+          if not IsOne(a) and IsOne(a^2) then
+              torig := a;
               break;
           fi;
-          i := i + 1;
       od;
   fi;
   if torig = false then
@@ -1228,10 +1227,14 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
       tm := torig;
   fi;
   t := StripMemory(tm);
+
+  Assert(1, IsOne(t^2));
+
   ch := Factors(CharacteristicPolynomial(f,f,t,1));
   if Length(ch) <> 2 or ch[1] <> ch[2] then
-      Error("how could this have happened?");
+      Error("matrix is not triagonalizable - this should never happen!");
   fi;
+
   one := OneMutable(t);
   bas := MutableCopyMat(NullspaceMat(Value(ch[1],t)));
   Add(bas,one[1]);
@@ -1315,7 +1318,9 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
                   fi;
               od;
               x[2] := x[2] + x[1] * el;
-              if x <> bas*StripMemory(xm)*bas^-1 then Error("!!!"); fi;
+              if x <> bas*StripMemory(xm)*bas^-1 then
+                Error("!!!");
+              fi;
           fi;
           # now x[2][2] is equal to One(f)
           # we postpone the actual computation of the final x until we
