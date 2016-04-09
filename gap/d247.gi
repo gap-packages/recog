@@ -120,7 +120,9 @@ RECOG.DirectFactorsFinder := function(gens,facgens,k,eq)
     for j in [1..Length(gens)] do
       z := o[i][1]^gens[j];
       l := 1;
-      while l <= Length(o) and not(equal(z,o[l])) do l := l + 1; od;
+      while l <= Length(o) and not(equal(z,o[l])) do
+          l := l + 1;
+      od;
       pgens[j][i] := l;
       if l > Length(o) then
         z := Concatenation([z],List(o[i]{[2..Length(o[i])]},x->x^gens[j]));
@@ -159,7 +161,9 @@ RECOG.DirectFactorsAction := function(data,el)
   for i in [1..Length(o)] do
     z := o[i][1]^el;
     j := 1;
-    while j <= Length(o) and not(equal(z,o[j])) do j := j + 1; od;
+    while j <= Length(o) and not(equal(z,o[j])) do
+        j := j + 1;
+    od;
     if j <= Length(o) then
       Add(res,j);
     else

@@ -104,7 +104,9 @@ ConvertToMatrixRep(bas,q);
   fac := First(facs,x->Degree(x)=1);
   pr := -(CoefficientsOfLaurentPolynomial(fac)[1][1]);
   inforec.pows := [pr^0];
-  for k in [1..d-1] do Add(inforec.pows,inforec.pows[k]*pr); od;
+  for k in [1..d-1] do
+      Add(inforec.pows,inforec.pows[k]*pr);
+  od;
   inforec.newdim := dim/inforec.d;
   inforec.sample := ListWithIdenticalEntries(inforec.newdim,Zero(inforec.FF));
 # FIXME: this will later go:
@@ -566,7 +568,9 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
                     # fact scalar or not!
       Info( InfoRecog, 3, "Suspect that G' is scalar, checking..." );
       i := 1;
-      while RECOG.IsScalarMat(gens[i]) <> false do i := i + 1; od;
+      while RECOG.IsScalarMat(gens[i]) <> false do
+          i := i + 1;
+      od;
       # It cannot happen that all matrices are scalar, because then
       # we would not be absolutely irreducible!
       # Now gens[i] is not central, since then the action would not

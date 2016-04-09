@@ -816,7 +816,9 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
   V := VectorSpace(f,bas);
   b := Basis(V,bas);
   sl2genss := List(sl2gens,x->List(BasisVectors(b),v->Coefficients(b,v*x)));
-  for i in sl2genss do ConvertToMatrixRep(i,q); od;
+  for i in sl2genss do
+      ConvertToMatrixRep(i,q);
+  od;
   Info(InfoRecog,2,
        "Recognising this SL2 constructively in 2 dimensions...");
   sl2genss := GeneratorsWithMemory(sl2genss);
@@ -1154,7 +1156,9 @@ RECOG.FindStdGens_SL := function(sld,f)
               sld := sld, sldf := fakegens, slnstdf := sl2stdf,
               p := p, ext := ext );
   Info(InfoRecog,2,"Going up to SL_d again...");
-  while std.n < std.d do RECOG.SLn_UpStep(std); od;
+  while std.n < std.d do
+      RECOG.SLn_UpStep(std);
+  od;
   return rec( slpstd := SLPOfElms(std.slnstdf), 
               bas := std.bas, basi := std.basi );
 end;
@@ -2430,7 +2434,9 @@ RECOG.FindSymplecticPairBasis := function(vecs)
         s := gram[i][j]^-1;
         MultRowVector(bas[j],s);
         MultRowVector(gram[j],s);
-        for k in [1..d] do gram[k][j] := gram[k][j]*s; od;
+        for k in [1..d] do
+          gram[k][j] := gram[k][j]*s;
+        od;
         Assert(1,gram = RECOG.ComputeGramSymplecticStandardForm(bas*vecs));
         # Now exchange vectors i+1 and j:
         if i+1 <> j then

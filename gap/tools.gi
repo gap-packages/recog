@@ -20,7 +20,9 @@ RECOG.ElementOrderStats := function(pr,order,n,k)
   ords := EmptyPlist(n);
   for i in [1..n] do
       Add(ords,order(Next(pr)));
-      for j in [1..k] do Next(pr); od;
+      for j in [1..k] do
+          Next(pr);
+      od;
       if i mod 100 = 0 then
           Print(QuoInt(i*100,n),"%\r");
       fi;
