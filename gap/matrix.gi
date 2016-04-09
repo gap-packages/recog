@@ -172,8 +172,7 @@ FindHomMethodsMatrix.Scalar := function(ri, G)
   slp := StraightLineProgramNC([[l]],Length(GeneratorsOfGroup(G)));
   Setslptonice(ri,slp);   # this sets the nice generators
   Setslpforelement(ri,SLPforElementFuncsMatrix.DiscreteLog);
-  ri!.generator := ResultOfStraightLineProgram(slp,
-                                      GeneratorsOfGroup(G))[1][1][1];
+  ri!.generator := z^gcd;
   SetFilterObj(ri,IsLeaf);
   return true;
 end;

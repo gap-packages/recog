@@ -1,18 +1,22 @@
 # MatDiagonal:
 # Usage: ReadPackage("recog","tst/MatDiagonal.g");
 LoadPackage("recog");
-m := IdentityMat(7,GF(5));
-gens := [];
-l := ShallowCopy(Elements(GF(5)));
-RemoveSet(l,0*Z(5));
-for i in [1..5] do
-    n := MutableCopyMat(m);
-    for j in [1..7] do
-        n[j][j] := Random(l);
+for F  in [ GF(5), GF(9), GF(16) ] do
+    for n in [1, 2, 3, 7] do
+        gens := [];
+        l := ShallowCopy(Elements(F));
+        RemoveSet(l,Zero(F));
+        for i in [1..5] do
+            m := IdentityMat(7,F);
+            for j in [1..7] do
+                m[j][j] := Random(l);
+            od;
+            Add(gens,m);
+        od;
+        g := GroupWithGenerators(gens);
+        Print("Testing MatDiagonal over ", F, ":\n");
+        ri := RECOG.TestGroup(g,false,Size(g));
+        Print("\n");
+        Assert(0, Size(ri) = Size(g));
     od;
-    Add(gens,n);
 od;
-g := GroupWithGenerators(gens);
-Print("Testing MatDiagonal:\n");
-ri := RECOG.TestGroup(g,false,Size(g));
-Print("\n");
