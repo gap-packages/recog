@@ -472,7 +472,8 @@ RECOG.ResetSLstd := function(r)
   fi;
   return r;
 end;
-  
+
+# TODO: document the parameters
 RECOG.InitSLstd := function(f,d,s,t,a,b)
   local r;
   r := rec( f := f, p := Characteristic(f), ext := DegreeOverPrimeField(f),
@@ -485,6 +486,11 @@ RECOG.FindFFCoeffs := function(r,lambda)
   return IntVecFFE(Coefficients(CanonicalBasis(r.f),lambda));
 end;
 
+# TODO: document this; what does "fake" mean????
+# Theory: the fake gens are only used for their memory. Since we are only
+# interested in the memory (to produce slps), we use trivial permutations for
+# the underlying group elements, so that the multiplication is cheap.
+# Verify and then document this.
 RECOG.InitSLfake := function(f,d)
   local ext,l;
   ext := DegreeOverPrimeField(f);
@@ -1077,6 +1083,7 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
   return rec( slpstd := SLPOfElms(std.all), bas := bas, basi := basi );
 end;
 
+# TODO: which algorithm is this? reference?
 RECOG.FindStdGens_SL := function(sld,f)
   # gens of sld must be gens for SL(d,q) in its natural rep with memory
   # This function calls RECOG.SLn_constructsl2 and then extends 
@@ -3084,7 +3091,7 @@ end;
 # d: a positive integer (typically ri!.gcd.gcd)
 # f: a galois field (typically ri!.field)
 #
-# Compute a primitive d-th roots of el in the field f.
+# Compute a primitive d-th root of el in the field f.
 RECOG.ComputeRootInFiniteField := function(el,d,f)
   local coeffs,facs,i,x;
   x := Indeterminate(f);
@@ -3093,6 +3100,9 @@ RECOG.ComputeRootInFiniteField := function(el,d,f)
   if i = fail then return fail; fi;
   coeffs := CoefficientsOfUnivariatePolynomial(facs[i]);
   return -coeffs[1];
+  # TODO: There must be better ways to compute roots in finite fields than
+  # factorizing polynomials... Somebody should implement one, and replace
+  # this code with it :)
 end;
 
 # Express an element of PSL_d as an slp in terms of standard generators.
@@ -3214,7 +3224,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
       if classical.IsSLContained = true then
           # Do not run the generic code in small cases:
           if (q^d-1)/(q-1) <= 1000 or d = 3 then  
-              # Note d=3 currently has a problem in the SL2-finder.
+              # FIXME: Note d=3 currently has a problem in the SL2-finder.
               Info(InfoRecog,2,"Classical natural: SL(",d,",",q,"): small ",
                    "case, handing over to Schreier-Sims.");
               ri!.comment := Concatenation("_SL(",String(d),",",String(q),")",

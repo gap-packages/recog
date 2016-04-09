@@ -327,6 +327,13 @@ InstallGlobalFunction( InstallAlmostSimpleHint,
   end );
 
 # FIXME: unused?
+# TODO: this was likely used to generate the hints in almostsimple/hints.gi.
+# Document this, and how to replicate the hints; move the code to a separate file.
+# Indeed, ideally a user should be able to trivially regenerate the list of hints
+# by running a script. Note that for that, we need to also explain how the arguments
+# "reps" and "maxes" are chosen...
+# Perhaps a full script is not possible; but then we should still explain how
+# the hints where generated.
 RECOG.ProduceTrivialStabChainHint := function(name,reps,maxes)
   local bad,f,g,gens,hint,list,m,o,prevdim,prevfield,r,range,res,ri,
         size,success,t,values,x;
@@ -515,6 +522,8 @@ end;
 # Under the assumption that G is an almost simple group,
 # attempt to guess the "natural" characteristic of the
 # group based on the two maximal orders of group elements.
+#
+# Used by FindHomMethodsProjective.ThreeLargeElOrders.
 RECOG.findchar:=function(ri,G,randelfunc)
     # randelfunc must be a function taking ri as one argument and returning
     # uniformly distributed random elements in G together with its
@@ -698,6 +707,10 @@ RECOG.RandElFuncSimpleSocle := function(ri)
   return rec( el := el, order := ord );
 end;
 
+# The following recognition method is based on the paper
+# "Large element orders and the characteristic of Lie-type simple groups."
+# by Kantor and Seress, Journal of Algebra 322 (2009) 802–832.
+#
 FindHomMethodsProjective.ThreeLargeElOrders := function(ri,G)
   local hint,name,namecat,p,res;
   RECOG.SetPseudoRandomStamp(G,"ThreeLargeElOrders");
@@ -924,6 +937,11 @@ FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
       Add(totry,d+2);
   fi;
   return fail;    # do not try any more now
+
+
+# FIXME: there is dead code below...
+
+
   for deg in totry do
       Info(InfoRecog,3,"Looking for Alt/Sym(",deg,")...");
       RecSnAnIsOne := IsOneProjective;

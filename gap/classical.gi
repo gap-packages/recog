@@ -2350,6 +2350,8 @@ function( arg )
   # return result
 end);
 
+# The following function pretty prints the output of RecogniseClassical.
+# This can be helpful when debugging it.
 DisplayRecog := function( r )
     
     local q0;
