@@ -1203,41 +1203,27 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
       od;
   fi;
   if torig = false then
-      repeat
-          am := PseudoRandom(g);
-      until Order(am) = q-1;
-      a := StripMemory(am);
-      eva := Eigenvectors(f,a);
-      repeat
-          repeat
-              bm := am^PseudoRandom(g);
-          until am*bm<>bm*am;
-          b := StripMemory(bm);
-          ev := Eigenvalues(f,b);
-          evb := List(ev,v->NullspaceMat(b-v*One(b))[1]);
-          evbi := evb^-1;
-          c := evb*a*evbi;
-          if IsZero(c[1][2]) or IsZero(c[2][1]) then
-              # We were lucky, a and b share an eigenspace
-              tm := Comm(am,bm);
-          else
-              u := eva[1]*evbi;
-              # We know that both components are non-zero since a and b do not
-              # have a common eigenspace!
-              repeat
-                  cm := am^PseudoRandom(g);
-                  c := StripMemory(cm);
-                  v := (eva[1]*c)*evbi;
-              until not(IsZero(v[1]) or IsZero(v[2]));
-              pos := LogFFE((v[2]/v[1])/(u[2]/u[1]),ev[2]);
-              if IsOddInt(pos) then
-                  pos := (pos + q - 1) / 2;
-              else
-                  pos := pos / 2;
-              fi;
-              tm := Comm(am,bm^pos*cm^-1);
-          fi;
-      until not(IsOne(tm));
+    # if no involution t has been given, compute one, using Proposition 4 from
+    # "Black box groups isomorphic to PGL(2,2^e)" by Kantor & Kassabov,
+    # Journal of Algebra, 421 (2015) 16–26.
+    repeat
+        am:=PseudoRandom(g);
+    until not IsOneProjective(am);
+    k := Order(am);
+    if IsEvenInt(k) then
+        tm := am^(k/2);
+    else
+        # find a conjugate of a which does not commute with a.
+        repeat
+            bm := am^PseudoRandom(g);
+            cm := am*bm;
+            tm := bm*am;
+        until cm<>tm;
+        tm := tm^-1 * cm;
+        if not IsOneProjective(StripMemory(tm)^2) then
+            tm := cm^((q^2-2)/2) * am;
+        fi;
+    fi;
   else
       tm := torig;
   fi;
