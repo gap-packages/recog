@@ -3096,7 +3096,7 @@ end;
 # appear in GAP 4.9. Once GAP 4.9 is out, we can switch
 # to using RootFFE directly.
 RECOG.ComputeRootInFiniteField := function(el, d, f)
-    local  e, m, p, a;
+    local z, e, m, p, a;
     if IsZero(el) or IsOne(el)  then
         return el;
     fi;
@@ -3105,13 +3105,13 @@ RECOG.ComputeRootInFiniteField := function(el, d, f)
     e := LogFFE(el, z);
     p := GcdInt(m, e);
     d := d mod m;
-    a := GcdInt(m, k);
+    a := GcdInt(m, d);
     if p mod a <> 0  then
         return fail;
     fi;
     a := e * (a / d mod (m / p)) / a mod m;
     return z ^ a;
-end
+end;
 
 # Express an element of PSL_d as an slp in terms of standard generators.
 SLPforElementFuncsProjective.PSLd := function(ri,x)
