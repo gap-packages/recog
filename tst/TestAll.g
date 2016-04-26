@@ -44,4 +44,3 @@ ReadPackage("recog","tst/TestClassicalNatural.g");
 # testsporadicrecog.g
 # Sporadics.g
 # products.g
-# pcgmemory.g
