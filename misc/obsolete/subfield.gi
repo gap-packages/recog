@@ -18,6 +18,8 @@
 ##
 #############################################################################
 
+# DeclareGlobalVariable( "SUBFIELD" );  # for the subfield code
+
 InstallValue( SUBFIELD, rec() );
 
 SUBFIELD.ScalarToMultiplyIntoSmallerField := function(m,k)
