@@ -106,7 +106,7 @@ we first summarise it in steps:
     as a straight line program in the images of the generators and applying
     this straight line program to the original generators. The quotient of
     the random element and the result of the straight line program lies in
-    the kernel of the homomorphism. After creating 20 random generators
+    the kernel of the homomorphism. After creating 20 (FIXME: is 20 correct?) random generators
     of the kernel we assume for the moment that they generate the kernel.
     </Item>
 <Item>The function <Ref Func="RecogniseGeneric"/> can now call itself
@@ -727,7 +727,7 @@ about the kernel:
     CallFuncList(methgensN(ri).method,Concatenation([ri],methgensN.args));
 </Listing>
 The record is initialised upon creation of the recognition info record
-to calling <Ref Func="FindKernelRandom"/> with one argument of 20 (in addition
+to calling <Ref Func="FindKernelRandom"/> with one argument of 20 (FIXME: is 20 correct?) (in addition
 to the first argument <A>ri</A>). See below for a choice of possible
 find kernel methods.
 </Description>
@@ -987,6 +987,9 @@ A successful find homomorphism method has the following duties:
     flag. <P/>
     A method finding a homomorphism which is not an isomorphism indicates
     so by not touching the flags.
+    <E>FIXME: What does that mean? Which flags? The IsLeaf filter? But then
+    this sounds as if isomorphisms require settings some flag.. but which?!?
+    perhaps remove that sentence?</E>
 </Item>
 <Mark>for leaves: <Ref Func="SLPforElement"/> function</Mark>
 <Item>
@@ -1035,7 +1038,7 @@ A successful find homomorphism method has the following duties:
     see <Ref Attr="findgensNmeth"/>).
     If one does not change the default value,
     the recursive recognition function will generate
-    20 random elements in <A>G</A> and produce random generators of the
+    20 (FIXME: is 20 correct?) random elements in <A>G</A> and produce random generators of the
     kernel by dividing by a preimage of an image under the homomorphism.
     Note that generators in <Ref Attr="gensN"/> have to have a
     memory attached to them that stores, how they were acquired from the
