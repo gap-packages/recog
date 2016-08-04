@@ -25,11 +25,8 @@ InstallValue( RecognitionInfoType,
 # Objectify(RecognitionInfoType,r);
 
 
-RECINFORECURLEVEL := 0;
-
 # a nice view method:
-InstallMethod( ViewObj, "for recognition infos", [IsRecognitionInfo],
-  function( ri )
+RECOG_ViewObj := function( level, ri )
     local ms;
     if IsReady(ri) then
         Print("<recoginfo ");
@@ -67,26 +64,29 @@ InstallMethod( ViewObj, "for recognition infos", [IsRecognitionInfo],
         Print(" Field=",Size(ri!.field));
     fi;
     if not(IsLeaf(ri)) then
-        Print("\n",String("",RECINFORECURLEVEL)," F:"); 
-        RECINFORECURLEVEL := RECINFORECURLEVEL+3;
+        Print("\n",String("",level)," F:"); 
         if HasRIFac(ri) then
-            ViewObj(RIFac(ri));
+            RECOG_ViewObj(level+3, RIFac(ri));
         else
             Print("has no factor");
         fi;
-        Print("\n",String("",RECINFORECURLEVEL-3), " K:");
+        Print("\n",String("",level), " K:");
         if HasRIKer(ri) then
             if RIKer(ri) = fail then
                 Print("<trivial kernel");
             else
-                ViewObj(RIKer(ri));
+                RECOG_ViewObj(level+3, RIKer(ri));
             fi;
         else
             Print("has no kernel");
         fi;
-        RECINFORECURLEVEL := RECINFORECURLEVEL-3;
     fi;
     Print(">");
+  end;
+
+InstallMethod( ViewObj, "for recognition infos", [IsRecognitionInfo],
+  function(ri)
+    RECOG_ViewObj(0, ri);
   end);
 
 
