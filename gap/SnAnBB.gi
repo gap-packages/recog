@@ -35,7 +35,7 @@ RecSnAnEq := EQ;
 ## is <r,s> in S_n
 
 SatisfiesSnPresentation := function( n, r, s )
-	 
+
     local j, t;
 
     Info( InfoRecSnAn, 1, "calling Satisfies Sn Presentation");
@@ -65,7 +65,7 @@ end;
 ##  is <s,t> in A_n
 
 SatisfiesAnPresentation := function( n, s, t )
-	 
+ 
     local j, r, ti;
 
     Info( InfoRecSnAn, 1, "calling Satisfies An Presentation");
@@ -237,7 +237,7 @@ NiceGeneratorsSnAn := function ( n, grp, N )
                           y := Comm(h, h^b);
                           if not(RecSnAnIsOne(y)) and
                              not(RecSnAnIsOne(y^2)) and RecSnAnIsOne(y^3) then
-		            Info(InfoRecSnAn,1,"found good transposition");
+                            Info(InfoRecSnAn,1,"found good transposition");
                             if SatisfiesSnPresentation( n, b, h ) then
                               Info( InfoRecSnAn, 1, 
                                 "Group satisfies presentation for Sn ",N);
@@ -334,7 +334,7 @@ NiceGeneratorsSnAn := function ( n, grp, N )
 
         # if we have an n- or (n-1)-cycle and a 3-cycle, test for An
         if elfound[3] and elfound[4] and n mod 2 = 0 then 
-            for a in g4 do		   
+            for a in g4 do   
                 i := Int(2 * n/3);
                 while N > 0 and i > 0 do
                     i := i-1;
@@ -360,12 +360,12 @@ NiceGeneratorsSnAn := function ( n, grp, N )
                             g := b * h;
                             if SatisfiesAnPresentation( n, g, h ) then
                               Info( InfoRecSnAn, 1, 
-		              "Group satisfies presentation for An ", N);
+                              "Group satisfies presentation for An ", N);
                               return [ g, h, "An" ];
                             else
                               RemoveElmList(g3,Position(g3,b));
                               if Length(g3)=0 then elfound[3]:=false;fi; 
-                            fi;			
+                            fi;
                           fi;
                         od;
                     fi;
@@ -575,7 +575,7 @@ FindImageSn := function( n, z, g, h, xis, xisl )
                     else
                         sup[lp1 mod 3 + 1] := 
                             Difference( sup[lp1 mod 3 + 1], mxj);
-	            fi;
+                    fi;
                     l := 4;  # exit loop over l
                 fi;
                 l := l + 1;
@@ -671,9 +671,9 @@ ConstructXiAn := function( n, g, h )
             xis[m+4] := g^0;
             xisl[m+4] := [];
 
-	    for j in [m+5 .. 2*m+3 ] do
-	        xis[j] := a;
-	        xisl[j] := [ [1 .. 5] ];
+            for j in [m+5 .. 2*m+3 ] do
+                xis[j] := a;
+                xisl[j] := [ [1 .. 5] ];
             od;
 
             xis[2*m+4] := b1;
@@ -1129,7 +1129,7 @@ FindImageAn := function( n, z, g, h, xis, xisl )
                 for j in [1..Length(sup[l])] do
                     if not IsBound(zim[i+l-1]) then
                         if IsImagePointAn(n,z,g,h,sup[l][j],s,a,b,
-			      t[findp[l][1]]^z, t[findp[l][2]]^z ) then
+                              t[findp[l][1]]^z, t[findp[l][2]]^z ) then
                             zim[i+l-1] := sup[l][j];
                         fi;
                     fi;
@@ -1438,7 +1438,7 @@ RecogniseSnAn :=  function( n, grp, eps )
             else
                 slp := SLPforAn( n, gl );
                 eval:=ResultOfStraightLineProgram(slp,[gens[2],gens[1]]);
-                if not(RecSnAnEq(eval,g)) then return fail; fi;			
+                if not(RecSnAnEq(eval,g)) then return fail; fi;
             fi;
         od;
 
