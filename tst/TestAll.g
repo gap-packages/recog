@@ -1,5 +1,9 @@
-# All systematic tests:
 LoadPackage("recog");
+
+# Bug fixes
+ReadPackage("recog","tst/bugfix.g");
+
+# All systematic tests:
 ReadPackage("recog","tst/tst1.g");
 ReadPackage("recog","tst/tst2.g");
 ReadPackage("recog","tst/tst3.g");
@@ -38,9 +42,11 @@ ReadPackage("recog","tst/MatFDPM.g");
 ReadPackage("recog","tst/PermDirProd.g");
 ReadPackage("recog","tst/MatTensor.g");
 ReadPackage("recog","tst/TestClassicalNatural.g");
+# FIXME occasional errors for GL(18,7), GL(20,5)
+ReadPackage("recog","tst/Sporadics.g");
 
 # The following files from tst/ are NOT loaded by this test:
-# TestAll.g  (of course)
-# testsporadicrecog.g
-# Sporadics.g
-# products.g
+# - TestAll.g  -> of course
+# - testsporadicrecog.g -> seems to work initially, but is very slow,
+#     probably because we resort to orbit methods instead of constructive recognition
+# - products.g -> read by other files
