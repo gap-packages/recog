@@ -26,6 +26,9 @@ DeclareInfoClass( "InfoRecSnAn" );
 SetInfoLevel( InfoRecSnAn, 0 );
 
 # The following are used for comparisons:
+
+# FIXME: Get rid of these globals.
+# However, it seems to me this whole file is dead code anyway..
 RecSnAnIsOne := IsOne;
 RecSnAnEq := EQ;
 
@@ -530,6 +533,7 @@ end;
 
 ##  Determine the image of z under lambda
 
+# FIXME: dead code? (it's callers are all dead)
 FindImageSn := function( n, z, g, h, xis, xisl )
 
     local i, j, l, t, tz, k, sup, m, rest, lp1, mxj, mxjpm, zim, OrderSup;
@@ -1170,6 +1174,8 @@ end;
 
 ##  SLP for pi from (1,2), (1,...,n)
 
+# FIXME: dead code? (it's callers are all dead)
+# FIXME: duplicate of RECOG.SLPforSn in giant.gi
 SLPforSn :=  function( n, pi )
 
     local cycles, initpts, c, newc, i, R, ci, cycslp, k ;
@@ -1236,6 +1242,8 @@ end;
 
 ##  SLP for pi from (1,2,3), sigma
 
+# FIXME: dead code? (it's callers are all dead)
+# FIXME: duplicate of RECOG.SLPforAn in giant.gi
 SLPforAn :=  function( n, pi )
 
     local cycles, initpts, c, newc,  R, i, nexttrpn, ci, cycslp, k, j,
@@ -1372,6 +1380,7 @@ end;
 ##
 ##  The main function.
 
+# FIXME: dead code? (it's callers are all dead)
 RecogniseSnAn :=  function( n, grp, eps )
 
     local N, gens, le, g, h, slp, gl, b, eval, xis;

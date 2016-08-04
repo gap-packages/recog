@@ -808,6 +808,7 @@ RECOG.RecognizeAlternating := function (orders)
    return mindeg;
 end;
 
+# FIXME: dead code? (it's callers are all dead)
 SLPforElementFuncsProjective.Alternating := function(ri,x)
   local y,slp;
   RecSnAnIsOne := IsOneProjective;
@@ -822,6 +823,7 @@ SLPforElementFuncsProjective.Alternating := function(ri,x)
   return slp;
 end;
 
+# FIXME: dead code? (it's callers are all dead)
 SLPforElementFuncsProjective.Symmetric := function(ri,x)
   local y,slp;
   RecSnAnIsOne := IsOneProjective;
