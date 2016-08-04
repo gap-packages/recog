@@ -177,7 +177,41 @@ FindHomMethodsMatrix.Scalar := function(ri, G)
   return true;
 end;
 
+
+# Given a matrix `mat`, and a set of indices `poss`,
+# check whether the projection to the block mat{poss}{poss}
+# is valid -- that is, whether the rows and columns in
+# the set poss contain only zero elements outside of the
+# positions indicated by poss.
+RECOG.IsDiagonalBlockOfMatrix := function(mat,poss)
+  local z, i, j;
+  z := Zero(mat[1][1]);
+  for i in poss do
+    for j in [1..Length(mat)] do
+      if i in poss then continue; fi;
+      if mat[i][j] <> z or mat[j][i] <> z then
+        return false;
+      fi;
+    od;
+  od;
+  return true;
+end;
+
+
+# Homomorphism method used by these recognition methods:
+# - FindHomMethodsMatrix.BlockScalar
+# - FindHomMethodsProjective.BlocksModScalars
 RECOG.HomToDiagonalBlock := function(data,el)
+  # Verify el is in the domain of definition of this homomorphism.
+  # Assuming the recognition result is correct, this is of course always
+  # the case if el is a group element. However, this function may also
+  # be called for elements which are not contained in the group.
+  # TODO: add a switch to optionally bypass this verification
+  # when we definitely don't need it?
+  if not RECOG.IsDiagonalBlockOfMatrix(el, data.poss) then
+    return fail;
+  fi;
+
   return ExtractSubMatrix(el,data.poss,data.poss);
 end;
 
@@ -401,14 +435,45 @@ FindHomMethodsMatrix.ReducibleIso := function(ri,G)
   return true;
 end;
 
+# Given a matrix `mat` and a list of index sets `blocks`,
+# verify that the matrix has block lower triangular shape
+# with respect to the given blocks.
+RECOG.IsBlockLowerTriangularWithBlocks := function(mat, blocks)
+  local z, b, col, row;
+  Assert(0, Concatenation(blocks) = [1..Length(mat)]);
+  z := Zero(mat[1][1]);
+  for b in blocks do
+    # Verify that there are only zeros above each block
+    for row in [1..b[1]-1] do
+      for col in b do
+        if mat[row][col] <> z then
+          return false;
+        fi;
+      od;
+    od;
+  od;
+  return true;
+end;
+
+# Homomorphism method used by FindHomMethodsMatrix.BlockLowerTriangular.
 RECOG.HomOntoBlockDiagonal := function(data,el)
   local dim,i,m;
+
+  # Verify el is in the domain of definition of this homomorphism.
+  # Assuming the recognition result is correct, this is of course always
+  # the case if el is a group element. However, this function may also
+  # be called for elements which are not contained in the group.
+  if not RECOG.IsBlockLowerTriangularWithBlocks(el,data.blocks) then
+    return fail;
+  fi;
+
   dim := Length(el);
   m := ZeroMutable(el);
   for i in [1..Length(data.blocks)] do
       CopySubMatrix(el,m,data.blocks[i],data.blocks[i],
                          data.blocks[i],data.blocks[i]);
   od;
+
   return m;
 end;
 
