@@ -993,15 +993,13 @@ A successful find homomorphism method has the following duties:
 </Item>
 <Mark>for leaves: <Ref Func="SLPforElement"/> function</Mark>
 <Item>
-    If a find homomorphism method has
-    produced a leaf in the recognition tree or has set the
-    <C>donotrecurse</C> component to <C>true</C> (see
-    <Ref Subsect="componentsri"/>), then it has to set the attribute
-    <Ref Attr="slpforelement"/> to a function like 
-    <Ref Func="SLPforElementGeneric"/> that can write an arbitrary element
-    in <A>G</A> as a straight line program in the nice generators of <A>G</A>.
-    The method may store additional data into the recognition info record
-    for this to work. It does not have to set any other value in <A>ri</A>.
+    If a find homomorphism method has produced a leaf in the recognition tree,
+    then it has to set the attribute <Ref Attr="slpforelement"/> to a function
+    like <Ref Func="SLPforElementGeneric"/> that can write an arbitrary
+    element in <A>G</A> as a straight line program in the nice generators of
+    <A>G</A>. The method may store additional data into the recognition info
+    record for this to work. It does not have to set any other value in
+    <A>ri</A>.
 </Item>
 <Mark>for leaves: information about nice generators</Mark>
 <Item>
