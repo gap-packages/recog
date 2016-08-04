@@ -7,6 +7,8 @@ for q in [2,3,4,5,7,8,9,11,13,16,17,25,81,256] do
 
     h := GL(d,q);
     gens := List([1..10],x->PseudoRandom(h));
+    # FIXME: while this is a generating set with HIGH PROBABILITY, it is not always one.
+    # This could lead to spurious failures in the test suite...
     g := GroupWithGenerators(gens);
     Print("Testing GL(",d,",",q,") in its natural representation...\n");
     ri := RECOG.TestGroup(g,false,Size(h));
