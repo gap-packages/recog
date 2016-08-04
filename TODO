@@ -2,34 +2,10 @@ Use other methods for going down in dimension 3 in SL code
   --> See Akos email 29 Jul 2011
 Finalize FindAllPPD method
 
-File permissions: 
-  doc/descriptions
-  doc/descriptions.matrix
-
-Bug report:
-
-Hi Max,
-
-interessiert an bug reports zu recog*? Falls ja, gehen die an Dich?
-
-Etwa:
-
-g := DirectProduct(SymmetricGroup(12),SymmetricGroup(5));
-repeat
-  h:=g^Random(SymmetricGroup(37));
-  r:=RecogniseGroup(h);
-until Size(h) <> Size(r);
-
-stoppt bei mir immer recht schnell, dann ist Size(r) einen Faktor 2 zu
-klein.
-
-Viele Grüße,
-  Frank
 
 Today:
 
   - Look at documentation: StdGens, StdPresentation
-  - Finish web pages
   - Bug with loading of single packages
   - Systematic test of classical natural
   - Tensor und Subfield tests fail because SL(4,5) does not find an SL2
@@ -43,9 +19,6 @@ Today:
   - fix new FindElmOf method with respect to PseudoRandom
   - implement sl2 natural
   - look at Pete's code (blackbox classical)
-  - create Makefile
-  - do not ship contrib
-  - do not ship named subdirs in gap
   - DisplayCompositionFactors is seriously broken e.g. in the projective
     case
 
@@ -85,13 +58,9 @@ Later TODO list:
 
 Future: 
 
-make New...StraightLineProgram official, throw old stuff out
-slp code into main library
-
 improvements of library in library
 
 to change once the new vector/matrix interface is in place:
 
   FieldOfMatrixGroup/DefaultFieldOfMatrixGroup
   
-
