@@ -270,6 +270,19 @@ ConvertToMatrixRep(homcomp,Size(f));
         Info(InfoRecog,2,"D247:Obviously did not get normal subgroup!");
         return fail;
     fi;
+
+    # NOTE: here we switch from matrix to permutation group recognition!
+    # Here is an example triggering this:
+    #
+    # gap> n:=7;; G:=AlternatingGroup(n);;
+    # gap> gens:=List(GeneratorsOfGroup(G),g->PermutationMat(g,n)) * Z(5);;
+    # gap> gens[1][1][2] := -gens[1][1][2];; gens[2][7][5] := -gens[2][7][5];;
+    # gap> H2:=Group(gens);; ri:=RecognizeGroup( H2 );
+    # gap> Grp(RIFac(ri));
+    # <matrix group with 2 generators>
+    # gap> Grp(RIFac(RIFac(ri)));
+    # Group([ (1,2,3,4,5,6,7), (1,2,3) ])
+
     a := OrbActionHomomorphism(G,o);
     SetHomom(ri,a);
     Setmethodsforfactor(ri,FindHomDbPerm);
