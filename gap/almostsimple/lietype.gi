@@ -822,7 +822,10 @@ FindHomMethodsProjective.LieTypeNonConstr := function(ri,G)
                  ", lookup up hints...");
             ri!.comment := Concatenation("_",r);
             res := LookupHintForSimple(ri,G,r);
-            if res = true then return true; fi;
+            # FIXME: LookupHintForSimple is for sporadics... So why do we use it here?
+            if res = true
+                then return true;
+            fi;
             Info(InfoRecog,2,"LieTypeNonConstr: giving up.");
             return fail;
         fi;
