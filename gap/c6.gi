@@ -8,6 +8,13 @@
 ##  Copyright 2005-2008 by the authors.
 ##  This file is free software, see license information at the end.
 ##
+## This implementation is probably based on the paper
+## 'A reduction algorithm for matrix groups with an extraspecial normal subgroup.'
+## by
+## Brooksbank, Peter; Niemeyer, Alice C.; Seress, Ákos
+## in
+## Finite geometries, groups, and computation, 1–16, Walter de Gruyter GmbH & Co. KG, Berlin, 2006. 
+##
 ##  Find a subgroup of the normaliser of a symplectic type r group
 ##
 #############################################################################
