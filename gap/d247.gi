@@ -9,6 +9,10 @@
 ##
 ##  Handle the (projective) imprimitive, tensor and tensor-induced cases.
 ##
+##  This implementation is inspired by Max Neunhoeffer's habil thesis
+##  and the variations D2, D4 and D7 of the Aschbacher cases. A copy can
+##  be obtained via Frank Luebeck, LDfM RWTH Aachen.
+##
 #############################################################################
 
 RECOG.InvolutionSearcher := function(pr,ord,tol)
@@ -56,6 +60,7 @@ RECOG.InvolutionCentraliser := function(pr,ord,x,nr)
 end;
 
 
+# See http://www.math.rwth-aachen.de/~Max.Neunhoeffer/Publications/pdf/perth09_handout.pdf
 RECOG.InvolutionJumper := function(pr,ord,x,tol,withodd)
   # x an involution in a group g, for which the product replacer pr produces
   # random elements, withodd is true or false, it switches the odd case on or
