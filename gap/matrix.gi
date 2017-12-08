@@ -235,6 +235,8 @@ FindHomMethodsMatrix.BlockScalar := function(ri,G)
       if nrblocks = 1 then     # no kernel:
           findgensNmeth(ri).method := FindKernelDoNothing;
       else   # exactly two blocks:
+          # FIXME: why don't we just compute a precise set of generators of the kernel?
+          # That should be easily and efficiently possible at this point, no?
           findgensNmeth(ri).args[1] := 7;
           findgensNmeth(ri).args[2] := 5;
           forkernel(ri).blocks := ri!.blocks{[1]};
@@ -265,6 +267,8 @@ FindHomMethodsMatrix.BlockScalar := function(ri,G)
            stamp := "BlockScalar" ),1);
 
   # the kernel is the first few blocks (can be only one!):
+  # FIXME: why don't we just compute a precise set of generators of the kernel?
+  # That should be easily and efficiently possible at this point, no?
   findgensNmeth(ri).args[1] := 3 + nrblocks;
   findgensNmeth(ri).args[2] := 5;
   forkernel(ri).blocks := ri!.blocks{[1..middle-1]};
@@ -287,7 +291,6 @@ ExtendToBasisOfFullRowspace := function(m,f)
   v := ZeroMutable(m[1]);
   if RankMat(m) < Length(m) then
       Error("No basis!");
-      return;
   fi;
   i := 1;
   o := One(f);
@@ -485,6 +488,7 @@ FindHomMethodsMatrix.BlockLowerTriangular := function(ri,G)
   data := rec( blocks := ri!.blocks );
   newgens := List(GeneratorsOfGroup(G),
                   x->RECOG.HomOntoBlockDiagonal(data,x));
+  Assert(0, not fail in newgens);
   H := GroupWithGenerators(newgens);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomOntoBlockDiagonal,data);
   SetHomom(ri,hom);

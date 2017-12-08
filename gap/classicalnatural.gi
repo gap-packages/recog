@@ -1316,6 +1316,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
               j := j + 1;
               x := MutableCopyMat(bas*StripMemory(xm)*bas^-1);
           until not(IsZero(x[1][2]));
+
           if not(IsOne(x[2][2])) then
               el := (One(f)-x[2][2])/x[1][2];
               co := Coefficients(can,el) * mati;
@@ -1326,6 +1327,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
               od;
               x[2] := x[2] + x[1] * el;
               if x <> bas*StripMemory(xm)*bas^-1 then
+                # FIXME: sometimes triggered by RecognizeGroup(GL(2,16));
                 Error("!!!");
               fi;
           fi;
@@ -1342,6 +1344,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
                   xm := xm * ttm[i];
               fi;
           od;
+# TODO: add sanity check here, too???
           x := StripMemory(xm);
           # now x[2][1] is equal to Zero(f) and thus x[1][1] is One(f) as well
           break;

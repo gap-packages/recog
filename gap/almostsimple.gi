@@ -938,8 +938,13 @@ FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
   if (d+2) mod p = 0 and d+2 > 10 then
       Add(totry,d+2);
   fi;
+
   return fail;    # do not try any more now
 
+
+# TODO: try out an example that should need this;
+#  e.g. start with A_n on k-subsets, k >= 2, then go to perm mats...
+#
 
 # FIXME: there is dead code below...
 
