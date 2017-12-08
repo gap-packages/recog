@@ -51,9 +51,13 @@ InstallGlobalFunction( "CallMethods", function(arg)
     repeat   # a loop to try all over again with higher tolerance
         i := 1;
         while i <= Length(db) do
-            if not(IsBound(ms.falsemethods.(db[i].stamp))) and
-               (not(IsBound(ms.failedmethods.(db[i].stamp))) or
-                ms.failedmethods.(db[i].stamp) <= tolerance) then
+            if IsBound(ms.falsemethods.(db[i].stamp)) or
+               (IsBound(ms.failedmethods.(db[i].stamp)) amd
+                ms.failedmethods.(db[i].stamp) > tolerance) then
+                Info(InfoMethSel,4,"Skipping rank ",db[i].rank," method \"",
+                     db[i].stamp,"\".");
+                i := i + 1;
+            else
 
                 # We try this one:
                 Info(InfoMethSel,3,"Calling  rank ",db[i].rank,
@@ -88,10 +92,6 @@ InstallGlobalFunction( "CallMethods", function(arg)
                 else
                     Error("Recognition method return invalid result: ", result);
                 fi;
-            else
-                Info(InfoMethSel,4,"Skipping rank ",db[i].rank," method \"",
-                     db[i].stamp,"\".");
-                i := i + 1;
             fi;
         od;
         # Nothing worked, increase tolerance:
