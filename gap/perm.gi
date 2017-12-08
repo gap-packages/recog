@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  perm.gi            
+##  perm.gi
 ##                                recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
@@ -22,7 +22,7 @@ FindHomMethodsPerm.Cyclic2 :=
      # Test applicability (this would no longer be necessary, because we
      # are called only for permutation groups anyway. However, this is an
      # example.
-     if not(IsPermGroup(H)) then 
+     if not(IsPermGroup(H)) then
          return NotEnoughInformation;
      fi;
      # Now we work:
@@ -56,8 +56,8 @@ SLPforElementFuncsPerm.Cyclic2 :=
 
 # The following would install this method with a very low rank if we would
 # like to:
-# 
-# AddMethod( FindHomDbPerm, FindHomMethodsPerm.Cyclic2, 
+#
+# AddMethod( FindHomDbPerm, FindHomMethodsPerm.Cyclic2,
 #            1, "Cyclic2",
 #            "cheat: find a Cyclic2" );
 
@@ -105,7 +105,7 @@ end;
 FindHomMethodsPerm.NonTransitiveByFoot :=
   function( ri, G )
     local data,hom,i,image,imgens,l,la,o,oo,p;
-    
+
     # Then test whether we can do something:
     if IsTransitive(G) then
         return false;    # do not call us again
@@ -135,7 +135,7 @@ FindHomMethodsPerm.NonTransitiveByFoot :=
     return true;
   end;
 
-FindHomMethodsPerm.NonTransitive := 
+FindHomMethodsPerm.NonTransitive :=
   function( ri, G )
     local hom,la,o;
 
@@ -166,7 +166,7 @@ FindHomMethodsPerm.Imprimitive :=
     if HasIsPrimitive(G) and IsPrimitive(G) then
         return false;   # never call us again
     fi;
-    
+
     RECOG.SetPseudoRandomStamp(G,"Imprimitive");
 
     # Now try to work:
@@ -215,7 +215,7 @@ FindHomMethodsPerm.BalTreeForBlocks := function(ri,G)
 
   blocks := ri!.blocks;
 
-  # We do exactly the same as in the non-transitive case, however, 
+  # We do exactly the same as in the non-transitive case, however,
   # we restrict to about half the blocks and pass our knowledge on:
   nrblocks := Length(blocks);
   if nrblocks = 1 then
@@ -259,7 +259,7 @@ DoSafetyCheckStabChain := function(S)
   od;
 end;
 
-FindHomMethodsPerm.StabChain := 
+FindHomMethodsPerm.StabChain :=
    function( ri, G )
      local Gmem,S,si;
 
@@ -336,11 +336,11 @@ WordinLabels := function(word,S,g)
   fi;
   return word;
 end;
-  
+
 SLPinLabels := function(S,g)
   local i,j,l,line,word;
   word := WordinLabels([],S,g);
-  if word = fail then 
+  if word = fail then
       return fail;
   fi;
   line := [];
@@ -433,14 +433,14 @@ FindHomMethodsPerm.Pcgs :=
     ri!.Gnomem := G;
     return true;
   end;
-    
-           
+
+
 # The following commands install the above methods into the database:
 
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.TrivialPermGroup,
           300, "TrivialPermGroup",
           "just go through generators and compare to the identity");
-AddMethod(FindHomDbPerm, FindHomMethodsPerm.ThrowAwayFixedPoints, 
+AddMethod(FindHomDbPerm, FindHomMethodsPerm.ThrowAwayFixedPoints,
           100, "ThrowAwayFixedPoints",
           "try to find a huge amount of (possible internal) fixed points");
 AddMethod(FindHomDbPerm, FindHomMethodsProjective.FewGensAbelian,
@@ -452,23 +452,23 @@ AddMethod(FindHomDbPerm, FindHomMethodsPerm.Pcgs,
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.VeryFewPoints,
           95, "VeryFewPoints",
           "calculate a stabchain if we act on very few points");
-AddMethod(FindHomDbPerm, FindHomMethodsPerm.NonTransitive, 
+AddMethod(FindHomDbPerm, FindHomMethodsPerm.NonTransitive,
           90, "NonTransitive",
           "try to find non-transitivity and restrict to orbit");
-AddMethod( FindHomDbPerm, FindHomMethodsPerm.Giant, 
+AddMethod( FindHomDbPerm, FindHomMethodsPerm.Giant,
           80, "Giant",
           "tries to find Sn and An" );
-AddMethod(FindHomDbPerm, FindHomMethodsPerm.Imprimitive, 
+AddMethod(FindHomDbPerm, FindHomMethodsPerm.Imprimitive,
           70, "Imprimitive",
           "for a imprimitive permutation group, restricts to block system");
-AddMethod(FindHomDbPerm, FindHomMethodsPerm.SnkSetswrSr, 
+AddMethod(FindHomDbPerm, FindHomMethodsPerm.SnkSetswrSr,
           60, "SnkSetswrSr",
           "tries to find jellyfish" );
-AddMethod(FindHomDbPerm, FindHomMethodsPerm.StabilizerChain, 
-          55, "StabilizerChain", 
+AddMethod(FindHomDbPerm, FindHomMethodsPerm.StabilizerChain,
+          55, "StabilizerChain",
           "for a permutation group using a stabilizer chain (genss)");
-AddMethod(FindHomDbPerm, FindHomMethodsPerm.StabChain, 
-          50, "StabChain", 
+AddMethod(FindHomDbPerm, FindHomMethodsPerm.StabChain,
+          50, "StabChain",
           "for a permutation group using a stabilizer chain");
 
 # Note that the last one will always succeed!

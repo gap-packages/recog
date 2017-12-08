@@ -1,7 +1,7 @@
 #############################################################################
 ##
-##  semilinear.gi          
-##                                recog package  
+##  semilinear.gi
+##                                recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
 ##
@@ -12,7 +12,7 @@
 ##
 #############################################################################
 
-RECOG.WriteOverBiggerFieldWithSmallerDegree := 
+RECOG.WriteOverBiggerFieldWithSmallerDegree :=
   function( inforec, gen )
     # inforec needs:
     #  bas, basi, sample, newdim, FF, d, qd from the Finder
@@ -25,7 +25,7 @@ RECOG.WriteOverBiggerFieldWithSmallerDegree :=
         for k in [1..inforec.newdim] do
             val := Zero(inforec.FF);
             for t in [1..inforec.d] do
-                val := gen[(i-1)*inforec.d+1][(k-1)*inforec.d+t] 
+                val := gen[(i-1)*inforec.d+1][(k-1)*inforec.d+t]
                        * inforec.pows[t] + val;
             od;
             row[k] := val;
@@ -36,9 +36,9 @@ ConvertToMatrixRep(newgen,inforec.qd);
     od;
     return newgen;
   end;
-  
+
 RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
-  # m a MeatAxe-module 
+  # m a MeatAxe-module
   local F,bas,d,dim,e,fac,facs,gens,i,inforec,j,k,mp,mu,new,newgens,pr,q,v;
 
   if not(MTX.IsIrreducible(m)) then
@@ -126,7 +126,7 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
   fi;
 
   # this usually comes after "ReducibleIso", which provides the following:
-  m := ri!.meataxemodule; 
+  m := ri!.meataxemodule;
   if MTX.IsAbsolutelyIrreducible(m) then
       return false;
   fi;
@@ -140,7 +140,7 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
                                 r.inforec);
   SetIsInjective(hom,true);   # this only holds for matrix groups, not for
   SetIsSurjective(hom,true);  # projective groups!
-  
+
   # Now report back:
   SetHomom(ri,hom);
 
@@ -176,7 +176,7 @@ FindHomMethodsProjective.BiggerScalarsOnly := function(ri,G)
            stamp := "StabilizerChain" ));
 
   findgensNmeth(ri).method := FindKernelDoNothing;
-  
+
   return true;
 end;
 

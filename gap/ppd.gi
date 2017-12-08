@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  ppd.gi        
+##  ppd.gi
 ##                                recog package
 ##                                                           Frank Celler
 ##
@@ -13,25 +13,25 @@
 ##
 #F  PrimitivePrimeDivisors( <d>, <p> ) . . . . compute the ppds of  <p>^<d>-1
 ##
-## ppds will be the product of all primitive prime divisors counting 
+## ppds will be the product of all primitive prime divisors counting
 ## multiplicities of p^d-1 and noppds will be p^d-1/ppds.
-## 
-##  cf. Neumann & Praeger, p 578/579 Procedure Psi(d,q) in 
+##
+##  cf. Neumann & Praeger, p 578/579 Procedure Psi(d,q) in
 ##  ``A Recognition Algorithm for special linear groups"
 ##  Proc. Lond. Math. Soc. (3) 65, 1992, pp 555-603.
 ##
 
 PrimitivePrimeDivisors := function(d, q)
-    
+
     local ddivs, c, a, ppds, noppds;
-    
+
     if d < 1 or q < 2 then return fail; fi;
     if d = 1 then
         return rec( ppds := q-1, noppds := 1 );
     fi;
-    
+
     noppds  := 1; ppds := q^d-1;
-    
+
     # Throughout the loop ppds * noppds = q^d-1;
     # Eventually ppds will contain the ppds and noppds the others
     ddivs :=  Unique(FactorsInt(d));
@@ -44,15 +44,15 @@ PrimitivePrimeDivisors := function(d, q)
             a := Gcd(ppds, a);
         od;
     od;
-    
+
     ## and return as ppds the product of all ppds and as
     ## noppds the quotient p^d-1/ppds
     return rec( ppds  := ppds, noppds := noppds );
-    
+
 end;
 
-    
-    
+
+
 
 
 #############################################################################
@@ -108,7 +108,7 @@ PPDIrreducibleFactor := function ( R, f, d, q )
             # replace <pow> by x^(q^(i+1))
             pow := PowerMod( pow, q, f );
         od;
-        # Since all irreducible factors of degree <= d/2 are gone, 
+        # Since all irreducible factors of degree <= d/2 are gone,
         # f must be irreducible itself at this stage.
         return StandardAssociate( R, f );
 
@@ -131,7 +131,7 @@ AllPpdsOfElement := function(F,m,p,a)
         n := n / gcd;
       od;
     end;
-        
+
     d := Length(m);
     if IsMatrix(m) then
         c := CharacteristicPolynomial(F,F,m);
@@ -224,7 +224,7 @@ AllPpdsOfElement2 := function(F,m,p,a)
         n := n / gcd;
       od;
     end;
-        
+
     d := Length(m);
     if IsMatrix(m) then
         c := CharacteristicPolynomial(F,F,m);
@@ -244,7 +244,7 @@ AllPpdsOfElement2 := function(F,m,p,a)
                 ## pm contains two fields, noppds and ppds.
                 ## ppds is the product of all ppds of p^(ae)-1
                 ## and noppds is (p^(ae)-1)/ppds.
-              
+
                 ## get rid of the non-ppd part
                 ## g will be x^noppds in F[x]/<gcd>
                 g := PowerMod( px, RemovePrimes(p^(a*e)-1,pm.ppds), f );
@@ -331,7 +331,7 @@ InstallGlobalFunction( IsPpdElement, function( F, m, d, p, a )
         return [e, islarge];
     fi;
 
- 
+
     ## Now we know (e+1) divides pm.ppds and (e+1) has to be
     ## a prime since all ppds are at least (e+1)
     if not IsPrimeInt (e+1) then
@@ -363,22 +363,22 @@ end );
 ##
 PPDIrreducibleFactorD2 := function ( f, d, q )
 
-	local i;
+    local i;
 
-	if d mod 2 <> 0 then 
-            Print( "d must be divisible by 2\n" );
-            return false; 
-        fi;
-
-	f := Factors( f );
-
-        for i in [ 1 .. Length(f) ] do
-            if Degree( f[i] ) = d/2 then
-		return f[i];
-            fi;
-	od;
-
+    if d mod 2 <> 0 then
+        Print( "d must be divisible by 2\n" );
         return false;
+    fi;
+
+    f := Factors( f );
+
+    for i in [ 1 .. Length(f) ] do
+        if Degree( f[i] ) = d/2 then
+            return f[i];
+        fi;
+    od;
+
+    return false;
 
 end;
 
@@ -445,16 +445,16 @@ InstallGlobalFunction( IsPpdElementD2, function( F, m, e, p, a )
     # compute the possible gcd with <e>+1
     e   := Degree(c);
     if pm.ppds mod (e+1) <> 0 then
-	# we know that all primes dividing pm.ppds are large
+        # we know that all primes dividing pm.ppds are large
         # and hence we know g is a large ppd-element
         islarge := true;
         return [ e, islarge, pm.noppds ];
     fi;
- 
-    # Now we know (e+1) divides pm.ppds and (e+1) has to be 
+
+    # Now we know (e+1) divides pm.ppds and (e+1) has to be
     # a prime since all ppds are at least (e+1)
     if not IsPrimeInt(e+1) then
-	return false;
+        return false;
     fi;
     g := PowerMod( g, e+1, c );
     if IsOne(g)  then

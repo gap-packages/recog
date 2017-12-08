@@ -16,11 +16,11 @@ DirectProductOfMatrixGroup := function(G,H)
   for h in GeneratorsOfGroup(H) do
     M:=One(MatrixAlgebra(FieldOfMatrixGroup(G),dG+dH));
     M:=MutableCopyMat(M);
-    for i in [1..dH] do  
+    for i in [1..dH] do
       for j in [1..dH] do
         M[dG+i][dG+j]:=h[i][j];
-      od;                      
-    od;  
+      od;
+    od;
     Add(gens,M);
   od;
   return GroupWithGenerators(gens);

@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  classicalnatural.gd        
+##  classicalnatural.gd
 ##                                recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress

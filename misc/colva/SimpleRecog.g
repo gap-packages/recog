@@ -19,11 +19,11 @@ RecogniseTrivialGroup := function(H,phi,I)
 # Recognises the trivial group possibly modulo scalars
  local T,recdata,x,n,g;
 
- T := GroupWithGenerators([One(CyclicGroup(1))]); 
+ T := GroupWithGenerators([One(CyclicGroup(1))]);
  recdata := rec(Group := T);
- recdata!.NiceGens := GeneratorsOfGroup(T); 
- recdata!.NiceGensSlps := [StraightLineProgramNC([[1,0]],1)]; 
- recdata!.GtoSlp := g->StraightLineProgramNC([[1,0]],1); 
+ recdata!.NiceGens := GeneratorsOfGroup(T);
+ recdata!.NiceGensSlps := [StraightLineProgramNC([[1,0]],1)];
+ recdata!.GtoSlp := g->StraightLineProgramNC([[1,0]],1);
  recdata!.SlptoG := w->ResultOfStraightLineProgram(w,recdata!.NiceGens);
 
 # Need to create a hom into T that returns fail if the element is not "trivial"
@@ -34,8 +34,8 @@ local x;
  x := ImageElm(phi,g);
  if not IsOne(x) then return fail; fi;
  return GeneratorsOfGroup(T)[1];
-end);      
- 
+end);
+
  elif IsMatrixGroup(I) then
    recdata!.newmap := GroupHomomorphismByFunction(H,T,
 function(g)
@@ -43,8 +43,8 @@ local x;
  x := ImageElm(phi,g);
  if not IsScalarMatrix(x) then return fail; fi;
  return GeneratorsOfGroup(T)[1];
-end);      
- 
+end);
+
  else
    recdata!.newmap := GroupHomomorphismByFunction(H,T,
 function(g)
@@ -54,7 +54,7 @@ local x,n;
 
  if not ForAll([1..n],i->IsScalarMatrix(ImageElm(Projection(I,i),x))) then return fail; fi;
  return GeneratorsOfGroup(T)[1];
-end);      
+end);
 
  fi;
 
@@ -69,9 +69,9 @@ RecognisePcGroup := function(G)
  recdata := rec(Group := G,name := "Pc group");
  if IsTrivial(G) then
    recdata!.NiceGens := [One(G)];
-   recdata!.NiceGensSlps := [StraightLineProgramNC([[1,0]],1)]; 
+   recdata!.NiceGensSlps := [StraightLineProgramNC([[1,0]],1)];
    recdata!.GtoSlp := function(g)
-  if IsOne(g) then return StraightLineProgramNC([[1,0]],1); 
+  if IsOne(g) then return StraightLineProgramNC([[1,0]],1);
   else return fail;
   fi;
   end;
@@ -90,14 +90,14 @@ RecognisePcGroup := function(G)
 # Compute a Pcgs of G and use it!!
  P := Pcgs(G);
  recdata!.NiceGens := AsList(P);
- recdata!.NiceGensSlps := List(AsList(P),x->SLPOfElm(ImageElm(rho,x))); 
+ recdata!.NiceGensSlps := List(AsList(P),x->SLPOfElm(ImageElm(rho,x)));
 
 # Solving the rewriting problem
  T2 := GroupWithMemory(GroupWithGenerators(List(AsList(P),x->())));
- GtoT2 := GroupHomomorphismByImages(G,T2,AsList(P),GeneratorsOfGroup(T2)); 
+ GtoT2 := GroupHomomorphismByImages(G,T2,AsList(P),GeneratorsOfGroup(T2));
  recdata!.GtoSlp := function(g)
    return SLPOfElm(ImageElm(GtoT2,g));
- end;  
+ end;
  recdata!.SlptoG := function(g)
    return ResultOfStraightLineProgram(w,AsList(P));
  end;
@@ -118,9 +118,9 @@ RecogniseQuasiSimple := function(G,name)
 # G is an alternating group - use the recogSnAnBB code
    Gm := GroupWithMemory(G);
    n := Int(SplitString(name,"_")[2]);
-   re := RecogniseSnAn(n,Gm,1/100);   
-   recdata!.NiceGens := [StripMemory(re[2][2]),StripMemory(re[2][1])]; 
-   recdata!.NiceGensSlps := [SLPOfElm(re[2][2]),SLPOfElm(re[2][1])];    
+   re := RecogniseSnAn(n,Gm,1/100);
+   recdata!.NiceGens := [StripMemory(re[2][2]),StripMemory(re[2][1])];
+   recdata!.NiceGensSlps := [SLPOfElm(re[2][2]),SLPOfElm(re[2][1])];
    ims := List(recdata!.NiceGens,g->FindImageAn( n, g, re[2][1], re[2][2], re[3][1], re[3][2] ));
    recdata!.Gold := GroupWithGenerators(ims);
    recdata!.GtoGold := GroupHomomorphismByFunction(G,recdata.Gold,g->FindImageAn( n, g, re[2][1], re[2][2], re[3][1], re[3][2] ));
@@ -141,21 +141,21 @@ RecogniseQuasiSimple := function(G,name)
 #   GBB := GpAsBBGp (G);
 #   GBBm := GroupWithMemory(GBB);
 #   npe := findnpe(name);
-#   re := SLDataStructure(GBBm,npe[2],npe[3],npe[1]); 
-#   if re=fail then 
+#   re := SLDataStructure(GBBm,npe[2],npe[3],npe[1]);
+#   if re=fail then
 #     Error("Failure in recognition of SL");
 #   fi;
 #   recdata!.NiceGens := List(re.gens,x->StripMemory(x[1])![1]);
 #   recdata!.NiceGensSlps := List(re.gens,x->SLPOfElm(x[1]));
 
-   
+
 
 #   recdata!.Gold := G;
 #   recdata!.GtoGold := GroupHomomorphismByFunction(G,G,g->g);
 #   recdata!.GoldtoG := GroupHomomorphismByFunction(G,G,g->g);
 #   recdata!.GtoSlp := function(g)
 #     return SLSLP( re, g, npe[1]);
-#   end;   
+#   end;
 #   recdata!.SlptoG := function(w)
 #     return ResultOfStraightLineProgram(w,recdata.NiceGens);
 #   end;
@@ -176,7 +176,7 @@ RecogniseQuasiSimple := function(G,name)
    recdata!.GoldtoG := GroupHomomorphismByFunction(G,G,g->g);
    recdata!.GtoSlp := function(g)
      return SLPinLabels(S,g);
-   end;   
+   end;
    recdata!.SlptoG := function(w)
      return ResultOfStraightLineProgram(w,recdata.NiceGens);
    end;
@@ -210,18 +210,18 @@ Print(String(Size(P)));
    recdata!.GoldtoG := GroupHomomorphismByFunction(G,G,g->g);
    recdata!.GtoSlp := function(g)
      local im;
-     if not g in G then 
+     if not g in G then
 Print("g not in G");
 return fail; fi;
 Print("elt in in G");
      im := ImageElm(GtoP,g);
-     if not im in P then 
+     if not im in P then
 Print("Image not in P");
 Print(String(im));
 return fail; fi;
 Print("image in in P");
      return SLPinLabels(S,im);
-   end;   
+   end;
    recdata!.SlptoG := function(w)
      return ResultOfStraightLineProgram(w,recdata.NiceGens);
    end;
@@ -229,7 +229,7 @@ Print("image in in P");
 
  recdata!.Name := [name,1];
  return recdata;
-end;  
+end;
 
 
 RefineMap := function(H,phi,I)
@@ -245,7 +245,7 @@ newI,newphi,im1,list,g,y,o;
     O := Order;
   fi;
   n := Size(I!.DirectProductInfo!.groups);
-  k := 100; 
+  k := 100;
   projs := List([1..n],i->Projection(I,i));
 
   blocks:=[[1..n]];
@@ -267,7 +267,7 @@ newI,newphi,im1,list,g,y,o;
     if Size(blocks)=n then return [phi,I]; fi;
   od;
   blocks := List(blocks,x->x[1]);
-  
+
 # Construct new map and image
   newI := DirectProduct(List(blocks,i->I!.DirectProductInfo!.groups[1]));
 
@@ -280,7 +280,7 @@ function(g)
 
   return [newphi,newI];
 end;
-    
+
 FindPoint := function(H,phi,point,I)
 # Find a point in H corresponding to point
   local O,n,k,projs,H1,c,gens,h,x,lp,lc,g,i,j,IdTest;
@@ -314,13 +314,13 @@ FindPoint := function(H,phi,point,I)
   od;
   for g in GeneratorsOfGroup(H1) do
     if not IdTest(ImageElm(projs[point],ImageElm(phi,g))) then return g; fi;
-  od;	
+  od;
 
 # Process has failed :-(
  Error("Error in finding a point");
 
-end; 
-  
+end;
+
 PermAction := function(G,H,phi,I)
 # Constructs the permutation action of G on I
   local O,n,projs,points,reps,ims,point,h,x,y,l,def,repims,rep,i,j,g;
@@ -339,24 +339,24 @@ PermAction := function(G,H,phi,I)
   ims := List([1..Size(GeneratorsOfGroup((G)))],i->[]);
   while Size(points)>0 do
     point := Random(points);
-    h:=FindPoint(H,phi,point,I);    
+    h:=FindPoint(H,phi,point,I);
     reps[point]:=h;
     repeat
       for i in [1..Size(GeneratorsOfGroup((G)))] do
         for j in [1..Size(reps)] do
           if IsBound(reps[j]) and not IsBound(ims[i][j]) then
             y := reps[j]^GeneratorsOfGroup(G)[i];
-            x:=ImageElm(phi,y);      
+            x:=ImageElm(phi,y);
             l := First([1..n],k->O(ImageElm(projs[k],x))<>1);
 
-#            l := First([1..n],k->(IsMatrixGroup#(I!.DirectProductInfo!.groups[1]) and not IsScalarMatrix(ImageElm#(projs[k],x))) and not IsOne(ImageElm(projs[k],x)));; 
+#            l := First([1..n],k->(IsMatrixGroup#(I!.DirectProductInfo!.groups[1]) and not IsScalarMatrix(ImageElm#(projs[k],x))) and not IsOne(ImageElm(projs[k],x)));;
             ims[i][j]:=l;
             if not IsBound(reps[l]) then reps[l]:=y; fi;
           fi;
         od;
       od;
       def:=Filtered([1..Size(reps)],i->IsBound(reps[i]));
-    until ForAll( def , 
+    until ForAll( def ,
 i-> ForAll([1..Size(GeneratorsOfGroup(G))],j-> IsBound(ims[j][i])))=true;
     SubtractSet(points,def);
   od;
@@ -370,8 +370,8 @@ end;
 FindGammaInv := function(gamma,g)
 # Find x such that gamma(x)=g
  local IdTest,gi,old,count,new;
- 
- if IsMatrix(g) then IdTest := IsScalarMatrix; 
+
+ if IsMatrix(g) then IdTest := IsScalarMatrix;
  elif IsPerm(g) then IdTest := IsOne;
  else
    Error("g is not a matrix or a permutation");
@@ -424,10 +424,10 @@ ElementOfCoprimeOrder := function(grp,o)
  repeat
    count := count+1;
    g := PseudoRandom(grp);
-   og := Order(g);   
+   og := Order(g);
    v := Product(List(ps,x->x^Valuation(og,x)));
    if og/v <> 1 then return g^(v); fi;
- until count > 1000;   
+ until count > 1000;
  Error ("Failed to find an element of coprime order");
 end;
 
@@ -436,21 +436,21 @@ end;
 WhichPowerIsModuleIsoModScalars := function(grp,name,gamma)
 # Find t such that gamma^t a module automorphism (modulo scalars) of the quasisimple matrix group defined by name?
 # membership test is a membership test in grp
- local m,g,gens,ims1,oz,o,z,ims,F,M1,M2,mat,t; 
+ local m,g,gens,ims1,oz,o,z,ims,F,M1,M2,mat,t;
 
 
 # First construct a generating set of elts of order coprime to the schur multiplier
  m := SchurMultiplierOrder(name);
- g := ElementOfCoprimeOrder(grp,m); 
+ g := ElementOfCoprimeOrder(grp,m);
 # Compute a number of random conjugates of g to get a probable generating set for grp
 
  gens := Concatenation([g],List([1..5],i->g^PseudoRandom(grp)));
  F := FieldOfMatrixGroup(grp);
  M1 := GModuleByMats(gens,F);
- 
- old := gens; 
+
+ old := gens;
  t := 0;
- repeat 
+ repeat
    t := t+1;
 # compute the images of gens under phi
    ims1 := List(old,x->ImageElm(gamma,x));
@@ -465,7 +465,7 @@ WhichPowerIsModuleIsoModScalars := function(grp,name,gamma)
    M2 := GModuleByMats(ims,F);
 
 # Do we have a module isomorphism
-   mat := MTX.IsomorphismModules(M1,M2); 
+   mat := MTX.IsomorphismModules(M1,M2);
    old := ims;
  until IsMatrix(mat);
  return [t,mat];
@@ -483,7 +483,7 @@ RecogniseQuasiSimpleDP := function(G,H,phi,I,name)
 
 # Is the image trivial?
  if IsImageTrivial(I) then return RecogniseTrivialGroup(H,phi,I); fi;
-  
+
 
 # Do we only have one copy of a nonab simple group??
  if IsMatrixGroup(I) or (IsPermGroup(I) and Size(Orbits(I))=1) then
@@ -512,21 +512,21 @@ RecogniseQuasiSimpleDP := function(G,H,phi,I,name)
  econj := List([1..Size(e)],i->GroupHomomorphismByFunction(H,H,g->g^e[i]));
 
 # Find generators for one block
- gens := List([1..3],i->FindPoint(H,phi,1,I));  
+ gens := List([1..3],i->FindPoint(H,phi,1,I));
  H1 := SubgroupNC(H,FastNormalClosure(GeneratorsOfGroup(H),gens,1));
  H1toblk := phi*projs[1];
  H1toblk!.Source := H1;
  blk := GroupWithGenerators(List(GeneratorsOfGroup(H1),x->ImageElm(H1toblk,x)));
  blkdata := RecogniseQuasiSimple(blk,name);
 
- invims := List(blkdata!.NiceGensSlps,w->ResultOfStraightLineProgram(w,GeneratorsOfGroup(H1))); 
+ invims := List(blkdata!.NiceGensSlps,w->ResultOfStraightLineProgram(w,GeneratorsOfGroup(H1)));
  Yhat := ShallowCopy(invims);
  blktoH1 := GroupHomomorphismByFunction(blk,H,g->
 ResultOfStraightLineProgram(blkdata!.GtoSlp(g),invims));
 
 
 
- 
+
  Y := blkdata!.NiceGens;
  YY := List(Y,y->ImageElm(Embedding(I,1),y));
  r := Length(Y);
@@ -552,12 +552,12 @@ g->ImageElm(projs[i],phi!.fun(econj[i]!.fun(blktoH1!.fun(g)))));
      else
        z := FindGammaInv(gamma,Y[j]);
      fi;
-     h := ImageElm(blktoH1,z)^e[i]; 
+     h := ImageElm(blktoH1,z)^e[i];
      y := ImageElm(phi,h);
      Add(YY,y);
      Add(Yhat,h);
    od;
- od;    
+ od;
 
 ## Set up the data structure
  recdata:=rec(Group := I, Name := [name,k]);
@@ -578,7 +578,7 @@ function(g)
  local list;
  list := List([1..k],i->ImageElm(Embedding(recdata!.Gold,i),ImageElm(Projection(I,i),g)));
  return Product(list);
- end);     
+ end);
 
  recdata!.NiceGens := List(YY,x->StripMemory(x));
  recdata!.invims := Yhat;
@@ -589,7 +589,7 @@ function(g)
  local list;
  list := List([1..k],i->ImageElm(Embedding(I,i),ImageElm(Projection(recdata!.Gold,i),g)));
  return Product(list);
- end);     
+ end);
 
  recdata!.newmap := phi;
 

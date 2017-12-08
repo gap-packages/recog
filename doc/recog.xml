@@ -4,7 +4,7 @@
 
 <!--
 
-recog.xml          recog package documentation                
+recog.xml          recog package documentation
                                                                 Max Neunhoeffer
                                                                     Ákos Seress
                                                                          et al.
@@ -19,7 +19,7 @@ recog.xml          recog package documentation
 <!--  TableOfContents  . . . . . .  generate a table of contents   -->
 <TableOfContents/>
 
-<!--  The only chapter of the book  --> 
+<!--  The only chapter of the book  -->
 <Body>
 <#Include SYSTEM "intro.xml">
 <#Include SYSTEM "install.xml">

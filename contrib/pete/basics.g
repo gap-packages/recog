@@ -24,7 +24,7 @@ return mat[1][1]*mat^0 = mat;
 end;
 
 ##########################################################
-## INPUT: 
+## INPUT:
 ##   (1) (black box) group <gp>
 ##   (2) element <x> supergroup of <gp>
 ## OUTPUT: <true> iff <x> is centralised by <gp>
@@ -43,7 +43,7 @@ end;
 ##
 ## black box "Bray trick" for computing involution centralisers
 ## <Nrgens> is the number of (distinct) gens prescribed by the user before
-## the algorithm cuts off; <limit> is the number of random choices the 
+## the algorithm cuts off; <limit> is the number of random choices the
 ## algorithm will make before reporting failure; <repn> is the representation
 ## of <group> (either "wb" or "bb")
 InvolutionCentraliser := function(gp, i, Nrgens, limit, rep)
@@ -145,7 +145,7 @@ end;
 
 ## writes a nonnegative integer <n> < <p>^<e> in base <p>
 NtoPadic := function(p, e, n)
-local  j, output; 
+local  j, output;
    output := [];
    for j in [1..e] do
       output[j] := (n mod p)*Z(p)^0;
@@ -154,9 +154,9 @@ local  j, output;
 return output;
 end;
 
-## writes a vector in GF(<p>)^<e> as a nonnegative integer 
+## writes a vector in GF(<p>)^<e> as a nonnegative integer
 PadictoN := function(p, e, vector)
-local  j, output; 
+local  j, output;
    output := 0;
    for j in [1..e] do
       output := output + p^(j-1)*IntFFE(vector[j]);

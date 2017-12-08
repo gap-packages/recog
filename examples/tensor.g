@@ -1,11 +1,11 @@
 MakeTensorProduct := function(g,h)
     local d,f,gensg,gensh,gensk,gg,i,j,x,xi;
-    gensg := GeneratorsOfGroup(g);        
+    gensg := GeneratorsOfGroup(g);
     gensh := GeneratorsOfGroup(h);
-    gensk := [];       
-    for i in gensg do 
-        for j in gensh do 
-            Add(gensk,KroneckerProduct(i,j)); 
+    gensk := [];
+    for i in gensg do
+        for j in gensh do
+            Add(gensk,KroneckerProduct(i,j));
         od;
     od;
     for i in gensk do

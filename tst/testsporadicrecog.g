@@ -22,7 +22,7 @@ TestGroup("M12",1,200);
 TestGroup("M22",1,200);
 TestGroup("M23",1,200);
 TestGroup("M24",1,200);
-TestGroup("HS",1,200); 
+TestGroup("HS",1,200);
 TestGroup("J1",8,200);
 TestGroup("J2",1,200);
 TestGroup("J3",10,200);

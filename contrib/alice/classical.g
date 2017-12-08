@@ -75,7 +75,7 @@ InitRecog := function (grp,case)
    local f;
 
    f := FieldOfMatrixGroup(grp);
-   
+
    recognise := rec( d := DegreeOfMatrixGroup(grp),
                      p := Characteristic(f),
                      a := DegreeOverPrimeField(f),
@@ -98,9 +98,9 @@ InitRecog := function (grp,case)
 
 # Compute the degrees of the irreducible factors of
 # the characteristic polynomial <cpol>
-IsReducible := function(grp,cpol) 
+IsReducible := function(grp,cpol)
   local deg, dims,g;
-  
+
   #reducible groups still possible?
   if recognise.isReducible = false then
      return false;
@@ -128,7 +128,7 @@ IsReducible := function(grp,cpol)
       #TODO: INFORECOG2?
      return false;
   fi;
-  
+
   return true;
 end;
 
@@ -139,15 +139,15 @@ TestRandomElement := function (grp,g)
     local ppd, bppd, d, cpol;
 
     d := recognise.d;
-    
+
     # Compute the characteristic polynomial
-    cpol := CharacteristicPolynomial(g); 
+    cpol := CharacteristicPolynomial(g);
     IsReducible(grp,cpol);
     ppd := IsPpdElement (FieldOfMatrixGroup(grp), cpol, d, recognise.q, 1);
     if ppd = false then
         return false;
     fi;
-    
+
     AddSet(recognise.E,ppd[1]);
     if ppd[2] = true then
         AddSet(recognise.LE,ppd[1]);
@@ -160,7 +160,7 @@ TestRandomElement := function (grp,g)
             recognise.basic := bppd[1];
         fi;
     fi;
-    
+
     return ppd[1];
 end;
 
@@ -168,17 +168,17 @@ end;
 #ppd element TODO: Better comments...
 GenericParameters := function(grp,case)
     local fact,d,q;
-    
+
     if not IsBound(recognise) then
         InitRecog(grp,case);
     fi;
-    
+
     d := recognise.d;
     q := recognise.q;
-    
+
     if case = "linear" and d <= 2 then
         return false;
-        
+
     elif case = "linear" and d = 3 then
         #q = 2^s-1
         fact := Collected(Factors(q+1));
@@ -186,26 +186,26 @@ GenericParameters := function(grp,case)
             return false;
         fi;
         return true;
-        
-    elif case = "symplectic" and 
+
+    elif case = "symplectic" and
       (d < 6 or (d mod 2 <> 0) or
        [d,q] in [[6,2],[6,3],[8,2]]) then
         return false;
-        
+
     elif case = "unitary" and
       (d < 5 or d = 6 or [d,q] = [5,4]) then
         return false;
-        
-    elif case = "orthogonalplus" and 
+
+    elif case = "orthogonalplus" and
       (d mod 2 <> 0 or d < 10
        or (d = 10 and q = 2)) then
         return false;
-        
+
     elif case = "orthogonalminus" and
-      (d mod 2 <> 0 or d < 6 
+      (d mod 2 <> 0 or d < 6
        or [d,q] in [[6,2],[6,3],[8,2]]) then
         return false;
-        
+
     elif case = "orthogonalcircle" then
         if d < 7 or [d,q] = [7,3] then
             return false;
@@ -219,7 +219,7 @@ GenericParameters := function(grp,case)
             return false;
         fi;
     fi;
-    
+
     return true;
 end;
 
@@ -229,18 +229,18 @@ end;
 
 IsGeneric := function (grp, N_gen)
     local b, N, g;
-    
+
     if not IsBound(recognise) then
         InitRecog(grp,"unknown");
     fi;
-    
+
     if recognise.isGeneric then
         #TODO: INFORECOG2 ... group is generic
         return true;
     fi;
-    
+
     b := recognise.d;
-    
+
     for N in [1..N_gen] do
         g := PseudoRandom(grp);
         recognise.n := recognise.n + 1;
@@ -253,7 +253,7 @@ IsGeneric := function (grp, N_gen)
             return true;
         fi;
     od;
-    
+
     return false;
 end;
 
@@ -261,13 +261,13 @@ end;
 #enough info to rule out extension field groups...?
 #TODO: comments...
 RuledOutExtFieldParamaters := function (grp,case)
-    
+
     local differmodfour, d, q, E;
-    
+
     d := recognise.d;
     q := recognise.q;
     E := recognise.E;
-    
+
     differmodfour := function(E)
         local e;
         for e in E do
@@ -277,17 +277,17 @@ RuledOutExtFieldParamaters := function (grp,case)
         od;
         return false;
     end;
-    
+
     if case = "linear" then
         if not IsPrime(d)
            or E <> Set([d-1,d])
            or d-1 in recognise.LE then
             return true;
         fi;
-        
+
     elif case = "unitary" then
         return true;
-        
+
     elif case = "symplectic" then
         if d mod 4 = 2 and q mod 2 = 1 then
             return (PositionProperty(E, x -> (x mod 4 = 0)) <> false);
@@ -300,7 +300,7 @@ RuledOutExtFieldParamaters := function (grp,case)
         else
             Error("d cannot be odd in case Sp");
         fi;
-        
+
     elif case = "orthogonalplus" then
         if d mod 4 = 2  then
             return (PositionProperty (E, x -> (x mod 4 = 0 )) <> false);
@@ -308,7 +308,7 @@ RuledOutExtFieldParamaters := function (grp,case)
             return differmodfour(E);
         else  Error("d cannot be odd in case O+");
      fi;
-     
+
     elif case = "orthogonalminus" then
         if d mod 4 = 0  then
             return (PositionProperty ( E, x -> (x mod 4 = 2)) <> false);
@@ -316,11 +316,11 @@ RuledOutExtFieldParamaters := function (grp,case)
             return differmodfour(E);
         else  Error("d cannot be odd in case O-");
     fi;
-    
+
     elif case = "orthogonalcircle" then
         return true;
     fi;
-    
+
     return false;
 end;
 
@@ -328,30 +328,30 @@ end;
 #rule out extension field...
 #TODO: comments...
 IsExtensionField := function (grp, case, N_ext)
-    
+
     local b, bx, g, ppd, N, testext;
-    
+
     if not IsBound(recognise) then
         InitRecog(grp,case);
     fi;
-    
+
     if (recognise.isGeneric and
        (not recognise.possibleOverLargerField)) then
         return false;
     fi;
-    
+
     b := recognise.d;
-    
+
     if Length(recognise.E) > 0 then
         b := Gcd (UnionSet(recognise.E,[recognise.d]));
     fi;
-    
+
     if case in ["linear","unitary","orthogonalcircle"] then
         bx := 1;
     else
         bx := 2;
     fi;
-    
+
     if b = bx then
         if RuledOutExtFieldParamaters(grp,case) then
             #TODO: INFORECOG2 ... not an extension field group
@@ -359,9 +359,9 @@ IsExtensionField := function (grp, case, N_ext)
         fi;
         return 0;
     fi;
-    
+
     N := 1;
-    
+
     while N <= N_ext do
         g := PseudoRandom(grp);
         recognise.n := recognise.n + 1;
@@ -372,7 +372,7 @@ IsExtensionField := function (grp, case, N_ext)
         elif b < bx then
             return false;
         fi;
-        
+
         if b = bx then
             testext := RuledOutExtFieldParamaters(grp,case);
             if testext then
@@ -382,7 +382,7 @@ IsExtensionField := function (grp, case, N_ext)
             fi;
         fi;
     od;
-    
+
     #INFORECOG1 ... group could preserve an extension field...
     return true;
 end;
@@ -409,14 +409,14 @@ FindCounterExample := function (grp, prop, N)
 
     return false;
 end;
-    
+
 
 IsAlternating := function(grp,N)
 
     local V, P, i,g ,q;
 
     q := recognise.q;
-    
+
     if recognise.d <> 4 or q <> recognise.p or (3 <= q and q < 23) then
        #TODO: INFORECOG2...G is not an alternating group
        return false;
@@ -428,21 +428,21 @@ IsAlternating := function(grp,N)
        if Size(P) <> 3*4*5*6*7 then
            #TODO: INFORECOG2...G is not an alternating group...
            return false;
-       else 
+       else
            #TODO: INFORECOG2...G might be A_7...
            AddSet(recognise.possibleNearlySimple,"A7");
            return true;
        fi;
     fi;
 
-    
+
     if q >= 23 then
-      
+
        if FindCounterExample(grp,g->2 in recognise.LE,N ) <> false then
          #TODO: INFORECOG2...G is not an alternating group...
          return false;
        fi;
-       
+
        AddSet (recognise.possibleNearlySimple, "2.A7");
        #TODO: INFORECOG2....G might be 2.A_7
        return true;
@@ -557,7 +557,7 @@ IsPSL := function ( grp, N )
         #InfoRecog2("#I  G' is not ", str, "\n");
         return false;
    fi;
-   
+
    str := Concatenation("PSL(2,",Int(2*E[2]+1));
    str := Concatenation(str, ")");
    #InfoRecog2("#I  G' might be ", str, "\n");
@@ -570,20 +570,20 @@ IsGenericNearlySimple := function( grp, case, N )
 
    local   isal;
 
-   if case <> "linear" then 
-       return false; 
+   if case <> "linear" then
+       return false;
    fi;
-   
-   if N < 0 then 
-       return true; 
+
+   if N < 0 then
+       return true;
    fi;
-   
-   if not IsBound(grp.recognise) then 
-       InitRecog(grp, case); 
+
+   if not IsBound(grp.recognise) then
+       InitRecog(grp, case);
    fi;
-   
+
    isal := IsAlternating(grp,N) or IsMatthieu(grp,N) or IsPSL(grp,N);
-   
+
    if not isal then
        recognise.possibleNearlySimple := Set([]);
    fi;
@@ -627,13 +627,13 @@ end;
 ##
 
 RecogniseClassicalNPCase := function( arg )
-    
+
     local   recog, d,  p,  a,  isext,  grp, N, case, n;
-    
+
     if not Length(arg)  in [2,3] then
         Error("usage: RecogniseClassicalNPCase( <grp>, <case>[, N])" );
     fi;
-    
+
     grp := arg[1];
     case := arg[2];
     if Length( arg ) = 3 then
@@ -645,7 +645,7 @@ RecogniseClassicalNPCase := function( arg )
              N := 25;
          fi;
      fi;
-     
+
      if IsBound(recognise) then
          if case = "linear"  and recognise.IsSLContained <> "unknown" then
              return recognise.IsSLContained;
@@ -659,17 +659,17 @@ RecogniseClassicalNPCase := function( arg )
            return recognise.IsOrthogonalGroup;
        fi;
    fi;
-   
+
    if not case in [ "linear", "unitary", "symplectic",
               "orthogonalplus", "orthogonalminus", "orthogonalcircle" ] then
        Error("unknown case\n");
    fi;
-   
+
    if IsBound( recognise ) and IsBound(recognise.type) and
       recognise.type = "unknown" then
        recognise.type := case;
    fi;
-   
+
    if not IsBound(recognise) then
        InitRecog( grp, case );
    elif (IsBound(recognise.type) and
@@ -687,7 +687,7 @@ RecogniseClassicalNPCase := function( arg )
        Unbind( recognise );
        return "does not apply";
    fi;
-   
+
    n := recognise.n;
    # try to establish whether the group is generic
    if not IsGeneric( grp, N )  then
@@ -697,15 +697,15 @@ RecogniseClassicalNPCase := function( arg )
        Unbind( recognise.type );
        return false;
    fi;
-   
+
    isext := IsExtensionField( grp, case, N-recognise.n+n );
    if isext = true then
        return false;
    elif isext = false then
        #InfoRecog1( "#I  The group does not preserve a");
-       if case = "symplectic" then 
+       if case = "symplectic" then
            #InfoRecog1(" symplectic form\n");
-   else 
+   else
        #InfoRecog1(" quadratic form\n");
    fi;
    Unbind(recognise.type);
@@ -725,7 +725,7 @@ RecogniseClassicalNPCase := function( arg )
    # to prove that the group acts irreducibly. In this case we call
    # the meataxe.
    if recognise.isReducible = "unknown" then
-       if IsIrreducible( 
+       if IsIrreducible(
             GModuleByMats(GeneratorsOfGroup(grp),FieldOfMatrixGroup(grp)) ) then
            recognise.isReducible := false;
        else
@@ -739,8 +739,8 @@ RecogniseClassicalNPCase := function( arg )
        return "does not apply";
    fi;
    #InfoRecog2("#I  The group acts irreducibly\n");
-   
-   
+
+
    ##ALICE: returnNPFlags?
 #   if SetReturnNPFlags( grp, case ) = true then
        #InfoRecog1("#I  Proved that the group contains a classical" );
@@ -767,19 +767,19 @@ end;
 #
 NonGenericLinear := function( grp, N )
     local order4, d,ord, g;
-    
+
     if not IsBound(recognise) then
         InitRecog(grp,"linear");
     fi;
-    
+
     if not IsBound(recognise.orders) then
         recognise.orders := Set([]);
     fi;
-    
-    
+
+
     order4 := false;
     d := recognise.d;
-    while  N >= 0  do 
+    while  N >= 0  do
         N := N - 1;
         g := Random(grp);
         recognise.n := recognise.n + 1;
@@ -789,11 +789,11 @@ NonGenericLinear := function( grp, N )
                 order4 := true;
             fi;
         fi;
-        
+
         if Length(recognise.LE) = 0 then
             TestRandomElement( grp, g);
         fi;
-        
+
         #ALICE: basic is a list in magma, boolean here?
         if Length(recognise.LE) >= 1 and 3 in recognise.LE and
            3 = recognise.basic and order4 = true  then
@@ -801,9 +801,9 @@ NonGenericLinear := function( grp, N )
         fi;
     od;
 
-    
+
     return false;
-    
+
 end;
 
 

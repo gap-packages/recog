@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  classical.gi        
+##  classical.gi
 ##                                recog package
 ##                                                           Alice Niemeyer
 ##
@@ -11,23 +11,23 @@
 ##
 ##
 ##  This file contains  an implementation  of the recognition  algorithms for
-##  classical groups by Niemeyer and Praeger.  A description  of them  can be 
-##  found in 
-##  
-##  [1] Alice C. Niemeyer and  Cheryl E. Praeger 
+##  classical groups by Niemeyer and Praeger.  A description  of them  can be
+##  found in
+##
+##  [1] Alice C. Niemeyer and  Cheryl E. Praeger
 ##      "A Recognition Algorithm for Classical Groups over Finite Fields",
 ##      Proc. London Math. Soc (3) 77, 1998, 117-169.
-## 
-##  [2] Alice C. Niemeyer and  Cheryl E. Praeger 
+##
+##  [2] Alice C. Niemeyer and  Cheryl E. Praeger
 ##      "Implementing a Recognition Algorithm for Classical Groups"
 ##      "Groups and Computation II", Amer. Math. Soc. DIMACS Series 28, 1997.
 ##
-##  [3] Alice C. Niemeyer and  Cheryl E. Praeger 
+##  [3] Alice C. Niemeyer and  Cheryl E. Praeger
 ##      "A Recognition Algorithm for Non-Generic Classical Groups over
 ##       Finite Fields", J. Austral. Math. Soc. (Series A)67 , 223-253, 1999.
 ##
 ##  This implementation uses some algorithms described elsewhere:
-## 
+##
 ##  [4] Frank Celler and C.R. Leedham-Green
 ##      "Calculating the order of an invertible matrix",
 ##      "Groups and Computation II", Amer. Math. Soc. DIMACS Series 28, 1997.
@@ -41,17 +41,17 @@
 ##    described in [5], which can often avoid an application  of the Meataxe
 ##    algorithm.
 ##
-##  [6] Frank Celler and Charles R. Leedham-Green and Scott H. Murray 
+##  [6] Frank Celler and Charles R. Leedham-Green and Scott H. Murray
 ##      and Alice C. Niemeyer and E.A. O'Brien
 ##      "Generating random elements of a finite group"
 ##      Comm. Algebra 23,  4931--4948 (1995)
 ##
 ##  For an overview see also
 ##
-##  [7] Cheryl E. Praeger, 
+##  [7] Cheryl E. Praeger,
 ##      "Primitive prime divisor elements in finite classical groups",
-##       Proc. of Groups St. Andrews 1997 in Bath II, 
-##       Eds: C.M. Campbell, E.F. Robertson, N. Ruskuc and G.C. Smith, 
+##       Proc. of Groups St. Andrews 1997 in Bath II,
+##       Eds: C.M. Campbell, E.F. Robertson, N. Ruskuc and G.C. Smith,
 ##       London Math. Soc. Lecture Note Series 261, 605--623.
 ##
 #############################################################################
@@ -81,20 +81,20 @@ end;
 # Check if m > 5 and the order of a basic lppd(d,q;e) element
 
 HasLBGgt5 := function( m, p, a, e )
-    
+
     local pm, i,  ppds;
-    
+
     if m <= 5 then return false; fi;
 
     # Find the basic ppds of p^(ae)-1
     pm := PrimitivePrimeDivisors(a*e, p);
     # find the ppds in m
     ppds := Gcd(pm.ppds, m);
-    
+
     # There are no ppds
     if ppds = 1 then return false; fi;
 
-    ## if e+1 does not divide ppds then 
+    ## if e+1 does not divide ppds then
     ## we know that all primes dividing ppds are large
     ## and hence we know <m> is a large ppd-element
     if ppds mod (e+1) = 0 then
@@ -106,7 +106,7 @@ HasLBGgt5 := function( m, p, a, e )
          # if (e+1)^2 does not divide m, then not large
          if not (m mod (e+1)^2) = 0 then return false; fi;
      fi;
- 
+
      return true;
 end;
 
@@ -133,7 +133,7 @@ KroneckerFactors := function(g)
 
     return [ [[I[1][1] , b],[ c, d]], A];
 end;
-           
+
 
 ######################################################################
 ##
@@ -171,54 +171,54 @@ end;
 
 
 # Test to check whether the group contains both a large ppd element
-# and a basic ppd element 
-# TODO: Better comments... 
+# and a basic ppd element
+# TODO: Better comments...
 RECOG.IsGenericParameters := function( recognise, grp )
-    
+
     local fact, d, q, hint;
-    
+
     hint := recognise.hint;
 
     d := recognise.d;
     q := recognise.q;
 
-    if hint = "unknown"  then 
+    if hint = "unknown"  then
         return false;
-    
+
     elif hint = "linear" and d <= 2 then
         recognise.isGeneric := false;
         return false;
-        
+
     elif hint = "linear" and d = 3 then
         #q = 2^s-1
-        if IsPowerOfPrime( q+1, 2 ) then 
+        if IsPowerOfPrime( q+1, 2 ) then
             recognise.isGeneric := false;
         fi;
         return false;
-        
-    elif hint = "symplectic" and 
+
+    elif hint = "symplectic" and
       (d < 6 or (d mod 2 <> 0) or
        [d,q] in [[6,2],[6,3],[8,2]]) then
         recognise.isGeneric := false;
         return false;
-        
+
     elif hint = "unitary" and
       (d < 5 or d = 6 or [d,q] = [5,4]) then
         recognise.isGeneric := false;
         return false;
-        
-    elif hint = "orthogonalplus" and 
+
+    elif hint = "orthogonalplus" and
       (d mod 2 <> 0 or d < 10
        or (d = 10 and q = 2)) then
         recognise.isGeneric := false;
         return false;
-        
+
     elif hint = "orthogonalminus" and
-      (d mod 2 <> 0 or d < 6 
+      (d mod 2 <> 0 or d < 6
        or [d,q] in [[6,2],[6,3],[8,2]]) then
         recognise.isGeneric := false;
         return false;
-        
+
     elif hint = "orthogonalcircle" then
         if d < 7 or [d,q] = [7,3] then
             recognise.isGeneric := false;
@@ -236,13 +236,13 @@ RECOG.IsGenericParameters := function( recognise, grp )
             return false;
         fi;
     fi;
-    
+
     return false;
 end;
 
 
 # Generate elements until we find the required ppd type
-# elements...monte  yes 
+# elements...monte  yes
 # TODO: Better comments
 
 RECOG.IsGeneric := function (recognise, grp)
@@ -250,27 +250,27 @@ RECOG.IsGeneric := function (recognise, grp)
     if recognise.isGeneric = false then
         return false;
     fi;
-    
+
     if Length(recognise.E) < 2 then return fail; fi;
     if Length(recognise.LE) < 1 then return fail; fi;
     if Length(recognise.BE) < 1 then return fail; fi;
 
     recognise.isGeneric := true;
-    
+
     return false;
 end;
 
 #enough info to rule out extension field groups...?
 #TODO: comments...
 RECOG.RuledOutExtField := function (recognise, grp)
-    
+
     local differmodfour, d, q, E, b, bx, hint;
-    
+
     hint := recognise.hint;
     d := recognise.d;
     q := recognise.q;
     E := recognise.E;
-    
+
     differmodfour := function(E)
         local e;
         for e in E do
@@ -280,24 +280,24 @@ RECOG.RuledOutExtField := function (recognise, grp)
         od;
         return false;
     end;
-    
+
     b := recognise.currentgcd;
-    
+
     if hint in ["linear","unitary","orthogonalcircle"] then
         bx := 1;
     else
         bx := 2;
     fi;
-    
 
-    if b < bx then 
+
+    if b < bx then
         if hint <> "unknown" then
            recognise.hintIsWrong := true;
            # raeume auf + komme nie wieder
            return true;
         fi;
-        recognise.isNotExt := true; 
-        return false; 
+        recognise.isNotExt := true;
+        return false;
     fi;
     if b > bx then return fail; fi;
 
@@ -308,17 +308,17 @@ RECOG.RuledOutExtField := function (recognise, grp)
             recognise.isNotExt  := true;
             return false;
         fi;
-        
+
     elif hint = "unitary" then
         recognise.isNotExt  := true;
         return false;
-        
+
     elif hint = "symplectic" then
         if d mod 4 = 2 and q mod 2 = 1 then
-             recognise.isNotExt := 
+             recognise.isNotExt :=
             (PositionProperty(E, x -> (x mod 4 = 0)) <> fail);
         elif  d mod 4 = 0 and q mod 2 = 0 then
-             recognise.isNotExt := 
+             recognise.isNotExt :=
              (PositionProperty( E, x -> (x mod 4 = 2)) <> fail);
         elif d mod 4 = 0 and q mod 2 = 1 then
              recognise.isNotExt := differmodfour(E);
@@ -330,40 +330,40 @@ RECOG.RuledOutExtField := function (recognise, grp)
            # raeume auf + komme nie wieder
            return true;
         fi;
-        
+
     elif hint = "orthogonalplus" then
         if d mod 4 = 2  then
-            recognise.isNotExt  := 
+            recognise.isNotExt  :=
            (PositionProperty (E, x -> (x mod 4 = 0 )) <> fail);
         elif d mod 4 = 0  then
             recognise.isNotExt  := differmodfour(E);
-        else  
+        else
            Info( InfoClassical, 2, "d cannot be odd in hint O+");
            recognise.hintIsWrong := true;
            # raeume auf + komme nie wieder
            return true;
         fi;
 
-     
+
     elif hint = "orthogonalminus" then
         if d mod 4 = 0  then
-            recognise.isNotExt  := 
+            recognise.isNotExt  :=
             (PositionProperty ( E, x -> (x mod 4 = 2)) <> fail);
         elif d mod 4 = 2  then
             recognise.isNotExt  := differmodfour(E);
-        else 
+        else
            Info( InfoClassical, 2, "d cannot be odd in hint O-");
            recognise.hintIsWrong := true;
            # raeume auf + komme nie wieder
            return true;
         fi;
-    
+
     elif hint = "orthogonalcircle" then
         recognise.isNotExt  := true;
         return false;
     fi;
-    
-    if recognise.isNotExt = true then return false; 
+
+    if recognise.isNotExt = true then return false;
     else return fail;
     fi;
 end;
@@ -373,9 +373,9 @@ RECOG.IsNotAlternating := function( recognise, grp )
     local V, P, i, g ,q, o;
 
     q := recognise.q;
-    
+
 #   if recognise.hint <> "unknown" and recognise.hint <> "linear" then
-#       Info( InfoClassical, 2, "G' not an AlternatingGroup;"); 
+#       Info( InfoClassical, 2, "G' not an AlternatingGroup;");
 #       recognise.isNotAlternating := true;
 #       return false;
 #   fi;
@@ -397,14 +397,14 @@ RECOG.IsNotAlternating := function( recognise, grp )
            Info( InfoClassical, 2, "G is not an alternating group" );
            recognise.isNotAlternating := true;
            return false;
-       else 
+       else
            Info( InfoClassical, 2, "G' might be A7;");
            AddSet(recognise.possibleNearlySimple,"A7");
            return true;
        fi;
     fi;
 
-    
+
     if q >= 23 then
         # TODO Check Magma Code
        o := Order( recognise.g );
@@ -421,8 +421,8 @@ RECOG.IsNotAlternating := function( recognise, grp )
                return false;
            fi;
        od;
-  
-       if recognise.n > 15 then     
+
+       if recognise.n > 15 then
            AddSet (recognise.possibleNearlySimple, "2.A7");
            Info( InfoClassical, 2, "G' might be 2.A7;");
            return  fail;
@@ -430,7 +430,7 @@ RECOG.IsNotAlternating := function( recognise, grp )
    fi;
 
    return fail;
-   
+
 end;
 
 
@@ -466,18 +466,18 @@ RECOG.IsNotMathieu := function( recognise, grp )
        ord := Order(g);
        if (ord mod 121=0 or (d=5 and ord=13) or (d=6 and ord=7)) then
           Info( InfoClassical, 2, "G' is not a Mathieu group;");
-          recognise.isNotMathieu := true; 
+          recognise.isNotMathieu := true;
           return false;
        fi;
    else
        if ForAny([6,7,8,9],m-> m in E) then
           Info( InfoClassical, 2, "G' is not a Mathieu group;");
-           recognise.isNotMathieu := true; 
+           recognise.isNotMathieu := true;
            return false;
        fi;
    fi;
 
- 
+
 # TODO Check how big n should be
     if d = 5 then
         if recognise.n > 15 then
@@ -499,7 +499,7 @@ RECOG.IsNotMathieu := function( recognise, grp )
             return fail;
         fi;
     fi;
- 
+
    return fail;
 
 end;
@@ -542,17 +542,17 @@ RECOG.IsNotPSL := function (recognise, grp)
     # test whether e_2 = e_1 + 1 and
     # e_1 + 1 and 2* e_2 + 1 are primes
     if  Length(E) >= 2 then
-        if E[2]-1<>E[1] or 
+        if E[2]-1<>E[1] or
             not IsPrimeInt(E[1]+1) or not IsPrimeInt(2*E[2]+1) then
             Info(InfoClassical, 2, " G' is not PSL(2,r)");
             recognise.isNotPSL := true;
             return false;
         fi;
     fi;
-   
+
    if d = 3 then
        # q = 3*2^s-1 and q^2-1 has no large ppd.
-       # TODO recheck this 
+       # TODO recheck this
        if (q = 2 or ((q+1) mod 3 = 0 and IsPowerOfPrime((q+1)/3,2))) then
             ord := Order(recognise.g);
             if (ord mod 8 <> 0 or (p^(2*a)-1) mod ord = 0) then
@@ -561,7 +561,7 @@ RECOG.IsNotPSL := function (recognise, grp)
                 return false;
            fi;
        else
-           if p = 3 or p = 7 or 2 in LE then  
+           if p = 3 or p = 7 or 2 in LE then
                 Info( InfoClassical, 2, "G' not PSL(2,7);");
                 recognise.isNotPSL := true;
                 return false;
@@ -610,26 +610,26 @@ RECOG.IsNotPSL := function (recognise, grp)
    return fail;
 end;
 
-    
+
 #############################################################################
 ##
 ## IsPrimitivePrimeDivisor . . . . . . . . . . . . . . ( b, a, p )
-## 
+##
 ## Test whether p is a primitive prime divisor of b^a-1.
 ##
 IsPrimitivePrimeDivisor := function( b, a, p )
-    
+
     local i;
-    
+
     if not IsPrimeInt(p) then return false; fi;
     if not IsInt(b) or b <= 1 then return false; fi;
     if not IsInt(a) or a <= 1 then return false; fi;
-    
+
     if (b^a-1) mod p <> 0 then return false; fi;
     for i in [ 1 .. a-1 ] do
         if (b^i-1) mod p = 0 then return false; fi;
     od;
-    
+
     return true;
 end;
 
@@ -640,7 +640,7 @@ RECOG.TestRandomElement := function (recognise, grp)
     ord, bc, phi, kf, o1, o2, cf, i, found, p;
 
     recognise.g := PseudoRandom(grp);
-    recognise.cpol := CharacteristicPolynomial(recognise.g); 
+    recognise.cpol := CharacteristicPolynomial(recognise.g);
     recognise.n := recognise.n + 1;
 
     d := recognise.d;
@@ -659,12 +659,12 @@ RECOG.TestRandomElement := function (recognise, grp)
         ord := ProjectiveOrder(g);
         AddSet( recognise.porders, ord );
     fi;
-        
-    ppd := IsPpdElement (f, cpol, d, recognise.q, 1); 
+
+    ppd := IsPpdElement (f, cpol, d, recognise.q, 1);
     # if the element is no ppd we get out
-    if ppd = false then 
+    if ppd = false then
         recognise.isppd := false;
-    else    
+    else
         AddSet(recognise.E,ppd[1]);
         recognise.currentgcd := Gcd( recognise.currentgcd, ppd[1] );
         if ppd[2] = true then
@@ -685,8 +685,8 @@ RECOG.TestRandomElement := function (recognise, grp)
         fi;
     fi;
     if recognise.needE2 = true then
-        ppd := IsPpdElementD2(f, cpol, d, recognise.q, 1); 
-        if ppd <> false then 
+        ppd := IsPpdElementD2(f, cpol, d, recognise.q, 1);
+        if ppd <> false then
             str := "  Found a large and special ppd(";
             str := Concatenation(str, String(recognise.d));
             str := Concatenation(str, ", " );
@@ -698,9 +698,9 @@ RECOG.TestRandomElement := function (recognise, grp)
 
             AddSet( recognise.E2, ppd[1] );
             if ppd[2] = true then
-        
+
             ## first we test whether the characteristic polynomial has
-            ## two factors of degree d/2. 
+            ## two factors of degree d/2.
             facs := Factors( cpol );
             deg := List(facs, EuclideanDegree );
             if Length(deg) = 2 and deg[1] = deg[2] and deg[1] = d/2 then
@@ -735,8 +735,8 @@ RECOG.TestRandomElement := function (recognise, grp)
         recognise.IsSUContained := false;
     fi;
 
-    if recognise.needBaseChange = true and recognise.bc = "unknown" then     
-        if Length(recognise.ClassicalForms) = 0 then    
+    if recognise.needBaseChange = true and recognise.bc = "unknown" then
+        if Length(recognise.ClassicalForms) = 0 then
             recognise.needForms := true;
             return NotEnoughInformation;
         fi;
@@ -744,7 +744,7 @@ RECOG.TestRandomElement := function (recognise, grp)
         while not found and  i <= Length(recognise.ClassicalForms) do
            phi := recognise.ClassicalForms[i];
            if IsSesquilinearForm(phi)  then
-                if IsOddInt (q) and IsHyperbolicForm(phi) then 
+                if IsOddInt (q) and IsHyperbolicForm(phi) then
                     Info(InfoClassical, 2,"Performing base change");
                     found := true;
                     bc := FindBase (f, phi);
@@ -762,7 +762,7 @@ RECOG.TestRandomElement := function (recognise, grp)
             fi;
             i := i + 1;
         od;
-        if not found then 
+        if not found then
             Info(InfoClassical, 2, "need basechange only in O+");
             return fail;
         fi;
@@ -773,7 +773,7 @@ RECOG.TestRandomElement := function (recognise, grp)
                 recognise.needBaseChange := true;
             else
                 kf := KroneckerFactors( g^recognise.bc );
-                if kf = false then 
+                if kf = false then
                     kf := KroneckerFactors( (g^2)^recognise.bc );
                 fi;
                 recognise.kf  := kf;
@@ -781,11 +781,11 @@ RECOG.TestRandomElement := function (recognise, grp)
       fi;
 
       if recognise.needPlusMinus = true then
-            if recognise.kf = "unknown" then  
+            if recognise.kf = "unknown" then
                 recognise.needKF := true;
                 return fail;
             fi;
-            if recognise.kf = false then  
+            if recognise.kf = false then
                 return fail;
             fi;
             kf := recognise.kf;
@@ -795,12 +795,12 @@ RECOG.TestRandomElement := function (recognise, grp)
             #o2 := Order( kf[2] );
             Info(InfoClassical,2,o1, " ", o2);
             ### ACN March 2007 needed Projective order
-            if  q mod 2 = 0 and (o1 <= 2 or o2 <= 2) then 
-	        return fail;
+            if  q mod 2 = 0 and (o1 <= 2 or o2 <= 2) then
+                return fail;
             elif q mod 2 <> 0 and (o1 <= 4 or o2 <= 4) then
-	        return fail;
+                return fail;
             fi;
-            if ( (q+1) mod o1 = 0 and (q+1) mod o2 = 0) then 
+            if ( (q+1) mod o1 = 0 and (q+1) mod o2 = 0) then
                 if not IsPowerOfPrime(q+1,2) and q <> 8 then
                     if  not ForAny( Unique(FactorsInt(o1)), r ->
                       IsPrimitivePrimeDivisor(p,2*recognise.a,r)) then
@@ -819,27 +819,27 @@ RECOG.TestRandomElement := function (recognise, grp)
                 fi;
                 AddSet( recognise.plusminus, [1,1] );
             fi;
-            if ( (q+1) mod o1 = 0 and (q-1) mod o2 = 0) then 
+            if ( (q+1) mod o1 = 0 and (q-1) mod o2 = 0) then
                 AddSet( recognise.plusminus, [1,-1] );
             fi;
-            if ( (q-1) mod o1 = 0 and (q+1) mod o2 = 0) then 
+            if ( (q-1) mod o1 = 0 and (q+1) mod o2 = 0) then
                 AddSet( recognise.plusminus, [1,-1] );
             fi;
-            if ( (q-1) mod o1 = 0 and (q-1) mod o2 = 0) then 
+            if ( (q-1) mod o1 = 0 and (q-1) mod o2 = 0) then
                 AddSet( recognise.plusminus, [-1,-1] );
             fi;
         fi;
 
-        if recognise.needDecompose = true then        
-            if recognise.kf = "unknown" then  
+        if recognise.needDecompose = true then
+            if recognise.kf = "unknown" then
                 recognise.needKF := true;
                 return fail;
             fi;
-            if recognise.kf = false then  
+            if recognise.kf = false then
                 return fail;
             fi;
-            kf := recognise.kf;     
-                
+            kf := recognise.kf;
+
             if not kf[1] in Group(recognise.sq1) then
                 AddSet(recognise.sq1,kf[1]);
             fi;
@@ -857,9 +857,9 @@ end;
 # Compute the degrees of the irreducible factors of
 # the characteristic polynomial <cpol>
 RECOG.IsReducible := function( recognise, grp )
-    
+
     local deg, dims, g;
-  
+
     # compute the degrees of the irreducible factors
     deg := List(Factors(recognise.cpol), i-> Degree(i));
 
@@ -881,7 +881,7 @@ RECOG.IsReducible := function( recognise, grp )
         recognise.isReducible := false;
         return false;
     fi;
-  
+
     return fail;
 end;
 
@@ -892,11 +892,11 @@ RECOG.NoClassicalForms := function( recognise, grp )
 
     d := recognise.d;
     field := recognise.field;
-    if recognise.maybeDual = false and 
-      recognise.maybeFrobenius = false then  
+    if recognise.maybeDual = false and
+      recognise.maybeFrobenius = false then
           if First(recognise.ClassicalForms,IsTrivialForm)=fail then
               Add(recognise.ClassicalForms,
-              BilinearFormByMatrix(NullMat(d,d,field),field));        
+              BilinearFormByMatrix(NullMat(d,d,field),field));
           fi;
           return false;
    fi;
@@ -908,7 +908,7 @@ end;
 
 
 RECOG.ClassicalForms := function( recognise, grp)
-    local   field,  z,  d,  i,  qq,  A,  c,  I,  t,  i0,  
+    local   field,  z,  d,  i,  qq,  A,  c,  I,  t,  i0,
             a,  l,  g,  module,  forms,  dmodule,  fmodule,  form;
 
     if recognise.n > 1 then
@@ -924,7 +924,7 @@ RECOG.ClassicalForms := function( recognise, grp)
         recognise.needMeataxe := true;
         return fail;
     fi;
-     
+
     # set up the field and other information
     field := recognise.field;
     d := recognise.d;
@@ -935,11 +935,11 @@ RECOG.ClassicalForms := function( recognise, grp)
         qq := Characteristic(field)^(DegreeOverPrimeField(field)/2);
     fi;
 
-    # if all forms are excluded then we are finished 
+    # if all forms are excluded then we are finished
     if not recognise.maybeDual and not recognise.maybeFrobenius  then
         if First(recognise.ClassicalForms,IsTrivialForm)=fail then
             Add(recognise.ClassicalForms,
-            BilinearFormByMatrix(NullMat(d,d,field), field ) ); 
+            BilinearFormByMatrix(NullMat(d,d,field), field ) );
         fi;
         return false;
     fi;
@@ -948,10 +948,10 @@ RECOG.ClassicalForms := function( recognise, grp)
     # now try to find an invariant form
     if recognise.maybeDual then
         dmodule := ClassicalForms_GeneratorsWithoutScalarsDual(grp);
-        if dmodule <> false then 
+        if dmodule <> false then
             form := ClassicalForms_InvariantFormDual(module,dmodule);
             if form <> false  then
-                Add( recognise.ClassicalForms, 
+                Add( recognise.ClassicalForms,
                 BilinearFormByMatrix(form[2], field));
                 if Length(form)=4 then
                     recognise.QuadraticFormType := form[1];
@@ -979,11 +979,11 @@ RECOG.ClassicalForms := function( recognise, grp)
     fi;
 
 
-    # if all forms are excluded then we are finished 
+    # if all forms are excluded then we are finished
     if not recognise.maybeDual and not recognise.maybeFrobenius  then
         if First(recognise.ClassicalForms,IsTrivialForm)=fail then
             Add(recognise.ClassicalForms,
-            BilinearFormByMatrix(NullMat(d,d,field), field)); 
+            BilinearFormByMatrix(NullMat(d,d,field), field));
             return false;
         fi;
     fi;
@@ -1003,12 +1003,12 @@ RECOG.MeatAxe := function( recognise, grp )
         return NotEnoughInformation;
     fi;
 
-    
+
     if MTX.IsIrreducible(recognise.module) then
         recognise.isReducible := false;
         return false;
     else
-        Info( InfoClassical, 2, 
+        Info( InfoClassical, 2,
         "The group acts reducibly and thus doesn't contain a classical group");
         recognise.isReducible := true;
         recognise.isSLContained := false;
@@ -1027,18 +1027,18 @@ RECOG.IsSLContained := function( recognise, grp )
        recognise.isNotExt <> true or
        recognise.isNotPSL <> true  or
        recognise.isReducible = true or
-       recognise.isNotMathieu <> true or 
+       recognise.isNotMathieu <> true or
        recognise.isNotAlternating <> true  then
           return fail;
     fi;
 
-    
-    if recognise.isReducible = "unknown" then 
+
+    if recognise.isReducible = "unknown" then
         recognise.needMeataxe := true;
-        return NotEnoughInformation; 
+        return NotEnoughInformation;
     fi;
 
-    
+
     # if we reach this point the natural module is irreducible
     # since the MeatAxe Method aborts in the reducible case.
     # Also we know that the module is absolutely irreducible,
@@ -1055,7 +1055,7 @@ RECOG.IsSLContained := function( recognise, grp )
         return true;
     else
         recognise.IsSLContained := false;
-        Info(InfoClassical,2,"The group does not contain SL(", 
+        Info(InfoClassical,2,"The group does not contain SL(",
              recognise.d, ", ", recognise.q, ");");
         return false;
     fi;
@@ -1087,16 +1087,16 @@ RECOG.IsSpContained := function( recognise, grp )
        recognise.isReducible = true or
        recognise.currentgcd <> 2 or
        recognise.isNotPSL <> true  or
-       recognise.isNotMathieu <> true or 
+       recognise.isNotMathieu <> true or
        recognise.isNotAlternating <> true  then
           return fail;
     fi;
 
 
-    
-    if recognise.isReducible = "unknown" then 
+
+    if recognise.isReducible = "unknown" then
         recognise.needMeataxe := true;
-        return NotEnoughInformation; 
+        return NotEnoughInformation;
     fi;
 
     # if we reach this point the natural module is irreducible
@@ -1107,8 +1107,8 @@ RECOG.IsSpContained := function( recognise, grp )
         recognise.needForms := true;
         return NotEnoughInformation;
     fi;
-        
-    # if the group preserves a symplectic form but not a 
+
+    # if the group preserves a symplectic form but not a
     # form we have found Sp
     if recognise.QuadraticForm = false and
         First(recognise.ClassicalForms,isSpForm) <> fail then
@@ -1120,7 +1120,7 @@ RECOG.IsSpContained := function( recognise, grp )
         return true;
     else
         recognise.IsSpContained := false;
-        Info(InfoClassical,2,"The group does not contain Sp(", 
+        Info(InfoClassical,2,"The group does not contain Sp(",
              recognise.d, ", ", recognise.q, ");");
         return false;
     fi;
@@ -1146,11 +1146,11 @@ RECOG.IsSUContained := function( recognise, grp )
         recognise.IsSUContained := false;
         return false;
     fi;
- 
+
     q0 := Characteristic(recognise.field)^
          (LogInt(recognise.q,Characteristic(recognise.field))/2);
-    
-        
+
+
 
     if recognise.IsSUContained = false then
         return false;
@@ -1160,16 +1160,16 @@ RECOG.IsSUContained := function( recognise, grp )
        recognise.isReducible = true or
        recognise.isNotExt <> true or
        recognise.isNotPSL <> true  or
-       recognise.isNotMathieu <> true or 
+       recognise.isNotMathieu <> true or
        recognise.isNotAlternating <> true  then
           return fail;
     fi;
 
 
-    
-    if recognise.isReducible = "unknown" then 
+
+    if recognise.isReducible = "unknown" then
         recognise.needMeataxe := true;
-        return NotEnoughInformation; 
+        return NotEnoughInformation;
     fi;
 
     # if we reach this point the natural module is irreducible
@@ -1180,7 +1180,7 @@ RECOG.IsSUContained := function( recognise, grp )
         recognise.needForms := true;
         return NotEnoughInformation;
     fi;
-        
+
     if First(recognise.ClassicalForms,isHermForm)<> fail then
         recognise.IsSUContained := true;
         Info(InfoClassical,2,"The group contains SU(", recognise.d, ", ",
@@ -1188,7 +1188,7 @@ RECOG.IsSUContained := function( recognise, grp )
         return true;
     else
         recognise.IsSUContained := false;
-        Info(InfoClassical,2,"The group does not contain SU(", 
+        Info(InfoClassical,2,"The group does not contain SU(",
              recognise.d, ", ", q0, ");");
         return false;
     fi;
@@ -1223,23 +1223,23 @@ RECOG.IsSOContained := function( recognise, grp )
     fi;
 
 
-    if IsOddInt(recognise.d) and not IsOddInt(recognise.q) then 
-        return false; 
+    if IsOddInt(recognise.d) and not IsOddInt(recognise.q) then
+        return false;
     fi;
 
     if recognise.isGeneric <> true or
        not recognise.currentgcd in [1,2] or
        recognise.isNotPSL <> true  or
        recognise.isReducible = true or
-       recognise.isNotMathieu <> true or 
+       recognise.isNotMathieu <> true or
        recognise.isNotAlternating <> true  then
           return fail;
     fi;
 
 
-    if recognise.isReducible = "unknown" then 
+    if recognise.isReducible = "unknown" then
         recognise.needMeataxe := true;
-        return NotEnoughInformation; 
+        return NotEnoughInformation;
     fi;
 
     # if we reach this point the natural module is irreducible
@@ -1250,7 +1250,7 @@ RECOG.IsSOContained := function( recognise, grp )
         recognise.needForms := true;
         return NotEnoughInformation;
     fi;
-        
+
     if First(recognise.ClassicalForms,isParForm)<> fail or
         IsQuadraticForm( recognise.QuadraticForm) and
         recognise.QuadraticFormType = "orthogonalcircle" then
@@ -1288,7 +1288,7 @@ RECOG.IsSOContained := function( recognise, grp )
         return true;
     else
         recognise.IsSOContained := false;
-        Info(InfoClassical,2,"The group does not contain SO(", 
+        Info(InfoClassical,2,"The group does not contain SO(",
              recognise.d, ", ", recognise.q, ");");
         return false;
     fi;
@@ -1344,10 +1344,10 @@ RECOG.NonGenericLinear := function( recognise, grp )
         recognise.IsSLContained := true;
         return true;
     end;
-                 
+
     if recognise.d > 3 then return false; fi;
-    if recognise.d = 3 and not IsPowerOfPrime(recognise.q+1, 2) then 
-        return false; 
+    if recognise.d = 3 and not IsPowerOfPrime(recognise.q+1, 2) then
+        return false;
     fi;
     # grp is non-generic if either d = 2 or (d,q) = (3, 2^s-1)
 
@@ -1355,7 +1355,7 @@ RECOG.NonGenericLinear := function( recognise, grp )
        return false;
     fi;
 
-    if Length( recognise.ClassicalForms ) > 0 and 
+    if Length( recognise.ClassicalForms ) > 0 and
        First(recognise.ClassicalForms,IsTrivialForm) = fail then
        return false;
     fi;
@@ -1367,9 +1367,9 @@ RECOG.NonGenericLinear := function( recognise, grp )
         return fail;
     fi;
 
-    if 3 in recognise.LE and 3 in recognise.BE 
+    if 3 in recognise.LE and 3 in recognise.BE
        and HasElementsMultipleOf(recognise.orders, [4]) then
-           return CheckFlag();        
+           return CheckFlag();
     fi;
 
     return fail;
@@ -1405,7 +1405,7 @@ RECOG.NonGenericSymplectic := function(recognise, grp)
         recognise.IsSpContained := true;
         return true;
     end;
-                 
+
     d := recognise.d;
     q := recognise.q;
 
@@ -1415,8 +1415,8 @@ RECOG.NonGenericSymplectic := function(recognise, grp)
        return false;
     fi;
 
-    if Length( recognise.ClassicalForms ) > 0 and 
-       recognise.QuadraticForm = false and 
+    if Length( recognise.ClassicalForms ) > 0 and
+       recognise.QuadraticForm = false and
        First( recognise.ClassicalForms, isSpForm) = fail then
        return false;
     fi;
@@ -1437,46 +1437,46 @@ RECOG.NonGenericSymplectic := function(recognise, grp)
 
     if d = 8 and q = 2 then
         if not HasElementsMultipleOf(recognise.orders, [5,9,17]) then
-            return fail; 
+            return fail;
         fi;
     elif d = 6 and q = 2 then
         if not HasElementsMultipleOf(recognise.orders, [5,7,9]) then
-            return fail; 
+            return fail;
         fi;
     elif d = 6 and q = 3 then
         if not HasElementsMultipleOf(recognise.orders, [5,7]) then
-            return fail; 
+            return fail;
         fi;
     elif d = 4 and q = 3 then
         if not HasElementsMultipleOf(recognise.orders, [5,9]) then
-            return fail; 
+            return fail;
         fi;
     elif d = 4 and q = 2 then
         if Size(grp) mod 720 <> 0 then
-            Info(InfoClassical,2,"group does not contain Sp(", 
+            Info(InfoClassical,2,"group does not contain Sp(",
                  recognise.d, ", ", recognise.q, ");");
            recognise.isSpContained := false;
            return false;
         fi;
     elif d = 4 and q = 5 then
         if not HasElementsMultipleOf(recognise.orders, [13,15]) then
-            return fail; 
+            return fail;
         fi;
     elif d = 4 and not IsPowerOfPrime(q+1,2) and not ((q+1) mod 3 = 0 and
                    IsPowerOfPrime((q+1)/3, 2)) and q<>2 then
-        if not 4 in recognise.LB then 
-            return fail; 
+        if not 4 in recognise.LB then
+            return fail;
         fi;
         if not 2 in  recognise.LS then return fail; fi;
     elif d = 4  and q >= 7 and IsPowerOfPrime(q+1,2) then
         if not 4 in recognise.LB then return fail; fi;
         if not HasElementsMultipleOf(recognise.orders, [4]) then
-            return fail; 
+            return fail;
         fi;
 
     elif d = 4 and q >= 11 and IsPowerOfPrime((q+1)/3, 2) then
         if not HasElementsMultipleOf(recognise.orders, [3,4]) then
-            return fail; 
+            return fail;
         fi;
         if not 4 in recognise.LB then return fail; fi;
     else
@@ -1485,8 +1485,8 @@ RECOG.NonGenericSymplectic := function(recognise, grp)
         return false;
     fi;
 
-    return CheckFlag();    
-    
+    return CheckFlag();
+
 end;
 
 ############################################################################/
@@ -1512,7 +1512,7 @@ RECOG.NonGenericUnitary := function(recognise, grp)
             recognise.needForms :=  true;
             return fail;
         fi;
-         Info(InfoClassical,2,"group contains SU(", 
+         Info(InfoClassical,2,"group contains SU(",
               recognise.d, ", ", recognise.q, ");");
         recognise.isSpContained := true;
 
@@ -1529,11 +1529,11 @@ RECOG.NonGenericUnitary := function(recognise, grp)
        return false;
     fi;
 
-    if Length( recognise.ClassicalForms ) > 0 and 
+    if Length( recognise.ClassicalForms ) > 0 and
        First( recognise.ClassicalForms, isHermForm )=fail then
        return false;
     fi;
-    
+
     if recognise.maybeFrobenius = false then return false; fi;
 
     if recognise.n <= 5 then
@@ -1555,27 +1555,27 @@ RECOG.NonGenericUnitary := function(recognise, grp)
 
     if d = 6 and q = 4 then
         if not HasElementsMultipleOf(recognise.orders, [7,10,11]) then
-            return fail; 
+            return fail;
         fi;
     elif d = 6 and q >= 9 then
         if not 3 in recognise.E2 then return fail; fi;
         if not 5 in recognise.LB then return fail; fi;
-    elif d = 5 and q = 4 then 
+    elif d = 5 and q = 4 then
         if not HasElementsMultipleOf(recognise.orders, [11,12]) then
-            return fail; 
+            return fail;
         fi;
-    elif d = 4 and q = 4 then 
+    elif d = 4 and q = 4 then
         #TO DO : check this is same in Magma
         if not HasElementsMultipleOf(recognise.orders, [5,9]) then
-            return fail; 
+            return fail;
         fi;
-    elif d = 4 and q = 9 then 
+    elif d = 4 and q = 9 then
         if not HasElementsMultipleOf(recognise.orders, [5,7,9]) then
-            return fail; 
+            return fail;
         fi;
-    elif d = 4 and q > 9 then 
-        if not 3 in recognise.LB then 
-            return fail; 
+    elif d = 4 and q > 9 then
+        if not 3 in recognise.LB then
+            return fail;
         fi;
         if not 2 in recognise.E2  then return fail; fi;
         f1 := Collected(Factors( q^3-1 ));
@@ -1593,80 +1593,80 @@ RECOG.NonGenericUnitary := function(recognise, grp)
             # 7 is not ppd of q^3-1
             return CheckFlag();
         fi;
-        # Now we know 7 is ppd of q^3 -1 
+        # Now we know 7 is ppd of q^3 -1
         if not q^2 mod 5 = 1 or q mod 5 = 1 then
             # 5 is not ppd of q^2-1
             return CheckFlag();
         fi;
-        if PositionProperty( recognise.orders, i -> 
+        if PositionProperty( recognise.orders, i ->
         (i mod 7 = 0 and     # order divisible by 7
          i <> 7 and          # but not equal to 7
          q^3 mod i = 1 and   # order divides q^3-1
         (7*(q-1)) mod i <> 0 # order does not divide 7*(q-1)
-         )) <> fail then 
+         )) <> fail then
             # 5 is not ppd of q^2-1
             return CheckFlag();
         fi;
     elif d = 3 and q = 4 then
-        if Order(grp) mod 216 = 0 then 
+        if Order(grp) mod 216 = 0 then
             return CheckFlag();
         else
             recognise.IsSUContained := false;
             return false;
         fi;
-    elif d = 3 and q = 9 then 
+    elif d = 3 and q = 9 then
         if not HasElementsMultipleOf(recognise.orders, [7]) then
-            return fail; 
+            return fail;
         fi;
         if recognise.hasSpecialEle = false then
             if not Order( recognise.g ) mod 6 = 0 then return fail; fi;
-            if PositionProperty( GeneratorsOfGroup(grp), 
+            if PositionProperty( GeneratorsOfGroup(grp),
                 h-> (Comm(h,recognise.g^3) <> One(grp))) <> fail then
-                Info( InfoClassical,2, 
+                Info( InfoClassical,2,
                       "Cube of element of order div by 6 is not central" );
                       recognise.hasSpecialEle := true;
                 return CheckFlag();
              fi;
         else return CheckFlag();
         fi;
-    elif d = 3 and q = 16 then 
+    elif d = 3 and q = 16 then
         if not HasElementsMultipleOf(recognise.orders, [5,13]) then
-            return fail; 
+            return fail;
         fi;
         if recognise.hasSpecialEle = false then
             if not Order(recognise.g) mod 5  = 0 then return fail; fi;
-            if PositionProperty( GeneratorsOfGroup(grp), 
+            if PositionProperty( GeneratorsOfGroup(grp),
             h-> (Comm(h,recognise.g) <> One(grp))) <> fail then
-                Info( InfoClassical,2, 
+                Info( InfoClassical,2,
                       "The element of order 5 is not central" );
                 recognise.hasSpecialEle := true;
                 return CheckFlag();
             fi;
         else return CheckFlag();
         fi;
-    elif d = 3 and q = 25 then 
+    elif d = 3 and q = 25 then
         if not HasElementsMultipleOf(recognise.orders, [5,7,8]) then
-            return fail; 
+            return fail;
         fi;
         if recognise.hasSpecialEle = false then
             if Order(recognise.g) mod 8 <> 0 then return fail; fi;
             g := recognise.g^(Order(recognise.g)/2);
-            if PositionProperty( GeneratorsOfGroup(grp), 
+            if PositionProperty( GeneratorsOfGroup(grp),
                                  h-> (Comm(h,g) <> One(grp))) <> fail then
-                Info( InfoClassical,2, 
+                Info( InfoClassical,2,
                   "involution in cyclic subgroup  of order 8 is not central" );
                 recognise.hasSpecialEle := true;
                 return CheckFlag();
              fi;
         else return CheckFlag();
-        fi;        
-    elif d = 3 and q >= 49  then 
+        fi;
+    elif d = 3 and q >= 49  then
         if not 3 in recognise.LE or not 3 in recognise.BE then
            return fail;
         fi;
         if not recognise.ppd[1] = 3 or not recognise.ppd[2]=true
-           or not recognise.ppd[3]=true then 
-            return fail; 
+           or not recognise.ppd[3]=true then
+            return fail;
         fi;
         if recognise.hasSpecialEle = false then
              str := "Searching for elements of order > 3 mod scalars";
@@ -1679,11 +1679,11 @@ RECOG.NonGenericUnitary := function(recognise, grp)
              fi;
              recognise.hasSpeccialEle := true;
              return CheckFlag();
-         else 
+         else
              return CheckFlag();
          fi;
     else
-        Info(InfoClassical,2, 
+        Info(InfoClassical,2,
             "NonGenericUnitary: d and q must have been be generic");
         return false;
     fi;
@@ -1691,7 +1691,7 @@ RECOG.NonGenericUnitary := function(recognise, grp)
 
     return CheckFlag();
 end;
-        
+
 
 RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
 
@@ -1712,7 +1712,7 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
             recognise.needForms :=  true;
             return fail;
         fi;
-        Info(InfoClassical,2,"group contains SO+(", 
+        Info(InfoClassical,2,"group contains SO+(",
              recognise.d, ", ", recognise.q, ");");
 
         recognise.IsSOContained := true;
@@ -1729,7 +1729,7 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
        return false;
     fi;
 
-    if (Length( recognise.ClassicalForms ) > 0 and 
+    if (Length( recognise.ClassicalForms ) > 0 and
        First(recognise.ClassicalForms, isHypForm)=fail) and
        (not IsQuadraticForm(recognise.QuadraticForm) or not
        recognise.QuadraticFormType = "orthogonalplus") then
@@ -1750,7 +1750,7 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
 
     if d = 10 and q = 2 then
         if not HasElementsMultipleOf( recognise.orders, [17,31])  then
-            return fail; 
+            return fail;
         fi;
     elif d = 8 and q = 2 then
         if not HasElementsMultipleOf( recognise.orders, [7,9,15]) and
@@ -1759,59 +1759,59 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
         fi;
 
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
-        orbs := Orbits( pgrp, MovedPointsPerms( GeneratorsOfGroup(pgrp)));   
+        orbs := Orbits( pgrp, MovedPointsPerms( GeneratorsOfGroup(pgrp)));
 
-        if Set(List(orbs,Length)) <> [ 120, 135 ] then 	
+        if Set(List(orbs,Length)) <> [ 120, 135 ] then
            recognise.isSOContained := false;
-           return false; 
+           return false;
         fi;
-	if Size(pgrp) mod  174182400 = 0 then
+        if Size(pgrp) mod  174182400 = 0 then
            return CheckFlag();
            recognise.isSOContained := true;
         else
            recognise.isSOContained := false;
-           return false; 
+           return false;
          fi;
     elif d = 8 and q = 3 then
         if not HasElementsMultipleOf( recognise.orders, [7,13])  then
-            return fail; 
+            return fail;
         fi;
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
-        orbs := Orbits( pgrp, MovedPointsPerms( GeneratorsOfGroup(pgrp)));   
-	if Set(List(orbs, Length)) <> [ 1080, 1120] then
+        orbs := Orbits( pgrp, MovedPointsPerms( GeneratorsOfGroup(pgrp)));
+        if Set(List(orbs, Length)) <> [ 1080, 1120] then
              recognise.isSOContained := false;
-             return false; 
+             return false;
         fi;
-        if Size(pgrp) mod 4952179814400 = 0 then 
+        if Size(pgrp) mod 4952179814400 = 0 then
              return CheckFlag();
         else
              recognise.isSOContained := false;
              return false;
         fi;
-    elif d = 8 and  q =  5 then 
+    elif d = 8 and  q =  5 then
         #ACN Feb 07: added fix - need also elements of order a mult of 3
         #            these are missing in the paper [3]
         if not HasElementsMultipleOf( recognise.orders, [7,13,3])  then
-            return fail; 
+            return fail;
         fi;
-    elif d = 8 and (q = 4 or q > 5) then 
+    elif d = 8 and (q = 4 or q > 5) then
         if not 6 in recognise.LB then return fail; fi;
         if not 4 in recognise.LS then return fail; fi;
     elif d = 6 and q = 2 then
         if not HasElementsMultipleOf( recognise.orders, [7]) and
            not HasElementsMultipleOf( recognise.orders, [15]) then
-            return fail; 
+            return fail;
         fi;
     elif d = 6 and q = 3 then
         if not HasElementsMultipleOf( recognise.orders, [5])  then
-            return fail; 
+            return fail;
         fi;
         if not 13 in recognise.orders then return fail; fi;
     elif d = 6 and q >= 4 then
         if not 4 in recognise.LB then return fail; fi;
         if not 3 in recognise.E2 then return fail; fi;
     elif d = 4 and (q = 8 or q >= 11) then
-        if recognise.needPlusMinus = false then 
+        if recognise.needPlusMinus = false then
             recognise.needPlusMinus := true;
             return NotEnoughInformation;
         fi;
@@ -1819,11 +1819,11 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
             return fail;
         fi;
     elif d = 4 and q = 2 then
-        if Size(grp) mod 36 <> 0 then 
+        if Size(grp) mod 36 <> 0 then
             recognise.isSOContained := false;
-            return false; 
+            return false;
         fi;
-        if recognise.needDecompose = false then 
+        if recognise.needDecompose = false then
            recognise.needDecompose := true;
            return fail;
         fi;
@@ -1836,11 +1836,11 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
                 return CheckFlag();
         fi;
     elif d = 4 and q = 3 then
-        if Size(grp) mod 288 <> 0 then 
+        if Size(grp) mod 288 <> 0 then
             recognise.isSOContained := false;
-            return false; 
+            return false;
         fi;
-        if recognise.needDecompose = false then 
+        if recognise.needDecompose = false then
            recognise.needDecompose := true;
            return fail;
         fi;
@@ -1855,12 +1855,12 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
     elif d = 4 and q =  4 then
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
         orbs := Orbits( pgrp, MovedPointsPerms(
-           GeneratorsOfGroup(pgrp)));   
-        if Size(pgrp) mod 3600 <> 0 then 
+           GeneratorsOfGroup(pgrp)));
+        if Size(pgrp) mod 3600 <> 0 then
              recognise.isSOContained := false;
-             return false; 
+             return false;
         fi;
-        if recognise.needDecompose = false then 
+        if recognise.needDecompose = false then
            recognise.needDecompose := true;
            return fail;
         fi;
@@ -1874,7 +1874,7 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
         fi;
     elif d = 4 and q = 5 then
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
-        if Size(pgrp) mod 7200 <> 0 then 
+        if Size(pgrp) mod 7200 <> 0 then
             recognise.isSOContained := false;
             return false;
         else
@@ -1882,11 +1882,11 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
         fi;
     elif d = 4 and q = 7 then
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
-        if Size(pgrp) mod 56448  <> 0 then 
+        if Size(pgrp) mod 56448  <> 0 then
             recognise.isSOContained := false;
             return false;
         fi;
-        if recognise.needDecompose = false then 
+        if recognise.needDecompose = false then
            recognise.needDecompose := true;
            return fail;
         fi;
@@ -1900,7 +1900,7 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
         fi;
     elif d = 4 and q = 9 then
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
-        if Size(pgrp) mod 259200 <> 0 then 
+        if Size(pgrp) mod 259200 <> 0 then
             recognise.isSOContained := false;
             return false;
         else
@@ -1908,10 +1908,10 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
         fi;
     else
         Info(InfoClassical, 2,
-             "NonGenericO+: d and q must have  been be generic");  
+             "NonGenericO+: d and q must have  been be generic");
         return false;
     fi;
-     
+
      return CheckFlag();
 
 end;
@@ -1936,7 +1936,7 @@ RECOG.NonGenericOrthogonalMinus := function(recognise, grp)
             recognise.needForms :=  true;
             return fail;
         fi;
-        Info(InfoClassical,2,"group contains SO-(", 
+        Info(InfoClassical,2,"group contains SO-(",
              recognise.d, ", ", recognise.q, ");");
         recognise.IsSOContained := true;
         return true;
@@ -1953,7 +1953,7 @@ RECOG.NonGenericOrthogonalMinus := function(recognise, grp)
        return false;
     fi;
 
-    if (Length(recognise.ClassicalForms) > 0 and 
+    if (Length(recognise.ClassicalForms) > 0 and
        First(recognise.ClassicalForms,isEllForm)=fail) and
        (not IsQuadraticForm(recognise.QuadraticForm) or not
        recognise.QuadraticFormType = "orthogonalminus") then
@@ -1967,28 +1967,28 @@ RECOG.NonGenericOrthogonalMinus := function(recognise, grp)
         return fail;
     fi;
 
-    
+
     if d = 8 and q = 2 then
         if not HasElementsMultipleOf( recognise.orders, [9,17])  then
-            return fail; 
+            return fail;
         fi;
     elif d = 6 and q = 3 then
         if not HasElementsMultipleOf( recognise.orders, [5,7,9])  then
-            return fail; 
+            return fail;
         fi;
-    elif d = 6 and q = 2 then 
+    elif d = 6 and q = 2 then
         if not HasElementsMultipleOf( recognise.orders, [5,9])  then
-            return fail; 
+            return fail;
         fi;
-    elif d = 4 and q = 2 then 
+    elif d = 4 and q = 2 then
         if not HasElementsMultipleOf( recognise.orders, [3,5])  then
-            return fail; 
+            return fail;
         fi;
     elif d = 4 and q = 3 then
         if not HasElementsMultipleOf( recognise.orders, [3,5])  then
-            return fail; 
+            return fail;
         fi;
-        pgrp := ProjectiveActionOnFullSpace( grp, GF(3), 4 );       
+        pgrp := ProjectiveActionOnFullSpace( grp, GF(3), 4 );
         orbs := Orbits( pgrp, MovedPointsPerms( GeneratorsOfGroup(pgrp)));
         if Length(orbs) >  3 then # ACN 10/6/08
             recognise.isSOContained := false;
@@ -2033,7 +2033,7 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
 
     if not IsOddInt(recognise.d) then return false; fi;
     if not IsOddInt(recognise.q) then return false; fi;
-    
+
     CheckFlag := function( )
         if recognise.isReducible = "unknown" then
            recognise.needMeataxe := true;
@@ -2043,7 +2043,7 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
             recognise.needForms :=  true;
             return fail;
         fi;
-        Info(InfoClassical,2,"group contains SOo(", 
+        Info(InfoClassical,2,"group contains SOo(",
              recognise.d, ", ", recognise.q, ");");
         recognise.IsSOContained := true;
         return true;
@@ -2056,7 +2056,7 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
        return false;
    fi;
 
-    if (Length( recognise.ClassicalForms ) > 0 and 
+    if (Length( recognise.ClassicalForms ) > 0 and
        First(recognise.ClassicalForms, isParForm)=fail) and
        (not IsQuadraticForm(recognise.QuadraticForm) or not
        recognise.QuadraticFormType = "orthogonalcircle") then
@@ -2070,91 +2070,91 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
         recognise.needOrders := true;
         return fail;
     fi;
-    
+
     if d = 3 then recognise.needLB := true; fi;
 
 
     if d = 7 and q = 3 then
         if not HasElementsMultipleOf( recognise.orders, [5,7,13])  then
-            return fail; 
+            return fail;
         fi;
     elif d = 5 and q = 3 then
         if not HasElementsMultipleOf( recognise.orders, [5,9])  then
-            return fail; 
+            return fail;
         fi;
-    elif d = 5 and q >= 5 then 
+    elif d = 5 and q >= 5 then
         if not 4 in recognise.LE then return fail; fi;
-    elif d = 3 and q = 3 then 
+    elif d = 3 and q = 3 then
         if not HasElementsMultipleOf( recognise.orders, [3])  then
-            return fail; 
+            return fail;
         fi;
-    elif d = 3 and q = 5 then 
+    elif d = 3 and q = 5 then
         if not HasElementsMultipleOf( recognise.orders, [3,5])  then
-            return fail; 
+            return fail;
         fi;
-    elif d = 3 and q = 7 then 
+    elif d = 3 and q = 7 then
         if not HasElementsMultipleOf( recognise.orders, [4,7])  then
-            return fail; 
+            return fail;
         fi;
-    elif d = 3 and q = 9 then 
+    elif d = 3 and q = 9 then
         if not HasElementsMultipleOf( recognise.orders, [3,5])  then
-            return fail; 
-        fi; 
+            return fail;
+        fi;
         if recognise.hasSpecialEle = false then
             if not Order(recognise.g) in [4,8] then return fail; fi;
             g := recognise.g^2;
-            if PositionProperty(GeneratorsOfGroup(grp), 
-               h->(Comm(h,g)<>One(grp))) <> fail then 
+            if PositionProperty(GeneratorsOfGroup(grp),
+               h->(Comm(h,g)<>One(grp))) <> fail then
                recognise.hasSpecialEle := true;
                return CheckFlag();
             fi;
         else
                return CheckFlag();
-        fi; 
+        fi;
         recognise.IsSOContained := false;
         return false;
-    elif d = 3 and q = 11 then 
+    elif d = 3 and q = 11 then
         if not HasElementsMultipleOf( recognise.orders, [3,11])  then
-            return fail; 
-        fi; 
-    elif d = 3 and q = 19 then 
+            return fail;
+        fi;
+    elif d = 3 and q = 19 then
         if not HasElementsMultipleOf( recognise.orders, [5,9,19])  then
-            return fail; 
-        fi; 
-    elif d = 3 and q >=31 and IsPowerOfPrime(q+1,2) then 
+            return fail;
+        fi;
+    elif d = 3 and q >=31 and IsPowerOfPrime(q+1,2) then
         s := Log2Int(q+1);
         if PositionProperty(recognise.orders,
-            i->(i > 2 and (q-1) mod i = 0))=fail then 
-            return fail; 
-        fi; 
-        if PositionProperty(recognise.orders, 
-            i-> i mod 2^(s-1) = 0 ) = fail then
-            return fail; 
-        fi; 
-    elif d = 3 and q>11 and ((q+1) mod 3=0 and
-        IsPowerOfPrime((q+1)/3,2)) then 
-        s := Log2Int((q+1)/3);
-        if PositionProperty(recognise.orders, 
-            i-> (i mod (3*2^(s-1)) = 0)) = fail then
-            return fail; 
-        fi; 
+            i->(i > 2 and (q-1) mod i = 0))=fail then
+            return fail;
+        fi;
         if PositionProperty(recognise.orders,
-            i->(i > 2 and (q-1) mod i = 0))=fail then 
-            return fail; 
-        fi; 
+            i-> i mod 2^(s-1) = 0 ) = fail then
+            return fail;
+        fi;
+    elif d = 3 and q>11 and ((q+1) mod 3=0 and
+        IsPowerOfPrime((q+1)/3,2)) then
+        s := Log2Int((q+1)/3);
+        if PositionProperty(recognise.orders,
+            i-> (i mod (3*2^(s-1)) = 0)) = fail then
+            return fail;
+        fi;
+        if PositionProperty(recognise.orders,
+            i->(i > 2 and (q-1) mod i = 0))=fail then
+            return fail;
+        fi;
     elif d = 3 and ((q+1) mod 3 <> 0 or not IsPowerOfPrime((q+1)/3,2)) and
-                   not IsPowerOfPrime(q+1,2) then 
+                   not IsPowerOfPrime(q+1,2) then
         if not 2 in recognise.LB then return fail; fi;
         if PositionProperty(recognise.orders,
-            i->(i > 2 and (q-1) mod i = 0))=fail then 
-            return fail; 
-        fi; 
+            i->(i > 2 and (q-1) mod i = 0))=fail then
+            return fail;
+        fi;
         ## need to check that the basic lppd( 3,q;2) elements have order
         ## greater than 5.
         if PositionProperty(recognise.orders, i->
-          HasLBGgt5(i,recognise.p,LogInt(q,recognise.p),2))=fail then 
-            return fail; 
-        fi; 
+          HasLBGgt5(i,recognise.p,LogInt(q,recognise.p),2))=fail then
+            return fail;
+        fi;
     else
        Info(InfoClassical, 2, "NonGenericOo: d and q must be generic" );
         return false;
@@ -2173,7 +2173,7 @@ end;
 #
 #  10 - 49 Termination Conditions
 #
-# 1 - 10 Workers 
+# 1 - 10 Workers
 
 AddMethod( ClassicalMethDb, RECOG.TestRandomElement, 100, "TestRandomElement",
            "makes new random element and stores it and its char poly" );
@@ -2188,24 +2188,24 @@ AddMethod( ClassicalMethDb, RECOG.IsReducible, 80, "IsReducible",
            "tests whether current random element rules out reducible" );
 
 AddMethod( ClassicalMethDb, RECOG.RuledOutExtField, 81,
-           "RuledOutExtField", 
+           "RuledOutExtField",
            "tests whether extension field case is ruled out" );
 
 AddMethod( ClassicalMethDb, RECOG.IsNotMathieu, 82,
-           "IsNotMathieu", 
+           "IsNotMathieu",
            "tests whether Mathieu Groups are ruled out" );
 
 AddMethod( ClassicalMethDb, RECOG.IsNotAlternating, 83,
-           "IsNotAlternating", 
+           "IsNotAlternating",
            "tests whether Alternating Groups are ruled out" );
 
 AddMethod( ClassicalMethDb, RECOG.IsNotPSL, 84,
-           "IsNotPSL", 
+           "IsNotPSL",
            "tests whether PSL groups are ruled out" );
 
 
 AddMethod( ClassicalMethDb, RECOG.NoClassicalForms, 85,
-           "NoClassicalForms", 
+           "NoClassicalForms",
            "tests whether we can rule out certain forms" );
 
 AddMethod( ClassicalMethDb, RECOG.MeatAxe, 9,
@@ -2220,21 +2220,21 @@ AddMethod( ClassicalMethDb, RECOG.NonGenericLinear, 10, "NonGenericLinear",
 AddMethod( ClassicalMethDb, RECOG.NonGenericUnitary, 11, "NonGenericUnitary",
            "tests whether group is non-generic Unitary" );
 
-AddMethod( ClassicalMethDb, RECOG.NonGenericSymplectic, 12, 
+AddMethod( ClassicalMethDb, RECOG.NonGenericSymplectic, 12,
             "NonGenericSymplectic",
            "tests whether group is non-generic Symplectic" );
 
-AddMethod( ClassicalMethDb, RECOG.NonGenericOrthogonalPlus, 13, 
+AddMethod( ClassicalMethDb, RECOG.NonGenericOrthogonalPlus, 13,
            "NonGenericOrthogonalPlus",
            "tests whether group is non-generic O+" );
 
 
-AddMethod( ClassicalMethDb, RECOG.NonGenericOrthogonalMinus, 14, 
+AddMethod( ClassicalMethDb, RECOG.NonGenericOrthogonalMinus, 14,
            "NonGenericOrthogonalMinus",
            "tests whether group is non-generic O-" );
 
 
-AddMethod( ClassicalMethDb, RECOG.NonGenericOrthogonalCircle, 15, 
+AddMethod( ClassicalMethDb, RECOG.NonGenericOrthogonalCircle, 15,
            "NonGenericOrthogonalCircle",
            "tests whether group is non-generic Oo" );
 
@@ -2261,12 +2261,12 @@ function( arg )
   fi;
   grp := arg[1];
   nrrandels := 30;
-  if DimensionOfMatrixGroup(grp) = 8 then 
+  if DimensionOfMatrixGroup(grp) = 8 then
      nrrandels := 200;
   elif DimensionOfMatrixGroup(grp) = 4 and
-      Size(FieldOfMatrixGroup(grp)) = 8 then 
+      Size(FieldOfMatrixGroup(grp)) = 8 then
      nrrandels := 300;
-  elif DimensionOfMatrixGroup(grp) <= 10 then 
+  elif DimensionOfMatrixGroup(grp) <= 10 then
       nrrandels := 50;
   fi;
   case := "unknown";
@@ -2274,12 +2274,12 @@ function( arg )
       if IsInt(arg[i]) then
           nrrandels := arg[i];
       else
-          if arg[i] in ["linear", "symplectic", "unitary", 
+          if arg[i] in ["linear", "symplectic", "unitary",
            "orthogonalplus", "orthogonalcircle", "unknown" ] then
               case := arg[i];
-	  else
-	      Info(InfoClassical,2,"Unknown case ",arg[i]," - ignored.");
-	  fi;
+          else
+              Info(InfoClassical,2,"Unknown case ",arg[i]," - ignored.");
+          fi;
       fi;
   od;
 
@@ -2291,7 +2291,7 @@ function( arg )
                    p := Characteristic(f),
                    a := DegreeOverPrimeField(f),
                    q := Characteristic(f)^DegreeOverPrimeField(f),
-                   E := [], LE := [], BE := [], LB := [], 
+                   E := [], LE := [], BE := [], LB := [],
                    LS := [], E2 := [], LE2 := [], BE2 := [],
                    g := fail,
                    cpol := fail,
@@ -2344,7 +2344,7 @@ function( arg )
   SetInfoLevel(InfoMethSel,merkinfolevel);
   # fail: bedeutet, dass entnervt aufgegeben wurde
   # true: bedeutet, dass eine Methode "erfolgreich" war
-  
+
   return recognise;
   # return result
 end);
@@ -2352,26 +2352,26 @@ end);
 # The following function pretty prints the output of RecogniseClassical.
 # This can be helpful when debugging it.
 DisplayRecog := function( r )
-    
+
     local q0;
-    
+
            Print("Reducible : ", r.isReducible, "\n" );
            Print("Forms: " );
            if Length(r.ClassicalForms)<> 1 then
               Print("Several Forms preserved\n");
-           elif IsTrivialForm( r.ClassicalForms[1] ) then 
+           elif IsTrivialForm( r.ClassicalForms[1] ) then
               Print("linear i.e. no forms\n");
            elif IsQuadraticForm(r.QuadraticForm) then
               Print("quadratic form of type: ", r.QuadraticFormType, "\n");
-           elif IsSymplecticForm(r.ClassicalForms[1]) then 
+           elif IsSymplecticForm(r.ClassicalForms[1]) then
               Print("symplectic\n");
-           elif IsHermitianForm( r.ClassicalForms[1] ) then 
+           elif IsHermitianForm( r.ClassicalForms[1] ) then
               Print("unitary\n");
-           elif IsEllipticForm( r.ClassicalForms[1] ) then 
+           elif IsEllipticForm( r.ClassicalForms[1] ) then
               Print("orthogonal minus\n");
-           elif IsParabolicForm( r.ClassicalForms[1] ) then 
+           elif IsParabolicForm( r.ClassicalForms[1] ) then
               Print("orthogonal circle\n");
-           elif IsHyperbolicForm( r.ClassicalForms[1] ) then 
+           elif IsHyperbolicForm( r.ClassicalForms[1] ) then
               Print("orthogonal plus\n");
            fi;
            if Length(r.E) > 0 then

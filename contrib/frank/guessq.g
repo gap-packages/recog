@@ -21,14 +21,14 @@ end;
 q := X(Cyclotomics, "q");
 
 #############################################################################
-##  
-#F  GFOrderSimp( <ser>, <dim>, <ord>, <q> ) . . . . . . orders of simple groups 
+##
+#F  GFOrderSimp( <ser>, <dim>, <ord>, <q> ) . . . . . . orders of simple groups
 #F  of Lie type
 ##
 ##  This function returns the entries from the list in [Carter, p.75].
 ##  <ser> is the series, <dim> the dimension and <ord> the order of
-##  the automorphism of the Dynkin diagram, <q> can be an indeterminate. 
-##  Example:  GFOrderSimp("A",3,2,q); returns the order of $SU_4(q)$. 
+##  the automorphism of the Dynkin diagram, <q> can be an indeterminate.
+##  Example:  GFOrderSimp("A",3,2,q); returns the order of $SU_4(q)$.
 ##
 GFOrderSimp:=function(ser, rk, F0ord, q)
   local s, erg, i;
@@ -60,7 +60,7 @@ GFOrderSimp:=function(ser, rk, F0ord, q)
     od;
     if F0ord=1 then
       return erg*(q^rk-1);
-    elif F0ord=2 then 
+    elif F0ord=2 then
       return erg*(q^rk+1);
     fi;
   elif ser="G" and rk =2 and F0ord=2 then
@@ -72,7 +72,7 @@ GFOrderSimp:=function(ser, rk, F0ord, q)
   elif ser="F" and rk=4 and F0ord=1 then
     return q^24*(q^2-1)*(q^6-1)*(q^8-1)*(q^12-1);
   elif ser="E" and rk=6 and F0ord=2 then
-    return q^36*(q^2-1)*(q^5+1)*(q^6-1)*(q^8-1)*(q^9+1)*(q^12-1);  
+    return q^36*(q^2-1)*(q^5+1)*(q^6-1)*(q^8-1)*(q^9+1)*(q^12-1);
   elif ser="E" and rk=6 and F0ord=1 then
     return q^36*(q^2-1)*(q^5-1)*(q^6-1)*(q^8-1)*(q^9-1)*(q^12-1);
   elif ser="E" and rk=7 then
@@ -95,7 +95,7 @@ MinimalDimBoundCrossCharSimp := function(ser, rk, F0ord, q)
   if ser in ["A", "~A"] and rk = 1 then
     if IsInt(q) then
       res := (q-1)/GcdInt(q-1,2);
-      if q in [4,9] then 
+      if q in [4,9] then
         res := res-1;
       fi;
     else
@@ -217,25 +217,25 @@ end;
 
 
 #############################################################################
-##  
-#F  PossibleCrossCharTypes( <ords>, <bnd> ) . . . possible q and Lie type from 
+##
+#F  PossibleCrossCharTypes( <ords>, <bnd> ) . . . possible q and Lie type from
 #F  element order(s) and degree bound
-##  
-##  Let G(q) be a simple group of Lie type. <ords> is one element order or a 
+##
+##  Let G(q) be a simple group of Lie type. <ords> is one element order or a
 ##  list of element orders from G(q) and <bnd> is an integer such that G(q)
 ##  has a representation in some non-defining characteristic of degree <= <bnd>.
-##  
+##
 ##  This function returns a list of lists of form [q, type, rank], each
-##  describing a possible type of G(q). If 'type' is in ["A", "2A", "B", "C", 
+##  describing a possible type of G(q). If 'type' is in ["A", "2A", "B", "C",
 ##  "D", "2D"] only the triple with maximal possible 'rank' is included.
-##  
+##
 ##  The result contains the actual type of G(q).
-##  
-##  If the actual q is not too small, then a very small number (say, 1 to 3) 
+##
+##  If the actual q is not too small, then a very small number (say, 1 to 3)
 ##  given element orders will already lead to a very small result list.
 ##  For small actual q a slightly larger number (say, 10) element orders
 ##  can be useful.
-##  
+##
 PossibleCrossCharTypes := function(ords, bnd)
   local d, sords, res, p, q, lrk, mrk, ll, f, l, a, szs;
   if IsInt(ords) then
@@ -243,7 +243,7 @@ PossibleCrossCharTypes := function(ords, bnd)
   fi;
   d := Lcm(ords);
   sords := Set(ords);
-  
+
   # If instead of bound 'bnd' is result of previous call then we only
   # compute a refinement
   if IsList(bnd) then
@@ -266,7 +266,7 @@ PossibleCrossCharTypes := function(ords, bnd)
     return res;
   fi;
 
-  # And now the main case with given bound  
+  # And now the main case with given bound
   res := [];
   # loop over p's until p^2 > 2*bnd+2; we  handle A_1 for big p below
   # also Suzuki and Ree groups are handled later
@@ -370,7 +370,7 @@ PossibleCrossCharTypes := function(ords, bnd)
     p := NextPrimeInt(p);
     # for bigger p only A_1(p) remains, this is handled next
   until p^2 > 2*bnd+2;
-  
+
   # case A_1(p) for p big: need primes p such that d| p^2(p-1)(p+1) in
   # range [sqrt(2 bnd + 2)..2 bnd + 2]:
   f := Set(Factors(d));
@@ -386,7 +386,7 @@ PossibleCrossCharTypes := function(ords, bnd)
   l := l - (l mod f);
   while l < 2*bnd+4 do
     for p in [l-1, l+1] do
-      if IsPrimeInt(p) and p^2*(p^2-1) mod d = 0 and ForAll(sords, 
+      if IsPrimeInt(p) and p^2*(p^2-1) mod d = 0 and ForAll(sords,
           o-> LeastRank(o, p) <= 1) then
         Add(res, [p, "A", 1]);
       fi;
@@ -400,7 +400,7 @@ PossibleCrossCharTypes := function(ords, bnd)
   while p^(3*f)/4 < bnd^2 do
     q := p^f;
     if q^2*(q-1)*(q^2+1) mod d = 0 then
-      Add(res, [q, "2B", 2]); 
+      Add(res, [q, "2B", 2]);
     fi;
     f := f+2;
   od;
@@ -410,7 +410,7 @@ PossibleCrossCharTypes := function(ords, bnd)
   while p^(2*f)/2 < bnd do
     q := p^f;
     if q^3*(q^2-1)*(q^2-q+1) mod d = 0 then
-      Add(res, [q, "2G", 2]); 
+      Add(res, [q, "2G", 2]);
     fi;
     f := f+2;
   od;
@@ -420,7 +420,7 @@ PossibleCrossCharTypes := function(ords, bnd)
   while p^(11*f)/4 < bnd^2 do
     q := p^f;
     if q^12*(q^2-q+1)*(q^4-q^2+1)*(q-1)^2*(q+1)^2*(q^2+1)^2 mod d = 0 then
-      Add(res, [p^f, "2F", 4]); 
+      Add(res, [p^f, "2F", 4]);
     fi;
     f := f+2;
   od;
@@ -450,7 +450,7 @@ PossibleqNoA1 := function(ords, bnd)
   # below we consider q = p^f
   p := 2;
   repeat
-    # type A_l(q), degree in non-def. char. > (q^l)/2-1 
+    # type A_l(q), degree in non-def. char. > (q^l)/2-1
     maxfl := LogInt(2*bnd+2, p);
     for f in [1..maxfl] do
       if Value(GFOrderSimp("A", Int(maxfl/f)), p^f) mod d = 0 then
@@ -469,15 +469,15 @@ PossibleqNoA1 := function(ords, bnd)
         Add(res, [p^f, "C", Int(maxfl/f)]);
       fi;
     od;
-    # type B_l(q), l > 2, degree in non-def. char. > q^(2l-2)/2 
-    maxfl := LogInt(2*bnd, p); # maximal 2 f (l-1) 
+    # type B_l(q), l > 2, degree in non-def. char. > q^(2l-2)/2
+    maxfl := LogInt(2*bnd, p); # maximal 2 f (l-1)
     for f in [1..Int(maxfl/4)] do
       if Value(GFOrderSimp("B", Int(maxfl/f/2)+1), p^f) mod d = 0 then
         Add(res, [p^f, "B", Int(maxfl/f/2)+1]);
       fi;
     od;
     # type D_l(q) and 2D_l(q), l > 3, degree in non-def. char. > q^(2l-3)/2
-    maxfl := LogInt(2*bnd, p); # maximal  f (2l-3) 
+    maxfl := LogInt(2*bnd, p); # maximal  f (2l-3)
     for f in [1..Int(maxfl/5)] do
       if Value(GFOrderSimp("D", Int((maxfl/f+3)/2)), p^f) mod d = 0 then
         Add(res, [p^f, "D", Int((maxfl/f+3)/2)]);
@@ -492,7 +492,7 @@ PossibleqNoA1 := function(ords, bnd)
     f := 1;
     while p^(2*f)-p^f - 1 <= bnd do
       if Value(GFOrderSimp("G", 2), p^f) mod d = 0 then
-        Add(res, [p^f, "G", 2]); 
+        Add(res, [p^f, "G", 2]);
       fi;
       f := f+1;
     od;
@@ -500,7 +500,7 @@ PossibleqNoA1 := function(ords, bnd)
     f := 1;
     while p^(3*f)*(p^(2*f)-1)-1 <= bnd do
       if Value(GFOrderSimp("D", 4, 3), p^f) mod d = 0 then
-        Add(res, [p^f, "3D", 4]); 
+        Add(res, [p^f, "3D", 4]);
       fi;
       f := f+1;
     od;
@@ -508,7 +508,7 @@ PossibleqNoA1 := function(ords, bnd)
     f := 1;
     while p^(8*f)/6 <= bnd do
       if Value(GFOrderSimp("F", 4), p^f) mod d = 0 then
-        Add(res, [p^f, "F", 4]); 
+        Add(res, [p^f, "F", 4]);
       fi;
       f := f+1;
     od;
@@ -516,10 +516,10 @@ PossibleqNoA1 := function(ords, bnd)
     f := 1;
     while p^(11*f)/2 <= bnd do
       if Value(GFOrderSimp("E", 6), p^f) mod d = 0 then
-        Add(res, [p^f, "E", 6]); 
+        Add(res, [p^f, "E", 6]);
       fi;
       if Value(GFOrderSimp("E", 6, 2), p^f) mod d = 0 then
-        Add(res, [p^f, "2E", 6]); 
+        Add(res, [p^f, "2E", 6]);
       fi;
       f := f+1;
     od;
@@ -527,7 +527,7 @@ PossibleqNoA1 := function(ords, bnd)
     f := 1;
     while p^(17*f)/2 <= bnd do
       if Value(GFOrderSimp("E", 7), p^f) mod d = 0 then
-        Add(res, [p^f, "E", 7]); 
+        Add(res, [p^f, "E", 7]);
       fi;
       f := f+1;
     od;
@@ -535,7 +535,7 @@ PossibleqNoA1 := function(ords, bnd)
     f := 1;
     while p^(29*f)/2 <= bnd do
       if Value(GFOrderSimp("E", 8), p^f) mod d = 0 then
-        Add(res, [p^f, "E", 8]); 
+        Add(res, [p^f, "E", 8]);
       fi;
       f := f+1;
     od;
@@ -548,7 +548,7 @@ PossibleqNoA1 := function(ords, bnd)
   f := 1;
   while p^(3*f)/4 < bnd^2 do
     if Value(q^5-q^4+q^3-q^2, p^f) mod d = 0 then
-      Add(res, [p^f, "2B", 2]); 
+      Add(res, [p^f, "2B", 2]);
     fi;
     f := f+2;
   od;
@@ -557,7 +557,7 @@ PossibleqNoA1 := function(ords, bnd)
   f := 1;
   while p^(2*f)/2 < bnd do
     if Value(q^7-q^6+q^4-q^3, p^f) mod d = 0 then
-      Add(res, [p^f, "2G", 2]); 
+      Add(res, [p^f, "2G", 2]);
     fi;
     f := f+2;
   od;
@@ -566,7 +566,7 @@ PossibleqNoA1 := function(ords, bnd)
   f := 1;
   while p^(11*f)/4 < bnd^2 do
     if Value(q^26-q^25+q^23-2*q^22+q^21+q^20-2*q^19+q^18+q^17-2*q^16+q^15-q^13+q^12, p^f) mod d = 0 then
-      Add(res, [p^f, "2F", 4]); 
+      Add(res, [p^f, "2F", 4]);
     fi;
     f := f+2;
   od;
@@ -583,7 +583,7 @@ FrequentOrdersSimp := function(ser, rk, F0ord, q)
   if ser in ["A","~A"] and F0ord = 1 then
     n := rk+1;
     d := (q^n-1)/(q-1);
-    res := [ [d/GcdInt(q-1,n), Phi(d)/d/n ] ]; 
+    res := [ [d/GcdInt(q-1,n), Phi(d)/d/n ] ];
   elif ser in ["B","C"] then
     d := Gcd(q-1,2);
     res := [[(q^rk-1)/d, Phi(q^rk-1)/2/rk/(q^rk-1)],
@@ -601,7 +601,7 @@ FrequentOrdersSimp := function(ser, rk, F0ord, q)
   return res;
 end;
 
-    
+
 RandomProjectiveOrders := function(G, r)
   return List([1..r], i-> ProjectiveOrder(PseudoRandom(G))[1]);
 end;
@@ -609,7 +609,7 @@ RandomOrders := function(G, r)
   return List([1..r], i-> Order(PseudoRandom(G)));
 end;
 ro := RandomProjectiveOrders;
-  
+
 testPossibleCrossCharTypes := function(typ, rk, q, dim)
   local g, i, mm, nonew, o, mm1, ords;
   if typ in ["A","~A"] then
@@ -653,7 +653,7 @@ testPossibleCrossCharTypes := function(typ, rk, q, dim)
   od;
   return [i, Set(List(mm, a-> SmallestRootInt(a[1]))), ords, mm];
 end;
-    
+
 MakeGroups := function(dat)
   local q, typ, rk, res, l;
   q := dat[1];
@@ -709,7 +709,7 @@ end;
 
 
 # kleine nicht einfache Gruppen, exzeptionelle Überlagerungen machen !!!!
-  
+
 
 
 

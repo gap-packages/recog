@@ -31,7 +31,7 @@ BindGlobal("Group_InitPseudoRandomNC",function( sub, grp, len, scramble )
 end);
 
 
-InstallGlobalFunction(PseudoRandomNormalClosureElement, 
+InstallGlobalFunction(PseudoRandomNormalClosureElement,
         function(grp,sub)
     local   seed,  i,  j, x;
 
@@ -51,14 +51,14 @@ InstallGlobalFunction(PseudoRandomNormalClosureElement,
     repeat
         j := Random([ 1 .. Length(seed[1]) ]);
     until i <> j;
-    
+
     x := PseudoRandom(grp);
     if Random([true,false])  then
         seed[1][j] := seed[1][i]^x * seed[1][j];
     else
         seed[1][j] := seed[1][j] * seed[1][i]^x;
     fi;
-    
+
     seed[2] := seed[2]*seed[1][j];
     return seed[2];
 
@@ -72,7 +72,7 @@ InstallGlobalFunction(IsProbablyPerfect, function( G )
         NmrTries := 100;
     fi;
     K := SubgroupNC(G, List(Combinations(GeneratorsOfGroup(G),2), c->Comm(c[1],c[2])));
-    if IsTrivial(K) then 
+    if IsTrivial(K) then
         return IsTrivial(G);
     fi;
     ngens := Length(GeneratorsOfGroup(G));
@@ -84,7 +84,7 @@ InstallGlobalFunction(IsProbablyPerfect, function( G )
                 ordbounds[i] := Gcd(ordbounds[i], Order(GeneratorsOfGroup(G)[i]*k));
             fi;
         od;
-        if ForAll(ordbounds, x->x =1) then 
+        if ForAll(ordbounds, x->x =1) then
             return true;
         fi;
     od;
@@ -100,7 +100,7 @@ InstallGlobalFunction(DerivedSubgroupApproximation, function(G)
     gens := [];
     Limit := 2*Length(GeneratorsOfGroup(G));
     nmr := 0;
-    repeat 
+    repeat
         nmr := nmr + 1;
         x := PseudoRandom(G);
         UniteSet(gens, Set(GeneratorsOfGroup(G), y->Comm(y,x)));

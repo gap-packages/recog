@@ -3,17 +3,17 @@
 #W  RecogniseAnSnOnFDPM.gap     user function            Stephen Howe
 #W                                                     & Maska Law
 ##
-#Y  v 1.0 Feburary 2005, School of Mathematics and Statistics, 
+#Y  v 1.0 Feburary 2005, School of Mathematics and Statistics,
 #Y                       The University of Western Australia
 ##
 ##  This file contains an implementation of an algorithm for recognising
 ##  An or Sn acting as matrix groups on their fully deleted permutation
-##  modules. The particular algorithm is described in the paper 
+##  modules. The particular algorithm is described in the paper
 ##  'Constructive recognition of finite alternating and symmetric groups
-##   acting as matrix groups on their natural permutation modules' 
-##  by Robert Beals, Charles R. Leedham-Green, Alice C. Niemeyer, 
+##   acting as matrix groups on their natural permutation modules'
+##  by Robert Beals, Charles R. Leedham-Green, Alice C. Niemeyer,
 ##  Cheryl E. Praeger, and 'Akos Seress.
-##  
+##
 ##  Functions are also provided for constructing the representations
 ##  of An and Sn on their fully deleted permutation modules.
 
@@ -28,15 +28,15 @@ end;
 
 IterateWithRandomElements := function(func, times, group)
 # IterateWithRandomElements(<func>, <times>, <group>) randomly
-# selects up to <times> random elements (from <group>) to find 
+# selects up to <times> random elements (from <group>) to find
 # an element such that <func> (with input being this random element)
-# does not return 'fail'. The function <func> must take a group 
+# does not return 'fail'. The function <func> must take a group
 # element as its only argument.
 
   local itr, # number of random elements selected
         re,  # a random element
         ret; # the result of func(re)
-  
+
   itr := 1;
   while itr <= times do
     # select random element
@@ -50,7 +50,7 @@ IterateWithRandomElements := function(func, times, group)
     # else try again
     itr := itr + 1;
   od;
-  
+
   return fail;
 end;
 
@@ -70,14 +70,14 @@ Mult := function(arg)
   local prod, mat, m;
 
   prod := arg[1];
-    
+
   for m in [2..Length(arg)] do
     mat := arg[m];
     ConvertToMatrixRep(mat);
     ConvertToMatrixRep(prod);
     prod := prod * mat;
   od;
-  
+
   return prod;
 end;
 
@@ -85,9 +85,9 @@ Conj := function(A, B)
 # Conj(A, B) returns the conjugation of
 # A by B (where A and B are two matrices)
 # That is Conj(A, B) = B^-1*A*B
-  
+
   ConvertToMatrixRep(B);
-  
+
   return Mult(B^-1, A, B);
 end;
 
@@ -95,9 +95,9 @@ ConjInv := function(A, B)
 # ConjInv(A, B) returns the conjugation of
 # A by B^-1 (where A and B are two matrices)
 # That is ConjInv(A, B) = B*A*B^-1
-  
+
   ConvertToMatrixRep(B);
-  
+
   return Mult(B, A, B^-1);
 end;
 
@@ -106,11 +106,11 @@ end;
 LinearFactors := function(poly, field)
 # LinearFactors(<poly>, <field>) returns a list with two
 # elements when given a univariate polynomial <poly> with
-# coefficients from the finite field <field>. The first 
-# element is a list of field elements [c1,...,cn] where 
-# t - ci divides <poly> for i = 1,...,n. The second element 
-# is a function from the multiplicative group of <field> to 
-# the integers such that: for every non-zero field element c, 
+# coefficients from the finite field <field>. The first
+# element is a list of field elements [c1,...,cn] where
+# t - ci divides <poly> for i = 1,...,n. The second element
+# is a function from the multiplicative group of <field> to
+# the integers such that: for every non-zero field element c,
 # the image of c is the multiplicity of t - c in <poly>.
 
   local linearFactors, # [c1,...,cn] s.t. t - ci is a factor
@@ -118,38 +118,38 @@ LinearFactors := function(poly, field)
         z,             # primitive root of field, i.e., z = Z(q)
         multList,      # a list of multiplicities where t - Z(q)^(i-1)
                        # has multiplicity multList[i]
-        Multiplicity;  # function mapping non-zero field elem. c to 
-                       # mult. of t - c 
-                        
+        Multiplicity;  # function mapping non-zero field elem. c to
+                       # mult. of t - c
+
   # find the linear factors of poly (as polynomials),
   # so linearFactors = [[ai*t + bi, mi]] where ai, bi are
   # field elements and mi are the multiplicities
   linearFactors := Filtered(Collected(Factors(PolynomialRing(field), poly)),
                             f -> DegreeOfLaurentPolynomial(f[1]) = 1);
-        
-  # put linearFactors into form [[ci, mi]] where mi is 
+
+  # put linearFactors into form [[ci, mi]] where mi is
   # multiplicity of t - ci
-  Apply(linearFactors, 
+  Apply(linearFactors,
         f -> [-Iterated(CoefficientsOfUnivariatePolynomial(f[1]), \/),
               f[2]]);
 
-        
+
   # create the function Multiplicity
 
   z := PrimitiveRoot(field); # find Z(q) where q is size of field
-  # create list s.t. the ith entry is the multiplicity 
+  # create list s.t. the ith entry is the multiplicity
   # of t - Z(q)^(i-1) in poly
   multList := [];
   for ix in [1..Length(linearFactors)] do
     multList[LogFFE(linearFactors[ix][1], z) + 1] := linearFactors[ix][2];
   od;
-  
+
   Multiplicity := function(ffe)
     local ffeIndex;
-    
+
     # calc index for ffe
     ffeIndex := LogFFE(ffe, z) + 1;
-    
+
     # if t - Z(q)^i is not a factor of poly
     # then multList[i] is not bound
     if IsBound(multList[ffeIndex]) then
@@ -157,19 +157,19 @@ LinearFactors := function(poly, field)
     else
       return 0;
     fi;
-  end;   
+  end;
 
   return [List(linearFactors, f -> f[1]), Multiplicity];
 end;
 
-IsPreDoubleTransposition := function(charPoly, t, linearFactors, 
+IsPreDoubleTransposition := function(charPoly, t, linearFactors,
                                      fdpmDim, nAmbig, field)
-# IsPreDoubleTransposition(<charPoly>, <t>, <linearFactors>, 
+# IsPreDoubleTransposition(<charPoly>, <t>, <linearFactors>,
 #                          <fdpmDim>, <nAmbig>, <field>)
-# determines whether some scalar multiple of the matrix described 
-# by <charPoly> (with indeterminate <t>) represents a 
-# pre-double-transposition. If so the scalar multiple is returned, 
-# otherwise 'false' is returned. 
+# determines whether some scalar multiple of the matrix described
+# by <charPoly> (with indeterminate <t>) represents a
+# pre-double-transposition. If so the scalar multiple is returned,
+# otherwise 'false' is returned.
 #   <linearFactors> - describes the linear factors of <charPoly>
 #   <fdpmDim> - the dimension of the matrices described
 #   <nAmbig> - true when there are two possible values for n
@@ -180,13 +180,13 @@ IsPreDoubleTransposition := function(charPoly, t, linearFactors,
   local b, c,     # field elements
         tpList,   # list of elements c s.t. t^2 - c^2 | charPoly
         r;        # a prime integer
-  
-  if Length(linearFactors[1]) < 2 then 
+
+  if Length(linearFactors[1]) < 2 then
     # we must have t + c and t - c as linear factors
     # for some c
     return false;
   else
-    tpList := []; 
+    tpList := [];
     # we expect tpList to only have two elements
     # at the end of this loop
     for c in linearFactors[1] do
@@ -206,7 +206,7 @@ IsPreDoubleTransposition := function(charPoly, t, linearFactors,
       fi;
     od;
   fi;
-  
+
   # determine whether tpList is of the form { c, -c } where
   # t + c has multiplicity 2
   if IsEmpty(tpList) then
@@ -217,37 +217,37 @@ IsPreDoubleTransposition := function(charPoly, t, linearFactors,
   elif linearFactors[2](tpList[2]) = 2 then
     # (t - tpList[2]) has multiplicity 2
     c := -tpList[2];
-  else 
+  else
     return false;
   fi;
-  
+
   # determine the scalar b associated with the matrix
   # whose characteristic polynomial we have
   if linearFactors[2](c) <> 2 then
     b := c;
     # some extra cases: Assuming s = 2 and 2 <= r < n/2 in proof,
     # so there may be a (unique) odd prime r >= n/2
-    if     IsPrime(fdpmDim - 2) 
+    if     IsPrime(fdpmDim - 2)
        and charPoly = (t^2 - b^2)*(t^(fdpmDim - 2) + b^(fdpmDim - 2)) then
       # corresponds to permutation with cycle type 1^1 2^1 (n-3)^1
       return false;
-    elif     nAmbig 
+    elif     nAmbig
          and fdpmDim - 4 <> 2 and IsPrime(fdpmDim - 4) # fdpmDim-4 is odd prime
          and charPoly = (t - b)^3*(t+b)*(t^(fdpmDim - 4) + b^(fdpmDim - 4)) then
       # corresponds to permutation with cycle type 2^3 (n-6)^1
       return false;
     fi;
-  elif fdpmDim mod 2 = 0 then # also mult (t - c) = 2 
+  elif fdpmDim mod 2 = 0 then # also mult (t - c) = 2
     # get coeffs of t^(fdpmDim - 1), t^(fdpmDim - 2), and t^(fdpmDim - 3)
     # in charPoly
     c := CoefficientsOfUnivariatePolynomial(charPoly){
              [fdpmDim - 3 .. fdpmDim - 1] + 1};
     # Check case 3 (ii) and first part of 3 (iii) together (they are
     # identical in terms of fdpmDim = n - delta). That is,
-    # check t^2-c[3]^2 | charPoly and 
+    # check t^2-c[3]^2 | charPoly and
     #  charPoly = (t-c[3])(t+c[3])^2(t^(fdpmDim-3)-c[3]^(fdpmDim - 3))
-    if     c[3] in tpList 
-       and charPoly = (t - c[3]) * (t + c[3])^2 * 
+    if     c[3] in tpList
+       and charPoly = (t - c[3]) * (t + c[3])^2 *
                       (t^(fdpmDim - 3) - c[3]^(fdpmDim - 3)) then
       # since we know the form of the characteristic polynomial we don't
       # need to check t^r + b^r does not divide charPoly for r etc.
@@ -259,8 +259,8 @@ IsPreDoubleTransposition := function(charPoly, t, linearFactors,
         # if c[1] <> 0 then we must have cycle type 2^2 3^1 (n-7)^1
         # if c[1] = 0 then we just set b
         b := c[3]/2;
-        if     not IsZero(c[1]) 
-           and charPoly = (t + b)^2 * (t^3 - b^3) * 
+        if     not IsZero(c[1])
+           and charPoly = (t + b)^2 * (t^3 - b^3) *
                           (t^(fdpmDim - 5) - b^(fdpmDim - 5)) then
           # we can return b since we have check the form
           # of charPoly
@@ -269,13 +269,13 @@ IsPreDoubleTransposition := function(charPoly, t, linearFactors,
       else
         return false; # c[3]/2 is not in tpList
       fi;
-    else 
+    else
       return false; # n not ambiguous
     fi;
-  else 
+  else
     return false; # no special cases for this value of fdpmDim
-  fi; # we have now either returned or found a possible scalar b 
-  
+  fi; # we have now either returned or found a possible scalar b
+
   # check there is no prime r = 2 or 5 <= r < n/2 with
   # t^r + b^r dividing charPoly
   r := 2;
@@ -286,16 +286,16 @@ IsPreDoubleTransposition := function(charPoly, t, linearFactors,
     fi;
     r := NextPrimeInt(r);
   od;
- 
+
   return b;
 end;
 
 IsPre3Cycle := function(charPoly, t, linearFactors, fdpmDim, nAmbig, field)
 # IsPre3Cycle(<charPoly>, <t>, <linearFactors>, <fdpmDim>, <nAmbig>, <field>)
-# determines whether some scalar multiple of the matrix described 
-# by <charPoly> (with indeterminate <t>) represents a 
-# pre-3-cycle. If so the scalar multiple is returned, 
-# otherwise 'false' is returned. 
+# determines whether some scalar multiple of the matrix described
+# by <charPoly> (with indeterminate <t>) represents a
+# pre-3-cycle. If so the scalar multiple is returned,
+# otherwise 'false' is returned.
 #   <linearFactors> - describes the linear factors of <charPoly>
 #   <fdpmDim> - the dimension of the matrices described
 #   <nAmbig> - true when there are two possible values for n
@@ -307,11 +307,11 @@ IsPre3Cycle := function(charPoly, t, linearFactors, fdpmDim, nAmbig, field)
         r,      # a prime
         b, c,   # field elements
         y;      # field element of order 3
-  
+
   if Size(field) mod 3 = 2 then
     # find all c s.t. t^3 - c^3 | charPoly
-    tcList := Filtered(linearFactors[1], 
-                       c -> IsZero(QuotientRemainder(charPoly, 
+    tcList := Filtered(linearFactors[1],
+                       c -> IsZero(QuotientRemainder(charPoly,
                                                      t^3 - c^3)[2]));
     if Length(tcList) = 1 then
       # check whether tcList = {c} where t^2+ct+c^2 has mult 1
@@ -332,7 +332,7 @@ IsPre3Cycle := function(charPoly, t, linearFactors, fdpmDim, nAmbig, field)
         c := CoefficientsOfUnivariatePolynomial(charPoly)[(fdpmDim - 2)+1];
         c := SquareRoots(field, c)[1];
       fi;
-      if charPoly = (t^2 + c*t + c^2)*(t^(fdpmDim-1) - c^(fdpmDim-1)) 
+      if charPoly = (t^2 + c*t + c^2)*(t^(fdpmDim-1) - c^(fdpmDim-1))
                     / (t - c) then
         # return the scalar since we know the form of charPoly
         return c;
@@ -348,13 +348,13 @@ IsPre3Cycle := function(charPoly, t, linearFactors, fdpmDim, nAmbig, field)
     y := PrimitiveRoot(field)^((Size(field)-1)/3);
     # find all elements c such that t-c | charPoly and t-cy^i | charPoly
     # for i = 1 or 2
-    tcList := Filtered(linearFactors[1], 
+    tcList := Filtered(linearFactors[1],
                        c ->    linearFactors[2](c*y)   > 0
                             or linearFactors[2](c*y^2) > 0);
 
-    if    Length(tcList) = 2 
-      and Order(tcList[1]*tcList[2]^-1) = 3 
-      and linearFactors[2](tcList[1]) = 1 
+    if    Length(tcList) = 2
+      and Order(tcList[1]*tcList[2]^-1) = 3
+      and linearFactors[2](tcList[1]) = 1
       and linearFactors[2](tcList[2]) = 1 then
         # set the scalar
         b := tcList[1]^2*tcList[2]^-1;
@@ -369,7 +369,7 @@ IsPre3Cycle := function(charPoly, t, linearFactors, fdpmDim, nAmbig, field)
         # get coeffs of t^(fdpmDim-1), t, and t^0
         c := CoefficientsOfUnivariatePolynomial(charPoly){[1,2,(fdpmDim-1)+1]};
         # check for pre-3-cycles with cycle type 3^1 (n-3)^1, if delta = 1,
-        # or cycle type 1^1 3^1 (n-4)^1, if delta = 2. The tests are 
+        # or cycle type 1^1 3^1 (n-4)^1, if delta = 2. The tests are
         # identical when written in terms of n - delta.
         if     (fdpmDim + 1) mod 3 <> 0
            and c[3] in tcList
@@ -389,34 +389,34 @@ IsPre3Cycle := function(charPoly, t, linearFactors, fdpmDim, nAmbig, field)
         fi;
       else # Length(lMult) > 1
         return false;
-      fi;             
+      fi;
     else # Length(tcList) <> 2 or 3
       return false;
-    fi;        
+    fi;
   fi; # end of q mod 3 = 1 case
-  
-  # check there are no primes r (<= n/3, r <> p) such that 
+
+  # check there are no primes r (<= n/3, r <> p) such that
   # t^2r + b^r*t^r + b^2r | charPoly
   r := 2;
   while r <= QuoInt(fdpmDim + 2, 3) do
     if    r <> Characteristic(field)
-      and IsZero(QuotientRemainder(charPoly, 
+      and IsZero(QuotientRemainder(charPoly,
                                    t^(2*r) + b^r*t^r + b^(2*r))[2]) then
       return false;
     fi;
     r := NextPrimeInt(r);
   od;
-  
+
   return b;
 end;
 
 Construct3Cycle := function(mat, fdpm)
-# Construct3Cycle(<mat>, <fdpm>) attempts  
-# to construct a matrix representing a 3-cycle from 
-# <mat>. If it is successful the new matrix is 
+# Construct3Cycle(<mat>, <fdpm>) attempts
+# to construct a matrix representing a 3-cycle from
+# <mat>. If it is successful the new matrix is
 # returned in a record, otherwise fail is returned.
 # The record has two components; the first is
-# 'matrix' and stores the matrix, the second is 'order' 
+# 'matrix' and stores the matrix, the second is 'order'
 # and stores the order of the matrix i.e. 3.
 
   local charPoly,      # the characteristic polynomial of mat
@@ -424,39 +424,39 @@ Construct3Cycle := function(mat, fdpm)
         linearFactors, # the linear factors of charPoly
         b,             # a field element
         order;         # order of the matrix
-        
+
   # calculate the characteristic polynomial and its linear factors
   charPoly := CharacteristicPolynomial(mat);
   t := IndeterminateOfLaurentPolynomial(charPoly);
   # calculate the linear factors of charPoly
   linearFactors := LinearFactors(charPoly, fdpm.field);
-    
+
   b := IsPre3Cycle(charPoly, t, linearFactors,
                    fdpm.dim, fdpm.nAmbig, fdpm.field);
 
   if b <> false then
     mat := b^-1*mat;
-  
-    # check the order 
+
+    # check the order
     order := Order(mat);
-    if     order < (fdpm.dim + 2)^(18*LogRat(fdpm.dim + 2, 2)) 
+    if     order < (fdpm.dim + 2)^(18*LogRat(fdpm.dim + 2, 2))
        and order mod 3 = 0 then
       ConvertToMatrixRep(mat);
       mat := mat^(order / 3);
       return rec( matrix := mat, order := 3 );
     fi;
   fi;
-  
+
   return fail;
 end;
 
 ConstructDoubleTransposition := function(mat, fdpm)
-# ConstructDoubleTransposition(<mat>, <fdpm>) 
+# ConstructDoubleTransposition(<mat>, <fdpm>)
 # attempts to construct a matrix representing a double
-# transposition from <mat>. If it is successful the new 
-# matrix is returned in a record, otherwise 'fail' is 
+# transposition from <mat>. If it is successful the new
+# matrix is returned in a record, otherwise 'fail' is
 # returned. The record has two components; the first is
-# 'matrix' and stores the matrix, the second is 'order' 
+# 'matrix' and stores the matrix, the second is 'order'
 # and stores the order of the matrix i.e. 2.
 
   local charPoly,      # the characteristic polynomial of mat
@@ -464,29 +464,29 @@ ConstructDoubleTransposition := function(mat, fdpm)
         linearFactors, # the linear factors of charPoly
         b,             # a field element
         order;         # order of the matrix
-        
+
   # calculate the characteristic polynomial and its linear factors
   charPoly := CharacteristicPolynomial(mat);
   t := IndeterminateOfLaurentPolynomial(charPoly);
   # calculate the linear factors of charPoly
   linearFactors := LinearFactors(charPoly, fdpm.field);
-    
+
   b := IsPreDoubleTransposition(charPoly, t, linearFactors,
                                 fdpm.dim, fdpm.nAmbig, fdpm.field);
 
   if b <> false then # mat is a pre-double-transposition
     mat := b^-1*mat;
-  
-    # check the order 
+
+    # check the order
     order := Order(mat);
-    if     order < (fdpm.dim + 2)^(18*LogRat(fdpm.dim + 2, 2)) 
+    if     order < (fdpm.dim + 2)^(18*LogRat(fdpm.dim + 2, 2))
        and order mod 2 = 0 then
       ConvertToMatrixRep(mat);
       mat := mat^(order / 2);
       return rec( matrix := mat, order := 2 );
     fi;
   fi;
-  
+
   return fail;
 end;
 
@@ -494,7 +494,7 @@ end;
 
 DoubleAndShrink := function(g, group, n)
 # DoubleAndShrink(<g>, <group>, <n>) returns a conjugate
-# h of <g> such that <g> and h have only 1 moved 
+# h of <g> such that <g> and h have only 1 moved
 # point in common where <group> is some matrix representation of
 # a finite symmetric group of order <n>, and <g> moves between
 # 3 and sqrt(<n>) points.
@@ -505,12 +505,12 @@ DoubleAndShrink := function(g, group, n)
         ri,      # the current random element
         gi,      # the current generated element
         temp,    # temp storage for some element
-        gconjs,  # gs[j-1]^s 
+        gconjs,  # gs[j-1]^s
         gconjrs, # gs[j-1]^(r[j-1]s) respectively
         i, j,    # counters
         s,       # conjugating element, g^s is returned
-        maxItr;  # maximum number of random element selections 
-        
+        maxItr;  # maximum number of random element selections
+
   # initialise variables
   maxItr := LogRat(n, 2);
   gs := [g];
@@ -525,7 +525,7 @@ DoubleAndShrink := function(g, group, n)
   i := 1;
   # find elements that do not commute
   while Commute(gi, rs[i][3]) do
-    if i >= maxItr then 
+    if i >= maxItr then
       return fail;
     fi;
     # generate next element
@@ -536,7 +536,7 @@ DoubleAndShrink := function(g, group, n)
     ConvertToMatrixRep(ri);
     temp := ri^-1;
     Add(rs, [ri, temp, Mult(temp, gi, ri)]);
-  
+
     i := i + 1;
   od;
   # go back through the generated elements to
@@ -562,14 +562,14 @@ DoubleAndShrink := function(g, group, n)
       # s stays the same
     fi;
   od;
-  
+
   return Conj(g, s);
 end;
 
 FixedPointSubspace := function(mat, k)
 # FixedPointSubspace(<mat>, <k>) for a matrix <mat> with
-# order <k> returns [F, W] where 
-#    - F is a list of vectors that form a basis 
+# order <k> returns [F, W] where
+#    - F is a list of vectors that form a basis
 #      for the fixed point subspace of <mat>, and
 #    - W is a list of vectors that form a basis for
 #      the complement W(<mat>) of F such that for all w
@@ -579,28 +579,28 @@ FixedPointSubspace := function(mat, k)
 # p is the characteristic of the field.
   local moveLT, trans;
 
-  # linear transformation mapping elements of the 
+  # linear transformation mapping elements of the
   # vector space to elements of W(<mat>), takes
   # a matrix as its argument
   moveLT := function(v)
     local sum, i;
-    
+
     # calculate (((v*mat + v)*mat + v)*mat + v)...)*mat + v
     sum := v;
     for i in [1..k-1] do
       sum := Mult(sum, mat) + v;
     od;
-    
+
     return k*v - sum;
   end;
-  
+
   # SemiEchelonMatTransformation(m)
   # returns rec ( heads, vectors, coeffs, relations )
   # where the rank of m is the length of coeffs
   # and coeffs*m are the row vectors of m in row echelon form
   # In particular [ coeffs    ] is the echelonizing matrix
   #               [ relations ]
-  
+
   # v is a fixed point of mat iff v is in the null space of Xmat
   # compute the transformation taking 'mat - One(mat)' to row echelon form
   trans := SemiEchelonMatTransformation(mat - One(mat));
@@ -617,25 +617,25 @@ SubspaceIntersection := function(basisA, basisB)
   local mat,   # matrix formed from rows of basisA and basisB
         row,   # a row vector in the intersection
         nullv; # basis for nullspace of mat
-  
+
   # check we are given lists of length 2
   if Length(basisA) <> 2 or Length(basisB) <> 2 then
     # this function only works for intersection of subspaces
     # of dimension 2
     return fail;
   fi;
-  
+
   # create the matrix whose rows are basisA[1], basisA[2],
   # basisB[1], and basisB[2]
   mat := [ShallowCopy(basisA[1]),
           ShallowCopy(basisA[2]),
           ShallowCopy(basisB[1]),
           ShallowCopy(basisB[2])];
-  
+
   # find the null space of the matrix
   nullv := SemiEchelonMatTransformation(mat).relations;
-  
-  if Length(nullv) <> 1 or (    IsZero(nullv[1][1]) 
+
+  if Length(nullv) <> 1 or (    IsZero(nullv[1][1])
                             and IsZero(nullv[1][2])) then
     # the two subspaces don't intersect in a one dimensional
     # subspace
@@ -650,11 +650,11 @@ SubspaceIntersection := function(basisA, basisB)
 end;
 
 FindBasisElement := function(g, group, epsilon, fdpm)
-# FindBasisElement(<g>, <group>, <epsilon>, <fdpm>) returns, 
+# FindBasisElement(<g>, <group>, <epsilon>, <fdpm>) returns,
 # with probability 1 - <epsilon>, a vector representing a basis
-# element of the fully deleted permutation module, that is, 
+# element of the fully deleted permutation module, that is,
 # a vector representing b(e_i - e_j) + (W \cap E) for some
-# non-zero field element b and integers i and j. A matrix 
+# non-zero field element b and integers i and j. A matrix
 # representing a 3-cycle or a double transposition is passed
 # in the record <g>. The record has two components; the first is
 # 'matrix' and stores the matrix, the second is 'order' and stores
@@ -662,7 +662,7 @@ FindBasisElement := function(g, group, epsilon, fdpm)
 # the permutation type the matrix represents).
 
   local itr, h, gh, temp;
-  
+
   itr := 1;
   # Check the bounds
   while itr < LogRat(epsilon^-1, 2)*7 do # 1/log(10/9) < 7
@@ -683,7 +683,7 @@ FindBasisElement := function(g, group, epsilon, fdpm)
     fi;
     itr := itr + 1;
   od;
-  
+
   return fail;
 end;
 
@@ -693,7 +693,7 @@ Power := function(xs, k)
 # Power(<xs>, <k>) computes <xs>[1]^<k> in
 # log k time where <xs> is the list
 # a list [x, x^2, x^4, ...., x^(2^m)] for some
-# matrix x. If k >= 2^(m+1) then the list will 
+# matrix x. If k >= 2^(m+1) then the list will
 # be updated
   local q, r, prod, xn;
 
@@ -715,7 +715,7 @@ Power := function(xs, k)
     # move to the next bit
     q := QuoInt(q, 2);
   od;
-    
+
   return prod;
 end;
 
@@ -727,13 +727,13 @@ VectorImages := function(v, xs)
 
   local k,    # counter
         vxs;  # the list [v,vx,...,vx^2logm]
-  
+
   # calc v,vx,...,vx^2logm
   vxs := [v];
   for k in [1..Length(xs)] do
     Append(vxs, Mult(vxs, xs[k]));
   od;
-  
+
   return vxs;
 end;
 
@@ -741,22 +741,22 @@ VectorImagesUnder := function(v, h, k)
 # VectorImagesUnder(<v>,<h>, <k>) returns
 # the list [<v>, <v>*h, ..., <v>*<h>^(2^(LogInt(k,2)+1)-1)]
   local hs, p;
-  
+
   hs := [h];
   for p in [1..LogInt(k, 2)] do
     ConvertToMatrixRep(hs[p]);
     Add(hs, hs[p]^2);
   od;
-  
+
   return VectorImages(v, hs);
 end;
 
 MoreBasisVectors := function(x, g, v, fdpm)
 # MoreBasisVectors(<x>, <g>, <v>, <fdpm>), where
-# <g> is a record and <g>.matrix represents a 3-cycle 
+# <g> is a record and <g>.matrix represents a 3-cycle
 # or double transposition, <g>.order is
 # the order of <g>.matrix, and <x> is a random group element;
-# returns a set of linked basis vectors of prime length r where 
+# returns a set of linked basis vectors of prime length r where
 # 0.6n+0.4 < r < 0.95n - 0.85
 
   local i,      # the number of vectors (obtained from v) we consider
@@ -783,20 +783,20 @@ MoreBasisVectors := function(x, g, v, fdpm)
   # vBasis is a Basis object for the vector space
   # spanned by v and vxs is the list of images of v
   # under x, ..., x^(n-1)
-    local r; 
+    local r;
 
-    # find least +ve integer k such that vx^k in 
+    # find least +ve integer k such that vx^k in
     # the vector space spanned by v
     # Note: opened up the bounds a bit so it works for
     # n < 13
     r := NextPrimeInt(Int(6*(fdpm.dim + 1)/10 + 4/10) - 1);
 
     # we can just check primes since, if r = r(v, x), and
-    # vx^s \in <v> then r divides s. If we are given a 
+    # vx^s \in <v> then r divides s. If we are given a
     # scalar multiple of the identity matrix then
     # we will fail when considering the list
     # { l : 1 <= l < r, vx^l <> vx^lg } as v <> vg
-    
+
     while r < (19*(fdpm.dim + 2) - 17)/20 do
       # check if vx^r = dv for some field element d
       if Coefficients(vBasis, vxs[r+1]) <> fail then
@@ -805,19 +805,19 @@ MoreBasisVectors := function(x, g, v, fdpm)
       fi;
       r := NextPrimeInt(r);
     od;
-    
+
     return fail;
   end;
-     
+
   # Determine how many vectors (all obtained from v) that
-  # we will consider. This number depends on whether we 
+  # we will consider. This number depends on whether we
   # have a 3-cycle or double transposition
   if g.order = 3 then
     i := 3;
   else
     i := 1;
   fi;
-  
+
   # Calculate the vectors we will consider
   ConvertToMatrixRep(g.matrix);
   vs := [];
@@ -825,8 +825,8 @@ MoreBasisVectors := function(x, g, v, fdpm)
     Add(vs, v);
     v := v*g.matrix;
   od;
-  
-  # Construct the matrices [x,x^2,x^4,...,x^(2^k)] 
+
+  # Construct the matrices [x,x^2,x^4,...,x^(2^k)]
   # where 2^k <= n < 2^(k+1) in log n time
   xs := [x];
   for k in [1..Int(LogInt(fdpm.dim + 2, 2))] do
@@ -836,18 +836,18 @@ MoreBasisVectors := function(x, g, v, fdpm)
 
   # Calculate Basis objects for the vector spaces
   # spanned by the vectors of vs. We can use these
-  # Basis objects to determine whether a vector lies 
-  # in the corresponding vector space (which is need 
+  # Basis objects to determine whether a vector lies
+  # in the corresponding vector space (which is need
   # for calculating r(x,vg^i)).
   vBases := List(vs, b -> BasisNC(VectorSpace(fdpm.field, [b]), [b]));
-  
+
   # Construct the images of the vectors in vs under
   # x, ..., x^(n-1) (in log n time). Then we will have
   # the vectors vg^ix, ..., vg^ix^(n-1) for i = 0, 1, 2,
   # if g rep. a 3-cycle and i = 0, otherwise
   ConvertToMatrixRep(vs);
   vImgs := TransposedMat(VectorImages(vs, xs));
-  
+
   # Calculate r(vg^i, x) for i = 0,1,2 if
   # g is a 3-cycle and, i = 0, if g is a double
   # transposition
@@ -855,7 +855,7 @@ MoreBasisVectors := function(x, g, v, fdpm)
 
   # for all vg^i such that r(vg^i, x) = r <> fail we check
   # whether the list { l | 1 <= l < r, vx^l <> vx^lg } = 2.
-  # If the list does have length two then we can compute 
+  # If the list does have length two then we can compute
   # a linked sequence of vectors using vg^i
   for k in [1..i] do
     # check that r(vg^k, x) succeeded
@@ -867,7 +867,7 @@ MoreBasisVectors := function(x, g, v, fdpm)
     vImgsG := Mult(mat, g.matrix);
     # calculate { l | 1 <= l < r, vx^l <> vx^lg }
     lList := Filtered([1..rs[k]-1], l -> vImgs[k][l+1] <> vImgsG[l+1]);
-    if Length(lList) = 2 then 
+    if Length(lList) = 2 then
       # try to construct linked sequence of vectors
       u := vImgs[k][lList[1]+1] - vImgsG[lList[1]+1];
       if i = 3 then # if g is a 3-cycle
@@ -877,7 +877,7 @@ MoreBasisVectors := function(x, g, v, fdpm)
           h := -d[1]^-1*Power(xs, lList[1]);
           return VectorImagesUnder(-vs[k], h, rs[k]-1){[1..rs[k]-1]};
         fi;
-        # if u not in span of vs[k] then check 
+        # if u not in span of vs[k] then check
         # whether u in span of vs[k]*g = vs[(k + 1) mod 3 + 1]
         d := Coefficients(vBases[k^(1,2,3)], u);
         if d <> fail then
@@ -898,7 +898,7 @@ MoreBasisVectors := function(x, g, v, fdpm)
       fi;
     fi;
   od;
-  
+
   return fail;
 end;
 
@@ -908,7 +908,7 @@ end;
 RowSpaceBasis  := function(mat)
 # RowSpaceGenerators(<mat>) returns the rows of
 # <mat> that form a basis for the row space
-# of <mat>. This code borrows from the 
+# of <mat>. This code borrows from the
 # implementation of SemiEchcelonMatDestructive.
 
   local basis,   # vectors of mat forming a basis
@@ -926,7 +926,7 @@ RowSpaceBasis  := function(mat)
   # calc size of matrix
   nrows := Length(mat);
   ncols := Length(mat[1]);
-  
+
   # list of the non-zero heads, that is, nzheads[i]
   # is the first non-element of vectors[i]
   nzheads := [];
@@ -937,10 +937,10 @@ RowSpaceBasis  := function(mat)
   # spanned by vectors, but the vectors in basis are
   # from mat
   basis := [];
-  
+
   for r in [1..nrows] do
     row := ShallowCopy(mat[r]);
-    
+
     # reduce row using vectors
     for c in [1..Length(nzheads)] do
       x := row[nzheads[c]];
@@ -950,7 +950,7 @@ RowSpaceBasis  := function(mat)
         AddRowVector(row, vectors[c], -x);
       fi;
     od;
-    
+
     # check row is not the zero row
     c := PositionNonZero(row);
     if c <= ncols then
@@ -962,22 +962,22 @@ RowSpaceBasis  := function(mat)
       Add(basis, mat[r]);
     fi;
   od;
-  
+
   return basis;
 end;
 
 ExtendToBasisEchelon := function(partial, d, field)
-# ExtendToBasisEchelon(<partial>, <d>, <field>) 
+# ExtendToBasisEchelon(<partial>, <d>, <field>)
 # returns a basis for <field>^<d> such that <partial>
 # is a prefix.
   local vectors, v;
-  
+
   # copy partial
   vectors := ShallowCopy(partial);
-  
+
   # append identity matrix
   Append(vectors, IdentityMat(d, field));
-  
+
   # return row space basis
   return RowSpaceBasis(vectors);
 end;
@@ -990,7 +990,7 @@ IsIntervalVector := function(v, s)
 # first s positions. If v is not an interval
 # vector then fail is returned
   local col, b, i, j;
-    
+
   # find first non-zero entry in v
   col := 1;
   while col <= s and IsZero(v[col]) do
@@ -1020,15 +1020,15 @@ IsIntervalVector := function(v, s)
     fi;
     col := col + 1;
   od;
-  
+
   return [b, [i, j]];
 end;
 
 FindBasis := function(x, vs, us, fdpm)
 # FindBasis(<x>, <vs>, <us>, <fdpm>) extends the list
-# of vectors in <vs> (and in <us>) to a linked basis 
+# of vectors in <vs> (and in <us>) to a linked basis
 # for the fully deleted permutation module, described
-# by <fdpm>, when given a random group element <x>. 
+# by <fdpm>, when given a random group element <x>.
 # The lists are updated as a side effect. If a basis
 # is found during the execution of this procedure
 # then the basis is returned, otherwise 'fail' is
@@ -1048,7 +1048,7 @@ FindBasis := function(x, vs, us, fdpm)
         temp,  # a row vector
         mone,  # -One(field)
         b;     # non-zero field element
-        
+
   s := Length(vs); # Length(us) should be s + 1
 
   # calc vi*x w.r.t. basis vi: for finding interval vectors
@@ -1063,7 +1063,7 @@ FindBasis := function(x, vs, us, fdpm)
   fi;
 
   # Find scalar b and i,j such that x = bh and j = i^h
-  
+
   # find i <= s such that vix is an interval vector in <vs>
   i := 1;
   inti := IsIntervalVector(vsx[i], s);
@@ -1075,10 +1075,10 @@ FindBasis := function(x, vs, us, fdpm)
   # check whether we found an i
   if inti <> fail then # we have; now we find the image of i
     ih := fail; # we have not found the image of i yet
-    
+
     vsum := ShallowCopy(vsx[i]);
     ConvertToVectorRep(vsum);
-    # find j s.t. vi*x + ... + vj*x is an interval vector in 
+    # find j s.t. vi*x + ... + vj*x is an interval vector in
     # span of vs
     for j in [i+1..s] do
       AddRowVector(vsum, vsx[j]);
@@ -1086,7 +1086,7 @@ FindBasis := function(x, vs, us, fdpm)
       # find interval (if any) of vsum
       ints := IsIntervalVector(vsum, s);
 
-      if ints <> fail then 
+      if ints <> fail then
         # we can find the image of i under h and
         # the scalar b s.t. x = bh for h in H0
         ih := Intersection(inti[2], ints[2]);
@@ -1143,12 +1143,12 @@ FindBasis := function(x, vs, us, fdpm)
       temp := ShallowCopy(vsx[i]);
       ConvertToVectorRep(temp);
       AddRowVector(temp, vsx[i+1]);
-      inti := IsIntervalVector(temp, s); 
+      inti := IsIntervalVector(temp, s);
     od;
     # check whether we found an i
     if inti <> fail then # we have; now we find the image of i
       ih := fail; # we have not found the image of i yet
-      
+
       # we only try this for i <= s - 2
       if i = s - 1 then
         vsum := ShallowCopy(vsx[i]);
@@ -1175,7 +1175,7 @@ FindBasis := function(x, vs, us, fdpm)
           fi;
         od;
       fi;
-      
+
       # if we haven't found ih try another way
       if ih = fail then
         vsum := ShallowCopy(vsx[i]);
@@ -1206,21 +1206,21 @@ FindBasis := function(x, vs, us, fdpm)
           return fail; # if we have found it now we never will
         fi;
       fi;
-    else 
+    else
       return fail;
     fi;
   fi;
   # found ih and b
-  
+
   # calc -1 in field, for use with AddRowVector
   mone := -One(fdpm.field);
 
   # calc vi*h w.r.t. basis vs
-  vsx := b^-1 * vsx;   
+  vsx := b^-1 * vsx;
   # calc vi*h not w.r.t. basis vs
   vsh := Mult(vs, b^-1*x);
   ConvertToMatrixRep(vsh);
-  
+
   # extend linked sequence
   vsum := ShallowCopy(vsx[i]);
   ConvertToVectorRep(vsum);
@@ -1238,12 +1238,12 @@ FindBasis := function(x, vs, us, fdpm)
       ConvertToVectorRep(temp);
       AddRowVector(temp, us[ih]);
       Add(us, temp); # us[s+2] := vi*h + ... + vj*h + us[ih]
-      
+
       temp := ShallowCopy(us[s+2]);
       ConvertToVectorRep(temp);
       AddRowVector(temp, us[s+1], mone);
       Add(vs, temp); # vs[s+1] := us[s+2] - us[s+1]
-      
+
       s := s + 1;
       # if vs and us span the fully deleted permutation module
       if s = fdpm.dim then
@@ -1251,7 +1251,7 @@ FindBasis := function(x, vs, us, fdpm)
       fi;
     fi;
   od;
-    
+
   if i <> 1 then
     # vsum = v1*h + ... + v(i-1)*h
     vsum := ShallowCopy(vsx[1]);
@@ -1274,7 +1274,7 @@ FindBasis := function(x, vs, us, fdpm)
         ConvertToVectorRep(temp);
         AddRowVector(temp, vsumh, mone);
         Add(us, temp);
-        
+
         temp := ShallowCopy(us[s+2]);
         ConvertToVectorRep(temp);
         AddRowVector(temp, us[s+1], mone);
@@ -1282,7 +1282,7 @@ FindBasis := function(x, vs, us, fdpm)
         s := s + 1;
         if s = fdpm.dim then
           # return vs and us if they span the fully deleted permutation
-          # module. Note: us[1] = u1 = 0 
+          # module. Note: us[1] = u1 = 0
           return [vs, us{[2..s+1]}];
         fi;
       fi;
@@ -1292,7 +1292,7 @@ FindBasis := function(x, vs, us, fdpm)
       AddRowVector(vsumh, vsh[j], mone);
     until j = i - 1;
   fi;
-  
+
   # we have not found a basis for the fully deleted permutation
   # module yet
   return fail;
@@ -1302,26 +1302,26 @@ end;
 ## by a matrix given the vectors u_2,...,u_(n-delta+1)
 
 PositionsNot := function(list, elem)
-# PositionsNot(<list>, <elem>) returns a 
+# PositionsNot(<list>, <elem>) returns a
 # list of all the positions in <list> whose
 # value is not <elem>.
   local pos, posList, zero;
-  
+
   # find position of first element <> elem
   posList := [];
   pos := PositionNot(list, elem);
-  
+
   # find subsequent positions
   while pos <= Length(list) do
     Add(posList, pos);
     pos := PositionNot(list, elem, pos);
   od;
-  
+
   return posList;
 end;
 
 ExpectedForm := function(row, fdpmDim, nAmbig)
-# ExpectedForm(<row>, <fdpmDim>, <nAmbig>) checks 
+# ExpectedForm(<row>, <fdpmDim>, <nAmbig>) checks
 # that <row> is of the form b*(u_ix - u_1x)
 # for some b and {ix, 1x}; if so either [b, [ix, 1x]] is
 # returned or [-b, [1x, ix]] is returned.
@@ -1331,7 +1331,7 @@ ExpectedForm := function(row, fdpmDim, nAmbig)
         posNotB,    # the positions of row whose values
                     # are not equal to b
         b;          # a (non-zero) field element
-  
+
   # find the non-zero positions of row
   posNonZero := PositionsNot(row, Zero(row[1]));
 
@@ -1348,7 +1348,7 @@ ExpectedForm := function(row, fdpmDim, nAmbig)
     fi;
   elif Length(posNonZero) >= fdpmDim - 1 and nAmbig then # only if delta = 2
     # determine +/- b: find two entries that are the same
-    
+
     if row[1] = row[2] or row[1] = row[3] then
       b := row[1];
     elif row[2] = row[3] then
@@ -1357,15 +1357,15 @@ ExpectedForm := function(row, fdpmDim, nAmbig)
          # can be only two
       return fail;
     fi;
-    
+
     # find positions in row that are not b
     posNotB := PositionsNot(row, b);
-    
+
     if IsEmpty(posNotB) then
       # {ix,1x} = {1,n} so b(u_ix - u_1x) = bu_ix
       return [b, [1, fdpmDim + 2]];
     elif Length(posNotB) = 1 then
-      # {ix, 1x} = {j,n} with j <> 1 and 
+      # {ix, 1x} = {j,n} with j <> 1 and
       # row[k] = b for k <> j - 1 and row[j-1] = 2b
       if row[posNotB[1]] = 2*b then
         return [b, [posNotB[1]+1, fdpmDim + 2]];
@@ -1380,7 +1380,7 @@ end;
 
 FindPermutation := function(rs, fdpm)
 # FindPermutation(<rs>, <fdpmDim>) returns the scalar
-# and permutation associated with a given matrix. If 
+# and permutation associated with a given matrix. If
 # the matrix is b*x (for some scalar b) then <rs> contains
 # the row vectors ui*b*x (where ui = e1 - ei) written
 # with respect to the vectors ui. If the matrix is not
@@ -1396,7 +1396,7 @@ FindPermutation := function(rs, fdpm)
         FindB,    # function to determine b from image of ui
         b,        # the scalar that the matrix represents
         pts;      # a list of images of points under a permutation
-    
+
   FindB := function(pmb, imgs);
     # input is b, [u_ix, 1x] or
     # -b and [1_x, u_ix]
@@ -1406,12 +1406,12 @@ FindPermutation := function(rs, fdpm)
       return pmb;
     fi;
   end;
-  
+
   # determine +/- b and [1x,2x]
   imgsA := ExpectedForm(rs[1], fdpm.dim, fdpm.nAmbig);
   # determine +/- b and [1x,3x]
   imgsB := ExpectedForm(rs[2], fdpm.dim, fdpm.nAmbig);
-  
+
   if imgsA <> fail and imgsB <> fail then
     # determine 1x
     oneIm := Intersection(imgsA[2], imgsB[2]);
@@ -1429,7 +1429,7 @@ FindPermutation := function(rs, fdpm)
 
   # build up permList by looking at rs[i] = u_(i+1)x (w.r.t to basis
   # us) for i = 2,...,n-delta
-  
+
   for r in rs do
     # check whether rs[i] in is an expected form
     imgsB := ExpectedForm(r, fdpm.dim, fdpm.nAmbig);
@@ -1440,7 +1440,7 @@ FindPermutation := function(rs, fdpm)
       # check (i+1)x has been defined uniquely and b is correct
       if Length(pts) = 1 and b = CallFuncList(FindB, imgsB) then
         Append(permList, pts);
-      else 
+      else
         return fail;
       fi;
     fi;
@@ -1454,11 +1454,11 @@ FindPermutation := function(rs, fdpm)
   if perm = fail then
     return fail;
   fi;
-    
+
   return [b, perm];
 end;
 
-## The main function that puts all the above together to 
+## The main function that puts all the above together to
 ## recognise our matrix group
 
 InfoFDPM := NewInfoClass("InfoFDPM");
@@ -1471,7 +1471,7 @@ RecogniseMatrixGroup := function(mgens, field, eps)
 # their fully deleted permutation module.
 
   local group,   # the matrix group
-        fdpm,    # a record containing information on 
+        fdpm,    # a record containing information on
                  # the fully deleted permutation module
         g,       # group element representing 3-cycle or double trans
         v,       # a vector from a linked basis
@@ -1481,27 +1481,27 @@ RecogniseMatrixGroup := function(mgens, field, eps)
         uvs,     # output of CompleteBasis
         cob,     # change of basis matrix, to the basis u_i for i = 2,...,n-delta+1
         perms;   # the permutations (and scalars) for each matrix
-  
+
   # construct matrix group
   group := Group(mgens);
-  
+
   # information on the fully deleted permutation module
   fdpm := rec( field     := field,
                fieldChar := Characteristic(field),
                dim       := DimensionOfMatrixGroup(group),
                nAmbig    := (DimensionOfMatrixGroup(group) + 2) mod
-                              Characteristic(field) = 0 
+                              Characteristic(field) = 0
              );
 
   # check the dimensions allow for the possibility that group is a
   # representation of An or Sn on its fully deleted permutation module
-  if fdpm.dim + 1 mod fdpm.fieldChar = 0 then 
+  if fdpm.dim + 1 mod fdpm.fieldChar = 0 then
     Print("With the given matrix dimensions and field characteristic your matrix group cannot be a representation of a symmetric group on its fully deleted permutation module.");
     return fail;
   fi;
-  
+
   Info(InfoFDPM, 2, "Searching for 3-cycle or double-transposition.");
-  
+
   # find 3-cycle or double transposition
   if fdpm.fieldChar = 3 then
     # check fdpm.dim is largest for IsPreDoubleTransposition to
@@ -1525,39 +1525,39 @@ RecogniseMatrixGroup := function(mgens, field, eps)
     fi;
     # search for a 3-cycle
     g := IterateWithRandomElements(
-             m -> Construct3Cycle(m, fdpm), 
+             m -> Construct3Cycle(m, fdpm),
              LogRat(eps^-1, 2)*(RootInt(fdpm.dim+2,3) + 1)*15, # 1/0.07 < 15
-             group); 
+             group);
   fi;
   # Note: when the field characteristic is >= 5 we could search
-  # for both 3-cycles and double transpositions. However we would still 
+  # for both 3-cycles and double transpositions. However we would still
   # require about as many random element selections as if we searched
   # only for 3-cycles and, if we found a double transposition, we would
   # require many more random element selections for MoreBasisVectors.
   # This is especially important when group is not a representation of
-  # An or Sn. 
+  # An or Sn.
 
   # check we found a 3-cycle or double transposition
   if g = fail then
     Info(InfoFDPM, 2, "Could not find 3-cycle or double-transposition.");
     return fail;
   fi;
-  
+
   if g.order = 3 then
     Info(InfoFDPM, 2, "Found 3-cycle.");
   else
-    Info(InfoFDPM, 2, "Found double-transposition."); 
+    Info(InfoFDPM, 2, "Found double-transposition.");
   fi;
 
   # find first basis vector
-  v := FindBasisElement(g, group, eps, fdpm);  
+  v := FindBasisElement(g, group, eps, fdpm);
   if v = fail then
     Info(InfoFDPM, 2, "Could not find basis element.");
     return fail;
   fi;
 
   Info(InfoFDPM, 2, "Found first basis element.");
-  
+
   # extend basis
   if g.order = 3 then
     vs := IterateWithRandomElements(
@@ -1568,43 +1568,43 @@ RecogniseMatrixGroup := function(mgens, field, eps)
     vs := IterateWithRandomElements(
               m -> MoreBasisVectors(m, g, v, fdpm),
               2000*LogRat(eps^-1, 2)*LogRat(fdpm.dim + 2, 2),
-              group); 
+              group);
   fi;
-  
+
   if vs = fail then
     Info(InfoFDPM, 2, "Could not find linked sequence of vectors.");
     return fail;
   fi;
-  
+
   Info(InfoFDPM, 2, "Found linked sequence of vectors.");
-  
+
   # complete basis
 
-  # compute start of alternate basis 
+  # compute start of alternate basis
   us := [Zero(vs[1])];
   for k in [1..Length(vs)] do
     Add(us, us[k] + vs[k]);
   od;
-  
+
   uvs := IterateWithRandomElements(
              m -> FindBasis(m, vs, us, fdpm),
-             LogRat(fdpm.dim + 2, 2)*(  LogRat(eps^-1, 2) 
+             LogRat(fdpm.dim + 2, 2)*(  LogRat(eps^-1, 2)
                                       + LogRat(fdpm.dim + 2, 2)),
              group);
-  
+
   if uvs = fail then
     Info(InfoFDPM, 2, "Could not complete basis.");
     return fail;
   fi;
 
   Info(InfoFDPM, 2, "Found change of basis matrix.");
-  
+
   # determine permutations and scalars: uvs[2] contains the
   # change of basis matrix that takes group elements into
   # our prefered form
   cob := uvs[2];
   ConvertToMatrixRep(cob);
-  
+
   if cob^-1 <> fail then
     return List(mgens, m -> FindPermutation(ConjInv(m, uvs[2]), fdpm));
   else
@@ -1619,16 +1619,16 @@ AlternateBasisMatrix := function(n, field)
 # AlternateBasisMatrix(<n>, <field>) returns the matrix
 # whose rows are the alternate basis u2,...,n(n-delta+1)
   local P, fdpmDim, r, c;
-  
+
   # determine dimension of the fully deleted permutation module
   if n mod Characteristic(field) = 0 then
     fdpmDim := n - 2;
   else
     fdpmDim := n - 1;
   fi;
-  
+
   P := IdentityMat(fdpmDim, field);
-  
+
   for r in [1..fdpmDim] do
     for c in [1..fdpmDim] do
       if r > c then
@@ -1636,12 +1636,12 @@ AlternateBasisMatrix := function(n, field)
       fi;
     od;
   od;
-  
+
   return P;
 end;
 
 FullyDeletedPermutationMatrices := function(perms, n, field)
-# FullyDeletedPermutationMatrices(<perms>, <n>, <field>) returns 
+# FullyDeletedPermutationMatrices(<perms>, <n>, <field>) returns
 # the matrices representing the elements of <perms> (<perms> is a list
 # of permutations) on the fully deleted permutation module over <field>.
 # The permutations are considered as elements of the symmetric group S<n>.
@@ -1654,69 +1654,69 @@ FullyDeletedPermutationMatrices := function(perms, n, field)
         bv,        # temp basis vector
         quotLT,    # linear trans. from W to V (the fully deleted perm. module)
         delta,     # codim of fully deleted perm. module
-        MatrixRep; # function returning matrix rep for given perm 
-  
+        MatrixRep; # function returning matrix rep for given perm
+
   # construct vector space U
   vspaceU := VectorSpace(field, PermutationMat((), n, field));
-  
+
   # create subspace W
   bv := ShallowCopy(Zero(vspaceU)); bv[1] := One(field); bv[2] := -One(field);
   delta := PermList(([1..n] mod n) + 1);
   basisW := List([0..n-1], i -> Permuted(bv, delta^i));
   subspaceW := Subspace(vspaceU, basisW);
-  
-  # create subspace E 
+
+  # create subspace E
   subspaceE := Subspace(vspaceU, [List([1..n], z -> One(field))]);
-  
+
   # create quotient homomorphism from W to V
-  quotLT := NaturalHomomorphismBySubspace(subspaceW, 
+  quotLT := NaturalHomomorphismBySubspace(subspaceW,
                                           Intersection(subspaceW,
                                                        subspaceE));
 
   # calculate codimension of V
   delta := 1 + Dimension(Intersection(subspaceW, subspaceE));
-  
-  # create basis for V (note: need it to be Basis object so 
+
+  # create basis for V (note: need it to be Basis object so
   # we can use Coefficients)
   basisV := List(basisW{[1..n-delta]}, b -> b^quotLT);
   basisV := Basis(VectorSpace(field, basisV), basisV);
-  
-  MatrixRep := p -> List(basisW{[1..n-delta]}, 
+
+  MatrixRep := p -> List(basisW{[1..n-delta]},
                          v -> Coefficients(basisV, Permuted(v, p)^quotLT));
-  
+
   # return matrix representations
   return List(perms, p -> MatrixRep(p));
 end;
 
 FullyDeletedPermutationRepresentation := function(perms, n, field, cob, scalars)
 # FullyDeletedPermutationRepresentation(<perms>, <n>, <field>, <cob>, <scalars>)
-# returns a representation of <perms> on their fully deleted permutation module 
+# returns a representation of <perms> on their fully deleted permutation module
 # over <field>. The elements of <perms> are consider to be permutations of <n>
-# objects. The matrices returned are those returned by 
-# FullyDeletedPermutationMatrices under the change of basis given by <cob> and 
-# multiplied by the elements of <scalars> (in particular the ith element of 
+# objects. The matrices returned are those returned by
+# FullyDeletedPermutationMatrices under the change of basis given by <cob> and
+# multiplied by the elements of <scalars> (in particular the ith element of
 # <perms> is multiplied by the ith elements of <scalars>).
-  return cob^-1 * ListN(FullyDeletedPermutationMatrices(perms, n, field), 
+  return cob^-1 * ListN(FullyDeletedPermutationMatrices(perms, n, field),
                         scalars, \*) * cob;
 end;
 
 RandomFullyDeletedPermutationRepresentation := function(perms, n, field)
 # RandomFullyDeletedPermutationRepresentation(<perms>, <n>, <field>) returns a
-# representation of <perms> on their fully deleted permutation module 
+# representation of <perms> on their fully deleted permutation module
 # over <field>. The elements of <perms> are consider to be permutations of <n>
-# objects. The matrices returned are those returned by 
-# FullyDeletedPermutationMatrices under a random change of basis and 
+# objects. The matrices returned are those returned by
+# FullyDeletedPermutationMatrices under a random change of basis and
 # multiplied by random elements of <field>. The change of basis matrix and
 # the scalars are also returned.
   local delta, scalars, s, cob;
-  
+
   # calculate dimension of matrix rep.
   if n mod Characteristic(field) = 0 then
     delta := 2;
   else
     delta := 1;
   fi;
-  
+
   # random generaate some non-zero scalars
   scalars := [];
   for s in [1..Length(perms)] do
@@ -1725,12 +1725,12 @@ RandomFullyDeletedPermutationRepresentation := function(perms, n, field)
       scalars[s] := Random(field);
     od;
   od;
-  
+
   # random change of basis matrix
   cob := RandomInvertibleMat(n - delta, field);
-  
+
   return [FullyDeletedPermutationRepresentation(perms, n, field, cob, scalars),
-          cob, 
+          cob,
           scalars];
 end;
 
@@ -1739,12 +1739,12 @@ RandomSymmetricGroupOnFDPM := function(n, field)
 # (with An <= G <= Sn) represented on its fully deleted permutation
 # module over <field>
   local G, gens;
-  
+
   gens := ShallowCopy(GeneratorsOfGroup(AlternatingGroup(n)));
   G := SymmetricGroup(n);
-  
+
   Append(gens, List([1..2*n], i -> Random(G)));
-  
+
   return [gens, RandomFullyDeletedPermutationRepresentation(gens, n, field)];
 end;
 
@@ -1752,9 +1752,9 @@ SymmetricGroupOnFDPM := function(n, field)
 # returns a representation of the symmetric group Sn on
 # its fully deleted permutation module
   local G, gens;
-  
+
   gens := GeneratorsOfGroup(SymmetricGroup(n));
-  
+
   return Group(FullyDeletedPermutationMatrices(gens, n, field));
 end;
 
@@ -1762,8 +1762,8 @@ AlternatingGroupOnFDPM := function(n, field)
 # returns a representation of the alternating group An on
 # its fully deleted permutation module
   local G, gens;
-  
+
   gens := GeneratorsOfGroup(AlternatingGroup(n));
-  
+
   return Group(FullyDeletedPermutationMatrices(gens, n, field));
 end;

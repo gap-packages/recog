@@ -11,7 +11,7 @@ lbl SEMISTD
 	incr V
 	if V gt 1000 then timeout
 	if A notin 1 2 3 4 5 6 7 8 9 10 11 12 14 15 16 18 20 &
-		23 24 28 30 then fail 
+		23 24 28 30 then fail
 	if F eq 0 then
 		if A in 16 18 28 then
 			div A 2 B
@@ -29,7 +29,7 @@ lbl SEMISTD
 
 	if F eq 0 then jmp SEMISTD
 	if G eq 0 then jmp SEMISTD
-	
+
 	set Y 0
 	set Z 0
 	set U 0
@@ -42,7 +42,7 @@ lbl CONJUGATE
 	mu 2 3 5
 	ord 5 D
 	if D notin 4 5 6 7 8 9 10 11 12 14 15 16 18 20 23 24 28 30 then fail
-	
+
 	if D eq 7 then
 		set Z 1   # We are in the correct conjugacy class!
 	endif
@@ -52,10 +52,10 @@ lbl CONJUGATE
 			set G 0
 			jmp SEMISTD
 		endif
-	
+
 		# Certain product orders are much more likely to
 		# occur with 5B elements (and vice versa)
-		if D in 6 12 14 24 30 then incr U  
+		if D in 6 12 14 24 30 then incr U
 		if D in 9 11 15 23 then decr U
 
 		if U eq 3 then
@@ -81,6 +81,6 @@ lbl CONJUGATE
 			jmp SEMISTD
 		endif
 	endif
-	
+
 
 	oup 2 2 3

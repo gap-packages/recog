@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  matrix.gd        
+##  matrix.gd
 ##                                recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress

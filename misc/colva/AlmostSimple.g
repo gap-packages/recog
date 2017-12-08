@@ -6,7 +6,7 @@ ElementInNormalSubgroup := function(G,N,g,Projective)
  # if the GCD of |g|,|n_1g|,...,|n_rg| = 1 then g is in N
  # if not then g probably is not in n
 
- if Projective = true then 
+ if Projective = true then
    O := function(g)
      return ProjectiveOrder(g)[1];
    end;
@@ -15,7 +15,7 @@ ElementInNormalSubgroup := function(G,N,g,Projective)
 
  nmr := 100;
  m := O(g);
- for i in [1..nmr] do 
+ for i in [1..nmr] do
    n := PseudoRandom(N);
    m := GcdInt(m, O(n*g));
    if m=1 then return true; fi;
@@ -33,7 +33,7 @@ ElementInNormalClosure := function(G,N,g,Projective)
  # if the GCD of |g|,|n_1g|,...,|n_rg| = 1 then g is in N
  # if not then g probably is not in n
 
- if Projective = true then 
+ if Projective = true then
    O := function(g)
      return ProjectiveOrder(g)[1];
    end;
@@ -42,7 +42,7 @@ ElementInNormalClosure := function(G,N,g,Projective)
 
  nmr := 100;
  m := O(g);
- for i in [1..nmr] do 
+ for i in [1..nmr] do
    n := PseudoRandomNormalClosureElement(G,N);
    m := GcdInt(m, O(n*g));
    if m=1 then return true; fi;
@@ -70,19 +70,19 @@ StableDerivative := function(G)
   until IsProbablyPerfect(G);
   return G;
 end;
-   
+
 ConstructCosets := function(G,N,Projective)
  # Constructs coset representatives of N in G
 
  local O,gens,C,t,x,g,i,j;
 
- if Projective = true then 
+ if Projective = true then
    O := function(g)
      return ProjectiveOrder(g)[1];
    end;
  else O := Order;
  fi;
- 
+
  gens := GeneratorsOfGroup(G);
  C := [One(G)];
  t := 1;
@@ -96,7 +96,7 @@ ConstructCosets := function(G,N,Projective)
      od;
    od;
    t := t+1;
- od;       
+ od;
 
  return C;
 end;
@@ -105,7 +105,7 @@ ImageInQuotient := function(G,N,C,g,Projective)
  # Constructs the image of G in G/N < Sym(C)
  local O,k,im,i,j,elts,m,x,temp,done,count;
 
- if Projective = true then 
+ if Projective = true then
    O := function(g)
      return ProjectiveOrder(g)[1];
    end;
@@ -122,11 +122,11 @@ ImageInQuotient := function(G,N,C,g,Projective)
    elts[i] := [];
    m[i] := [];
    temp := C[i]*g;
-   for j in [1..k] do     
+   for j in [1..k] do
      elts[i][j]:=temp*C[j]^-1;
      m[i][j] := O(elts[i][j]);
    od;
- od; 
+ od;
 # One of C[i]*gC[j]^-1 is in N for each i and the corresponding j will be the image of the point i under g
 
  im := [ ];
@@ -154,26 +154,26 @@ ImageInQuotient := function(G,N,C,g,Projective)
      od;
    od;
  until count >= k-1;
- 
+
  if count=k-1 then
-# work out the remaining point 
+# work out the remaining point
    im[Difference([1..k],done)[1]]:=Difference([1..k],im)[1];
  fi;
 
  return PermList(im);
 
 end;
- 
+
 ImageInPerfectGroup := function(HZ,H,g,z,k)
 # H is perfect, HZ = <H,z> and there exists 1 <= i <= k with gz^i in H - find the i
  local d,q,detg,detz,j,l,SLscalars,divs,elts,m,i,count,relt,ipos;
 # Make the search smaller by forcing det(gz^i) to be 1
  d := DimensionOfMatrixGroup(H);
  q := Size(FieldOfMatrixGroup(H));
- detg := Determinant(g); 
+ detg := Determinant(g);
  detz := z[1][1]^d;
  j := LogFFE(detg^-1,detz);
- l := (q-1) / GcdInt(q-1,d); 
+ l := (q-1) / GcdInt(q-1,d);
  SLscalars := z^l;
  z := z^j;
 
@@ -195,9 +195,9 @@ ImageInPerfectGroup := function(HZ,H,g,z,k)
    if count=500 then
      return false;
    fi;
- until not ipos=fail;   
+ until not ipos=fail;
  i := divs[ipos];
  return SLscalars^i*z*g;
 end;
 
-# Now some 
+# Now some

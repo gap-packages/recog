@@ -1,4 +1,4 @@
-#represents group element g from the main branch as a permutation of the 
+#represents group element g from the main branch as a permutation of the
 #socle factors.
 
 MySocleAction:= function(soc, g)
@@ -10,12 +10,12 @@ fi;
 return GeneratorsOfGroup(grp)[1];
 end;
 
-  
-  
+
+
 #copied from TrivialActionPushdown in ordering.m
 RearrangeTopFactors:= function(ri)
 
-local soc_found, soc, nri, d, R, phi, I, i, Pgens, Pinv_ims, P, perms, 
+local soc_found, soc, nri, d, R, phi, I, i, Pgens, Pinv_ims, P, perms,
   ki, pgs,alpha,zeta,pgs_ims;
 
 nri:= StructuralCopy(ri);
@@ -29,15 +29,15 @@ while HasRIKer(nri) and not soc_found do
   fi;
 od;
 
-if not soc_found then 
+if not soc_found then
   Print("solvable group, nothing do do\n");
-  return ri; 
+  return ri;
 fi;
- 
-#was hoping to use this a short-cut, but it seems that 
+
+#was hoping to use this a short-cut, but it seems that
 #groups in the socle are not necessarily represented as explicit direct
-#products. 
-if not IsDirectProduct(Grp(RIFac(nri))) then 
+#products.
+if not IsDirectProduct(Grp(RIFac(nri))) then
   SetTFordered(ri, "Pker");
   return ri;
 fi;
@@ -54,19 +54,19 @@ Pgens:= [Identity(SymmetricGroup(2))];
 Pinv_ims:= [Identity(overgroup(soc))];
 P:= GroupWithGenerators(Pgens);
 
-#work up the tree, checking whether action is trivial (in 
-#which case push down to Pker). 
+#work up the tree, checking whether action is trivial (in
+#which case push down to Pker).
 while (HasRIParent(nri)) do
   nri:= RIParent(nri);
 
-  #now need to find the permutation action of the preimages of the 
-  #generators of  the factor on the factors of the socle.  
+  #now need to find the permutation action of the preimages of the
+  #generators of  the factor on the factors of the socle.
   perms:= List(pregensfac(nri), x ->MySocleAction(soc,x));
 
   #first do the case where this is not a new action - must belong to a lower
   #factor group or be trivial.
   if IsSubgroup(P, GroupWithGenerators(perms)) then
-    if HasTFordered(RIFac(RIKer(nri))) and (RIFac(RIKer(nri))!.TFordered = "Socle") then 
+    if HasTFordered(RIFac(RIKer(nri))) and (RIFac(RIKer(nri))!.TFordered = "Socle") then
       #don't reorder, just label this as the beginning of Pker
       SetTFordered(nri, "Pker");
     elif HasTFordered(RIKer(nri)) and RIKer(nri)!.TFordered = "Pker" then
@@ -77,19 +77,19 @@ while (HasRIParent(nri)) do
     else
       ki:= GroupHomomorphismByImagesNC(P, overgroup(soc), Pgens, Pinv_ims);
       #have to move down below all bits that act nontrivially on socle.
-      while not (HasTFordered(RIFac(RIKer(nri))) and 
+      while not (HasTFordered(RIFac(RIKer(nri))) and
                 RIFac(RIKer(nri))!.TFordered = "Socle") do
-          if IsBound(Grp(RIFac(RIKer(nri)))!.Pcgs) then 
+          if IsBound(Grp(RIFac(RIKer(nri)))!.Pcgs) then
             #move past a (soluble) PC group
             pgs:= pregensfac(RIKer(nri));
             pgs_ims:= List(pgs, x->x*Image(ki,MySocleAction(soc, x))^-1);
             alpha:= GroupHomomorphismByImagesNC(Grp(RIFac(RIKer(nri))), overgroup(nri), pgs, pgs_ims);
             zeta:= function(g)
-               return Image(Homom(RIKer(nri)),(g*Image(alpha, 
+               return Image(Homom(RIKer(nri)),(g*Image(alpha,
                     Image(Homom(RIKer(nri)), g))^-1));
             end;
           else
-            #should have a nonabelian group to move past here, 
+            #should have a nonabelian group to move past here,
             #according to Mark, it'll be a permutation group by this point.
             #I think what we should be doing is same style as "past non ab"
             #but that we don't need the checks, as the trivial action should
@@ -103,7 +103,7 @@ while (HasRIParent(nri)) do
           nri:= SwapFactors(nri, zeta);
       od;
     fi;
-  else 
+  else
   #have found some new permutations to add
     for i in [1..Length(perms)] do
       if not perms[i] in P then

@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  init.g                recog package                   
+##  init.g                recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
 ##                                                                 et al.

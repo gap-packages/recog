@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  blackbox.gi          
+##  blackbox.gi
 ##                                recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
@@ -13,7 +13,7 @@
 #############################################################################
 
 BBStdGenFinder := rec();
-BBStdGenFinder.HS := 
+BBStdGenFinder.HS :=
 # Created by bbtogap.py from HSG1-find1 from the ATLAS page
 function(arg)
     local vars,els,G;
@@ -23,7 +23,7 @@ function(arg)
     G := Group(arg);
 
     # Black box algorithm to find standard generators of HS
-    
+
     vars.V := 0;
     repeat    # label SEMISTD
         els[1] := PseudoRandom(G);
@@ -39,7 +39,7 @@ function(arg)
 
     els[2] := els[1]^10;
     els[3] := els[1]^4;
-    
+
     vars.X := 0;
     repeat    # label CONJUGATE
         vars.X := vars.X + 1;
@@ -66,9 +66,9 @@ function(arg)
     vars := rec();
     G := Group(arg);
     # Black box algorithm to find standard generators of M11
-    
+
     vars.V := 0;
-    
+
     repeat    # label START
         els[1] := PseudoRandom(G);
         vars.A := RECOG.ProjectiveOrder(els[1]);
@@ -83,14 +83,14 @@ function(arg)
 
     vars.B := QuoInt(vars.A,2);
     els[2] := els[1]^vars.B;
-    
+
     vars.C := QuoInt(vars.A,4);
     els[3] := els[1]^vars.C;
-    
+
     # The elements 2 and 3 are now in the correct conjugacy classes.
-    
+
     vars.X := 0;
-    
+
     repeat    # label CONJ
         vars.X := vars.X + 1;
         if vars.X > 1000 then
@@ -100,24 +100,24 @@ function(arg)
         els[3] := els[3]^els[4];
         els[5] := els[2]*els[3];
         vars.D := RECOG.ProjectiveOrder(els[5]);
-        
+
         if not(vars.D in [2, 3, 4, 5, 6, 8, 11]) then
             return fail;
         fi;
     until vars.D = 11;
-        
+
     els[6] := els[5]*els[3];
     els[7] := els[6]*els[3];
     els[8] := els[5]*els[6];
     els[9] := els[8]*els[7];
-    
+
     vars.E := RECOG.ProjectiveOrder(els[9]);
-    
+
     if vars.E = 3 then
         els[10] := els[3]^-1;
         els[3] := els[10];
     fi;
-    
+
     return els{[2, 3]};
 end;
 
@@ -132,7 +132,7 @@ function(arg)
 
     # Black box algorithm to find standard generators of M12
     # (Second listed algorithm)
-    
+
     vars.F := 0;
     vars.G := 0;
     vars.V := 0;
@@ -159,7 +159,7 @@ function(arg)
                 vars.G := 1;
             fi;
         fi;
-    until vars.F <> 0 and vars.G <> 0;        
+    until vars.F <> 0 and vars.G <> 0;
     vars.X := 0;
     repeat    # label ELTORDER3
         vars.X := vars.X + 1;
@@ -176,7 +176,7 @@ function(arg)
     until vars.D in [3,6];
     vars.E := QuoInt(vars.D,3);
     els[7] := els[6]^vars.E;
-    
+
     vars.X := 0;
     repeat    # label CONJUGATE
         vars.X := vars.X + 1;
@@ -187,7 +187,7 @@ function(arg)
         els[7] := els[7]^els[8];
         els[9] := els[2]*els[7];
         vars.F := RECOG.ProjectiveOrder(els[9]);
-        
+
         if not(vars.F in [2, 3, 5, 6, 8, 10, 11]) then
             return fail;
         fi;
@@ -206,9 +206,9 @@ function(arg)
 
     # Black box algorithm to find standard generators
     # of M22
-    
+
     vars.V := 0;
-    
+
     repeat    # label START
         els[1] := PseudoRandom(G);
         vars.A := RECOG.ProjectiveOrder(els[1]);
@@ -223,9 +223,9 @@ function(arg)
 
     els[3] := els[1]*els[1];
     els[2] := els[3]*els[3];
-    
+
     vars.X := 0;
-    
+
     repeat    # label CONJ
         vars.X := vars.X + 1;
         if vars.X > 1000 then
@@ -241,17 +241,17 @@ function(arg)
         if vars.D <> 11 then
             continue;    # was jmp to CONJ
         fi;
-        
+
         els[6] := els[5]*els[3];
         els[7] := els[5]*els[6];
         vars.E := RECOG.ProjectiveOrder(els[7]);
-        
+
         if vars.E <> 11 then
             continue;    # was jmp to CONJ
         fi;
         break;  # this is a success
     until false;
-        
+
     return els{[2, 3]};
 end;
 
@@ -265,7 +265,7 @@ function(arg)
     G := Group(arg);
 
     # Black box algorithm to find standard generators of J2
-    
+
     vars.F := 0;
     vars.G := 0;
     vars.H := 0;
@@ -295,7 +295,7 @@ function(arg)
                 vars.G := 1;
             fi;
         fi;
-        
+
         # As well as finding elements of order 2 and 3 (for the
         # generators), we find a 2A-element. This allows us
         # to prove that the elements we have are in the right classes
@@ -307,7 +307,7 @@ function(arg)
                 vars.H := 1;
             fi;
         fi;
-        
+
         if vars.F = 0 then
             continue;    # was jmp to SEMISTD
         fi;
@@ -317,7 +317,7 @@ function(arg)
         if vars.H = 0 then
             continue;    # was jmp to SEMISTD
         fi;
-        
+
         els[5] := els[2]*els[4];
         vars.D := RECOG.ProjectiveOrder(els[5]);
         if vars.D in [1, 2, 3, 4, 5] then
@@ -325,7 +325,7 @@ function(arg)
             vars.F := 0;
             continue;    # was jmp to SEMISTD
         fi;
-        
+
         els[6] := els[3]*els[4];
         vars.E := RECOG.ProjectiveOrder(els[6]);
         if vars.E in [6, 12] then
@@ -335,9 +335,9 @@ function(arg)
         fi;
         break;
     until false;
-        
+
     # The elements are definitely in classes 2B and 3B now.
-    
+
     repeat    # label CONJUGATE
         vars.X := vars.X + 1;
         if vars.X > 1000 then
@@ -350,16 +350,16 @@ function(arg)
         if not(vars.D in [2, 3, 5, 6, 7, 8, 10, 12, 15]) then
             return fail;
         fi;
-        
+
         if vars.D <> 7 then
             continue;    # was jmp to CONJUGATE
         fi;
-        
+
         els[9] := els[8]*els[3];
         els[10] := els[8]*els[9];
-        
+
         vars.E := RECOG.ProjectiveOrder(els[10]);
-        
+
         if not(vars.E in [10, 12, 15]) then
             return fail;
         fi;
@@ -368,12 +368,12 @@ function(arg)
         fi;
         break;
     until false;
-        
+
     return els{[2, 3]};
 end;
 
 # Created by bbtogap.py from Co3G1-find1 from the Atlas web page
-BBStdGenFinder.Co3 := 
+BBStdGenFinder.Co3 :=
 function(arg)
     local vars,els,G;
     if Length(arg) > 0 and IsList(arg[1]) then arg := arg[1]; fi;
@@ -382,7 +382,7 @@ function(arg)
     G := Group(arg);
 
     # Black box algorithm to find standard generators of Co3
-    
+
     vars.F := 0;
     vars.G := 0;
     vars.V := 0;
@@ -397,7 +397,7 @@ function(arg)
                           23,24,30]) then
             return fail;
         fi;
-        
+
         if vars.F = 0 then
             if vars.A in [9,18,24,30] then
                 vars.B := QuoInt(vars.A,3);
@@ -411,7 +411,7 @@ function(arg)
                 vars.G := 1;
             fi;
         fi;
-        
+
         if vars.F = 0 then
             continue;    # was jmp to SEMISTD
         fi;
@@ -420,7 +420,7 @@ function(arg)
         fi;
         break;
     until false;
-        
+
     vars.X := 0;
     repeat    # label CONJUGATE
         vars.X := vars.X + 1;
@@ -439,12 +439,12 @@ function(arg)
         fi;
         break;
     until false;
-        
+
     return els{[2, 3]};
 end;
 
 # Created by bbtogap.py from Co2G1-find1 from the Atlas web page
-BBStdGenFinder.Co2 := 
+BBStdGenFinder.Co2 :=
 function(arg)
     local vars,els,G,toSEMISTD;
     if Length(arg) > 0 and IsList(arg[1]) then arg := arg[1]; fi;
@@ -453,12 +453,12 @@ function(arg)
     G := Group(arg);
 
     # Black box algorithm to find standard generators of Co2
-    
+
     vars.F := 0;
     vars.G := 0;
     vars.V := 0;
     vars.X := 0;
-    
+
     repeat    # label SEMISTD
         els[1] := PseudoRandom(G);
         vars.A := RECOG.ProjectiveOrder(els[1]);
@@ -484,14 +484,14 @@ function(arg)
                 vars.G := 1;
             fi;
         fi;
-        
+
         if vars.F = 0 then
             continue;    # was jmp to SEMISTD
         fi;
         if vars.G = 0 then
             continue;    # was jmp to SEMISTD
         fi;
-        
+
         vars.Y := 0;
         vars.Z := 0;
         vars.U := 0;
@@ -509,18 +509,18 @@ function(arg)
                               28,30]) then
                 return fail;
             fi;
-            
+
             if vars.D = 7 then
                 vars.Z := 1;
             fi;
-            
+
             if vars.Z = 0 then
                 if vars.Y > 35 then
                     vars.G := 0;
                     toSEMISTD := true;
                     break;    # was jmp to SEMISTD
                 fi;
-                
+
                 # Certain product orders are much more likely to
                 # occur with 5B elements (and vice versa)
                 if vars.D in [6,12,14,24,30] then
@@ -529,7 +529,7 @@ function(arg)
                 if vars.D in [9,11,15,23] then
                     vars.U := vars.U + 1;
                 fi;
-                
+
                 if vars.U = 3 then
                     # Probably a 5B element.
                     vars.G := 0;
@@ -537,19 +537,19 @@ function(arg)
                     break;    # was jmp to SEMISTD
                 fi;
             fi;
-            
+
             if vars.D <> 28 then
                 continue;    # was jmp to CONJUGATE
             fi;
-            
+
             # Once we've got y s.t. o(xy) = 28, we need to check
             # o(xyy) = 9 if we don't yet know that y is in the right
             # class.
             if vars.Z = 0 then
                 els[6] := els[5]*els[3];
-                
+
                 vars.E := RECOG.ProjectiveOrder(els[6]);
-                
+
                 if not(vars.E in [9, 15]) then
                     return fail;
                 fi;
@@ -564,12 +564,12 @@ function(arg)
         until false;
         if not(toSEMISTD) then break; fi;
     until false;
-            
+
     return els{[2,3]};
 end;
 
 # Created by bbtogap.py
-BBStdGenFinder.Ly := 
+BBStdGenFinder.Ly :=
 function(arg)
     local vars,els,G;
     if Length(arg) > 0 and IsList(arg[1]) then arg := arg[1]; fi;
@@ -578,7 +578,7 @@ function(arg)
     G := Group(arg);
 
     # Black box algorithm to find standard generators of Ly
-    
+
     vars.F := 0;
     vars.G := 0;
     vars.V := 0;
@@ -608,7 +608,7 @@ function(arg)
             fi;
         fi;
     until vars.F <> 0 and vars.G <> 0;
-        
+
     vars.X := 0;
     repeat    # label CONJUGATE
         vars.X := vars.X + 1;
@@ -626,7 +626,7 @@ function(arg)
         if vars.D <> 14 then
             continue;    # was jmp to CONJUGATE
         fi;
-        
+
         els[6] := els[5]*els[3];
         els[7] := els[5]*els[5];
         els[8] := els[7]*els[6];
@@ -635,7 +635,7 @@ function(arg)
             continue;    # was jmp to CONJUGATE
         fi;
         break;
-    until false;    
+    until false;
     return els{[2,3]};
 end;
 

@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  snksetswrsr.g      
+##  snksetswrsr.g
 ##                                recog package
 ##                                                            Maska Law
 ##                                                 &  Alice C. Niemeyer
@@ -12,8 +12,8 @@
 ##  This file is free software, see license information at the end.
 ##
 ##
-##  This file provides code for recognising whether a permutation group 
-##  on N points is isomorphic to G wr S_r where G is S_n acting on 
+##  This file provides code for recognising whether a permutation group
+##  on N points is isomorphic to G wr S_r where G is S_n acting on
 ##  k-sets and N = Binomial(n,k)^r and kr > 1.
 ##
 #############################################################################
@@ -28,9 +28,9 @@ SetInfoLevel( InfoJellyfish, 1 );
 #F  NkrGetParameters( <N> )
 ##
 ##  Computes all [n,k,r] such that N = Binomial(n,k)^r. Returns those
-##  satisfying k*r > 1 and 2*r*k^2 < n (sufficient condition from 
-##  BLS (Lemma 2.10) that ensures that there is a unique minimal and a 
-##  unique maximal suborbit of the form which is needed). Note that 
+##  satisfying k*r > 1 and 2*r*k^2 < n (sufficient condition from
+##  BLS (Lemma 2.10) that ensures that there is a unique minimal and a
+##  unique maximal suborbit of the form which is needed). Note that
 ##  this last condition can be changed in the last line of the code.
 
 RECOG.NkrGetParameters := function( N )
@@ -39,14 +39,14 @@ RECOG.NkrGetParameters := function( N )
 
     list:=[];
     maxr:=Gcd(List(Collected(FactorsInt(N)),x->x[2]));
-    for r in DivisorsInt(maxr) do 
+    for r in DivisorsInt(maxr) do
         newN:=RootInt(N,r);
         k:=0;
         repeat
             k:=k+1;
             num:=RootInt(newN*Factorial(k),k);
-            for n in [num..num+k-1] do 
-                if Binomial(n,k)=newN then 
+            for n in [num..num+k-1] do
+                if Binomial(n,k)=newN then
                     Add(list, [n,k,r]);
                 fi;
             od;
@@ -104,7 +104,7 @@ RECOG.NkrTraceSchreierTree := function( beta, sv )
     o := One(sv[beta]);
     h := One(sv[beta]);
     while sv[beta] <> o do
-        h := h * sv[beta]; 
+        h := h * sv[beta];
         beta := beta^sv[beta];
     od;
 
@@ -117,8 +117,8 @@ end;
 ##
 #F  NkrOrbitsOfStabiliser( <alpha>, <sv>, <grp> )
 ##
-##  The following function attempts to construct the stabiliser in <G> 
-##  of a point <alpha>. 
+##  The following function attempts to construct the stabiliser in <G>
+##  of a point <alpha>.
 
 RECOG.NkrOrbitsOfStabiliser := function ( alpha, sv, grp )
 
@@ -149,35 +149,35 @@ end;
 #F  FirstJellyfish( <alpha>, <svalpha>, <gammaalpha>, <deltaalpha>,
 ##                  <G>, <n>, <k>, <r> )
 ##
-##  The following function attempts to construct a jellyfish, namely the 
-##  set of all points whose i-th component contains the letter l, for 
+##  The following function attempts to construct a jellyfish, namely the
+##  set of all points whose i-th component contains the letter l, for
 ##  some fixed i in [1..r] and l in [1..n].
 ##  A jellyfish has size (n-1 choose k-1)*(n choose k)^(r-1).
 ##
-##  The set of points used to construct the jellyfish are returned for 
+##  The set of points used to construct the jellyfish are returned for
 ##  use later as an identifier.
 
-RECOG.FirstJellyfish := function( alpha, svalpha, gammaalpha, deltaalpha, 
+RECOG.FirstJellyfish := function( alpha, svalpha, gammaalpha, deltaalpha,
                             G, n, k, r )
 
     local beta, g, deltabeta, gams, jellyfish, I, gamma, deltagamma, idjf;
 
-    # we need a point <beta> in <gammaalpha> : best to choose random 
+    # we need a point <beta> in <gammaalpha> : best to choose random
     # <beta> in <gammaalpha> since <gammaalpha> is small
     # wlog : assume <alpha> and <beta> differ in component 1 and the
     # letter x satisfies x in <beta>[1] and not x in <alpha>[1]
     beta := Random( gammaalpha );
     g := RECOG.NkrTraceSchreierTree( beta, svalpha );
-    if g = fail then 
+    if g = fail then
         Info(InfoRecog,2,"Schreier tracing failed");
-        return fail; 
-    else g := g^-1; 
+        return fail;
+    else g := g^-1;
     fi;
 
     # use <g> to obtain the longest <G>_<beta>-orbit
     deltabeta := List( deltaalpha, i -> i^g );
 
-    # <gams> will be those points <gamma> such that 
+    # <gams> will be those points <gamma> such that
     # (a)  <gamma>[i] is disjoint from <alpha>[i] for i >= 1;
     # (b)  <gamma>[1] meet <beta>[1] is x.
     gams := Difference( deltaalpha, deltabeta );
@@ -185,10 +185,10 @@ RECOG.FirstJellyfish := function( alpha, svalpha, gammaalpha, deltaalpha,
     # the domain <D> of all points
     jellyfish := [1..LargestMovedPoint(G)];
 
-    # for each <gamma> in <gams>, we will remove from <D> those points 
+    # for each <gamma> in <gams>, we will remove from <D> those points
     # in deltagamma, leaving the jellyfish on x in component 1
 
-    # we can calculate some small number <I> to determine how many 
+    # we can calculate some small number <I> to determine how many
     # points in <gams> are enough, up to some acceptable probability
     I := 4*k*r;
     # <idjf> will record those <gamma> used to construct the jellyfish
@@ -197,17 +197,17 @@ RECOG.FirstJellyfish := function( alpha, svalpha, gammaalpha, deltaalpha,
         I := I - 1;
         gamma := Random( gams );
         g := RECOG.NkrTraceSchreierTree( gamma, svalpha );
-        if g = fail then 
+        if g = fail then
             Info(InfoRecog,2,"Schreier tracing failed - 2");
-            return fail; 
-        else g := g^-1; 
+            return fail;
+        else g := g^-1;
         fi;
         deltagamma := List( deltaalpha, i -> i^g );
         Add( idjf, gamma );
         jellyfish := Difference( jellyfish, deltagamma );
     od;
 
-    if I = 0 and Size(jellyfish)>Binomial(n-1,k-1)*Binomial(n,k)^(r-1) 
+    if I = 0 and Size(jellyfish)>Binomial(n-1,k-1)*Binomial(n,k)^(r-1)
         then Info(InfoRecog,2,"gammas ran out for ",[n,k,r]);
         return fail;
     elif Size(jellyfish) < Binomial(n-1,k-1)*Binomial(n,k)^(r-1)
@@ -216,7 +216,7 @@ RECOG.FirstJellyfish := function( alpha, svalpha, gammaalpha, deltaalpha,
     fi;
 
     return [ jellyfish, Set(idjf) ];
-    
+
 end;
 
 
@@ -224,19 +224,19 @@ end;
 ##
 #F  GetAllJellyfish( <jellyfish>, <idjf>, <G>, <n>, <k>, <r> )
 ##
-##  The following function takes a jellyfish <jellyfish> and constructs 
-##  n*r jellyfish by building up the <G>-orbit of <jellyfish>, since <G> 
-##  is transitive on jellyfish. The order in which the jellyfish are 
-##  constructed (as images of some previous jellyfish) determines the 
-##  number in [1..n*r] that it represents. This correspondence is recorded 
-##  in the table <T>, the rows of which represent the points and contain 
+##  The following function takes a jellyfish <jellyfish> and constructs
+##  n*r jellyfish by building up the <G>-orbit of <jellyfish>, since <G>
+##  is transitive on jellyfish. The order in which the jellyfish are
+##  constructed (as images of some previous jellyfish) determines the
+##  number in [1..n*r] that it represents. This correspondence is recorded
+##  in the table <T>, the rows of which represent the points and contain
 ##  the numbers of the jellyfish containing that point.
 ##
-##  Each jellyfish is identified by a subset of its tentacles : the size 
+##  Each jellyfish is identified by a subset of its tentacles : the size
 ##  of these identifying subsets is determined by the number of points
-##  <gamma> in Difference( <deltaalpha>, <deltabeta> ) originally needed 
-##  to construct the first jellyfish. These identifying subsets are also 
-##  returned for use in constructing more efficiently the permutation 
+##  <gamma> in Difference( <deltaalpha>, <deltabeta> ) originally needed
+##  to construct the first jellyfish. These identifying subsets are also
+##  returned for use in constructing more efficiently the permutation
 ##  corresponding to a given group element.
 
 RECOG.GetAllJellyfish := function( jellyfish, idjf, G, n, k, r )
@@ -348,7 +348,7 @@ RECOG.OtherGetAllJellyfish:=function ( jellyfish, idjf, G, n, k, r )
 
 end;
 
-  
+
 #########################################################################
 ##
 #F AllJellyfish( <G> )
@@ -356,18 +356,18 @@ end;
 ## This is the main function.
 ##
 ## Note re: the shortest orbit and the longest orbit of <G>_<alpha> :
-## (i) the shortest orbit consists of those points in Omega for which 
-## the k-sets in each of r-1 components are identical to the k-sets of 
-## <alpha> in those r-1 components and for which the k-set in the 
-## remaining component meets the k-set of <alpha> in that component in 
+## (i) the shortest orbit consists of those points in Omega for which
+## the k-sets in each of r-1 components are identical to the k-sets of
+## <alpha> in those r-1 components and for which the k-set in the
+## remaining component meets the k-set of <alpha> in that component in
 ## k-1 letters. It has size (k choose k-1)*(n-k)*r. Notation: gammaalpha.
-## (ii) the longest orbit consists of those points in Omega for which 
-## the k-set in each component is disjoint from the k-set in the same 
+## (ii) the longest orbit consists of those points in Omega for which
+## the k-set in each component is disjoint from the k-set in the same
 ## component of <alpha>. It has size (n-k choose k)^r. Notation: deltaalpha.
 
 RECOG.AllJellyfish := function( G )
 
-    local N, D, gens, gensinv, i, g, alpha, svalpha, alphaorbs, sizes, 
+    local N, D, gens, gensinv, i, g, alpha, svalpha, alphaorbs, sizes,
           s, l, params, p, n, k, r, jellyfishone, alljellyfish;
 
     N := LargestMovedPoint(G);
@@ -388,7 +388,7 @@ RECOG.AllJellyfish := function( G )
     sizes := List( alphaorbs, i -> Length(i) );
     s := Minimum( sizes );
     l := Maximum( sizes );
-    if Length(Filtered(sizes,i->i=s)) > 1 or 
+    if Length(Filtered(sizes,i->i=s)) > 1 or
        Length(Filtered(sizes,i->i=l)) > 1 then
         Info(InfoRecog,2,"no unique max or min sized G_alpha orbit");
         return fail;
@@ -400,19 +400,19 @@ RECOG.AllJellyfish := function( G )
 
     for p in params do
         n := p[1]; k := p[2]; r := p[3];
-        if Size(s) = Binomial(k,k-1) * (n-k) * r and 
+        if Size(s) = Binomial(k,k-1) * (n-k) * r and
            Size(l) = Binomial(n-k,k)^r then
             jellyfishone := RECOG.FirstJellyfish(alpha,svalpha,s,l,G,n,k,r);
-            if jellyfishone <> fail then 
+            if jellyfishone <> fail then
                 Info(InfoRecog,2,"found jellyfish for ",p);
-                alljellyfish := RECOG.GetAllJellyfish( jellyfishone[1], 
+                alljellyfish := RECOG.GetAllJellyfish( jellyfishone[1],
                                  jellyfishone[2], G,n,k,r );
                 if alljellyfish <> fail then
                     return alljellyfish;
                 fi;
             fi;
         else
-            Info(InfoRecog,2, 
+            Info(InfoRecog,2,
         "couldn't find orbits of correct size for n=",n," k=",k," r=",r);
         fi;
     od;
@@ -429,11 +429,11 @@ end;
 ##
 ## This function returns the permutation of [1..n*r] corresponding to <g>.
 ##
-## A jellyfish is identified by a subset of its tentacles : the size of 
-## these identifying subsets is determined by the number of points 
-## <gamma> in Difference( <deltaalpha>, <deltabeta> ) originally needed 
-## to construct the first jellyfish. The intersection of the images 
-## under <g> of the points in an identifying subset determines the image 
+## A jellyfish is identified by a subset of its tentacles : the size of
+## these identifying subsets is determined by the number of points
+## <gamma> in Difference( <deltaalpha>, <deltabeta> ) originally needed
+## to construct the first jellyfish. The intersection of the images
+## under <g> of the points in an identifying subset determines the image
 ## of the letter of the jellyfish.
 
 RECOG.FindImageJellyfish := function( g, T, seen )

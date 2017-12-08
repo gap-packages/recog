@@ -1,7 +1,7 @@
 #############################################################################
 ##
-##  almostsimple.gi        
-##                                recog package                   
+##  almostsimple.gi
+##                                recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
 ##
@@ -14,8 +14,8 @@
 #############################################################################
 
 RECOG.ParseNumber := function( number, d, default )
-  if IsInt(number) then 
-      return number; 
+  if IsInt(number) then
+      return number;
   fi;
   if IsString(number) then
       if number = "logd" then return LogInt(d,2); fi;
@@ -72,7 +72,7 @@ RECOG.MakeStabChainHint := function( chain, stdgens )
                              treehashsize := 1000, storenumbers := true ));
                   else
                       o := Orb(gens,b[j],OnSubspacesByCanonicalBasis,
-                         rec( report := 10000, treehashsize := 1000, 
+                         rec( report := 10000, treehashsize := 1000,
                               storenumbers := true ));
                   fi;
                   Enumerate(o);
@@ -116,7 +116,7 @@ InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
         return fail;
     fi;
     gm := Group(ri!.gensHmem);
-    gm!.pseudorandomfunc := [rec( 
+    gm!.pseudorandomfunc := [rec(
        func := function(ri) return RandomElm(ri,"StdGens",true).el; end,
        args := [ri])];
     Info(InfoRecog,2,"Finding standard generators with bbox program...");
@@ -170,7 +170,7 @@ InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
             if Length(b) = 1 then
                 opt.Cand := rec( points := [b[1]], ops := [OnLines] );
             else
-                opt.Cand := rec( points := [b], 
+                opt.Cand := rec( points := [b],
                                  ops := [OnSubspacesByCanonicalBasis] );
             fi;
             gm := GroupWithGenerators(stdgens);
@@ -230,7 +230,7 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
   Info(InfoRecog,3,"Using numberrandgens=",numberrandgens,
        " triesinnerlimit=",triesinnerlimit," trieslimit=",trieslimit,
        " orblenlimit=",orblenlimit);
-  
+
   repeat
       gens := ShallowCopy(x);
       triesinner := 0;
@@ -241,7 +241,7 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
               continue;
           fi;
       else
-          while Length(gens) < numberrandgens and 
+          while Length(gens) < numberrandgens and
                 triesinner < triesinnerlimit do
               y := PseudoRandom(G);
               Add(gens,y);
@@ -273,11 +273,11 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
           ConvertToMatrixRep(s);
           Info(InfoRecog,2,"Found invariant subspace of dimension ",
                Length(s),", enumerating orbit...");
-          if not IsBound(hint.subspacedims) or 
+          if not IsBound(hint.subspacedims) or
              Length(s) in hint.subspacedims then
               #orb := RECOG.OrbitSubspaceWithLimit(G,s,orblenlimit);
               orb := Orb(G,s,OnSubspacesByCanonicalBasis,
-                         rec(storenumbers := true, 
+                         rec(storenumbers := true,
                              hashlen := NextPrimeInt(2*orblenlimit)));
               Enumerate(orb,orblenlimit);
               if IsClosed(orb) then
@@ -287,7 +287,7 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
                       forkernel(ri).t := Concatenation(orb);
                       forkernel(ri).blocksize := Length(s);
                       Add(forkernel(ri).hints,
-                  rec(method:=FindHomMethodsProjective.DoBaseChangeForBlocks, 
+                  rec(method:=FindHomMethodsProjective.DoBaseChangeForBlocks,
                             rank := 2000, stamp := "DoBaseChangeForBlocks"),1);
                       Setimmediateverification(ri,true);
                       findgensNmeth(ri).args[1] := Length(orb)+3;
@@ -311,7 +311,7 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
   until tries > trieslimit;
   return fail;
 end );
-  
+
 # We start a database of hints, whenever we discover a certain group, we
 # can ask this database what to do:
 
@@ -395,7 +395,7 @@ RECOG.ProduceTrivialStabChainHint := function(name,reps,maxes)
                 "  rec( name := \"",name,"\", fields := [",
                 Size(f),"], dimensions := [",Length(gens.generators[1]),
                 "], \n       usemax := ",list{range},
-                ", \n       size := ", size, 
+                ", \n       size := ", size,
                 ", atlasrepnrs := [",r,"], \n       values := ",
                 values{range},"\n  ));\n");
       fi;
@@ -467,7 +467,7 @@ end;
 #        elordersstart := [31], numberrandgens := 2, tries := 1,
 #        triesforgens := 100, orblenlimit := 32, issimple := true ) );
 
-InstallGlobalFunction( LookupHintForSimple, 
+InstallGlobalFunction( LookupHintForSimple,
   function(ri,G,name)
     local dim,f,hi,j,p,q;
     Info(InfoRecog,2,"Looking up hints for ",name,"...");
@@ -479,11 +479,11 @@ InstallGlobalFunction( LookupHintForSimple,
         q := Size(f);
         dim := ri!.dimension;
         while j <= Length(hi) do
-            if (not(IsBound(hi[j].characteristics)) or 
-                p in hi[j].characteristics) and 
+            if (not(IsBound(hi[j].characteristics)) or
+                p in hi[j].characteristics) and
                (not(IsBound(hi[j].fields)) or
                 q in hi[j].fields) and
-               (not(IsBound(hi[j].dimensiondivs)) or 
+               (not(IsBound(hi[j].dimensiondivs)) or
                 ForAny(hi[j].dimensiondivs,d->dim mod d = 0)) and
                (not(IsBound(hi[j].dimensions)) or
                 dim in hi[j].dimensions) then
@@ -547,7 +547,7 @@ RECOG.findchar:=function(ri,G,randelfunc)
         vec:=Random(vs);
     until not(IsZero(vec));
 
-    if RECOG.shortorbit(vec,Product(GeneratorsOfGroup(G)), 3*d) = 3*d then 
+    if RECOG.shortorbit(vec,Product(GeneratorsOfGroup(G)), 3*d) = 3*d then
         return p;
     fi;
 
@@ -563,14 +563,14 @@ RECOG.findchar:=function(ri,G,randelfunc)
         r := randelfunc(ri);
         g := r.el;
         order:=r.order;
-        if order >= 3*d then 
+        if order >= 3*d then
             return p;
         elif order > m1 then
             m3:=m2;
             m2:=m1;
             m1:=order;
             last:=count;
-        elif order<m1 and order>m2 then 
+        elif order<m1 and order>m2 then
             m3:=m2;
             m2:=order;
             last:=count;
@@ -581,7 +581,7 @@ RECOG.findchar:=function(ri,G,randelfunc)
     until count=bound or count>=2*last+50;
 
     #handle ambiguous cases
-    if [m1,m2,m3] = [13,7,5] then 
+    if [m1,m2,m3] = [13,7,5] then
         return [[13,7, ["2B2",8]]];
     elif [m1,m2] = [13,8] then
         return [[13,8, ["l",3,3]]];
@@ -589,11 +589,11 @@ RECOG.findchar:=function(ri,G,randelfunc)
         return [[13,7, ["l",2,13]]];
     elif [m1,m2,m3] = [13,12,6] then
         return [[13,12,["l",2,5]]];
-    elif [m1,m2,m3] = [13,12,9] then 
+    elif [m1,m2,m3] = [13,12,9] then
         return [[13,12,["G2",3]]];
-    elif [m1,m2,m3] = [12,9,6] then 
+    elif [m1,m2,m3] = [12,9,6] then
         return [[12,9,["u",4,2]]];
-    elif [m1,m2,m3] = [12,9,8] then 
+    elif [m1,m2,m3] = [12,9,8] then
         return [[12,9,["u",4,3]]];
     elif [m1,m2] = [5,3] then
         return [[ 5,3,["l",2,4]]];
@@ -607,7 +607,7 @@ RECOG.findchar:=function(ri,G,randelfunc)
         return [[30,20,["s",4,5]]];
     elif [m1,m2] = [30,24] then
         return [[30,24,["s",8,2]]];
-    elif [m1,m2] = [63,60] then 
+    elif [m1,m2] = [63,60] then
         return [[63,60,["u",4,5]]];
     elif [m1,m2] = [91,85] then
         return [[91,85,["l",3,16]]];
@@ -616,11 +616,11 @@ RECOG.findchar:=function(ri,G,randelfunc)
     list:=Filtered(RECOG.grouplist, x->x[1]=m1 and x[2]=m2);
     #one more ambiguous case
     if  Length(list) >=2 and (
-        (list[1][3]{[1,2]}=["l",2] and list[2][3][1]="G2") or 
+        (list[1][3]{[1,2]}=["l",2] and list[2][3][1]="G2") or
         (list[2][3]{[1,2]}=["l",2] and list[1][3][1]="G2")) then
        if m3>m1/2 then
            return Filtered(list,x->x[3][1]="G2");
-       else 
+       else
            return Filtered(list,x->x[3][1]="l");
        fi;
     else
@@ -642,7 +642,7 @@ RECOG.MakePSL2Hint := function( name, G )
   # we are in cross characteristic.
   # to be made better...
   return rec( elordersstart := [defchar], numberrandgens := 1, tries := 10,
-              triesforgens := 3*(name[3]+1), 
+              triesforgens := 3*(name[3]+1),
               orblenlimit := 3*(name[3]+1) );
 end;
 
@@ -687,7 +687,7 @@ FindHomMethodsProjective.ComputeSimpleSocle := function(ri,G)
       Add(ri!.simplesoclerando,ProjectiveOrder(x)[1]);
   od;
   ri!.simplesoclerandp := 0;
-  ri!.simplesocle!.pseudorandomfunc := 
+  ri!.simplesocle!.pseudorandomfunc :=
        [rec( func := Next, args := [ri!.simplesoclepr] )];
   return false;
 end;
@@ -754,9 +754,9 @@ end;
 
 RECOG.DegreeAlternating := function (orders)
     local   degs,  prims,  m,  f,  n;
-    degs := []; 
+    degs := [];
     prims := [];
-    for m in orders do 
+    for m in orders do
         if m > 1 then
             f := Collected(Factors(m));
             Sort(f);
@@ -764,7 +764,7 @@ RECOG.DegreeAlternating := function (orders)
             if f[1][1] = 2 then n := n+2; fi;
             AddSet(degs,n);
             UniteSet(prims,Set(f,x->x[1]));
-        fi; 
+        fi;
     od;
     return [degs, prims];
 end;
@@ -774,26 +774,26 @@ RECOG.RecognizeAlternating := function (orders)
    tmp := RECOG.DegreeAlternating (orders);
    degs := tmp[1];
    prims := tmp[2];
-   if Length(degs) = 0 then 
-       return "Unknown"; 
+   if Length(degs) = 0 then
+       return "Unknown";
    fi;
    mindeg := Maximum (degs);  # minimal possible degree
-   
+
    p1 := PrevPrimeInt (mindeg + 1);
    p2 := PrevPrimeInt (p1);
    if not p1 in prims or not p2 in prims then
        return 0;
    fi;
    if mindeg mod 2 = 1 then
-       if not (mindeg in orders and  mindeg - 2 in orders) then 
+       if not (mindeg in orders and  mindeg - 2 in orders) then
            return 0;
        fi;
    else
-       if not mindeg - 1 in orders then 
+       if not mindeg - 1 in orders then
            return 0;
        fi;
    fi;
-  
+
    for i in [3..Minimum (QuoInt(mindeg,2) - 1, 6)] do
        if IsPrime (i) and IsPrime (mindeg - i) then
            if not i * (mindeg - i) in orders then
@@ -863,9 +863,9 @@ FindHomMethodsProjective.AlternatingBBByOrders := function(ri,G)
               r := RecogniseSnAn(deg,Gm,1/100);
               RecSnAnIsOne := IsOne;
               RecSnAnEq := EQ;
-              if r = fail or r[1] <> "An" then 
+              if r = fail or r[1] <> "An" then
                   Info(InfoRecog,2,"AltByOrders: Did not find generators.");
-                  continue; 
+                  continue;
               fi;
               Info(InfoRecog,2,"Found Alt(",deg,")!");
               ri!.recogSnAnRec := r;
@@ -957,9 +957,9 @@ FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
       r := RecogniseSnAn(deg,Gm,1/100);
       RecSnAnIsOne := IsOne;
       RecSnAnEq := EQ;
-      if r = fail then 
+      if r = fail then
           Info(InfoRecog,2,"AltSym: deg=",deg,": did not find generators.");
-          continue; 
+          continue;
       fi;
       if r[1] = "An" then
           Info(InfoRecog,2,"Found Alt(",deg,")!");
@@ -974,7 +974,7 @@ FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
           SetIsSimpleGroup(ri,true);
           ri!.comment := "_Alt";
           return true;
-      else   # r[1] = "Sn" 
+      else   # r[1] = "Sn"
           Info(InfoRecog,2,"Found Sym(",deg,")!");
           ri!.recogSnAnRec := r;
           ri!.recogSnAnDeg := deg;
@@ -1013,7 +1013,7 @@ RECOG.SporadicsElementOrders :=
   [ 1,2,3,4,5,6,7,8,9,10,11,12,14,15,19,20,21,22,25,30, 35,40 ],
   [ 1,2,3,4,5,6,7,8,9,10,11,12,14,15,18,20,21,22,24,25,
       28,30,31,33,37,40,42,67 ],
-  [ 1,2,3,4,5,6,7,8,9,10,11,12,14,15,18,20,21,22,23,24,30 
+  [ 1,2,3,4,5,6,7,8,9,10,11,12,14,15,18,20,21,22,23,24,30
      ],[ 1,2,3,4,5,6,7,8,9,10,11,12,14,15,16,18,20,23,24,28,30 ],
   [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,18,20,21,24 ],
   [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,18,20,21,22,24,30 ],
@@ -1130,7 +1130,7 @@ RECOG.SporadicsProbabilities :=
       1/44,1/68,2/69,3/140,2/71,1/26,1/28,2/87,1/44,1/46,2/93,
       1/47,2/95,1/52,1/105,1/110,2/119 ],
   [ 1/190080,17/1920,5/216,3/32,1/20,5/24,1/8,3/20,1/11,1/4 ],
-  [ 1/887040,29/8960,1/72,7/96,1/10,1/8,1/7,1/8,1/10,1/11,1/12,1/7 
+  [ 1/887040,29/8960,1/72,7/96,1/10,1/8,1/7,1/8,1/10,1/11,1/12,1/7
      ],[ 1/88704000,11/21504,1/720,7/240,17/750,17/240,1/14,1/8,1/6,
       1/11,1/12,1/14,1/30,1/5,1/30 ],
   [ 1/1209600,103/26880,31/2160,11/192,7/300,7/48,1/14,5/48,3/20,
@@ -1314,7 +1314,7 @@ FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
             for killers in RECOG.SporadicsKillers[jj] do
               if Intersection(ordersseen,
                               RECOG.SporadicsElementOrders[jj]{killers})=[]
-                 and (1-Sum(RECOG.SporadicsProbabilities[jj]{killers}))^i 
+                 and (1-Sum(RECOG.SporadicsProbabilities[jj]{killers}))^i
                      < 10^-3 then
                   raus := true;
                   break;

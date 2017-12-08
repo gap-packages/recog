@@ -1,16 +1,3 @@
-#############################################################################
-##
-##  blackbox.gd
-##                                recog package
-##                                                        Max Neunhoeffer
-##                                                            Ákos Seress
-##
-##  Copyright 2005-2009 by the authors.
-##  This file is free software, see license information at the end.
-##
-##  A collection of find homomorphism methods for black box groups.
-##
-#############################################################################
 
 ##
 ##  This program is free software: you can redistribute it and/or modify
@@ -26,4 +13,3 @@
 ##  You should have received a copy of the GNU General Public License
 ##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
-

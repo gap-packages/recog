@@ -1,7 +1,7 @@
 #############################################################################
 ##
-##  slconstr.gi        
-##                                recog package                    
+##  slconstr.gi
+##                                recog package
 ##                                                       Peter Brooksbank
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
@@ -36,7 +36,7 @@ end;
 
 ## writes a nonnegative integer <n> < <p>^<e> in base <p>
 SLCR.NtoPadic := function(p, e, n)
-local  j, output; 
+local  j, output;
    output := [];
    for j in [1..e] do
       output[j] := (n mod p)*Z(p)^0;
@@ -45,9 +45,9 @@ local  j, output;
 return output;
 end;
 
-## writes a vector in GF(<p>)^<e> as a nonnegative integer 
+## writes a vector in GF(<p>)^<e> as a nonnegative integer
 SLCR.PadictoN := function(p, e, vector)
-local  j, output; 
+local  j, output;
    output := 0;
    for j in [1..e] do
       output := output + p^(j-1)*IntFFE(vector[j]);
@@ -59,7 +59,7 @@ end;
 ##                                                                          ##
 ## This is the implementation of the Kantor-Seress algorithm for PSL(d,q)   ##
 ##                                                                          ##
-############################################################################## 
+##############################################################################
 
 ##############################################################################
 ##
@@ -70,7 +70,7 @@ end;
 ## the flag "true" if and only if $n$ is the order of $r$.
 
 SLCR.BoundedOrder := function( bbg, r, n, primes)
-local  prime;     
+local  prime;
    for prime in primes do
      if IsOne(r^(n/prime)) then return(false);
      fi;
@@ -85,7 +85,7 @@ end;
 ## Writes a number 0 <= n < p^e in base p
 
 SLCR.NtoPadic := function (p, e, n)
-local  j, output;  
+local  j, output;
    output := [];
    for j in [1..e] do
       output[j] := (n mod p)*Z(p)^0;
@@ -98,10 +98,10 @@ end;
 ##
 #F SLCR.PadictoN( <prime> , <power>, <vector> )
 ##
-## Writes a vector in GF(p)^e as a number 0 <= n < p^e 
+## Writes a vector in GF(p)^e as a number 0 <= n < p^e
 
 SLCR.PadictoN := function (p, e, vector)
-local  j, output;  
+local  j, output;
    output := 0;
    for j in [1..e] do
        output := output + p^(j-1)*IntFFE(vector[j]);
@@ -113,21 +113,21 @@ end;
 ##
 #F SLCR.IS_IN_CENTRE( <bbgroup> , <elt> )
 ##
-## In case the group we are dealing with is a PSL instead of an SL, we 
+## In case the group we are dealing with is a PSL instead of an SL, we
 ## will need to check with certain elements lie in the centre of our group.
 
 SLCR.IS_IN_CENTRE := function (bbg, x)
-local   gen, gens;     
+local   gen, gens;
      gens := GeneratorsOfGroup(bbg);
      for gen in gens do
        if not One(bbg) = Comm(x,gen) then return (false);
        fi;
      od;
 return (true);
-end;       
-   
+end;
 
-                   
+
+
 ##############################################################################
 ##
 #F SLCR.AppendTran( <bbg> , <H> , <x> , <p> )
@@ -138,13 +138,13 @@ end;
 ## The subroutine will return this new $H$ and alter the vectors of its elms.
 
 SLCR.AppendTran := function (bbg, H, x, p)
-local    new, length, tau, i, j, y;    
+local    new, length, tau, i, j, y;
      tau:= One(bbg);
      length := Length (H);
-     for i in [1..p-1] do    
+     for i in [1..p-1] do
        tau := tau * x;
        for j in [1..length] do
-         y := H[j]; 
+         y := H[j];
          new := y * tau;
          Add (H, new);
        od;
@@ -163,7 +163,7 @@ end;
 #SLCR.IsInTranGroup := function (bbg, H, x)
 #local  h, i;
 #   for h in H do
-#      if  h = x then 
+#      if  h = x then
 #return (true);
 #      fi;
 #   od;
@@ -175,8 +175,8 @@ end;
 ##
 #F SLCR.MatrixOfEndo( <group>, <elem.ab.subgp>, <prime>, <dimension>, <automorph> )
 ##
-## Computes the matrix of the linear transformation $s$ 
-## in terms of ## the standard basis of $T$. The routine assumes 
+## Computes the matrix of the linear transformation $s$
+## in terms of ## the standard basis of $T$. The routine assumes
 ## that $T$ is listed in the order as in SLCR.AppendTran.
 ## $|T|=p^e$, $T \le bbg$
 
@@ -188,16 +188,16 @@ local  i,j, conj, stop, matrixofs;   # output
        # the basis vectors of T are in positions p^i +1
        conj := T[p^i +1]^s;
        # find conj in T
-       stop := false; 
+       stop := false;
        j := 0;
-       repeat 
+       repeat
          j := j+1;
          if conj = T[j] then
             stop := true;
          fi;
-       until stop or j=p^e; 
-       if not stop then 
-return fail; 
+       until stop or j=p^e;
+       if not stop then
+return fail;
        fi;
        Add(matrixofs, SLCR.NtoPadic(p,e,j-1));
      od;
@@ -205,7 +205,7 @@ return matrixofs;
 end;
 
 
-############################################     
+############################################
 
 SLCR.extractgen := function (matrixofs, endo, p, e, weights, limit)
 local  prod, power, conj, j, stop, temp, ans, k;
@@ -230,7 +230,7 @@ local  prod, power, conj, j, stop, temp, ans, k;
       ans:=ans*conj*endo;
       temp := ShallowCopy(temp);
       temp[1] := temp[1] + weights[1];
-      if ans =temp then 
+      if ans =temp then
           stop := true;
       else
           j := j+1;
@@ -238,65 +238,65 @@ local  prod, power, conj, j, stop, temp, ans, k;
       fi;
    until stop or (j = limit);
 return j;
-end;        
-            
+end;
 
-    
+
+
 ##############################################################################
 ##
 #F SLCR.FindGoodElement ( <bbgroup> , <prime> , <power> , <dim> , <limit> )
 ##
-## This function will take as input a bbgroup which is somehow known to be 
-## isomorphic to $SL(d,q)$ or $PSL(d,q)$ where $q=p^e$. The function will 
+## This function will take as input a bbgroup which is somehow known to be
+## isomorphic to $SL(d,q)$ or $PSL(d,q)$ where $q=p^e$. The function will
 ## (if anything) output a bbgroup element r of order p*ppd#(p;e(d-2)).
 
 SLCR.FindGoodElement:=function( bbg, p, e, d, limit )
-local    r, q, v, primes, collect2s, z, i, a, c, w, phi, psi;   
+local    r, q, v, primes, collect2s, z, i, a, c, w, phi, psi;
    q := p^e;
    if d=3 and q=4 then
       i := 1;
-      repeat 
-        r := PseudoRandom(bbg); 
-        if (r^12 = One(bbg)) and ( not (r^6 = One(bbg))) then 
-Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
-           return r^6;
-        fi; 
-        i := i+1;
-      until i = limit;
-   elif d=3 and q=2 then 
-      i := 1; 
       repeat
         r := PseudoRandom(bbg);
-        if r^4 = One(bbg) then 
-           if r^2 = One(bbg) then 
+        if (r^12 = One(bbg)) and ( not (r^6 = One(bbg))) then
+Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
+           return r^6;
+        fi;
+        i := i+1;
+      until i = limit;
+   elif d=3 and q=2 then
+      i := 1;
+      repeat
+        r := PseudoRandom(bbg);
+        if r^4 = One(bbg) then
+           if r^2 = One(bbg) then
 Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
               return r;
-           else 
+           else
 Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
               return r^2;
            fi;
         fi;
         i := i+1;
       until i = limit;
-   else 
+   else
        z:=p^(e*(d-2))-1;
        primes:=Set(FactorsInt(e*(d-2)));
-            
+
        collect2s:=function( n )
        # the 2-part of n
        local i, prod;
-              prod:=1; 
+              prod:=1;
               i := n;
               while (i mod 2) = 0 do
                   i := i/2;
                   prod := prod * 2;
               od;
               return prod;
-       end;                        
+       end;
 
        psi:=1; phi:=z;
-       if e*(d-2)>1 then       
-         for c in primes do 
+       if e*(d-2)>1 then
+         for c in primes do
             a:=Gcd(phi, p^(e*(d-2)/c)-1);
             while a>1 do
               psi:=a*psi;
@@ -306,7 +306,7 @@ Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
          od;
        fi;
        i:=1;
-       repeat 
+       repeat
          r := PseudoRandom(bbg);
          v := r^p;
          if One(bbg)=v^z and not One(bbg)=r^z  then
@@ -315,7 +315,7 @@ Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
                   ((not One(bbg) = v^3) and (One(bbg) = v^9)) then
 Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
 return( r );
-               fi;   
+               fi;
             elif (e*(d-2) = 2) and (p+1 = 2^(Log(p+1,2))) then
                # p is Mersenne prime
                w:=2*z/collect2s( z );
@@ -323,16 +323,16 @@ return( r );
 Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
 return( r );
                fi;
-            elif not One(bbg) = v^psi then 
+            elif not One(bbg) = v^psi then
 Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
 return( r );
             fi;
-         fi;           
-            
+         fi;
+
          i:=i + 1;
        until i = limit;
    fi; # the big loop with cases
-   
+
 return fail;
 end;
 
@@ -341,25 +341,25 @@ end;
 ##
 #F SLCR.SL4FindGoodElement ( <bbgroup> , <prime> , <power> , <limit> )
 ##
-## This function will take as input a bbgroup which is somehow known to be 
-## isomorphic to $SL(4,q)$ or $PSL(4,q)$ where $q=p^e$. The function will 
+## This function will take as input a bbgroup which is somehow known to be
+## isomorphic to $SL(4,q)$ or $PSL(4,q)$ where $q=p^e$. The function will
 ## (if anything) output a bbgroup element r of order p*ppd#(p;2e).
 
 SLCR.SL4FindGoodElement := function (bbg, p, e, limit)
-local    r, q, i;    
+local    r, q, i;
    q := p^e;
-   if q=2 then 
-      i := 1; 
+   if q=2 then
+      i := 1;
       repeat
         r := PseudoRandom(bbg);
         if r^6=One(bbg) and ( not (r^3 = One(bbg)))
            and ( not (r^2 = One(bbg)))  then
 Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
 return r;
-        fi; 
+        fi;
         i := i+1;
       until i = limit;
-   elif q=3 then 
+   elif q=3 then
       i := 1;
       repeat
         r := PseudoRandom(bbg);
@@ -367,11 +367,11 @@ return r;
                        and ( not SLCR.IS_IN_CENTRE(bbg,r^6) )  then
 Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
 return r;
-        fi; 
+        fi;
         i := i+1;
       until i = limit;
-   elif q=5 then 
-      i := 1; 
+   elif q=5 then
+      i := 1;
       repeat
         r := PseudoRandom(bbg);
         r := r^4;
@@ -379,11 +379,11 @@ return r;
                        and ( not (r^5 = One(bbg)))  then
 Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
            return r;
-        fi; 
+        fi;
         i := i+1;
       until i = limit;
-   elif q=9 then 
-      i := 1; 
+   elif q=9 then
+      i := 1;
       repeat
         r := PseudoRandom(bbg);
         r := r^8;
@@ -391,11 +391,11 @@ Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
                        and ( not (r^5 = One(bbg)))  then
 Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
 return r;
-        fi; 
+        fi;
         i := i+1;
       until i = limit;
-   elif q=17 then 
-      i := 1; 
+   elif q=17 then
+      i := 1;
       repeat
         r := PseudoRandom(bbg);
         r := r^16;
@@ -403,19 +403,19 @@ return r;
                  and ( not (r^17 = One(bbg)))  then
 Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
 return r;
-        fi; 
+        fi;
         i := i+1;
       until i = limit;
    else
-      i := 1; 
-      repeat 
+      i := 1;
+      repeat
         r := PseudoRandom(bbg);
-        if (r^(p*(q^2-1))=One(bbg)) and (not (r^(q^2-1)=One(bbg))) 
-                and (not (r^(8*p*(q+1))=One(bbg))) 
-                and (not (r^(p*(q-1))=One(bbg))) then 
+        if (r^(p*(q^2-1))=One(bbg)) and (not (r^(q^2-1)=One(bbg)))
+                and (not (r^(8*p*(q+1))=One(bbg)))
+                and (not (r^(p*(q-1))=One(bbg))) then
 Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
-return r; 
-        fi; 
+return r;
+        fi;
         i := i+1;
       until i = limit;
    fi;
@@ -439,7 +439,7 @@ local s;
       fi;
    od;
 return true;
-end;         
+end;
 
 #############################################################################
 ##
@@ -452,7 +452,7 @@ end;
 ## We may already have a transvection in the input
 
 SLCR.SL2Search := function (arg)
-local   bbg, p, e, r, m, rand, primes, count, out;  
+local   bbg, p, e, r, m, rand, primes, count, out;
    bbg := arg[1];
    p := arg[2];
    e := arg[3];
@@ -497,7 +497,7 @@ local   bbg, p, e, r, m, rand, primes, count, out;
        fi; # IsBound(out.gen)
      fi;  # One(bbg)=r
      count:=count+1;
-     if IsBound(out.tran) and IsBound(out.gen) then 
+     if IsBound(out.tran) and IsBound(out.gen) then
 return(out);
      fi;
    od;
@@ -515,7 +515,7 @@ end;
 ## success is highly probable.
 ##
 SLCR.ConstructTranGroup:=function( bbg , tran , p , e )
-local  t, tinv, B, H, m, x, y, q, count, new, tau, i, j;     
+local  t, tinv, B, H, m, x, y, q, count, new, tau, i, j;
      #t:=ShallowCopy(tran);    this got rid of the memory!
      t:=tran;
      m:=128*(p^e+1)*e;
@@ -555,7 +555,7 @@ end;
 ## returns a generator of $G$ which does not normalize $T$
 
 SLCR.Dislodge := function (bbg, T)
-local  j, t, tinv, i, gens, tconj, gen;   
+local  j, t, tinv, i, gens, tconj, gen;
    gens:=GeneratorsOfGroup(bbg);
    t:=T[2];
    tinv := t^(-1);
@@ -584,7 +584,7 @@ end;
 ## to conjugate <gen> to an $s$ which will normalize $T$ and $T^<conj>$.
 
 SLCR.Standardize:=function( bbg , T , j , s)
-local  fixed, out, t, sinv, firstconj, ytos, y, u, z, c;  
+local  fixed, out, t, sinv, firstconj, ytos, y, u, z, c;
     t:=T[2];
     out:=rec();
     sinv := s^(-1);
@@ -634,8 +634,8 @@ end;
 
 SLCR.SL2ReOrder:=function( bbg , T , s , j , p , e )
 local  auto, newT, Tgamma, B, images, matrixofs, matrixofpow,
-       row, count, autom, setofimages, position, good, stop, 
-       pow, conj, weights, rho, tnew, out, t, u, uinv, newTgamma, i,k; 
+       row, count, autom, setofimages, position, good, stop,
+       pow, conj, weights, rho, tnew, out, t, u, uinv, newTgamma, i,k;
    t:=T[2];
       # handle the case of prime field first
    if e = 1 then
@@ -787,7 +787,7 @@ local  p, e, rho, coeff1, coeff2, srslp, i, trslp, s1slp, t1slp, jslp;
    trslp := StraightLineProgram ([[1,0]], Length (data.gens));
    for i in [1..e] do
      if coeff2[i] > 0 then
-         trslp := SLCR.ProdProg (trslp, StraightLineProgram ([[(d-1)*(d-1)*e+i, coeff2[i]]], Length (data.gens))); 
+         trslp := SLCR.ProdProg (trslp, StraightLineProgram ([[(d-1)*(d-1)*e+i, coeff2[i]]], Length (data.gens)));
      fi;
    od;
 
@@ -864,7 +864,7 @@ end;
 ## we consider only the case conjugating Q(gamma) to somewhere
 
 SLCR.SLConjInQ:=function( bbg, y, Qgamma, Q, Tgamma, T, j, p, e, boolean )
-local  U, len, lengamma, c, a0, z, b, u, stop, q, jj, conj, i, k; 
+local  U, len, lengamma, c, a0, z, b, u, stop, q, jj, conj, i, k;
      # handle trivial case
    if SLCR.EqualPoints(bbg, One(bbg), y, Qgamma) then
       return One(bbg);
@@ -985,7 +985,7 @@ end;
 ## to apply the routine in Qgamma, we need the inverse transpose of <transv>
 
 SLCR.SLLinearCombQ := function (T, t21, c, d, w)
-local  cinv, wconj, copyw, cpower, coord, i, k, stop, vec, q, rho;       
+local  cinv, wconj, copyw, cpower, coord, i, k, stop, vec, q, rho;
    cinv := c^(-1);
    q := Length(T);
    rho := Z(q);
@@ -1046,14 +1046,14 @@ end;
 ##
 #F SLCR.SLSLP ( <data structure for bbg>, <bbg element or matrix>, <dimension> )
 ##
-## writes a straight-line program reaching the given element 
+## writes a straight-line program reaching the given element
 ## of the natural matrix representation from the
 ## generators in the data structure
 
 SLCR.SLSLP := function (data, x, d)
 local  p, e, q, bbg, W, leftslp, rightslp, i, j, k, stop, seed, sprog, a, b,
-       FB, gens, coeffs, xinv, Q, Qgamma,  y, u, vec, mat, det, exp, slprog, 
-       smat, slp, W2, gcd, cent, centprog;     
+       FB, gens, coeffs, xinv, Q, Qgamma,  y, u, vec, mat, det, exp, slprog,
+       smat, slp, W2, gcd, cent, centprog;
 
    p := data.prime;
    e := data.power;
@@ -1075,7 +1075,7 @@ return fail;
          # put non-zero element in lower right corner
          if W[d-i][d-i] = 0*Z(q) then
             j := First([1..d-i], a -> not (W[a][d-i] = 0*Z(q)));
-            leftslp := SLCR.ProdProg (leftslp, 
+            leftslp := SLCR.ProdProg (leftslp,
                                 StraightLineProgram ([[(d-i-1)*(d-i-2)*e+(j-1)*e+1,1]], Length (data.gens)));
             for k in [1..d-i] do
               W[d-i][k] := W[d-i][k]- W[j][k];
@@ -1092,7 +1092,7 @@ return fail;
            coeffs := FB[LogFFE(b,Z(q))+1];
            for k in [1..e] do
              if coeffs[k] <> 0 then
-                leftslp := SLCR.ProdProg (leftslp, 
+                leftslp := SLCR.ProdProg (leftslp,
                            StraightLineProgram ([[(d-i-1)^2*e+(j-1)*e+k, coeffs[k]]], Length (data.gens)));
              fi;
            od;
@@ -1110,7 +1110,7 @@ return fail;
            coeffs := FB[LogFFE(a,Z(q))+1];
            for k in [1..e] do
              if coeffs[k] <> 0 then
-               rightslp := SLCR.ProdProg (rightslp, 
+               rightslp := SLCR.ProdProg (rightslp,
                StraightLineProgram ([[(d-i-1)*(d-i-2)*e+(j-1)*e+k, coeffs[k]]], Length (data.gens)));
              fi;
            od;
@@ -1128,14 +1128,14 @@ return fail;
            leftslp := SLCR.ProdProg(leftslp, sprog);
         fi;
      od;
-     rightslp := SLCR.InvProg (rightslp); 
+     rightslp := SLCR.InvProg (rightslp);
 return SLCR.ProdProg (leftslp, rightslp);
 end;
 
 
 #########################################################################
 ##
-#F SLCR.SLSLPbb ( <data structure for bbg>, <bbg element or matrix>, 
+#F SLCR.SLSLPbb ( <data structure for bbg>, <bbg element or matrix>,
 #                 <dimension> )
 ##
 ## writes a straight-line program reaching the given element of the
@@ -1144,8 +1144,8 @@ end;
 
 SLCR.SLSLPbb := function (data, x, d)
 local  p, e, q, bbg, W, leftslp, rightslp, i, j, k, stop, seed, sprog, a, b,
-       FB, gens, coeffs, xinv, Q, Qgamma,  y, u, vec, mat, det, exp, slprog, 
-       smat, slp, W2, gcd, cent, centprog;     
+       FB, gens, coeffs, xinv, Q, Qgamma,  y, u, vec, mat, det, exp, slprog,
+       smat, slp, W2, gcd, cent, centprog;
 
    p := data.prime;
    e := data.power;
@@ -1166,7 +1166,7 @@ local  p, e, q, bbg, W, leftslp, rightslp, i, j, k, stop, seed, sprog, a, b,
         repeat
           if not SLCR.IsOnAxis(bbg, Q[i]^(-1)*xinv, Qgamma, Q) then
              stop := true;
-             rightslp := SLCR.ProdProg (rightslp, 
+             rightslp := SLCR.ProdProg (rightslp,
                       StraightLineProgram ([[(d-1)*(d-2)*e+(i-1)*e+1, 1]], Length (data.gens)));
              u := Q[i];
           else
@@ -1218,7 +1218,7 @@ return fail;
              coeffs := FB[LogFFE(vec[j],Z(q))+1];
              for k in [1..e] do
                if coeffs[k] <> 0 then
-                  rightslp := SLCR.ProdProg (rightslp, 
+                  rightslp := SLCR.ProdProg (rightslp,
                         StraightLineProgram ([[(d-1)^2*e + (j-1)*e + k, coeffs[k]]], Length (data.gens)));
                fi;
              od;
@@ -1251,7 +1251,7 @@ return fail;
      fi;
      if not (Determinant(mat) = Z(q)^0) then return fail; fi;
      if d > 2 then
-        #****error here 
+        #****error here
         slp := SLCR.SLSLP(data, mat^(-1), d-1);
         rightslp := SLCR.ProdProg(rightslp, slp);
         W := W * ResultOfStraightLineProgram (slp, List (data.gens, x -> x[1]));
@@ -1288,7 +1288,7 @@ return fail;
            coeffs := FB[LogFFE(vec[j],Z(q))+1];
            for k in [1..e] do
              if coeffs[k] <> 0 then
-                rightslp := SLCR.ProdProg (rightslp, 
+                rightslp := SLCR.ProdProg (rightslp,
                    StraightLineProgram ([[(d-1)*(d-2)*e+(j-1)*e+k, coeffs[k]]], Length (data.gens)));
              fi;
            od;
@@ -1309,8 +1309,8 @@ end;
 ## allow us to compute the matrix image of an $x$ in bbg.
 
 SLCR.SL2DataStructure:=function( arg )
-local  bbg, p, e, data, data1, data2, data3, s, s1, j, j1, t, T,    
-       i, rho, fieldbasis, coeffmatrix, cmat, cslp, gens;    
+local  bbg, p, e, data, data1, data2, data3, s, s1, j, j1, t, T,
+       i, rho, fieldbasis, coeffmatrix, cmat, cslp, gens;
    data:=rec();
    bbg := arg[1];
    p := arg[2];
@@ -1406,7 +1406,7 @@ return fail;
    data.cprog := [];
    data.cprog[1] := [];
    data.cprog[2] := ProductOfStraightLinePrograms ( StraightLineProgram ([[1,-1]], Length (data.gens)),
-                   ProductOfStraightLinePrograms ( StraightLineProgram ([[e+1,1]], Length (data.gens)), 
+                   ProductOfStraightLinePrograms ( StraightLineProgram ([[e+1,1]], Length (data.gens)),
                                                    StraightLineProgram ([[1,-1]], Length (data.gens)) ) );
    data.c[2] :=(data.gens[1][1])^(-1)*data.gens[e+1][1]*(data.gens[1][1])^(-1);
    data.t21 := data.gens[1][1];
@@ -1429,7 +1429,7 @@ end;
 ##     <tran> and <tran1> - GF(p) bases for two tran gps spanning $Q$
 ##           <conj>       - an elt of bbg interchanging the tran gps of $Q$
 SLCR.SL3ConstructQ:=function( bbg , t , pp , e )
-local  out, p, tinv, u, cand, f, u1, t1new, t1, i, m, r, T1, S;    
+local  out, p, tinv, u, cand, f, u1, t1new, t1, i, m, r, T1, S;
    tinv := t^(-1);
    S:=[t];
    T1:=[ One( bbg ) ];
@@ -1524,7 +1524,7 @@ end;
 ## At this stage, we do not need a transvection to do the job.
 
 SLCR.ComputeGamma:=function( bbg , f , Q , T )
-local   U, t, q, stop, i, test; 
+local   U, t, q, stop, i, test;
    U:=List( Q , x -> x^f );
    t:=T[2];
    q := Length(T);
@@ -1551,7 +1551,7 @@ end;
 ## <data> is the data structure of L to construct straight-line programs
 
 SLCR.SLConstructBasisQ := function(bbg,data, Q, Qgamma, d, q)
-local  t21, t21invtran, c, baseQ, baseQgamma, i, stop, s, sinv, T, Tgamma, b1, b1prime; 
+local  t21, t21invtran, c, baseQ, baseQgamma, i, stop, s, sinv, T, Tgamma, b1, b1prime;
    t21 := data.t21;
    t21invtran := data.t21invtran;
    sinv := data.sinv;
@@ -1608,12 +1608,12 @@ return fail;
       baseQgamma[i] := baseQgamma[i-1]^c;
    od;
 
-return rec (trangpQ := T, 
+return rec (trangpQ := T,
             baseQ := baseQ,
             baseQgamma := baseQgamma,
-            trangpQgamma := Tgamma, 
+            trangpQgamma := Tgamma,
             conj := c,
-            lincombQ := t21, 
+            lincombQ := t21,
             lincombQgamma:=t21invtran);
 end;
 
@@ -1717,8 +1717,8 @@ end;
 ## transpose. In fact, we shall exchange Q and Qgamma
 
 SLCR.SLExchangeL := function (data, Q, Qgamma, pQ, d)
-local  i, j, stop, p, e, q, bbg, t21, t21invtran, b1, b1prime, mat, 
-       trangp, t31, comm, temp; 
+local  i, j, stop, p, e, q, bbg, t21, t21invtran, b1, b1prime, mat,
+       trangp, t31, comm, temp;
    bbg := data.bbg;
    t21 := data.t21;
    t21invtran := data.t21invtran;
@@ -1777,7 +1777,7 @@ end;
 ## SLCR.SLConstructBasisQ
 
 SLCR.AttachSLNewgens := function(data, data3, d, jgamma)
-local e, rho, i, j, conj, vec, a, newTgamma; 
+local e, rho, i, j, conj, vec, a, newTgamma;
 
    # We wish to keep the same format as SLCR.SL2DataStructure. We attach
    # GF(p)-generators for Q, then for Qgamma.
@@ -1855,7 +1855,7 @@ return fail;
    mat[1][d] := (-1)^d*Z(q)^0;
    mat[d][1] := (-1)^(d-1)*Z(q)^0;;
    cprog := SLCR.SLSLP (data2, mat, d);
-   ccprog := StraightLineProgram (LinesOfStraightLineProgram (data2.cprog[d-1]), 
+   ccprog := StraightLineProgram (LinesOfStraightLineProgram (data2.cprog[d-1]),
                                      NrInputsOfStraightLineProgram (cprog));
    data2.cprog[d] := SLCR.ProdProg (ccprog, cprog);
    for i in [1..d-1] do
@@ -1864,7 +1864,7 @@ return fail;
                               NrInputsOfStraightLineProgram (data2.cprog[d]));
       fi;
    od;
-   data2.c[d] := data2.c[d-1] * ResultOfStraightLineProgram (cprog, List (data2.gens, x->x[1])); 
+   data2.c[d] := data2.c[d-1] * ResultOfStraightLineProgram (cprog, List (data2.gens, x->x[1]));
    data2.trangp[d-1] := data3.trangpQ;
    data2.trangpgamma[d-1] := data3.trangpQgamma;
 
@@ -1893,7 +1893,7 @@ end;
 ## gather together all of the necessary information.
 
 SLCR.SL3DataStructure := function (bbg, p, e)
-local  r, t, rho, data1, T1, t1, t1inv, f, finv, T1finv, T, jgamma, Qgamma, 
+local  r, t, rho, data1, T1, t1, t1inv, f, finv, T1finv, T, jgamma, Qgamma,
        data2, data3, mat, cprog, i;
    rho := Z(p^e);
    r:=SLCR.FindGoodElement( bbg , p , e , 3 , 14*p^e);
@@ -1978,7 +1978,7 @@ end;
 
 SLCR.SLFindGenerators := function(bbg, data1, r, p, e, d)
 local   i, j, stop, q, limit, tau, tauinv, jgamma, jgammainv, qalpha, Q,
-        pQ, Lgen, Qgamma, pQalpha, Tgamma, u; 
+        pQ, Lgen, Qgamma, pQalpha, Tgamma, u;
    q := p^e;
    tau := r^p;
    tauinv := tau^(-1);
@@ -2112,7 +2112,7 @@ Print("constructed L with j=",j,"   i=",i,"  limit=",Int(2*(1- 1/q)^(-5)),"\n");
               fi;
            until stop or i > 2 * (1- 1/q)^(-5);
            if not stop then
-              j := j+1; 
+              j := j+1;
            else
               genrec := SLCR.SLFindGenerators(bbg,data1,r,p,e,d);
               if genrec = fail then
@@ -2190,7 +2190,7 @@ end;
 ##SLCR.SLIsomorphism := function(data,x,d)
 ##local  p, e, q, bbg, W, leftslp, rightslp, i, j, k, stop, seed, sprog, a, b, shift,
 ##       FB, gens, coeffs, xinv, Q, Qgamma, y, u, vec, mat, det, exp, slprog, smat,
-##       slp, W2, gcd, cent, centprog;  
+##       slp, W2, gcd, cent, centprog;
 ##   p := data.prime;
 ##   e := data.power;
 ##   q := p^e;
@@ -2212,7 +2212,7 @@ end;
 ##         # put non-zero element in lower right corner
 ##         if W[d-i][d-i] = 0*Z(q) then
 ##            j := First([1..d-i], a -> not (W[a][d-i] = 0*Z(q)));
-##            leftslp := SLCR.ProdProg (leftslp, 
+##            leftslp := SLCR.ProdProg (leftslp,
 ##                           StraightLineProgram ([[(d-i-1)*(d-i-2)*e+(j-1)*e+1,1]], Length (data.gens)));
 ##            for k in [1..d-i] do
 ##              W[d-i][k] := W[d-i][k]- W[j][k];
@@ -2231,7 +2231,7 @@ end;
 ##           coeffs := FB[LogFFE(b,Z(q))+1];
 ##           for k in [1..e] do
 ##             if coeffs[k] <> 0 then
-##                leftslp := SLCR.ProdProg (leftslp, 
+##                leftslp := SLCR.ProdProg (leftslp,
 ##                     StraightLineProgram ([[(d-i-1)^2*e + (j-1)*e + k, coeffs[k]]], Length (data.gens)));
 ##             fi;
 ##           od;
@@ -2250,7 +2250,7 @@ end;
 ##           coeffs := FB[LogFFE(a,Z(q))+1];
 ##           for k in [1..e] do
 ##             if coeffs[k] <> 0 then
-##                rightslp := SLCR.ProdProg (leftslp, StraightLineProgram ([[(d-i-1)*(d-i-2)*e + (j-1)*e + k, coeffs[k]]], 
+##                rightslp := SLCR.ProdProg (leftslp, StraightLineProgram ([[(d-i-1)*(d-i-2)*e + (j-1)*e + k, coeffs[k]]],
 ##                                                     Length (data.gens)));
 ##             fi;
 ##           od;
@@ -2284,7 +2284,7 @@ end;
 ##        repeat
 ##          if not SLCR.IsOnAxis(bbg, Q[i]^(-1)*xinv, Qgamma, Q) then
 ##             stop := true;
-##             rightslp := SLCR.ProdProg (rightslp, 
+##             rightslp := SLCR.ProdProg (rightslp,
 ##                StraightLineProgram ([[(d-1)*(d-2)*e + (i-1)*e + 1, 1]], Length (data.gens)));
 ##             u := Q[i];
 ##          else
@@ -2338,7 +2338,7 @@ end;
 ##             coeffs := FB[LogFFE(b,Z(q))+1];
 ##             for k in [1..e] do
 ##               if coeffs[k] <> 0 then
-##                  rightslp := SLCR.ProdProg (rightslp, 
+##                  rightslp := SLCR.ProdProg (rightslp,
 ##                          StraightLineProgram ([[(d-1)^2*e + (j-1)*e + k, coeffs[k]]], Length (data.gens)));
 ##               fi;
 ##             od;
@@ -2405,7 +2405,7 @@ end;
 ##           coeffs := FB[LogFFE(vec[j],Z(q))+1];
 ##           for k in [1..e] do
 ##             if coeffs[k] <> 0 then
-##                rightslp := SLCR.ProdProg (rightslp, 
+##                rightslp := SLCR.ProdProg (rightslp,
 ##                    StraightLineProgram ([[(d-1)*(d-2)*e + (j-1)*e + k, coeffs[k]]], Length (data.gens)));
 ##             fi;
 ##           od;
@@ -2465,7 +2465,7 @@ FindHomMethodsMatrix.NaturalSL := function(ri,G)
 
     if not(IsMatrixGroup(G)) then
         return NotEnoughInformation;
-    fi;  
+    fi;
 
     il := InfoLevel(InfoMethSel);
     SetInfoLevel(InfoMethSel,0);

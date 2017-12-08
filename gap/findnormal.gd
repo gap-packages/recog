@@ -1,7 +1,7 @@
 #############################################################################
 ##
-##  findnormal.gd          
-##                                recog package  
+##  findnormal.gd
+##                                recog package
 ##                                                        Max Neunhoeffer
 ##
 ##  Copyright 2009 by the authors.

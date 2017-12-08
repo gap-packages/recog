@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  recoggiant.g     
+##  recoggiant.g
 ##                            recog package
 ##                                                     Maska Law
 ##                                                & 'Akos Seress
@@ -33,19 +33,19 @@ RECOG.NiceGeneratorsSn := function ( mp, grp, N )
 
     n := Length(mp);
     while N > 0 do
-	N := N - 1;
+        N := N - 1;
         t := PseudoRandom( grp );
         # was: cyclen := Collected( CycleLengths( t, [1..n] ) );
         cyclen := CycleStructurePerm(t);
 
         # was: if IsBound(g) = false and [n,1] in cyclen then
         if IsBound(g) = false and IsBound(cyclen[n-1]) then
-	    # we found an $n$-cycle
+            # we found an $n$-cycle
             g := t;
         fi;
-          
+
         if IsBound(y) = false and IsBound(cyclen[1]) and cyclen[1] = 1 and
-               ForAll([1..QuoInt(n,2)-1],i->not(IsBound(cyclen[2*i+1]))) 
+               ForAll([1..QuoInt(n,2)-1],i->not(IsBound(cyclen[2*i+1])))
                # was: Filtered( cyclen, x -> x[1] mod 2 = 0 ) = [ [ 2,1 ] ]
         then
             # we can get a transposition
@@ -63,9 +63,9 @@ RECOG.NiceGeneratorsSn := function ( mp, grp, N )
                     then h := y^x;
                     return [ g, h ];
                 fi;
-	    od;
+            od;
             return fail;
-	fi;    
+        fi;
 
     od; # loop over random elements
 
@@ -94,7 +94,7 @@ RECOG.ConjEltSn :=  function( mp, g, h )
     fi;
 
     c := [];
-    for i in [ 1 .. n ] do 
+    for i in [ 1 .. n ] do
         c[pos] := i;
         pos := pos^g;
     od;
@@ -128,14 +128,14 @@ RECOG.RecogniseSn :=  function( mp, grp, eps )
     N := Int(24 * (4/3)^3 * le * 6 * n);
 
     gens := RECOG.NiceGeneratorsSn( mp, grp, N );
-    if gens = fail then 
+    if gens = fail then
         Info(InfoGiants,1,"couldn't find nice generators for Sn");
         return fail;
     fi;
 
     c := RECOG.ConjEltSn( mp, gens[1], gens[2] );
 
-    return rec( stamp := "Sn", degree := n, 
+    return rec( stamp := "Sn", degree := n,
                 gens := Reversed(gens),  conjperm := c );
 
 end;
@@ -221,8 +221,8 @@ RECOG.NiceGeneratorsAnOdd := function ( mp, grp, N )
     l := One(grp);
 
     while N > 0 do
-	N := N - 1;
-	t := PseudoRandom( grp );
+        N := N - 1;
+        t := PseudoRandom( grp );
         # was: cyclen := Collected( CycleLengths( t, [1..n] ) );
         cyclen := CycleStructurePerm(t);
 
@@ -239,15 +239,15 @@ RECOG.NiceGeneratorsAnOdd := function ( mp, grp, N )
             #b := t^(Lcm(List(cyclen,x->x[1]))/3);
             b := t^(Lcm(Filtered([2..n],x->IsBound(cyclen[x-1])))/3);
         fi;
-	    
-        if IsBound(a) and IsBound(b) then 
+
+        if IsBound(a) and IsBound(b) then
             i := 10*n;
             suppb := MovedPoints( b );
             while i > 0 do
                 i := i-1;
                 t := PseudoRandom( grp );
 
-                suppc := List( suppb, x -> x^t );  
+                suppc := List( suppb, x -> x^t );
                 # support of c=b^t, say [i,j,k]
 
                 suppca := List( suppc, x -> x^a );
@@ -333,12 +333,12 @@ RECOG.ConjEltAnEven := function( mp, g, h )
         for i in [1..Length(oo)] do
             c[oo[i]] := i+n;
         od;
-        
+
     else   # s1 = k
-        if supp[2]^h = supp[2]^g then 
+        if supp[2]^h = supp[2]^g then
             c[supp[2]] := 1;
             c[supp[3]] := 2;
-        else 
+        else
             c[supp[3]] := 1;
             c[supp[2]] := 2;
         fi;
@@ -402,24 +402,24 @@ end;
 
 RECOG.RecogniseAn :=  function( mp, grp, eps )
 
-	local le, N, gens, c, n;
+        local le, N, gens, c, n;
 
         n := Length(mp);
 
-	le := 0;
-	while 2^le < eps^-1 do
-	    le := le + 1;
+        le := 0;
+        while 2^le < eps^-1 do
+            le := le + 1;
         od;
 
-	N := Int(24 * (4/3)^3 * le * 6 * n);
+        N := Int(24 * (4/3)^3 * le * 6 * n);
 
         if n mod 2 = 0 then
-	    gens := RECOG.NiceGeneratorsAnEven( mp, grp, N );
+            gens := RECOG.NiceGeneratorsAnEven( mp, grp, N );
         else
             gens := RECOG.NiceGeneratorsAnOdd( mp, grp, N );
         fi;
 
-	if gens = fail then 
+        if gens = fail then
             Info(InfoGiants,1,"couldn't find nice generators for An");
             return fail;
         fi;
@@ -430,7 +430,7 @@ RECOG.RecogniseAn :=  function( mp, grp, eps )
             c := RECOG.ConjEltAnOdd( mp, gens[1], gens[2] );
         fi;
 
-	return rec( stamp := "An", degree := n, 
+        return rec( stamp := "An", degree := n,
                     gens := Reversed(gens), conjperm := c );
 end;
 
@@ -487,14 +487,14 @@ RECOG.SLPforSn :=  function( n, pi )
         return StraightLineProgramNC( [[1,0]], 2 );
     fi;
 
-    # we need the cycles of pi of length > 1 to be written such 
+    # we need the cycles of pi of length > 1 to be written such
     # that the minimum point is the initial point of the cycle
     initpts := [ ];
     cycles := [ ];
     for c in Filtered( Cycles( pi, [ 1 .. n ] ), c -> Length(c) > 1 ) do
         i := Minimum( c );
         Add( initpts, i );
-        if i = c[1] then 
+        if i = c[1] then
             Add( cycles, c );
         else
             newc := [ i ];
@@ -508,7 +508,7 @@ RECOG.SLPforSn :=  function( n, pi )
     # R will be a straight line program from tau_1, sigma_1
     # we update cycle product, tau_i+1, sigma_i+2
     # and then overwrite the updates into positions 1,2,3
-    R := [ [1,0], [3,1], [1,1], [2,1,1,1], 
+    R := [ [1,0], [3,1], [1,1], [2,1,1,1],
                     [[4,1],1], [[5,1],2], [[6,1],3] ];
     i := 1;
     repeat
@@ -557,14 +557,14 @@ RECOG.SLPforAn :=  function( n, pi )
         return fail;
     fi;
 
-    # we need the cycles of pi of length > 1 to be written such 
+    # we need the cycles of pi of length > 1 to be written such
     # that the minimum point is the initial point of the cycle
     initpts := [ ];
     cycles := [ ];
     for c in Filtered( Cycles( pi, [ 1 .. n ] ), c -> Length(c) > 1 ) do
         i := Minimum( c );
         Add( initpts, i );
-        if i = c[1] then 
+        if i = c[1] then
             Add( cycles, c );
         else
             newc := [ i ];
@@ -598,23 +598,23 @@ RECOG.SLPforAn :=  function( n, pi )
                 # NB: if i < j < n-1 then (i,j)(n-1,n) = (n-1,n)(i,j)
                 if j = i+1 then
                     if IsEvenInt( n-i ) then
-                        Append( cycslp, [ 3,i+2-n, 2,2, 3,1, 2,1, 
+                        Append( cycslp, [ 3,i+2-n, 2,2, 3,1, 2,1,
                                           3,-1, 2,2, 3,n-i-2 ] );
                     else
-                        Append( cycslp, [ 3,i+2-n, 2,1, 3,1, 2,1, 
+                        Append( cycslp, [ 3,i+2-n, 2,1, 3,1, 2,1,
                                           3,-1, 2,1, 3,n-i-2 ] );
                     fi;
                 else
                     if IsEvenInt( n-i ) then
-                        Append( cycslp, [ 3,i+2-j, 2,1, 3,j-n, 
-                                          2,2, 3,1, 2,1, 3,-1, 2,2, 
+                        Append( cycslp, [ 3,i+2-j, 2,1, 3,j-n,
+                                          2,2, 3,1, 2,1, 3,-1, 2,2,
                                           3,n-j, 2,2, 3,j-i-2 ] );
                     elif IsOddInt( n-i ) and IsEvenInt( j-i-2 ) then
-                        Append( cycslp, [ 3,i+2-j, 2,1, 3,j-n, 
+                        Append( cycslp, [ 3,i+2-j, 2,1, 3,j-n,
                                           2,1, 3,1, 2,1, 3,-1, 2,1,
                                           3,n-j, 2,2, 3,j-i-2 ] );
                     else
-                        Append( cycslp, [ 3,i+2-j, 2,2, 3,j-n, 
+                        Append( cycslp, [ 3,i+2-j, 2,2, 3,j-n,
                                           2,1, 3,1, 2,1, 3,-1, 2,1,
                                           3,n-j, 2,1, 3,j-i-2 ] );
                     fi;
@@ -655,7 +655,7 @@ RECOG.SLPforAn :=  function( n, pi )
         od;
         Append( R, [ [cycslp,4] ] );
 
-      else  # not (i in initpts)  
+      else  # not (i in initpts)
         # we carry forward cycle product computed so far
         Append( R, [ [[1,1],4] ] );
       fi;

@@ -56,7 +56,7 @@ newI,newphi,im1,list,g,y,o;
 
   O := MyOrder;
   n := NumberOfDPComponents(I);
-  k := 100; 
+  k := 100;
   projs := List([1..n],i->MyProjection(I,i));
 
   blocks:=[[1..n]];
@@ -78,7 +78,7 @@ newI,newphi,im1,list,g,y,o;
     if Size(blocks)=n then return [phi,I]; fi;
   od;
   blocks := List(blocks,x->x[1]);
-  
+
 # Construct new map and image
   newI := DirectProduct(List(blocks,i->Image(projs[1])));
 
@@ -91,7 +91,7 @@ function(g)
 
   return [newphi,newI];
 end;
-    
+
 FindPoint := function(H,phi,point,I)
 # Find a point in H corresponding to point
   local O,n,k,projs,H1,c,gens,h,x,lp,lc,g,i,j;
@@ -117,13 +117,13 @@ FindPoint := function(H,phi,point,I)
   od;
   for g in GeneratorsOfGroup(H1) do
     if not IdTest(ImageElm(projs[point],ImageElm(phi,g))) then return g; fi;
-  od;	
+  od;
 
 # Process has failed :-(
  Error("Error in finding a point");
 
-end; 
-  
+end;
+
 PermAction := function(G,H,phi,I)
 # Constructs the permutation action of G on I
   local O,n,projs,points,reps,ims,point,h,x,y,l,def,repims,rep,i,j,g;
@@ -136,24 +136,24 @@ PermAction := function(G,H,phi,I)
   ims := List([1..Size(GeneratorsOfGroup((G)))],i->[]);
   while Size(points)>0 do
     point := Random(points);
-    h:=FindPoint(H,phi,point,I);    
+    h:=FindPoint(H,phi,point,I);
     reps[point]:=h;
     repeat
       for i in [1..Size(GeneratorsOfGroup((G)))] do
         for j in [1..Size(reps)] do
           if IsBound(reps[j]) and not IsBound(ims[i][j]) then
             y := reps[j]^GeneratorsOfGroup(G)[i];
-            x:=ImageElm(phi,y);      
+            x:=ImageElm(phi,y);
             l := First([1..n],k->O(ImageElm(projs[k],x))<>1);
 
-#            l := First([1..n],k->(IsMatrixGroup#(I!.DirectProductInfo!.groups[1]) and not IsScalarMatrix(ImageElm#(projs[k],x))) and not IsOne(ImageElm(projs[k],x)));; 
+#            l := First([1..n],k->(IsMatrixGroup#(I!.DirectProductInfo!.groups[1]) and not IsScalarMatrix(ImageElm#(projs[k],x))) and not IsOne(ImageElm(projs[k],x)));;
             ims[i][j]:=l;
             if not IsBound(reps[l]) then reps[l]:=y; fi;
           fi;
         od;
       od;
       def:=Filtered([1..Size(reps)],i->IsBound(reps[i]));
-    until ForAll( def , 
+    until ForAll( def ,
 i-> ForAll([1..Size(GeneratorsOfGroup(G))],j-> IsBound(ims[j][i])))=true;
     SubtractSet(points,def);
   od;
@@ -167,8 +167,8 @@ end;
 FindGammaInv := function(gamma,g)
 # Find x such that gamma(x)=g
  local IdTest,gi,old,count,new;
- 
- if IsMatrix(g) then IdTest := IsScalarMatrix; 
+
+ if IsMatrix(g) then IdTest := IsScalarMatrix;
  elif IsPerm(g) then IdTest := IsOne;
  else
    Error("g is not a matrix or a permutation");
@@ -223,10 +223,10 @@ ElementOfCoprimeOrder := function(grp,o)
  repeat
    count := count+1;
    g := PseudoRandom(grp);
-   og := Order(g);   
+   og := Order(g);
    v := Product(List(ps,x->x^Valuation(og,x)));
    if og/v <> 1 then return g^(v); fi;
- until count > 1000;   
+ until count > 1000;
  Error ("Failed to find an element of coprime order");
 end;
 
@@ -235,21 +235,21 @@ end;
 WhichPowerIsModuleIsoModScalars := function(grp,name,gamma)
 # Find t such that gamma^t a module automorphism (modulo scalars) of the quasisimple matrix group defined by name?
 # membership test is a membership test in grp
- local m,g,gens,ims1,oz,o,z,ims,F,M1,M2,mat,t,old; 
+ local m,g,gens,ims1,oz,o,z,ims,F,M1,M2,mat,t,old;
 
 
 # First construct a generating set of elts of order coprime to the schur multiplier
  m := SchurMultiplierOrder(name);
- g := ElementOfCoprimeOrder(grp,m); 
+ g := ElementOfCoprimeOrder(grp,m);
 # Compute a number of random conjugates of g to get a probable generating set for grp
 
  gens := Concatenation([g],List([1..5],i->g^PseudoRandom(grp)));
  F := FieldOfMatrixGroup(grp);
  M1 := GModuleByMats(gens,F);
- 
- old := gens; 
+
+ old := gens;
  t := 0;
- repeat 
+ repeat
    t := t+1;
 # compute the images of gens under phi
    ims1 := List(old,x->ImageElm(gamma,x));
@@ -264,7 +264,7 @@ WhichPowerIsModuleIsoModScalars := function(grp,name,gamma)
    M2 := GModuleByMats(ims,F);
 
 # Do we have a module isomorphism
-   mat := MTX.IsomorphismModules(M1,M2); 
+   mat := MTX.IsomorphismModules(M1,M2);
    old := ims;
  until IsMatrix(mat);
  return [t,mat];
@@ -273,7 +273,7 @@ WhichPowerIsModuleIsoModScalars := function(grp,name,gamma)
 end;
 
 SolveLeafDP := function(ri,rifac,name)
-# Solves the constructive membership problem in a Direct Product 
+# Solves the constructive membership problem in a Direct Product
 # of nonabelian simple groups
  local I,phi,R,k,projs,blk,bool,permrep,invhom,econj,gens,
        H1,H1toblk,riH1,blkdata,invims,Yhat,blktoH1,Y,YY,r,i,
@@ -299,7 +299,7 @@ SolveLeafDP := function(ri,rifac,name)
  fi;
 
 # Unable to do this right now
-# Need SLP's in G for generators of H 
+# Need SLP's in G for generators of H
 
 
  permrep := PermAction(overgroup(ri),Grp(ri),phi,I);
@@ -307,15 +307,15 @@ SolveLeafDP := function(ri,rifac,name)
  e := List([1..k],i-> ImageElm(invhom,RepresentativeAction(permrep,1,i)));
  econj := List([1..Size(e)],i->GroupHomomorphismByFunction(Grp(ri),Grp(ri),g->g^e[i]));
 
- gens := List([1..3],i->FindPoint(Grp(ri),phi,1,I));  
+ gens := List([1..3],i->FindPoint(Grp(ri),phi,1,I));
  H1 := SubgroupNC(Grp(ri),FastNormalClosure(GeneratorsOfGroup(Grp(ri)),gens,1));
  H1toblk := phi*projs[1];
  H1toblk!.Source := H1;
  blk := GroupWithGenerators(List(GeneratorsOfGroup(H1),x->ImageElm(H1toblk,x)));
- 
+
  riH1 := rec();
  Objectify(RecognitionInfoType,riH1);;
- 
+
  SetGrp(riH1,H1);
  blkdata := RecogniseLeaf(riH1,blk,name);;
 
@@ -324,7 +324,7 @@ SolveLeafDP := function(ri,rifac,name)
  Yhat := ShallowCopy(invims);
  blktoH1 := GroupHomomorphismByFunction(blk,Grp(ri),g->
 ResultOfStraightLineProgram( SLPforElement(blkdata,g),invims));
- 
+
  Y := NiceGens(blkdata);
  YY := List(Y,y->ImageElm(MyEmbedding(I,1),y));
  r := Length(Y);
@@ -353,12 +353,12 @@ g->ImageElm(projs[i],phi!.fun(econj[i]!.fun(blktoH1!.fun(g)))));
      else
        z := FindGammaInv(gamma,Y[j]);
      fi;
-     h := ImageElm(blktoH1,z)^e[i]; 
+     h := ImageElm(blktoH1,z)^e[i];
      y := ImageElm(phi,h);
      Add(YY,y);
      Add(Yhat,h);
    od;
- od;    
+ od;
 
  Setpregensfac(ri,Yhat);
  SetNiceGens(rifac,YY);
@@ -375,7 +375,7 @@ g->ImageElm(projs[i],phi!.fun(econj[i]!.fun(blktoH1!.fun(g)))));
  SetFilterObj(rifac,IsReady);
  return true;
 end;
- 
+
 
 
 

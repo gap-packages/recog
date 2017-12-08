@@ -16,7 +16,7 @@ AddScalarstoKernel := function(ri,rifac,Z)
    Add(l,y);
    return true;
  fi;
-       
+
  if IsDirectProduct(Grp(rifac)) then
    n := NumberOfDPComponents(Grp(rifac));
    for i in [1..n] do
@@ -27,8 +27,8 @@ AddScalarstoKernel := function(ri,rifac,Z)
    od;
    return true;
  fi;
-end;  
- 
+end;
+
 
 #DealWithOpG := function(ri)
 ## Construct the remaining part of the chief series sitting in Op(G)
@@ -50,12 +50,12 @@ end;
 # lri := []; rri := [];
 # lri[1] := rec();
 # Objectify(RecognitionInfoType,lri[1]);;
-  
+
 # SetGrp(lri[1],Grp(ri));
 
 # overgp := ShallowCopy(overgroup(ri));
 # Setovergroup(lri[1],overgp);
- 
+
 # count := 1;
 # for i in [1..(Length(dims)-1)] do
 #   for j in [1..(Length(dims)-i)] do
@@ -86,7 +86,7 @@ end;
 #     od;
 #     return mat;
 #   end;
-#   Vsubims := List(Ugens,x->GtoVp(x));   
+#   Vsubims := List(Ugens,x->GtoVp(x));
 #   Vsub := SubspaceNC(Vp,Vsubims);
 #   if Dimension(Vsub) gt 0 then
 # Construct a basis for Vsub
@@ -107,7 +107,7 @@ end;
 #       for k1 in [1..Length(B)] do
 #         for k2 in [1..Length(GeneratorsOfGroup(G))] do
 #           mat := Blockgensinverses[k2][j1]*Bmats[k1]*Blockgens[k2][i1];
-#           im := BlownUpVector(Fbasis,Concatenation(mat)); 
+#           im := BlownUpVector(Fbasis,Concatenation(mat));
 #           if not im in Vsub then
 #             Add(ExtraElts,Bpreims[k1]^GeneratorsOfGroup(G)[k2]);
 #             Add(B,im);
@@ -115,7 +115,7 @@ end;
 #             Add(Bpreims,Bpreims[k1]^GeneratorsOfGroup(G)[k2]);
 #             Add(Vsubims,im);
 #             Vsub := SubspaceNC(Vp,Vsubims);
-#           fi; 
+#           fi;
 #         od;
 #       od;
 #       Ugens := Concatenation(Ugens,ExtraElts);
@@ -130,14 +130,14 @@ end;
 # Solve the rewriting problem with these gens
 #     P := Pcgs(VPc);
 #     Triv := GroupWithMemory(GroupWithGenerators(List(AsList(P),x->())));
-#     VPctoTriv := GroupHomomorphismByImages(VPc,Triv,AsList(P),GeneratorsOfGroup(Triv)); 
+#     VPctoTriv := GroupHomomorphismByImages(VPc,Triv,AsList(P),GeneratorsOfGroup(Triv));
 #     mems := List(AsList(P),x->ImageElm(VPctoTriv,x));
-#     Setslptonice(rri[count],SLPOfElms(mems));   
+#     Setslptonice(rri[count],SLPOfElms(mems));
 #     Setcalcnicegens(rri[count], CalcNiceGensGeneric);
 #     Setslpforelement(rri[count],
 #   function(rri[count],g)
 #     return SLPOfElm(ImageElm(VPctoTriv,g));
-#   end);  
+#   end);
 #     Setpregensfac(lri[count],Bpreims);
 #     SetHomom(lri[count],GroupHomomorphismByFunction(Grp(lri[count]),VPc,function(g)
 #  local v;
@@ -145,7 +145,6 @@ end;
 #  return PcElementByExponents(Pcgs(VPc),List(v,x->IntFFE(x)));
 #  end));
 # Setup the kernel
-          
 
 
 
@@ -155,14 +154,15 @@ end;
 
 
 
-	
+
+
 
 
 InstallGlobalFunction( NormalTree,
   function(arg)
     # Contructs a normal tree
     # Call via NormalTree(G,nsm,depth)
-    
+
     # Assume all the generators have no memory!
     local H,N,depth,done,i,knowledge,l,ll,methgensN,methoddb,
           proj1,proj2,ri,rifac,riker,s,x,y,z,succ,counter,nsm,name,
@@ -197,32 +197,32 @@ InstallGlobalFunction( NormalTree,
     SetgensN(ri,[]);       # this will grow over time
     SetfindgensNmeth(ri,rec(method := FindKernelRandom, args := [20]));
     Setimmediateverification(ri,false);
-    Setforkernel(ri,rec(hints := []));   
+    Setforkernel(ri,rec(hints := []));
           # this is eventually handed down to the kernel
-    Setforfactor(ri,rec(hints := []));   
+    Setforfactor(ri,rec(hints := []));
           # this is eventually handed down to the factor
 
 
     # Use the homomorphism defined by nsm!.Maps[depth+1];
     if IsBound(nsm!.Maps[depth+1]) then
       SetHomom(ri,nsm!.Maps[depth+1]);
-      name := nsm!.Names[depth+1]; 
-      Setfhmethsel(ri,"Hom from NSM"); 
+      name := nsm!.Names[depth+1];
+      Setfhmethsel(ri,"Hom from NSM");
       OverI := nsm!.MapImages[depth+1];
     else
 # We are now in Op(G)
 #      map1 := IsomorphismPcPGroup(Grp(ri));
 #      map2 := IsomorphismPcGroup(Image(map1));
-#  Should have some good spinning up property and a better way of handling this!       
+#  Should have some good spinning up property and a better way of handling this!
       SetHomom(ri,IsomorphismPcGroup(Grp(ri)));
       OverI := Image(Homom(ri));
       name := "";
-    fi;     
-      
+    fi;
+
 
     # We know we are in the non-leaf case:
     # In that case we know that ri now homom and image of homom is a leaf
-    
+
     Info(InfoRecognition,1,"Going to the factor (depth=",depth,")");
 
     I := SubgroupNC(OverI,List(GeneratorsOfGroup(H), x->ImageElm(Homom(ri),x)));
@@ -256,12 +256,12 @@ InstallGlobalFunction( NormalTree,
         methgensN := findgensNmeth(ri);
         succ := CallFuncList(methgensN.method,
                              Concatenation([ri],methgensN.args));
-        
+
 # If the map is modulo scalars force the scalars to be added to the kernel
     if IsBound(nsm!.Scalars[depth+1]) and nsm!.Scalars[depth+1]<>0 then
       succ := AddScalarstoKernel(ri,rifac,nsm!.Scalars[depth+1]);
     fi;
-   
+
     # Do a little bit of preparation for the generators of N:
     l := gensN(ri);
     if not(IsBound(ri!.leavegensNuntouched)) then
@@ -292,7 +292,7 @@ InstallGlobalFunction( NormalTree,
         # This is now in terms of the generators of H plus the preimages
         # of the nice generators behind the homomorphism!
         N := Group(StripMemory(gensN(ri)));
-        
+
         riker := NormalTree( N, nsm, depth+1 );;
         SetRIKer(ri,riker);
         SetRIParent(riker,ri);

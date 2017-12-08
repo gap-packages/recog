@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  blackbox.gi          
+##  blackbox.gi
 ##                                recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress

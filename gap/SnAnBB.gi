@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  recogSnAnBB.g        
+##  recogSnAnBB.g
 ##                              recog package
 ##                                                           Maska Law
 ##                                                   Alice C. Niemeyer
@@ -16,8 +16,8 @@
 ##  with known degree n is isomorphic to A_n or S_n.
 ##
 ##  The code is based upon the algorithm presented in the paper
-##       "A black-box group algorithm for recognizing 
-##        finite symmetric and alternating groups. I." 
+##       "A black-box group algorithm for recognizing
+##        finite symmetric and alternating groups. I."
 ##  by Robert Beals, Charles R. Leedham-Green, Alice C. Niemeyer,
 ##     Cheryl E. Praeger and 'Akos Seress.
 ##
@@ -65,7 +65,7 @@ end;
 ##  is <s,t> in A_n
 
 SatisfiesAnPresentation := function( n, s, t )
- 
+
     local j, r, ti;
 
     Info( InfoRecSnAn, 1, "calling Satisfies An Presentation");
@@ -118,12 +118,12 @@ end;
 
 NiceGeneratorsSnAn := function ( n, grp, N )
 
-    local AddStack, g1, g2, g3, g4, g, h, a, b, c, t, i, k, l, 
+    local AddStack, g1, g2, g3, g4, g, h, a, b, c, t, i, k, l,
           delta, elfound, m, x, y;
 
     # we put the elements that we look for on stacks
     AddStack := function( stk, e )
-        if Length(stk) = 0 then 
+        if Length(stk) = 0 then
             stk[1] := e;
         elif Length(stk) = 1 then
             stk[2] := e;
@@ -147,7 +147,7 @@ NiceGeneratorsSnAn := function ( n, grp, N )
     fi;
 
     g1 := [];   # $n$-cycles
-    g2 := [];   # transpositions  
+    g2 := [];   # transpositions
     g3 := [];   # $n$ or $n-1$-cycles
     g4 := [];   # 3-cycles
 
@@ -156,9 +156,9 @@ NiceGeneratorsSnAn := function ( n, grp, N )
         t := PseudoRandom(grp);
 
         # use this random element to check the transpositions
-        for a in g2 do 
+        for a in g2 do
             x := a * a^t;
-            if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and 
+            if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and
                not(RecSnAnIsOne(x^3)) then
                 # a is not a transposition
                 Info( InfoRecSnAn, 2, "a is not a transposition");
@@ -168,9 +168,9 @@ NiceGeneratorsSnAn := function ( n, grp, N )
         od;
 
         # use this random element to check the 3-cycle
-        for a in g4 do 
+        for a in g4 do
             x := a * a^t;
-            if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and 
+            if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and
                not(RecSnAnIsOne(x^3)) and not(RecSnAnIsOne(x^5)) then
                 # a is not a 3-cycle
                 Info( InfoRecSnAn, 2, "a is not a 3-cycle");
@@ -212,7 +212,7 @@ NiceGeneratorsSnAn := function ( n, grp, N )
             elfound[4] := true;
             Info( InfoRecSnAn, 2, "found 3-cycle");
         fi;
-       
+
         # if we have an n-cycle and a transposition, test for Sn
         if elfound[1] and elfound[2] then
             # hopefully $g2\lambda$ is a transposition
@@ -221,25 +221,25 @@ NiceGeneratorsSnAn := function ( n, grp, N )
                 while N>0 and i>0 do # take up to n-1 conjugates,
                                      # check if they match some n-cycle
                     i := i-1;
-                    h := a^PseudoRandom(grp); 
-                    # use this opportunity again to check that 
+                    h := a^PseudoRandom(grp);
+                    # use this opportunity again to check that
                     # a really is a transposition
                     x := a*h;
-                    if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and 
-                       not(RecSnAnIsOne(x^3)) then 
+                    if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and
+                       not(RecSnAnIsOne(x^3)) then
                         # a is not a transposition
                         Info(InfoRecSnAn,2,"a is not a transposition");
                         RemoveElmList(g2,Position(g2,a));
                         if Length(g2) = 0 then elfound[2] := false; fi;
                         i := 0;
                     else
-                        for b in g1 do 
+                        for b in g1 do
                           y := Comm(h, h^b);
                           if not(RecSnAnIsOne(y)) and
                              not(RecSnAnIsOne(y^2)) and RecSnAnIsOne(y^3) then
                             Info(InfoRecSnAn,1,"found good transposition");
                             if SatisfiesSnPresentation( n, b, h ) then
-                              Info( InfoRecSnAn, 1, 
+                              Info( InfoRecSnAn, 1,
                                 "Group satisfies presentation for Sn ",N);
                               return [ b, h, "Sn" ];
                             else
@@ -254,16 +254,16 @@ NiceGeneratorsSnAn := function ( n, grp, N )
         fi;
 
         # if we have an n- or (n-1)-cycle and a 3-cycle, test for An
-        if elfound[3] and elfound[4] and n mod 2 <> 0 then 
+        if elfound[3] and elfound[4] and n mod 2 <> 0 then
             for a in g4 do  # choose a 3-cycle
                 i := 1 + Int(n/3);
                 while N > 0 and i > 0 do
                     i := i-1;
                     c := a^PseudoRandom(grp);
-                    # use this opportunity again to check that 
+                    # use this opportunity again to check that
                     # a really is a 3-cycle
                     x := a * c;
-                    if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and 
+                    if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and
                        not(RecSnAnIsOne(x^3)) and not(RecSnAnIsOne(x^5)) then
                         # a is not a 3-cycle
                         Info( InfoRecSnAn, 2, "a is not a 3-cycle");
@@ -277,7 +277,7 @@ NiceGeneratorsSnAn := function ( n, grp, N )
                             t := c*c^b;
                             if RecSnAnEq(t^2,t) then
                                 # k = 3
-                                x := c^(b^2); 
+                                x := c^(b^2);
                                 y := c^x;
                                 if RecSnAnIsOne(Comm(y, y^(b^2))) then
                                     # y\lambda = (1,5,2)
@@ -290,7 +290,7 @@ NiceGeneratorsSnAn := function ( n, grp, N )
                                 # 5 <= k <= n -2
                                 x := c^b;
                                 y := c^x;
-                                if RecSnAnIsOne(Comm(y,y^b)) then 
+                                if RecSnAnIsOne(Comm(y,y^b)) then
                                     # y = (1,3,k) hence c = (1,2,k)
                                     h := Comm(c^2, x);
                                 else
@@ -302,7 +302,7 @@ NiceGeneratorsSnAn := function ( n, grp, N )
                                 y := c^x;
                                 if RecSnAnIsOne(Comm(y,y^b)) then
                                     # y = (n-1, 1, 3), c = (1,2,n-1)
-                                    h := Comm(c^2,x); 
+                                    h := Comm(c^2,x);
                                 elif RecSnAnIsOne(Comm(y,y^(b^2))) then
                                     # y = (1,4,5) c = (1,4,2)
                                     h := Comm(c,x^2);
@@ -311,19 +311,19 @@ NiceGeneratorsSnAn := function ( n, grp, N )
                                     h := Comm(c,x^2);
                                 else
                                     # y = (1,3,4)  c = ( 1,2,4)
-                                    h := Comm(c^2,x); 
+                                    h := Comm(c^2,x);
                                 fi;
                             fi;
 
                             g := b * h^2;
 
                             if SatisfiesAnPresentation( n, g, h ) then
-                              Info( InfoRecSnAn, 1, 
+                              Info( InfoRecSnAn, 1,
                               "Group satisfies presentation for An ",N);
                               return [ g, h, "An" ];
                             else
                               RemoveElmList(g3,Position(g3,b));
-                              if Length(g3)=0 then elfound[3]:=false;fi; 
+                              if Length(g3)=0 then elfound[3]:=false;fi;
                             fi;
                           fi;
                         od;  # for b in g3
@@ -333,16 +333,16 @@ NiceGeneratorsSnAn := function ( n, grp, N )
         fi;
 
         # if we have an n- or (n-1)-cycle and a 3-cycle, test for An
-        if elfound[3] and elfound[4] and n mod 2 = 0 then 
-            for a in g4 do   
+        if elfound[3] and elfound[4] and n mod 2 = 0 then
+            for a in g4 do
                 i := Int(2 * n/3);
                 while N > 0 and i > 0 do
                     i := i-1;
                     c := a^PseudoRandom(grp);
-                    # use this opportunity again to check that 
+                    # use this opportunity again to check that
                     # a really is a 3-cycle
                     x := a * c;
-                    if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and 
+                    if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and
                        not(RecSnAnIsOne(x^3)) and not(RecSnAnIsOne(x^5)) then
                         # a is not a 3-cycle
                         Info( InfoRecSnAn, 2, "a is not a 3-cycle");
@@ -351,7 +351,7 @@ NiceGeneratorsSnAn := function ( n, grp, N )
                         i := 0;
                     else
                         for b in g3 do
-                          if not(RecSnAnIsOne(Comm(c,c^b))) and 
+                          if not(RecSnAnIsOne(Comm(c,c^b))) and
                              not(RecSnAnIsOne(Comm(c,c^(b^2)))) and
                              not(RecSnAnIsOne(Comm(c,c^(b^4)))) then
                             # hope: supp (c) = {1,i,j}
@@ -359,12 +359,12 @@ NiceGeneratorsSnAn := function ( n, grp, N )
                             # h = (1,i,i+1)
                             g := b * h;
                             if SatisfiesAnPresentation( n, g, h ) then
-                              Info( InfoRecSnAn, 1, 
+                              Info( InfoRecSnAn, 1,
                               "Group satisfies presentation for An ", N);
                               return [ g, h, "An" ];
                             else
                               RemoveElmList(g3,Position(g3,b));
-                              if Length(g3)=0 then elfound[3]:=false;fi; 
+                              if Length(g3)=0 then elfound[3]:=false;fi;
                             fi;
                           fi;
                         od;
@@ -415,11 +415,11 @@ ConstructXiSn := function( n, g, h )
         m := m + 1;
     od;
 
-    if (n mod 3) = 0 then 
+    if (n mod 3) = 0 then
         xis  := List( [1..2*m+4], i -> h^0 );
         xisl := List( [1..2*m+4], i -> [ ] );
         for i in [ 1 .. k ] do
-            if ((i mod 2) = 1) and (i < k) then 
+            if ((i mod 2) = 1) and (i < k) then
                 xis[m+2] := xis[m+2]*a^(conj*pow);
                 Add(xisl[m+2],[3*i-1..3*i+1]);
                 xis[m+1] := xis[m+1]*a^((conj*pow)^2);
@@ -452,7 +452,7 @@ ConstructXiSn := function( n, g, h )
         xis  := List( [1..2*m+6], i -> h^0 );
         xisl := List( [1..2*m+6], i -> [ ] );
         for i in [ 1 .. k ] do
-            if ((i mod 2) = 1) and (i < k) then 
+            if ((i mod 2) = 1) and (i < k) then
                 xis[m+2] := xis[m+2]*a^(conj*pow);
                 Add(xisl[m+2],[3*i-1..3*i+1]);
                 xis[m+1] := xis[m+1]*a^((conj*pow)^2);
@@ -481,10 +481,10 @@ ConstructXiSn := function( n, g, h )
             od;
             a := a^c;
         od;
-        if (n mod 3) =1 then 
+        if (n mod 3) =1 then
             xis[m+3] := a;
             xisl[m+3] := [[1,2,n]];
-        elif (n mod 3) =2 then 
+        elif (n mod 3) =2 then
             xis[m+3] := a;
             xisl[m+3] := [[1,n-1,n]];
         fi;
@@ -541,9 +541,9 @@ FindImageSn := function( n, z, g, h, xis, xisl )
     m := Length(xisl)/2;
     t := [h,h^g];
     t[3] := h^(t[2]);
-    k := g^3; 
+    k := g^3;
     zim := [];
-    
+
     # compute images of i, i+1 and i+2
     i := 1;
     while i <= n-2 do
@@ -559,10 +559,10 @@ FindImageSn := function( n, z, g, h, xis, xisl )
                     sup[l] := Difference( sup[l], mxj);
                     sup[lp1] := Difference( sup[lp1], mxj);
                     if RecSnAnEq(tz[lp1]*xis[j],xis[j]*tz[lp1]) then
-                        sup[lp1 mod 3 + 1] := 
+                        sup[lp1 mod 3 + 1] :=
                             Difference( sup[lp1 mod 3 + 1], mxj);
                     else
-                        sup[lp1 mod 3 + 1] := 
+                        sup[lp1 mod 3 + 1] :=
                             Difference( sup[lp1 mod 3 + 1], mxjpm);
                     fi;
                     l := 4;  # exit loop over l
@@ -570,10 +570,10 @@ FindImageSn := function( n, z, g, h, xis, xisl )
                     sup[l] := Difference( sup[l], mxjpm);
                     sup[lp1] := Difference( sup[lp1], mxjpm);
                     if RecSnAnEq(tz[lp1]*xis[j+m],xis[j+m]*tz[lp1]) then
-                        sup[(lp1) mod 3 + 1] := 
+                        sup[(lp1) mod 3 + 1] :=
                             Difference( sup[lp1 mod 3 + 1], mxjpm);
                     else
-                        sup[lp1 mod 3 + 1] := 
+                        sup[lp1 mod 3 + 1] :=
                             Difference( sup[lp1 mod 3 + 1], mxj);
                     fi;
                     l := 4;  # exit loop over l
@@ -583,13 +583,13 @@ FindImageSn := function( n, z, g, h, xis, xisl )
         od;
 
         # now the images of i,i+1,i+2 should be determined up to 5 points
-        for l in [ 1 .. 3 ] do 
+        for l in [ 1 .. 3 ] do
             lp1 := l mod 3 + 1;
             for j in sup[l] do
                 if not IsBound(zim[i+l-1]) then
-                    if Length(sup[l]) = 1 then 
+                    if Length(sup[l]) = 1 then
                         zim[i+l-1] := sup[l][1];
-                    elif IsImagePoint(n,z,g,h,j,t[l]^z,t[lp1 mod 3+1]^z) 
+                    elif IsImagePoint(n,z,g,h,j,t[l]^z,t[lp1 mod 3+1]^z)
                         then zim[i+l-1] := j;
                     fi;
                 fi;
@@ -603,16 +603,16 @@ FindImageSn := function( n, z, g, h, xis, xisl )
 
     od;  # while
 
-    if RemInt(n,3) = 1 then 
+    if RemInt(n,3) = 1 then
         zim[n] := Difference([1..n],zim)[1];
     fi;
 
     if RemInt(n,3) = 2 then
         sup := Difference([1..n],zim);
-        if IsImagePoint(n,z,g,h,sup[1],(h^(g^(-1)))^z, 
+        if IsImagePoint(n,z,g,h,sup[1],(h^(g^(-1)))^z,
                                                  (h^(g^(-2)))^z ) then
             zim[n] := sup[1];
-        else 
+        else
             zim[n] := sup[2];
         fi;
         zim[n-1] := Difference(sup,[zim[n]])[1];
@@ -639,7 +639,7 @@ ConstructXiAn := function( n, g, h )
 
     c := g^5;
 
-    if (n mod 2) = 1 then 
+    if (n mod 2) = 1 then
         if (n mod 5) = 0 then
             a := h * (h^g)^(-1) * h^(g^2); # (1,2,3,4,5)
             cyc := g*h; # (1,2,3,...,n)
@@ -666,7 +666,7 @@ ConstructXiAn := function( n, g, h )
             xisl[m+1] := [ [3..7] ];
             xis[m+2] := a2;
             xisl[m+2] := [ [2,3,6,9,10] ];
-            xis[m+3] := a3; 
+            xis[m+3] := a3;
             xisl[m+3] := [ [3,4,7,8,9] ];
             xis[m+4] := g^0;
             xisl[m+4] := [];
@@ -680,8 +680,8 @@ ConstructXiAn := function( n, g, h )
             xisl[2*m+4] := [ [1,2,8,9,10] ];
             xis[2*m+5] := b2;
             xisl[2*m+5] := [ [1,4,5,7,8] ];
-            xis[2*m+6] := b3; 
-            xisl[2*m+6] := [ [1,2,5,6,10] ];     
+            xis[2*m+6] := b3;
+            xisl[2*m+6] := [ [1,2,5,6,10] ];
 
             for i in [ 2 .. k ] do
               if ((i mod 2) = 1) and (i<k) then
@@ -690,28 +690,28 @@ ConstructXiAn := function( n, g, h )
                 a2 := a2^cyc10;
                 b2 := b2^cyc10;
                 a3 := a3^cyc10;
-                b3 := b3^cyc10;          
+                b3 := b3^cyc10;
                 xis[m+1] := xis[m+1] * a1;
                 Add(xisl[m+1], [5*i-2..5*i+2] );
                 xis[m+2] := xis[m+2] * a2;
                 Add(xisl[m+2], [5*i-3,5*i-2,5*i+1,5*i+4,5*i+5] );
-                xis[m+3] := xis[m+3] * a3; 
+                xis[m+3] := xis[m+3] * a3;
                 Add(xisl[m+3], [5*i-2,5*i-1,5*i+2,5*i+3,5*i+4] );
                 xis[2*m+4] := xis[2*m+4] * b1;
                 Add(xisl[2*m+4], [5*i-4,5*i-3,5*i+3,5*i+4,5*i+5] );
                 xis[2*m+5] := xis[2*m+5] * b2;
                 Add(xisl[2*m+5], [5*i-4,5*i-1,5*i,5*i+2,5*i+3] );
-                xis[2*m+6] := xis[2*m+6] * b3; 
+                xis[2*m+6] := xis[2*m+6] * b3;
                 Add(xisl[2*m+6], [5*i-4,5*i-3,5*i,5*i+1,5*i+5] );
               fi;
               b := Binary(i, m);
               for j in [1 .. m] do
-                if b[j] = 1 then 
-                    xis[j]  := xis[j] * anew; 
+                if b[j] = 1 then
+                    xis[j]  := xis[j] * anew;
                     Add(xisl[j], [5*i-4 .. 5*i]);
                 fi;
-                if b[j+m] = 1 then 
-                    xis[j+m+3]  := xis[j+m+3] * anew; 
+                if b[j+m] = 1 then
+                    xis[j+m+3]  := xis[j+m+3] * anew;
                     Add(xisl[j+m+3], [5*i-4 .. 5*i]);
                 fi;
               od;
@@ -732,7 +732,7 @@ ConstructXiAn := function( n, g, h )
             a3 := a1^(aux^2); # (3,4,7,8,9)
             b3 := ((a^aux)^(anew^2))^(g^2); # (1,2,5,6,10)
 
-            xis := [a]; 
+            xis := [a];
             xisl := [ [ [1 .. 5] ] ];
 
             for j in [ 2 .. m] do
@@ -744,7 +744,7 @@ ConstructXiAn := function( n, g, h )
             xisl[m+1] := [ [3..7] ];
             xis[m+2] := a2;
             xisl[m+2] := [ [2,3,6,9,10] ];
-            xis[m+3] := a3; 
+            xis[m+3] := a3;
             xisl[m+3] := [ [3,4,7,8,9] ];
             xis[m+5] := g^0;
             xisl[m+5] := [];
@@ -758,8 +758,8 @@ ConstructXiAn := function( n, g, h )
             xisl[2*m+5] := [ [1,2,8,9,10] ];
             xis[2*m+6] := b2;
             xisl[2*m+6] := [ [1,4,5,7,8] ];
-            xis[2*m+7] := b3; 
-            xisl[2*m+7] := [ [1,2,5,6,10] ];     
+            xis[2*m+7] := b3;
+            xisl[2*m+7] := [ [1,2,5,6,10] ];
 
             for i in [ 2 .. k ] do
               if ((i mod 2) = 1) and (i<k) then
@@ -768,28 +768,28 @@ ConstructXiAn := function( n, g, h )
                 a2 := a2^cyc10;
                 b2 := b2^cyc10;
                 a3 := a3^cyc10;
-                b3 := b3^cyc10;          
+                b3 := b3^cyc10;
                 xis[m+1] := xis[m+1] * a1;
                 Add(xisl[m+1], [5*i-2..5*i+2] );
                 xis[m+2] := xis[m+2] * a2;
                 Add(xisl[m+2], [5*i-3,5*i-2,5*i+1,5*i+4,5*i+5] );
-                xis[m+3] := xis[m+3] * a3; 
+                xis[m+3] := xis[m+3] * a3;
                 Add(xisl[m+3], [5*i-2,5*i-1,5*i+2,5*i+3,5*i+4] );
                 xis[2*m+5] := xis[2*m+5] * b1;
                 Add(xisl[2*m+5], [5*i-4,5*i-3,5*i+3,5*i+4,5*i+5] );
                 xis[2*m+6] := xis[2*m+6] * b2;
                 Add(xisl[2*m+6], [5*i-4,5*i-1,5*i,5*i+2,5*i+3] );
-                xis[2*m+7] := xis[2*m+7] * b3; 
+                xis[2*m+7] := xis[2*m+7] * b3;
                 Add(xisl[2*m+7], [5*i-4,5*i-3,5*i,5*i+1,5*i+5] );
               fi;
               b := Binary(i, m);
               for j in [1 .. m] do
-                if b[j] = 1 then 
-                    xis[j]  := xis[j] * anew; 
+                if b[j] = 1 then
+                    xis[j]  := xis[j] * anew;
                     Add(xisl[j], [5*i-4 .. 5*i]);
                 fi;
-                if b[j+m] = 1 then 
-                    xis[j+m+4]  := xis[j+m+4] * anew; 
+                if b[j+m] = 1 then
+                    xis[j+m+4]  := xis[j+m+4] * anew;
                     Add(xisl[j+m+4], [5*i-4 .. 5*i]);
                 fi;
               od;
@@ -799,7 +799,7 @@ ConstructXiAn := function( n, g, h )
             xis[m+4] := anew;
             xisl[m+4] := [Union([1..5-(n mod 5)],[n+1-(n mod 5)..n])];
             xis[2*m+8] := g^0;
-            xisl[2*m+8] := []; 
+            xisl[2*m+8] := [];
 
         fi;  # n mod 5
 
@@ -818,7 +818,7 @@ ConstructXiAn := function( n, g, h )
             a3 := a1^(aux^2); # (3,4,7,8,9)
             b3 := ((a^aux)^(anew^2))^(g^2); # (1,2,5,6,10)
 
-            xis := [a]; 
+            xis := [a];
             xisl := [ [ [1 .. 5] ] ];
 
             for j in [ 2 .. m] do
@@ -830,7 +830,7 @@ ConstructXiAn := function( n, g, h )
             xisl[m+1] := [ [3..7] ];
             xis[m+2] := a2;
             xisl[m+2] := [ [2,3,6,9,10] ];
-            xis[m+3] := a3; 
+            xis[m+3] := a3;
             xisl[m+3] := [ [3,4,7,8,9] ];
             xis[m+4] := g^0;
             xisl[m+4] := [];
@@ -844,8 +844,8 @@ ConstructXiAn := function( n, g, h )
             xisl[2*m+4] := [ [1,2,8,9,10] ];
             xis[2*m+5] := b2;
             xisl[2*m+5] := [ [1,4,5,7,8] ];
-            xis[2*m+6] := b3; 
-            xisl[2*m+6] := [ [1,2,5,6,10] ];     
+            xis[2*m+6] := b3;
+            xisl[2*m+6] := [ [1,2,5,6,10] ];
 
             a1 := a1^cyc10;
             b1 := ((b1^(cyc^2))^(h^2))^(cyc^8);
@@ -860,29 +860,29 @@ ConstructXiAn := function( n, g, h )
                 Add(xisl[m+1], [5*i-2..5*i+2] );
                 xis[m+2] := xis[m+2] * a2;
                 Add(xisl[m+2], [5*i-3,5*i-2,5*i+1,5*i+4,5*i+5] );
-                xis[m+3] := xis[m+3] * a3; 
+                xis[m+3] := xis[m+3] * a3;
                 Add(xisl[m+3], [5*i-2,5*i-1,5*i+2,5*i+3,5*i+4] );
                 xis[2*m+4] := xis[2*m+4] * b1;
                 Add(xisl[2*m+4], [5*i-4,5*i-3,5*i+3,5*i+4,5*i+5] );
                 xis[2*m+5] := xis[2*m+5] * b2;
                 Add(xisl[2*m+5], [5*i-4,5*i-1,5*i,5*i+2,5*i+3] );
-                xis[2*m+6] := xis[2*m+6] * b3; 
+                xis[2*m+6] := xis[2*m+6] * b3;
                 Add(xisl[2*m+6], [5*i-4,5*i-3,5*i,5*i+1,5*i+5] );
                 a1 := a1^cyc10;
                 b1 := b1^cyc10;
                 a2 := a2^cyc10;
                 b2 := b2^cyc10;
                 a3 := a3^cyc10;
-                b3 := b3^cyc10;          
+                b3 := b3^cyc10;
               fi;
               b := Binary(i, m);
               for j in [1 .. m] do
-                if b[j] = 1 then 
-                    xis[j] := xis[j] * anew; 
+                if b[j] = 1 then
+                    xis[j] := xis[j] * anew;
                     Add(xisl[j], [5*i-4 .. 5*i]);
                 fi;
-                if b[j+m] = 1 then 
-                    xis[j+m+3] := xis[j+m+3] * anew; 
+                if b[j+m] = 1 then
+                    xis[j+m+3] := xis[j+m+3] * anew;
                     Add(xisl[j+m+3], [5*i-4 .. 5*i]);
                 fi;
               od;
@@ -913,7 +913,7 @@ ConstructXiAn := function( n, g, h )
             xisl[m+1] := [ [3..7] ];
             xis[m+2] := a2;
             xisl[m+2] := [ [2,3,6,9,10] ];
-            xis[m+3] := a3; 
+            xis[m+3] := a3;
             xisl[m+3] := [ [3,4,7,8,9] ];
             xis[m+5] := g^0;
             xisl[m+5] := [];
@@ -927,8 +927,8 @@ ConstructXiAn := function( n, g, h )
             xisl[2*m+5] := [ [1,2,8,9,10] ];
             xis[2*m+6] := b2;
             xisl[2*m+6] := [ [1,4,5,7,8] ];
-            xis[2*m+7] := b3; 
-            xisl[2*m+7] := [ [1,2,5,6,10] ];     
+            xis[2*m+7] := b3;
+            xisl[2*m+7] := [ [1,2,5,6,10] ];
 
             a1 := a1^cyc10;
             b1 := ((b1^(cyc^2))^(h^2))^(cyc^8);
@@ -943,29 +943,29 @@ ConstructXiAn := function( n, g, h )
                 Add(xisl[m+1], [5*i-2..5*i+2] );
                 xis[m+2] := xis[m+2] * a2;
                 Add(xisl[m+2], [5*i-3,5*i-2,5*i+1,5*i+4,5*i+5] );
-                xis[m+3] := xis[m+3] * a3; 
+                xis[m+3] := xis[m+3] * a3;
                 Add(xisl[m+3], [5*i-2,5*i-1,5*i+2,5*i+3,5*i+4] );
                 xis[2*m+5] := xis[2*m+5] * b1;
                 Add(xisl[2*m+5], [5*i-4,5*i-3,5*i+3,5*i+4,5*i+5] );
                 xis[2*m+6] := xis[2*m+6] * b2;
                 Add(xisl[2*m+6], [5*i-4,5*i-1,5*i,5*i+2,5*i+3] );
-                xis[2*m+7] := xis[2*m+7] * b3; 
+                xis[2*m+7] := xis[2*m+7] * b3;
                 Add(xisl[2*m+7], [5*i-4,5*i-3,5*i,5*i+1,5*i+5] );
                 a1 := a1^cyc10;
                 b1 := b1^cyc10;
                 a2 := a2^cyc10;
                 b2 := b2^cyc10;
                 a3 := a3^cyc10;
-                b3 := b3^cyc10;          
+                b3 := b3^cyc10;
               fi;
               b := Binary(i, m);
               for j in [1 .. m] do
-                if b[j] = 1 then 
-                    xis[j] := xis[j] * anew; 
+                if b[j] = 1 then
+                    xis[j] := xis[j] * anew;
                     Add(xisl[j], [5*i-4 .. 5*i]);
                 fi;
-                if b[j+m] = 1 then 
-                    xis[j+m+4] := xis[j+m+4] * anew; 
+                if b[j+m] = 1 then
+                    xis[j+m+4] := xis[j+m+4] * anew;
                     Add(xisl[j+m+4], [5*i-4 .. 5*i]);
                 fi;
               od;
@@ -975,7 +975,7 @@ ConstructXiAn := function( n, g, h )
             xis[m+4] := anew;
             xisl[m+4] := [Union([2..6-(n mod 5)],[n+1-(n mod 5)..n])];
             xis[2*m+8] := g^0;
-            xisl[2*m+8] := []; 
+            xisl[2*m+8] := [];
 
         fi;  # n mod 5
 
@@ -1037,8 +1037,8 @@ FindImageAn := function( n, z, g, h, xis, xisl )
     m := Length(xisl)/2;
     # list of pairs of 3-cycles intersecting in i is in ith entry
     findp := [[1,7], [1,8], [1,5], [2,5], [4,7] ];
-    ## Find two 3-cycles which have the other two points in common 
-    ## with the d-th 3-cycle, e.g. 
+    ## Find two 3-cycles which have the other two points in common
+    ## with the d-th 3-cycle, e.g.
     ## if t[d] = (1,2,3) then we want (1,2,4) and (1,2,5)
     tc := [[2,4],[1,7],[1,4],[1,3],[3,6],[1,5],[2,5],[2,3],[1,2],[1,5]];
     rest := [ 5*QuoInt(n,5)+1 .. 5*QuoInt(n,5) + RemInt(n,5) ];
@@ -1048,7 +1048,7 @@ FindImageAn := function( n, z, g, h, xis, xisl )
     if n mod 2 <> 0 then
         b := g * h;  # the n-cycle
         c := (h^(b^2))*h;  # (1,2,3,4,5)
-        t := []; 
+        t := [];
         for i in [ 0 .. 4 ] do
             Add(t,h^(c^i));
             Add(t,(h^(c*h^(-1)))^(c^i));
@@ -1059,7 +1059,7 @@ FindImageAn := function( n, z, g, h, xis, xisl )
     else
         b := g * h;  # the (n-1)-cycle without 2
         c :=  (h^2*((h^2)^(b^2)) * h^2);  # (1,2,3,4,5)
-        t := []; 
+        t := [];
         for i in [ 0 .. 4 ] do
             Add(t,h^(c^i));
             Add(t,((h^g)^(-1))^(c^i));
@@ -1077,14 +1077,14 @@ FindImageAn := function( n, z, g, h, xis, xisl )
     s[4] := s[3]^(g^2);
     s[5] := s[4]^(g^2);
     zim := [];
-    
+
     # compute images of i, ..,  i+4
     i := 1;
     while i <= n-4 do
         tdz := List(t, x->x^z);
         sup := [ [1..n], [1..n], [1..n], [1..n], [1..n] ];
         for j in [1 .. m] do
-            d := 1; 
+            d := 1;
             mxj := xisl[j];
             mxjpm := xisl[j+m];
             while d <= 10 do
@@ -1093,7 +1093,7 @@ FindImageAn := function( n, z, g, h, xis, xisl )
                     sup[tim[d][2]] := Difference( sup[tim[d][2]], mxj);
                     sup[tim[d][3]] := Difference( sup[tim[d][3]], mxj);
                     k := tc[d];
-                    for jj in [ 1 .. 2 ] do 
+                    for jj in [ 1 .. 2 ] do
                         dd := Difference(tim[k[jj]], tim[d])[1];
                         if RecSnAnEq(tdz[k[jj]]*xis[j],xis[j]*tdz[k[jj]]) then
                             sup[dd] :=  Difference( sup[dd], mxj);
@@ -1107,7 +1107,7 @@ FindImageAn := function( n, z, g, h, xis, xisl )
                     sup[tim[d][2]] := Difference(sup[tim[d][2]], mxjpm);
                     sup[tim[d][3]] := Difference(sup[tim[d][3]], mxjpm);
                     k := tc[d];
-                    for jj in [ 1 .. 2 ] do 
+                    for jj in [ 1 .. 2 ] do
                         dd := Difference(tim[k[jj]], tim[d])[1];
                         if RecSnAnEq(tdz[k[jj]]*xis[j+m],xis[j+m]*tdz[k[jj]]) then
                             sup[dd] :=  Difference( sup[dd], mxjpm);
@@ -1122,8 +1122,8 @@ FindImageAn := function( n, z, g, h, xis, xisl )
         od;
 
         # Now determine the images of these 5 points
-        for l in [ 1 .. 5 ] do 
-            if Length(sup[l]) = 1 
+        for l in [ 1 .. 5 ] do
+            if Length(sup[l]) = 1
                 then zim[i+l-1] := sup[l][1];
             else
                 for j in [1..Length(sup[l])] do
@@ -1146,7 +1146,7 @@ FindImageAn := function( n, z, g, h, xis, xisl )
         i := i + 5;
     od;
 
-    if RemInt(n,5) = 1 then 
+    if RemInt(n,5) = 1 then
         zim[n] := Difference([1..n],zim)[1];
     elif RemInt(n,5) > 1 then
         t := List( t, j -> j^(b^(-5+RemInt(n,5))));
@@ -1169,7 +1169,7 @@ FindImageAn := function( n, z, g, h, xis, xisl )
 
     return PermList(zim);
 
-end; 
+end;
 
 
 ##  SLP for pi from (1,2), (1,...,n)
@@ -1184,14 +1184,14 @@ SLPforSn :=  function( n, pi )
         return StraightLineProgram([[1,0]],2);
     fi;
 
-    # we need the cycles of pi of length > 1 to be written such 
+    # we need the cycles of pi of length > 1 to be written such
     # that the minimum point is the initial point of the cycle
     initpts := [ ];
     cycles := [ ];
     for c in Filtered( Cycles( pi, [ 1 .. n ] ), c -> Length(c) > 1 ) do
         i := Minimum( c );
         Add( initpts, i );
-        if i = c[1] then 
+        if i = c[1] then
             Add( cycles, c );
         else
             newc := [ i ];
@@ -1205,7 +1205,7 @@ SLPforSn :=  function( n, pi )
     # R will be a straight line program from tau_1, sigma_1
     # we update cycle product, tau_i+1, sigma_i+2
     # and then overwrite the updates into positions 1,2,3
-    R := [ [1,0], [3,1], [1,1], [2,1,1,1], 
+    R := [ [1,0], [3,1], [1,1], [2,1,1,1],
                     [[4,1],1], [[5,1],2], [[6,1],3] ];
     i := 1;
     repeat
@@ -1253,14 +1253,14 @@ SLPforAn :=  function( n, pi )
         return StraightLineProgram([[1,0]],2);
     fi;
 
-    # we need the cycles of pi of length > 1 to be written such 
+    # we need the cycles of pi of length > 1 to be written such
     # that the minimum point is the initial point of the cycle
     initpts := [ ];
     cycles := [ ];
     for c in Filtered( Cycles( pi, [ 1 .. n ] ), c -> Length(c) > 1 ) do
         i := Minimum( c );
         Add( initpts, i );
-        if i = c[1] then 
+        if i = c[1] then
             Add( cycles, c );
         else
             newc := [ i ];
@@ -1294,23 +1294,23 @@ SLPforAn :=  function( n, pi )
                 # NB: if i < j < n-1 then (i,j)(n-1,n) = (n-1,n)(i,j)
                 if j = i+1 then
                     if IsEvenInt( n-i ) then
-                        Append( cycslp, [ 3,i+2-n, 2,2, 3,1, 2,1, 
+                        Append( cycslp, [ 3,i+2-n, 2,2, 3,1, 2,1,
                                           3,-1, 2,2, 3,n-i-2 ] );
                     else
-                        Append( cycslp, [ 3,i+2-n, 2,1, 3,1, 2,1, 
+                        Append( cycslp, [ 3,i+2-n, 2,1, 3,1, 2,1,
                                           3,-1, 2,1, 3,n-i-2 ] );
                     fi;
                 else
                     if IsEvenInt( n-i ) then
-                        Append( cycslp, [ 3,i+2-j, 2,1, 3,j-n, 
-                                          2,2, 3,1, 2,1, 3,-1, 2,2, 
+                        Append( cycslp, [ 3,i+2-j, 2,1, 3,j-n,
+                                          2,2, 3,1, 2,1, 3,-1, 2,2,
                                           3,n-j, 2,2, 3,j-i-2 ] );
                     elif IsOddInt( n-i ) and IsEvenInt( j-i-2 ) then
-                        Append( cycslp, [ 3,i+2-j, 2,1, 3,j-n, 
+                        Append( cycslp, [ 3,i+2-j, 2,1, 3,j-n,
                                           2,1, 3,1, 2,1, 3,-1, 2,1,
                                           3,n-j, 2,2, 3,j-i-2 ] );
                     else
-                        Append( cycslp, [ 3,i+2-j, 2,2, 3,j-n, 
+                        Append( cycslp, [ 3,i+2-j, 2,2, 3,j-n,
                                           2,1, 3,1, 2,1, 3,-1, 2,1,
                                           3,n-j, 2,1, 3,j-i-2 ] );
                     fi;
@@ -1343,7 +1343,7 @@ SLPforAn :=  function( n, pi )
         od;
         Append( R, [ [cycslp,4] ] );
 
-      else  # not (i in initpts)  
+      else  # not (i in initpts)
         # we carry forward cycle product computed so far
         Append( R, [ [[1,1],4] ] );
       fi;
@@ -1412,14 +1412,14 @@ RecogniseSnAn :=  function( n, grp, eps )
             gl := FindImageAn( n, g, gens[1], gens[2], xis[1], xis[2] );
             if gl = fail then return fail; fi;
             if SignPerm(gl) = -1 then
-                # we found an odd permutation, 
+                # we found an odd permutation,
                 # so the group cannot be An
                 slp := SLPforAn( n, (1,2)*gl );
                 eval:=ResultOfStraightLineProgram(slp,[gens[2],gens[1]]);
                 h :=  eval * g^-1;
-                if n mod 2 <> 0 then 
+                if n mod 2 <> 0 then
                     b := gens[1] * gens[2];
-                else 
+                else
                     b := h * gens[1] * gens[2];
                 fi;
                 if SatisfiesSnPresentation( n, b, h ) then

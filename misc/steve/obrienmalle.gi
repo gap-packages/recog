@@ -32,8 +32,8 @@ end;  # Commutators
 
 ProbablyGroupExponent := function (G)
     local   l,  i,  orders,  g,  o,  m;
-    l := [1]; 
-    i := 1; 
+    l := [1];
+    i := 1;
     orders := [];
    repeat
       g := PseudoRandom (G);
@@ -50,7 +50,7 @@ RandomGensDerived := function (G)
     local   gens,  i,  g1,  g2;
    gens := [];
    for i in [1..NMR_COMM] do
-       g1 := PseudoRandom (G); 
+       g1 := PseudoRandom (G);
        g2 := PseudoRandom (G);
        AddSet(gens,Comm(g1,g2));
    od;
@@ -88,7 +88,7 @@ RandomInvModCenter := function (G)
             return [g, true];
         fi;
     od;
-    return [One(G), false];  # No involution found 
+    return [One(G), false];  # No involution found
 end;    # RandomInvModCenter
 
 FindFieldSize := function (H, dim)
@@ -105,7 +105,7 @@ FindFieldSize := function (H, dim)
        if IsPrimePowerInt(2*o-1) and 2*o-1 mod 3 = 0 then
            ree := true;
        fi;
-   fi;      # to recognize the Ree groups 
+   fi;      # to recognize the Ree groups
    if (dim = 1) or ree then
        for i in [2*o+1, 2*o-1] do
            if IsPrimePowerInt(i) then
@@ -142,7 +142,7 @@ end;        # WhichL2q
 
 
 SmallCentralizer := function (G)
-    local   G0,  dim,  tmp,  r1,  flag,  invs,  jf,  g,  h,  x,  o,  
+    local   G0,  dim,  tmp,  r1,  flag,  invs,  jf,  g,  h,  x,  o,
             H,  cc,  oG,  xx,  yy;
     G0 := G;
     dim := 0;
@@ -175,7 +175,7 @@ SmallCentralizer := function (G)
             xx := RandomGensDerived (G);
             G := SubgroupNC(G0, xx);
             yy := Commutators ( xx, cc );
-            if ForAll(yy,i->Order(i)=1) then 
+            if ForAll(yy,i->Order(i)=1) then
                 return [oG, dim, H, true];  # L2 (q), D_{q+-1}
             fi;
         fi;
@@ -187,8 +187,8 @@ end;    # SmallCentralizer
 # given group G, determine its defining field */
 DetermineFieldSize := function (G)
     local   tmp,  qs;
-    tmp := SmallCentralizer (G);  
-    qs := FindFieldSize (tmp[3], tmp[2]);                       
+    tmp := SmallCentralizer (G);
+    qs := FindFieldSize (tmp[3], tmp[2]);
     return qs;
 end;
 
@@ -200,14 +200,14 @@ RemoveSome := function (types, ns, orders)
   if ns = 9 then
       if 15 in orders then
           RemoveSome(types, "U_4 ( 3 )");
-      else 
+      else
           ns := 0;
       fi;
   fi;
   if ns >= 19 then
      if ForAny(orders, o-> not o in  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
                 16, 17, 18, 19, 20, 21, 22, 24, 28, 30, 33, 35]) then
-         RemoveSet( types,"2E_6 ( 2 )"); 
+         RemoveSet( types,"2E_6 ( 2 )");
      fi;
  fi;
  return [types, ns];
@@ -215,9 +215,9 @@ end;   # RemoveSome
 
 DegreeAlternating := function (orders)
     local   degs,  prims,  m,  f,  n;
-    degs := []; 
+    degs := [];
     prims := [];
-    for m in orders do 
+    for m in orders do
         if m > 1 then
             f := Collected(Factors(m));
             Sort(f);
@@ -225,7 +225,7 @@ DegreeAlternating := function (orders)
             if f[1][1] = 2 then n := n+2; fi;
             AddSet(degs,n);
             UniteSet(prims,Set(f,x->x[1]));
-        fi; 
+        fi;
     od;
     return [degs, prims];
 end;    #  DegreeAlternating
@@ -235,26 +235,26 @@ RecognizeAlternating := function (orders)
    tmp := DegreeAlternating (orders);
    degs := tmp[1];
    prims := tmp[2];
-   if Length(degs) = 0 then 
-       return "Unknown"; 
+   if Length(degs) = 0 then
+       return "Unknown";
    fi;
    mindeg := Maximum (degs);  # minimal possible degree
-   
+
    p1 := PrevPrimeInt (mindeg + 1);
    p2 := PrevPrimeInt (p1);
    if not p1 in prims or not p2 in prims then
        return 0;
    fi;
    if mindeg mod 2 = 1 then
-       if not (mindeg in orders and  mindeg - 2 in orders) then 
+       if not (mindeg in orders and  mindeg - 2 in orders) then
            return 0;
        fi;
    else
-       if not mindeg - 1 in orders then 
+       if not mindeg - 1 in orders then
            return 0;
        fi;
    fi;
-  
+
    for i in [3..Minimum (QuoInt(mindeg,2) - 1, 6)] do
        if IsPrime (i) and IsPrime (mindeg - i) then
            if not i * (mindeg - i) in orders then
@@ -333,8 +333,8 @@ SporadicGroupData := [
                            allowed := [16,23,24,28,29,30,31,33,35,40,42,44,66],
                            name := "J_4")];
                            # is 15 not needed here?
-                      
-                      
+
+
 
 RecognizeSporadic := function (orders)
     local   maxords,  spors,  r;
@@ -347,28 +347,28 @@ RecognizeSporadic := function (orders)
             Add(spors,r.name);
         fi;
     od;
-  return spors;  
+  return spors;
 end;  # RecognizeSporadic
 
-RecogniseSporadic := RecognizeSporadic; 
+RecogniseSporadic := RecognizeSporadic;
 
 IdentifySimple := function (G0)
-    local   NmrTries,  limit,  d,  orders,  NRtries,  ct,  tmp,  G,  
-            dim,  H,  flag,  qs,  flag2,  ps,  types,  p,  erg,  ns,  
+    local   NmrTries,  limit,  d,  orders,  NRtries,  ct,  tmp,  G,
+            dim,  H,  flag,  qs,  flag2,  ps,  types,  p,  erg,  ns,
             spors, deg;
-    
+
     NmrTries := ValueOption("NmrTries");
     if NmrTries = fail then
         NmrTries := 15;
     fi;
-    
+
     if IsMatrixGroup(G0) then
         deg := DimensionOfMatrixGroup(G0);
     else
         deg := 100;
     fi;
-    
-#  /* replace G0 by successive terms of its derived series  
+
+#  /* replace G0 by successive terms of its derived series
 #     until we obtain a perfect group; if there are more
 #     than 3 iterations, then we can conclude that
 #     G/Z (F^* (G)) is probably not almost simple */
@@ -377,15 +377,15 @@ IdentifySimple := function (G0)
     while IsProbablyPerfect (G0) = false and limit < 4 do
         limit := limit + 1;
         G0 := DerivedSubgroupApproximation (G0);
-        if IsTrivial(G0)  then 
-            return [false]; 
+        if IsTrivial(G0)  then
+            return [false];
         fi;
     od;
-    
-    if limit > 4 then 
-        return [false, "G0 is not quasi-simple"]; 
+
+    if limit > 4 then
+        return [false, "G0 is not quasi-simple"];
     fi;
-    
+
     if IsMatrixGroup(G0) then
         d := DimensionOfMatrixGroup(G0);
     else
@@ -408,11 +408,11 @@ IdentifySimple := function (G0)
                 flag2 := tmp[2];
                 qs := WhichL2q (G, qs);
                 ct := ct + 1;
-            else 
-                qs := [2]; 
+            else
+                qs := [2];
             fi;
         until Length(qs) >= 1 or ct >= 6;
-       
+
         UniteSet(orders,Set([1..NR2 + 4*d], i-> PossiblyProjectiveOrder(PseudoRandom(G0))));
         ps := Set(qs, q->Factors(q)[1]);
         AddSet(ps,2);
@@ -423,9 +423,9 @@ IdentifySimple := function (G0)
                 AddSet(types,erg);
             fi;
         od;
-        
+
         ns := RecognizeAlternating (orders);
-        if ns <> "Unknown" then 
+        if ns <> "Unknown" then
             tmp := RemoveSome (types, ns, orders);
             types := tmp[1];
             ns := tmp[2];
@@ -433,10 +433,10 @@ IdentifySimple := function (G0)
                 AddSet(types,Concatenation("A_",String(ns)));
             fi;
         fi;
-     
+
         spors := RecognizeSporadic (orders);
         types := Union(types, spors);
-     
+
         if Length(types) >= 1 then
             if  Length(types) = 1 then
                 return [true, types[1]];
@@ -445,14 +445,14 @@ IdentifySimple := function (G0)
             fi;
         fi;
     until Length(types) > 0 or NRtries > NmrTries;
-  
+
     Print("Not recognized after ", NmrTries, " tries; qs = ",qs,"\n");
     return [false];
 
 end;  # IdentifySimple
 
 
-InstallNonConstructiveRecognizer(function(g) 
+InstallNonConstructiveRecognizer(function(g)
     local   res;
     res := IdentifySimple(g);
     if res[1] = true then

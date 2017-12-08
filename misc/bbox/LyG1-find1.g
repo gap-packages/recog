@@ -7,7 +7,7 @@ f := function(arg)
     G := Group(arg);
 
     # Black box algorithm to find standard generators of Ly
-    
+
     vars.F := 0;
     vars.G := 0;
     vars.V := 0;
@@ -37,7 +37,7 @@ f := function(arg)
             fi;
         fi;
     until vars.F <> 0 and vars.G <> 0;
-        
+
     vars.X := 0;
     repeat    # label CONJUGATE
         vars.X := vars.X + 1;
@@ -55,7 +55,7 @@ f := function(arg)
         if vars.D <> 14 then
             continue;    # was jmp to CONJUGATE
         fi;
-        
+
         els[6] := els[5]*els[3];
         els[7] := els[5]*els[5];
         els[8] := els[7]*els[6];
@@ -64,7 +64,7 @@ f := function(arg)
             continue;    # was jmp to CONJUGATE
         fi;
         break;
-    until false;    
+    until false;
     return els{[2,3]};
 end;
 

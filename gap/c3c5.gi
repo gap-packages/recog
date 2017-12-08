@@ -1,7 +1,7 @@
 #############################################################################
 ##
-##  semilinear.gi          
-##                                recog package  
+##  semilinear.gi
+##                                recog package
 ##                                                    Colva Rouney-Dougal
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
@@ -19,7 +19,7 @@
 ##
 #############################################################################
 
-RECOG.WriteOverBiggerFieldWithSmallerDegree := 
+RECOG.WriteOverBiggerFieldWithSmallerDegree :=
   function( inforec, gen )
     # inforec needs:
     #  bas, basi, sample, newdim, FF, d, qd from the Finder
@@ -35,7 +35,7 @@ RECOG.WriteOverBiggerFieldWithSmallerDegree :=
         for k in [1..inforec.newdim] do
             val := Zero(inforec.FF);
             for t in [1..inforec.d] do
-                val := gen[(i-1)*inforec.d+1][(k-1)*inforec.d+t] 
+                val := gen[(i-1)*inforec.d+1][(k-1)*inforec.d+t]
                        * inforec.pows[t] + val;
             od;
             row[k] := val;
@@ -46,9 +46,9 @@ ConvertToMatrixRep(newgen,inforec.qd);
     od;
     return newgen;
   end;
-  
+
 RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
-  # m a MeatAxe-module 
+  # m a MeatAxe-module
   local F,bas,d,dim,e,fac,facs,gens,i,inforec,j,k,mp,mu,new,newgens,pr,q,v;
 
   if not(MTX.IsIrreducible(m)) then
@@ -141,7 +141,7 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
       ri!.meataxemodule := GModuleByMats(GeneratorsOfGroup(G),f);
   fi;
 
-  m := ri!.meataxemodule; 
+  m := ri!.meataxemodule;
   if MTX.IsAbsolutelyIrreducible(m) then
       return false;
   fi;
@@ -157,7 +157,7 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
   SetIsSurjective(hom,true);  # projective groups!
                               # But as a GAP homomorphism between matrix
                               # groups, it is an isomorphism.
-  
+
   # Now report back:
   SetHomom(ri,hom);
 
@@ -202,7 +202,7 @@ FindHomMethodsProjective.BiggerScalarsOnly := function(ri,G)
            stamp := "StabilizerChain" ));
 
   findgensNmeth(ri).method := FindKernelDoNothing;
-  
+
   return true;
 end;
 
@@ -241,8 +241,8 @@ RECOG.ScalarsToMultiplyIntoSmallerField := function(l,k)
       if r = fail then return fail; fi;
       if not(IsSubset(f,r.field)) then
           f := ClosureField(f,r.field);
-          if f = k then 
-              return fail; 
+          if f = k then
+              return fail;
           fi;
       fi;
       scalars[i] := r.scalar;
@@ -252,9 +252,9 @@ RECOG.ScalarsToMultiplyIntoSmallerField := function(l,k)
 end;
 
 RECOG.BaseChangeForSmallestPossibleField := function(grp,mtx,k)
-  # grp is a matrix group over k, which must be a finite field. mtx must be 
+  # grp is a matrix group over k, which must be a finite field. mtx must be
   # the GModuleByMats(GeneratorsOfGroup(grp),k).
-  # The module mtx must be irreducible (not necessarily absolutely irred). 
+  # The module mtx must be irreducible (not necessarily absolutely irred).
   # A subfield f of k has property (*), if and only if there
   # is an invertible matrix t with entries in k such that for every generator
   # x in gens t*x*t^-1 has entries in f.
@@ -264,7 +264,7 @@ RECOG.BaseChangeForSmallestPossibleField := function(grp,mtx,k)
   #   r.t       : the matrix t
   #   r.ti      : the inverse of t
   #   r.newgens : the list of generators t * x * ti
-  #   r.field   : the smaller field 
+  #   r.field   : the smaller field
 
   local a,algel,b,bi,charPoly,deg,dim,element,f,facs,field,g,i,newgens,
         r,scalars,seb,v,w;
@@ -279,7 +279,7 @@ RECOG.BaseChangeForSmallestPossibleField := function(grp,mtx,k)
   dim := Length(a);
   while ( element = false ) do
     a := a + Random ( f ) * PseudoRandom ( grp ) ;
-  
+
     # Check char. polynomial of a to make sure it lies in smallField [ x ]
     charPoly := CharacteristicPolynomial ( a ) ;
     field := Field(CoefficientsOfLaurentPolynomial(charPoly)[1]);
@@ -289,11 +289,11 @@ RECOG.BaseChangeForSmallestPossibleField := function(grp,mtx,k)
             return fail;
         fi;
     fi;
-    
+
     # FIXME: We only take factors that occur just once (good factors)!
     facs := Collected(Factors(charPoly : onlydegs := [1..3]));
     facs := Filtered(facs,x->x[2] = 1);
-    
+
     i := 1;
     while i <= Length(facs) do
         algel := Value(facs[i][1],a);
@@ -362,7 +362,7 @@ end;
 
 FindHomMethodsProjective.Subfield :=
   function(ri,G)
-    # We assume G to be absolutely irreducible, although this is not 
+    # We assume G to be absolutely irreducible, although this is not
     # necessary:
     local Gprime,H,b,dim,f,hom,mo,newgens,pf,r;
     RECOG.SetPseudoRandomStamp(G,"Subfield");
@@ -395,7 +395,7 @@ FindHomMethodsProjective.Subfield :=
 
     return false;   # nothing more to do for us, C3C5 takes care of the rest!
   end;
-      
+
 RECOG.HomActionFieldAuto := function(data,el)
   local pos,y;
   y := data.cgen ^ el;
@@ -456,7 +456,7 @@ RECOG.HomForNilpotent := function(data,el)
       return decomp[2];
   fi;
 end;
-  
+
 RECOG.ProjectiveOrder := function(el)
   return ProjectiveOrder(el)[1];
 end;
@@ -490,7 +490,7 @@ FindHomMethodsProjective.KnownNilpotent := function(ri,G)
   fi;
   if Length(primes) < 2 then return false; fi;   # not our beer
   cut := QuoInt(Length(primes),2);
-  data := rec( primesfactor := primes{[1..cut]}, 
+  data := rec( primesfactor := primes{[1..cut]},
                primeskernel := primes{[cut+1..Length(primes)]},
                orderfunc := orderfunc );
   gens2 := List(gensm,x->RECOG.DecomposeNilpotent(data,x));
@@ -621,7 +621,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
       Add(Hgens,Next(pr));
   od;
   H := GroupWithGenerators(Hgens);
-  # Now H is with very high probability a subgroup of N which has the 
+  # Now H is with very high probability a subgroup of N which has the
   # same orbits as N on one-dimensional subspaces and thus the same
   # submodule lattice as N in the natural module.
 
@@ -649,12 +649,12 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
               if r <> fail then   # Yes again! This works!
                   Info(InfoRecog,2,"Conjugating group from GL(",dim,",",f,
                        ") into GL(",dim,",",r.field,").");
-            
+
                   # Set up an isomorphism:
                   H := GroupWithGenerators(newgens);
                   hom := GroupHomByFuncWithData(G,H,
                            RECOG.HomDoBaseAndFieldChangeWithScalarFinding,b);
-                  # Now report back, it is an isomorphism, because this is a 
+                  # Now report back, it is an isomorphism, because this is a
                   # projective method:
                   SetHomom(ri,hom);
                   findgensNmeth(ri).method := FindKernelDoNothing;
@@ -740,7 +740,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
           basis := Concatenation(homs);
           ConvertToMatrixRep(basis,Size(f));
           subdim := MTX.Dimension(collf[1][1]);
-          r := rec(t := basis, ti := basis^-1, 
+          r := rec(t := basis, ti := basis^-1,
                    blocksize := MTX.Dimension(collf[1][1]));
           # Note that we already checked for semilinear, so we know that
           # the irreducible N-submodule is absolutely irreducible!
@@ -753,16 +753,16 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
               Error("This should never have happened (3), tell Max.");
               return false;
           fi;
-    
+
           H := GroupWithGenerators(conjgensG);
           hom := GroupHomByFuncWithData(G,H,RECOG.HomDoBaseChange,r);
           SetHomom(ri,hom);
-    
+
           # Hand down information:
           forfactor(ri).blocksize := r.blocksize;
           forfactor(ri).generatorskronecker := kro;
           Add( forfactor(ri).hints,
-               rec( method := FindHomMethodsProjective.KroneckerProduct, 
+               rec( method := FindHomMethodsProjective.KroneckerProduct,
                     rank := 4000, stamp := "KroneckerProduct" ) );
           # This is an isomorphism:
           findgensNmeth(ri).method := FindKernelDoNothing;
@@ -782,7 +782,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
       a := OrbActionHomomorphism(G,o);
       SetHomom(ri,a);
       Setmethodsforfactor(ri,FindHomDbPerm);
-    
+
       return true;
 
   fi;

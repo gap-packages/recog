@@ -7,7 +7,7 @@ LoadPackage("recog");
 z := Z(5)*0;
 o := Z(5)^0;
 s := Z(5^2);
-gens := 
+gens :=
 [[[z,z,z,z,z,z,z,z,z,o,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z],
 [z,z,z,z,z,z,z,z,z,z,o,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z],
 [z,z,z,z,z,z,z,z,z,z,z,o,z,z,z,z,z,z,z,z,z,z,z,z,z,z,z],

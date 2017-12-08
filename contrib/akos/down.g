@@ -2,7 +2,7 @@
 first:=function(list)
 local i;
 
-for i in [1..Length(list)] do 
+for i in [1..Length(list)] do
     if list[i]>1 and Gcd(list[i],Product(list)/list[i])=1 then
        return list[i];
     fi;
@@ -21,9 +21,9 @@ d:=list[2];
 q:=list[3];
 
 Print(d,"\c");
-#find an element with irreducible action of relative prime dimension to 
+#find an element with irreducible action of relative prime dimension to
 #all other invariant subspaces
-repeat 
+repeat
 Print(".\c");
    r:=PseudoRandom(g);
    pol:=CharacteristicPolynomial(r);
@@ -35,7 +35,7 @@ until newdim <> fail and newdim<=d/4;
 # raise r to a power so that acting trivially outside one invariant subspace
 degrees:=Filtered(degrees, x->x<>newdim);
 power:=q^10*Lcm(List(degrees, x->q^x-1));
-if q=2 then 
+if q=2 then
    power:=power*2^10;
 fi;
 rr:=r^power;

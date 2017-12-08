@@ -27,7 +27,7 @@ lbl SEMISTD
 
 	if F eq 0 then jmp SEMISTD
 	if G eq 0 then jmp SEMISTD
-	
+
 	set X 0
 lbl CONJUGATE
 	incr X

@@ -4,16 +4,16 @@ pol,factors,degrees;
 
 n:=DimensionOfMatrixGroup(g);
 d:=Dimension(subspg);
-repeat 
+repeat
   ready:=false;
   y:=PseudoRandom(g);
   pol:=CharacteristicPolynomial(y);
   factors:=Factors(pol);
   degrees:=List(factors,Degree);
-  if d-1 in degrees then 
+  if d-1 in degrees then
      order:=Order(y);
      yy:=y^(order/Gcd(order,q-1));
-     if not IsOne(yy) then 
+     if not IsOne(yy) then
           es:= Eigenspaces(GF(q),yy);
           es:=Filtered(es,x->Dimension(x)=d-1 and IsSubspace(subspg,x));
           if Length(es)>0 then
@@ -33,8 +33,8 @@ for i in [1..4] do
     b := x^yy;
     c := x^(yy^2);
     h := Group(a,b,c);
-    ready:=false;  
-    repeat 
+    ready:=false;
+    repeat
       r:=PseudoRandom(h);
       r:=r^(q*(q+1));
       if not IsOne(r) and r*yy=yy*r then
@@ -52,7 +52,7 @@ gens,degrees, factors, pol, ready,ready2,list,hmod,cf, fac,vs,z;
 
 n:=DimensionOfMatrixGroup(g);
 
-if q-1>n then 
+if q-1>n then
   subspg:=VectorSpace(GF(q),One(g));
   subgplist:=[g,subspg];
   workingdim:=n;
@@ -62,13 +62,13 @@ if q-1>n then
   od;
 else
   n:=DimensionOfMatrixGroup(g);
-  repeat  
+  repeat
     ready:=false;
     y:=PseudoRandom(g);
     pol:=CharacteristicPolynomial(y);
     factors:=Factors(pol);
     degrees:=List(factors,Degree);
-    if SortedList(degrees)=[1,1,n-2] then 
+    if SortedList(degrees)=[1,1,n-2] then
        order:=Order(y);
        if order mod 2 = 0 then
           yy:=y^(order/2);
@@ -92,7 +92,7 @@ else
        Add(list,Maximum(degrees));
      od;
      list:=Set(list);
-     if 3 in list and 2 in list then 
+     if 3 in list and 2 in list then
        ready2:=true;
        hmod:=GModuleByMats(gens,GF(q));
        cf:=MTX.CompositionFactors(hmod);

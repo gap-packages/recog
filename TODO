@@ -50,17 +50,17 @@ Later TODO list:
   - Cleanup matrix.gi (e.g. remove det code)
  - Pete Sp -> send mail
  - PCGS with memory: Luks, Murray, Cooperman implementation
- - Hash functions for vectors over finite fields 257 <= q <= 65536 
+ - Hash functions for vectors over finite fields 257 <= q <= 65536
    -> NumberFFVector
  - do more C9 cases
 
 ========================================================================
 
-Future: 
+Future:
 
 improvements of library in library
 
 to change once the new vector/matrix interface is in place:
 
   FieldOfMatrixGroup/DefaultFieldOfMatrixGroup
-  
+

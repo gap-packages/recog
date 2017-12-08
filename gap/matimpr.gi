@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  matimpr.gi        
+##  matimpr.gi
 ##                                recog package
 ##                                                        Max Neunhoeffer
 ##                                                         Alice Niemeyer
@@ -24,7 +24,7 @@
 RECOG.OrbitSubspaceWithLimit := function( grp, U, max )
 
     local   orb,  orbset, new,  pnt,  img,  gen, gens;
-  
+
     gens := GeneratorsOfGroup(grp);
 
     # start with the singleton orbit
@@ -144,7 +144,7 @@ RECOG.SmallHomomorphicImageProjectiveGroup := function ( grp )
       od;
       return false;   # go out all the way without success
     end;
-    
+
     Info(InfoRecog,2,"LowIndex: Trying 10 first elements...");
     for i in [1..10] do   # this is just heuristics!
         gens := [PseudoRandom(grp)];
@@ -181,8 +181,8 @@ FindHomMethodsProjective.LowIndex := function(ri,G)
           # A block system: We do a base change isomorphism:
           forkernel(ri).t := Concatenation(res.orb);
           forkernel(ri).blocksize := Length(res.orb[1]);
-          Add(forkernel(ri).hints, 
-              rec(method := FindHomMethodsProjective.DoBaseChangeForBlocks, 
+          Add(forkernel(ri).hints,
+              rec(method := FindHomMethodsProjective.DoBaseChangeForBlocks,
                   rank := 2000, stamp := "DoBaseChangeForBlocks"),1);
           Setimmediateverification(ri,true);
           findgensNmeth(ri).args[1] := Length(res.orb)+3;
@@ -260,7 +260,7 @@ FindHomMethodsProjective.BlocksBackToMats := function(ri,G)
   H := Group(newgens);
   hom := GroupHomomorphismByFunction(G,H,RECOG.HomBackToMats);
   SetHomom(ri,hom);
-  
+
   # hints for the factor:
   Setmethodsforfactor(ri,FindHomDbMatrix);
   forfactor(ri).blocks := ri!.blocks{[1..Length(ri!.blocks)-1]};
@@ -270,7 +270,7 @@ FindHomMethodsProjective.BlocksBackToMats := function(ri,G)
 
   # This is an isomorphism:
   findgensNmeth(ri).method := FindKernelDoNothing;
-  
+
   return true;
 end;
 
@@ -283,7 +283,7 @@ end;
 #  fi;
 #  cut := QuoInt(nrblocks,2);  # this is now at least 1
 #  subdim := cut * ri!.blocksize;
-#  
+#
 #  # Project onto factor:
 #  newgens := List(GeneratorsOfGroup(G),
 #                  x->ExtractSubMatrix(x,[subdim+1..dim],[subdim+1..dim]));
@@ -308,7 +308,7 @@ end;
 #  forkernel(ri).subdim := subdim;
 #  forkernel(ri).blocksize := ri!.blocksize;
 #  Add(forkernel(ri).hints,
-#      rec( method := FindHomMethodsProjective.BalTreeForBlocksProjKernel, 
+#      rec( method := FindHomMethodsProjective.BalTreeForBlocksProjKernel,
 #           rank := 2000, stamp := "BalTreeForBlocksProjKernel" ));
 #
 #  # Verify the kernel immediately after its recognition:
@@ -371,7 +371,7 @@ end;
 #
 #  # But pass on the information on blocks:
 #  forfactor(ri).blocksize := ri!.blocksize;
-#  Add(forfactor(ri).hints, 
+#  Add(forfactor(ri).hints,
 #      rec(method := FindHomMethodsProjective.BalTreeForBlocks,
 #                               rank := 2000, stamp := "BalTreeForBlocks"));
 #

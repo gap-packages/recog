@@ -183,7 +183,7 @@ SLnUpStep := function(w)
           # Now check that Vn + Vn*s^c1 has dimension 2n-1:
           Vnc := VectorSpace(w.f,c{[1..w.n]});
           sum1 := ClosureLeftModule(Vn,Vnc);
-          if Dimension(sum1) = aimdim then 
+          if Dimension(sum1) = aimdim then
               Fixc := VectorSpace(w.f,NullspaceMat(c-One(c)));
               int1 := Intersection(Fixc,Vn);
               for i in [1..Dimension(int1)] do
@@ -192,7 +192,7 @@ SLnUpStep := function(w)
               od;
               if IsZero(v[w.n]) then
                   Print("Ooops: Component n was zero!\n");
-                  continue; 
+                  continue;
               fi;
               v := v / v[w.n];   # normalize to 1 in position n
               Assert(0,v*c=v);
@@ -203,7 +203,7 @@ SLnUpStep := function(w)
 
       # Now we found our aimdim-dimensional space W. Since SL_n
       # has a d-n-dimensional fixed space W_{d-n} and W contains a complement
-      # of that fixed space, the intersection of W and W_{d-n} has dimension 
+      # of that fixed space, the intersection of W and W_{d-n} has dimension
       # newdim.
 
       # Change basis:
@@ -254,13 +254,13 @@ SLnUpStep := function(w)
           fi;
           i := i + 1;
       od;
-      if Length(pivots2) = newdim then 
+      if Length(pivots2) = newdim then
           cii := cii{pivots2}^-1;
           ConvertToMatrixRep(cii,w.f);
           c := newbas * c * newbasi;
           w.bas := newbas * w.bas;
           w.basi := w.basi * newbasi;
-          break; 
+          break;
       fi;
       Print("Ooops, no nice bottom...\n");
       # Otherwise simply try again
@@ -387,7 +387,7 @@ SLnUpStep := function(w)
 
   # From here on we distinguish three cases:
   #   * w.n = 2
-  #   * we finish off the constructive recognition 
+  #   * we finish off the constructive recognition
   #   * we have to do another step as the next thing
   if w.n = 2 then
       w.slnstdf[2*w.ext+2] := transd[1]*transr[1]^-1*transd[1];
@@ -493,7 +493,7 @@ MakeTest := function(p,e,n,d)
   return r;
 end;
 
-guck := 
+guck :=
 function ( w )
     local  i;
     for i  in w.slnstdf  do

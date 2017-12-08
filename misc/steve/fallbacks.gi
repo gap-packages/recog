@@ -59,8 +59,8 @@ InstallNonConstructiveRecognizer( function(g)
     RecognitionInfo(g).Name := name;
     return name;
 end,"Call IsomorphismTypeInfoFiniteSimpleGroup");
-    
-        
+
+
 InstallFactorizer(function(g,gens,x)
     local   f,  hom,  w,  s;
     f := FreeGroup(Length(gens));
@@ -70,6 +70,6 @@ InstallFactorizer(function(g,gens,x)
     return s;
 end,
   "Use homomorphism from the free group");
-        
-        
-    
+
+
+

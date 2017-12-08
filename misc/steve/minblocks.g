@@ -5,15 +5,15 @@
 #  Based on the implementation in the GAP3 matrix package, reimplemented with new bugs
 #  by Steve Linton, June 2006
 #
-#  
+#
 #
 
 
 MinBlocks := function(G, B)
-    local   equateBlocks,  realBlock,  mergeBlocks,  Bc,  o,  res,  
-            eb,  pivots,  i,  blocks,  coeffs,  gens,  ngens,  invs,  
-            igen,  p,  blockact,  blockdel,  k,  v,  b1,  gen,  w,  
-            w1,  coeff,  j,  x,  y,  b2,  hits,  nblocks,  numbering,  
+    local   equateBlocks,  realBlock,  mergeBlocks,  Bc,  o,  res,
+            eb,  pivots,  i,  blocks,  coeffs,  gens,  ngens,  invs,
+            igen,  p,  blockact,  blockdel,  k,  v,  b1,  gen,  w,
+            w1,  coeff,  j,  x,  y,  b2,  hits,  nblocks,  numbering,
             live,  perms,  perm;
     equateBlocks := function(b1,b2)
         local   i,  b2im,  b2im2,  b1im;
@@ -35,7 +35,7 @@ MinBlocks := function(G, B)
                 fi;
                 blockact[b2im][invs[i]] := b1;
                 b1im := realBlock(blockact[b1][i]);
-                if b1im = 0 then 
+                if b1im = 0 then
                     blockact[b1][i] := b2im;
                 else
                     equateBlocks(b1im,b2im);
@@ -43,9 +43,9 @@ MinBlocks := function(G, B)
             fi;
         od;
     end;
-                    
+
     realBlock := function(b)
-        if b = 0 then 
+        if b = 0 then
             return 0;
         fi;
         if IsBound(blockdel[b]) then
@@ -55,7 +55,7 @@ MinBlocks := function(G, B)
             return b;
         fi;
     end;
-                
+
     mergeBlocks := function(set)
         local   i;
         for i in [2..Length(set)] do
@@ -63,7 +63,7 @@ MinBlocks := function(G, B)
         od;
        blocks := List(blocks,realBlock);
     end;
-    
+
     Bc := List(B,ShallowCopy);
     o := One(B[1][1]);
     ConvertToMatrixRep(Bc);
@@ -174,9 +174,9 @@ MinBlocks := function(G, B)
         od;
         Add(perms, PermList(perm));
     od;
-    return rec(nblocks := nblocks, 
-               permact := perms, 
+    return rec(nblocks := nblocks,
+               permact := perms,
                block := Bc{Filtered([1..Length(eb)], i->realBlock(blocks[i]) = 1)});
 end;
 
-            
+

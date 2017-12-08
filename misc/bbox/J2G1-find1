@@ -36,7 +36,7 @@ lbl SEMISTD
 			pwr D 1 4
 			set H 1
 		endif
-	endif 
+	endif
 
 	if F eq 0 then jmp SEMISTD
 	if G eq 0 then jmp SEMISTD
@@ -59,7 +59,7 @@ lbl SEMISTD
 	endif
 
 	# The elements are definitely in classes 2B and 3B now.
-	
+
 lbl CONJUGATE
 	incr X
 	if X gt 1000 then timeout

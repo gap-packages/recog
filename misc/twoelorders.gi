@@ -1,7 +1,7 @@
 #############################################################################
 ##
-##  twoelorders.gi        
-##                                recog package                   
+##  twoelorders.gi
+##                                recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
 ##
@@ -1585,7 +1585,7 @@ RECOG.TableOfTwoLargestGroupElementOrders :=
 # This is the same as above, however the fourth position now holds
 # the minimum degree this group occurs:
 
-RECOG.TableOfTwoLargestGroupElementOrdersWithDegreeBound := 
+RECOG.TableOfTwoLargestGroupElementOrdersWithDegreeBound :=
 [ [3,2,["l",2,5],2],[4,3,["l",2,7],3],
   [5,3,["l",2,4],2],[5,3,["l",2,5],2],
   [5,3,["s",4,2],4],[5,4,["l",2,9],4],
@@ -4124,15 +4124,15 @@ function(dimbound)
     local list, q, n;
 
     list:=[];
-    for q in [4..2*dimbound+1] do 
-      if IsPrimePowerInt(q) then 
+    for q in [4..2*dimbound+1] do
+      if IsPrimePowerInt(q) then
         Add(list, ["l",2,q]);
       fi;
     od;
 
     for n in [3..LogInt(dimbound,2)] do
       for q in [2..RootInt(dimbound,2)] do
-        if IsPrimePowerInt(q) and (q^n-q)/(q-1)-1 <= dimbound then 
+        if IsPrimePowerInt(q) and (q^n-q)/(q-1)-1 <= dimbound then
           Add(list, ["l",n,q]);
         fi;
       od;
@@ -4143,7 +4143,7 @@ function(dimbound)
         if IsPrimePowerInt(q) and (q mod 2 = 1) and (q^n-1)/2 <= dimbound then
           Add(list, ["s",2*n,q]);
         fi;
-        if IsPrimePowerInt(q) and (q mod 2 = 0) and 
+        if IsPrimePowerInt(q) and (q mod 2 = 0) and
             (q^n-1)*(q^n-q)/(2*(q+1)) <= dimbound then
           Add(list, ["s",2*n,q]);
         fi;
@@ -4152,18 +4152,18 @@ function(dimbound)
 
     for n in [3..LogInt(dimbound,2)] do
       for q in [2..RootInt(dimbound,2)] do
-        if IsPrimePowerInt(q) and  (q^n-1)/(q+1) <= dimbound and 
+        if IsPrimePowerInt(q) and  (q^n-1)/(q+1) <= dimbound and
              [n,q]<>[3,2] then
           Add(list, ["u",n,q]);
-        fi; 
+        fi;
       od;
     od;
 
     for n in [4..LogInt(dimbound,2)] do
-      if (2^n-1)*(2^(n-1)-1)/3 <= dimbound then 
+      if (2^n-1)*(2^(n-1)-1)/3 <= dimbound then
         Add(list, ["o+",2*n,2]);
       fi;
-      if (3^n-1)*(3^(n-1)-1)/8 <= dimbound then 
+      if (3^n-1)*(3^(n-1)-1)/8 <= dimbound then
         Add(list, ["o+",2*n,3]);
       fi;
       for q in [4..RootInt(dimbound,2)] do
@@ -4182,11 +4182,11 @@ function(dimbound)
     od;
 
     for n in [3..LogInt(dimbound,2)] do
-      if (3^n-1)*(3^n-3)/8 <= dimbound then 
+      if (3^n-1)*(3^n-3)/8 <= dimbound then
         Add(list, ["o",2*n+1,3]);
       fi;
       for q in [5..RootInt(dimbound,2)] do
-        if IsPrimePowerInt(q) and (q mod 2 = 1) and  
+        if IsPrimePowerInt(q) and (q mod 2 = 1) and
             (q^(2*n)-1)/(q^2-1)-2 <= dimbound then
           Add(list, ["o",2*n+1,q]);
         fi;
@@ -4230,21 +4230,21 @@ function(dimbound)
       if IsPrimePowerInt(q) and (q mod 2 = 1) and q^8+q^4-2 <= dimbound then
         Add(list, ["F4",q]);
       fi;
-      if IsPrimePowerInt(q) and (q mod 2 = 0) and 
+      if IsPrimePowerInt(q) and (q mod 2 = 0) and
          (q^3-1)*(q^8-q^7)/2 <= dimbound then
         Add(list, ["F4",q]);
       fi;
     od;
 
     for q in [2..RootInt(dimbound,2)] do
-      if IsPrimePowerInt(q) and q^11-q^9 <= dimbound then 
+      if IsPrimePowerInt(q) and q^11-q^9 <= dimbound then
         Add(list, ["2E6",q]);
         Add(list, ["E6",q]);
       fi;
-      if IsPrimePowerInt(q) and q^17-q^15 <= dimbound then 
+      if IsPrimePowerInt(q) and q^17-q^15 <= dimbound then
         Add(list, ["E7",q]);
       fi;
-      if IsPrimePowerInt(q) and q^29-q^27 <= dimbound then 
+      if IsPrimePowerInt(q) and q^29-q^27 <= dimbound then
         Add(list, ["E8",q]);
       fi;
     od;
@@ -4278,7 +4278,7 @@ function(dimbound)
     if dimbound >= 112 then Add(list,["J4"]); fi;
     if dimbound >= 4370 then Add(list,["B"]); fi;
     if dimbound >= 196882 then Add(list,["M"]); fi;
-    
+
     return list;
 
 end;
@@ -4323,7 +4323,7 @@ RECOG.MakePSL2Hint := function( name, G )
   # we are in cross characteristic.
   # to be made better...
   return rec( elordersstart := [defchar], numberrandgens := 1, tries := 10,
-              triesforgens := 3*(name[3]+1), 
+              triesforgens := 3*(name[3]+1),
               orblenlimit := 3*(name[3]+1) );
 end;
 
@@ -4357,7 +4357,7 @@ FindHomMethodsProjective.TwoLargeElOrders := function(ri,G)
           max[2] := o;
       fi;
   od;
-  Info(InfoRecog,2,"Two largest projective orders found: ",max,"."); 
+  Info(InfoRecog,2,"Two largest projective orders found: ",max,".");
   tab := RECOG.TableOfTwoLargestGroupElementOrdersWithDegreeBound;
   p := PositionSorted(tab,max);
   if p > Length(tab) or tab[p]{[1..2]} <> max then

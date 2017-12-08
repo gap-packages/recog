@@ -12,4 +12,4 @@ od;
 sfex2 := Group(gens2);
 
 Print("Two examples in sfex1 and sfex2.\n");
-    
+

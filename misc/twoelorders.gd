@@ -1,7 +1,7 @@
 #############################################################################
 ##
-##  twoelorders.gd        
-##                                recog package                   
+##  twoelorders.gd
+##                                recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
 ##

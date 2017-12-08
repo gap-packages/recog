@@ -2,7 +2,7 @@ MyIsInnerAutomorphism := function(grp,name,phi,membershiptest)
 # Is phi an inner automorphism (possibly modulo scalars) of the quasisimple matrix group grp or direct product of quasisimple groups of given names?
 # membership test is a membership test in grp
  local m,g,gens,ims1,oz,o,z,ims,F,M1,M2,mat,t,i,detmat,z1,j,d
-       ,el,t1,k,names,celt,gp,mtest,kappa,bool; 
+       ,el,t1,k,names,celt,gp,mtest,kappa,bool;
 
 
 # Have to deal with each direct product component seperately
@@ -22,12 +22,12 @@ ImageElm(MyProjection(grp,k),ImageElm(phi,ImageElm(MyEmbedding(grp,k),g))));
      kappa := phi;
      mtest := membershiptest;
    fi;
-   
+
   #was falling over with socle factor A_5s cos they became perm grps,
   #hopefully this will catch it.
   if IsPermGroup(gp) then
     bool:= IsInnerAutomorphism(kappa);
-    if not bool then 
+    if not bool then
       return false;
     elif not IsDirectProduct(grp) then
       return ConjugatorOfConjugatorIsomorphism(kappa);
@@ -43,7 +43,7 @@ ImageElm(MyProjection(grp,k),ImageElm(phi,ImageElm(MyEmbedding(grp,k),g))));
 # Compute a number of random conjugates of g to get a probable generating set for gp
 
    gens := Concatenation([g],List([1..5],i->g^PseudoRandom(gp)));
- 
+
 # compute the images of gens under phi
    ims1 := List(gens,x->ImageElm(kappa,x));
 
@@ -61,7 +61,7 @@ ImageElm(MyProjection(grp,k),ImageElm(phi,ImageElm(MyEmbedding(grp,k),g))));
    M1 := GModuleByMats(gens,F);
    M2 := GModuleByMats(ims,F);
 
-   mat := MTX.IsomorphismModules(M1,M2); 
+   mat := MTX.IsomorphismModules(M1,M2);
    if not IsMatrix(mat) then return false; fi;
 
 
@@ -81,7 +81,7 @@ ImageElm(MyProjection(grp,k),ImageElm(phi,ImageElm(MyEmbedding(grp,k),g))));
    for i in [0..Order(z1)-1] do
      t := (z1^i*z^j)*One(gp)*mat;
 #     t := (z^i)*One(gp)*mat;
-     if IsStraightLineProgram(mtest(t)) then 
+     if IsStraightLineProgram(mtest(t)) then
        if IsDirectProduct(grp) then
          celt := celt * ImageElm(MyEmbedding(grp,k),t);
          break;
@@ -91,7 +91,7 @@ ImageElm(MyProjection(grp,k),ImageElm(phi,ImageElm(MyEmbedding(grp,k),g))));
      fi;
      if i = Order(z1)-1 then return false; fi;
    od;
- od; 
+ od;
  return celt;
 end;
 
@@ -100,7 +100,7 @@ PastNonAb := function(ri)
  local x,riker,aut,w,preim,t,inns,i,innspreims,y,l,rihom,kerhom
        ,zeta, conj_elt;
 
- 
+
  x := pregensfac(ri)[1];
  if IsDirectProduct(Grp(RIFac(RIKer(ri)))) and not IsTrivial(PermAction(GroupWithGenerators([x]),Grp(RIKer(ri)),Homom(RIKer(ri)),Grp(RIFac(RIKer(ri))))) then return false;
  fi;
@@ -110,7 +110,7 @@ PastNonAb := function(ri)
  aut := GroupHomomorphismByFunction(Grp(RIFac(riker)),Grp(RIFac(riker)),
 function(g)
  local w,preim;
- w := slpforelement(RIFac(riker))(RIFac(riker),g); 
+ w := slpforelement(RIFac(riker))(RIFac(riker),g);
  preim := ResultOfStraightLineProgram(w,pregensfac(riker));
  return ImageElm(Homom(riker),preim^x);
 end);
@@ -126,7 +126,7 @@ end);
    aut := GroupHomomorphismByFunction(Grp(RIFac(riker)),Grp(RIFac(riker)),
 function(g)
  local w,preim;
- w := slpforelement(RIFac(riker))(RIFac(riker),g); 
+ w := slpforelement(RIFac(riker))(RIFac(riker),g);
  preim := ResultOfStraightLineProgram(w,pregensfac(riker));
  return ImageElm(Homom(riker),preim^x);
 end);
@@ -155,7 +155,7 @@ end);
  return zeta;
 end;
 
-#returns a function from Grp(ri) to Grp(RIFac(RIKer(ri))) if can do so, 
+#returns a function from Grp(ri) to Grp(RIFac(RIKer(ri))) if can do so,
 #otherwise returns false.
 AbPastAb := function(ri)
 ## Tries to push an abelian layer past another abelian layer where the layers are over different primes
@@ -167,20 +167,20 @@ AbPastAb := function(ri)
  for i in [1..Length(NiceGens(RIFac(riker)))] do
    im := ImageElm(Homom(riker),pregensfac(riker)[i]^x);
    if im <> NiceGens(RIFac(riker))[i] then
-     return false; 
+     return false;
    fi;
  od;
 
 # Now we know x acts trivially on RIFac(riker)
 # Construct the new lifting
  q := Grp(RIFac(riker))!.Pcgs!.RelativeOrders[1];
- l := GroupHomomorphismByImagesNC(Grp(RIFac(ri)),Grp(ri),List(NiceGens(RIFac(ri)),x->x^q),List(pregensfac(ri),x->x^q));  
- 
+ l := GroupHomomorphismByImagesNC(Grp(RIFac(ri)),Grp(ri),List(NiceGens(RIFac(ri)),x->x^q),List(pregensfac(ri),x->x^q));
+
 # Construct the new map
  zeta := GroupHomomorphismByFunction(Grp(ri),Grp(RIFac(riker)),g->ImageElm(Homom(riker),g*ImageElm(Homom(ri)*l,g)^-1));
  return zeta;
-end;   
-       
+end;
+
 
 AbPastAbSamePrime := function(ri)
 ## Tries to push an abelian layer past another abelian layer where the layers are over the same prime. returns a list of homs in this case
@@ -196,21 +196,21 @@ AbPastAbSamePrime := function(ri)
  for i in [1..Length(NiceGens(RIFac(riker)))] do
    im := ImageElm(Homom(riker),pregensfac(riker)[i]^x);
    if im <> NiceGens(RIFac(riker))[i] then
-     return [false]; 
+     return [false];
    fi;
  od;
 
 # Construct a map down onto the direct product of the two factor groups
  p := Grp(RIFac(riker))!.Pcgs!.RelativeOrders[1];
- l := GroupHomomorphismByImagesNC(Grp(RIFac(ri)),Grp(ri),NiceGens(RIFac(ri)),pregensfac(ri));  
+ l := GroupHomomorphismByImagesNC(Grp(RIFac(ri)),Grp(ri),NiceGens(RIFac(ri)),pregensfac(ri));
  psi := GroupHomomorphismByFunction(Grp(ri),Grp(RIFac(riker)),g->ImageElm(Homom(riker),g*ImageElm(l,ImageElm(Homom(ri),g))^-1));
 # check generators and relations of facto(ri) map to 1 under psi
  checkelts1 := List(pregensfac(ri),x->x^p);
  if not ForAll(checkelts1,x->IsOne(ImageElm(psi,x))) then return [false]; fi;
  checkelts2 := Concatenation(List([1..Length(pregensfac(ri))],i->List([(i+1)..Length(pregensfac(ri))],j->Comm(pregensfac(ri)[i],pregensfac(ri)[j]))));
  if not ForAll(checkelts2,x->IsOne(ImageElm(psi,x))) then return [false]; fi;
- 
- D := DirectProduct(Grp(RIFac(ri)),Grp(RIFac(riker)));  
+
+ D := DirectProduct(Grp(RIFac(ri)),Grp(RIFac(riker)));
  phi := GroupHomomorphismByFunction(Grp(ri),D,g->ImageElm(Homom(ri)*Embedding(D,1),g)*ImageElm(psi*Embedding(D,2),g));
  pregens := Concatenation(pregensfac(ri),pregensfac(riker));
 # Construct the action of G on D
@@ -218,12 +218,12 @@ AbPastAbSamePrime := function(ri)
  for g in GeneratorsOfGroup(overgroup(ri)) do
    Add(AcGens,List(pregens,x->ExponentsOfPcElement(Pcgs(D),ImageElm(phi,x^g))));
  od;
-# Construct the minimal submodules of the module 
+# Construct the minimal submodules of the module
  M := GModuleByMats(Z(p)^0*AcGens,GF(p));
  CS := MTX.BasesMinimalSubmodules(M);
 
 # get the list of normal subgroups
-  
+
  L := List(CS,x->
 SubgroupNC(D,List(x,v->VectortoPc(v,D))));
  for i in [1..Length(L)] do
@@ -241,7 +241,7 @@ SubgroupNC(D,List(x,v->VectortoPc(v,D))));
 end;
 
 NonAbPastAb := function(ri)
-## Tries to push a non abelian layer past an abelian layer. This algorithm is randomized due to the lack of presentations. 
+## Tries to push a non abelian layer past an abelian layer. This algorithm is randomized due to the lack of presentations.
 ## Only works if the nonabelian layer is a perm group
  local x,riker,i,target_size,s,im,gens,g,p,words,invims,invims1,gens2,
     zeta,h,lift,g1;
@@ -253,10 +253,10 @@ NonAbPastAb := function(ri)
  for i in [1..Length(NiceGens(RIFac(riker)))] do
    im := ImageElm(Homom(riker),pregensfac(riker)[i]^x);
    if im <> NiceGens(RIFac(riker))[i] then
-     return false; 
+     return false;
    fi;
  od;
- 
+
 # construct a new generating set of elts coprime to p
 
   p := Grp(RIFac(riker))!.Pcgs!.RelativeOrders[1];
@@ -271,7 +271,7 @@ NonAbPastAb := function(ri)
     Add(gens,g);
   od;
   #this contains known upper limit target_size for Group(gens);
-  s:= StabChain(GroupWithGenerators(gens), rec(random:= 1, 
+  s:= StabChain(GroupWithGenerators(gens), rec(random:= 1,
                                         limit:= target_size));
   #if haven't yet found enough, add extra generators
   #one-by-one and check each time.
@@ -281,22 +281,22 @@ NonAbPastAb := function(ri)
       g := g^(p^Valuation(Order(g),p));
     until not IsOne(g);
     Add(gens, g);
-    s:= StabChain(GroupWithGenerators(gens), rec(random:= 1, 
+    s:= StabChain(GroupWithGenerators(gens), rec(random:= 1,
                 limit:= target_size));
   od;
-  
+
  #all of these were PseudoRandom(Grp(ri)) but since that's a matrix
  #group i presume should be conjugating in RIFac(ri) - Colva.
- #Add(gens,g^PseudoRandom(Grp(RIFac(ri))));  
- #Add(gens,g^PseudoRandom(Grp(RIFac(ri)))); 
+ #Add(gens,g^PseudoRandom(Grp(RIFac(ri))));
+ #Add(gens,g^PseudoRandom(Grp(RIFac(ri))));
  #Add(gens,g^PseudoRandom(Grp(RIFac(ri))));
  #repeat
  #  g := PseudoRandom(Grp(RIFac(ri)));
  #  g := g^(p^Valuation(Order(g),p));
  #until not IsOne(g);
- #Add(gens,g);  
- #Add(gens,g^PseudoRandom(Grp(RIFac(ri))));  
- #Add(gens,g^PseudoRandom(Grp(RIFac(ri)))); 
+ #Add(gens,g);
+ #Add(gens,g^PseudoRandom(Grp(RIFac(ri))));
+ #Add(gens,g^PseudoRandom(Grp(RIFac(ri))));
  #Add(gens,g^PseudoRandom(Grp(RIFac(ri))));
 
  words := List(gens,x->SLPforElement(RIFac(ri),x));
@@ -310,11 +310,11 @@ NonAbPastAb := function(ri)
 
 # Do some random testing of elts to check that zeta is a hom
  for i in [1..20] do
-   g := PseudoRandom(Grp(ri));   
+   g := PseudoRandom(Grp(ri));
    g1:= ImageElm(zeta, g);
    h := PseudoRandom(Grp(ri));
-   if g1*ImageElm(zeta,h)<>ImageElm(zeta,g*h) then 
-     return false; 
+   if g1*ImageElm(zeta,h)<>ImageElm(zeta,g*h) then
+     return false;
    fi;
  od;
  return zeta;
@@ -351,7 +351,7 @@ end);
  SetNiceGens(nrifac,Concatenation(List(NiceGens(RIFac(ri)),x->ImageElm(MyEmbedding(D,1),x)),List(NiceGens(RIFac(riker)),x->ImageElm(MyEmbedding(D,2),x))));
 
  SetFilterObj(nrifac,IsLeaf);
- Setfhmethsel(nrifac,"socle"); 
+ Setfhmethsel(nrifac,"socle");
  Setslpforelement(nrifac, function(nrifac,g)
 
    local list;
@@ -363,7 +363,7 @@ end);
  SetSize(nrifac,Size(RIFac(ri))*Size(RIFac(riker)));
  SetFilterObj(nrifac,IsReady);
 
-# setup the new record for the subgroup - nri will take the place of the old ri, but iwth 
+# setup the new record for the subgroup - nri will take the place of the old ri, but iwth
 #ker(riker) as its kernel and nrifac, the new socle, as its factor.
  nri := rec();
  Objectify( RecognitionInfoType, nri );;
@@ -379,7 +379,7 @@ end);
  if HasRIKer(riker) and RIKer(riker) = fail then
    SetRIKer(nri, fail);
  elif HasRIKer(riker) then
-   SetRIKer(nri,RIKer(riker)); 
+   SetRIKer(nri,RIKer(riker));
    SetRIParent(RIKer(nri),nri);
    if not SanityCheck(nri) then
      Error(2);
@@ -391,10 +391,10 @@ end);
 List(pregensfac(ri),g->
 g*ResultOfStraightLineProgram(SLPforElement(RIFac(riker),ImageElm(phi*MyProjection(D,2),g)),pregensfac(riker))^-1),
 pregensfac(riker)));
- #this was causing problems with the kernel was fail. 
+ #this was causing problems with the kernel was fail.
  if HasRIKer(nri) and RIKer(nri) <> fail then
    SetNiceGens(nri,Concatenation(pregensfac(nri),NiceGens(RIKer(nri))));
- elif HasRIKer(nri) then 
+ elif HasRIKer(nri) then
  #so the kernel is the trivial group, just need preimages of the socle generators.
    SetNiceGens(nri, pregensfac(nri));
  fi;
@@ -432,7 +432,7 @@ SwapFactors := function(ri,zeta)
  SetHomom(nriker,StructuralCopy(Homom(ri)));
  SetHomom(nri,zeta);
  Setpregensfac(nri,StructuralCopy(pregensfac(riker)));
- Setpregensfac(nriker,List(pregensfac(ri),x->x*ResultOfStraightLineProgram(SLPforElement(rikerfac,ImageElm(zeta,x)),pregensfac(riker))^-1));  
+ Setpregensfac(nriker,List(pregensfac(ri),x->x*ResultOfStraightLineProgram(SLPforElement(rikerfac,ImageElm(zeta,x)),pregensfac(riker))^-1));
  SetRIKer(nriker,StructuralCopy(RIKer(riker)));
  SetRIParent(RIKer(nriker),nriker);
  SetRIParent(nriker,nri);
@@ -451,7 +451,7 @@ SwapFactors := function(ri,zeta)
    fi;
  fi;
  if HasRIKer(riker) then
-   SetRIKer(nriker,RIKer(riker)); 
+   SetRIKer(nriker,RIKer(riker));
    SetRIParent(RIKer(riker),nriker);
    if not SanityCheck(nri) then
      Error(5);
@@ -476,7 +476,7 @@ SwapFactors := function(ri,zeta)
    SetGrp(nriker,GroupWithGenerators(pregensfac(nriker)));
  fi;
  Setslpforelement(nri,SLPforElementGeneric);
- Setslpforelement(nriker,SLPforElementGeneric);   
+ Setslpforelement(nriker,SLPforElementGeneric);
  overgp := ShallowCopy(overgroup(ri));
  Setovergroup(nri,overgp);
  Setovergroup(nriker,overgp);
@@ -497,11 +497,11 @@ IsSolubleTree := function(ri)
  else
    return true;
  fi;
-end;  
+end;
 
 
-#this is the main function for the rearrangement. We have three nodes, namely pri, 
-#priker and ker(priker) with corresponding factor groups prifac and prikerfac, and are trying 
+#this is the main function for the rearrangement. We have three nodes, namely pri,
+#priker and ker(priker) with corresponding factor groups prifac and prikerfac, and are trying
 #to either put prifac and prikerfac on the same level (if they are both nonabelian simple and #hence part of the socle), or push prifac past prikerfac.
 
 PushDown := function(pri)
@@ -516,19 +516,19 @@ PushDown := function(pri)
  if not IsBound(Grp(prikerfac)!.Pcgs) then
 # prikerfac is nonabelian
    Print("Calling PastNonAb(pri)\n");
-   zeta := [PastNonAb(pri)]; 
+   zeta := [PastNonAb(pri)];
 
  elif not IsBound(Grp(prifac)!.Pcgs) then
 # prikerfac is abelian and priker is nonabelian
    Print("Calling NonAbPastAb(pri)\n");
-   zeta := [NonAbPastAb(pri)];   
+   zeta := [NonAbPastAb(pri)];
 
  elif Grp(prifac)!.Pcgs!.RelativeOrders[1] = Grp(prikerfac)!.Pcgs!.RelativeOrders[1] then
 # prifac and prikerfac are abelian over the same prime, this function returns a list of maps.
-  Print("doing AbPastAbSamePrime\n"); 
+  Print("doing AbPastAbSamePrime\n");
   zeta := AbPastAbSamePrime(pri);
 
- else		
+ else
 #both groups are abelian over different primes.
   Print("Calling AbPastAb");
    zeta := [AbPastAb(pri)];
@@ -536,18 +536,18 @@ PushDown := function(pri)
 
  if zeta = [false] then
    Print("zeta was false, record is now\n");
-   View(pri); 
-   return false; 
+   View(pri);
+   return false;
  fi;
 
-# Is RIFac(priker)) the socle, i.e. are we pushing down into or 
+# Is RIFac(priker)) the socle, i.e. are we pushing down into or
 #past the socle?
  if IsBound(prikerfac!.TFordered) and prikerfac!.TFordered="Socle" then
    zeta := zeta[1];
  #if both groups are insoluble then they should both be in the socle together.
    if not IsBound(Grp(prifac)!.Pcgs) then
      npri := PushIntoSocle(pri,zeta);;
-     SetTFordered(RIFac(npri),"Socle"); 
+     SetTFordered(RIFac(npri),"Socle");
    else
  #otherwise we should put prifac below prikerfac.
      npri := SwapFactors(pri,zeta);;
@@ -559,19 +559,19 @@ PushDown := function(pri)
    return npri;
  fi;
 
-#this is the case where RIFac(priker) is not the socle, we try 
-#each of our maps in turn and 
-#look to see whether we can push pri down a level, then recurse to 
-#try to push it down further. 
-#successful recursion terminates once we've pushed it down past or 
-#into the socle - the previous paragraph of this code. if we can't 
+#this is the case where RIFac(priker) is not the socle, we try
+#each of our maps in turn and
+#look to see whether we can push pri down a level, then recurse to
+#try to push it down further.
+#successful recursion terminates once we've pushed it down past or
+#into the socle - the previous paragraph of this code. if we can't
 #do that then there's no point moving it at all.
  for i in [1..Length(zeta)] do
    Print("trying zeta, i is", i, "\n");
    npri := SwapFactors(StructuralCopy(pri),zeta[i]);;
    knpri := PushDown(StructuralCopy(RIKer(npri)));;
 #having a problem with something believing it's got a parent when it doesn't.
-   if knpri <> false and npri <> false then 
+   if knpri <> false and npri <> false then
 #found a map that works.
      SetRIKer(npri,knpri);
      SetRIParent(knpri,npri);
@@ -580,15 +580,15 @@ PushDown := function(pri)
      fi;
      SetNiceGens(npri,Concatenation(pregensfac(npri),NiceGens(knpri)));
      View(npri);
-     if not SanityCheck(npri) then 
+     if not SanityCheck(npri) then
        Error(7);
      fi;
-     return npri; 
+     return npri;
    fi;
  od;
  return false;
 end;
-     
+
 
 
 
@@ -620,15 +620,15 @@ OrderTree := function(ri)
    pri := StructuralCopy(RIParent(pri));
    SetNiceGens(pri,Concatenation(pregensfac(pri),NiceGens(RIKer(pri))));
    npri := PushDown(StructuralCopy(pri));;
-   if npri <> false then 
+   if npri <> false then
      pri := StructuralCopy(npri);
      if not SanityCheck(pri) then
        Error(75);
-     fi; 
+     fi;
    fi;
  od;
- 
- #this is kind of messy, but i haven't managed to track down where all the 
+
+ #this is kind of messy, but i haven't managed to track down where all the
  #parent kernel factor not matching up errors are occurring
  while HasRIKer(pri) and not RIKer(pri) = fail do
    SetRIParent(RIKer(pri), pri);

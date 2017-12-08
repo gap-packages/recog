@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  matrix.gi          
+##  matrix.gi
 ##                                recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
@@ -28,7 +28,7 @@ FindHomMethodsMatrix.TrivialMatrixGroup := function(ri, G)
   SetSize(G,1);
   SetSize(ri,1);
   Setslpforelement(ri,SLPforElementFuncsMatrix.TrivialMatrixGroup);
-  Setslptonice( ri, 
+  Setslptonice( ri,
                 StraightLineProgramNC([[[1,0]]],Length(GeneratorsOfGroup(G))));
   SetFilterObj(ri,IsLeaf);
   return true;
@@ -67,7 +67,7 @@ FindHomMethodsMatrix.DiagonalMatrices := function(ri, G)
       i := i + 1;
   od;
 
-  if not(isscalars) then 
+  if not(isscalars) then
       # We quickly know that we want to make a balanced tree:
       ri!.blocks := List([1..d],i->[i]);
       # Note that we cannot tell the upper levels that they should better
@@ -116,7 +116,7 @@ end;
 #      ri!.containedinsl := true;
 #      return false;  # will not succeed
 #  fi;
-#  
+#
 #  H := GroupWithGenerators(dets);
 #  hom := GroupHomomorphismByFunction(G,H,RECOG.DetWrapper);
 #
@@ -217,7 +217,7 @@ end;
 
 FindHomMethodsMatrix.BlockScalar := function(ri,G)
   # We assume that ri!.blocks is a list of ranges where the non-trivial
-  # scalar blocks are. Note that their length does not have to sum up to 
+  # scalar blocks are. Note that their length does not have to sum up to
   # the dimension, because some blocks at the end might already be trivial.
   local H,data,hom,middle,newgens,nrblocks,topblock;
   nrblocks := Length(ri!.blocks);  # this is always >= 1
@@ -240,7 +240,7 @@ FindHomMethodsMatrix.BlockScalar := function(ri,G)
           findgensNmeth(ri).args[1] := 7;
           findgensNmeth(ri).args[2] := 5;
           forkernel(ri).blocks := ri!.blocks{[1]};
-          # We have to go to BlockScalar with 1 block because the one block 
+          # We have to go to BlockScalar with 1 block because the one block
           # is only a part of the whole matrix:
           Add(forkernel(ri).hints,
               rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000,
@@ -335,7 +335,7 @@ RECOG.CleanRow := function( basis, vec, extend, dec)
   if dec <> fail then
     MultRowVector(dec,Zero(dec[1]));
   fi;
-  
+
   # First a little shortcut:
   firstnz := PositionNonZero(vec);
   if firstnz > Length(vec) then
@@ -406,12 +406,12 @@ FindHomMethodsMatrix.ReducibleIso := function(ri,G)
   f := ri!.field;
   m := GModuleByMats(GeneratorsOfGroup(G),f);
   isirred := MTX.IsIrreducible(m);
-  
+
   # Save the MeatAxe module for later use:
   ri!.meataxemodule := m;
   # Report enduring failure if irreducible:
   if isirred then return false; fi;
-  
+
   # Now compute a composition series:
   compseries := MTX.BasesCompositionSeries(m);
   bc := RECOG.FindAdjustedBasis(compseries);
@@ -495,7 +495,7 @@ FindHomMethodsMatrix.BlockLowerTriangular := function(ri,G)
 
   # Now give hints downward:
   forfactor(ri).blocks := ri!.blocks;
-  Add(forfactor(ri).hints, 
+  Add(forfactor(ri).hints,
       rec( method := FindHomMethodsMatrix.BlockDiagonal,
            rank := 2000, stamp := "BlockDiagonal" ) );
   findgensNmeth(ri).method := FindKernelLowerLeftPGroup;
@@ -516,7 +516,7 @@ FindHomMethodsMatrix.BlockDiagonal := function(ri,G)
   SetHomom(ri,hom);
   # Now give hints downward:
   forfactor(ri).blocks := ri!.blocks;
-  Add(forfactor(ri).hints, 
+  Add(forfactor(ri).hints,
       rec( method := FindHomMethodsProjective.BlocksModScalars,
            rank := 2000, stamp := "BlocksModScalars" ) );
   # We go to projective, although it would not matter here, because we
@@ -563,7 +563,7 @@ end;
 #  data := rec(subdim := ri!.subdim);
 #  newgens := List(gens, x->RECOG.HomInducedOnFactor(data,x));
 #  H := GroupWithGenerators(newgens);
-#  hom := GroupHomByFuncWithData(G,H,RECOG.HomInducedOnFactor,data); 
+#  hom := GroupHomByFuncWithData(G,H,RECOG.HomInducedOnFactor,data);
 #
 #  # Now report back:
 #  SetHomom(ri,hom);
@@ -692,7 +692,7 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
         #   x is the identity (<=> curlay > Length(lens))
         #   x has been cleaned up to some layer and is not yet zero
         #     in that layer (<=> pos <= Length(v))
-        #     then a power of x will be a new generator in that layer and 
+        #     then a power of x will be a new generator in that layer and
         #     has to be added in position i in the list of generators
         if curlay <= Length(lens) then   # a new generator
             # Now find a new pivot:
@@ -754,11 +754,11 @@ end;
 FindHomMethodsMatrix.LowerLeftPGroup := function(ri,G)
   local f,p;
   # Do we really have our favorite situation?
-  if not(IsBound(ri!.blocks) and IsBound(ri!.lens) and 
-         IsBound(ri!.canonicalbasis) and IsBound(ri!.gensNvectors) and 
+  if not(IsBound(ri!.blocks) and IsBound(ri!.lens) and
+         IsBound(ri!.canonicalbasis) and IsBound(ri!.gensNvectors) and
          IsBound(ri!.gensNpivots)) then
       return NotEnoughInformation;
-  fi; 
+  fi;
   # We are done, because we can do linear algebra:
   f := ri!.field;
   p := Characteristic(f);
@@ -782,7 +782,7 @@ FindHomMethodsMatrix.GoProjective := function(ri,G)
   findgensNmeth(ri).args := [Length(Factors(q-1))+5];
   return true;
 end;
-  
+
 FindHomMethodsMatrix.KnownStabilizerChain := function(ri,G)
   local S,hom;
   if HasStoredStabilizerChain(G) then
@@ -832,7 +832,7 @@ end;
 #          # We proved that it is an isomorphism:
 #          findgensNmeth(ri).method := FindKernelDoNothing;
 #          Info(InfoRecog,2,"Spans rowspace ==> found isomorphism.");
-#      else 
+#      else
 #          Info(InfoRecog,3,"Rank of o{[1..3*d]} is ",r,".");
 #      fi;
 #  fi;
@@ -841,7 +841,7 @@ end;
 #  Setmethodsforfactor(ri,FindHomDbPerm);
 #  return true;
 #end;
-#  
+#
 #FindHomMethodsMatrix.IsomorphismPermGroup := function(ri,G)
 #  SetHomom(ri,IsomorphismPermGroup(G));
 #  findgensNmeth(ri).method := FindKernelDoNothing;

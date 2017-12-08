@@ -3,10 +3,10 @@ findnpe := function(name)
  local v1,v2,n,q,p,e;
 
  v1 := SplitString(name,"_")[2];
- v2 := SplitString(v1,"("); 
+ v2 := SplitString(v1,"(");
  n := Int(v2[1]);
  q := PrimePowersInt(Int(SplitString(v2[2],")")[1]));
- p := q[1]; e := q[2];  
+ p := q[1]; e := q[2];
  return [n,p,e];
 end;
 
@@ -41,7 +41,7 @@ SchurMultiplierOrder := function(name)
  if name[1]='L' then
    npf := findnpe(name);
    n := npf[1]; p := npf[2]; f := npf[3];
-   if n=2 then 
+   if n=2 then
      d := GcdInt(2,p^f-1);
      if p=2 and f=2 then return 2*d;
      elif p=3 and f=2 then return 3*d;
@@ -82,7 +82,7 @@ SchurMultiplierOrder := function(name)
 
 # Omega
  v := SplitString(name,"_");
- if v[1]="O" then     
+ if v[1]="O" then
    npf := findnpe(name);
    n := (npf[1]-1)/2; p := npf[2]; f := npf[3]; q := p^f;
    d := GcdInt(2,q-1);
@@ -94,7 +94,7 @@ SchurMultiplierOrder := function(name)
 
 
 
-# Omega^+ 
+# Omega^+
  if v[1]="O^+" then
    npf := findnpe(name);
    n := npf[1]/2; p := npf[2]; f := npf[3]; q := p^f;
@@ -109,14 +109,14 @@ SchurMultiplierOrder := function(name)
    fi;
  fi;
 
-# Omega^-   
+# Omega^-
  if v[1]="O^-" then
    npf := findnpe(name);
    n := npf[1]; p := npf[2]; f := npf[3]; q := p^f;
    d := GcdInt(4,q^n+1);
    return d;
  fi;
- 
+
 ## Given up - this has become very boring - can't be bothered to do the exceptionals!!!
 
  return 6;
@@ -130,10 +130,10 @@ OuterOrderBound := function(str)
   if str[1]='A' then
 # Alternating groups
     n := Int(SplitString(str,"_")[2]);
-    if n=6 then return 4; 
+    if n=6 then return 4;
     else return 2;
     fi;
-  elif str in 
+  elif str in
   ["M_11","M_23","M_24","Co_3","Co_2","He","Fi_23"
 ,"HN","Th","M","J_1","Ly","J_4","M_12","J_2","Co_1","B","Ru",
 "McL","ON","J_3","Suz","Fi_22","M_22"] then return 2;
@@ -157,7 +157,7 @@ OuterOrderBound := function(str)
     else
       return 8*f;
     fi;
-  elif str[1]='2' and str[2]='B' then      
+  elif str[1]='2' and str[2]='B' then
     v1 := SplitString(str,"(")[2];
     f := PrimePowersInt(Int(SplitString(v1,")")[1]))[2];
     return f;
@@ -194,13 +194,13 @@ SimpleGroupOrder := function(name)
   elif name[1]='O' then
     if name[2]='_' then
       npe := findnpe(name);
-      return Size(SO(npe[1],npe[2]^npe[3]))/GcdInt(2,npe[2]^npe[3]-1);   
+      return Size(SO(npe[1],npe[2]^npe[3]))/GcdInt(2,npe[2]^npe[3]-1);
     elif name[3]='+' then
       npe := findnpe(name);
-      return Size(SO(1,npe[1],npe[2]^npe[3]))/(2*GcdInt(2,(npe[2]^npe[3])^(npe[1]/1)-1));   
-    elif name[3]='-' then     
+      return Size(SO(1,npe[1],npe[2]^npe[3]))/(2*GcdInt(2,(npe[2]^npe[3])^(npe[1]/1)-1));
+    elif name[3]='-' then
       npe := findnpe(name);
-      return Size(SO(-1,npe[1],npe[2]^npe[3]))/(2*GcdInt(2,(npe[2]^npe[3])^(npe[1]/1)+1));   
+      return Size(SO(-1,npe[1],npe[2]^npe[3]))/(2*GcdInt(2,(npe[2]^npe[3])^(npe[1]/1)+1));
     fi;
   fi;
 
@@ -212,7 +212,7 @@ ProbGenNonAb :=function(str,m,k)
 ## Returns an underestimate of the probability of k random generators generating the simple group given by str.  Assumes that the probability of randomly generating a simple group with 3 generators is > 833/900 = P_3(A_6)
 # Require k to be greater than 3
   local Ord_G, Out_G, C ,psi_k,y;
-  
+
   Ord_G:=SimpleGroupOrder(str);
   Out_G:=OuterOrderBound(str);
   C:=833/900;
@@ -230,7 +230,7 @@ ProbGenAb := function(q,r,k)
   if k<r then return 0; fi;
   return Product(List([1..r],l->1-q^(l-1)/q^k));
 end;
-  
+
 
 RequiredNumberOfGens := function(T,e)
 # T is a list of tuples containing names and the number of copies #of simple groups

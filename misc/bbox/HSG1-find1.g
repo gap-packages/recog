@@ -7,7 +7,7 @@ HSfinder := function(arg)
     G := Group(arg);
 
     # Black box algorithm to find standard generators of HS
-    
+
     vars.V := 0;
     repeat    # label SEMISTD
         els[1] := PseudoRandom(G);
@@ -23,7 +23,7 @@ HSfinder := function(arg)
 
     els[2] := els[1]^10;
     els[3] := els[1]^4;
-    
+
     vars.X := 0;
     repeat    # label CONJUGATE
         vars.X := vars.X + 1;

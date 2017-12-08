@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  RecogniseAnSnOnFDPM.gd      
+##  RecogniseAnSnOnFDPM.gd
 ##                                recog package
 ##                                                           Stephen Howe
 ##                                                              Maska Law
@@ -11,7 +11,7 @@
 ##  This file is free software, see license information at the end.
 ##
 ##  Declarations for RecogniseAnSnOnDFPM.gi.
-##  
+##
 #############################################################################
 
 DeclareInfoClass("InfoFDPM");

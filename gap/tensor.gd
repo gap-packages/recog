@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  tensor.gd          
+##  tensor.gd
 ##                                recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
@@ -8,7 +8,7 @@
 ##  Copyright 2005-2008 by the authors.
 ##  This file is free software, see license information at the end.
 ##
-##  A collection of find homomorphism methods for tensor product 
+##  A collection of find homomorphism methods for tensor product
 ##  decompositions of matrix groups.
 ##
 #############################################################################

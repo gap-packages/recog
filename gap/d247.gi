@@ -1,7 +1,7 @@
 #############################################################################
 ##
-##  d247.gi          
-##                                recog package  
+##  d247.gi
+##                                recog package
 ##                                                        Max Neunhoeffer
 ##
 ##  Copyright 2006-2008 by the authors.
@@ -116,7 +116,7 @@ RECOG.DirectFactorsFinder := function(gens,facgens,k,eq)
   equal := function(a,b)
     return ForAny(b,y-> not(eq(a*y,y*a)));
   end;
-  
+
   # Enumerate orbit:
   o := [fgens];
   pgens := List([1..Length(gens)],j->EmptyPlist(k));
@@ -132,17 +132,17 @@ RECOG.DirectFactorsFinder := function(gens,facgens,k,eq)
       if l > Length(o) then
         z := Concatenation([z],List(o[i]{[2..Length(o[i])]},x->x^gens[j]));
         Add(o,z);
-        if Length(o) > k then 
+        if Length(o) > k then
             Info(InfoRecog,1,
                  "Strange, found more direct factors than expected!");
-            return fail; 
+            return fail;
         fi;
       fi;
     od;
     i := i + 1;
   od;
 
-  if Length(o) < k then 
+  if Length(o) < k then
       Info(InfoRecog,1,"Strange, found less direct factors than expected!");
       return fail;
   fi;
@@ -161,7 +161,7 @@ RECOG.DirectFactorsAction := function(data,el)
   equal := function(a,b)
     return ForAny(b,y-> not(eq(a*y,y*a)));
   end;
-  
+
   res := EmptyPlist(Length(o));
   for i in [1..Length(o)] do
     z := o[i][1]^el;
@@ -227,7 +227,7 @@ RECOG.SortOutReducibleNormalSubgroup :=
 # FIXME: This will go:
         ConvertToMatrixRep(basis,Size(f));
         subdim := MTX.Dimension(collf[1][1]);
-        r := rec(t := basis, ti := basis^-1, 
+        r := rec(t := basis, ti := basis^-1,
                  blocksize := MTX.Dimension(collf[1][1]));
         # Note that we already checked for semilinear, so we know that
         # the irreducible N-submodule is absolutely irreducible!
@@ -240,16 +240,16 @@ RECOG.SortOutReducibleNormalSubgroup :=
             Error("This should never have happened (346), tell Max.");
             return false;
         fi;
-    
+
         H := GroupWithGenerators(conjgensG);
         hom := GroupHomByFuncWithData(G,H,RECOG.HomDoBaseChange,r);
         SetHomom(ri,hom);
-    
+
         # Hand down information:
         forfactor(ri).blocksize := r.blocksize;
         forfactor(ri).generatorskronecker := kro;
         Add( forfactor(ri).hints,
-             rec( method := FindHomMethodsProjective.KroneckerProduct, 
+             rec( method := FindHomMethodsProjective.KroneckerProduct,
                   rank := 4000, stamp := "KroneckerProduct" ) );
         # This is an isomorphism:
         findgensNmeth(ri).method := FindKernelDoNothing;
@@ -303,7 +303,7 @@ RECOG.SortOutReducibleSecondNormalSubgroup :=
     # nngens generators for a proper normal subgroup of a proper
     # irreducible normal subgroup, mm a reducible MeatAxe module with
     # generators nngens.
-    # This function takes care of the cases to construct a reduction 
+    # This function takes care of the cases to construct a reduction
     # if we have a D7 case.
     # Only call this with absolutely irreducible G!
     # Only call this if we already know that G is not C3!
@@ -343,7 +343,7 @@ RECOG.SortOutReducibleSecondNormalSubgroup :=
   end;
 
 FindHomMethodsProjective.D247 := function(ri,G)
-  # We try to produce an element of a normal subgroup by playing 
+  # We try to produce an element of a normal subgroup by playing
   # tricks.
   local CheckNormalClosure,f,i,res,x,ispower;
 
@@ -356,9 +356,9 @@ FindHomMethodsProjective.D247 := function(ri,G)
     ngens := FastNormalClosure(GeneratorsOfGroup(G),[x],4);
     m := GModuleByMats(ngens,f);
     if MTX.IsIrreducible(m) then
-        if not(ispower) then 
+        if not(ispower) then
             Info(InfoRecog,4,"Dimension is no power!");
-            return fail; 
+            return fail;
         fi;
         # we want to look for D7 here, using the same trick again:
         count := 0;
@@ -380,7 +380,7 @@ FindHomMethodsProjective.D247 := function(ri,G)
     if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;
     Info(InfoRecog,2,"D247: Seem to have found something!");
     return RECOG.SortOutReducibleNormalSubgroup(ri,G,ngens,m);
-  end;   
+  end;
 
   Info(InfoRecog,2,"D247: Trying the involution jumper 9 times...");
   f := ri!.field;
@@ -396,10 +396,10 @@ FindHomMethodsProjective.D247 := function(ri,G)
       res := CheckNormalClosure(x);
       if res in [true,false] then return res; fi;
       x := RECOG.InvolutionJumper(ri!.pr,RECOG.ProjectiveOrder,x,100,true);
-      if x = fail then 
+      if x = fail then
           if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;
           Info(InfoRecog,2,"Involution Jumper failed, giving up!");
-          return fail; 
+          return fail;
       fi;
   od;
   res := CheckNormalClosure(x);
@@ -411,7 +411,7 @@ end;
 
 # FIXME: PrototypeForC2C4 is not used anywhere
 FindHomMethodsProjective.PrototypeForC2C4 := function(ri,G)
-  # We try to produce an element of a normal subgroup by playing 
+  # We try to produce an element of a normal subgroup by playing
   # tricks.
   local CheckNormalClosure,f,m,res,ngens,l;
 
@@ -429,7 +429,7 @@ FindHomMethodsProjective.PrototypeForC2C4 := function(ri,G)
     else
         return fail;
     fi;
-  end;   
+  end;
 
   Info(InfoRecog,2,"Proto: Starting to work...");
 

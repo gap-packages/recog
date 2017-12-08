@@ -1,7 +1,7 @@
 #############################################################################
 ##
-##  findnormal.gi          
-##                                recog package  
+##  findnormal.gi
+##                                recog package
 ##                                                        Max Neunhoeffer
 ##
 ##  Copyright 2009 by the authors.
@@ -343,7 +343,7 @@ RECOG.RandomSubproduct := function(a,opt)
     else
         rs := GlobalMersenneTwister;
     fi;
-    if IsBound(opt.DoPowers) then 
+    if IsBound(opt.DoPowers) then
         dopowers := opt.DoPowers;
     else
         dopowers := false;
@@ -396,7 +396,7 @@ RECOG.BlindDescentStep := function(G,x,y,opt)
       usepseudo := false;
   fi;
 
-  c := Comm(x,y); 
+  c := Comm(x,y);
   if not(isone(c)) then
       return rec( el := c, Ngens := [c], Nready := false, central := false,
                   isknownproper := false );
@@ -508,9 +508,9 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
                   AddList(centgens,z);
                   counteven := counteven + 1;
                   UseElement(z);
-                  if blindr.isknownproper then 
+                  if blindr.isknownproper then
                       if InfoLevel(InfoFindEvenNormal)>=3 then Print("\n"); fi;
-                      return blindr; 
+                      return blindr;
                   fi;
               fi;
               z := (x * x^(y^-1))^(o/2);
@@ -518,9 +518,9 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
                   AddList(centgens,z);
                   counteven := counteven + 1;
                   UseElement(z);
-                  if blindr.isknownproper then 
+                  if blindr.isknownproper then
                       if InfoLevel(InfoFindEvenNormal)>=3 then Print("\n"); fi;
-                      return blindr; 
+                      return blindr;
                   fi;
               fi;
           else
@@ -534,9 +534,9 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
                   z := z^(o/2);
                   if AddList(centinvols,z^(o/2)) then
                       UseElement(z);
-                      if blindr.isknownproper then 
+                      if blindr.isknownproper then
                       if InfoLevel(InfoFindEvenNormal)>=3 then Print("\n"); fi;
-                          return blindr; 
+                          return blindr;
                       fi;
                   fi;
               fi;
@@ -597,7 +597,7 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
                           if blindr.isknownproper then return blindr; fi;
                       fi;
                   od;
-                  blindr.msg := 
+                  blindr.msg :=
   "If at all possible, we found an element of an even proper normal subgroup.";
                   blindr.success := true;
                   return blindr;
@@ -698,10 +698,10 @@ FindHomMethodsProjective.FindEvenNormal := function(ri,G)
                            rec( Projective:=true, DoBlindDescent := true ));
               if rr.success then
                   mm := GModuleByMats(rr.Ngens,f);
-                  if MTX.IsIrreducible(mm) then 
+                  if MTX.IsIrreducible(mm) then
                       Info(InfoRecog,2,
             "FindEvenNormal: Second normal subgroup was not reducible.");
-                      return fail; 
+                      return fail;
                   fi;
                   res := RECOG.SortOutReducibleSecondNormalSubgroup(ri,G,
                                     rr.Ngens,mm);
@@ -719,7 +719,7 @@ end;
 FindHomMethodsProjective.FindElmOfEvenNormal := function(ri,G)
   local cf,count,f,m,mm,r,res,rr;
   RECOG.SetPseudoRandomStamp(G,"FindElmOfEvenNormal");
-  r := FindElmOfEvenNormalSubgroup(G, 
+  r := FindElmOfEvenNormalSubgroup(G,
           rec( Projective := true, SkipTrivAbelian := true ));
   if r.success = fail then return fail; fi;
   if not IsBound(r.Nready) or not(r.Nready) then
@@ -749,10 +749,10 @@ FindHomMethodsProjective.FindElmOfEvenNormal := function(ri,G)
                   rr.Ngens := FastNormalClosure(r.Ngens,[rr.el],20);
               fi;
               mm := GModuleByMats(rr.Ngens,f);
-              if MTX.IsIrreducible(mm) then 
+              if MTX.IsIrreducible(mm) then
                   Info(InfoRecog,2,
            "FindElmOfEvenNormal: Second normal subgroup was not reducible.");
-                  return fail; 
+                  return fail;
               fi;
               res := RECOG.SortOutReducibleSecondNormalSubgroup(
                                       ri,G,rr.Ngens,mm);

@@ -16,7 +16,7 @@ lbl START
 
 	set X 0
 
-lbl CONJ	
+lbl CONJ
  	incr X
 	if X gt 1000 then timeout
 	rand 4

@@ -3,7 +3,7 @@ d := 1;
 q := p^d;
 n := 3;
 m := 2;
-a := GL(m,q);        
+a := GL(m,q);
 b := GL(n,q);
 f := GF(q);
 agens := GeneratorsOfGroup(a);
@@ -27,7 +27,7 @@ for i in [m+1..m+n] do
         v[i][j] := Random(f);
     od;
 od;
-ConvertToMatrixRep(x,q);        
+ConvertToMatrixRep(x,q);
 ConvertToMatrixRep(y,q);
 ConvertToMatrixRep(u,q);
 ConvertToMatrixRep(v,q);

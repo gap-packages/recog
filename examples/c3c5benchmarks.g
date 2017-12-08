@@ -26,14 +26,14 @@ gens2 := List(gens,y->y^x);;
 
 # 2.A8 in GL(24,5):
 gens := AtlasGenerators("2.A8",19).generators;
-gl := GL(24,GF(5,6)); 
+gl := GL(24,GF(5,6));
 x := PseudoRandom(gl);;
 gens2 := List(gens,y->y^x);;
 # AppendTo("c3c5benchmarks_mats.g","2A8_24_15625 := ",gens2,";\n");
 
 # GL(90,2) in GL(90,2^16):
 gens := GeneratorsOfGroup(GL(90,2));
-gl := GL(90,GF(2,16)); 
+gl := GL(90,GF(2,16));
 x := PseudoRandom(gl);;
 gens2 := List(gens,y->y^x);;
 # AppendTo("c3c5benchmarks_mats.g","GL_90_65536 := ",gens2,";\n");
@@ -43,7 +43,7 @@ gens := AtlasGenerators("J2",17).generators;
 bas := CanonicalBasis(GF(4));
 gens2 := List(gens,x->BlownUpMat(bas,x));;
 for i in gens2 do ConvertToMatrixRep(i,2); od;
-gl := GL(28,GF(2)); 
+gl := GL(28,GF(2));
 x := PseudoRandom(gl);;
 gens2 := List(gens2,y->y^x);;
 # AppendTo("c3c5benchmarks_mats.g","J2_28_2 := ",gens2,";\n");
@@ -60,7 +60,7 @@ gens := AtlasGenerators("M22",40).generators;
 bas := CanonicalBasis(GF(9));
 gens2 := List(gens,x->BlownUpMat(bas,x));;
 for i in gens2 do ConvertToMatrixRep(i,3); od;
-gl := GL(90,GF(3)); 
+gl := GL(90,GF(3));
 x := PseudoRandom(gl);;
 gens2 := List(gens2,y->y^x);;
 # AppendTo("c3c5benchmarks_mats.g","M22_90_2 := ",gens2,";\n");
@@ -74,18 +74,18 @@ bas := CanonicalBasis(GF(5,3));
 gens3 := List(gens2,x->BlownUpMat(bas,x));
 for i in gens3 do ConvertToMatrixRep(i,5); od;
 m := GModuleByMats(gens3,GF(5));
-MTX.IsAbsolutelyIrreducible(m); 
-c := MTX.FieldGenCentMat(m);    
+MTX.IsAbsolutelyIrreducible(m);
+c := MTX.FieldGenCentMat(m);
 cc := ExtractSubMatrix(c,[1..3],[1..3]);
 t := TransformingMats(cc,cc^5);
-m := Fold(t[1],3,t); 
+m := Fold(t[1],3,t);
 DeterminantMat(m);   # must be nonzero!
 Order(m);            # must be 6
 mm := m^2;           # has order 3
 n := ZeroMatrix(69,69,gens3[1]);
 for i in [1,4..67] do CopySubMatrix(mm,n,[1..3],[i..i+2],[1..3],[i..i+2]); od;
 Add(gens3,n);
-gl := GL(69,GF(5)); 
+gl := GL(69,GF(5));
 x := PseudoRandom(gl);;
 gens3 := List(gens3,y->y^x);;
 # AppendTo("c3c5benchmarks_mats.g","M24_69_5 := ",gens3,";\n");
@@ -101,7 +101,7 @@ f := function(gens1,gens2)
   for i in [1..Length(gens1)] do
     for j in [1..Length(gens2)] do
       Add(gens,KroneckerProduct(gens1[i],gens2[j]));
-    od; 
+    od;
   od;
   return gens;
 end;

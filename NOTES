@@ -19,7 +19,7 @@ Lie:
 A,l,q   ->   Darstellungen SL(l+1,q) = proj. Darstellungen PSL(l+1,q)
 B,l,q   ->   Spin(2l+1,q)      PSpin , Omega in SO(2l+1,q)
 C,l,q   ->   Sp(2l,q)                  PSp(2l,q)
-D,l,q   ->   Spin(2l,q)        
+D,l,q   ->   Spin(2l,q)
 E,6-8,
 F,4
 G,2

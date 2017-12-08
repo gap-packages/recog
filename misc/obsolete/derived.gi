@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  derived.gi        
+##  derived.gi
 ##                                recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
@@ -56,7 +56,7 @@ FindHomMethodsProjective.Derived :=
         basis := Concatenation(homs);
         ConvertToMatrixRep(basis);
         subdim := MTX.Dimension(collf[1][1]);
-        r := rec(t := basis, ti := basis^-1, 
+        r := rec(t := basis, ti := basis^-1,
                  blocksize := MTX.Dimension(collf[1][1]));
         # Note that we already checked for semilinear, so we know that
         # the irreducible N-submodule is absolutely irreducible!
@@ -77,7 +77,7 @@ FindHomMethodsProjective.Derived :=
         forfactor(ri).blocksize := r.blocksize;
         forfactor(ri).generatorskronecker := kro;
         Add( forfactor(ri).hints,
-             rec( method := FindHomMethodsProjective.KroneckerProduct, 
+             rec( method := FindHomMethodsProjective.KroneckerProduct,
                   rank := 4000, stamp := "KroneckerProduct" ) );
         # This is an isomorphism:
         findgensNmeth(ri).method := FindKernelDoNothing;

@@ -1,5 +1,5 @@
 Example 1:
-  SL(55,9) blown up into GL(110,3) 
+  SL(55,9) blown up into GL(110,3)
   --> works, but evaluation of nice gens is hard
 
 Example 2:
@@ -25,7 +25,7 @@ Example 6:
   --> does not yet work, because no compression for such matrices
 
 Example 7:
-  Comes from something in GL(10,3^10). Currently not feasible due to 
+  Comes from something in GL(10,3^10). Currently not feasible due to
   proper matrices.
   --> does not yet work
 
@@ -51,7 +51,7 @@ Example 11:
   --> works, involution jumper takes it apart
 
 Example 12:
-  3^(1+17).U(8,2).3.2 
+  3^(1+17).U(8,2).3.2
   with size: 396361728
   --> works?
 

@@ -1,4 +1,4 @@
-<!-- 
+<!--
 
   intro.xml            recog package documentation
                                                              Max Neunhoeffer
@@ -25,7 +25,7 @@ This package is about group recognition. To be written further.
 <Heading>Overview over this manual</Heading>
 
 Chapter <Ref Chap="install"/> describes the installation of this package.
-Chapter <Ref Chap="recognition" BookName="recogbase"/> describes the 
+Chapter <Ref Chap="recognition" BookName="recogbase"/> describes the
 generic, recursive procedure
 used for group recognition throughout this package. At the heart of this
 procedure is the definition of <Q>FindHomomorphism</Q> methods, which is
@@ -33,8 +33,8 @@ also described in that chapter. For the choice of the right method
 for finding a homomorphism (or an isomorphism) we use another generic
 procedure, the <Q>method selection</Q> which is not to be confused with
 the &GAP; method selection. Our own method selection is described in detail
-in Chapter <Ref Chap="method selection" BookName="recogbase"/>, because it is 
-interesting in its own 
+in Chapter <Ref Chap="method selection" BookName="recogbase"/>, because it is
+interesting in its own
 right and might be useful in other circumstances.<P/>
 
 <E>More text on other chapters to be written.</E><P/>

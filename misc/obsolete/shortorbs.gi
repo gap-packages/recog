@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  shortorbs.gi            
+##  shortorbs.gi
 ##                                recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
@@ -17,7 +17,7 @@
 #############################################################################
 
 RECOG.InitHT := function(len, hfun, eqfun);
-  return rec(len := len, nr := 0, els := [], vals := [], 
+  return rec(len := len, nr := 0, els := [], vals := [],
              hf := hfun, eqf := eqfun, colls := 0);
 end;
 
@@ -109,7 +109,7 @@ RECOG.MyOrbit := function(gens,x,op,hashlen,hashfun)
   # must be an upper bound of the orbit length and will be used as length
   # of the hash table. `hashfun' must be a hash function for objects
   # in the orbit (that is like `x') and must return values in [1..hashlen].
-  # The function returns a record. Its `orbit' entry is a list of points 
+  # The function returns a record. Its `orbit' entry is a list of points
   # beginning with `x'. Its `perms' entry is a list with an entry
   # for each generator in `gens' being a permutation of the orbit as
   # a list of integers.
@@ -183,7 +183,7 @@ RECOG.MyOrbitWork := function(orbrec,limit)
   fi;
   return orbrec.isready;
 end;
-  
+
 
 
 # Number of random elements generated:
@@ -329,7 +329,7 @@ FindHomMethodsMatrix.ShortOrbits := function(ri,g)
        "Found orbit of length ",Length(o[i].orbit)," (#",i,").");
 
   o := o[i];    # the others are no longer needed
-  
+
   imgperms := List(o.perms,PermList);
   imggrp := Group(imgperms);
   data := rec( source := g, range := imggrp, orb := o );
@@ -338,11 +338,11 @@ FindHomMethodsMatrix.ShortOrbits := function(ri,g)
 
   SetHomom(ri,hom);
   Setmethodsforfactor(ri,FindHomDbPerm);
-  
+
   return true;
 end;
 
-#AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.ShortOrbits, 
+#AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.ShortOrbits,
 #           500, "ShortOrbits",
 #           "tries to find a short orbit via O'Brien/Murray heuristics" );
 

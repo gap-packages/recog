@@ -1,5 +1,5 @@
 # Created by bbtogap.py from M12G1-find1 from the Atlas web page
-M12G1find1 := 
+M12G1find1 :=
 function(arg)
     local vars,els,G;
     if Length(arg) > 0 and IsList(arg[1]) then arg := arg[1]; fi;
@@ -9,7 +9,7 @@ function(arg)
 
     # Black box algorithm to find standard generators of M12
     # (Second listed algorithm)
-    
+
     vars.F := 0;
     vars.G := 0;
     vars.V := 0;
@@ -36,7 +36,7 @@ function(arg)
                 vars.G := 1;
             fi;
         fi;
-    until vars.F <> 0 and vars.G <> 0;        
+    until vars.F <> 0 and vars.G <> 0;
     vars.X := 0;
     repeat    # label ELTORDER3
         vars.X := vars.X + 1;
@@ -53,7 +53,7 @@ function(arg)
     until vars.D in [3,6];
     vars.E := QuoInt(vars.D,3);
     els[7] := els[6]^vars.E;
-    
+
     vars.X := 0;
     repeat    # label CONJUGATE
         vars.X := vars.X + 1;
@@ -64,7 +64,7 @@ function(arg)
         els[7] := els[7]^els[8];
         els[9] := els[2]*els[7];
         vars.F := Order(els[9]);
-        
+
         if not(vars.F in [2, 3, 5, 6, 8, 10, 11]) then
             return fail;
         fi;

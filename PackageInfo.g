@@ -1,10 +1,10 @@
 #############################################################################
-##  
+##
 ##  PackageInfo.g for the package `recog'
-##  
+##
 
 RecogsFunnyNameFormatterFunction := function(st)
-  if Length(st) = 0 then 
+  if Length(st) = 0 then
       return st;
   else
       return Concatenation(" (",st,")");
@@ -27,7 +27,7 @@ Date := "08/03/2016", # dd/mm/yyyy format
 
 ##  Information about authors and maintainers.
 Persons := [
-  rec( 
+  rec(
     LastName      := "Neunhöffer",
     FirstNames    := "Max",
     IsAuthor      := true,
@@ -41,20 +41,20 @@ Persons := [
     #Place         := "St Andrews",
     #Institution   := "University of St Andrews"
   ),
-  rec( 
+  rec(
     LastName      := "Seress",
     FirstNames    := "Ákos",
     IsAuthor      := true,
     IsMaintainer  := false,
   ),
-  rec( 
+  rec(
     LastName      := "Ankaralioglu",
     FirstNames    := "Nurullah",
     IsAuthor      := true,
     IsMaintainer  := false,
     Email         := "ankarali@atauni.edu.tr",
   ),
-  rec( 
+  rec(
     LastName      := "Brooksbank",
     FirstNames    := "Peter",
     IsAuthor      := true,
@@ -87,7 +87,7 @@ Persons := [
     IsMaintainer  := false,
     PostalAddress := "Unknown",
   ),
-  rec( 
+  rec(
     LastName      := "Law",
     FirstNames    := "Maska",
     IsAuthor      := true,
@@ -104,7 +104,7 @@ Persons := [
     Place         := "Perth",
     Institution   := "University of Western Australia"
   ),
-  rec( 
+  rec(
     LastName      := "Linton",
     FirstNames    := "Steve",
     IsAuthor      := true,
@@ -130,7 +130,7 @@ Persons := [
     Place         := "Kaiserslautern",
     Institution   := "Universitaet Kaiserslautern",
   ),
-  rec( 
+  rec(
     LastName      := "Niemeyer",
     FirstNames    := "Alice",
     IsAuthor      := true,
@@ -194,15 +194,15 @@ Persons := [
 
 ##  Status information. Currently the following cases are recognized:
 ##    "accepted"      for successfully refereed packages
-##    "deposited"     for packages for which the GAP developers agreed 
+##    "deposited"     for packages for which the GAP developers agreed
 ##                    to distribute them with the core GAP system
-##    "dev"           for development versions of packages 
+##    "dev"           for development versions of packages
 ##    "other"         for all other packages
 ##
 # Status := "accepted",
 Status := "deposited",
 
-##  You must provide the next two entries if and only if the status is 
+##  You must provide the next two entries if and only if the status is
 ##  "accepted" because is was successfully refereed:
 # format: 'name (place)'
 # CommunicatedBy := "Mike Atkinson (St. Andrews)",
@@ -224,14 +224,14 @@ ArchiveURL      := Concatenation( ~.SourceRepository.URL,
                                  "/", ~.PackageName, "-", ~.Version ),
 ArchiveFormats := ".tar.gz .tar.bz2",
 
-##  Here you  must provide a short abstract explaining the package content 
-##  in HTML format (used on the package overview Web page) and an URL 
+##  Here you  must provide a short abstract explaining the package content
+##  in HTML format (used on the package overview Web page) and an URL
 ##  for a Webpage with more detailed information about the package
 ##  (not more than a few lines, less is ok):
 ##  Please, use '<span class="pkgname">GAP</span>' and
 ##  '<span class="pkgname">MyPKG</span>' for specifing package names.
-##  
-AbstractHTML := 
+##
+AbstractHTML :=
   "<b>Warning:</b> This package is still under development and \
    this version is to be considered a working, but preliminary one. <p/> \
    This packages contains a collection of methods for the \
@@ -289,13 +289,13 @@ BannerString := Concatenation(
 
 AvailabilityTest := ReturnTrue,
 
-##  *Optional*, but recommended: path relative to package root to a file which 
+##  *Optional*, but recommended: path relative to package root to a file which
 ##  contains as many tests of the package functionality as sensible.
 #TestFile := "tst/TestAll.g",
 ## Currently, due to the Monte-Carlo nature of our algorithms and other
 ## technical details, this is not a proper GAP test file.
 
-##  *Optional*: Here you can list some keyword related to the topic 
+##  *Optional*: Here you can list some keyword related to the topic
 ##  of the package.
 Keywords := ["matrix group recognition", "group recognition", "methods"],
 

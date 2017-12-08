@@ -1,8 +1,8 @@
 SolvePcWord := function(rri,g)
  local T,PtoT;
  T := GroupWithMemory(GroupWithGenerators(List(AsList(Pcgs(Grp(rri))),x->())));
- PtoT := GroupHomomorphismByImages(Grp(rri),T,AsList(Pcgs(Grp(rri))),GeneratorsOfGroup(T)); 
-  
+ PtoT := GroupHomomorphismByImages(Grp(rri),T,AsList(Pcgs(Grp(rri))),GeneratorsOfGroup(T));
+
  return SLPOfElm(ImageElm(PtoT,g));
 end;
 
@@ -15,7 +15,7 @@ InsertSubTree := function(ri,rifac,maps)
 
  # remember the kernel of ri!
  kerfac := RIKer(ri);;
- 
+
  # construct maps from ri -> new groups
  phi := StructuralCopy(Homom(ri));
  Q := List(maps,x->Image(x));
@@ -25,7 +25,7 @@ InsertSubTree := function(ri,rifac,maps)
  lri := []; rri := [];
  lri[1] := rec();
  Objectify(RecognitionInfoType,lri[1]);;
-  
+
  SetGrp(lri[1],Grp(ri));
 
  ripregensfac := ShallowCopy(pregensfac(ri));
@@ -58,9 +58,9 @@ InsertSubTree := function(ri,rifac,maps)
 # Setup the kernel
 
    if kerfac <> fail then
-     kgens := Concatenation(GeneratorsOfGroup(Grp(kerfac)),List(GeneratorsOfGroup(Kernel(maps[i])),x->ResultOfStraightLineProgram(slpforelement(rifac)(rifac,x),ripregensfac)));   
+     kgens := Concatenation(GeneratorsOfGroup(Grp(kerfac)),List(GeneratorsOfGroup(Kernel(maps[i])),x->ResultOfStraightLineProgram(slpforelement(rifac)(rifac,x),ripregensfac)));
    else
-     kgens := List(GeneratorsOfGroup(Kernel(maps[i])),x->ResultOfStraightLineProgram(slpforelement(rifac)(rifac,x),ripregensfac));   
+     kgens := List(GeneratorsOfGroup(Kernel(maps[i])),x->ResultOfStraightLineProgram(slpforelement(rifac)(rifac,x),ripregensfac));
    fi;
    if Length(kgens)=0 then
      kgens := [One(overgp)];
@@ -69,12 +69,12 @@ InsertSubTree := function(ri,rifac,maps)
    Objectify(RecognitionInfoType,lri[i+1]);;
    SetGrp(lri[i+1],GroupWithGenerators(kgens));
    SetRIKer(lri[i],lri[i+1]);
-   SetRIFac(lri[i],rri[i]);	
+   SetRIFac(lri[i],rri[i]);
    SetRIParent(lri[i+1],lri[i]);
-   SetRIParent(rri[i],lri[i]);   
- od;  
+   SetRIParent(rri[i],lri[i]);
+ od;
 
-   
+
  # tell lri[1] to join onto RIParent(ri)
  if HasRIParent(ri) then
    SetRIParent(lri[1],StructuralCopy(RIParent(ri)));
@@ -83,7 +83,7 @@ InsertSubTree := function(ri,rifac,maps)
  # tell last lri to be kerfac
    SetRIKer(lri[Size(Q)],StructuralCopy(kerfac));
    SetRIParent(RIKer(lri[Size(Q)]),lri[Size(Q)]);
- 
+
  # Set up the nice generators
 
  i := Size(Q);
@@ -109,7 +109,7 @@ RefineSolubleLayers := function(ri)
  phi := Homom(ri);
  I := Grp(rifac);
 
- if not IsPcGroup(I) or IsElementaryAbelian(I) then 
+ if not IsPcGroup(I) or IsElementaryAbelian(I) then
    riker := RIKer(ri);
    SetRIKer(ri,RefineSolubleLayers(riker));
    if RIKer(ri)<>fail then
@@ -146,8 +146,8 @@ ConstructActionMatrices := function(ri)
  od;
 
  return AcGens;
-end; 
- 
+end;
+
 VectortoPc := function(v,Pc)
  return PcElementByExponents(Pcgs(Pc),List(v,x->IntFFE(x)));
 end;
@@ -161,7 +161,7 @@ RefineElementaryAbelianLayers := function(ri)
  phi := Homom(ri);
  I := Grp(rifac);
 
- if not IsPcGroup(I) or IsCyclic(I) then 
+ if not IsPcGroup(I) or IsCyclic(I) then
    riker := RIKer(ri);
    SetRIKer(ri,RefineElementaryAbelianLayers(riker));
    if RIKer(ri)<>fail then
@@ -172,12 +172,12 @@ RefineElementaryAbelianLayers := function(ri)
    return ri;
  fi;
 
- AcGens := ConstructActionMatrices(ri);  
+ AcGens := ConstructActionMatrices(ri);
  p := I!.Pcgs!.RelativeOrders[1];
  M := GModuleByMats(Z(p)^0*AcGens,GF(p));
 
  #if the module is irreducible then the ChiefSeries can't be refined.
- if MTX.IsIrreducible(M) then 
+ if MTX.IsIrreducible(M) then
    riker := RIKer(ri);
    SetRIKer(ri,RefineElementaryAbelianLayers(riker));
    if RIKer(ri)<>fail then
@@ -185,7 +185,7 @@ RefineElementaryAbelianLayers := function(ri)
    else
      SetNiceGens(ri,pregensfac(ri));
    fi;
-   
+
    return ri;
  fi;
 
@@ -193,10 +193,10 @@ RefineElementaryAbelianLayers := function(ri)
 
 
 # get the list of normal subgroups
-  
+
   L := List([Length(CS),Length(CS)-1..1],i->
 SubgroupNC(Grp(RIFac(ri)),List(CS[i],v->VectortoPc(v,Grp(RIFac(ri))))));
-  
+
   maps := List([1..Length(L)-1],i->NaturalHomomorphismByNormalSubgroupNC(L[i],L[i+1]));
   ri := InsertSubTree(ri, rifac, maps);;
   riker := RIKer(ri);
@@ -214,7 +214,7 @@ end;
 RemoveTrivialLayers := function(ri)
 # Removes the trivial layers
  local rifac,riker,I,parri,newriker;
- 
+
  if ri=fail then return ri; fi;
 
  rifac := RIFac(ri);;
@@ -231,7 +231,7 @@ RemoveTrivialLayers := function(ri)
    else
      Unbind(ri!.RIParent);
      ResetFilterObj(ri, HasRIParent);
-   fi; 
+   fi;
    newriker := RIKer(ri);
    SetRIKer(ri,RemoveTrivialLayers(newriker));
    if RIKer(ri)<>fail then
@@ -243,7 +243,7 @@ RemoveTrivialLayers := function(ri)
    return RemoveTrivialLayers(ri);
  fi;
 
- SetRIKer(ri,RemoveTrivialLayers(riker));   
+ SetRIKer(ri,RemoveTrivialLayers(riker));
  if RIKer(ri)<>fail then
    SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(RIKer(ri))));
  else

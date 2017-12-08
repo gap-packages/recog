@@ -5,7 +5,7 @@
 #   allorders := ...,            # list of all possible element orders in G
 #   freqorders := ...,           # list of orders such that probabability
 #                                # that a random el has one of these is ~ 1/2
-#   probability := ...,          # probability that a random element has an 
+#   probability := ...,          # probability that a random element has an
 #                                # order in freqorders
 #   notorders := ...,            # list of numbers that are *not* the order
 #                                # of an element of G
@@ -59,7 +59,7 @@ RECOG.InitBinomialTab := function()
 end;
 RECOG.InitBinomialTab();
 Unbind(RECOG.InitBinomialTab);
-      
+
 RECOG.CheckFingerPrint := function(fp,orders)
     local count,i;
     if IsBound(fp.notorders) then
@@ -69,7 +69,7 @@ RECOG.CheckFingerPrint := function(fp,orders)
         if ForAny(orders,o->fp.exponent mod o <> 0) then return 0; fi;
     elif IsBound(fp.size) then
         if ForAny(orders,o->fp.size mod o <> 0) then return 0; fi;
-    fi; 
+    fi;
     if IsBound(fp.allorders) then
         if ForAny(orders,o->not(o in fp.allorders)) then return 0; fi;
     fi;

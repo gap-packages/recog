@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  tensor.gi          
+##  tensor.gi
 ##                                recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
@@ -8,7 +8,7 @@
 ##  Copyright 2005-2008 by the authors.
 ##  This file is free software, see license information at the end.
 ##
-##  A collection of find homomorphism methods for tensor product 
+##  A collection of find homomorphism methods for tensor product
 ##  decompositions of matrix groups.
 ##
 #############################################################################
@@ -28,7 +28,7 @@ RECOG.FindTensorKernel := function(G,onlyone)
       #Print(pfacs,"\n");
       for j in pfacs do
           #Print(j," \c");
-          Add(kgens,z^(allps/j)); 
+          Add(kgens,z^(allps/j));
               # make a prime element, hope it is in the kernel
       od;
       #Print("\n");
@@ -58,7 +58,7 @@ RECOG.FindTensorKernel := function(G,onlyone)
       #Print(Length(notused)," \c");
       N := GroupWithGenerators(FastNormalClosure(GeneratorsOfGroup(G),[c],10));
       if onlyone and
-         (ForAny(GeneratorsOfGroup(N),m->IsZero(m[1][1]) or 
+         (ForAny(GeneratorsOfGroup(N),m->IsZero(m[1][1]) or
                                          not(IsOne(m*(m[1][1])^-1)))) then
           # we found a non-scalar normal subgroup:
           #Print("\n");
@@ -120,7 +120,7 @@ RECOG.FindTensorDecomposition := function(G,N)
           return rec(t := basis, ti := basisi, blocksize := subdim);
       fi;
       # Otherwise we have a tensor decomposition over a bigger field:
-      # This will not be reached, since we have made sure that 
+      # This will not be reached, since we have made sure that
       # semilinear already caught this. (Lemma: If one tensor factor is
       # semilinear, then the product is.)
       Error("This should never have happened (1), talk to Max.");
@@ -196,7 +196,7 @@ RECOG.IsKroneckerProduct := function(m,blocksize)
       od;
       Add(ac,ar);
   od;
-  # FIXME: 
+  # FIXME:
   ConvertToMatrixRep(a);
   ConvertToMatrixRep(ac);
   return [true,a,ac];
@@ -279,7 +279,7 @@ RECOG.FindTensorOtherFactor := function(G,N,blocksize)
   # Basechange already done such that N is a block scalar matrix meaning
   # "block-diagonal" and all blocks along the diagonal are equal.
   local c,i,invs,o,out,timeout,x,z;
-  
+
   # Find a non-scalar involution in N:
   timeout := 100;
   while true do
@@ -315,11 +315,11 @@ RECOG.FindTensorOtherFactor := function(G,N,blocksize)
       od;
   od;
 end;
-  
+
 
 FindHomMethodsProjective.TensorDecomposable := function(ri,G)
   local H,N,conjgensG,d,f,hom,kro,r;
-  
+
   RECOG.SetPseudoRandomStamp(G,"TensorDecomposable");
 
   # Here we probably want to do an order test and even a polynomial
@@ -350,7 +350,7 @@ FindHomMethodsProjective.TensorDecomposable := function(ri,G)
       Setmethodsforfactor(ri,FindHomDbPerm);
       return true;
   fi;
-  
+
   Info(InfoRecog,2,
        "TensorDecomposable: I seem to have found a tensor decomposition.");
 
@@ -416,7 +416,7 @@ RECOG.HomTensorKernel := function(data,m)
 end;
 
 FindHomMethodsProjective.KroneckerKernel := function(ri,G)
-  # One up in the tree we got the hint about a Kronecker product, this 
+  # One up in the tree we got the hint about a Kronecker product, this
   # method is called when we have gone to one factor and now are in the
   # kernel. So we know that we are a block diagonal matrix with identical
   # diagonal blocks. All we do is to project down to one of the blocks.

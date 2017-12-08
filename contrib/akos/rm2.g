@@ -7,8 +7,8 @@
 
 # *********  REQUIRES alg4 *********
 alg8 := function ( g , f , k )
-  local gPrime, gPrimeGenerators, moduleGenerators, 
-	s, temp, t, cosets, cosetReps, length, c, 
+  local gPrime, gPrimeGenerators, moduleGenerators,
+	s, temp, t, cosets, cosetReps, length, c,
 	smallRing, charPoly, j, i, perm, c_jSizes ,
         done , positionInTree , descendNext ,
         chanceOfSuccess , depthInTree , gPrimeGenerators2 ,
@@ -21,10 +21,10 @@ alg8 := function ( g , f , k )
     Print("This algorithm requires an absolutely irreducible group.\n");
     return fail ;
   fi ;
-	
+
   # check to make sure that f is contained in k
   if not IsSubset(k, f) then
-    Print("\nError. f = ", f, 
+    Print("\nError. f = ", f,
 	  " must be contained in of k = ", k, "\n");
     return fail;
   fi;
@@ -42,8 +42,8 @@ alg8 := function ( g , f , k )
   # set the threshold for testing (currently arbitrarily)
   testThreshold := 10 ;
 
-  # Step 1:  find a list s of elements of g that together 
-  #          with g' act absolutely irreducibly.  
+  # Step 1:  find a list s of elements of g that together
+  #          with g' act absolutely irreducibly.
 
   gPrime := DerivedSubgroup ( g ) ;
   gPrimeGenerators2 := GeneratorsOfGroup ( gPrime ) ;
@@ -56,11 +56,11 @@ alg8 := function ( g , f , k )
 
   while not (MTX.IsAbsolutelyIrreducible(
 	         GModuleByMats(moduleGenerators , k ))) do
-    		
+
     # to avoid redundancy in s, we check each time
-    # to make sure that temp is not already in s		
+    # to make sure that temp is not already in s
     temp := PseudoRandom ( g ) ;
-    if Length ( s ) >= 1 then 
+    if Length ( s ) >= 1 then
       while temp in Group ( s ) do
         temp := PseudoRandom(g);
       od ;
@@ -77,28 +77,28 @@ alg8 := function ( g , f , k )
   # Step 1 ends here
 
 
-  # Step 2a:  Find the set c_j of cosets of Units(f) in 
-  #           Units(k) such that x*s[j] has its char poly 
-  #           in f, where x is a representative of a coset  
-  	
+  # Step 2a:  Find the set c_j of cosets of Units(f) in
+  #           Units(k) such that x*s[j] has its char poly
+  #           in f, where x is a representative of a coset
+
   # we require the cosets of the group of units of f in the
   # group of units of k
   cosets := RightCosets(Units(k), Units(f));
-	
+
   # since we will have a list of cosets and a list of coset
-  # representatives running in parallel, we work with the 
-  # indices of the elements of the lists rather than the 
-  # actual elements. That is, we use 
+  # representatives running in parallel, we work with the
+  # indices of the elements of the lists rather than the
+  # actual elements. That is, we use
   # 'for i in [1..Length(cosets]' rather than
   # 'for x in cosets'
-	
+
   length := Length(cosets);
   cosetReps := [];
   for i in [1..length] do
     Add(cosetReps, Representative(cosets[i]));
   od;
-	
-  # c will be the list of lists of cosets c_j for which 
+
+  # c will be the list of lists of cosets c_j for which
   # cosetReps[i]*s[j] has its charPoly in f
   c := [];
   smallRing := PolynomialRing(f);
@@ -110,7 +110,7 @@ alg8 := function ( g , f , k )
         Add ( c [ j ] , cosetReps [ i ] ) ;
       fi;
     od;
-				
+
     if Length ( c [ j ] ) = 0 then
       return false ;
     fi ;
@@ -118,7 +118,7 @@ alg8 := function ( g , f , k )
 
 
 ####################################
-#  Step 2b:  Reorder s (and c) in order of 
+#  Step 2b:  Reorder s (and c) in order of
 #            increasing size of c_j
 ############################################
 
@@ -140,9 +140,9 @@ alg8 := function ( g , f , k )
       depthInTree := depthInTree + 1 ;
       positionInTree [ depthInTree ] := 1 ;
     else
-      positionInTree [ depthInTree ] := positionInTree [ depthInTree ]+ 1  
+      positionInTree [ depthInTree ] := positionInTree [ depthInTree ]+ 1
 ;
-      if positionInTree [ depthInTree ] <= Length ( c [ depthInTree ] ) 
+      if positionInTree [ depthInTree ] <= Length ( c [ depthInTree ] )
 then
         done := true ;
       fi ;
@@ -154,7 +154,7 @@ then
           done := true ;
         else
           positionInTree [ depthInTree ] := positionInTree [ depthInTree ] + 1 ;
-          if positionInTree [ depthInTree ] <= Length ( c [ depthInTree ] 
+          if positionInTree [ depthInTree ] <= Length ( c [ depthInTree ]
 ) then
             done := true ;
           fi ;
@@ -181,7 +181,7 @@ then
           temp := Zero ( f ) ;
           for j in [ 1 .. testThreshold ] do
             k2 := Random ( [ 1 .. depthInTree ] ) ;
-            temp := temp + Random ( f ) * PseudoRandom ( gPrime ) 
+            temp := temp + Random ( f ) * PseudoRandom ( gPrime )
                          + Random ( f ) * s [ k2 ] * c [ k2 ] [ positionInTree [ k2 ] ];
           od ;
           if not ( CharacteristicPolynomial ( temp ) in smallRing ) then
@@ -217,7 +217,7 @@ then
             # in f.
             success := true ;
             bInverse := b ^ ( -1 ) ;
-            for k2 in GeneratorsOfGroup ( g ) do 
+            for k2 in GeneratorsOfGroup ( g ) do
               if success then
                 temp := bInverse * k2 * b ;
                 done := false ;
@@ -248,7 +248,7 @@ then
           fi ;
         fi ;
       fi ;
-     
+
     else
       done := true ;
     fi ;

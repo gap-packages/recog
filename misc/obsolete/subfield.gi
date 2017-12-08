@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  subfield.gi        
+##  subfield.gi
 ##                              recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
@@ -8,8 +8,8 @@
 ##                                                            Nick Werner
 ##                                                            Justin Lynd
 ##                                                            Niraj Khare
-##                                                           
-## 
+##
+##
 ##
 ##  Copyright 2006-2008 by the authors.
 ##  This file is free software, see license information at the end.
@@ -55,8 +55,8 @@ SUBFIELD.ScalarsToMultiplyIntoSmallerField := function(l,k)
       if r = fail then return fail; fi;
       if not(IsSubset(f,r.field)) then
           f := ClosureField(f,r.field);
-          if f = k then 
-              return fail; 
+          if f = k then
+              return fail;
           fi;
       fi;
       scalars[i] := r.scalar;
@@ -66,9 +66,9 @@ SUBFIELD.ScalarsToMultiplyIntoSmallerField := function(l,k)
 end;
 
 SUBFIELD.BaseChangeForSmallestPossibleField := function(grp,mtx,k)
-  # grp is a matrix group over k, which must be a finite field. mtx must be 
+  # grp is a matrix group over k, which must be a finite field. mtx must be
   # the GModuleByMats(GeneratorsOfGroup(grp),k).
-  # The module mtx must be irreducible (not necessarily absolutely irred). 
+  # The module mtx must be irreducible (not necessarily absolutely irred).
   # A subfield f of k has property (*), if and only if there
   # is an invertible matrix t with entries in k such that for every generator
   # x in gens t*x*t^-1 has entries in f.
@@ -78,7 +78,7 @@ SUBFIELD.BaseChangeForSmallestPossibleField := function(grp,mtx,k)
   #   r.t       : the matrix t
   #   r.ti      : the inverse of t
   #   r.newgens : the list of generators t * x * ti
-  #   r.field   : the smaller field 
+  #   r.field   : the smaller field
 
   local a,algel,b,bi,charPoly,deg,dim,element,f,facs,field,g,i,newgens,
         r,scalars,seb,v,w;
@@ -93,7 +93,7 @@ SUBFIELD.BaseChangeForSmallestPossibleField := function(grp,mtx,k)
   dim := Length(a);
   while ( element = false ) do
     a := a + Random ( f ) * PseudoRandom ( grp ) ;
-  
+
     # Check char. polynomial of a to make sure it lies in smallField [ x ]
     charPoly := CharacteristicPolynomial ( a ) ;
     field := Field(CoefficientsOfLaurentPolynomial(charPoly)[1]);
@@ -103,11 +103,11 @@ SUBFIELD.BaseChangeForSmallestPossibleField := function(grp,mtx,k)
             return fail;
         fi;
     fi;
-    
+
     # FIXME: We only take factors that occur just once (good factors)!
     facs := Collected(Factors(charPoly : onlydegs := [1..3]));
     facs := Filtered(facs,x->x[2] = 1);
-    
+
     i := 1;
     while i <= Length(facs) do
         algel := Value(facs[i][1],a);
@@ -145,7 +145,7 @@ SUBFIELD.BaseChangeForSmallestPossibleField := function(grp,mtx,k)
   return rec( newgens := newgens, field := f, t := b, ti := bi );
 end;
 
-      
+
 ###########################################################################
 # Currently not used:
 ###########################################################################
@@ -164,14 +164,14 @@ SUBFIELD.addToNNRBasis := function ( nnrbasis , v )
   # check each of the previous 1s to see if need to clear them in temp
   for i in [ 1 .. s ] do
     if not ( IsZero ( temp [ nnrbasis . locOfPivots [ i ] ] ) ) then
-      AddRowVector ( temp , nnrbasis . ans [ i ] , 
+      AddRowVector ( temp , nnrbasis . ans [ i ] ,
                      - temp [ nnrbasis . locOfPivots [ i ] ] ) ;
     fi ;
   od ;
 
   # is temp the zero vector?  if so, nothing to add, so return false
   nonzero := PositionNonZero ( temp ) ;
-  
+
   if nonzero > Size ( temp ) then
     return false ;
   fi ;
@@ -233,7 +233,7 @@ SUBFIELD.alg4 := function ( matrixGroup , smallField , bigField )
         temp := true ;
       fi ;
     od ;
-  
+
     # Check char. polynomial of a to make sure it lies in smallField [ x ]
     charPoly := CharacteristicPolynomial ( a ) ;
     field := Field(CoefficientsOfLaurentPolynomial(charPoly)[1]);
@@ -263,7 +263,7 @@ SUBFIELD.alg4 := function ( matrixGroup , smallField , bigField )
       fi ;
     od ;
     if lambda <> false and (lambda in smallField) then
-      element := a ;      
+      element := a ;
     fi ;
   od ;
 
@@ -277,7 +277,7 @@ SUBFIELD.alg4 := function ( matrixGroup , smallField , bigField )
   # Was:
   #temp := TransposedMat ( a ) - lambda * One ( a ) ;
   temp := a - lambda * One ( a ) ;
-  # Was: 
+  # Was:
   #v := TriangulizedNullspaceMat( temp ) [1];
   v := NullspaceMat( temp ) [1];
 
@@ -287,11 +287,11 @@ SUBFIELD.alg4 := function ( matrixGroup , smallField , bigField )
   # step 3: make a basis b out of vectors of the form g * v
   #b := [ ] ;
   nnrbasis := rec ( ans := [ ] , locOfPivots := [ ] ) ;
-  
-  
+
+
   # Was:
   #while not Size(b) = Size(a) do
-  #  g := PseudoRandom(matrixGroup); 
+  #  g := PseudoRandom(matrixGroup);
   #  if ( SUBFIELD.addToNNRBasis ( nnrbasis , g * v ) ) then
   #    Add(b, g * v);
   #  fi;
@@ -311,7 +311,7 @@ SUBFIELD.alg4 := function ( matrixGroup , smallField , bigField )
   ConvertToMatrixRep(b);
 
   # up until now, b is a list of row vectors... we want to transpose it
-  # no longer necessary: b := TransposedMat ( b ) ;    
+  # no longer necessary: b := TransposedMat ( b ) ;
 
   # step 3 ends here
 
@@ -322,7 +322,7 @@ SUBFIELD.alg4 := function ( matrixGroup , smallField , bigField )
   binverse := b ^ ( -1 ) ;
   # A little optimisation here, create group object outside:
   newgens := [];
-  for g in GeneratorsOfGroup ( matrixGroup ) do 
+  for g in GeneratorsOfGroup ( matrixGroup ) do
     # Was:
     # temp := binverse * g * b ;
     temp := b * g * binverse ;
@@ -335,8 +335,8 @@ SUBFIELD.alg4 := function ( matrixGroup , smallField , bigField )
         fi;
     fi;
   od;
-  
-  return rec(t := b, ti := binverse, newgens := newgens, 
+
+  return rec(t := b, ti := binverse, newgens := newgens,
              field := smallField);
   end ;
 
@@ -349,8 +349,8 @@ SUBFIELD.alg4 := function ( matrixGroup , smallField , bigField )
 
 # *********  REQUIRES SUBFIELD.alg4 *********
 SUBFIELD.alg8 := function ( g , gPrime , f , k )
-  local gPrimeGenerators, moduleGenerators, 
-	s, temp, t, cosets, cosetReps, length, c, 
+  local gPrimeGenerators, moduleGenerators,
+	s, temp, t, cosets, cosetReps, length, c,
 	smallRing, charPoly, j, i, perm, c_jSizes ,
         done , positionInTree , descendNext ,
         chanceOfSuccess , depthInTree , gPrimeGenerators2 ,
@@ -360,7 +360,7 @@ SUBFIELD.alg8 := function ( g , gPrime , f , k )
   # This must only be called if the natural module of the matrix group g
   # is absolutely irreducible and the natural module of gprime (the derived
   # subgroup) is not absolutely irreducible.
-  
+
   # The following is taken care for in the method selection already:
   # check for absolute irreducibility of g first
   #if not (MTX.IsAbsolutelyIrreducible (
@@ -368,11 +368,11 @@ SUBFIELD.alg8 := function ( g , gPrime , f , k )
   #  Print("This algorithm requires an absolutely irreducible group.\n");
   #  return fail ;
   #fi ;
-	
+
   # The following lies in the responsibility of the caller:
   # check to make sure that f is contained in k
   #if not IsSubset(k, f) then
-  #  Print("\nError. f = ", f, 
+  #  Print("\nError. f = ", f,
   #        " must be contained in of k = ", k, "\n");
   #  return fail;
   #fi;
@@ -391,8 +391,8 @@ SUBFIELD.alg8 := function ( g , gPrime , f , k )
   # set the threshold for testing (currently arbitrarily)
   testThreshold := 10 ;
 
-  # Step 1:  find a list s of elements of g that together 
-  #          with g' act absolutely irreducibly.  
+  # Step 1:  find a list s of elements of g that together
+  #          with g' act absolutely irreducibly.
 
   # we already got that: gPrime := DerivedSubgroup ( g ) ;
   gPrimeGenerators2 := GeneratorsOfGroup ( gPrime ) ;
@@ -408,12 +408,12 @@ SUBFIELD.alg8 := function ( g , gPrime , f , k )
   repeat
   #while not (MTX.IsAbsolutelyIrreducible(
   #	         GModuleByMats(moduleGenerators , k ))) do
-    		
+
     # to avoid redundancy in s, we check each time
-    # to make sure that temp is not already in s		
+    # to make sure that temp is not already in s
     temp := PseudoRandom ( g ) ;
     # Will not happen, test is expensive, if so, does not hurt:
-    #if Length ( s ) >= 1 then 
+    #if Length ( s ) >= 1 then
     #  while temp in Group ( s ) do
     #    temp := PseudoRandom(g);
     #  od ;
@@ -431,28 +431,28 @@ SUBFIELD.alg8 := function ( g , gPrime , f , k )
   # Step 1 ends here
 
 
-  # Step 2a:  Find the set c_j of cosets of Units(f) in 
-  #           Units(k) such that x*s[j] has its char poly 
-  #           in f, where x is a representative of a coset  
-  	
+  # Step 2a:  Find the set c_j of cosets of Units(f) in
+  #           Units(k) such that x*s[j] has its char poly
+  #           in f, where x is a representative of a coset
+
   # we require the cosets of the group of units of f in the
   # group of units of k
   cosets := RightCosets(Units(k), Units(f));
-	
+
   # since we will have a list of cosets and a list of coset
-  # representatives running in parallel, we work with the 
-  # indices of the elements of the lists rather than the 
-  # actual elements. That is, we use 
+  # representatives running in parallel, we work with the
+  # indices of the elements of the lists rather than the
+  # actual elements. That is, we use
   # 'for i in [1..Length(cosets]' rather than
   # 'for x in cosets'
-	
+
   length := Length(cosets);
   cosetReps := [];
   for i in [1..length] do
     Add(cosetReps, Representative(cosets[i]));
   od;
-	
-  # c will be the list of lists of cosets c_j for which 
+
+  # c will be the list of lists of cosets c_j for which
   # cosetReps[i]*s[j] has its charPoly in f
   c := [];
   smallRing := PolynomialRing(f);
@@ -464,7 +464,7 @@ SUBFIELD.alg8 := function ( g , gPrime , f , k )
         Add ( c [ j ] , cosetReps [ i ] ) ;
       fi;
     od;
-				
+
     if Length ( c [ j ] ) = 0 then
       return false ;
     fi ;
@@ -472,7 +472,7 @@ SUBFIELD.alg8 := function ( g , gPrime , f , k )
 
 
 ####################################
-#  Step 2b:  Reorder s (and c) in order of 
+#  Step 2b:  Reorder s (and c) in order of
 #            increasing size of c_j
 ############################################
 
@@ -532,7 +532,7 @@ SUBFIELD.alg8 := function ( g , gPrime , f , k )
           temp := Zero ( f ) ;
           for j in [ 1 .. testThreshold ] do
             k2 := Random ( [ 1 .. depthInTree ] ) ;
-            temp := temp + Random ( f ) * PseudoRandom ( gPrime ) 
+            temp := temp + Random ( f ) * PseudoRandom ( gPrime )
                          + Random ( f ) * s [ k2 ] * c[k2][positionInTree[k2]];
           od ;
           if not ( CharacteristicPolynomial ( temp ) in smallRing ) then
@@ -568,7 +568,7 @@ SUBFIELD.alg8 := function ( g , gPrime , f , k )
             # in f.
             success := true ;
             bInverse := b ^ ( -1 ) ;
-            for k2 in GeneratorsOfGroup ( g ) do 
+            for k2 in GeneratorsOfGroup ( g ) do
               if success then
                 temp := b * k2 * bInverse ;
                 done := false ;
@@ -599,7 +599,7 @@ SUBFIELD.alg8 := function ( g , gPrime , f , k )
           fi ;
         fi ;
       fi ;
-     
+
     else
       done := true ;
     fi ;
@@ -652,7 +652,7 @@ end;
 
 FindHomMethodsProjective.Subfield :=
   function(ri,G)
-    # We assume G to be absolutely irreducible, although this is not 
+    # We assume G to be absolutely irreducible, although this is not
     # necessary:
     local Gprime,H,b,dim,f,hom,mo,newgens,pf,r;
     f := ri!.field;

@@ -17,7 +17,7 @@ addToNNRBasis := function ( nnrbasis , v )
 
   # is temp the zero vector?  if so, nothing to add, so return false
   nonzero := PositionNonZero ( temp ) ;
-  
+
   if nonzero > Size ( temp ) then
     return false ;
   fi ;
@@ -38,7 +38,7 @@ addToNNRBasis := function ( nnrbasis , v )
 
   return true ;
   end;
-  
+
 
 
 
@@ -51,7 +51,7 @@ addToNNRBasis := function ( nnrbasis , v )
 #
 alg4 := function ( matrixGroup , smallField , bigField )
   local element , a,  smallRing ,
-        charPoly , roots , i , j , k , 
+        charPoly , roots , i , j , k ,
         lambda , match , allEigenvectors , v , b , binverse , g ,
         temp , nnrbasis , n, count ;
 
@@ -83,7 +83,7 @@ alg4 := function ( matrixGroup , smallField , bigField )
         temp := true ;
       fi ;
     od ;
-  
+
     if element = false then
       # Check characteristic polynomial of a to make sure it lies in smallField [ x ]
       charPoly := CharacteristicPolynomial ( a ) ;
@@ -110,7 +110,7 @@ alg4 := function ( matrixGroup , smallField , bigField )
         fi ;
       od ;
       if lambda <> false and (lambda in smallField) then
-        element := a ;      
+        element := a ;
       fi ;
     fi ;
   od ;
@@ -131,18 +131,18 @@ alg4 := function ( matrixGroup , smallField , bigField )
   # step 3: make a basis b out of vectors of the form g * v
   b := [ ] ;
   nnrbasis := rec ( ans := [ ] , locOfPivots := [ ] ) ;
-  
-  
+
+
   while not Size(b) = Size(a) do
-    g := PseudoRandom(matrixGroup); 
+    g := PseudoRandom(matrixGroup);
     if ( addToNNRBasis ( nnrbasis , g * v ) ) then
       Add(b, g * v);
     fi;
   od;
-	
-  
+
+
   # up until now, b is a list of row vectors... we want to transpose it
-  b := TransposedMat ( b ) ;    
+  b := TransposedMat ( b ) ;
 
   # step 3 ends here
 
@@ -150,7 +150,7 @@ alg4 := function ( matrixGroup , smallField , bigField )
   # step 4:  conjugate the generators by B & check to see if inside the smaller field
   # somehow we are getting here without (necessarily) having b being n x n
   binverse := b ^ ( -1 ) ;
-  for g in GeneratorsOfGroup ( matrixGroup ) do 
+  for g in GeneratorsOfGroup ( matrixGroup ) do
     temp := binverse * g * b ;
     if not ( temp in GL ( Size ( a ) , smallField ) ) then
       return false ;

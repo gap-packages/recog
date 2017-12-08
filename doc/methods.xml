@@ -1,4 +1,4 @@
-<!-- 
+<!--
 
    methods.xml            recog package documentation
                                                                Max Neunhoeffer
@@ -84,7 +84,7 @@ Chapter <Ref Chap="method selection" BookName="recogbase"/>).
 <Subsection Label="TrivialPermGroup">
 <Heading><C>TrivialPermGroup</C></Heading>
 
-This method is successful if and only if all generators of the permutation 
+This method is successful if and only if all generators of the permutation
 group <A>G</A> are equal to the identity. Otherwise it returns
 <K>false</K> indicating that it will never succeed. This method
 is only installed to handle the trivial case such that we do not have to
@@ -95,14 +95,14 @@ take this case into account in the other methods.
 <Subsection Label="ThrowAwayFixedPoints">
 <Heading><C>ThrowAwayFixedPoints</C></Heading>
 
-This method defines a homomorphism of a permutation group 
-<A>G</A> to the action on the moved points of <A>G</A> if 
-<A>G</A> does not have too many moved points. In the current setup, the 
+This method defines a homomorphism of a permutation group
+<A>G</A> to the action on the moved points of <A>G</A> if
+<A>G</A> does not have too many moved points. In the current setup, the
 homomorphism is defined if the number <M>k</M> of moved
-points is at most <M>1/3</M> of the largest moved point of <A>G</A>, 
-or  <M>k</M> is at most half of the number of points on which 
-<A>G</A> is stored internally by &GAP;. The method returns 
-<K>false</K> if it does not define a homomorphism indicating that it will 
+points is at most <M>1/3</M> of the largest moved point of <A>G</A>,
+or  <M>k</M> is at most half of the number of points on which
+<A>G</A> is stored internally by &GAP;. The method returns
+<K>false</K> if it does not define a homomorphism indicating that it will
 never succeed.
 
 </Subsection>
@@ -295,12 +295,12 @@ a composition series of the underlying module is computed and a base
 change is performed to write <A>G</A> in a block lower triangular form.
 Also, the method passes a hint to the image group that it is in
 block lower triangular form, so the image immediately can make
-recursive calls for the actions on the diagonal blocks, and then to the 
+recursive calls for the actions on the diagonal blocks, and then to the
 lower <M>p</M>-part. For the image the method <C>BlockLowerTriangular</C>
 (see <Ref Subsect="BlockLowerTriangular"/>) is used.
 
 <P/>
-Note that this method is implemented in a way such that it can also be 
+Note that this method is implemented in a way such that it can also be
 used as a method for a projective group <A>G</A>. In that case the
 recognition info record has the <C>!.projective</C> component bound
 to <K>true</K> and this information is passed down to image and kernel.
@@ -315,13 +315,13 @@ This method is only called when a hint was passed down from the method
 to block lower triangular form has been performed. The method can then
 immediately find a homomorphism by mapping to the diagonal blocks. It sets
 up this homomorphism and gives hints to image and kernel. For the image,
-the method <C>BlockDiagonal</C> (see <Ref Subsect="BlockDiagonal"/>) 
+the method <C>BlockDiagonal</C> (see <Ref Subsect="BlockDiagonal"/>)
 is used and for the kernel,
-the method <C>LowerLeftPGroup</C> (see <Ref Subsect="LowerLeftPGroup"/>) 
+the method <C>LowerLeftPGroup</C> (see <Ref Subsect="LowerLeftPGroup"/>)
 is used.
 
 <P/>
-Note that this method is implemented in a way such that it can also be 
+Note that this method is implemented in a way such that it can also be
 used as a method for a projective group <A>G</A>. In that case the
 recognition info record has the <C>!.projective</C> component bound
 to <K>true</K> and this information is passed down to image and kernel.
@@ -332,7 +332,7 @@ to <K>true</K> and this information is passed down to image and kernel.
 
 This method is only called when a hint was passed down from the method
 <C>BlockLowerTriangular</C> (see <Ref Subsect="BlockLowerTriangular"/>).
-In that case, it knows that the group is in block diagonal form. 
+In that case, it knows that the group is in block diagonal form.
 The method is used both in the matrix- and the projective case.
 
 <P/>
@@ -346,7 +346,7 @@ either use <C>BlockScalar</C> (see <Ref Subsect="BlockScalar"/>)
 or <C>BlockScalarProj</C> (see <Ref Subsect="BlockScalarProj"/>) respectively.
 
 <P/>
-Note that this method is implemented in a way such that it can also be 
+Note that this method is implemented in a way such that it can also be
 used as a method for a projective group <A>G</A>. In that case the
 recognition info record has the <C>!.projective</C> component bound
 to <K>true</K> and this information is passed down to image and kernel.
@@ -380,7 +380,7 @@ and does scalar recognition in each leaf.
 
 This method is only called by a hint from <C>BlockLowerTriangular</C>
 as the kernel of the homomorphism mapping to the diagonal blocks.
-The method uses the fact the this kernel is a <M>p</M>-group where 
+The method uses the fact the this kernel is a <M>p</M>-group where
 <M>p</M> is the characteristic of the underlying field. It exploits
 this fact and uses this special structure to find nice generators
 and a method to express group elements in terms of these.
@@ -398,7 +398,7 @@ The following table gives an overview over the installed methods and their
 rank (higher rank means higher priority, the method is tried earlier, see
 Chapter <Ref Chap="method selection" BookName="recogbase"/>). Note
 that the recognition for matrix group switches to projective recognition
-rather soon in the recognition process such that most recognition methods 
+rather soon in the recognition process such that most recognition methods
 in fact are installed as methods for projective groups.
 
 <Table Align="|l|l|l|">
@@ -496,7 +496,7 @@ element <M>g \in <A>G</A></M> is the determinant of a matrix representative of
 <Heading><C>ReducibleIso</C></Heading>
 
 This method is the same as the matrix group method with the same name
-(see <Ref Subsect="ReducibleIso"/>), which is able to take into account 
+(see <Ref Subsect="ReducibleIso"/>), which is able to take into account
 the projective mode.
 
 </Subsection>
@@ -504,13 +504,13 @@ the projective mode.
 <Subsection Label="BlocksModScalars">
 <Heading><C>BlocksModScalars</C></Heading>
 
-This method is only called when hinted from above. In this method it is 
+This method is only called when hinted from above. In this method it is
 understood that G should <E>neither</E>
 be recognised as a matrix group <E>nor</E> as a projective group.
 Rather, it treats all diagonal blocks modulo scalars which means that
 two matrices are considered to be equal, if they differ only by a scalar
 factor in <E>corresponding</E> diagonal blocks, and this scalar can
-be different for each diagonal block. This means that the kernel of 
+be different for each diagonal block. This means that the kernel of
 the homomorphism mapping to a node which is recognised using this
 method will have only scalar matrices in all diagonal blocks.
 
@@ -528,7 +528,7 @@ then this method returns <K>false</K>. If <A>G</A> is not absolutely
 irreducible then a homomorphism into a smaller dimensional representation
 over an extension field is defined. A hint is handed down to the image that
 no test for absolute irreducibility has to be done any more. Another hint
-is handed down to the kernel indicating that the only possible kernel 
+is handed down to the kernel indicating that the only possible kernel
 elements can be elements in the centraliser of <A>G</A> in <M>PGL(d,q)</M>
 that come from scalar matrices in the extension field.
 
@@ -537,12 +537,12 @@ that come from scalar matrices in the extension field.
 <Subsection Label="Subfield">
 <Heading><C>Subfield</C></Heading>
 
-When this method runs it knows that the projective group <A>G</A> acts 
+When this method runs it knows that the projective group <A>G</A> acts
 absolutely irreducibly. It then tries to realise this group over a smaller
 field. The algorithm used is the one using the <Q>standard basis approach</Q>
-known from isomorphism testing of absolutely irreducible modules. It 
+known from isomorphism testing of absolutely irreducible modules. It
 finds a base change to write the projective group over the smallest
-field possible. Since the group is projective, it may choose to 
+field possible. Since the group is projective, it may choose to
 multiply generators with arbitrary scalars to write them over a smaller field.
 
 <P/>
@@ -552,7 +552,7 @@ If the group can be written over a smaller field, then taking commutators
 loses the scalars preventing a direct base change to work. Therefore,
 if the derived subgroup still acts irreducibly, the standard basis approach
 can find the right base change that could also do the job for the whole
-group. If it acts reducibly, the method <C>Derived</C> (see 
+group. If it acts reducibly, the method <C>Derived</C> (see
 <Ref Subsect="Derived"/>) which is run next already has the computed
 derived subgroup and can try different things to find a reduction.
 
@@ -572,7 +572,7 @@ we get an action of <A>G</A> on the isotypic components. Either way,
 we find a reduction.
 
 <P/>
-If the derived group acts irreducibly, we return <K>false</K> in the current 
+If the derived group acts irreducibly, we return <K>false</K> in the current
 implementation.
 
 </Subsection>
@@ -605,13 +605,13 @@ action of <A>G</A> on a decomposition of <M>GF(q)^d</M>, or <K>fail</K>.
 <Subsection Label="Tensor">
 <Heading><C>Tensor</C></Heading>
 
-This method currently tries to find one tensor factor by powering up 
-commutators of random elements to elements of prime order. This seems 
+This method currently tries to find one tensor factor by powering up
+commutators of random elements to elements of prime order. This seems
 to work quite well provided that the two tensor factors are not
 <Q>linked</Q> too much such that there exist enough elements that act
 with different orders on both tensor factors.
 
-<P/> 
+<P/>
 This method and its description needs some improvement.
 
 </Subsection>
@@ -619,7 +619,7 @@ This method and its description needs some improvement.
 <Subsection Label="TwoLargeElOrders">
 <Heading><C>TwoLargeElOrders</C></Heading>
 
-In the case when the input group <A>G</A><M> \le PGL(d,p^e)</M> is 
+In the case when the input group <A>G</A><M> \le PGL(d,p^e)</M> is
 suspected to be
 simple but not alternating, this method takes the two
 largest element orders from a sample of pseudorandom elements of
@@ -651,7 +651,7 @@ a block decomposition respected by the matrix group <A>G</A> to be recognised
 and the promise that all diagonal blocks of all group elements
 will only be scalar matrices. This method simply norms the last diagonal
 block in all generators by multiplying with a scalar and then
-delegates to <C>BlockScalar</C> (see <Ref Subsect="BlockScalar"/>) 
+delegates to <C>BlockScalar</C> (see <Ref Subsect="BlockScalar"/>)
 and matrix group mode to do the recognition.
 
 </Subsection>

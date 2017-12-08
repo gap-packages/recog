@@ -2,14 +2,14 @@
 ## Uses only standard BSGS functions
 
 PermGrpMaps := function(G,ri)
- 
+
  local g,Soc,Rad,C,phi,i,Facs,temp,Orbs,PermtoPc;
 
-# First Solvable groups  
+# First Solvable groups
  if IsSolvable(G) then
 # Want to construct a PC presentation - not sure how best to do this, so currently doing nothing!
    PermtoPc := IsomorphismPcGroup(G);
-   
+
    ri!.Maps := [ PermtoPc ];
    ri!.Names := [Size(G)];
    ri!.Class := "Permutation Group";
@@ -23,10 +23,10 @@ PermGrpMaps := function(G,ri)
 
 # Use ChiefSeriesThrough for the moment
  Soc := Socle(G); Rad := RadicalGroup(G);
- C := ChiefSeriesThrough(G,[Soc,Rad]); 
+ C := ChiefSeriesThrough(G,[Soc,Rad]);
  phi := List([1..(Size(C)-1)],i->NaturalHomomorphismByNormalSubgroupNC(C[i],C[i+1]));
  Facs := List(phi,i->Image(i));
- 
+
  ri!.Maps := phi;
  ri!.MapImages := [];
  ri!.Names := [];
@@ -56,8 +56,8 @@ PermGrpMaps := function(G,ri)
    fi;
    i := i-1;
  od;
-     
+
  return true;
 end;
 
-    
+

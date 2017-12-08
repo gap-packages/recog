@@ -1,5 +1,5 @@
 # Created by bbtogap.py from Co3G1-find1 from the Atlas web page
-Co3G1find1 := 
+Co3G1find1 :=
 function(arg)
     local vars,els,G;
     if Length(arg) > 0 and IsList(arg[1]) then arg := arg[1]; fi;
@@ -8,7 +8,7 @@ function(arg)
     G := Group(arg);
 
     # Black box algorithm to find standard generators of Co3
-    
+
     vars.F := 0;
     vars.G := 0;
     vars.V := 0;
@@ -23,7 +23,7 @@ function(arg)
                           23,24,30]) then
             return fail;
         fi;
-        
+
         if vars.F = 0 then
             if vars.A in [9,18,24,30] then
                 vars.B := QuoInt(vars.A,3);
@@ -37,7 +37,7 @@ function(arg)
                 vars.G := 1;
             fi;
         fi;
-        
+
         if vars.F = 0 then
             continue;    # was jmp to SEMISTD
         fi;
@@ -46,7 +46,7 @@ function(arg)
         fi;
         break;
     until false;
-        
+
     vars.X := 0;
     repeat    # label CONJUGATE
         vars.X := vars.X + 1;
@@ -65,7 +65,7 @@ function(arg)
         fi;
         break;
     until false;
-        
+
     return els{[2, 3]};
 end;
 

@@ -4,7 +4,7 @@
 MakeGapFormat:= procedure(grp)
   printf "[";
   for i in [1..Ngens(grp)-1] do
-    printf "%o,", grp.i; 
+    printf "%o,", grp.i;
   end for;
   printf "%o]", grp.Ngens(grp);
 end procedure;
@@ -18,7 +18,7 @@ MakeMatGapFormat:= procedure(mat_grp)
   else
     p:= #BaseRing(mat_grp.1);
 
-    //this assertion is safe since getting these from groups of 
+    //this assertion is safe since getting these from groups of
     //affine type.
     assert IsPrime(p);
 
@@ -33,7 +33,7 @@ MakeMatGapFormat:= procedure(mat_grp)
           printf "[[";
         else
           printf "[";
-        end if;  
+        end if;
         for k in [1..d-1] do
           printf "%o*Z(%o )^0,", x[j][k], p;
         end for;
@@ -73,7 +73,7 @@ sub_lengths:= function(g)
 end function;
 
 get_ons:= function(g, ons, i)
-   if ons eq "Affine" then 
+   if ons eq "Affine" then
       id:= "1";
     elif ons eq "AlmostSimple" then
       id:= "2";
@@ -116,7 +116,7 @@ procedure GetGapFiles(d1, d2)
       if IsSimple(g) then b1:= 1; else b1:= 0; end if;
       if IsSoluble(g) then b2:= 2; else b2:= 0; end if;
       b:= b1+b2;
-      //pull out A_n, S_n to make it run faster.    
+      //pull out A_n, S_n to make it run faster.
       if i gt max-2 then
         id:= "AlmostSimple";
       else
@@ -165,7 +165,7 @@ procedure GetGapFiles(d1, d2)
       end if;
     end for;
   end for;
-end procedure;    
+end procedure;
 
 
 

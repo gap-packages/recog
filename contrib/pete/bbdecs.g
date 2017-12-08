@@ -3,7 +3,7 @@
 #I This is the declaration file for the constructive recognition package of ##
 ## black box classical groups.                                              ##
 ##                                                                          ##
-############################################################################## 
+##############################################################################
 
 IsBBGpElm := NewCategory ("IsBBGpElm", IsMultiplicativeElementWithInverse);
 IsBBGpElmColl := CategoryCollections (IsBBGpElm);
@@ -57,7 +57,7 @@ HasChain := Tester (Chain);
 NaturalFlag := NewProperty("NaturalFlag", IsPermBBGp);
 SetNaturalFlag := Setter (NaturalFlag);
 HasNaturalFlag := Tester (NaturalFlag);
-         
+
 #############################################################################
 ##
 #F  PermInverseBBGp( <chain>, <perm> ) . . . . inverse in permutation bb group
@@ -101,13 +101,13 @@ end;
 
 PermAltProd := function (chain, x, y)
 local   concat,     # concatenation of the input words
-        inverse,    # the inverse of concat as a word 
+        inverse,    # the inverse of concat as a word
         product;    # the inverse of inverse as a word; output
     # x,y must be lists of permutations themselves!
     concat := Concatenation(x,y);
     inverse := PermInverseBBGp( chain, concat );
 return(inverse);
-end; 
+end;
 
 
 #############################################################################
@@ -118,7 +118,7 @@ end;
 ##  the group $G$, the routine computes xy as a list.
 
 PermProductBBGp := function (chain, x, y)
-local   inverse,    # the inverse of concat as a word 
+local   inverse,    # the inverse of concat as a word
         product;    # the inverse of inverse as a word; output
 
     # x,y must be lists of permutations themselves!
@@ -127,7 +127,7 @@ local   inverse,    # the inverse of concat as a word
 return product;
 end;
 
-    
+
 ############################################################################
 ##
 #F PermEqualsBBGp( <chain> , <x> , <y> )
@@ -136,13 +136,13 @@ end;
 
 PermEqualsBBGp:=function( chain , x , y )
 local stb;
-    stb:=chain;    
+    stb:=chain;
     while IsBound(stb.stabilizer) do
       if not ImageInWord(stb.orbit[1],x)=ImageInWord(stb.orbit[1],y) then
            return(false);
       fi;
       stb:=stb.stabilizer;
-    od;    
+    od;
 return(true);
 end;
 
@@ -152,7 +152,7 @@ end;
 ##
 ## PAB: 02-12-04
 ## this test presumes that the $p$-core of <gp> is nilpotent class-2:
-## in particular, it covers the setting we 
+## in particular, it covers the setting we
 ## are interested in, namely extraspecial $p$-groups
 
 PQuotientEqualsBBGp := function (gp, p, x, y)
@@ -495,12 +495,12 @@ end);
 ##
 #A PseudoRandom( <bbgroup> )                  . . . random function in bbg
 
-InstallMethod( PseudoRandom , "method for permbbgs with chain" , true , 
+InstallMethod( PseudoRandom , "method for permbbgs with chain" , true ,
   [HasChain] , 0 ,
 function( bbg )
 local fam, chain;
    chain := Chain( bbg );
    fam := FamilyObj(GeneratorsOfGroup(bbg)[1]);
 return BBGpElmFromList(fam, RandomElmAsWord( chain ) );
-end); 
+end);
 

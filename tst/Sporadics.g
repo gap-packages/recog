@@ -12,5 +12,5 @@ for n in RECOG.SporadicsNames{Concatenation([1..23],[27..40])} do
         Print(">>>>>AMBIGUITY: ",res,"\n");
     else
         Print("Success: ",res,"\n");
-    fi; 
+    fi;
 od;

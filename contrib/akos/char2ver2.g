@@ -4,16 +4,16 @@ pol,factors,degrees;
 
 n:=DimensionOfMatrixGroup(g);
 #d:=Dimension(subspg);
-repeat 
+repeat
   ready:=false;
   y:=PseudoRandom(g);
   pol:=CharacteristicPolynomial(y);
   factors:=Factors(pol);
   degrees:=List(factors,Degree);
-  if d-1 in degrees then 
+  if d-1 in degrees then
      order:=Order(y);
      yy:=y^(order/Gcd(order,q-1));
-     if not IsOne(yy) then 
+     if not IsOne(yy) then
           es:= Eigenspaces(GF(q),yy);
           es:=Filtered(es,x->Dimension(x)=d-1 and IsSubspace(subspg,x));
           if Length(es)>0 then
@@ -33,8 +33,8 @@ for i in [1..4] do
     b := x^yy;
     c := x^(yy^2);
     h := Group(a,b,c);
-    ready:=false;  
-    repeat 
+    ready:=false;
+    repeat
       r:=PseudoRandom(h);
       r:=r^(q*(q+1));
       if not IsOne(r) and r*yy=yy*r then
@@ -52,7 +52,7 @@ gens,degrees,factors,pol,ready,ready2,ready3,z;
 
 n:=DimensionOfMatrixGroup(g);
 
-if q-1>n then 
+if q-1>n then
   subspg:=VectorSpace(GF(q),One(g));
   subgplist:=[g,subspg];
   workingdim:=n;
@@ -63,13 +63,13 @@ if q-1>n then
 else
   #case of small q
   n:=DimensionOfMatrixGroup(g);
-  repeat  
+  repeat
     ready:=false;
     y:=PseudoRandom(g);
     pol:=CharacteristicPolynomial(y);
     factors:=Factors(pol);
     degrees:=List(factors,Degree);
-    if SortedList(degrees)=[1,1,n-2] then 
+    if SortedList(degrees)=[1,1,n-2] then
        order:=Order(y);
        if order mod 2 = 0 then
           yy:=y^(order/2);
@@ -95,16 +95,16 @@ else
        elif Maximum(degrees)=3 then
           ready3:=true;
        fi;
-       if ready2 and ready3 then 
+       if ready2 and ready3 then
            break;
        fi;
      od;
-     if not (ready2 and ready3) then 
+     if not (ready2 and ready3) then
         ready2:=false;
         ready3:=false;
      fi;
-  until ready2 and ready3; 
-  
+  until ready2 and ready3;
+
   subgplist:=godownone(h,VectorSpace(GF(q),One(g)),q,3);
 fi;
 
@@ -116,7 +116,7 @@ local basis,gens,x,vec;
 
 basis:=Basis(out[2]);
 gens:=GeneratorsOfGroup(out[1]);
-for x in gens do 
+for x in gens do
     for vec in basis do
         Print(vec*x in out[2]);
     od;

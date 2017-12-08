@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  projective.gd        
+##  projective.gd
 ##                                recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress

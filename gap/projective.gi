@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  projective.gi      
+##  projective.gi
 ##                                recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
@@ -27,7 +27,7 @@ FindHomMethodsProjective.TrivialProjectiveGroup := function(ri, G)
   od;
   SetSize(ri,1);
   Setslpforelement(ri,SLPforElementFuncsProjective.TrivialProjectiveGroup);
-  Setslptonice( ri, 
+  Setslptonice( ri,
                 StraightLineProgramNC([[[1,0]]],Length(GeneratorsOfGroup(G))));
   SetFilterObj(ri,IsLeaf);
   return true;
@@ -35,7 +35,7 @@ end;
 
 FindHomMethodsProjective.BlocksModScalars := function(ri,G)
   # We assume that ri!.blocks is a list of ranges where the diagonal
-  # blocks are. Note that their length does not have to sum up to 
+  # blocks are. Note that their length does not have to sum up to
   # the dimension, because some blocks at the end might already be trivial.
   # Note further that in this method it is understood that G should *neither*
   # be recognised as a matrix group *nor* as a projective group. Rather,
@@ -53,7 +53,7 @@ FindHomMethodsProjective.BlocksModScalars := function(ri,G)
       ri!.comment := "_BlocksDim=1";
       return true;
   fi;
-      
+
   if nrblocks = 1 then   # in this case the block is everything!
       # no hints for the factor, will run into diagonal and notice scalar
       data := rec(poss := ri!.blocks[1]);
@@ -206,7 +206,7 @@ RECOG.MakeAlternatingMatrixReps := function(deg,f,tens)
   r := MTX.CollectedFactors(m);
   return List(r,x->x[1].generators);
 end;
-  
+
 RECOG.MakeSymmetricMatrixReps := function(deg,f,tens)
   local a,b,gens,gens2,i,m,ogens,r;
   a := SymmetricGroup(deg);
@@ -223,7 +223,7 @@ RECOG.MakeSymmetricMatrixReps := function(deg,f,tens)
   r := MTX.CollectedFactors(m);
   return List(r,x->x[1].generators);
 end;
-  
+
 # The method installations:
 
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.TrivialProjectiveGroup,
@@ -279,7 +279,7 @@ AddMethod( FindHomDbProjective, FindHomMethodsProjective.FindElmOfEvenNormal,
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.LowIndex,
    600, "LowIndex",
         "find an (imprimitive) action on subspaces" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.ComputeSimpleSocle, 
+AddMethod( FindHomDbProjective, FindHomMethodsProjective.ComputeSimpleSocle,
    550, "ComputeSimpleSocle",
         "compute simple socle of almost simple group" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.ThreeLargeElOrders,

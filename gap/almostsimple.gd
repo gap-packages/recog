@@ -1,7 +1,7 @@
 #############################################################################
 ##
-##  almostsimple.gd        
-##                                recog package                   
+##  almostsimple.gd
+##                                recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
 ##

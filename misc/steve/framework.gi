@@ -4,8 +4,8 @@ BindGlobal("RecognitionOutcomesFamily",
         NewFamily("RecognitionOutcomesFamily",
                 IsRecognitionOutcome));
 
-BindGlobal("RecognitionOutcomesDefaultType", 
-        NewType(RecognitionOutcomesFamily, 
+BindGlobal("RecognitionOutcomesDefaultType",
+        NewType(RecognitionOutcomesFamily,
                 IsRecognitionOutcome and IsRecognitionOutcomeDefaultRep and
                 HasNameOfRecognitionOutcome and HasDescriptionOfRecognitionOutcome));
 
@@ -74,10 +74,10 @@ InstallGlobalFunction(InstallNonConstructiveRecognizer, function(f, descr)
     if not IsString(descr) then
         Error("InstallNonConstructiveRecognizer: description should be a string");
     fi;
-    Add(NON_CONSTRUCTIVE_RECOGNIZERS,f); 
-    Add(NON_CONSTRUCTIVE_RECOGNIZER_DESCRIPTIONS,descr); 
+    Add(NON_CONSTRUCTIVE_RECOGNIZERS,f);
+    Add(NON_CONSTRUCTIVE_RECOGNIZER_DESCRIPTIONS,descr);
 end);
-    
+
 BindGlobal("FACTORIZERS", []);
 BindGlobal("FACTORIZER_DESCRIPTIONS", []);
 
@@ -88,10 +88,10 @@ InstallGlobalFunction(InstallFactorizer, function(f, descr)
     if not IsString(descr) then
         Error("InstallFactorizer: description should be a string");
     fi;
-    Add(FACTORIZERS, f); 
-    Add(FACTORIZER_DESCRIPTIONS, descr); 
+    Add(FACTORIZERS, f);
+    Add(FACTORIZER_DESCRIPTIONS, descr);
 end);
-    
+
 BindGlobal("EPIMORPHSIM_CONSTRUCTORS", []);
 BindGlobal("EPIMORPHSIM_CONSTRUCTOR_DESCRIPTIONS", []);
 
@@ -102,15 +102,15 @@ InstallGlobalFunction(InstallEpimorphismConstructor, function(r,descr)
     if not IsString(descr) then
         Error("InstallNonConstructiveRecognizer: description should be a string");
     fi;
-    Add(EPIMORPHSIM_CONSTRUCTORS, r); 
-    Add(EPIMORPHSIM_CONSTRUCTOR_DESCRIPTIONS, descr); 
+    Add(EPIMORPHSIM_CONSTRUCTORS, r);
+    Add(EPIMORPHSIM_CONSTRUCTOR_DESCRIPTIONS, descr);
 end);
-    
-    
-InstallMethod(RecognitionInfo, "initialise with empty record", [IsGroup], 
+
+
+InstallMethod(RecognitionInfo, "initialise with empty record", [IsGroup],
         g -> rec());
-        
-InstallGlobalFunction(NonConstructivelyRecognize, 
+
+InstallGlobalFunction(NonConstructivelyRecognize,
         function(g)
     local   i,  f,  res;
     for i in [1..Length(NON_CONSTRUCTIVE_RECOGNIZERS)] do

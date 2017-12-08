@@ -18,7 +18,7 @@ local g,gens,gensg,mat,c1,c2,i,x,tensorgens,g1,g2,y;
 g:=GL(2,q);
 gensg:=GeneratorsOfGroup(g);
 gens:=[ ];
-for i in [1..5] do 
+for i in [1..5] do
      for x in gensg do
           mat:=IdentityMat(10,GF(q));
                    mat[2*i-1][2*i-1]:=x[1][1];
@@ -44,7 +44,7 @@ od;
 c2[9][1]:=Z(q)^0;
 c2[10][2]:=Z(q)^0;
 tensorgens:=[];
-for x in gens do 
+for x in gens do
      Add(tensorgens,KroneckerProduct(x,IdentityMat(3,GF(q))));
 od;
 Add(tensorgens,KroneckerProduct(c1,IdentityMat(3,GF(q))));
@@ -62,7 +62,7 @@ local g,gens,gensg,mat,c1,c2,i,x,tensorgens,G;
 g:=GL(2,q);
 gensg:=GeneratorsOfGroup(g);
 gens:=[ ];
-for i in [1..5] do 
+for i in [1..5] do
      for x in gensg do
           mat:=IdentityMat(10,GF(q));
                    mat[2*i-1][2*i-1]:=x[1][1];
@@ -88,7 +88,7 @@ od;
 c2[9][1]:=Z(q)^0;
 c2[10][2]:=Z(q)^0;
 tensorgens:=[];
-for x in gens do 
+for x in gens do
      Add(tensorgens,KroneckerProduct(x,IdentityMat(10,GF(q))));
      Add(tensorgens,KroneckerProduct(IdentityMat(10,GF(q)),x));
 od;
@@ -104,23 +104,23 @@ separate:=function(g,N)
 local r, ready, s, t, order, factor, f1, f2, len, cl, cl2, i, count, divisors, x;
 ready:=false;
 count:=0;
-repeat 
+repeat
    r:=PseudoRandom(g);
    order:=ProjectiveOrder(r)[1];
    factor:=Collected(Factors(order));
    len:=Length(factor);
-   if len >1 then 
+   if len >1 then
       f1:=(factor[len][1])^(factor[len][2]);
       f2:=(factor[len-1][1])^(factor[len-1][2]);
       s:=r^(order/f1);
       t:=r^(order/f2);
       cl:=[s];
-      for i in [1..10] do 
+      for i in [1..10] do
         Add(cl,s^PseudoRandom(g));
       od;
-      if ForAll (cl,x->Comm(x,t)=One(x)) then 
+      if ForAll (cl,x->Comm(x,t)=One(x)) then
          cl2:=[t];
-         for i in [1..10] do 
+         for i in [1..10] do
             Add(cl2,t^PseudoRandom(g));
          od;
          for i in [1..10] do
@@ -134,12 +134,12 @@ repeat
    fi;
    count:=count+1;
 until ready or count>N;
-if ready then 
+if ready then
    for i in [1..2] do
        r:=PseudoRandom(g);
        divisors:=DivisorsInt(ProjectiveOrder(r)[1]);
-       for x in divisors do 
-           if CheckAnswer(r^x,cl) then 
+       for x in divisors do
+           if CheckAnswer(r^x,cl) then
               Add(cl2,r^x);
            elif CheckAnswer(r^x,cl2) then
               Add(cl,r^x);
@@ -151,7 +151,7 @@ if ready then
        Add(cl2,randomsubproduct(cl2)^PseudoRandom(g));
    od;
    return [Group(cl),Group(cl2)];
-else 
+else
    return fail;
 fi;
 end;
@@ -168,7 +168,7 @@ NextStep := function ( g, a )
 	    c := b^-1 mod a;
 Print("b=",b,"  c=",c,"\n");
             return g^(b*c);
-	 		
+
          fi;
 
 	 return fail;
@@ -180,7 +180,7 @@ CheckAnswer := function( x, Bgens )
 
 	    local y;
 
-	    if x = fail then return false; fi;	    
+	    if x = fail then return false; fi;
 	    if Length(Bgens) = 0 then return true; fi;
 	    for y in Bgens do
 	    	if Comm( x, y ) <> Bgens[1]^0 then
@@ -198,7 +198,7 @@ TensorDecompose := function( G, g, Agens, Bgens, N)
 
 	local  h, a, b, i, B, hs, ans, order;
 
-	    		
+
 	B := Group( Bgens );
 	a := ProjectiveOrder(g)[1];
         Print( "aoriginal=",a,"\n");
@@ -211,7 +211,7 @@ TensorDecompose := function( G, g, Agens, Bgens, N)
 	od;
         Print( " a = ", a, "\n" );
 	i := 1;
-        repeat 
+        repeat
               h := PseudoRandom(B);
 	      a := Gcd( a, ProjectiveOrder( g*h )[1] );
 	      ans := NextStep ( g * h, a);
@@ -243,9 +243,9 @@ parts:=[];
                        parts[i]:=[x,x^0];
            elif CheckAnswer(x,Agens) then
                        parts[i]:=[x^0,x];
-           else 
+           else
                        parts[i]:=TensorDecompose(g,x,Agens,Bgens,100);
-           fi;     
+           fi;
      od;
 a:=GcdRepresentation(euclid);
 b:=1;

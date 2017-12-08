@@ -7,7 +7,7 @@ import os,sys
 
 
 header = '''# Created by bbtogap.py from %s from the Atlas web page
-%s := 
+%s :=
 function(arg)
     local vars,els,G;
     if Length(arg) > 0 and IsList(arg[1]) then arg := arg[1]; fi;
@@ -97,7 +97,7 @@ def rewriteline(line):
         return 'vars.'+args[2]+' := '+num(args[0])+' mod '+num(args[1])+';'
     elif cmd == 'if':
         st,pos = doif('if',args)
-        if pos == len(args)-1: 
+        if pos == len(args)-1:
             newindent += indentsteps
             return st
         # there is a statement after the if:

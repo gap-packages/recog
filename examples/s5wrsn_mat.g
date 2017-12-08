@@ -31,14 +31,14 @@ od;
 m := MutableCopyMat(gen);
 for j in [2..n-1] do
     m{[1+4*j..4+4*j]}{[1+4*j..4+4*j]} := id;
-od; 
+od;
 m{[1..4]}{[5..8]} := id;
 m{[5..8]}{[1..4]} := id;
 Add(gens,m);
 m := MutableCopyMat(gen);
 for j in [0..n-2] do
     m{[5+4*j..8+4*j]}{[1+4*j..4+4*j]} := id;
-od; 
+od;
 m{[1..4]}{[4*n-3..4*n]} := id;
 Add(gens,m);
 r := RandomInvertibleMat(n*4,GF(7));
