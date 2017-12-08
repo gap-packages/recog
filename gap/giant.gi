@@ -21,25 +21,6 @@ DeclareInfoClass( "InfoGiants" );
 SetInfoLevel( InfoGiants, 1 );
 
 
-########################################################################
-##
-#F  WhichGiant(<grp>) . . . . . . . . . . . . . . . is <grp> A_n or S_n
-##
-##
-
-RECOG.WhichGiant :=  function( grp )
-
-    local  x ;
-
-    for x in GeneratorsOfGroup( grp ) do
-        if SignPerm(x) = -1 then return ["Sn"]; fi;
-    od;
-
-    return ["An"];
-
-end;
-
-
 #######################################################################
 ##
 #F  NiceGeneratorsSn(<n>,<grp>,<N>) ...... find n-cycle, transposition
@@ -464,24 +445,11 @@ end;
 
 RECOG.RecogniseGiant :=  function( mp, grp, eps )
 
-    if RECOG.WhichGiant( grp ) = [ "Sn" ] then
+    if ForAny(GeneratorsOfGroup( grp ), x -> SignPerm(x) = -1) then
         return RECOG.RecogniseSn( mp, grp, eps );
     else
         return RECOG.RecogniseAn( mp, grp, eps );
     fi;
-
-end;
-
-
-########################################################################
-##
-#F  FindImageGiant(<pi>, <data>) . . . . . image of pi under conj perm
-##
-##
-
-RECOG.FindImageGiant :=  function( pi, data )
-
-    return pi^data.conjperm;
 
 end;
 
