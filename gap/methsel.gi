@@ -57,41 +57,41 @@ InstallGlobalFunction( "CallMethods", function(arg)
                 Info(InfoMethSel,4,"Skipping rank ",db[i].rank," method \"",
                      db[i].stamp,"\".");
                 i := i + 1;
-            else
+                continue;
+            fi;
 
-                # We try this one:
-                Info(InfoMethSel,3,"Calling  rank ",db[i].rank,
-                         " method \"", db[i].stamp,"\"...");
-                result := CallFuncList(db[i].method,methargs);
-                if result = NeverApplicable then
-                    Info(InfoMethSel,3,"Finished rank ",db[i].rank,
-                         " method \"", db[i].stamp,"\": NeverApplicable.");
-                    ms.falsemethods.(db[i].stamp) := 1;
-                    i := 1;    # start all over again
-                elif result = TemporaryFailure then
-                    Info(InfoMethSel,2,"Finished rank ",db[i].rank,
-                         " method \"", db[i].stamp,"\": TemporaryFailure.");
-                    if IsBound(ms.failedmethods.(db[i].stamp)) then
-                        ms.failedmethods.(db[i].stamp) :=
-                            ms.failedmethods.(db[i].stamp) + 1;
-                    else
-                        ms.failedmethods.(db[i].stamp) := 1;
-                    fi;
-                    i := 1;    # start all over again
-                elif result = NotEnoughInformation then
-                    Info(InfoMethSel,3,"Finished rank ",db[i].rank,
-                         " method \"", db[i].stamp,"\": not applicable.");
-                    i := i + 1;   # just try the next one
-                elif result = Success then    # we have a result
-                    Info(InfoMethSel,2,"Finished rank ",db[i].rank,
-                         " method \"", db[i].stamp,"\": success.");
-                    ms.successmethod := db[i].stamp;
-                    ms.result := result;
-                    ms.tolerance := tolerance;
-                    return ms;
+            # We try this one:
+            Info(InfoMethSel,3,"Calling  rank ",db[i].rank,
+                     " method \"", db[i].stamp,"\"...");
+            result := CallFuncList(db[i].method,methargs);
+            if result = NeverApplicable then
+                Info(InfoMethSel,3,"Finished rank ",db[i].rank,
+                     " method \"", db[i].stamp,"\": NeverApplicable.");
+                ms.falsemethods.(db[i].stamp) := 1;
+                i := 1;    # start all over again
+            elif result = TemporaryFailure then
+                Info(InfoMethSel,2,"Finished rank ",db[i].rank,
+                     " method \"", db[i].stamp,"\": TemporaryFailure.");
+                if IsBound(ms.failedmethods.(db[i].stamp)) then
+                    ms.failedmethods.(db[i].stamp) :=
+                        ms.failedmethods.(db[i].stamp) + 1;
                 else
-                    Error("Recognition method return invalid result: ", result);
+                    ms.failedmethods.(db[i].stamp) := 1;
                 fi;
+                i := 1;    # start all over again
+            elif result = NotEnoughInformation then
+                Info(InfoMethSel,3,"Finished rank ",db[i].rank,
+                     " method \"", db[i].stamp,"\": not applicable.");
+                i := i + 1;   # just try the next one
+            elif result = Success then    # we have a result
+                Info(InfoMethSel,2,"Finished rank ",db[i].rank,
+                     " method \"", db[i].stamp,"\": success.");
+                ms.successmethod := db[i].stamp;
+                ms.result := result;
+                ms.tolerance := tolerance;
+                return ms;
+            else
+                Error("Recognition method return invalid result: ", result);
             fi;
         od;
         # Nothing worked, increase tolerance:
