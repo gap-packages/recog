@@ -302,6 +302,7 @@ end;
 ## A variant of GetAllJellyfish.
 ##
 
+# FIXME: unused?
 RECOG.OtherGetAllJellyfish:=function ( jellyfish, idjf, G, n, k, r )
 
     local  HaveSeen, T, seen, orb, i, g, gens, cnt, pnt, jf, id, img, mm;
