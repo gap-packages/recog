@@ -13,11 +13,19 @@
 
 InstallGlobalFunction( IsOneProjective,
   function(el)
-    local s;
+    local s, n, i, j, zero;
+    n := Length(el[1]);
+    Assert(1, DimensionsMat(el) = [n,n]);
     s := el[1][1];
     if IsZero(s) then return false; fi;
-    s := s^-1;
-    return IsOne( s*el );
+    zero := Zero(s);
+    for i in [1..n] do
+        if el[i][i] <> s then return false; fi;
+        for j in [1..n] do
+            if i <> j and el[i][j] <> zero then return false; fi;
+        od;
+    od;
+    return true;
   end );
 
 InstallGlobalFunction( IsEqualProjective,
