@@ -32,76 +32,76 @@
 #
 
 InstallGlobalFunction( "CallMethods", function(arg)
-  # First argument is a list of records  ....  TODO  that describes the method selection process.
-  # Second argument is a number, the tolerance limit.
-  # All other arguments are handed through to the methods.
+    # First argument is a list of records  ....  TODO  that describes the method selection process.
+    # Second argument is a number, the tolerance limit.
+    # All other arguments are handed through to the methods.
 
-  local i,methargs,ms,result,tolerance,tolerancelimit,db;
+    local i,methargs,ms,result,tolerance,tolerancelimit,db;
 
-  if Length(arg) < 2 then
-      Error("CallMethods needs at least two arguments!");
-  fi;
-  db := arg[1];
-  ms := rec(failedmethods := rec(), falsemethods := rec());
-  tolerancelimit := arg[2];
-  methargs := arg{[3..Length(arg)]};
+    if Length(arg) < 2 then
+        Error("CallMethods needs at least two arguments!");
+    fi;
+    db := arg[1];
+    ms := rec(failedmethods := rec(), falsemethods := rec());
+    tolerancelimit := arg[2];
+    methargs := arg{[3..Length(arg)]};
   
-  # Initialize record:
-  tolerance := 0;    # reuse methods that failed that many times
-  repeat   # a loop to try all over again with higher tolerance
-      i := 1;
-      while i <= Length(db) do
-          if not(IsBound(ms.falsemethods.(db[i].stamp))) and
-             (not(IsBound(ms.failedmethods.(db[i].stamp))) or
-              ms.failedmethods.(db[i].stamp) <= tolerance) then
+    # Initialize record:
+    tolerance := 0;    # reuse methods that failed that many times
+    repeat   # a loop to try all over again with higher tolerance
+        i := 1;
+        while i <= Length(db) do
+            if not(IsBound(ms.falsemethods.(db[i].stamp))) and
+               (not(IsBound(ms.failedmethods.(db[i].stamp))) or
+                ms.failedmethods.(db[i].stamp) <= tolerance) then
 
-              # We try this one:
-              Info(InfoMethSel,3,"Calling  rank ",db[i].rank,
-                       " method \"", db[i].stamp,"\"...");
-              result := CallFuncList(db[i].method,methargs);
-              if result = NeverApplicable then
-                  Info(InfoMethSel,3,"Finished rank ",db[i].rank,
-                       " method \"", db[i].stamp,"\": NeverApplicable.");
-                  ms.falsemethods.(db[i].stamp) := 1;
-                  i := 1;    # start all over again
-              elif result = TemporaryFailure then
-                  Info(InfoMethSel,2,"Finished rank ",db[i].rank,
-                       " method \"", db[i].stamp,"\": TemporaryFailure.");
-                  if IsBound(ms.failedmethods.(db[i].stamp)) then
-                      ms.failedmethods.(db[i].stamp) :=
-                          ms.failedmethods.(db[i].stamp) + 1;
-                  else
-                      ms.failedmethods.(db[i].stamp) := 1;
-                  fi;
-                  i := 1;    # start all over again
-              elif result = NotEnoughInformation then
-                  Info(InfoMethSel,3,"Finished rank ",db[i].rank,
-                       " method \"", db[i].stamp,"\": not applicable.");
-                  i := i + 1;   # just try the next one
-              elif result = Success then    # we have a result
-                  Info(InfoMethSel,2,"Finished rank ",db[i].rank,
-                       " method \"", db[i].stamp,"\": success.");
-                  ms.successmethod := db[i].stamp;
-                  ms.result := result;
-                  ms.tolerance := tolerance;
-                  return ms;
-              else
-                  Error("Recognition method return invalid result: ", result);
-              fi;
-          else
-              Info(InfoMethSel,4,"Skipping rank ",db[i].rank," method \"",
-                   db[i].stamp,"\".");
-              i := i + 1;
-          fi;
-      od;
-      # Nothing worked, increase tolerance:
-      Info(InfoMethSel,1,"Increasing tolerance to ",tolerance);
-      tolerance := tolerance + 1;
-  until tolerance > tolerancelimit;
-  Info(InfoMethSel,1,"Giving up!");
-  ms.result := TemporaryFailure;
-  ms.tolerance := tolerance;
-  return ms;
+                # We try this one:
+                Info(InfoMethSel,3,"Calling  rank ",db[i].rank,
+                         " method \"", db[i].stamp,"\"...");
+                result := CallFuncList(db[i].method,methargs);
+                if result = NeverApplicable then
+                    Info(InfoMethSel,3,"Finished rank ",db[i].rank,
+                         " method \"", db[i].stamp,"\": NeverApplicable.");
+                    ms.falsemethods.(db[i].stamp) := 1;
+                    i := 1;    # start all over again
+                elif result = TemporaryFailure then
+                    Info(InfoMethSel,2,"Finished rank ",db[i].rank,
+                         " method \"", db[i].stamp,"\": TemporaryFailure.");
+                    if IsBound(ms.failedmethods.(db[i].stamp)) then
+                        ms.failedmethods.(db[i].stamp) :=
+                            ms.failedmethods.(db[i].stamp) + 1;
+                    else
+                        ms.failedmethods.(db[i].stamp) := 1;
+                    fi;
+                    i := 1;    # start all over again
+                elif result = NotEnoughInformation then
+                    Info(InfoMethSel,3,"Finished rank ",db[i].rank,
+                         " method \"", db[i].stamp,"\": not applicable.");
+                    i := i + 1;   # just try the next one
+                elif result = Success then    # we have a result
+                    Info(InfoMethSel,2,"Finished rank ",db[i].rank,
+                         " method \"", db[i].stamp,"\": success.");
+                    ms.successmethod := db[i].stamp;
+                    ms.result := result;
+                    ms.tolerance := tolerance;
+                    return ms;
+                else
+                    Error("Recognition method return invalid result: ", result);
+                fi;
+            else
+                Info(InfoMethSel,4,"Skipping rank ",db[i].rank," method \"",
+                     db[i].stamp,"\".");
+                i := i + 1;
+            fi;
+        od;
+        # Nothing worked, increase tolerance:
+        Info(InfoMethSel,1,"Increasing tolerance to ",tolerance);
+        tolerance := tolerance + 1;
+    until tolerance > tolerancelimit;
+    Info(InfoMethSel,1,"Giving up!");
+    ms.result := TemporaryFailure;
+    ms.tolerance := tolerance;
+    return ms;
 end);
 
 ##
