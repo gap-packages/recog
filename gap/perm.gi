@@ -22,8 +22,8 @@ FindHomMethodsPerm.Cyclic2 :=
      # Test applicability (this would no longer be necessary, because we
      # are called only for permutation groups anyway. However, this is an
      # example.
-     if not(IsPermGroup(H)) then
-         return NotEnoughInformation;
+     if not IsPermGroup(H) then
+         return NeverApplicable;
      fi;
      # Now we work:
      if Size(H) = 2 then
@@ -39,9 +39,9 @@ FindHomMethodsPerm.Cyclic2 :=
          Setslpforelement(ri,SLPforElementFuncsPerm.Cyclic2);
          SetFilterObj(ri,IsLeaf);
          SetIsSimpleGroup(ri,true);
-         return true;     # this indicates success
+         return Success;     # this indicates success
      else
-         return false;    # do not call us again
+         return NeverApplicable;    # do not call us again
      fi;
    end;
 
@@ -158,13 +158,13 @@ FindHomMethodsPerm.Imprimitive :=
 
     # Only look for primitivity once we know transitivity:
     # This ensures the right trying order even if the ranking is wrong.
-    if not(HasIsTransitive(G)) then
+    if not HasIsTransitive(G) then
         return NotEnoughInformation;
     fi;
 
     # We test for known non-primitivity:
     if HasIsPrimitive(G) and IsPrimitive(G) then
-        return false;   # never call us again
+        return NeverApplicable;   # never call us again
     fi;
 
     RECOG.SetPseudoRandomStamp(G,"Imprimitive");
@@ -173,7 +173,7 @@ FindHomMethodsPerm.Imprimitive :=
     blocks := MaximalBlocks(G,MovedPoints(G));
     if Length(blocks) = 1 then
         SetIsPrimitive(G,true);
-        return false;   # never call us again
+        return NeverApplicable;   # never call us again
     fi;
 
     # Find the homomorphism:
@@ -193,7 +193,7 @@ FindHomMethodsPerm.Imprimitive :=
                                 stamp := "BalTreeForBlocks"));
     findgensNmeth(ri).args[1] := Length(blocks)+3;
     findgensNmeth(ri).args[2] := 5;
-    return true;
+    return Success;
   end;
 
 FindHomMethodsPerm.PcgsForBlocks := function(ri,G)
@@ -207,7 +207,7 @@ FindHomMethodsPerm.PcgsForBlocks := function(ri,G)
       return FindHomMethodsPerm.Pcgs(ri,G);
   fi;
   # We have failed, let others do the work...
-  return false;
+  return NeverApplicable;
 end;
 
 FindHomMethodsPerm.BalTreeForBlocks := function(ri,G)
@@ -402,7 +402,7 @@ FindHomMethodsPerm.ThrowAwayFixedPoints :=
       l := List(gens,StoredPointsPerm);
       n := NrMovedPoints(G);
       if 2*n > Maximum(l) or 3*n > LargestMovedPoint(G) then  # we do nothing
-          return false;
+          return NeverApplicable;
       fi;
       o := MovedPoints(G);
       hom := ActionHomomorphism(G,o);
@@ -411,7 +411,7 @@ FindHomMethodsPerm.ThrowAwayFixedPoints :=
       # Initialize the rest of the record:
       findgensNmeth(ri).method := FindKernelDoNothing;
 
-      return true;
+      return Success;
   end;
 
 FindHomMethodsPerm.Pcgs :=
@@ -423,7 +423,7 @@ FindHomMethodsPerm.Pcgs :=
        args := [ri])];
     pcgs := Pcgs(GM);
     if pcgs = fail then
-        return false;
+        return NeverApplicable;
     fi;
     S := StabChainMutable(GM);
     DoSafetyCheckStabChain(S);
@@ -437,7 +437,7 @@ FindHomMethodsPerm.Pcgs :=
     SetSize(G,SizeStabChain(S));
     SetSize(ri,SizeStabChain(S));
     ri!.Gnomem := G;
-    return true;
+    return Success;
   end;
 
 

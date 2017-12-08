@@ -469,16 +469,16 @@ end;
 FindHomMethodsPerm.SnkSetswrSr :=
   function(ri,grp)
     local res,T,seen,imgens,hom;
-    if not(IsPermGroup(grp)) then
-        return NotEnoughInformation;
+    if not IsPermGroup(grp) then
+        return NeverApplicable;
     fi;
-    if not(IsPrimitive(grp)) then
-        return false;
+    if not IsPrimitive(grp) then
+        return NeverApplicable;
     fi;
     RECOG.SetPseudoRandomStamp(grp,"Jellyfish");
     res := RECOG.AllJellyfish(grp);
-    if res = fail or res = false then
-        return res;
+    if res = fail then
+        return TemporaryFailure;
     fi;
     ri!.jellyfishinfo := res;
     T := res[1];
@@ -490,7 +490,7 @@ FindHomMethodsPerm.SnkSetswrSr :=
                                   rec(T := T,seen := seen));
     SetHomom(ri,hom);
 
-    return true;
+    return Success;
   end;
 
 ##

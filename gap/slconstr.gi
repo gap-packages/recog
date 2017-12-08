@@ -2463,8 +2463,8 @@ end;
 FindHomMethodsMatrix.NaturalSL := function(ri,G)
   local data,e,genlist,grpmem,i,j,n,p,q,r,il;
 
-    if not(IsMatrixGroup(G)) then
-        return NotEnoughInformation;
+    if not IsMatrixGroup(G) then
+        return NeverApplicable;
     fi;
 
     il := InfoLevel(InfoMethSel);
@@ -2473,7 +2473,7 @@ FindHomMethodsMatrix.NaturalSL := function(ri,G)
     SetInfoLevel(InfoMethSel,il);
     if not( (IsBound(r.isSLContained) and r.isSLContained = true) or
             (IsBound(r.IsSLContained) and r.IsSLContained = true) ) then
-        return fail;
+        return TemporaryFailure;
     fi;
 
 
@@ -2510,7 +2510,7 @@ FindHomMethodsMatrix.NaturalSL := function(ri,G)
   SetFilterObj(ri,IsLeaf);
   SetNiceGens(ri,StripMemory(genlist));
   Setslptonice(ri,data.slpnice);
-  return true;
+  return Success;
 end;
 
 #AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.NaturalSL,

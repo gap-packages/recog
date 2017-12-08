@@ -691,15 +691,15 @@ RECOG.GiantEpsilon := 1/1024;
 FindHomMethodsPerm.Giant :=
   function(ri,grp)
     local grpmem,mp,res;
-    if not(IsPermGroup(grp)) then
-        return NotEnoughInformation;
+    if not IsPermGroup(grp) then
+        return NeverApplicable;
     fi;
-    if not(IsTransitive(grp)) then
-        return false;
+    if not IsTransitive(grp) then
+        return NeverApplicable;
     fi;
     mp := MovedPoints(grp);
     if RECOG.IsGiant(grp,mp) = fail then
-        return fail;
+        return TemporaryFailure;
     fi;
     grpmem := Group(ri!.gensHmem);
     grpmem!.pseudorandomfunc := [rec(
@@ -708,7 +708,7 @@ FindHomMethodsPerm.Giant :=
 
     res := RECOG.RecogniseGiant(mp,grpmem,RECOG.GiantEpsilon);
     if res = fail then
-        return fail;
+        return TemporaryFailure;
     fi;
     res.slpnice := SLPOfElms(res.gens);
     # Note that when putting the generators into the record, we reverse
@@ -725,7 +725,7 @@ FindHomMethodsPerm.Giant :=
     fi;
     SetNiceGens(ri,StripMemory(res.gens));
     Setslptonice(ri,res.slpnice);
-    return true;
+    return Success;
   end;
 
 SLPforElementFuncsPerm.Giant :=
