@@ -1,4 +1,4 @@
-<!-- 
+<!--
 
    methsel.xml        recogbase package documentation
                                                                Max Neunhoeffer
@@ -50,7 +50,7 @@ one of the following four values:<P/>
 
 <List>
 <Mark><C>Success</C></Mark>
-<Item>means that the method was successful and no more methods have to be 
+<Item>means that the method was successful and no more methods have to be
     tried.</Item>
 <Mark><C>NeverApplicable</C></Mark>
 <Item>means that the method was not successful and that there is no point
@@ -97,7 +97,7 @@ There is one convenience function to put a new method into a method database:
 <Func Name="AddMethod" Arg="db, meth, rank, stamp [,comment]"/>
 <Returns>nothing</Returns>
 <Description>
-    <A>db</A> must be a method database (list of records, see above) with 
+    <A>db</A> must be a method database (list of records, see above) with
     non-ascending rank values. <A>meth</A> is the method function,
     <A>rank</A> the rank and <A>stamp</A> a string valued stamp. The
     optional argument <A>comment</A> can be a string comment. The record
@@ -124,7 +124,7 @@ function:
     arguments, which are handed down to the called methods. Of course they
     must fulfill the conventions defined for the methods in the database
     <A>db</A>.<P/>
-    The function first creates a <Q>method selection</Q> record keeping track 
+    The function first creates a <Q>method selection</Q> record keeping track
     of the things that happened during the method trying procedure,
     which is also used during this procedure. Then it calls methods with
     the algorithm described below and in the end returns the method
@@ -157,7 +157,7 @@ The method selection record has the following components:
 </List>
 
 The algorithm used by <Ref Func="CallMethods"/> is extremely simple:
-It sets a counter <C>tolerance</C> to zero. The main loop starts at the 
+It sets a counter <C>tolerance</C> to zero. The main loop starts at the
 beginning of the method database and runs through the methods in turn.
 Provided a method did not yet return <C>false</C> and did not yet return
 <C>fail</C> more than <C>tolerance</C> times before, it is tried. According
@@ -181,7 +181,7 @@ If the main loop reaches the end of the method database without calling
 a method (because all methods have already failed or are not applicable),
 then the counter <C>tolerance</C> is increased by one and everything
 starts all over again. This is repeated until <C>tolerance</C> is greater
-than the <C>limit</C> which is the second argument of 
+than the <C>limit</C> which is the second argument of
 <Ref Func="CallMethods"/>. The last value of the <C>tolerance</C> counter
 is returned in the component <C>tolerance</C> of the method selection
 record.<P/>
@@ -196,7 +196,7 @@ that even failed methods can collect additional information about the
 arguments changing them accordingly. This might give methods that come
 earlier and were not applicable up to now the opportunity to begin
 working. Therefore one can install very good methods that depend on some
-already known knowledge which will only be acquired during the method 
+already known knowledge which will only be acquired during the method
 selection procedure by other methods, with a high rank.<P/>
 
 </Section>

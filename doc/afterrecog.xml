@@ -1,4 +1,4 @@
-<!-- 
+<!--
 
 afterrecog.xml          recogbase package documentation
                                                                Max Neunhoeffer
@@ -18,7 +18,7 @@ after a successful recognition (and possibly verification).<P/>
 
 Of course, one can inspect the whole tree of recognition info records
 just by looking at the stored attribute values. Moreover, constructive
-membership tests can be performed using the function 
+membership tests can be performed using the function
 <Ref Func="SLPforElement"/>, thereby writing an arbitrary element
 in terms of the nice generators, which are stored in the attribute
 <Ref Attr="NiceGens"/>. If <C>fail</C> is returned, then the
@@ -46,10 +46,10 @@ gap> ri := RecogniseGroup(g);
  K:<recoginfo Giant Size=479001600>>]]>
 </Log>
 
-One sees that the recursive process runs, first it finds that the 
+One sees that the recursive process runs, first it finds that the
 permutation action is not transitive, a homomorphism is found by mapping
-onto the action on one of the orbits. The image is recognised to permute 
-only a few points. The kernel is recognised to be a full symmetric group 
+onto the action on one of the orbits. The image is recognised to permute
+only a few points. The kernel is recognised to be a full symmetric group
 in its natural action on at least 10 points (recognised as <Q>Giant</Q>).
 <P/>
 

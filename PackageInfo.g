@@ -1,5 +1,5 @@
 #############################################################################
-##  
+##
 ##  PackageInfo.g for the package `recogbase'
 ##
 
@@ -12,7 +12,7 @@ Date := "08/03/2016", # dd/mm/yyyy format
 
 ##  Information about authors and maintainers.
 Persons := [
-  rec( 
+  rec(
     LastName      := "Neunhöffer",
     FirstNames    := "Max",
     IsAuthor      := true,
@@ -26,7 +26,7 @@ Persons := [
     #Place         := "St Andrews",
     #Institution   := "University of St Andrews"
   ),
-  rec( 
+  rec(
     LastName      := "Seress",
     FirstNames    := "Ákos",
     IsAuthor      := true,
@@ -53,15 +53,15 @@ Persons := [
 
 ##  Status information. Currently the following cases are recognized:
 ##    "accepted"      for successfully refereed packages
-##    "deposited"     for packages for which the GAP developers agreed 
+##    "deposited"     for packages for which the GAP developers agreed
 ##                    to distribute them with the core GAP system
-##    "dev"           for development versions of packages 
+##    "dev"           for development versions of packages
 ##    "other"         for all other packages
 ##
 # Status := "accepted",
 Status := "deposited",
 
-##  You must provide the next two entries if and only if the status is 
+##  You must provide the next two entries if and only if the status is
 ##  "accepted" because is was successfully refereed:
 # format: 'name (place)'
 # CommunicatedBy := "Mike Atkinson (St. Andrews)",
@@ -118,14 +118,14 @@ Dependencies := rec(
 
 AvailabilityTest := ReturnTrue,
 
-##  *Optional*, but recommended: path relative to package root to a file which 
+##  *Optional*, but recommended: path relative to package root to a file which
 ##  contains as many tests of the package functionality as sensible.
 #TestFile := "tst/testall.g",
 
-##  *Optional*: Here you can list some keyword related to the topic 
+##  *Optional*: Here you can list some keyword related to the topic
 ##  of the package.
 Keywords := ["group recognition", "matrix group recognition",
-"permutation group", "black box group", "composition tree", 
+"permutation group", "black box group", "composition tree",
 "Aschbacher classes", "method selection"],
 
 AutoDoc := rec(

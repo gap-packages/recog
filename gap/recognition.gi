@@ -64,7 +64,7 @@ RECOG_ViewObj := function( level, ri )
         Print(" Field=",Size(ri!.field));
     fi;
     if not(IsLeaf(ri)) then
-        Print("\n",String("",level)," F:"); 
+        Print("\n",String("",level)," F:");
         if HasRIFac(ri) then
             RECOG_ViewObj(level+3, RIFac(ri));
         else
@@ -127,8 +127,8 @@ InstallGlobalFunction( RecogniseGroup,
 # TODO: perhaps check if the result does not have IsReady set;
 # in that case print a warning or error or ...?
 
-    # Note: one cannot use "RecogniseGroup" to recognise projective groups 
-    #       as of now since "Projective groups" do not yet exist as GAP 
+    # Note: one cannot use "RecogniseGroup" to recognise projective groups
+    #       as of now since "Projective groups" do not yet exist as GAP
     #       objects here!
   end);
 
@@ -161,9 +161,9 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     Setslpforelement(ri,SLPforElementGeneric);
     SetgensN(ri,[]);       # this will grow over time
     Setimmediateverification(ri,false);
-    Setforkernel(ri,rec(hints := []));   
+    Setforkernel(ri,rec(hints := []));
           # this is eventually handed down to the kernel
-    Setforfactor(ri,rec(hints := []));   
+    Setforfactor(ri,rec(hints := []));
           # this is eventually handed down to the factor
     if projective then
         Setisone(ri,IsOneProjective);
@@ -176,7 +176,7 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     # FIXME: perhaps DON'T set a default for findgensNmeth, to ensure
     # people always set a value? Or at least find some way so that
     # methods must explicitly acknowledge that they want the default...
-    SetfindgensNmeth(ri,rec(method := FindKernelFastNormalClosure, 
+    SetfindgensNmeth(ri,rec(method := FindKernelFastNormalClosure,
                             args := [6,3]));
     if IsMatrixGroup(H) then
         ri!.field := FieldOfMatrixGroup(H);
@@ -198,7 +198,7 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
                                 args := [ri,"PseudoRandom",false])];
     return ri;
   end );
-    
+
 RECOG.SetPseudoRandomStamp := function(g,st)
   if IsBound(g!.pseudorandomfunc) then
       g!.pseudorandomfunc[Length(g!.pseudorandomfunc)].args[2] := st;
@@ -210,8 +210,8 @@ InstallMethod( RandomElm, "for a recognition info record, a string and a bool",
   function(ri, s, mem)
     local pos,el;
     if ri!.randstore then
-        if not(IsBound(ri!.randrpt.(s))) then 
-            ri!.randrpt.(s) := 1; 
+        if not(IsBound(ri!.randrpt.(s))) then
+            ri!.randrpt.(s) := 1;
             pos := 1;
         else
             ri!.randrpt.(s) := ri!.randrpt.(s) + 1;
@@ -231,14 +231,14 @@ InstallMethod( RandomElm, "for a recognition info record, a string and a bool",
     fi;
   end );
 
-InstallMethod( RandomElmOrd, 
+InstallMethod( RandomElmOrd,
   "for a recognition info record, a string and a bool",
   [ IsRecognitionInfo, IsString, IsBool ],
   function(ri, s, mem)
     local pos,res;
     if ri!.randstore then
-        if not(IsBound(ri!.randopt.(s))) then 
-            ri!.randopt.(s) := 1; 
+        if not(IsBound(ri!.randopt.(s))) then
+            ri!.randopt.(s) := 1;
             pos := 1;
         else
             ri!.randopt.(s) := ri!.randopt.(s) + 1;
@@ -301,14 +301,14 @@ InstallMethod( GetElmOrd, "for a recognition info record and a record",
     fi;
   end );
 
-InstallMethod( RandomElmPpd, 
+InstallMethod( RandomElmPpd,
   "for a recognition info record, a string and a bool",
   [ IsRecognitionInfo, IsString, IsBool ],
   function(ri, s, mem)
     local pos,res;
     if ri!.randstore then
-        if not(IsBound(ri!.randppt.(s))) then 
-            ri!.randppt.(s) := 1; 
+        if not(IsBound(ri!.randppt.(s))) then
+            ri!.randppt.(s) := 1;
             pos := 1;
         else
             ri!.randppt.(s) := ri!.randppt.(s) + 1;
@@ -414,7 +414,7 @@ InstallGlobalFunction( PrintTreePos,
         fi;
     fi;
   end );
-    
+
 InstallGlobalFunction( RecogniseGeneric,
   function(arg)
     # Assume all the generators have no memory!
@@ -470,7 +470,7 @@ InstallGlobalFunction( RecogniseGeneric,
     fi;
 
     # Handle the leaf case:
-    if IsLeaf(ri) then   
+    if IsLeaf(ri) then
         # If nobody has set how we produce preimages of the nicegens:
         if not(Hascalcnicegens(ri)) then
             Setcalcnicegens(ri,CalcNiceGensGeneric);
@@ -502,7 +502,7 @@ InstallGlobalFunction( RecogniseGeneric,
 
     # The non-leaf case:
     # In that case we know that ri now knows: homom plus additional data.
-    
+
     # Try to recognise the factor a few times, then give up:
     counter := 0;
     repeat
@@ -524,8 +524,8 @@ InstallGlobalFunction( RecogniseGeneric,
               counter,").");
         fi;
         Add(depth,'F');
-        rifac := RecogniseGeneric( 
-                  Group(List(GeneratorsOfGroup(H), x->ImageElm(Homom(ri),x))), 
+        rifac := RecogniseGeneric(
+                  Group(List(GeneratorsOfGroup(H), x->ImageElm(Homom(ri),x))),
                   methodsforfactor(ri), depth, forfactor(ri) ); # TODO: change forfactor to hintsForFactor??)
         Remove(depth);
         PrintTreePos("F",depth,H);
@@ -579,7 +579,7 @@ InstallGlobalFunction( RecogniseGeneric,
         # remove duplicates:
         ll := [];
         for i in [1..Length(l)] do
-            if not(isone(ri)(l[i])) and 
+            if not(isone(ri)(l[i])) and
                (i = 1 or not(isequal(ri)(l[i],l[i-1]))) then
                 Add(ll,l[i]);
             fi;
@@ -607,7 +607,7 @@ InstallGlobalFunction( RecogniseGeneric,
 
         # This is now in terms of the generators of H!
         N := Group(StripMemory(gensN(ri)));
-        
+
         Add(depth,'K');
         riker := RecogniseGeneric( N, methoddb, depth, forkernel(ri) );
         Remove(depth);
@@ -712,8 +712,8 @@ InstallGlobalFunction( SLPforElement,
     fi;
     return slp;
   end );
-    
-InstallGlobalFunction( SLPforElementGeneric, 
+
+InstallGlobalFunction( SLPforElementGeneric,
   # generic method for a non-leaf node
   function(ri,g)
     local gg,n,rifac,riker,s,s1,s2,y,nr1,nr2;
@@ -857,7 +857,7 @@ InstallGlobalFunction( FindKernelFastNormalClosure,
     return true;
   end);
 
-InstallOtherMethod( Size, "for a recognition info record", 
+InstallOtherMethod( Size, "for a recognition info record",
   [IsRecognitionInfo and IsReady],
   function(ri)
     local size;
@@ -964,12 +964,12 @@ InstallGlobalFunction( "GetCompositionTreeNode",
     local r,c;
     r := ri;
     for c in what do
-      if c in "fF" then r := RIFac(r); 
+      if c in "fF" then r := RIFac(r);
       elif c in "kK" then r := RIKer(r); fi;
     od;
     return r;
   end );
-  
+
 # Testing:
 
 RECOG.TestGroup := function(g,proj,size)
@@ -1047,7 +1047,7 @@ RECOG.TestRecognitionNode := function(ri,stop,recurse)
 end;
 
 
-      
+
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU General Public License as published by

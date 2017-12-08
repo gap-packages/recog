@@ -17,7 +17,7 @@
 #  rank       : an integer rank
 #  stamp      : a string describing the method uniquely
 #  comment    : an optional comment to describe the method for humans
-#  
+#
 # A database of methods is just a list of such records.
 #
 # Data for the method selection process is collected in another record

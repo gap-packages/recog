@@ -28,7 +28,7 @@ InstallOtherMethod( ExtractSubMatrix, "hack: for lists of compressed vectors",
     return n;
   end );
 
-InstallMethod( PseudoRandom, "for a group object with generators, use func", 
+InstallMethod( PseudoRandom, "for a group object with generators, use func",
   [ IsGroup and HasGeneratorsOfGroup ], 1,
   function( g )
     local l;
