@@ -949,8 +949,8 @@ the calling convention by means of a hypothetical function:
 
 <ManSection>
     <Func Name="FindHomomorphism" Arg="ri, G"/>
-    <Returns>One of the values <C>true</C>, <C>false</C>, <C>fail</C>, or
-        <C>NotApplicable</C>.</Returns>
+    <Returns>One of the values <C>Success</C>, <C>NeverApplicable</C>,
+        <C>TemporaryFailure</C>, or <C>NotEnoughInformation</C>.</Returns>
     <Description>
         Find homomorphism methods take two arguments <A>ri</A> and <A>G</A>,
         of which <A>ri</A> is a recognition info record and <A>G</A> is

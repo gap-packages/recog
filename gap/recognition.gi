@@ -142,7 +142,7 @@ InstallGlobalFunction( TryFindHomMethod,
     ri := EmptyRecognitionInfoRecord(rec(),g,projective);
     Unbind(g!.pseudorandomfunc);
     result := method(ri,g);
-    if result in [fail,false] then
+    if result in [TemporaryFailure, NeverApplicable] then
         return result;
     else
         SetFilterObj(ri,IsReady);
@@ -461,7 +461,7 @@ InstallGlobalFunction( RecogniseGeneric,
     fi;
     # Reset the pseudo random stamp:
     RECOG.SetPseudoRandomStamp(Grp(ri),"PseudoRandom");
-    if fhmethsel(ri).result = fail then
+    if fhmethsel(ri).result = TemporaryFailure then
         # FIXME: shouldn't we print an error here? at least if the user called us...
         # Perhaps yes: this is an ri which does NOT have IsReady set, and may be useful for debugging...
         SetFilterObj(ri,IsLeaf);

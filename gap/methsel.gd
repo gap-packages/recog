@@ -16,12 +16,34 @@
 DeclareInfoClass( "InfoMethSel" );
 SetInfoLevel(InfoMethSel,1);
 DeclareGlobalFunction( "AddMethod" );
-DeclareGlobalVariable( "NotApplicable" );
 DeclareGlobalFunction( "CallMethods" );
 
-# The following method has to be here because recogbase already uses
-# it in its reading of the implemenation phase. This is if recogbase
-# is loaded explicitly.
+
+# Possible return values for recognition methods:
+#
+# method successfully computed a homomorphism
+# (used to be 'true')
+BindGlobal("Success", "Success");
+
+# method is never applicable to this kind of group (e.g. input is
+# non-solvable, but method is only applicable to solvable groups),
+# don't bother to try it again
+# (used to be 'false')
+BindGlobal("NeverApplicable", "NeverApplicable");
+
+# The method temporarily failed, that it could be sensible to call it
+# again in this situation at a later stage. This value is typical for a Las
+# Vegas algorithm using randomised methods, which has failed, but which may
+# succeed when called again.
+# (used to be 'fail')
+BindGlobal("TemporaryFailure", "TemporaryFailure");
+
+# method needs more information (e.g. things like whether group is
+# solvable; transitive; etc.) -> try again later if new information
+# becomes available
+# (used to be 'NotApplicable')
+BindGlobal("NotEnoughInformation", "NotEnoughInformation");
+
 
 # Add a method to a database with "AddMethod" and call a method from a
 # database with "CallMethods".

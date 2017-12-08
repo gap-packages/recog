@@ -49,18 +49,18 @@ user is completely free there. A method can (and has to) return
 one of the following four values:<P/>
 
 <List>
-<Mark><C>true</C></Mark>
+<Mark><C>Success</C></Mark>
 <Item>means that the method was successful and no more methods have to be 
     tried.</Item>
-<Mark><C>false</C></Mark>
+<Mark><C>NeverApplicable</C></Mark>
 <Item>means that the method was not successful and that there is no point
     to call the method again in this situation whatsoever.</Item>
-<Mark><C>fail</C></Mark>
+<Mark><C>TemporaryFailure</C></Mark>
 <Item>means that the method temporarily failed, that it however could be
     sensible to call it again in this situation at a later stage. This
     value is typical for a Las Vegas algorithm using randomised methods,
     which has failed, but which may succeed when called again.</Item>
-<Mark><C>NotApplicable</C></Mark>
+<Mark><C>NotEnoughInformation</C></Mark>
 <Item>means that the method for some reason refused to do its work. However,
     it is possible that it will become applicable later such that it makes
     sense to call it again, may when more information is available.</Item>
@@ -170,7 +170,7 @@ to the value returned by the method, the following happens:
     <Mark><C>fail</C></Mark>
     <Item>this is counted in the method selection record and the main
           loop starts again at the beginning of the method database.</Item>
-    <Mark><C>NotApplicable</C></Mark>
+    <Mark><C>NotEnoughInformation</C></Mark>
     <Item>the main loop goes to the next method in the method database.</Item>
     <Mark><C>true</C></Mark>
     <Item>this is marked in the method selection record and the procedure
