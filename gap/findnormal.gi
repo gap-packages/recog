@@ -41,17 +41,6 @@ InstallValue( FINDEVENNORMALOPTS, rec(
   SizeLimitAllInvols := 32,
 ) );
 
-InstallGlobalFunction( RECOG_EqProjective,
-  function(a,b)
-    local i,p,s;
-    p := PositionNonZero(a[1]);
-    s := b[1][p] / a[1][p];
-    for i in [1..Length(a)] do
-        if s*a[i] <> b[i] then return false; fi;
-    od;
-    return true;
-  end );
-
 InstallGlobalFunction( RECOG_IsNormal,
   function(g,h,projective)
     local S,x,y;
@@ -308,8 +297,8 @@ InstallMethod( FindEvenNormalSubgroup, "for a group object and a record",
 
   # Set some defaults:
   if IsBound(opt.Projective) and opt.Projective then
-      if not(IsBound(opt.IsOne)) then opt.IsOne := GENSS_IsOneProjective; fi;
-      if not(IsBound(opt.Eq)) then opt.Eq := RECOG_EqProjective; fi;
+      if not(IsBound(opt.IsOne)) then opt.IsOne := IsOneProjective; fi;
+      if not(IsBound(opt.Eq)) then opt.Eq := IsEqualProjective; fi;
       if not(IsBound(opt.Order)) then opt.Order := RECOG.ProjectiveOrder; fi;
   fi;
   GENSS_CopyDefaultOptions( FINDEVENNORMALOPTS, opt );
@@ -507,6 +496,7 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
       count := 0;
       counteven := 0;
       countodd := 0;
+
       repeat
           y := PseudoRandom(h);
           c := x * x^y;       # = Comm(x,y) since x is an involution
@@ -640,8 +630,8 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
 
   # Set some defaults:
   if IsBound(opt.Projective) and opt.Projective then
-      if not(IsBound(opt.IsOne)) then opt.IsOne := GENSS_IsOneProjective; fi;
-      if not(IsBound(opt.Eq)) then opt.Eq := RECOG_EqProjective; fi;
+      if not(IsBound(opt.IsOne)) then opt.IsOne := IsOneProjective; fi;
+      if not(IsBound(opt.Eq)) then opt.Eq := IsEqualProjective; fi;
       if not(IsBound(opt.Order)) then opt.Order := RECOG.ProjectiveOrder; fi;
   fi;
   GENSS_CopyDefaultOptions( FINDEVENNORMALOPTS, opt );
