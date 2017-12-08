@@ -329,7 +329,7 @@ end;
 #  local H,dim,gens,hom,newgens,gen,data;
 #  # Are we applicable?
 #  if not(IsBound(ri!.subdim)) then
-#      return NotApplicable;
+#      return NotEnoughInformation;
 #  fi;
 #
 #  # Project onto subspace:

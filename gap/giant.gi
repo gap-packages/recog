@@ -692,7 +692,7 @@ FindHomMethodsPerm.Giant :=
   function(ri,grp)
     local grpmem,mp,res;
     if not(IsPermGroup(grp)) then
-        return NotApplicable;
+        return NotEnoughInformation;
     fi;
     if not(IsTransitive(grp)) then
         return false;

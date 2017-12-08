@@ -160,7 +160,7 @@ If the method constructs <M>D</M> then the calling node becomes a leaf.
 <Heading><C>Imprimitive</C></Heading>
 
 If the input group is not known to be transitive then this method
-returns <K>NotApplicable</K>. If the input group is known to be transitive
+returns <K>NotEnoughInformation</K>. If the input group is known to be transitive
 and primitive then the method returns <K>false</K>; otherwise, the method
 tries to compute a nontrivial block system. If successful then a
 homomorphism to the action on the blocks is defined; otherwise,

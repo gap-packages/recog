@@ -738,7 +738,7 @@ RECOG.TestRandomElement := function (recognise, grp)
     if recognise.needBaseChange = true and recognise.bc = "unknown" then     
         if Length(recognise.ClassicalForms) = 0 then    
             recognise.needForms := true;
-            return NotApplicable;
+            return NotEnoughInformation;
         fi;
         i := 1;  found := false;
         while not found and  i <= Length(recognise.ClassicalForms) do
@@ -916,7 +916,7 @@ RECOG.ClassicalForms := function( recognise, grp)
     fi;
 
     if recognise.needForms <> true then
-        return NotApplicable;
+        return NotEnoughInformation;
     fi;
 
     # the group has to be absolutely irreducible
@@ -1000,7 +1000,7 @@ RECOG.MeatAxe := function( recognise, grp )
     fi;
 
     if recognise.needMeataxe <> true then
-        return NotApplicable;
+        return NotEnoughInformation;
     fi;
 
     
@@ -1035,7 +1035,7 @@ RECOG.IsSLContained := function( recognise, grp )
     
     if recognise.isReducible = "unknown" then 
         recognise.needMeataxe := true;
-        return NotApplicable; 
+        return NotEnoughInformation; 
     fi;
 
     
@@ -1045,7 +1045,7 @@ RECOG.IsSLContained := function( recognise, grp )
     # since we are in the generic case.
     if Length(recognise.ClassicalForms)=0 then
         recognise.needForms := true;
-        return NotApplicable;
+        return NotEnoughInformation;
     fi;
 
     if First(recognise.ClassicalForms, IsTrivialForm) <> fail then
@@ -1096,7 +1096,7 @@ RECOG.IsSpContained := function( recognise, grp )
     
     if recognise.isReducible = "unknown" then 
         recognise.needMeataxe := true;
-        return NotApplicable; 
+        return NotEnoughInformation; 
     fi;
 
     # if we reach this point the natural module is irreducible
@@ -1105,7 +1105,7 @@ RECOG.IsSpContained := function( recognise, grp )
     # since we are in the generic case.
     if Length(recognise.ClassicalForms)=0 then
         recognise.needForms := true;
-        return NotApplicable;
+        return NotEnoughInformation;
     fi;
         
     # if the group preserves a symplectic form but not a 
@@ -1169,7 +1169,7 @@ RECOG.IsSUContained := function( recognise, grp )
     
     if recognise.isReducible = "unknown" then 
         recognise.needMeataxe := true;
-        return NotApplicable; 
+        return NotEnoughInformation; 
     fi;
 
     # if we reach this point the natural module is irreducible
@@ -1178,7 +1178,7 @@ RECOG.IsSUContained := function( recognise, grp )
     # since we are in the generic case.
     if Length(recognise.ClassicalForms)=0 then
         recognise.needForms := true;
-        return NotApplicable;
+        return NotEnoughInformation;
     fi;
         
     if First(recognise.ClassicalForms,isHermForm)<> fail then
@@ -1239,7 +1239,7 @@ RECOG.IsSOContained := function( recognise, grp )
 
     if recognise.isReducible = "unknown" then 
         recognise.needMeataxe := true;
-        return NotApplicable; 
+        return NotEnoughInformation; 
     fi;
 
     # if we reach this point the natural module is irreducible
@@ -1248,7 +1248,7 @@ RECOG.IsSOContained := function( recognise, grp )
     # since we are in the generic case.
     if Length(recognise.ClassicalForms)=0 then
         recognise.needForms := true;
-        return NotApplicable;
+        return NotEnoughInformation;
     fi;
         
     if First(recognise.ClassicalForms,isParForm)<> fail or
@@ -1424,7 +1424,7 @@ RECOG.NonGenericSymplectic := function(recognise, grp)
     if d > 8 then  return false; fi;
 
     if recognise.n <= 5 then
-        return NotApplicable;
+        return NotEnoughInformation;
     elif recognise.n <= 6 and d <> 4 then
         recognise.needOrders := true;
         return fail;
@@ -1537,7 +1537,7 @@ RECOG.NonGenericUnitary := function(recognise, grp)
     if recognise.maybeFrobenius = false then return false; fi;
 
     if recognise.n <= 5 then
-        return NotApplicable;
+        return NotEnoughInformation;
     elif recognise.n = 6 then
         recognise.needOrders := true;
         if d = 6 or d = 4 then
@@ -1742,7 +1742,7 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
     fi;
 
     if recognise.n <= 5 then
-        return NotApplicable;
+        return NotEnoughInformation;
     elif recognise.n = 6 then
         recognise.needOrders := true;
         return fail;
@@ -1813,7 +1813,7 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
     elif d = 4 and (q = 8 or q >= 11) then
         if recognise.needPlusMinus = false then 
             recognise.needPlusMinus := true;
-            return NotApplicable;
+            return NotEnoughInformation;
         fi;
         if not IsSubset(recognise.plusminus,[[1,1],[1,-1],[-1,-1]]) then
             return fail;
@@ -1961,7 +1961,7 @@ RECOG.NonGenericOrthogonalMinus := function(recognise, grp)
     fi;
 
     if recognise.n <= 5 then
-        return NotApplicable;
+        return NotEnoughInformation;
     elif recognise.n = 6 then
         recognise.needOrders := true;
         return fail;
@@ -2065,7 +2065,7 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
 
 
     if recognise.n <= 5 then
-        return NotApplicable;
+        return NotEnoughInformation;
     elif recognise.n = 6 then
         recognise.needOrders := true;
         return fail;

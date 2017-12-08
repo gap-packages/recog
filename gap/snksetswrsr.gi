@@ -469,7 +469,7 @@ FindHomMethodsPerm.SnkSetswrSr :=
   function(ri,grp)
     local res,T,seen,imgens,hom;
     if not(IsPermGroup(grp)) then
-        return NotApplicable;
+        return NotEnoughInformation;
     fi;
     if not(IsPrimitive(grp)) then
         return false;

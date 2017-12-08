@@ -2464,7 +2464,7 @@ FindHomMethodsMatrix.NaturalSL := function(ri,G)
   local data,e,genlist,grpmem,i,j,n,p,q,r,il;
 
     if not(IsMatrixGroup(G)) then
-        return NotApplicable;
+        return NotEnoughInformation;
     fi;  
 
     il := InfoLevel(InfoMethSel);

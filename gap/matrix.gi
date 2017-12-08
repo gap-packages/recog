@@ -137,7 +137,7 @@ end;
 FindHomMethodsMatrix.Scalar := function(ri, G)
   local f,gcd,generator,gens,i,l,o,pows,q,rep,slp,subset,z;
   if ri!.dimension > 1 then
-      return NotApplicable;
+      return NotEnoughInformation;
   fi;
 
   # FIXME: FieldOfMatrixGroup
@@ -554,7 +554,7 @@ end;
 #  local H,dim,gens,hom,newgens,gen,data;
 #  # Are we applicable?
 #  if not(IsBound(ri!.subdim)) then
-#      return NotApplicable;
+#      return NotEnoughInformation;
 #  fi;
 #
 #  # Project onto factor:
@@ -757,7 +757,7 @@ FindHomMethodsMatrix.LowerLeftPGroup := function(ri,G)
   if not(IsBound(ri!.blocks) and IsBound(ri!.lens) and 
          IsBound(ri!.canonicalbasis) and IsBound(ri!.gensNvectors) and 
          IsBound(ri!.gensNpivots)) then
-      return NotApplicable;
+      return NotEnoughInformation;
   fi; 
   # We are done, because we can do linear algebra:
   f := ri!.field;

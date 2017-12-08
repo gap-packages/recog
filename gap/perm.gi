@@ -23,7 +23,7 @@ FindHomMethodsPerm.Cyclic2 :=
      # are called only for permutation groups anyway. However, this is an
      # example.
      if not(IsPermGroup(H)) then 
-         return NotApplicable;
+         return NotEnoughInformation;
      fi;
      # Now we work:
      if Size(H) = 2 then
@@ -159,7 +159,7 @@ FindHomMethodsPerm.Imprimitive :=
     # Only look for primitivity once we know transitivity:
     # This ensures the right trying order even if the ranking is wrong.
     if not(HasIsTransitive(G)) then
-        return NotApplicable;
+        return NotEnoughInformation;
     fi;
 
     # We test for known non-primitivity:
