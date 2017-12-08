@@ -2257,8 +2257,7 @@ function( arg )
   local ret, recognise, grp, case, nrrandels, i, f, q, merkinfolevel;
 
   if Length( arg ) < 1 or Length( arg ) > 3 then
-      Error( "Usage: RecogniseClassical( grp [,nrrandels][,case] )" );
-      return;
+      ErrorNoReturn( "Usage: RecogniseClassical( grp [,nrrandels][,case] )" );
   fi;
   grp := arg[1];
   nrrandels := 30;
