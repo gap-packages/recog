@@ -36,12 +36,12 @@ DeclareFilter( "IsLeaf" );
 DeclareFilter( "IsReady" );
 DeclareAttribute( "Grp", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "Homom", IsRecognitionInfo, "mutable" );
-DeclareAttribute( "StdGens", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "StdGens", IsRecognitionInfo, "mutable" );    # TODO: implement
 DeclareAttribute( "NiceGens", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "RIFac", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "RIKer", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "RIParent", IsRecognitionInfo, "mutable" );
-DeclareAttribute( "StdPresentation", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "StdPresentation", IsRecognitionInfo, "mutable" );    # TODO: implement
 DeclareProperty( "IsSimpleGroup", IsRecognitionInfo );
 DeclareProperty( "IsAlmostSimpleGroup", IsRecognitionInfo );
 InstallTrueMethod( IsAlmostSimpleGroup, IsSimpleGroup );
@@ -50,11 +50,11 @@ DeclareAttribute( "pregensfac", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "calcnicegens", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "slptonice", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "slptostd", IsRecognitionInfo, "mutable" );
-DeclareAttribute( "fhmethsel", IsRecognitionInfo, "mutable" );
-DeclareAttribute( "methodsforfactor", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "fhmethsel", IsRecognitionInfo, "mutable" );      # TODO: rename?
+DeclareAttribute( "methodsforfactor", IsRecognitionInfo, "mutable" ); # rename to MethodsDBForFactor
 DeclareAttribute( "slpforelement", IsRecognitionInfo, "mutable" );
 # Here we collect generators of the kernel:
-DeclareAttribute( "gensN", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "gensN", IsRecognitionInfo, "mutable" );      # TODO: rename?
 # The following holds a method, described by a record, to find generators
 # of the kernel:
 DeclareAttribute( "findgensNmeth", IsRecognitionInfo, "mutable" );

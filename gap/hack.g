@@ -32,6 +32,11 @@ InstallMethod( PseudoRandom, "for a group object with generators, use func",
   [ IsGroup and HasGeneratorsOfGroup ], 1,
   function( g )
     local l;
+    # FIXME: get rid of this hackish override of PseudoRandom,
+    # and define our own operation instead (say, RECOG_PseuoRandom)?!
+    # Or at least change pseudorandomfunc to an attribute, so that
+    # the filter of this method can be turned into something like
+    #  IsGroup and HasPseudoRandomFunc
     if IsBound(g!.pseudorandomfunc) and Length(g!.pseudorandomfunc) > 0 then
         l := Length(g!.pseudorandomfunc);
         return CallFuncList(g!.pseudorandomfunc[l].func,

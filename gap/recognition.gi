@@ -123,18 +123,24 @@ InstallGlobalFunction( RecogniseGroup,
     else
         return RecogniseGeneric(G,FindHomDbBB,"");
     fi;
+
+# TODO: perhaps check if the result does not have IsReady set;
+# in that case print a warning or error or ...?
+
     # Note: one cannot use "RecogniseGroup" to recognise projective groups 
     #       as of now since "Projective groups" do not yet exist as GAP 
     #       objects here!
   end);
 
+# TODO: TryFindHomMethod is never called by anything
+# in recog or recogbase.
+# Seems to be for user intervention and/or debugging?
+# If so, document it accordingly. Otherwise remove it!
 InstallGlobalFunction( TryFindHomMethod,
   function( g, method, projective )
     local result,ri;
     ri := EmptyRecognitionInfoRecord(rec(),g,projective);
-    if IsBound(g!.pseudorandomfunc) then
-        Unbind(g!.pseudorandomfunc);
-    fi;
+    Unbind(g!.pseudorandomfunc);
     result := method(ri,g);
     if result in [fail,false] then
         return result;
@@ -167,6 +173,9 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
         Setisequal(ri,\=);
     fi;
     ri!.projective := projective;
+    # FIXME: perhaps DON'T set a default for findgensNmeth, to ensure
+    # people always set a value? Or at least find some way so that
+    # methods must explicitly acknowledge that they want the default...
     SetfindgensNmeth(ri,rec(method := FindKernelFastNormalClosure, 
                             args := [6,3]));
     if IsMatrixGroup(H) then
@@ -182,7 +191,7 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     ri!.randrpt := rec();
     ri!.randopt := rec();
     ri!.randppt := rec();
-    ri!.randstore := true;
+    ri!.randstore := true;  # TODO: try what happens if we change this to false in terms of performance
     H!.pseudorandomfunc := [rec(func := function(ri,name,bool)
                                           return RandomElm(ri,name,bool).el;
                                         end,
@@ -415,7 +424,7 @@ InstallGlobalFunction( RecogniseGeneric,
     # Look after arguments:
     H := arg[1];
     methoddb := arg[2];
-    depth := arg[3];
+    depth := arg[3];    # FIXME: why is this a string? perhaps rename to depthString? or indentString...
     if Length(arg) = 4 then
         knowledge := arg[4];
     else
@@ -436,7 +445,7 @@ InstallGlobalFunction( RecogniseGeneric,
         ri := EmptyRecognitionInfoRecord(knowledge,H,false);
     fi;
     ri!.depth := Length(depth);
-    ri!.depthst := depth;
+    ri!.depthst := depth;   # FIXME: rename depthst to depthString or so?
     # was here earlier: Setcalcnicegens(ri,CalcNiceGensGeneric);
     Setmethodsforfactor(ri,methoddb);
 
@@ -447,10 +456,14 @@ InstallGlobalFunction( RecogniseGeneric,
         Setfhmethsel(ri,CallMethods( allmethods, 10, ri, H));
     else
         Setfhmethsel(ri,CallMethods( methoddb, 10, ri, H ));
+        # TODO: extract the value 10 into a named constant, and / or make it
+        #       an option parameter to the func
     fi;
     # Reset the pseudo random stamp:
     RECOG.SetPseudoRandomStamp(Grp(ri),"PseudoRandom");
     if fhmethsel(ri).result = fail then
+        # FIXME: shouldn't we print an error here? at least if the user called us...
+        # Perhaps yes: this is an ri which does NOT have IsReady set, and may be useful for debugging...
         SetFilterObj(ri,IsLeaf);
         if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
         return ri;
@@ -471,11 +484,17 @@ InstallGlobalFunction( RecogniseGeneric,
                 SetNiceGens(ri,ResultOfStraightLineProgram(slptonice(ri),
                                             GeneratorsOfGroup(H)));
             else
+                # FIXME: is this a good idea???
+                # maybe an error would be better for debugging
                 SetNiceGens(ri,GeneratorsOfGroup(H));
             fi;
         fi;
         # these two were set correctly by FindHomomorphism
         if IsLeaf(ri) then SetFilterObj(ri,IsReady); fi;
+        # FIXME: settle what IsReady means *exactly*;
+        # if it means that the leaf is "guaranteed" to be mathematically correct,
+        # then we need to verify that this is really always the case (for some
+        # methods, one might doubt this...)
         if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
         # StopStoringRandEls(ri);
         return ri;
@@ -507,7 +526,7 @@ InstallGlobalFunction( RecogniseGeneric,
         Add(depth,'F');
         rifac := RecogniseGeneric( 
                   Group(List(GeneratorsOfGroup(H), x->ImageElm(Homom(ri),x))), 
-                  methodsforfactor(ri), depth, forfactor(ri) );
+                  methodsforfactor(ri), depth, forfactor(ri) ); # TODO: change forfactor to hintsForFactor??)
         Remove(depth);
         PrintTreePos("F",depth,H);
         SetRIFac(ri,rifac);
@@ -530,8 +549,15 @@ InstallGlobalFunction( RecogniseGeneric,
         # Now we want to have preimages of the new generators in the factor:
         Info(InfoRecog,2,"Calculating preimages of nice generators.");
         Setpregensfac( ri, CalcNiceGens(rifac,ri!.gensHmem) );
-        ri!.genswithmem := Concatenation(ri!.gensHmem,pregensfac(ri));
-        ForgetMemory(pregensfac(ri));
+        ri!.genswithmem := Concatenation(ri!.gensHmem,pregensfac(ri));  # FIXME: what is genswithmem? document it?
+        # TODO: somehow here is the hidden assumption that pregensfac()
+        # contains (at least initially) generators with memory; and then
+        # we strip this memory away. That's bad design
+        # TODO: rewrite this code to not need ForgetMemory at all
+
+        # replace the entries of the list pregensfac(ri) with
+        # generators without memory
+        ForgetMemory(pregensfac(ri));   # TODO: get rid of ForgetMemory here!
 
         # Now create the kernel generators with the stored method:
         methgensN := findgensNmeth(ri);
@@ -594,7 +620,6 @@ InstallGlobalFunction( RecogniseGeneric,
         if IsReady(riker) and immediateverification(ri) then
             # Do an immediate verification:
             Info(InfoRecog,2,"Doing immediate verification.");
-            i := 1;
             for i in [1..5] do
                 # We must use different random elements than the kernel
                 # finding routines!
@@ -816,6 +841,7 @@ InstallGlobalFunction( FastNormalClosure , function( grpgens, list, n )
   return list2;
 end );
 
+# FIXME: rename FindKernelFastNormalClosure to indicate that it *also* computes random generators
 InstallGlobalFunction( FindKernelFastNormalClosure,
   # Used in the generic recursive routine.
   function(ri,n1,n2)

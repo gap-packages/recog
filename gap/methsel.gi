@@ -35,7 +35,7 @@
 InstallValue( NotApplicable, "NotApplicable" );
 
 InstallGlobalFunction( "CallMethods", function(arg)
-  # First argument is a record that describes the method selection process.
+  # First argument is a list of records  ....  TODO  that describes the method selection process.
   # Second argument is a number, the tolerance limit.
   # All other arguments are handed through to the methods.
 
