@@ -39,8 +39,8 @@ RECOG_ViewObj := function( level, ri )
     if Hasfhmethsel(ri) then
         ms := fhmethsel(ri);
         if IsRecord(ms) then
-            if IsBound(ms.successmethod) then
-                Print(ms.successmethod);
+            if IsBound(ms.successMethod) then
+                Print(ms.successMethod);
             else
                 Print("NO STAMP");
             fi;

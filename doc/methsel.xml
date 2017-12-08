@@ -135,19 +135,19 @@ function:
 The method selection record has the following components:
 
 <List>
-    <Mark><C>falsemethods</C></Mark>
-    <Item>a record, in which for every method that returned <C>false</C>
+    <Mark><C>inapplicableMethods</C></Mark>
+    <Item>a record, in which for every method that returned <C>NeverApplicable</C>
         the value 1 is bound to the component with name the stamp
         of the method.</Item>
-    <Mark><C>failedmethods</C></Mark>
-    <Item>a record, in which for every time a method returned <C>fail</C>
+    <Mark><C>failedMethods</C></Mark>
+    <Item>a record, in which for every time a method returned <C>TemporaryFailure</C>
         the value bound to the component with name the stamp of the method
         is increased by 1 (not being bound means zero).</Item>
-    <Mark><C>successmethod</C></Mark>
+    <Mark><C>successMethod</C></Mark>
     <Item>the stamp of the method that succeeded, if one did. This component
         is only bound after successful completion.</Item>
     <Mark><C>result</C></Mark>
-    <Item>a boolean value which is either <C>true</C> or <C>fail</C>
+    <Item>a boolean value which is either <C>Success</C> or <C>TemporaryFailure</C>
         depending on whether a successful method was found or the procedure
         gave up respectively. This component is only bound after
         completion of the method selection procedure.</Item>
