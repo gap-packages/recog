@@ -42,7 +42,7 @@ ReadPackage("recog","tst/MatFDPM.g");
 ReadPackage("recog","tst/PermDirProd.g");
 ReadPackage("recog","tst/MatTensor.g");
 ReadPackage("recog","tst/TestClassicalNatural.g");
-# FIXME occasional errors for GL(18,7), GL(20,5)
+# FIXME occasional errors forGL(17,3), GL(18,7), GL(20,5)
 ReadPackage("recog","tst/Sporadics.g");
 
 # The following files from tst/ are NOT loaded by this test:
