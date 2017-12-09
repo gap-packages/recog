@@ -159,15 +159,15 @@ The method selection record has the following components:
 The algorithm used by <Ref Func="CallMethods"/> is extremely simple:
 It sets a counter <C>tolerance</C> to zero. The main loop starts at the
 beginning of the method database and runs through the methods in turn.
-Provided a method did not yet return <C>false</C> and did not yet return
-<C>fail</C> more than <C>tolerance</C> times before, it is tried. According
+Provided a method did not yet return <C>NeverApplicable</C> and did not yet return
+<C>TemporaryFailure</C> more than <C>tolerance</C> times before, it is tried. According
 to the value returned by the method, the following happens:
 
 <List>
-    <Mark><C>false</C></Mark>
+    <Mark><C>NeverApplicable</C></Mark>
     <Item>this is marked in the method selection record and the main
           loop starts again at the beginning of the method database.</Item>
-    <Mark><C>fail</C></Mark>
+    <Mark><C>TemporaryFailure</C></Mark>
     <Item>this is counted in the method selection record and the main
           loop starts again at the beginning of the method database.</Item>
     <Mark><C>NotEnoughInformation</C></Mark>
@@ -191,7 +191,7 @@ after each failed method call! However, this does not lead to an infinite
 loop, because the failure is recorded in the method selection record such
 that the method is skipped until the <C>tolerance</C> increases. Once the
 <C>tolerance</C> has been increased methods having returned
-<C>fail</C> will be called again. The idea behind this approach is
+<C>TemporaryFailure</C> will be called again. The idea behind this approach is
 that even failed methods can collect additional information about the
 arguments changing them accordingly. This might give methods that come
 earlier and were not applicable up to now the opportunity to begin

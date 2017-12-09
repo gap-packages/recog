@@ -24,8 +24,8 @@ recog.xml          recog package documentation
 <#Include SYSTEM "intro.xml">
 <#Include SYSTEM "install.xml">
 
-<#Include SYSTEM "methsel.xml">
 <#Include SYSTEM "recognition.xml">
+<#Include SYSTEM "methsel.xml">
 <#Include SYSTEM "afterrecog.xml">
 
 <#Include SYSTEM "methods.xml">
