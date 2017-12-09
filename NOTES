@@ -31,3 +31,7 @@ G,2
 2F,2,q=2^*   (* ist ungerade)
 2G,2,q=3^*   (* ist ungerade)
 
+
+
+Change framework to sort hints into database according to rank???
+Should nrgensH, groupmem, genswithmem be documented?
