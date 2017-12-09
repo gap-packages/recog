@@ -1,18 +1,15 @@
 #############################################################################
 ##
-##  projective.gd        recogbase package
+##  perm.gi            recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
 ##
 ##  Copyright 2006-2008 by the authors.
 ##  This file is free software, see license information at the end.
 ##
-##  Declaration stuff for projective recognition.
+##  Generic code for permutation groups.
 ##
 #############################################################################
-
-DeclareGlobalFunction( "IsOneProjective" );
-DeclareGlobalFunction( "IsEqualProjective" );
 
 ##
 ##  This program is free software: you can redistribute it and/or modify

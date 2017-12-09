@@ -1,15 +1,18 @@
 #############################################################################
 ##
-##  blackbox.gi          recogbase package
+##  projective.gd        recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
 ##
-##  Copyright 2005-2008 by the authors.
+##  Copyright 2006-2008 by the authors.
 ##  This file is free software, see license information at the end.
 ##
-##  Declarations for generic framework for black box groups.
+##  Declaration stuff for projective recognition.
 ##
 #############################################################################
+
+DeclareGlobalFunction( "IsOneProjective" );
+DeclareGlobalFunction( "IsEqualProjective" );
 
 ##
 ##  This program is free software: you can redistribute it and/or modify

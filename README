@@ -17,7 +17,7 @@ This is all which is needed if you installed the package in the standard
 'pkg' subdirectory.
 
 Note that the recog package needs the 'orb', 'genss', 'FactInt',
-'AtlasRep', 'Forms' and 'recogbase' packages to work.
+'AtlasRep' and 'Forms'' packages to work.
 
 If you installed the package in another 'pkg' directory than the standard
 'pkg' directory in your GAP 4 installation, then you have to add the path

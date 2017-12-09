@@ -12,6 +12,21 @@
 ##
 #############################################################################
 
+# Generic:
+ReadPackage("recog","gap/base/methsel.gi");
+ReadPackage("recog","gap/base/recognition.gi");
+
+# The following contain generic functionality for different types of groups:
+
+# Permutations:
+ReadPackage("recog","gap/base/perm.gi");
+# Matrices/Projective:
+ReadPackage("recog","gap/base/matrix.gi");
+ReadPackage("recog","gap/base/projective.gi");
+# Black box:
+ReadPackage("recog","gap/base/blackbox.gd");
+
+
 # Some tools:
 ReadPackage("recog","gap/tools.gi");
 

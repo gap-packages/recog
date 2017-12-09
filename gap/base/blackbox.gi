@@ -1,31 +1,15 @@
 #############################################################################
 ##
-##  read.g                recogbase package
+##  blackbox.gi          recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
 ##
 ##  Copyright 2005-2008 by the authors.
 ##  This file is free software, see license information at the end.
 ##
-##  Reading the implementation part of the recogbase package.
+##  Declarations for generic framework for black box groups.
 ##
 #############################################################################
-
-# Generic:
-ReadPackage("recogbase","gap/methsel.gi");
-ReadPackage("recogbase","gap/recognition.gi");
-
-# The following contain generic functionality for different types of groups:
-
-# Permutations:
-ReadPackage("recogbase","gap/perm.gi");
-# Matrices/Projective:
-ReadPackage("recogbase","gap/matrix.gi");
-ReadPackage("recogbase","gap/projective.gi");
-# Black box:
-ReadPackage("recogbase","gap/blackbox.gd");
-
-# Note: Nearly all methods are now in the "recog" package.
 
 ##
 ##  This program is free software: you can redistribute it and/or modify

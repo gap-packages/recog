@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  hacks.g           recogbase package
+##  hacks.g           recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
 ##

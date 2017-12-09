@@ -1,13 +1,13 @@
 #############################################################################
 ##
-##  perm.gi            recogbase package
+##  matrix.gd        recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
 ##
-##  Copyright 2006-2008 by the authors.
+##  Copyright 2006-2008 by the authors
 ##  This file is free software, see license information at the end.
 ##
-##  Generic code for permutation groups.
+##  Declaration stuff for matrix recognition.
 ##
 #############################################################################
 

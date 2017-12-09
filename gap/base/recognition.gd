@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  recognition.gd        recogbase package
+##  recognition.gd        recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
 ##

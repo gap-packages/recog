@@ -1,13 +1,13 @@
 #############################################################################
 ##
-##  perm.gd        recogbase package
+##  blackbox.gd          recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
 ##
-##  Copyright 2006-2008 by the authors
+##  Copyright 2005-2008 by the authors.
 ##  This file is free software, see license information at the end.
 ##
-##  Declaration stuff for permutation group recognition.
+##  Generic framework for black box groups.
 ##
 #############################################################################
 

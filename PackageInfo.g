@@ -22,7 +22,7 @@ SetPackageInfo( rec(
 
 PackageName := "recog",
 Subtitle := "A collection of group recognition methods",
-Version := "1.2.5dev",
+Version := "1.3dev",
 Date := "08/03/2016", # dd/mm/yyyy format
 
 ##  Information about authors and maintainers.
@@ -248,7 +248,7 @@ PackageDoc := rec(
 ),
 
 Dependencies := rec(
-  GAP := ">=4.6.3",
+  GAP := ">=4.8.8",
   NeededOtherPackages := [
     ["GAPDoc", ">= 1.2"],
     ["Forms", ">= 1.2"],
@@ -256,7 +256,6 @@ Dependencies := rec(
     ["Orb", ">= 3.4"],
     ["FactInt", ">= 1.5.2"],
     ["AtlasRep", ">= 1.4.0"],
-    ["recogbase", ">= 1.2.3.1"],
   ],
   SuggestedOtherPackages := [],
   ExternalConditions := []
@@ -297,7 +296,9 @@ AvailabilityTest := ReturnTrue,
 
 ##  *Optional*: Here you can list some keyword related to the topic
 ##  of the package.
-Keywords := ["matrix group recognition", "group recognition", "methods"],
+Keywords := ["group recognition", "matrix group recognition",
+"permutation group", "black box group", "composition tree",
+"Aschbacher classes", "method selection"],
 
 AutoDoc := rec(
     TitlePage := rec(
@@ -313,4 +314,3 @@ AutoDoc := rec(
 ));
 Unbind(RecogsFunnyNameFormatterFunction);
 Unbind(RecogsFunnyWWWURLFunction);
-

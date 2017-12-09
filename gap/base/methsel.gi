@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  methsel.gi            recogbase package
+##  methsel.gi            recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
 ##

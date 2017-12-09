@@ -22,9 +22,6 @@ By default the <Package>recog</Package> package is not automatically
 loaded by &GAP; when it is installed. You must load the package with
 <C>LoadPackage("recog");</C> before its functions become available.<P/>
 
-Note that the <Package>recogbase</Package> package is needed by this
-package.<P/>
-
 Please, send us an e-mail if you have any questions, remarks,
 suggestions, etc. concerning this package. Also, we would like to hear
 about applications of this package.<P/>

@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  recognition.gi        recogbase package
+##  recognition.gi        recog package
 ##                                                        Max Neunhoeffer
 ##                                                            Ákos Seress
 ##
@@ -133,7 +133,7 @@ InstallGlobalFunction( RecogniseGroup,
   end);
 
 # TODO: TryFindHomMethod is never called by anything
-# in recog or recogbase.
+# in recog.
 # Seems to be for user intervention and/or debugging?
 # If so, document it accordingly. Otherwise remove it!
 InstallGlobalFunction( TryFindHomMethod,
