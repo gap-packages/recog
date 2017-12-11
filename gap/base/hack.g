@@ -45,6 +45,21 @@ InstallMethod( PseudoRandom, "for a group object with generators, use func",
     TryNextMethod();
   end );
 
+# Randomize methods for non-compressed vectors, to support fields with more
+# than 256 elements; needed by RECOG.RuleOutSmallProjOrder
+InstallOtherMethod( Randomize, "for a mutable FFE vector",
+  [ IsFFECollection and IsPlistRep and IsMutable ],
+  v -> Randomize(v, GlobalMersenneTwister));
+
+InstallOtherMethod( Randomize, "for a mutable FFE vector and a random source",
+  [ IsFFECollection and IsPlistRep and IsMutable, IsRandomSource ],
+  function( v, rs )
+    local f,i;
+    f := DefaultField(v);
+    for i in [1..Length(v)] do v[i] := Random(rs,f); od;
+    return v;
+  end );
+
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU General Public License as published by
