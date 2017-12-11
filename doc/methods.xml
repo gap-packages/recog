@@ -22,64 +22,7 @@ The following table gives an overview over the installed methods and their
 rank (higher rank means higher priority, the method is tried earlier, see
 Chapter <Ref Chap="methsel"/>).
 
-<Table Align="|l|l|l|">
-<Caption>Permutation group find homomorphism methods</Caption>
-<HorLine/>
-<Row>
-<Item>300</Item>
-<Item><C>TrivialPermGroup</C></Item>
-<Item><Ref Subsect="TrivialPermGroup"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>100</Item>
-<Item><C>ThrowAwayFixedPoints</C></Item>
-<Item><Ref Subsect="ThrowAwayFixedPoints"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>97</Item>
-<Item><C>Pcgs</C></Item>
-<Item><Ref Subsect="Pcgs"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>95</Item>
-<Item><C>VeryFewPoints</C></Item>
-<Item><Ref Subsect="VeryFewPoints"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>90</Item>
-<Item><C>NonTransitive</C></Item>
-<Item><Ref Subsect="NonTransitive"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>80</Item>
-<Item><C>Giant</C></Item>
-<Item><Ref Subsect="Giant"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>70</Item>
-<Item><C>Imprimitive</C></Item>
-<Item><Ref Subsect="Imprimitive"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>60</Item>
-<Item><C>SnkSetswrSr</C></Item>
-<Item><Ref Subsect="SnkSetswrSr"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>50</Item>
-<Item><C>StabChain</C></Item>
-<Item><Ref Subsect="StabChain"/></Item>
-</Row>
-<HorLine/>
-</Table>
+<#Include SYSTEM "methods_perm_table.xml">
 
 <Subsection Label="TrivialPermGroup">
 <Heading><C>TrivialPermGroup</C></Heading>
@@ -215,46 +158,7 @@ system can switch to projective groups by dividing out the subgroup
 of scalar matrices. The bulk of the recognition methods are then
 installed es methods for projective groups.
 
-<Table Align="|l|l|l|">
-<Caption>Matrix group find homomorphism methods</Caption>
-<HorLine/>
-<Row>
-<Item>3100</Item>
-<Item><C>TrivialMatrixGroup</C></Item>
-<Item><Ref Subsect="TrivialMatrixGroup"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>1175</Item>
-<Item><C>KnownStabilizerChain</C></Item>
-<Item><Ref Subsect="KnownStabilizerChain"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>1100</Item>
-<Item><C>DiagonalMatrices</C></Item>
-<Item><Ref Subsect="DiagonalMatrices"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>1050</Item>
-<Item><C>FewGensAbelian</C></Item>
-<Item><Ref Subsect="FewGensAbelian"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>1000</Item>
-<Item><C>ReducibleIso</C></Item>
-<Item><Ref Subsect="ReducibleIso"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>900</Item>
-<Item><C>GoProjective</C></Item>
-<Item><Ref Subsect="GoProjective"/></Item>
-</Row>
-<HorLine/>
-</Table>
+<#Include SYSTEM "methods_matrix_table.xml">
 
 <Subsection Label="TrivialMatrixGroup">
 <Heading><C>TrivialMatrixGroup</C></Heading>
@@ -401,76 +305,7 @@ that the recognition for matrix group switches to projective recognition
 rather soon in the recognition process such that most recognition methods
 in fact are installed as methods for projective groups.
 
-<Table Align="|l|l|l|">
-<Caption>Projective group find homomorphism methods</Caption>
-<HorLine/>
-<Row>
-<Item>3000</Item>
-<Item><C>TrivialProjectiveGroup</C></Item>
-<Item><Ref Subsect="TrivialProjectiveGroup"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>1300</Item>
-<Item><C>ProjDeterminant</C></Item>
-<Item><Ref Subsect="ProjDeterminant"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>1200</Item>
-<Item><C>ReducibleIso</C></Item>
-<Item><Ref Subsect="ReducibleIsoProj"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>1100</Item>
-<Item><C>NotAbsolutelyIrred</C></Item>
-<Item><Ref Subsect="NotAbsolutelyIrred"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>1000</Item>
-<Item><C>Subfield</C></Item>
-<Item><Ref Subsect="Subfield"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>900</Item>
-<Item><C>Derived</C></Item>
-<Item><Ref Subsect="Derived"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>800</Item>
-<Item><C>LowIndex</C></Item>
-<Item><Ref Subsect="LowIndex"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>700</Item>
-<Item><C>C6</C></Item>
-<Item><Ref Subsect="C6"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>600</Item>
-<Item><C>Tensor</C></Item>
-<Item><Ref Subsect="Tensor"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>500</Item>
-<Item><C>TwoLargeElOrders</C></Item>
-<Item><Ref Subsect="TwoLargeElOrders"/></Item>
-</Row>
-<HorLine/>
-<Row>
-<Item>100</Item>
-<Item><C>StabilizerChain</C></Item>
-<Item><Ref Subsect="StabilizerChain"/></Item>
-</Row>
-<HorLine/>
-</Table>
+<#Include SYSTEM "methods_proj_table.xml">
 
 <Subsection Label="TrivialProjectiveGroup">
 <Heading><C>TrivialProjectiveGroup</C></Heading>

@@ -18,7 +18,12 @@ doc/chooser.html
 /doc/*.tex
 /doc/*.toc
 /doc/manual.pdf
+
+# ignore generated XML files:
 /doc/title.xml
+/doc/methods_matrix_table.xml
+/doc/methods_perm_table.xml
+/doc/methods_proj_table.xml
 
 /gh-pages/
 /tmp/

@@ -7,4 +7,5 @@ if fail = LoadPackage("AutoDoc", ">= 2016.01.21") then
     Error("AutoDoc 2016.01.21 or newer is required");
 fi;
 
+Read("regen_doc.g");
 AutoDoc(rec( scaffold := rec( MainPage := false )));
