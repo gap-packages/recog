@@ -18,19 +18,16 @@ SLPforElementFuncsProjective.TrivialProjectiveGroup :=
    end;
 
 FindHomMethodsProjective.TrivialProjectiveGroup := function(ri, G)
-  local g,gens;
+  local gens;
   gens := GeneratorsOfGroup(G);
-  for g in gens do
-      if not(IsOneProjective(g)) then
-          return false;
-      fi;
-  od;
-  SetSize(ri,1);
-  Setslpforelement(ri,SLPforElementFuncsProjective.TrivialProjectiveGroup);
-  Setslptonice( ri,
-                StraightLineProgramNC([[[1,0]]],Length(GeneratorsOfGroup(G))));
-  SetFilterObj(ri,IsLeaf);
-  return true;
+  if not ForAll(gens, IsOneProjective) then
+      return NeverApplicable;
+  fi;
+  SetSize(ri, 1);
+  Setslpforelement(ri, SLPforElementFuncsProjective.TrivialProjectiveGroup);
+  Setslptonice(ri, StraightLineProgramNC([[[1,0]]],Length(gens)));
+  SetFilterObj(ri, IsLeaf);
+  return Success;
 end;
 
 FindHomMethodsProjective.BlocksModScalars := function(ri,G)
@@ -51,7 +48,7 @@ FindHomMethodsProjective.BlocksModScalars := function(ri,G)
                                               Length(GeneratorsOfGroup(G))));
       SetFilterObj(ri,IsLeaf);
       ri!.comment := "_BlocksDim=1";
-      return true;
+      return Success;
   fi;
 
   if nrblocks = 1 then   # in this case the block is everything!
@@ -65,7 +62,7 @@ FindHomMethodsProjective.BlocksModScalars := function(ri,G)
       Setmethodsforfactor(ri,FindHomDbProjective);
       # no kernel:
       findgensNmeth(ri).method := FindKernelDoNothing;
-      return true;
+      return Success;
   fi;
   # Otherwise more than one block, cut in half:
   middle := QuoInt(nrblocks,2)+1;   # the first one taken
@@ -96,7 +93,7 @@ FindHomMethodsProjective.BlocksModScalars := function(ri,G)
       rec( method := FindHomMethodsProjective.BlocksModScalars, rank := 2000,
            stamp := "BlocksModScalars" ),1);
   Setimmediateverification(ri,true);
-  return true;
+  return Success;
 end;
 
 SLPforElementFuncsProjective.StabilizerChain := function(ri,x)
@@ -124,13 +121,12 @@ FindHomMethodsProjective.StabilizerChain := function(ri,G)
       Unbind(S!.opt.RandomElmFunc);
       Setslpforelement(ri,SLPforElementFuncsProjective.StabilizerChain);
       SetFilterObj(ri,IsLeaf);
-      return true;
   else
       ForgetMemory(S);
       SetHomom(ri,OrbActionHomomorphism(G,S!.orb));
       Setmethodsforfactor(ri,FindHomDbPerm);
-      return true;
   fi;
+  return Success;
 end;
 
 RECOG.HomProjDet := function(data,m)
@@ -143,10 +139,10 @@ FindHomMethodsProjective.ProjDeterminant := function(ri,G)
   d := ri!.dimension;
   q := Size(f);
   gcd := GcdInt(q-1,d);
-  if gcd = 1 then return false; fi;
+  if gcd = 1 then return NeverApplicable; fi;
   z := Z(q);
   detsadd := List(GeneratorsOfGroup(G),x->LogFFE(DeterminantMat(x),z) mod gcd);
-  if IsZero(detsadd) then return false; fi;
+  if IsZero(detsadd) then return NeverApplicable; fi;
   Info(InfoRecog,2,"ProjDeterminant: found non-trivial homomorphism.");
   c := PermList(Concatenation([2..gcd],[1]));
   newgens := List(detsadd,x->c^x);
@@ -158,7 +154,7 @@ FindHomMethodsProjective.ProjDeterminant := function(ri,G)
   findgensNmeth(ri).args[1] := 8;
   findgensNmeth(ri).args[2] := 5;
   Setimmediateverification(ri,true);
-  return true;
+  return Success;
 end;
 
 # scale the given block-scalar matrix x so that its last block
@@ -189,7 +185,7 @@ FindHomMethodsProjective.BlockScalarProj := function(ri,G)
       rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000,
            stamp := "BlockScalar" ), 1);
   forfactor(ri).blocks := ri!.blocks{[1..Length(ri!.blocks)-1]};
-  return true;
+  return Success;
 end;
 
 RECOG.MakeAlternatingMatrixReps := function(deg,f,tens)
