@@ -161,10 +161,12 @@ FindHomMethodsProjective.ProjDeterminant := function(ri,G)
   return true;
 end;
 
+# scale the given block-scalar matrix x so that its last block
+# is the identity matrix
 RECOG.HomNormLastBlock := function(data,x)
   local pos;
   pos := data!.blocks[Length(data!.blocks)][1];
-  if not(IsOne(x[pos][pos])) then
+  if not IsOne(x[pos][pos]) then
       x := (x[pos][pos]^-1)*x;
   fi;
   return x;
