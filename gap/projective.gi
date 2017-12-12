@@ -157,22 +157,49 @@ FindHomMethodsProjective.ProjDeterminant := function(ri,G)
   return Success;
 end;
 
+RECOG.IsBlockScalarMatrix := function(blocks, x)
+  local b, s;
+  if not IsDiagonalMat(x) then
+      return false;
+  fi;
+  for b in blocks do
+      s := b[1];
+      s := x[s][s];
+      if not ForAll(b, pos -> x[pos][pos] = s) then
+          return false;
+      fi;
+  od;
+  return true;
+end;
+
 # scale the given block-scalar matrix x so that its last block
 # is the identity matrix
-RECOG.HomNormLastBlock := function(data,x)
-  local pos;
-  pos := data!.blocks[Length(data!.blocks)][1];
-  if not IsOne(x[pos][pos]) then
-      x := (x[pos][pos]^-1)*x;
+RECOG.HomNormLastBlock := function(data, x)
+  local blocks, pos, s;
+  blocks := data!.blocks;
+  if not RECOG.IsBlockScalarMatrix(blocks, x) then
+      return fail;
+  fi;
+  pos := blocks[Length(blocks)][1];
+  s := x[pos][pos];
+  if not IsOne(s) then
+      x := s^-1 * x;
   fi;
   return x;
 end;
 
 FindHomMethodsProjective.BlockScalarProj := function(ri,G)
   # We just norm the last block and go to matrix methods.
-  local H,data,hom,newgens;
+  local H,data,hom,newgens,g;
   data := rec( blocks := ri!.blocks );
-  newgens := List(GeneratorsOfGroup(G),x->RECOG.HomNormLastBlock(data,x));
+  newgens := [];
+  for g in GeneratorsOfGroup(G) do
+      g := RECOG.HomNormLastBlock(data, g);
+      if g = fail then
+          return NeverApplicable;
+      fi;
+      Add(newgens, g);
+  od;
   H := GroupWithGenerators(newgens);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomNormLastBlock,data);
   SetHomom(ri,hom);
