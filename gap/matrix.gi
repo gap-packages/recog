@@ -18,20 +18,16 @@ SLPforElementFuncsMatrix.TrivialMatrixGroup :=
    end;
 
 FindHomMethodsMatrix.TrivialMatrixGroup := function(ri, G)
-  local g,gens;
+  local gens;
   gens := GeneratorsOfGroup(G);
-  for g in gens do
-      if not(IsOne(g)) then
-          return false;
-      fi;
-  od;
-  SetSize(G,1);
-  SetSize(ri,1);
-  Setslpforelement(ri,SLPforElementFuncsMatrix.TrivialMatrixGroup);
-  Setslptonice( ri,
-                StraightLineProgramNC([[[1,0]]],Length(GeneratorsOfGroup(G))));
-  SetFilterObj(ri,IsLeaf);
-  return true;
+  if not IsTrivial(G) then
+      return NeverApplicable;
+  fi;
+  SetSize(ri, 1);
+  Setslpforelement(ri, SLPforElementFuncsMatrix.TrivialMatrixGroup);
+  Setslptonice(ri, StraightLineProgramNC([[[1,0]]],Length(gens)));
+  SetFilterObj(ri, IsLeaf);
+  return Success;
 end;
 
 RECOG.HomToScalars := function(data,el)
@@ -48,8 +44,8 @@ FindHomMethodsMatrix.DiagonalMatrices := function(ri, G)
   fi;
 
   gens := GeneratorsOfGroup(G);
-  if not(ForAll(gens,IsDiagonalMat)) then
-      return false;
+  if not ForAll(gens, IsDiagonalMat) then
+      return NeverApplicable;
   fi;
 
   f := ri!.field;
@@ -87,7 +83,7 @@ FindHomMethodsMatrix.DiagonalMatrices := function(ri, G)
   Add(forfactor(ri).hints,rec( method := FindHomMethodsMatrix.Scalar,
                                rank := 4000, stamp := "Scalar" ),1);
 
-  return true;
+  return Success;
 end;
 
 #RECOG.DetWrapper := function(m)
@@ -174,7 +170,7 @@ FindHomMethodsMatrix.Scalar := function(ri, G)
   Setslpforelement(ri,SLPforElementFuncsMatrix.DiscreteLog);
   ri!.generator := z^gcd;
   SetFilterObj(ri,IsLeaf);
-  return true;
+  return Success;
 end;
 
 
@@ -247,7 +243,7 @@ FindHomMethodsMatrix.BlockScalar := function(ri,G)
                    stamp := "BlockScalar" ),1);
           Setimmediateverification(ri,true);
       fi;
-      return true;
+      return Success;
   fi;
 
   # We hack away at least two blocks and leave at least one:
@@ -276,7 +272,7 @@ FindHomMethodsMatrix.BlockScalar := function(ri,G)
       rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000,
            stamp := "BlockScalar" ),1);
   Setimmediateverification(ri,true);
-  return true;
+  return Success;
 end;
 
 # A helper function for base changes:
@@ -399,7 +395,7 @@ FindHomMethodsMatrix.ReducibleIso := function(ri,G)
 
   if IsBound(ri!.isabsolutelyirred) and ri!.isabsolutelyirred then
       # this information is coming from above
-      return false;
+      return NeverApplicable;
   fi;
 
   # FIXME:
@@ -410,7 +406,7 @@ FindHomMethodsMatrix.ReducibleIso := function(ri,G)
   # Save the MeatAxe module for later use:
   ri!.meataxemodule := m;
   # Report enduring failure if irreducible:
-  if isirred then return false; fi;
+  if isirred then return NeverApplicable; fi;
 
   # Now compute a composition series:
   compseries := MTX.BasesCompositionSeries(m);
@@ -435,7 +431,7 @@ FindHomMethodsMatrix.ReducibleIso := function(ri,G)
       rec(method := FindHomMethodsMatrix.BlockLowerTriangular,
           rank := 4000,stamp := "BlockLowerTriangular"));
 
-  return true;
+  return Success;
 end;
 
 # Given a matrix `mat` and a list of index sets `blocks`,
@@ -503,7 +499,7 @@ FindHomMethodsMatrix.BlockLowerTriangular := function(ri,G)
   Add(forkernel(ri).hints,rec(method := FindHomMethodsMatrix.LowerLeftPGroup,
                               rank := 2000,stamp := "LowerLeftPGroup"));
   forkernel(ri).blocks := ri!.blocks;
-  return true;
+  return Success;
 end;
 
 FindHomMethodsMatrix.BlockDiagonal := function(ri,G)
@@ -538,7 +534,7 @@ FindHomMethodsMatrix.BlockDiagonal := function(ri,G)
                                   rank := 2000,stamp := "BlockScalar"));
   fi;
   forkernel(ri).blocks := ri!.blocks;
-  return true;
+  return Success;
 end;
 
 #RECOG.HomInducedOnFactor := function(data,el)
@@ -646,7 +642,7 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
         # In the projective case we can now have matrices with an arbitrary
         # nonzero scalar on the diagonal, we get rid of it by norming.
         # Then we can go on as in the matrix group case...
-        if ri!.projective and not(IsOne(x[1][1])) then
+        if ri!.projective and not IsOne(x[1][1]) then
             x := (x[1][1]^-1) * x;
         fi;
 
@@ -765,7 +761,7 @@ FindHomMethodsMatrix.LowerLeftPGroup := function(ri,G)
   SetFilterObj(ri,IsLeaf);
   Setslpforelement(ri,SLPforElementFuncsMatrix.LowerLeftPGroup);
   SetSize(ri,p^Length(ri!.gensNvectors));
-  return true;
+  return Success;
 end;
 
 FindHomMethodsMatrix.GoProjective := function(ri,G)
@@ -780,7 +776,7 @@ FindHomMethodsMatrix.GoProjective := function(ri,G)
   q := Size(ri!.field);
   findgensNmeth(ri).method := FindKernelRandom;
   findgensNmeth(ri).args := [Length(Factors(q-1))+5];
-  return true;
+  return Success;
 end;
 
 FindHomMethodsMatrix.KnownStabilizerChain := function(ri,G)
@@ -792,7 +788,7 @@ FindHomMethodsMatrix.KnownStabilizerChain := function(ri,G)
       SetHomom(ri,hom);
       Setmethodsforfactor(ri,FindHomDbPerm);
       forkernel(ri).StabilizerChainFromAbove := S;
-      return true;
+      return Success;
   elif IsBound(ri!.StabilizerChainFromAbove) then
       Info(InfoRecog,2,"Know stabilizer chain for super group, using base.");
       S := StabilizerChain(G,rec( Base := ri!.StabilizerChainFromAbove ));
@@ -801,9 +797,9 @@ FindHomMethodsMatrix.KnownStabilizerChain := function(ri,G)
       SetHomom(ri,hom);
       Setmethodsforfactor(ri,FindHomDbPerm);
       forkernel(ri).StabilizerChainFromAbove := S;
-      return true;
+      return Success;
   fi;
-  return false;
+  return NeverApplicable;
 end;
 
 #FindHomMethodsMatrix.SmallVectorSpace := function(ri,G)
