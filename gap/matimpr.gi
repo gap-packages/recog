@@ -13,6 +13,7 @@
 ##  This should better be (and is now) called "LowIndex".
 ##
 #############################################################################
+## TODO: WHOLE FILE NOT USED? Was probably replaced by d247.gi
 
 #############################################################################
 ##
