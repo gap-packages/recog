@@ -332,11 +332,17 @@ RECOG.BaseChangeForSmallestPossibleField := function(grp,mtx,k)
 end;
 
 RECOG.ForceToOtherField := function(m,fieldsize)
-  local n,v,w;
+  local n,v,w,q;
   n := [];
   for v in m do
       w := List(v,x->x);  # this unpacks
-      if ConvertToVectorRep(w,fieldsize) = fail then
+      # Note: we used to call ConvertToVectorRep(w,fieldsize), which
+      # also would save us work down the line; however, unfortunately
+      # this may run into an Error instead of returning fail, so we have
+      # to resort to the following, which is somewhat less efficient if
+      # some rows are already defined over subfields.
+      q := ConvertToVectorRep(w);
+      if q = fail or (fieldsize mod q) <> 0 then
           return fail;
       fi;
       Add(n,w);

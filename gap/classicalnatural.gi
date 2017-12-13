@@ -3134,7 +3134,7 @@ SLPforElementFuncsProjective.PSLd := function(ri,x)
       # projective class.
       root := RECOG.ComputeRootInFiniteField(1/det,Length(y),ri!.field);
       if root = fail then
-          Error("Should not have happened, 15634, tell Max!");
+          return fail;
       fi;
       y := y * root;
   fi;

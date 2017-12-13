@@ -130,7 +130,10 @@ FindHomMethodsProjective.StabilizerChain := function(ri,G)
 end;
 
 RECOG.HomProjDet := function(data,m)
-  return data.c ^ (LogFFE(DeterminantMat(m),data.z) mod data.gcd);
+  local x;
+  x := LogFFE(DeterminantMat(m),data.z);
+  if x = fail then return fail; fi;
+  return data.c ^ (x mod data.gcd);
 end;
 
 FindHomMethodsProjective.ProjDeterminant := function(ri,G)

@@ -439,14 +439,21 @@ end;
 
 RECOG.FindImageJellyfish := function( g, T, seen )
 
-    local nr, h, i, gams;
+    local nr, h, i, gams, tmp;
 
     nr := Length( seen );
     h := List( [1..nr], i -> 0 );
 
     for i in [1..nr] do
         gams := OnSets( seen[i], g );
-        h[i] := Intersection( List( gams, t -> T[t] ) )[1];
+        if ForAny( gams, t -> not IsBound(T[t])) then
+            return fail;
+        fi;
+        tmp := Intersection( List( gams, t -> T[t] ) );
+        if Length(tmp) = 0 then
+            return fail;
+        fi;
+        h[i] := tmp[1];
     od;
 
     if Size(Set(h)) <> nr then
