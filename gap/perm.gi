@@ -379,17 +379,13 @@ SLPforElementFuncsPerm.StabChain :=
 StoredPointsPerm := function(p)
   # Determines, as a permutation of how many points p is stored.
   local s;
-  s := SHALLOW_SIZE(p);
-  # HACK: detect whether the permutation is store with 2 or 4 bytes
-  # per point. For up to 2^16 points, GAP uses two bytes, for
-  # a total of 2*2^16 = 131072 bytes. Anything larger must be using
-  # four bytes per point.
-  # TODO: once GAP 4.9 is out, use this check instead:
-  #if TNUM_OBJ(b) = T_PERM4 then
-  if s > 131072 then
-      return s/4;
+  s := SIZE_OBJ(p) - GAPInfo.BytesPerVariable;
+  if IsPerm4Rep(p) then
+      return s/4;   # permutation stored with 4 bytes per point
+  elif IsPerm2Rep(p) then
+      return s/2;   # permutation stored with 2 bytes per point
   else
-      return s/2;
+      Error("StoredPointsPerm: input is not an internal permutation");
   fi;
 end;
 
