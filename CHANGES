@@ -1,7 +1,12 @@
 This file describes changes in the recog package.
 
 1.3 (YYYY-MM-DD)
-  - Merged recogbase package into recog
+  - Require GAP >= 4.9
+  - Merge recogbase package into recog
+  - Remove a lot of dead code
+  - Add comments throughout the codebase (e.g. notes on the origin
+    of some algorithms; FIXME and TODO remarks; ...)
+  - Add input validation to some more homomorphisms
 
 1.2.5 (2016-03-08)
   - Maintenance release
