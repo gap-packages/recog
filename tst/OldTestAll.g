@@ -46,7 +46,7 @@ ReadPackage("recog","tst/TestClassicalNatural.g");
 ReadPackage("recog","tst/Sporadics.g");
 
 # The following files from tst/ are NOT loaded by this test:
-# - TestAll.g  -> of course
+# - OldTestAll.g  -> of course
 # - testsporadicrecog.g -> seems to work initially, but is very slow,
 #     probably because we resort to orbit methods instead of constructive recognition
 # - products.g -> read by other files
