@@ -287,15 +287,8 @@ BannerString := Concatenation(
 ),
 
 AvailabilityTest := ReturnTrue,
+TestFile := "tst/testall.g",
 
-##  *Optional*, but recommended: path relative to package root to a file which
-##  contains as many tests of the package functionality as sensible.
-#TestFile := "tst/TestAll.g",
-## Currently, due to the Monte-Carlo nature of our algorithms and other
-## technical details, this is not a proper GAP test file.
-
-##  *Optional*: Here you can list some keyword related to the topic
-##  of the package.
 Keywords := ["group recognition", "matrix group recognition",
 "permutation group", "black box group", "composition tree",
 "Aschbacher classes", "method selection"],
