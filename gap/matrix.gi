@@ -639,13 +639,6 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
                  ri!.genswithmem{[ri!.nrgensH+1..Length(ri!.genswithmem)]});
         x := x^-1 * y;   # this is in the kernel
 
-        # In the projective case we can now have matrices with an arbitrary
-        # nonzero scalar on the diagonal, we get rid of it by norming.
-        # Then we can go on as in the matrix group case...
-        if ri!.projective and not IsOne(x[1,1]) then
-            x := (x[1,1]^-1) * x;
-        fi;
-
         # Now clean out this vector and remember what we did:
         curlay := 1;
         v := RECOG.ExtractLowStuff(x,curlay,ri!.blocks,lens,b);
