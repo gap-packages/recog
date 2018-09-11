@@ -59,8 +59,8 @@ RECOG.FindTensorKernel := function(G,onlyone)
       #Print(Length(notused)," \c");
       N := GroupWithGenerators(FastNormalClosure(GeneratorsOfGroup(G),[c],10));
       if onlyone and
-         (ForAny(GeneratorsOfGroup(N),m->IsZero(m[1][1]) or
-                                         not(IsOne(m*(m[1][1])^-1)))) then
+         (ForAny(GeneratorsOfGroup(N),m->IsZero(m[1,1]) or
+                                         not(IsOne(m*(m[1,1])^-1)))) then
           # we found a non-scalar normal subgroup:
           #Print("\n");
           return N;
@@ -182,14 +182,14 @@ RECOG.IsKroneckerProduct := function(m,blocksize)
   entrypos := ((pos-1) mod blocksize)+1;
   a := ExtractSubMatrix(m,[1..blocksize],
                           [(blockpos-1)*blocksize+1..blockpos*blocksize]);
-  a := a/a[1][entrypos];
+  a := a/a[1,entrypos];
   ac := [];
   for i in [1..d/blocksize] do
       ar := [];
       for j in [1..d/blocksize] do
           b := ExtractSubMatrix(m,[(i-1)*blocksize+1..i*blocksize],
                                   [(j-1)*blocksize+1..j*blocksize]);
-          mul := b[1][entrypos];
+          mul := b[1,entrypos];
           if a * mul <> b then
               return [false];
           fi;
@@ -254,9 +254,9 @@ RECOG.IsScalarMat := function(m)
   if not(IsDiagonalMat(m)) then
       return false;
   fi;
-  x := m[1][1];
+  x := m[1,1];
   for i in [2..Length(m)] do
-      if m[i][i] <> x then
+      if m[i,i] <> x then
           return false;
       fi;
   od;

@@ -53,9 +53,9 @@ FindHomMethodsMatrix.DiagonalMatrices := function(ri, G)
   i := 1;
   while isscalars and i <= Length(gens) do
       j := 2;
-      upperleft := gens[i][1][1];
+      upperleft := gens[i][1,1];
       while isscalars and j <= d do
-          if upperleft <> gens[i][j][j] then
+          if upperleft <> gens[i][j,j] then
               isscalars := false;
           fi;
           j := j + 1;
@@ -125,7 +125,7 @@ end;
 
 SLPforElementFuncsMatrix.DiscreteLog := function(ri,x)
   local log;
-  log := LogFFE(x[1][1],ri!.generator);
+  log := LogFFE(x[1,1],ri!.generator);
   if log = fail then return fail; fi;
   return StraightLineProgramNC([[1,log]],1);
 end;
@@ -139,7 +139,7 @@ FindHomMethodsMatrix.Scalar := function(ri, G)
   # FIXME: FieldOfMatrixGroup
   f := ri!.field;
   o := One(f);
-  gens := List(GeneratorsOfGroup(G),x->x[1][1]);
+  gens := List(GeneratorsOfGroup(G),x->x[1,1]);
   subset := Filtered([1..Length(gens)],i->not(IsOne(gens[i])));
   if subset = [] then
       return FindHomMethodsMatrix.TrivialMatrixGroup(ri,G);
@@ -181,11 +181,11 @@ end;
 # positions indicated by poss.
 RECOG.IsDiagonalBlockOfMatrix := function(mat,poss)
   local z, i, j;
-  z := Zero(mat[1][1]);
+  z := Zero(mat[1,1]);
   for i in poss do
     for j in [1..Length(mat)] do
       if i in poss then continue; fi;
-      if mat[i][j] <> z or mat[j][i] <> z then
+      if mat[i,j] <> z or mat[j,i] <> z then
         return false;
       fi;
     od;
@@ -440,12 +440,12 @@ end;
 RECOG.IsBlockLowerTriangularWithBlocks := function(mat, blocks)
   local z, b, col, row;
   Assert(0, Concatenation(blocks) = [1..Length(mat)]);
-  z := Zero(mat[1][1]);
+  z := Zero(mat[1,1]);
   for b in blocks do
     # Verify that there are only zeros above each block
     for row in [1..b[1]-1] do
       for col in b do
-        if mat[row][col] <> z then
+        if mat[row,col] <> z then
           return false;
         fi;
       od;
@@ -642,8 +642,8 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
         # In the projective case we can now have matrices with an arbitrary
         # nonzero scalar on the diagonal, we get rid of it by norming.
         # Then we can go on as in the matrix group case...
-        if ri!.projective and not IsOne(x[1][1]) then
-            x := (x[1][1]^-1) * x;
+        if ri!.projective and not IsOne(x[1,1]) then
+            x := (x[1,1]^-1) * x;
         fi;
 
         # Now clean out this vector and remember what we did:
@@ -719,8 +719,8 @@ SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
   # First project and calculate the vector:
   local done,h,i,l,layer,pow;
   # Take care of the projective case:
-  if ri!.projective and not(IsOne(g[1][1])) then
-      g := (g[1][1]^-1) * g;
+  if ri!.projective and not(IsOne(g[1,1])) then
+      g := (g[1,1]^-1) * g;
   fi;
   l := [];
   i := 1;

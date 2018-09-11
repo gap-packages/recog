@@ -22,7 +22,7 @@ InstallOtherMethod( ExtractSubMatrix, "hack: for lists of compressed vectors",
     for i in poss1 do
         Add(n,ShallowCopy(m[i]{poss2}));
     od;
-    if IsFFE(m[1][1]) then
+    if IsFFE(m[1,1]) then
         ConvertToMatrixRep(n);
     fi;
     return n;

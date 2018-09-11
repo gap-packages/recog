@@ -678,10 +678,10 @@ RECOG.MakeSL_StdGens := function(p,ext,n,d)
   t := [];
   for i in [0..ext-1] do
       x := IdentityMat(d,f);
-      x[1][2] := Z(p,ext)^i;
+      x[1,2] := Z(p,ext)^i;
       Add(s,x);
       x := IdentityMat(d,f);
-      x[2][1] := Z(p,ext)^i;
+      x[2,1] := Z(p,ext)^i;
       Add(t,x);
   od;
   res := rec( s := s, t := t, a := a, b := b, f := f, q := q, p := p,
@@ -700,20 +700,20 @@ RECOG.ExpressInStd_SL2 := function(m,std)
       mi := InverseMutable(m);
   fi;
   std.left := std.One;
-  if not(IsOne(mi[1][1])) then
-      if IsZero(mi[2][1]) then
+  if not(IsOne(mi[1,1])) then
+      if IsZero(mi[2,1]) then
           RECOG.DoRowOp_SL(mi,2,1,std.one,std);
-          # Now mi[2][1] is non-zero
+          # Now mi[2,1] is non-zero
       fi;
-      RECOG.DoRowOp_SL(mi,1,2,(std.one-mi[1][1])/mi[2][1],std);
+      RECOG.DoRowOp_SL(mi,1,2,(std.one-mi[1,1])/mi[2,1],std);
   fi;
-  # Now mi[1][1] is equal to one
-  if not(IsZero(mi[2][1])) then
-      RECOG.DoRowOp_SL(mi,2,1,-mi[2][1],std);
+  # Now mi[1,1] is equal to one
+  if not(IsZero(mi[2,1])) then
+      RECOG.DoRowOp_SL(mi,2,1,-mi[2,1],std);
   fi;
-  # Now mi[2][1] is equal to zero and thus mi[2][2] equal to one
-  if not(IsZero(mi[1][2])) then
-      RECOG.DoRowOp_SL(mi,1,2,-mi[1][2],std);
+  # Now mi[2,1] is equal to zero and thus mi[2,2] equal to one
+  if not(IsZero(mi[1,2])) then
+      RECOG.DoRowOp_SL(mi,1,2,-mi[1,2],std);
   fi;
   # Now mi is the identity matrix, the element collected in std
   # is the one to multiply on the left hand side to transform mi to the
@@ -734,21 +734,21 @@ RECOG.ExpressInStd_SL := function(m,std)
   std.left := std.One;
   d := Length(m);
   for i in [1..d] do
-      if not(IsOne(mi[i][i])) then
-          pos := First([i+1..d],k->not IsZero(mi[k][i]));
+      if not(IsOne(mi[i,i])) then
+          pos := First([i+1..d],k->not IsZero(mi[k,i]));
           if pos = fail then
               pos := i+1;
               RECOG.DoRowOp_SL(mi,pos,i,std.one,std);
           fi;
-          RECOG.DoRowOp_SL(mi,i,pos,(std.one-mi[i][i])/mi[pos][i],std);
+          RECOG.DoRowOp_SL(mi,i,pos,(std.one-mi[i,i])/mi[pos,i],std);
       fi;
-      # Now mi[i][i] is equal to one
+      # Now mi[i,i] is equal to one
       for j in Concatenation([1..i-1],[i+1..d]) do
-          if not(IsZero(mi[j][i])) then
-              RECOG.DoRowOp_SL(mi,j,i,-mi[j][i],std);
+          if not(IsZero(mi[j,i])) then
+              RECOG.DoRowOp_SL(mi,j,i,-mi[j,i],std);
           fi;
       od;
-      # Now mi[i][i] is the only non-zero entry in the column
+      # Now mi[i,i] is the only non-zero entry in the column
   od;
   # Now mi is the identity matrix, the element collected in std
   # is the one to multiply on the left hand side to transform mi to the
@@ -914,7 +914,7 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
               Add(yy,(bas[i]*y-bas[i])*basi);
               yy[i] := yy[i]{[1..n+1]};
           od;
-          if q > 2 and IsOne(yy[n+1][n+1]) then
+          if q > 2 and IsOne(yy[n+1,n+1]) then
               if InfoLevel(InfoRecog) >= 3 then Print("#\c"); fi;
               continue;
           fi;
@@ -945,27 +945,27 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
           std.left := std.One;
           std.right := std.One;
           for i in [1..n-1] do
-              lambda := -yy[i][n+1]/yy[n][n+1];
+              lambda := -yy[i,n+1]/yy[n,n+1];
               RECOG.DoRowOp_SL(yy,i,n,lambda,std);
               RECOG.DoColOp_SL(yy,i,n,-lambda,std);
           od;
           yf := std.left * yf * std.right;
           z := yy+One(yy);
           zf := yf;
-          if not(IsZero(z[n][n])) or not(IsOne(z[n][n+1])) or
-             not(IsZero(z[n+1][n+1])) or not(IsOne(z[n+1][n])) then
+          if not(IsZero(z[n,n])) or not(IsOne(z[n,n+1])) or
+             not(IsZero(z[n+1,n+1])) or not(IsOne(z[n+1,n])) then
               Error("How on earth could this happen???");
           fi;
       else  # q > 2
           while true do   # will be left by break when we had success!
-              # Note that by construction yy[n][n+1] is not zero!
+              # Note that by construction yy[n,n+1] is not zero!
               yy2 := MutableCopyMat(yy);
               std.left := std.One;
               std.right := std.One;
               # We want to be careful not to kill row n:
               repeat
                   lambda := PrimitiveRoot(f)^Random(0,q-1);
-              until lambda <> -yy2[n][n+1]/yy2[n-1][n+1];
+              until lambda <> -yy2[n,n+1]/yy2[n-1,n+1];
               RECOG.DoRowOp_SL(yy2,n,n-1,lambda,std);
               RECOG.DoColOp_SL(yy2,n,n-1,-lambda,std);
               mu := lambda;
@@ -977,7 +977,7 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
               # We want to be careful not to kill row n:
               repeat
                   lambda := PrimitiveRoot(f)^Random(0,q-1);
-              until (lambda <> -yy3[n][n+1]/yy3[n-1][n+1]) and
+              until (lambda <> -yy3[n,n+1]/yy3[n-1,n+1]) and
                     (lambda <> mu or q = 3);
                     # in GF(3) there are not enough values!
               RECOG.DoRowOp_SL(yy3,n,n-1,lambda,std);
@@ -991,7 +991,7 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
               std.left := std.One;
               std.right := std.One;
               for i in [1..n-1] do
-                  lambda := -yy[i][n+1]/yy[n][n+1];
+                  lambda := -yy[i,n+1]/yy[n,n+1];
                   RECOG.DoRowOp_SL(yy,i,n,lambda,std);
                   RECOG.DoColOp_SL(yy,i,n,-lambda,std);
               od;
@@ -1000,7 +1000,7 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
               std.left := std.One;
               std.right := std.One;
               for i in [1..n-1] do
-                  lambda := -yy2[i][n+1]/yy2[n][n+1];
+                  lambda := -yy2[i,n+1]/yy2[n,n+1];
                   RECOG.DoRowOp_SL(yy2,i,n,lambda,std);
                   RECOG.DoColOp_SL(yy2,i,n,-lambda,std);
               od;
@@ -1009,7 +1009,7 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
               std.left := std.One;
               std.right := std.One;
               for i in [1..n-1] do
-                  lambda := -yy3[i][n+1]/yy3[n][n+1];
+                  lambda := -yy3[i,n+1]/yy3[n,n+1];
                   RECOG.DoRowOp_SL(yy3,i,n,lambda,std);
                   RECOG.DoColOp_SL(yy3,i,n,-lambda,std);
               od;
@@ -1034,7 +1034,7 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
           fi;
           stdsl2 := RECOG.InitSLfake(f,2);
           goodguy := Reversed(IdentityMat(2,f));
-          goodguy[1][2] := - goodguy[1][2];
+          goodguy[1,2] := - goodguy[1,2];
           slp := RECOG.ExpressInStd_SL2(resl2.bas*goodguy*resl2.basi,stdsl2);
           el := ResultOfStraightLineProgram(slp,resl2.all);
           slp := SLPOfElm(el);
@@ -1059,14 +1059,14 @@ RECOG.FindStdGens_SL_EvenChar := function(sld,f)
       std.right := std.One;
       # Now we clean out the last row of z:
       for i in [1..n-1] do
-          if not(IsZero(z[n+1][i])) then
-              RECOG.DoColOp_SL(z,n,i,-z[n+1][i],std);
+          if not(IsZero(z[n+1,i])) then
+              RECOG.DoColOp_SL(z,n,i,-z[n+1,i],std);
           fi;
       od;
       # Now we clean out the second last row of z:
       for i in [1..n-1] do
-          if not(IsZero(z[n][i])) then
-              RECOG.DoRowOp_SL(z,n,i,-z[n][i],std);
+          if not(IsZero(z[n,i])) then
+              RECOG.DoRowOp_SL(z,n,i,-z[n,i],std);
           fi;
       od;
       zf := std.left * zf * std.right;
@@ -1252,7 +1252,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   can := CanonicalBasis(f);
   tt := [t];
   ttm := [tm];
-  mat := [Coefficients(can,tb[2][1])];
+  mat := [Coefficients(can,tb[2,1])];
   mb := MutableBasis(GF(2),mat);
   o := [gens[1]];
   os := [gens[1]];
@@ -1280,7 +1280,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
           xm := xm * c^(((q-1)*(q+1)-1)/2);
           x := StripMemory(xm);
           xb := bas*x*bas^-1;
-          co := Coefficients(can,xb[2][1]);
+          co := Coefficients(can,xb[2,1]);
       until not(IsContainedInSpan(mb,co));
       CloseMutableBasis(mb,co);
       Add(tt,x);
@@ -1315,10 +1315,10 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
               xm := o[j];
               j := j + 1;
               x := MutableCopyMat(bas*StripMemory(xm)*bas^-1);
-          until not(IsZero(x[1][2]));
+          until not(IsZero(x[1,2]));
 
-          if not(IsOne(x[2][2])) then
-              el := (One(f)-x[2][2])/x[1][2];
+          if not(IsOne(x[2,2])) then
+              el := (One(f)-x[2,2])/x[1,2];
               co := Coefficients(can,el) * mati;
               for i in [1..Length(co)] do
                   if not(IsZero(co[i])) then
@@ -1331,13 +1331,13 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
                 Error("!!!");
               fi;
           fi;
-          # now x[2][2] is equal to One(f)
+          # now x[2,2] is equal to One(f)
           # we postpone the actual computation of the final x until we
           # know it is needed:
-          co := Coefficients(can,x[1][2]);
+          co := Coefficients(can,x[1,2]);
           if IsContainedInSpan(mb,co) then continue; fi;
           # OK, we need it, so let's make it:
-          el := x[2][1];
+          el := x[2,1];
           co2 := Coefficients(can,el) * mati;
           for i in [1..Length(co2)] do
               if not(IsZero(co2[i])) then
@@ -1346,7 +1346,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
           od;
 # TODO: add sanity check here, too???
           x := StripMemory(xm);
-          # now x[2][1] is equal to Zero(f) and thus x[1][1] is One(f) as well
+          # now x[2,1] is equal to Zero(f) and thus x[1,1] is One(f) as well
           break;
       od;
       CloseMutableBasis(mb,co);
@@ -2012,7 +2012,7 @@ RECOG.SLn_UpStep := function(w)
   else
       # In this case the n-1-cycle is the identity, so we take a transvection:
       s := MutableCopyMat(id);
-      s[1][2] := One(w.f);
+      s[1,2] := One(w.f);
       sf := w.slnstdf[1];
   fi;
 
@@ -2154,7 +2154,7 @@ RECOG.SLn_UpStep := function(w)
           # Now cleanup in column n above row n, the entries there
           # are lambda times the stuff in column i of ci:
           for j in [1..w.n-1] do
-              tf := DoRowOp_n(tf,j,w.n,-ci[j][i]*lambda,w);
+              tf := DoRowOp_n(tf,j,w.n,-ci[j,i]*lambda,w);
           od;
           Add(trans,tf);
       od;
@@ -2191,11 +2191,11 @@ RECOG.SLn_UpStep := function(w)
       tf := cfi*tf*cf;
       # Now cleanup in rows above row n:
       for j in [1..w.n-1] do
-          tf := DoRowOp_n(tf,j,w.n,-ci[j][w.n],w);
+          tf := DoRowOp_n(tf,j,w.n,-ci[j,w.n],w);
       od;
       # Now cleanup in rows below row n:
       for j in [1..newdim] do
-          coeffs := IntVecFFE(Coefficients(w.can,-ci[w.n+j][w.n]));
+          coeffs := IntVecFFE(Coefficients(w.can,-ci[w.n+j,w.n]));
           for k in [1..w.ext] do
               if not(IsZero(coeffs[k])) then
                   if IsOne(coeffs[k]) then
@@ -2208,15 +2208,15 @@ RECOG.SLn_UpStep := function(w)
       od;
       # Now cleanup column n above row n:
       for j in [1..w.n-1] do
-          tf := DoColOp_n(tf,j,w.n,ci[j][w.n],w);
+          tf := DoColOp_n(tf,j,w.n,ci[j,w.n],w);
       od;
       # Now cleanup row n left of column n:
       for j in [1..w.n-1] do
-          tf := DoRowOp_n(tf,w.n,j,-c[i][j],w);
+          tf := DoRowOp_n(tf,w.n,j,-c[i,j],w);
       od;
       # Now cleanup column n below row n:
       for j in [1..newdim] do
-          coeffs := IntVecFFE(Coefficients(w.can,ci[w.n+j][w.n]));
+          coeffs := IntVecFFE(Coefficients(w.can,ci[w.n+j,w.n]));
           for k in [1..w.ext] do
               if not(IsZero(coeffs[k])) then
                   if IsOne(coeffs[k]) then
@@ -2411,10 +2411,10 @@ RECOG.ComputeGramSymplecticStandardForm := function(vecs)
     for j in [i+1..l] do
       v := zero;
       for k in [1,3..2*n-1] do
-        v := v + vecs[i][k]*vecs[j][k+1] - vecs[i][k+1]*vecs[j][k];
+        v := v + vecs[i,k]*vecs[j,k+1] - vecs[i,k+1]*vecs[j,k];
       od;
-      gram[i][j] := v;
-      gram[j][i] := -v;
+      gram[i,j] := v;
+      gram[j,i] := -v;
     od;
   od;
   return gram;
@@ -2431,12 +2431,12 @@ RECOG.FindSymplecticPairBasis := function(vecs)
   for i in [1,3..d-1] do
     j := i+1;
     while j <= d do
-      if not(IsZero(gram[i][j])) then
-        s := gram[i][j]^-1;
+      if not(IsZero(gram[i,j])) then
+        s := gram[i,j]^-1;
         MultRowVector(bas[j],s);
         MultRowVector(gram[j],s);
         for k in [1..d] do
-          gram[k][j] := gram[k][j]*s;
+          gram[k,j] := gram[k,j]*s;
         od;
         Assert(1,gram = RECOG.ComputeGramSymplecticStandardForm(bas*vecs));
         # Now exchange vectors i+1 and j:
@@ -2444,9 +2444,9 @@ RECOG.FindSymplecticPairBasis := function(vecs)
           bas{[i+1,j]} := bas{[j,i+1]};
           gram{[i+1,j]} := gram{[j,i+1]};
           for k in [1..d] do
-            dummy := gram[k][i+1];
-            gram[k][i+1] := gram[k][j];
-            gram[k][j] := dummy;
+            dummy := gram[k,i+1];
+            gram[k,i+1] := gram[k,j];
+            gram[k,j] := dummy;
           od;
           Assert(1,gram = RECOG.ComputeGramSymplecticStandardForm(bas*vecs));
         fi;
@@ -2457,21 +2457,21 @@ RECOG.FindSymplecticPairBasis := function(vecs)
     if j > d then return [fail,"degenerate"]; fi;
     # Now i,i+1 is a symplectic pair, clean out the rest:
     for j in [i+2..d] do
-      if not(IsZero(gram[i][j])) then
-        s := gram[i][j];
+      if not(IsZero(gram[i,j])) then
+        s := gram[i,j];
         AddRowVector(bas[j],bas[i+1],-s);
         AddRowVector(gram[j],gram[i+1],-s);
         for k in [1..d] do
-          gram[k][j] := gram[k][j] - s*gram[k][i+1];
+          gram[k,j] := gram[k,j] - s*gram[k,i+1];
         od;
         Assert(1,gram = RECOG.ComputeGramSymplecticStandardForm(bas*vecs));
       fi;
-      if not(IsZero(gram[i+1][j])) then
-        s := gram[i+1][j];
+      if not(IsZero(gram[i+1,j])) then
+        s := gram[i+1,j];
         AddRowVector(bas[j],bas[i],s);
         AddRowVector(gram[j],gram[i],s);
         for k in [1..d] do
-          gram[k][j] := gram[k][j] + s*gram[k][i];
+          gram[k,j] := gram[k,j] + s*gram[k,i];
         od;
         Assert(1,gram = RECOG.ComputeGramSymplecticStandardForm(bas*vecs));
       fi;
@@ -2527,54 +2527,54 @@ end;
 RECOG.MakeSpnTfn := function(n,d,f,lambda)
   local t;
   t := IdentityMat(2*d,f);
-  t[2*n-1][2*n] := lambda;
+  t[2*n-1,2*n] := lambda;
   return t;
 end;
 
 RECOG.MakeSpnTfnei := function(n,d,f,i,lambda)
   local t;
   t := IdentityMat(2*d,f);
-  t[2*i][2*i-1] := -lambda;
-  t[2*i][2*n] := -lambda;
-  t[2*n-1][2*i-1] := lambda;
-  t[2*n-1][2*n] := lambda;
+  t[2*i,2*i-1] := -lambda;
+  t[2*i,2*n] := -lambda;
+  t[2*n-1,2*i-1] := lambda;
+  t[2*n-1,2*n] := lambda;
   return t;
 end;
 
 RECOG.MakeSpnTfnfi := function(n,d,f,i,lambda)
   local t;
   t := IdentityMat(2*d,f);
-  t[2*i-1][2*i] := lambda;
-  t[2*i-1][2*n] := lambda;
-  t[2*n-1][2*i] := lambda;
-  t[2*n-1][2*n] := lambda;
+  t[2*i-1,2*i] := lambda;
+  t[2*i-1,2*n] := lambda;
+  t[2*n-1,2*i] := lambda;
+  t[2*n-1,2*n] := lambda;
   return t;
 end;
 
 RECOG.MakeSpnTen := function(n,d,f,lambda)
   local t;
   t := IdentityMat(2*d,f);
-  t[2*n][2*n-1] := -lambda;
+  t[2*n,2*n-1] := -lambda;
   return t;
 end;
 
 RECOG.MakeSpnTenei := function(n,d,f,i,lambda)
   local t;
   t := IdentityMat(2*d,f);
-  t[2*i][2*i-1] := -lambda;
-  t[2*i][2*n-1] := -lambda;
-  t[2*n][2*i-1] := -lambda;
-  t[2*n][2*n-1] := -lambda;
+  t[2*i,2*i-1] := -lambda;
+  t[2*i,2*n-1] := -lambda;
+  t[2*n,2*i-1] := -lambda;
+  t[2*n,2*n-1] := -lambda;
   return t;
 end;
 
 RECOG.MakeSpnTenfi := function(n,d,f,i,lambda)
   local t;
   t := IdentityMat(2*d,f);
-  t[2*i-1][2*i] := lambda;
-  t[2*i-1][2*n-1] := lambda;
-  t[2*n][2*i] := -lambda;
-  t[2*n][2*n-1] := -lambda;
+  t[2*i-1,2*i] := lambda;
+  t[2*i-1,2*n-1] := lambda;
+  t[2*n,2*i] := -lambda;
+  t[2*n,2*n-1] := -lambda;
   return t;
 end;
 
@@ -2589,13 +2589,13 @@ RECOG.MakeSp_StdGens := function(p,ext,n,d)
   zeta := PrimitiveRoot(f);
   id := IdentityMat(2*d,f);
   res.s := MutableCopyMat(id);
-  res.s[2*n-1][2*n-1] := zero;
-  res.s[2*n-1][2*n] := one;
-  res.s[2*n][2*n-1] := -one;
-  res.s[2*n][2*n] := zero;
+  res.s[2*n-1,2*n-1] := zero;
+  res.s[2*n-1,2*n] := one;
+  res.s[2*n,2*n-1] := -one;
+  res.s[2*n,2*n] := zero;
   res.delta := MutableCopyMat(id);
-  res.delta[2*n-1][2*n-1] := zeta;
-  res.delta[2*n][2*n] := zeta^-1;
+  res.delta[2*n-1,2*n-1] := zeta;
+  res.delta[2*n,2*n] := zeta^-1;
   l := Concatenation([3..2*n],[1,2]);
   res.v := PermutationMat(PermList(l),2*d,f);
   res.ten := List([0..ext-1],
@@ -2686,7 +2686,7 @@ RECOG.SpMakeImage_en :=
           v[fI] := v[fI] + v[ei];
           if M <> fail then
             for l in [1..Length(M)] do
-              M[l][fI] := M[l][fI] + M[l][ei];
+              M[l,fI] := M[l,fI] + M[l,ei];
             od;
           fi;
         else
@@ -2698,8 +2698,8 @@ RECOG.SpMakeImage_en :=
           v[2*n] := v[2*n] * zeta^-1;
           if M <> fail then
             for l in [1..Length(M)] do
-              M[l][2*n-1] := M[l][2*n-1] * zeta;
-              M[l][2*n] := M[l][2*n] * zeta^-1;
+              M[l,2*n-1] := M[l,2*n-1] * zeta;
+              M[l,2*n] := M[l,2*n] * zeta^-1;
             od;
           fi;
           coeff := zeta;
@@ -2713,15 +2713,15 @@ RECOG.SpMakeImage_en :=
           sc := -v[ei]/(coeff-v[fI]);
           si := IntVecFFE(Coefficients(s.can,sc));
           for k in [1..ext] do
-            t := t * s.tfnei[i][k]^si[k];
+            t := t * s.tfnei[i,k]^si[k];
           od;
           v[2*n] := v[2*n] - v[ei];
           v[ei] := zero;
           if M <> fail then
             for l in [1..Length(M)] do
-              sc2 := sc * (M[l][2*n-1]-M[l][fI]);
-              M[l][ei] := M[l][ei] + sc2;
-              M[l][2*n] := M[l][2*n] + sc2;
+              sc2 := sc * (M[l,2*n-1]-M[l,fI]);
+              M[l,ei] := M[l,ei] + sc2;
+              M[l,2*n] := M[l,2*n] + sc2;
             od;
           fi;
           Assert(1,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 1"));
@@ -2731,15 +2731,15 @@ RECOG.SpMakeImage_en :=
           sc := -v[fI]/coeff;
           si := IntVecFFE(Coefficients(s.can,sc));
           for k in [1..ext] do
-            t := t * s.tfnfi[i][k]^si[k];
+            t := t * s.tfnfi[i,k]^si[k];
           od;
           v[2*n] := v[2*n] - v[fI];
           v[fI] := zero;
           if M <> fail then
             for l in [1..Length(M)] do
-              sc2 := sc * (M[l][2*n-1]+M[l][ei]);
-              M[l][fI] := M[l][fI] + sc2;
-              M[l][2*n] := M[l][2*n] + sc2;
+              sc2 := sc * (M[l,2*n-1]+M[l,ei]);
+              M[l,fI] := M[l,fI] + sc2;
+              M[l,2*n] := M[l,2*n] + sc2;
             od;
           fi;
           Assert(1,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 2"));
@@ -2751,15 +2751,15 @@ RECOG.SpMakeImage_en :=
         sc := -v[fI]/(coeff+v[ei]);
         si := IntVecFFE(Coefficients(s.can,sc));
         for k in [1..ext] do
-          t := t * s.tfnfi[i][k]^si[k];
+          t := t * s.tfnfi[i,k]^si[k];
         od;
         v[2*n] := v[2*n] - v[fI];
         v[fI] := zero;
         if M <> fail then
           for l in [1..Length(M)] do
-            sc2 := sc * (M[l][2*n-1]+M[l][ei]);
-            M[l][fI] := M[l][fI] + sc2;
-            M[l][2*n] := M[l][2*n] + sc2;
+            sc2 := sc * (M[l,2*n-1]+M[l,ei]);
+            M[l,fI] := M[l,fI] + sc2;
+            M[l,2*n] := M[l,2*n] + sc2;
           od;
         fi;
         Assert(1,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 3"));
@@ -2767,15 +2767,15 @@ RECOG.SpMakeImage_en :=
         sc := -v[ei]/coeff;
         si := IntVecFFE(Coefficients(s.can,sc));
         for k in [1..ext] do
-          t := t * s.tfnei[i][k]^si[k];
+          t := t * s.tfnei[i,k]^si[k];
         od;
         v[2*n] := v[2*n] - v[ei];
         v[ei] := zero;
         if M <> fail then
           for l in [1..Length(M)] do
-            sc2 := sc * (M[l][2*n-1]-M[l][fI]);
-            M[l][ei] := M[l][ei] + sc2;
-            M[l][2*n] := M[l][2*n] + sc2;
+            sc2 := sc * (M[l,2*n-1]-M[l,fI]);
+            M[l,ei] := M[l,ei] + sc2;
+            M[l,2*n] := M[l,2*n] + sc2;
           od;
         fi;
         Assert(1,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 4"));
@@ -2787,8 +2787,8 @@ RECOG.SpMakeImage_en :=
         v[2*n] := v[2*n] * zeta;
         if M <> fail then
           for l in [1..Length(M)] do
-            M[l][2*n-1] := M[l][2*n-1] * zeta^-1;
-            M[l][2*n] := M[l][2*n] * zeta;
+            M[l,2*n-1] := M[l,2*n-1] * zeta^-1;
+            M[l,2*n] := M[l,2*n] * zeta;
           od;
         fi;
         Assert(1,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 5"));
@@ -2804,7 +2804,7 @@ RECOG.SpMakeImage_en :=
       v[2*n] := zero;
       if M <> fail then
         for l in [1..Length(M)] do
-          M[l][2*n] := M[l][2*n] + M[l][2*n-1] * sc;
+          M[l,2*n] := M[l,2*n] + M[l,2*n-1] * sc;
         od;
       fi;
       Assert(1,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 6"));
@@ -2854,10 +2854,10 @@ RECOG.DoSpExperiment := function(r)
   if RankMat(ExtractSubMatrix(vecs,[1,2],[2*r.n-1,2*r.n])) < 2 then
     return ["Vn \cap Vnc cannot replace <e_n,f_n>",c1];
   fi;
-  if IsZero(vecs[1][2*r.n-1]) then
+  if IsZero(vecs[1,2*r.n-1]) then
     vecs[1] := vecs[1]+vecs[2];
   fi;
-  MultRowVector(vecs[1],vecs[1][2*r.n-1]^-1);
+  MultRowVector(vecs[1],vecs[1,2*r.n-1]^-1);
   bas := RECOG.FindSymplecticPairBasis(vecs);
   if bas[1] = fail then
     return ["Vn \cap Vnc degenerate",c1];
@@ -3048,7 +3048,7 @@ SLPforElementFuncsProjective.PSL2 := function(ri,x)
                                                           ri!.gcd.gcd);
   fi;
   pos := PositionNonZero(y[1]);
-  s := RECOG.NormaliseScalarForPSLd(y[1][pos],ri!.normlist);
+  s := RECOG.NormaliseScalarForPSLd(y[1,pos],ri!.normlist);
   slp := RECOG.ExpressInStd_SL2(s * y,ri!.fakegens);
   return slp;
 end;
@@ -3146,7 +3146,7 @@ SLPforElementFuncsProjective.PSLd := function(ri,x)
                                                           ri!.gcd.gcd);
   fi;
   pos := PositionNonZero(y[1]);
-  s := RECOG.NormaliseScalarForPSLd(y[1][pos],ri!.normlist);
+  s := RECOG.NormaliseScalarForPSLd(y[1,pos],ri!.normlist);
   slp := RECOG.ExpressInStd_SL(s * y,ri!.fakegens);
   return slp;
 end;

@@ -122,16 +122,16 @@ KroneckerFactors := function(g)
     if IsZero(Determinant(A)) then
         return false;
     fi;
-    b := (B * A^-1); b := b[1][1];
-    c := (C * A^-1); c := c[1][1];
-    d := (D * A^-1); d := d[1][1];
+    b := (B * A^-1); b := b[1,1];
+    c := (C * A^-1); c := c[1,1];
+    d := (D * A^-1); d := d[1,1];
     I := A^0;
 
     if B*A^-1 <> I*b or C*A^-1 <> I*c or D*A^-1 <> I*d then
         return false;
     fi;
 
-    return [ [[I[1][1] , b],[ c, d]], A];
+    return [ [[I[1,1] , b],[ c, d]], A];
 end;
 
 

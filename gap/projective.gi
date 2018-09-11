@@ -167,8 +167,8 @@ RECOG.IsBlockScalarMatrix := function(blocks, x)
   fi;
   for b in blocks do
       s := b[1];
-      s := x[s][s];
-      if not ForAll(b, pos -> x[pos][pos] = s) then
+      s := x[s,s];
+      if not ForAll(b, pos -> x[pos,pos] = s) then
           return false;
       fi;
   od;
@@ -184,7 +184,7 @@ RECOG.HomNormLastBlock := function(data, x)
       return fail;
   fi;
   pos := blocks[Length(blocks)][1];
-  s := x[pos][pos];
+  s := x[pos,pos];
   if not IsOne(s) then
       x := s^-1 * x;
   fi;

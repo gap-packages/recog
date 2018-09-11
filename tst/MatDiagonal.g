@@ -9,7 +9,7 @@ for F  in [ GF(5), GF(9), GF(16) ] do
         for i in [1..5] do
             m := IdentityMat(7,F);
             for j in [1..7] do
-                m[j][j] := Random(l);
+                m[j,j] := Random(l);
             od;
             Add(gens,m);
         od;

@@ -8,7 +8,7 @@ DirectProductOfMatrixGroup := function(G,H)
     M:=MutableCopyMat(M);
     for i in [1..dG] do
       for j in [1..dG] do
-        M[i][j]:=g[i][j];
+        M[i,j]:=g[i,j];
       od;
     od;
     Add(gens,M);
@@ -18,7 +18,7 @@ DirectProductOfMatrixGroup := function(G,H)
     M:=MutableCopyMat(M);
     for i in [1..dH] do
       for j in [1..dH] do
-        M[dG+i][dG+j]:=h[i][j];
+        M[dG+i,dG+j]:=h[i,j];
       od;
     od;
     Add(gens,M);

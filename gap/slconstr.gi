@@ -1073,19 +1073,19 @@ return fail;
      W:= List(x, ShallowCopy);
      for i in [0..d-2] do
          # put non-zero element in lower right corner
-         if W[d-i][d-i] = 0*Z(q) then
-            j := First([1..d-i], a -> not (W[a][d-i] = 0*Z(q)));
+         if W[d-i,d-i] = 0*Z(q) then
+            j := First([1..d-i], a -> not (W[a,d-i] = 0*Z(q)));
             leftslp := SLCR.ProdProg (leftslp,
                                 StraightLineProgram ([[(d-i-1)*(d-i-2)*e+(j-1)*e+1,1]], Length (data.gens)));
             for k in [1..d-i] do
-              W[d-i][k] := W[d-i][k]- W[j][k];
+              W[d-i,k] := W[d-i,k]- W[j,k];
             od;
          fi;
          # clear last column
          for j in [1..d-i-1] do
-          if not W[j][d-i] = 0*Z(q) then
+          if not W[j,d-i] = 0*Z(q) then
               # a is the nontriv element of the multiplying matrix
-           a := -W[j][d-i]/W[d-i][d-i];
+           a := -W[j,d-i]/W[d-i,d-i];
               # b is what we have to express as a linear combination
               # in the standard basis of GF(q)
            b := -a;
@@ -1097,15 +1097,15 @@ return fail;
              fi;
            od;
            for k in [1..d-i] do
-              W[j][k] := W[j][k] + a * W[d-i][k];
+              W[j,k] := W[j,k] + a * W[d-i,k];
            od;
-          fi; # W[j][d-i] = 0*Z(q);
+          fi; # W[j,d-i] = 0*Z(q);
          od;
             # clear last row
          for j in [1..d-i-1] do
-          if not W[d-i][j] = 0*Z(q) then
+          if not W[d-i,j] = 0*Z(q) then
               # a is the nontriv element of the multiplying matrix
-           a := -W[d-i][j]/W[d-i][d-i];
+           a := -W[d-i,j]/W[d-i,d-i];
               # no inverse is taken here
            coeffs := FB[LogFFE(a,Z(q))+1];
            for k in [1..e] do
@@ -1115,15 +1115,15 @@ return fail;
              fi;
            od;
            for k in [1..d-i] do
-              W[k][j] := W[k][j] + a * W[k][d-i];
+              W[k,j] := W[k,j] + a * W[k,d-i];
            od;
           fi;
          od;
      od; # i-loop
        # now we have a diagonal matrix
      for i in [0 .. d-2] do
-        if not W[d-i][d-i] = Z(q)^0 then
-           k := LogFFE(W[d-i][d-i], Z(q));
+        if not W[d-i,d-i] = Z(q)^0 then
+           k := LogFFE(W[d-i,d-i], Z(q));
            sprog := SLCR.PowerProg(data.sprog[d-i],k);
            leftslp := SLCR.ProdProg(leftslp, sprog);
         fi;
@@ -1246,7 +1246,7 @@ return fail;
         rightslp := SLCR.ProdProg(rightslp, slprog);
         W := W * ResultOfStraightLineProgram (slprog, List (data.gens, x -> x[1]));
         smat := Z(q)^(- exp)*IdentityMat(d-1,GF(q));
-        smat[1][1] := Z(q)^(-2* exp);
+        smat[1,1] := Z(q)^(-2* exp);
         mat := mat * smat;
      fi;
      if not (Determinant(mat) = Z(q)^0) then return fail; fi;
@@ -1850,10 +1850,10 @@ return fail;
       fi;
    od;
    mat := IdentityMat(d, GF(q));
-   mat[1][1] := 0 * Z(q);
-   mat[d][d] := 0 * Z(q);
-   mat[1][d] := (-1)^d*Z(q)^0;
-   mat[d][1] := (-1)^(d-1)*Z(q)^0;;
+   mat[1,1] := 0 * Z(q);
+   mat[d,d] := 0 * Z(q);
+   mat[1,d] := (-1)^d*Z(q)^0;
+   mat[d,1] := (-1)^(d-1)*Z(q)^0;;
    cprog := SLCR.SLSLP (data2, mat, d);
    ccprog := StraightLineProgram (LinesOfStraightLineProgram (data2.cprog[d-1]),
                                      NrInputsOfStraightLineProgram (cprog));
@@ -2210,21 +2210,21 @@ end;
 ##     W:= List(x, ShallowCopy);
 ##     for i in [0..d-2] do
 ##         # put non-zero element in lower right corner
-##         if W[d-i][d-i] = 0*Z(q) then
-##            j := First([1..d-i], a -> not (W[a][d-i] = 0*Z(q)));
+##         if W[d-i,d-i] = 0*Z(q) then
+##            j := First([1..d-i], a -> not (W[a,d-i] = 0*Z(q)));
 ##            leftslp := SLCR.ProdProg (leftslp,
 ##                           StraightLineProgram ([[(d-i-1)*(d-i-2)*e+(j-1)*e+1,1]], Length (data.gens)));
 ##            for k in [1..d-i] do
-##              W[d-i][k] := W[d-i][k]- W[j][k];
+##              W[d-i,k] := W[d-i,k]- W[j,k];
 ##            od;
 ##         fi;
 ##            # clear last column
 ##            # in the generators in the (d-i)th column the powers start with shift
-##         shift := gens[(d-i-1)^2*e+1][2][3];
+##         shift := gens[(d-i-1)^2*e+1][2,3];
 ##         for j in [1..d-i-1] do
-##          if not W[j][d-i] = 0*Z(q) then
+##          if not W[j,d-i] = 0*Z(q) then
 ##              # a is the nontriv element of the multiplying matrix
-##           a := -W[j][d-i]/W[d-i][d-i];
+##           a := -W[j,d-i]/W[d-i,d-i];
 ##              # b is what we have to express as a linear combination
 ##              # in the standard basis of GF(q)
 ##           b := -a/shift;
@@ -2236,16 +2236,16 @@ end;
 ##             fi;
 ##           od;
 ##           for k in [1..d-i] do
-##              W[j][k] := W[j][k] + a * W[d-i][k];
+##              W[j,k] := W[j,k] + a * W[d-i,k];
 ##           od;
-##          fi; # W[j][d-i] = 0*Z(q);
+##          fi; # W[j,d-i] = 0*Z(q);
 ##         od;
 ##            # clear last row
 ##            # no shift
 ##         for j in [1..d-i-1] do
-##          if not W[d-i][j] = 0*Z(q) then
+##          if not W[d-i,j] = 0*Z(q) then
 ##              # a is the nontriv element of the multiplying matrix
-##           a := -W[d-i][j]/W[d-i][d-i];
+##           a := -W[d-i,j]/W[d-i,d-i];
 ##              # no inverse is taken here
 ##           coeffs := FB[LogFFE(a,Z(q))+1];
 ##           for k in [1..e] do
@@ -2255,15 +2255,15 @@ end;
 ##             fi;
 ##           od;
 ##           for k in [1..d-i] do
-##              W[k][j] := W[k][j] + a * W[k][d-i];
+##              W[k,j] := W[k,j] + a * W[k,d-i];
 ##           od;
 ##          fi;
 ##         od;
 ##     od; # i-loop
 ##     # now we have a diagonal matrix
 ##     for i in [0 .. d-2] do
-##        if not W[d-i][d-i] = Z(q)^0 then
-##           k := LogFFE(W[d-i][d-i], Z(q));
+##        if not W[d-i,d-i] = Z(q)^0 then
+##           k := LogFFE(W[d-i,d-i], Z(q));
 ##           sprog := SLCR.PowerProg(data.sprog[d-i],k);
 ##           leftslp := SLCR.ProdProg(leftslp, sprog);
 ##        fi;
@@ -2365,7 +2365,7 @@ end;
 ##        rightslp := SLCR.ProdProg(rightslp, slprog);
 ##        W := W * ResultOfStraightLineProgram (slprog, List (data.gens, x->x[1]));
 ##        smat := Z(q)^(- exp)*IdentityMat(d-1,GF(q));
-##        smat[1][1] := Z(q)^(-2* exp);
+##        smat[1,1] := Z(q)^(-2* exp);
 ##        mat := mat * smat;
 ##     fi;
 ##     if d > 2 then

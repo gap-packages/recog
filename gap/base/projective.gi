@@ -16,13 +16,13 @@ InstallGlobalFunction( IsOneProjective,
     local s, n, i, j, zero;
     n := Length(el[1]);
     Assert(1, DimensionsMat(el) = [n,n]);
-    s := el[1][1];
+    s := el[1,1];
     if IsZero(s) then return false; fi;
     zero := Zero(s);
     for i in [1..n] do
-        if el[i][i] <> s then return false; fi;
+        if el[i,i] <> s then return false; fi;
         for j in [1..n] do
-            if i <> j and el[i][j] <> zero then return false; fi;
+            if i <> j and el[i,j] <> zero then return false; fi;
         od;
     od;
     return true;
@@ -32,7 +32,7 @@ InstallGlobalFunction( IsEqualProjective,
   function(a,b)
     local p,s,i;
     p := PositionNonZero(a[1]);
-    s := b[1][p] / a[1][p];
+    s := b[1,p] / a[1,p];
     for i in [1..Length(a)] do
         if s*a[i] <> b[i] then return false; fi;
     od;

@@ -228,7 +228,7 @@ RECOG.basis2:=function(r,n,q,g)
 
        repeat
           if IsBound(gens[k]) then
-             if gens[k]<>gens[k][1][1]*One(g) then
+             if gens[k]<>gens[k][1,1]*One(g) then
                 a:=gens[k];
                 posa:=k;
              else
@@ -243,7 +243,7 @@ RECOG.basis2:=function(r,n,q,g)
           k:=k+1;
           repeat
             if IsBound(gens[k]) then
-               if gens[k] = gens[k][1][1]*One(g) then
+               if gens[k] = gens[k][1,1]*One(g) then
                   Unbind(gens[k]);
                   k:=k+1;
                elif gens[k]*a <> a*gens[k] then
@@ -371,7 +371,7 @@ RECOG.rewriteones := function(r,n,q,data,blocks,x)
             xx := list[i]^x;
             exp := RECOG.exponents(r,n,q,data.es,xx);
             remain := RECOG.check(r,n,q,list,xx,exp);
-            if remain <> remain[1][1]*One(remain) then
+            if remain <> remain[1,1]*One(remain) then
                 return fail;
             fi;
             Add(mat, Z(r)^0*exp);
@@ -462,7 +462,7 @@ RECOG.basis:=function(r,n,q,g)
       repeat
         k:=k+1;
         a:=gens[k];
-      until a<>a[1][1]*One(a) or k=len;
+      until a<>a[1,1]*One(a) or k=len;
       posa:=k;
       if k<len then
         repeat
@@ -540,7 +540,7 @@ RECOG.TestAbelianOld := function (n,grp,u)
             x  := RandomSubproduct(list);
             y  := RandomSubproduct(list);
         x  := Comm(x,y);
-        if x <> x[1][1] * One(x) then
+        if x <> x[1,1] * One(x) then
         return [false,x];
         fi;
             randlist:= RandomSubproduct(list);
@@ -636,7 +636,7 @@ RECOG.BlindDescent := function(r,n,grp,limit)
         fi;
         for p in Union(List( Collected(Factors(oy)), i->i[1]),[1]) do
             z :=Comm(x,y^(oy/p));
-            if z <> z[1][1] * One(z) then
+            if z <> z[1,1] * One(z) then
                 x := z;
             fi;
         od;
@@ -914,11 +914,11 @@ RECOG.MakeC6Group := function(g,over,p)
         # The us and vs are the images of the Ts and Ds under x
         #
         us := List([1..k], i->
-                   Product([1..k], j-> Ts[j]^IntFFE(x[i][j]))*
-                   Product([1..k], j-> Ds[j]^IntFFE(x[i][j+k])));
+                   Product([1..k], j-> Ts[j]^IntFFE(x[i,j]))*
+                   Product([1..k], j-> Ds[j]^IntFFE(x[i,j+k])));
         vs := List([1..k], i->
-                   Product([1..k], j-> Ts[j]^IntFFE(x[i+k][j]))*
-                   Product([1..k], j-> Ds[j]^IntFFE(x[i+k][j+k])));
+                   Product([1..k], j-> Ts[j]^IntFFE(x[i+k,j]))*
+                   Product([1..k], j-> Ds[j]^IntFFE(x[i+k,j+k])));
         #
         # Now we want the vector fixed by the all the vs
         #

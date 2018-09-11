@@ -250,7 +250,7 @@ RECOG.HomBackToMats := function(el)
   # This just norms this last block to 1.
   local d;
   d := Length(el);
-  return (el[d][d]^-1)*el;
+  return (el[d,d]^-1)*el;
 end;
 
 FindHomMethodsProjective.BlocksBackToMats := function(ri,G)
