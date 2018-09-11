@@ -977,13 +977,13 @@ RECOG.TestGroup := function(g,proj,size)
   count := 0;
   repeat
       count := count + 1;
-      r := Runtime();
+      #r := Runtime();
       if proj then
           ri := RecogniseProjectiveGroup(g);
       else
           ri := RecogniseGroup(g);
       fi;
-      Print("Time for recognition: ",Runtime()-r,"\n");
+      #Print("Time for recognition: ",Runtime()-r,"\n");
       if Size(ri) <> size then
           Print("ALARM: set count to -1 to skip test!\n");
           Error("Alarm: Size not correct!\n");
