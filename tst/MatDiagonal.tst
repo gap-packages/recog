@@ -1,79 +1,69 @@
-gap> for F  in [ GF(5), GF(9), GF(16) ] do
->     for n in [1, 2, 3, 7] do
->         gens := [];
->         l := ShallowCopy(Elements(F));
->         RemoveSet(l,Zero(F));
->         for i in [1..5] do
->             m := IdentityMat(7,F);
->             for j in [1..7] do
->                 m[j,j] := Random(l);
->             od;
->             Add(gens,m);
+gap> TestMatDiagonal := function(F, n)
+>     local gens, l, i, m, j, g, ri;
+>     gens := [];
+>     l := ShallowCopy(Elements(F));
+>     RemoveSet(l,Zero(F));
+>     for i in [1..5] do
+>         m := IdentityMat(7,F);
+>         for j in [1..7] do
+>             m[j,j] := Random(l);
 >         od;
->         g := GroupWithGenerators(gens);
->         Print("Testing MatDiagonal over ", F, ":\n");
->         ri := RECOG.TestGroup(g,false,Size(g));
->         Print("\n");
->         Assert(0, Size(ri) = Size(g));
+>         Add(gens,m);
 >     od;
-> od;
-Testing MatDiagonal over GF(5):
+>     g := GroupWithGenerators(gens);
+>     return RECOG.TestGroup(g,false,Size(g));
+> end;;
+
+#
+gap> TestMatDiagonal(GF(5), 1);;
+Test was OK!
+..............................
+30 random elements successfully sifted!
+gap> TestMatDiagonal(GF(5), 2);;
+Test was OK!
+..............................
+30 random elements successfully sifted!
+gap> TestMatDiagonal(GF(5), 3);;
+Test was OK!
+..............................
+30 random elements successfully sifted!
+gap> TestMatDiagonal(GF(5), 7);;
 Test was OK!
 ..............................
 30 random elements successfully sifted!
 
-Testing MatDiagonal over GF(5):
+#
+gap> TestMatDiagonal(GF(9), 1);;
+Test was OK!
+..............................
+30 random elements successfully sifted!
+gap> TestMatDiagonal(GF(9), 2);;
+Test was OK!
+..............................
+30 random elements successfully sifted!
+gap> TestMatDiagonal(GF(9), 3);;
+Test was OK!
+..............................
+30 random elements successfully sifted!
+gap> TestMatDiagonal(GF(9), 7);;
 Test was OK!
 ..............................
 30 random elements successfully sifted!
 
-Testing MatDiagonal over GF(5):
+#
+gap> TestMatDiagonal(GF(16), 1);;
 Test was OK!
 ..............................
 30 random elements successfully sifted!
-
-Testing MatDiagonal over GF(5):
+gap> TestMatDiagonal(GF(16), 2);;
 Test was OK!
 ..............................
 30 random elements successfully sifted!
-
-Testing MatDiagonal over GF(3^2):
+gap> TestMatDiagonal(GF(16), 3);;
 Test was OK!
 ..............................
 30 random elements successfully sifted!
-
-Testing MatDiagonal over GF(3^2):
+gap> TestMatDiagonal(GF(16), 7);;
 Test was OK!
 ..............................
 30 random elements successfully sifted!
-
-Testing MatDiagonal over GF(3^2):
-Test was OK!
-..............................
-30 random elements successfully sifted!
-
-Testing MatDiagonal over GF(3^2):
-Test was OK!
-..............................
-30 random elements successfully sifted!
-
-Testing MatDiagonal over GF(2^4):
-Test was OK!
-..............................
-30 random elements successfully sifted!
-
-Testing MatDiagonal over GF(2^4):
-Test was OK!
-..............................
-30 random elements successfully sifted!
-
-Testing MatDiagonal over GF(2^4):
-Test was OK!
-..............................
-30 random elements successfully sifted!
-
-Testing MatDiagonal over GF(2^4):
-Test was OK!
-..............................
-30 random elements successfully sifted!
-
