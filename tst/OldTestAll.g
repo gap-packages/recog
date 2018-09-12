@@ -1,21 +1,6 @@
 LoadPackage("recog");
 
-# Bug fixes
-ReadPackage("recog","tst/bugfix.g");
-
 # All systematic tests:
-ReadPackage("recog","tst/tst1.g");
-ReadPackage("recog","tst/tst2.g");
-ReadPackage("recog","tst/tst3.g");
-ReadPackage("recog","tst/tst4.g");
-ReadPackage("recog","tst/tst5.g");
-ReadPackage("recog","tst/tst6.g");
-ReadPackage("recog","tst/tst7.g");
-ReadPackage("recog","tst/tst8.g");
-ReadPackage("recog","tst/tst9.g");
-ReadPackage("recog","tst/tst10.g");
-ReadPackage("recog","tst/tst11.g");
-ReadPackage("recog","tst/test1.g");
 ReadPackage("recog","tst/MatTrivial.g");
 ReadPackage("recog","tst/ProjTrivial.g");
 ReadPackage("recog","tst/MatDiagonal.g");
