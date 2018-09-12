@@ -973,13 +973,15 @@ InstallGlobalFunction( "GetCompositionTreeNode",
 # Testing:
 
 RECOG.TestGroup := function(g,proj,size)
-  local l,r,ri,s,x,count,lvl;
+  local l,r,ri,s,x,count,lvl,seedMT,seedRS;
   count := 0;
   lvl:=InfoLevel(InfoRecog);
   SetInfoLevel(InfoRecog, 0);
   repeat
       count := count + 1;
       #r := Runtime();
+      seedMT := State(GlobalMersenneTwister);
+      seedRS := State(GlobalRandomSource);
       if proj then
           ri := RecogniseProjectiveGroup(g);
       else
@@ -988,6 +990,8 @@ RECOG.TestGroup := function(g,proj,size)
       #Print("Time for recognition: ",Runtime()-r,"\n");
       if Size(ri) <> size then
           Print("ALARM: set count to -1 to skip test!\n");
+          Print("seedMT := ", seedMT, ";\n");
+          Print("seedRS := ", seedRS, ";\n");
           Error("Alarm: Size not correct!\n");
           if count = -1 then return fail; fi;
       else
