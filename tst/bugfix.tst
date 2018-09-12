@@ -1,6 +1,5 @@
 #
 gap> START_TEST("bugfix.tst");
-gap> SetInfoLevel(InfoRecog, 0);
 
 # See https://github.com/gap-packages/recog/issues/1
 gap> gens := [];; e:=Z(2)^0;;
@@ -25,9 +24,10 @@ gap> seedMT:=[ "\020\267\245\255\tY\255\226\242\343\237\304!\233\377\336\025b\24
 gap> Reset(GlobalMersenneTwister, seedMT);;
 gap> Reset(GlobalRandomSource, seedRS);;
 gap> G:=ClassicalMaximals("L",3,3)[4];;
-gap> ri:=RecognizeGroup(G);;
-gap> Size(ri);
-24
+gap> RECOG.TestGroup(G, false, 24);;
+Test was OK!
+..............................
+30 random elements successfully sifted!
 
 #
 gap> STOP_TEST("bugfix.tst");

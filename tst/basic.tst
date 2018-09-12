@@ -1,6 +1,5 @@
 #
 gap> START_TEST("basic.tst");
-gap> SetInfoLevel(InfoRecog, 0);
 
 # Test for VeryFewPoints:
 gap> g := SymmetricGroup(5);;
@@ -59,13 +58,6 @@ gap> g := DirectProduct(g,g);;
 gap> g := DirectProduct(g,g);;
 gap> g := DirectProduct(g,g);;
 gap> ri := RECOG.TestGroup(g,false,24^32);;
-Test was OK!
-..............................
-30 random elements successfully sifted!
-
-# Test for trivial group:
-gap> g := Group( () );;
-gap> ri := RECOG.TestGroup(g,false,1);;
 Test was OK!
 ..............................
 30 random elements successfully sifted!

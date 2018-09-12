@@ -973,8 +973,10 @@ InstallGlobalFunction( "GetCompositionTreeNode",
 # Testing:
 
 RECOG.TestGroup := function(g,proj,size)
-  local l,r,ri,s,x,count;
+  local l,r,ri,s,x,count,lvl;
   count := 0;
+  lvl:=InfoLevel(InfoRecog);
+  SetInfoLevel(InfoRecog, 0);
   repeat
       count := count + 1;
       #r := Runtime();
@@ -1009,6 +1011,7 @@ RECOG.TestGroup := function(g,proj,size)
       fi;
   until count >= 30;
   Print("\n30 random elements successfully sifted!\n");
+  SetInfoLevel(InfoRecog, lvl);
   return ri;
 end;
 
