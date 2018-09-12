@@ -10,9 +10,6 @@ gap> mat:=IdentityMat(4,GF(2));; mat[4,3]:=e;; Add(gens, mat);
 gap> G:=Group(gens);
 <matrix group with 4 generators>
 gap> ri:=RECOG.TestGroup(G, false, 192);;
-Test was OK!
-..............................
-30 random elements successfully sifted!
 gap> outsider:=Reversed(IdentityMat(4,GF(2)));;
 gap> outsider in ri;
 false
@@ -27,9 +24,6 @@ gap> G:=ClassicalMaximals("L",3,3)[4];;
 
 # FIXME: check disabled for now, due to regression
 # gap> ri:=RECOG.TestGroup(G, false, 24);;
-# Test was OK!
-# ..............................
-# 30 random elements successfully sifted!
 
 #
 gap> STOP_TEST("bugfix.tst");

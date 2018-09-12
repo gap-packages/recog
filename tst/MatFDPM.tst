@@ -15,9 +15,6 @@ gap> x := PseudoRandom(GL(max,f));;
 gap> mgens := List(cf[pos].generators,y->y^x);;
 gap> h := Group(mgens);;
 gap> ri := RECOG.TestGroup(h,false,Size(g));;
-Test was OK!
-..............................
-30 random elements successfully sifted!
 
 # Symmetric:
 gap> deg := Random(10,88);;
@@ -34,6 +31,3 @@ gap> x := PseudoRandom(GL(max,f));;
 gap> mgens := List(cf[pos].generators,y->y^x);;
 gap> h := Group(mgens);;
 gap> ri := RECOG.TestGroup(h,false,Size(g));;
-Test was OK!
-..............................
-30 random elements successfully sifted!

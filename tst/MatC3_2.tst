@@ -506,6 +506,3 @@ gap> gens := Z(2) * [
 > ];;
 gap> g := Group(gens);;
 gap> ri := RECOG.TestGroup(g,false,931392000);;
-Test was OK!
-..............................
-30 random elements successfully sifted!

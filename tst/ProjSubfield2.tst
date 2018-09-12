@@ -8,6 +8,3 @@ gap> g := GroupWithGenerators(gens);;
 # Remark: The *6 comes from the fact that by blowing up we lose a factor
 #         of 6 in scalars, they are now in the projective group.
 gap> ri := RECOG.TestGroup(g,true,Size(PGL(3,5^2))*6);;
-Test was OK!
-..............................
-30 random elements successfully sifted!

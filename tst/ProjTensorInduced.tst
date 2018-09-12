@@ -15,6 +15,3 @@ gap> m := PermutationMat(p,27,GF(5));;
 gap> Add(gens,m);;
 gap> k := GroupWithGenerators(gens);;
 gap> ri := RECOG.TestGroup(k,true,Size(PGL(3,5))^3*6);;
-Test was OK!
-..............................
-30 random elements successfully sifted!

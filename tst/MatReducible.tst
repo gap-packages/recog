@@ -24,6 +24,3 @@ gap> x := PseudoRandom(GL(10,5));;
 gap> gens := [m1^x,m2^x];;
 gap> g := GroupWithGenerators(gens);;
 gap> ri := RECOG.TestGroup(g,false,61035156250000);;
-Test was OK!
-..............................
-30 random elements successfully sifted!

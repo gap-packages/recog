@@ -16,54 +16,18 @@ gap> TestMatDiagonal := function(F, n)
 
 #
 gap> TestMatDiagonal(GF(5), 1);;
-Test was OK!
-..............................
-30 random elements successfully sifted!
 gap> TestMatDiagonal(GF(5), 2);;
-Test was OK!
-..............................
-30 random elements successfully sifted!
 gap> TestMatDiagonal(GF(5), 3);;
-Test was OK!
-..............................
-30 random elements successfully sifted!
 gap> TestMatDiagonal(GF(5), 7);;
-Test was OK!
-..............................
-30 random elements successfully sifted!
 
 #
 gap> TestMatDiagonal(GF(9), 1);;
-Test was OK!
-..............................
-30 random elements successfully sifted!
 gap> TestMatDiagonal(GF(9), 2);;
-Test was OK!
-..............................
-30 random elements successfully sifted!
 gap> TestMatDiagonal(GF(9), 3);;
-Test was OK!
-..............................
-30 random elements successfully sifted!
 gap> TestMatDiagonal(GF(9), 7);;
-Test was OK!
-..............................
-30 random elements successfully sifted!
 
 #
 gap> TestMatDiagonal(GF(16), 1);;
-Test was OK!
-..............................
-30 random elements successfully sifted!
 gap> TestMatDiagonal(GF(16), 2);;
-Test was OK!
-..............................
-30 random elements successfully sifted!
 gap> TestMatDiagonal(GF(16), 3);;
-Test was OK!
-..............................
-30 random elements successfully sifted!
 gap> TestMatDiagonal(GF(16), 7);;
-Test was OK!
-..............................
-30 random elements successfully sifted!

@@ -20,6 +20,3 @@ gap> gens := Z(3)^0 *
 gap> for i in gens do ConvertToMatrixRep(i,3); od;
 gap> g := Group(gens);;
 gap> ri := RECOG.TestGroup(g,false,21998167367904);;
-Test was OK!
-..............................
-30 random elements successfully sifted!

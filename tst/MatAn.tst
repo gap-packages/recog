@@ -7,6 +7,3 @@ gap> gens := cf[pos].generators;;
 gap> g := Group(gens);;
 gap> g := Group(List([1..10],x->PseudoRandom(g)));;
 gap> ri := RECOG.TestGroup(g,false,Factorial(51)/2);;
-Test was OK!
-..............................
-30 random elements successfully sifted!
