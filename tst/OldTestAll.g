@@ -1,7 +1,6 @@
 LoadPackage("recog");
 
 # All systematic tests:
-ReadPackage("recog","tst/ProjC6.g"); # slow
 ReadPackage("recog","tst/MatC6.g"); # SLOW
 ReadPackage("recog","tst/MatTensor.g"); # slow
 ReadPackage("recog","tst/TestClassicalNatural.g"); # SLOW due too many cases
