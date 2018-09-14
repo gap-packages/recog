@@ -3,7 +3,6 @@ LoadPackage("recog");
 # All systematic tests:
 ReadPackage("recog","tst/MatC6.g"); # SLOW
 ReadPackage("recog","tst/MatTensor.g"); # slow
-ReadPackage("recog","tst/TestClassicalNatural.g"); # SLOW due too many cases
 # FIXME occasional errors for GL(17,3), GL(18,7), GL(20,5)
 ReadPackage("recog","tst/Sporadics.g");
 

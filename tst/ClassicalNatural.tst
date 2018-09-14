@@ -170,7 +170,6 @@ Stamp: ClassicalNatural
 gap> TestRecogGL(18,9);;
 Stamp: ClassicalNatural
 gap> #TestRecogGL(19,9);; # disabled to speedup this .tst file
-Stamp: ClassicalNatural
 
 #
 gap> #TestRecogGL(2,16);; # FIXME: see issue #12
