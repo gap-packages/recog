@@ -169,7 +169,7 @@ FindHomMethodsProjective.LowIndex := function(ri,G)
   RECOG.SetPseudoRandomStamp(G,"LowIndex");
   res := RECOG.SmallHomomorphicImageProjectiveGroup(G);
   if res = fail then
-      return fail;
+      return fail; # FIXME: fail = TemporaryFailure here really correct?
   else
       res := res[1];
       # Now distinguish between a block system and just an orbit:
@@ -194,7 +194,7 @@ FindHomMethodsProjective.LowIndex := function(ri,G)
       SetHomom(ri,res.hom);
       Setmethodsforfactor(ri,FindHomDbPerm);
 
-      return true;
+      return Success;
   fi;
 end;
 
@@ -218,7 +218,7 @@ FindHomMethodsProjective.DoBaseChangeForBlocks := function(ri,G)
       rec(method := FindHomMethodsProjective.Blocks,rank := 2000,
           stamp := "Blocks"));
 
-  return true;
+  return Success;
 end;
 
 FindHomMethodsProjective.Blocks := function(ri,G)
@@ -242,7 +242,7 @@ FindHomMethodsProjective.Blocks := function(ri,G)
   Add(forkernel(ri).hints,
       rec(method := FindHomMethodsProjective.BlocksBackToMats, rank := 2000,
           stamp := "BlocksBackToMats"));
-  return true;
+  return Success;
 end;
 
 RECOG.HomBackToMats := function(el)
@@ -272,7 +272,7 @@ FindHomMethodsProjective.BlocksBackToMats := function(ri,G)
   # This is an isomorphism:
   findgensNmeth(ri).method := FindKernelDoNothing;
 
-  return true;
+  return Success;
 end;
 
 #FindHomMethodsProjective.BalTreeForBlocks := function(ri,G)
@@ -315,7 +315,7 @@ end;
 #  # Verify the kernel immediately after its recognition:
 #  Setimmediateverification(ri,true);
 #
-#  return true;
+#  return Success;
 #end;
 #
 #RECOG.HomInducedOnSubspace := function(data,el)
@@ -354,7 +354,7 @@ end;
 #  Add(forkernel(ri).hints,rec(method := FindHomMethodsMatrix.LowerLeftPGroup,
 #                              rank := 2000,stamp := "LowerLeftPGroup"));
 #
-#  return true;
+#  return Success;
 #end;
 
 #FindHomMethodsProjective.BalTreeForBlocksProjKernel := function(ri,G)
@@ -376,7 +376,7 @@ end;
 #      rec(method := FindHomMethodsProjective.BalTreeForBlocks,
 #                               rank := 2000, stamp := "BalTreeForBlocks"));
 #
-#  return true;
+#  return Success;
 #end;
 
 ##

@@ -23,14 +23,14 @@ DeclareGlobalFunction( "CallMethods" );
 #
 # method successfully computed a homomorphism
 # (used to be 'true')
-#BindGlobal("Success", "Success");
+#BindGlobal("Success", MakeImmutable("Success"));
 BindGlobal("Success", true);    # HACK: use old value for now, to ease transition
 
 # method is never applicable to this kind of group (e.g. input is
 # non-solvable, but method is only applicable to solvable groups),
 # don't bother to try it again
 # (used to be 'false')
-#BindGlobal("NeverApplicable", "NeverApplicable");
+#BindGlobal("NeverApplicable", MakeImmutable("NeverApplicable"));
 BindGlobal("NeverApplicable", false);    # HACK: use old value for now, to ease transition
 
 # The method temporarily failed, that it could be sensible to call it
@@ -38,7 +38,7 @@ BindGlobal("NeverApplicable", false);    # HACK: use old value for now, to ease 
 # Vegas algorithm using randomised methods, which has failed, but which may
 # succeed when called again.
 # (used to be 'fail')
-#BindGlobal("TemporaryFailure", "TemporaryFailure");
+#BindGlobal("TemporaryFailure", MakeImmutable("TemporaryFailure"));
 BindGlobal("TemporaryFailure", fail);    # HACK: use old value for now, to ease transition
 
 # method needs more information (e.g. things like whether group is

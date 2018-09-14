@@ -215,12 +215,11 @@ RECOG.SortOutReducibleNormalSubgroup :=
             # Usually this should have been caught by using projective orders.
             Info(InfoRecog,2,"D247:Scalar subgroup, FastNormalClosure must ",
                  "have made a mistake!");
-            return fail;
+            return TemporaryFailure;
         fi;
         Info(InfoRecog,2,"D247:Restriction to normal subgroup is homogeneous.");
         if not(MTX.IsAbsolutelyIrreducible(collf[1][1])) then
             Error("Is this really possible??? G acts absolutely irred!");
-            return false;
         fi;
         homs := MTX.Homomorphisms(collf[1][1],m);
         basis := Concatenation(homs);
@@ -238,7 +237,6 @@ RECOG.SortOutReducibleNormalSubgroup :=
             Info(InfoRecog,1,"VERY, VERY, STRANGE!");
             Info(InfoRecog,1,"False alarm, was not a tensor decomposition.");
             Error("This should never have happened (346), tell Max.");
-            return false;
         fi;
 
         H := GroupWithGenerators(conjgensG);
@@ -254,7 +252,7 @@ RECOG.SortOutReducibleNormalSubgroup :=
         # This is an isomorphism:
         findgensNmeth(ri).method := FindKernelDoNothing;
         ri!.comment := "_D4TensorDec";
-        return true;
+        return Success;
     fi;
     Info(InfoRecog,2,"D247:Using action on the set of homogeneous components",
            " (",Length(collf)," elements)...");
@@ -262,7 +260,7 @@ RECOG.SortOutReducibleNormalSubgroup :=
     homs := MTX.Homomorphisms(collf[1][1],m);
     if Length(homs) = 0 then
         Info(InfoRecog,2,"Restricted module not semisimple ==> not normal");
-        return fail;
+        return TemporaryFailure;
     fi;
     homsimg := BasisVectors(Basis(VectorSpace(f,Concatenation(homs))));
     homcomp := MutableCopyMat(homsimg);
@@ -273,7 +271,7 @@ ConvertToMatrixRep(homcomp,Size(f));
     Enumerate(o,QuoInt(ri!.dimension,Length(homcomp)));
     if not(IsClosed(o)) then
         Info(InfoRecog,2,"D247:Obviously did not get normal subgroup!");
-        return fail;
+        return TemporaryFailure;
     fi;
 
     # NOTE: here we switch from matrix to permutation group recognition!
@@ -295,7 +293,7 @@ ConvertToMatrixRep(homcomp,Size(f));
     Setimmediateverification(ri,true);
     findgensNmeth(ri).args[1] := Length(o)+6;
     findgensNmeth(ri).args[2] := 4;
-    return true;
+    return Success;
   end;
 
 RECOG.SortOutReducibleSecondNormalSubgroup :=
@@ -329,7 +327,7 @@ RECOG.SortOutReducibleSecondNormalSubgroup :=
                 Info(InfoRecog,2,"D247: Success, found D7 with action",
                      " on ",mult," direct factors.");
                 ri!.comment := "_D7TensorInduced";
-                return true;
+                return Success;
             else
                 Info(InfoRecog,2,"D247: Did not find direct factors!");
             fi;
@@ -339,7 +337,7 @@ RECOG.SortOutReducibleSecondNormalSubgroup :=
     else
         Info(InfoRecog,2,"D247: Restriction not homogeneous!");
     fi;
-    return fail;
+    return fail; # FIXME: fail = TemporaryFailure here really correct?
   end;
 
 FindHomMethodsProjective.D247 := function(ri,G)
@@ -358,14 +356,16 @@ FindHomMethodsProjective.D247 := function(ri,G)
     if MTX.IsIrreducible(m) then
         if not(ispower) then
             Info(InfoRecog,4,"Dimension is no power!");
-            return fail;
+            return fail; # FIXME: fail = TemporaryFailure here really correct?
         fi;
         # we want to look for D7 here, using the same trick again:
         count := 0;
         #n := GroupWithGenerators(ngens);
         pr := ProductReplacer(ngens);
         y := RECOG.InvolutionJumper(pr,RECOG.ProjectiveOrder,x,200,false);
-        if y = fail then return fail; fi;
+        if y = fail then
+            return TemporaryFailure;
+        fi;
         for i in [1..3] do
             z := RECOG.InvolutionJumper(pr,RECOG.ProjectiveOrder,y,200,false);
             if z <> fail then y := z; fi;
@@ -375,20 +375,20 @@ FindHomMethodsProjective.D247 := function(ri,G)
         if not(MTX.IsIrreducible(mm)) then
             return RECOG.SortOutReducibleSecondNormalSubgroup(ri,G,nngens,mm);
         fi;
-        return fail;
+        return fail; # FIXME: fail = TemporaryFailure here really correct?
     fi;
     if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;
     Info(InfoRecog,2,"D247: Seem to have found something!");
     return RECOG.SortOutReducibleNormalSubgroup(ri,G,ngens,m);
   end;
 
-  Info(InfoRecog,2,"D247: Trying the involution jumper 9 times...");
+  Info(InfoRecog,2,"D247: Trying the involution jumper 9 times..."); # FIXME: don't hardcode '9'
   f := ri!.field;
   ispower := Length(RECOG.IsPower(ri!.dimension)) > 0;
   x := RECOG.InvolutionSearcher(ri!.pr,RECOG.ProjectiveOrder,100);
   if x = fail then
       Info(InfoRecog,2,"Did not find an involution! Giving up.");
-      return fail;
+      return TemporaryFailure;
   fi;
 
   for i in [1..9] do
@@ -399,14 +399,14 @@ FindHomMethodsProjective.D247 := function(ri,G)
       if x = fail then
           if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;
           Info(InfoRecog,2,"Involution Jumper failed, giving up!");
-          return fail;
+          return TemporaryFailure;
       fi;
   od;
   res := CheckNormalClosure(x);
   if res in [true,false] then return res; fi;
   if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;
   Info(InfoRecog,2,"D247: Did not find normal subgroup, giving up.");
-  return fail;
+  return TemporaryFailure;
 end;
 
 # FIXME: PrototypeForC2C4 is not used anywhere

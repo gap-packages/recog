@@ -130,7 +130,7 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
 
   if IsBound(ri!.isabsolutelyirred) and ri!.isabsolutelyirred then
       # this information is coming from above
-      return false;
+      return NeverApplicable;
   fi;
 
   f := ri!.field;
@@ -143,7 +143,7 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
 
   m := ri!.meataxemodule;
   if MTX.IsAbsolutelyIrreducible(m) then
-      return false;
+      return NeverApplicable;
   fi;
 
   Info(InfoRecog,2,"Rewriting generators over larger field with smaller",
@@ -176,7 +176,7 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
   forkernel(ri).biggerscalarsbas := r.inforec.bas;
   forkernel(ri).biggerscalarsbasi := r.inforec.basi;
 
-  return true;
+  return Success;
 end;
 
 RECOG.HomBCToDiagonalBlock := function(data,x)
@@ -203,7 +203,7 @@ FindHomMethodsProjective.BiggerScalarsOnly := function(ri,G)
 
   findgensNmeth(ri).method := FindKernelDoNothing;
 
-  return true;
+  return Success;
 end;
 
 # The following are for subfield computations:
@@ -396,7 +396,7 @@ FindHomMethodsProjective.Subfield :=
         # Now report back, it is an isomorphism:
         SetHomom(ri,hom);
         findgensNmeth(ri).method := FindKernelDoNothing;
-        return true;
+        return Success;
     fi;
 
     return false;   # nothing more to do for us, C3C5 takes care of the rest!
@@ -476,7 +476,7 @@ end;
 
 FindHomMethodsProjective.KnownNilpotent := function(ri,G)
   # Hint to this method if you know G to be nilpotent or call it directly
-  # if you find out so. Note that it will return false if G is a p-group
+  # if you find out so. Note that it will return NeverApplicable if G is a p-group
   # for some prime p. Make sure that the !.projective component is set
   # correctly such that we can set the right Order method.
   local H,cut,data,gens,gens2,gensfac,gensker,gensm,hom,orderfunc,ords,primes;
@@ -494,7 +494,7 @@ FindHomMethodsProjective.KnownNilpotent := function(ri,G)
       primes := Union(List(ords,o->Set(Factors(o))));
       RemoveSet(primes,1);    # in case there were identities!
   fi;
-  if Length(primes) < 2 then return false; fi;   # not our beer
+  if Length(primes) < 2 then return NeverApplicable; fi;   # not our beer
   cut := QuoInt(Length(primes),2);
   data := rec( primesfactor := primes{[1..cut]},
                primeskernel := primes{[cut+1..Length(primes)]},
@@ -518,21 +518,21 @@ FindHomMethodsProjective.KnownNilpotent := function(ri,G)
   findgensNmeth(ri).method := FindKernelDoNothing;  # kernel already known
   ri!.leavegensNuntouched := true;
   Setcalcnicegens(ri,RECOG.CalcNiceGensKnownNilpotent);
-  return true;
+  return Success;
 end;
 
 FindHomMethodsProjective.FewGensAbelian := function(ri,G)
-  # If the number of generators is less than or equal to 20, then check
+  # If the number of generators is less than or equal to 200, then check
   # abelian and if so, hint to KnownNilpotent to write it as a direct
   # product of Sylow subgroups
   local gens,i,j,l;
   gens := GeneratorsOfGroup(G);
   l := Length(gens);
-  if l > 200 then return false; fi;
+  if l > 200 then return NeverApplicable; fi;
   for i in [1..l-1] do
       for j in [i+1..l] do
           if not(ri!.isequal(gens[i]*gens[j],gens[j]*gens[i])) then
-              return false;
+              return NeverApplicable;
           fi;
       od;
   od;
@@ -557,7 +557,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
       ri!.meataxemodule := GModuleByMats(GeneratorsOfGroup(G),f);
   fi;
   if not(MTX.IsIrreducible(ri!.meataxemodule)) then
-      return false;     # not our case
+      return NeverApplicable;     # not our case
   fi;
   dim := ri!.dimension;
   pf := PrimeField(f);
@@ -612,7 +612,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
           poss := Filtered([1..Length(gensim)],i->IsOne(gensim[i]));
           Append(gensN(ri),ri!.gensHmem{poss});
           findgensNmeth(ri).args[1] := 5;
-          return true;
+          return Success;
       fi;
   fi;
 
@@ -664,7 +664,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
                   # projective method:
                   SetHomom(ri,hom);
                   findgensNmeth(ri).method := FindKernelDoNothing;
-                  return true;
+                  return Success;
               fi;
           fi;
       fi;
@@ -677,7 +677,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
           # We fail, G is neither C3 nor C5, and we do not find a way
           # for any reduction using H:
           Info(InfoRecog,2,"G is not C3 (semilinear).");
-          return false;
+          return NeverApplicable;
       fi;
 
       # Now G is C3, so we have to compute the action of G on the
@@ -703,7 +703,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
           if pos = fail then   # something is wrong!
               Info( InfoRecog, 1, "Sudden failure, G should be C3 but isn't! ",
                     "C3C5 gives up for the moment." );
-              return fail;
+              return TemporaryFailure;
           fi;
           Add(gensim,cyc^cc[pos]);
       od;
@@ -714,7 +714,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
                   rec( c := c,cc := cc,cgen := cgen, cyc := cyc ) );
       SetHomom(ri,hom);
       Setmethodsforfactor(ri,FindHomDbPerm);
-      return true;
+      return Success;
 
       # The kernel will be semilinear directly, however, we have to
       # run the MeatAxe again, so give no hint!
@@ -735,12 +735,10 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
           if MTX.Dimension(collf[1][1]) = 1 then
               Error("This should never have happened (2), tell Max.");
               # This should have been caught by the scalar test above.
-              return false;
           fi;
           Info(InfoRecog,2,"Restriction to H is homogeneous.");
           if not(MTX.IsAbsolutelyIrreducible(collf[1][1])) then
               Error("Is this really possible??? G acts absolutely irred!");
-              return false;
           fi;
           homs := MTX.Homomorphisms(collf[1][1],m);
           basis := Concatenation(homs);
@@ -757,7 +755,6 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
               Info(InfoRecog,1,"VERY, VERY, STRANGE!");
               Info(InfoRecog,1,"False alarm, was not a tensor decomposition.");
               Error("This should never have happened (3), tell Max.");
-              return false;
           fi;
 
           H := GroupWithGenerators(conjgensG);
@@ -772,7 +769,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
                     rank := 4000, stamp := "KroneckerProduct" ) );
           # This is an isomorphism:
           findgensNmeth(ri).method := FindKernelDoNothing;
-          return true;
+          return Success;
       fi;
       Info(InfoRecog,2,"Using action on the set of homogeneous components",
            " (",Length(collf)," elements)...");
@@ -789,10 +786,9 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
       SetHomom(ri,a);
       Setmethodsforfactor(ri,FindHomDbPerm);
 
-      return true;
+      return Success;
 
   fi;
-  return fail;   # Just to have some conclusion, this is never reached!
 end;
 
 ##

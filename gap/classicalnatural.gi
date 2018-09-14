@@ -3163,13 +3163,13 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
   if d = 2 then
       if not(RECOG.IsThisSL2Natural(GeneratorsOfGroup(g),f)) then
           Info(InfoRecog,2,"ClassicalNatural: Is not PSL_2.");
-          return fail;
+          return fail; # FIXME: fail = TemporaryFailure here really correct?
       fi;
   else
       classical := RecogniseClassical(g);
       if classical.isSLContained <> true then
           Info(InfoRecog,2,"ClassicalNatural: Is not PSL.");
-          return fail;
+          return fail; # FIXME: fail = TemporaryFailure here really correct?
       fi;
   fi;
 
@@ -3230,7 +3230,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
       SetSize(ri,(q+1)*(q-1)*q/GcdInt(2,q-1));
       SetIsSimpleGroup(ri,true);
       Setslpforelement(ri,SLPforElementFuncsProjective.PSL2);
-      return true;
+      return Success;
   else   # bigger than 2:
       if classical.isSLContained = true then
           # Do not run the generic code in small cases:
@@ -3259,10 +3259,11 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
           SetSize(ri,Product([0..d-1],i->(q^d-q^i))/((q-1)*gcd.gcd));
           SetIsSimpleGroup(ri,true);
           Setslpforelement(ri,SLPforElementFuncsProjective.PSLd);
-          return true;
+          return Success;
       fi;
-      return fail;
   fi;
+
+  return fail; # FIXME: fail = TemporaryFailure here really correct?
 
 end;
 

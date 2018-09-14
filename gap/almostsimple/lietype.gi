@@ -827,8 +827,8 @@ FindHomMethodsProjective.LieTypeNonConstr := function(ri,G)
             ri!.comment := Concatenation("_",r);
             res := LookupHintForSimple(ri,G,r);
             # FIXME: LookupHintForSimple is for sporadics... So why do we use it here?
-            if res = true
-                then return true;
+            if res = true then
+                return Success;
             fi;
             Info(InfoRecog,2,"LieTypeNonConstr: giving up.");
             return fail;
@@ -836,7 +836,7 @@ FindHomMethodsProjective.LieTypeNonConstr := function(ri,G)
         count := count + 1;
         if count > 3 then
             Info(InfoRecog,2,"LieTypeNonConstr: giving up...");
-            return fail;
+            return TemporaryFailure;
         fi;
         Info(InfoRecog,2,"LieTypeNonConstr: need more element orders...");
         for i in [1..dim] do

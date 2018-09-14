@@ -701,19 +701,19 @@ FindHomMethodsProjective.FindEvenNormal := function(ri,G)
                   if MTX.IsIrreducible(mm) then
                       Info(InfoRecog,2,
             "FindEvenNormal: Second normal subgroup was not reducible.");
-                      return fail;
+                      return fail; # FIXME: fail = TemporaryFailure here really correct?
                   fi;
                   res := RECOG.SortOutReducibleSecondNormalSubgroup(ri,G,
                                     rr.Ngens,mm);
-                  if res = true then return res; fi;
+                  if res = true then return Success; fi;
                   r := rr;
               else
-                  return fail;
+                  return fail; # FIXME: fail = TemporaryFailure here really correct?
               fi;
           until count >= 2;
       fi;
   fi;
-  return fail;
+  return fail; # FIXME: fail = TemporaryFailure here really correct?
 end;
 
 FindHomMethodsProjective.FindElmOfEvenNormal := function(ri,G)
@@ -721,7 +721,9 @@ FindHomMethodsProjective.FindElmOfEvenNormal := function(ri,G)
   RECOG.SetPseudoRandomStamp(G,"FindElmOfEvenNormal");
   r := FindElmOfEvenNormalSubgroup(G,
           rec( Projective := true, SkipTrivAbelian := true ));
-  if r.success = fail then return fail; fi;
+  if r.success = fail then # FIXME: fail = TemporaryFailure here really correct?
+      return fail; # FIXME: fail = TemporaryFailure here really correct?
+  fi;
   if not IsBound(r.Nready) or not(r.Nready) then
       r.Ngens := FastNormalClosure(GeneratorsOfGroup(G),[r.el],20);
   fi;
@@ -752,16 +754,16 @@ FindHomMethodsProjective.FindElmOfEvenNormal := function(ri,G)
               if MTX.IsIrreducible(mm) then
                   Info(InfoRecog,2,
            "FindElmOfEvenNormal: Second normal subgroup was not reducible.");
-                  return fail;
+                  return fail; # FIXME: fail = TemporaryFailure here really correct?
               fi;
               res := RECOG.SortOutReducibleSecondNormalSubgroup(
                                       ri,G,rr.Ngens,mm);
-              if res = true then return res; fi;
+              if res = true then return Success; fi;
               r := rr;
           until count >= 2;
       fi;
   fi;
-  return fail;
+  return fail; # FIXME: fail = TemporaryFailure here really correct?
 end;
 
 ##

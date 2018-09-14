@@ -681,15 +681,15 @@ RECOG.New2RecogniseC6 := function(grp)
     r := ppi[1];
     n := ppi[2];
     if not Length(ppi) = 2 then
-        return false;
+        return NeverApplicable;
     fi;
     if (q-1) mod r <> 0 then
-        return false;
+        return NeverApplicable;
     fi;
 
     ## first find a non-central element of the <r>-core of <grp>
     b := RECOG.BlindDescent(r,n,grp,100);
-    if b = fail then return fail; fi;
+    if b = fail then return TemporaryFailure; fi;
     Info(InfoRecog,3,"Finished blind descent");
 
     u := b[1];
@@ -708,7 +708,7 @@ RECOG.New2RecogniseC6 := function(grp)
         return rec( igens := igens, basis := grpbasis,
                     r := r, n := n, q := q );
     else
-        return fail;
+        return TemporaryFailure;
     fi;
 
 end;
@@ -719,7 +719,9 @@ FindHomMethodsProjective.C6 := function(ri,G)
     RECOG.SetPseudoRandomStamp(G,"C6");
 
     re := RECOG.New2RecogniseC6(G);
-    if re = fail or re = false then return re; fi;
+    if re = TemporaryFailure or re = NeverApplicable then
+        return re;
+    fi;
 
     if re.basis.basis = rec() then
         Info(InfoRecog,2,"C6: Found block system.");
@@ -747,7 +749,7 @@ FindHomMethodsProjective.C6 := function(ri,G)
     fi;
     SetHomom(ri,hom);
 
-    return true;
+    return Success;
 end;
 
 # code prepared by Steve Linton

@@ -689,7 +689,7 @@ FindHomMethodsProjective.ComputeSimpleSocle := function(ri,G)
   ri!.simplesoclerandp := 0;
   ri!.simplesocle!.pseudorandomfunc :=
        [rec( func := Next, args := [ri!.simplesoclepr] )];
-  return false;
+  return NeverApplicable;
 end;
 
 RECOG.RandElFuncSimpleSocle := function(ri)
@@ -718,7 +718,7 @@ FindHomMethodsProjective.ThreeLargeElOrders := function(ri,G)
   p := RECOG.findchar(ri,ri!.simplesocle,RECOG.RandElFuncSimpleSocle);
   if p = Characteristic(ri!.field) then
       Info(InfoRecog,2,"ThreeLargeElOrders: defining characteristic p=",p);
-      return false;
+      return false; # FIXME: false = NeverApplicable here really correct?
   fi;
   # Try all possibilities:
   Info(InfoRecog,2,"ThreeLargeElOrders: found ",p);
@@ -746,10 +746,10 @@ FindHomMethodsProjective.ThreeLargeElOrders := function(ri,G)
           fi;
           res := LookupHintForSimple(ri,G,namecat);
       fi;
-      if res = true then return true; fi;
+      if res = true then return Success; fi;
   od;
   Info(InfoRecog,2,"Did not succeed with hints, giving up...");
-  return fail;
+  return fail; # FIXME: fail = TemporaryFailure here really correct?
 end;
 
 RECOG.DegreeAlternating := function (orders)
@@ -878,11 +878,11 @@ FindHomMethodsProjective.AlternatingBBByOrders := function(ri,G)
               ForgetMemory(r[3][1]);
               SetFilterObj(ri,IsLeaf);
               SetIsSimpleGroup(ri,true);
-              return true;
+              return Success;
           fi;
       fi;
   od;
-  return fail;
+  return fail; # FIXME: fail = TemporaryFailure here really correct?
 end;
 
 RECOG.HomFDPM := function(data,x)
@@ -906,7 +906,7 @@ FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
       fact := FactorsTD(o,primes);
       if Length(fact[2]) <> 0 then
           Info(InfoRecog,2,"AltSym: prime factor of order excludes A_n");
-          return false;
+          return NeverApplicable;
       fi;
   od;
   f := ri!.field;
@@ -926,21 +926,13 @@ FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
               Setmethodsforfactor(ri,FindHomDbPerm);
 
               ri!.comment := "_FDPM";
-              return true;
+              return Success;
           fi;
       fi;
       Info(InfoRecog,3,"Deleted permutation module method failed.");
   fi;
-  p := Characteristic(f);
-  totry := EmptyPlist(2);
-  if (d+1) mod p <> 0 and d+1 > 10 then
-      Add(totry,d+1);
-  fi;
-  if (d+2) mod p = 0 and d+2 > 10 then
-      Add(totry,d+2);
-  fi;
 
-  return fail;    # do not try any more now
+  return TemporaryFailure;    # do not try any more now
 
 
 # TODO: try out an example that should need this;
@@ -949,6 +941,14 @@ FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
 
 # FIXME: there is dead code below...
 
+  p := Characteristic(f);
+  totry := EmptyPlist(2);
+  if (d+1) mod p <> 0 and d+1 > 10 then
+      Add(totry,d+1);
+  fi;
+  if (d+2) mod p = 0 and d+2 > 10 then
+      Add(totry,d+2);
+  fi;
 
   for deg in totry do
       Info(InfoRecog,3,"Looking for Alt/Sym(",deg,")...");
@@ -974,7 +974,7 @@ FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
           SetFilterObj(ri,IsLeaf);
           SetIsSimpleGroup(ri,true);
           ri!.comment := "_Alt";
-          return true;
+          return Success;
       else   # r[1] = "Sn"
           Info(InfoRecog,2,"Found Sym(",deg,")!");
           ri!.recogSnAnRec := r;
@@ -987,10 +987,10 @@ FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
           SetFilterObj(ri,IsLeaf);
           SetIsAlmostSimpleGroup(ri,true);
           ri!.comment := "_Sym";
-          return true;
+          return Success;
       fi;
   od;
-  return fail;
+  return TemporaryFailure;
 end;
 
 # Looking at element orders to determine which sporadic it could be:
@@ -1271,7 +1271,7 @@ FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
       o := RECOG.RuleOutSmallProjOrder(r.el);
       if o = fail then
           Info(InfoRecog,2,"Ruled out all sporadic groups.");
-          return false;
+          return NeverApplicable;
       fi;
       if i <= Length(gens) then
           if ri!.projective then
@@ -1289,7 +1289,7 @@ FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
       l := Filtered(l,i->o in RECOG.SporadicsElementOrders[i]);
       if l = [] then
           Info(InfoRecog,2,"Ruled out all sporadic groups.");
-          return false;
+          return NeverApplicable;
       fi;
       # Throw out improbable ones:
       j := 1;
@@ -1333,7 +1333,7 @@ FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
       od;
       if l = [] then
           Info(InfoRecog,2,"Ruled out all sporadic groups.");
-          return false;
+          return NeverApplicable;
       fi;
       if Length(l) = 1 then
         count := count + 1;
@@ -1356,16 +1356,16 @@ FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
   for i in [1..Length(l)] do
       Info(InfoRecog,2,"Trying hint for ",RECOG.SporadicsNames[l[i]],"...");
       res := LookupHintForSimple(ri,G,RECOG.SporadicsNames[l[i]]);
-      if res = true then return res; fi;
+      if res = true then return Success; fi;
       if IsBound(RECOG.SporadicsWorkers[l[i]]) then
           Info(InfoRecog,2,"Calling its installed worker...");
           res := RECOG.SporadicsWorkers[l[1]](RECOG.SporadicsNames[l[i]],
                                         RECOG.SporadicsSizes[l[i]],ri,G);
-          if res = true then return res; fi;
+          if res = true then return Success; fi;
       fi;
       Info(InfoRecog,2,"This did not work.");
   od;
-  return false;
+  return false; # FIXME: false = NeverApplicable here really correct?
 end;
 
 

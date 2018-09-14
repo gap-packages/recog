@@ -329,7 +329,7 @@ FindHomMethodsProjective.TensorDecomposable := function(ri,G)
 
   d := ri!.dimension;
   if IsPrime(d) then
-      return false;
+      return NeverApplicable;
   fi;
   f := ri!.field;
 
@@ -340,7 +340,7 @@ FindHomMethodsProjective.TensorDecomposable := function(ri,G)
        "TensorDecomposable: I seem to have found a normal subgroup...");
   r := RECOG.FindTensorDecomposition(G,N);
   if r = fail then
-      return fail;
+      return TemporaryFailure;
   fi;
   if IsBound(r.orbit) then
       Info(InfoRecog,2,"Did not find tensor decomposition but orbit.");
@@ -349,7 +349,7 @@ FindHomMethodsProjective.TensorDecomposable := function(ri,G)
                                 "surjective");
       SetHomom(ri,hom);
       Setmethodsforfactor(ri,FindHomDbPerm);
-      return true;
+      return Success;
   fi;
 
   Info(InfoRecog,2,
@@ -366,7 +366,7 @@ FindHomMethodsProjective.TensorDecomposable := function(ri,G)
                                 "surjective");
       SetHomom(ri,hom);
       Setmethodsforfactor(ri,FindHomDbPerm);
-      return true;
+      return Success;
   fi;
 
   H := GroupWithGenerators(conjgensG);
@@ -381,7 +381,7 @@ FindHomMethodsProjective.TensorDecomposable := function(ri,G)
             stamp := "KroneckerProduct" ), 1 );
   # This is an isomorphism:
   findgensNmeth(ri).method := FindKernelDoNothing;
-  return true;
+  return Success;
 end;
 
 RECOG.HomTensorFactor := function(data,m)
@@ -406,7 +406,7 @@ FindHomMethodsProjective.KroneckerProduct := function(ri,G)
        rec( method := FindHomMethodsProjective.KroneckerKernel, rank := 2000,
             stamp := "KroneckerKernel" ), 1);
   forkernel(ri).blocksize := ri!.blocksize;
-  return true;
+  return Success;
 end;
 
 RECOG.HomTensorKernel := function(data,m)
@@ -428,7 +428,7 @@ FindHomMethodsProjective.KroneckerKernel := function(ri,G)
   hom := GroupHomByFuncWithData(G,H,RECOG.HomTensorKernel,data);
   SetHomom(ri,hom);
   findgensNmeth(ri).method := FindKernelDoNothing;
-  return true;
+  return Success;
 end;
 
 ##

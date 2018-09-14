@@ -74,21 +74,21 @@ FindHomMethodsPerm.TrivialPermGroup := function(ri, G)
   gens := GeneratorsOfGroup(G);
   for g in gens do
       if not(IsOne(g)) then
-          return false;
+          return NeverApplicable;
       fi;
   od;
   Setslpforelement(ri,SLPforElementFuncsPerm.TrivialPermGroup);
   Setslptonice( ri,
                 StraightLineProgramNC([[[1,0]]],Length(GeneratorsOfGroup(G))));
   SetFilterObj(ri,IsLeaf);
-  return true;
+  return Success;
 end;
 
 FindHomMethodsPerm.VeryFewPoints := function(ri, G)
   if LargestMovedPoint(G) <= 10 then
       return FindHomMethodsPerm.StabChain(ri, G);
   else
-      return false;
+      return NeverApplicable;
   fi;
 end;
 
@@ -108,7 +108,7 @@ FindHomMethodsPerm.NonTransitiveByFoot :=
 
     # Then test whether we can do something:
     if IsTransitive(G) then
-        return false;    # do not call us again
+        return NeverApplicable;
     fi;
 
     # Otherwise find an orbit and restrict:
@@ -132,7 +132,7 @@ FindHomMethodsPerm.NonTransitiveByFoot :=
     hom := GroupHomByFuncWithData(G,Group(imgens),RestrictToOrbitHomFunc,data);
     SetHomom(ri,hom);
 
-    return true;
+    return Success;
   end;
 
 FindHomMethodsPerm.NonTransitive :=
@@ -141,7 +141,7 @@ FindHomMethodsPerm.NonTransitive :=
 
     # Then test whether we can do something:
     if IsTransitive(G) then
-        return false;    # do not call us again
+        return NeverApplicable;
     fi;
 
     la := LargestMovedPoint(G);
@@ -149,7 +149,7 @@ FindHomMethodsPerm.NonTransitive :=
     Enumerate(o);
     hom := OrbActionHomomorphism(G,o);
     SetHomom(ri,hom);
-    return true;
+    return Success;
   end;
 
 FindHomMethodsPerm.Imprimitive :=
@@ -220,7 +220,7 @@ FindHomMethodsPerm.BalTreeForBlocks := function(ri,G)
   nrblocks := Length(blocks);
   if nrblocks = 1 then
       # this might happen during the descent into the tree
-      return false;
+      return NeverApplicable;
   fi;
   cut := QuoInt(nrblocks,2);  # this is now at least 1
   lowerhalf := blocks{[1..cut]};
@@ -245,7 +245,7 @@ FindHomMethodsPerm.BalTreeForBlocks := function(ri,G)
                                   rank := 200,
                                   stamp := "BalTreeForBlocks"),1);
   fi;
-  return true;
+  return Success;
 end;
 
 # Now to the small base groups using stabilizer chains:
@@ -285,7 +285,7 @@ FindHomMethodsPerm.StabChain :=
      SetSize(G,SizeStabChain(S));
      SetSize(ri,SizeStabChain(S));
      ri!.Gnomem := G;
-     return true;
+     return Success;
    end;
 
 SLPforElementFuncsPerm.StabilizerChain := function(ri,x)
@@ -308,7 +308,7 @@ FindHomMethodsPerm.StabilizerChain := function(ri,G)
   ForgetMemory(S);
   Setslpforelement(ri,SLPforElementFuncsPerm.StabilizerChain);
   SetFilterObj(ri,IsLeaf);
-  return true;
+  return Success;
 end;
 
 WordinLabels := function(word,S,g)

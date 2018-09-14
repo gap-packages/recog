@@ -2453,7 +2453,7 @@ SLCR.FindHom := function(ri,G,d,q)
   SetFilterObj(ri,IsLeaf);
   SetNiceGens(ri,StripMemory(genlist));
   Setslptonice(ri,data.slpnice);
-  return true;
+  return Success;
 end;
 
 SLPforElementFuncsMatrix.SLConstructive := function(ri,x)
