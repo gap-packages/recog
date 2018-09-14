@@ -40,25 +40,25 @@ SetReturnNPFlags := function( grp, case )
    fi;
 
    #SetIsSymplecticGroupFlag( recognise, false );
-   recognise.IsSymplecticGroup := false;
+   recognise.isSymplecticGroup := false;
    #SetIsOrthogonalGroupFlag( recognise, false );
-   recognise.IsOrthogonalGroup := false;
+   recognise.isOrthogonalGroup := false;
    #SetIsUnitaryGroupFlag( recognise, false );
-   recognise.IsUnitaryGroup := false;
+   recognise.isUnitaryGroup := false;
    #SetIsSLContainedFlag( recognise, false );
-   recognise.IsSLContained := false;
+   recognise.isSLContained := false;
    if case = "linear"  then
        #SetIsSLContainedFlag( recognise, true  );
-       recognise.IsSLContained := true;
+       recognise.isSLContained := true;
    elif case = "symplectic"  then
        #SetIsSymplecticGroupFlag( recognise, true  );
-       recognise.IsSymplecticGroup := true;
+       recognise.isSymplecticGroup := true;
    elif case = "unitary"  then
        #SetIsUnitaryGroupFlag( recognise, true  );
-       recognise.IsUnitaryGroup := true;
+       recognise.isUnitaryGroup := true;
    elif case in ["orthogonalminus","orthogonalplus","orthogonalcircle"] then
        #SetIsOrthogonalGroupFlag( recognise, true  );
-       recognise.IsOrthogonalGroup := true;
+       recognise.isOrthogonalGroup := true;
    fi;
    #set the group type
    recognise.type := case;
@@ -89,10 +89,10 @@ InitRecog := function (grp,case)
                      possibleNearlySimple := Set([]),
                      dimsReducible := [],
                      orders := Set([]),
-                     IsSLContained := "unknown",
-                     IsSymplecticGroup := "unknown",
-                     IsOrthogonalGroup := "unknown",
-                     IsUnitaryGroup := "unknown",
+                     isSLContained := "unknown",
+                     isSymplecticGroup := "unknown",
+                     isOrthogonalGroup := "unknown",
+                     isUnitaryGroup := "unknown",
                     );
  end;
 
@@ -647,16 +647,16 @@ RecogniseClassicalNPCase := function( arg )
      fi;
 
      if IsBound(recognise) then
-         if case = "linear"  and recognise.IsSLContained <> "unknown" then
-             return recognise.IsSLContained;
+         if case = "linear"  and recognise.isSLContained <> "unknown" then
+             return recognise.isSLContained;
        elif case = "symplectic" and
-         recognise.IsSymplecticGroup <> "unknown" then
-           return recognise.IsSymplecticGroup;
-       elif case = "unitary" and recognise.IsUnitaryGroup <>"unknown" then
-           return recognise.IsUnitaryGroupFlag;
+         recognise.isSymplecticGroup <> "unknown" then
+           return recognise.isSymplecticGroup;
+       elif case = "unitary" and recognise.isUnitaryGroup <>"unknown" then
+           return recognise.isUnitaryGroupFlag;
        elif case in ["orthogonalminus","orthogonalplus","orthogonalcircle"] and
-         recognise.IsOrthogonalGroup <> "unknown" then
-           return recognise.IsOrthogonalGroup;
+         recognise.isOrthogonalGroup <> "unknown" then
+           return recognise.isOrthogonalGroup;
        fi;
    fi;
 

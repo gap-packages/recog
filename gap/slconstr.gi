@@ -2471,8 +2471,7 @@ FindHomMethodsMatrix.NaturalSL := function(ri,G)
     SetInfoLevel(InfoMethSel,0);
     r:=RecogniseClassical(G,"linear");
     SetInfoLevel(InfoMethSel,il);
-    if not( (IsBound(r.isSLContained) and r.isSLContained = true) or
-            (IsBound(r.IsSLContained) and r.IsSLContained = true) ) then
+    if not( (IsBound(r.isSLContained) and r.isSLContained = true) ) then
         return TemporaryFailure;
     fi;
 

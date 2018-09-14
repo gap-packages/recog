@@ -3167,7 +3167,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
       fi;
   else
       classical := RecogniseClassical(g);
-      if classical.IsSLContained <> true then
+      if classical.isSLContained <> true then
           Info(InfoRecog,2,"ClassicalNatural: Is not PSL.");
           return fail;
       fi;
@@ -3232,7 +3232,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
       Setslpforelement(ri,SLPforElementFuncsProjective.PSL2);
       return true;
   else   # bigger than 2:
-      if classical.IsSLContained = true then
+      if classical.isSLContained = true then
           # Do not run the generic code in small cases:
           if (q^d-1)/(q-1) <= 1000 or d = 3 then
               # FIXME: Note d=3 currently has a problem in the SL2-finder.

@@ -728,11 +728,11 @@ RECOG.TestRandomElement := function (recognise, grp)
 
 
     if PositionProperty(recognise.E, x->(x mod 2 <> 0)) <> fail then
-        recognise.IsSpContained := false;
-        recognise.IsSOContained := false;
+        recognise.isSpContained := false;
+        recognise.isSOContained := false;
     fi;
     if PositionProperty(recognise.E, x ->(x mod 2 = 0)) <> fail then
-        recognise.IsSUContained := false;
+        recognise.isSUContained := false;
     fi;
 
     if recognise.needBaseChange = true and recognise.bc = "unknown" then
@@ -1049,12 +1049,12 @@ RECOG.IsSLContained := function( recognise, grp )
     fi;
 
     if First(recognise.ClassicalForms, IsTrivialForm) <> fail then
-        recognise.IsSLContained := true;
+        recognise.isSLContained := true;
         Info(InfoClassical,2,"The group contains SL(", recognise.d, ", ",
              recognise.q, ");");
         return true;
     else
-        recognise.IsSLContained := false;
+        recognise.isSLContained := false;
         Info(InfoClassical,2,"The group does not contain SL(",
              recognise.d, ", ", recognise.q, ");");
         return false;
@@ -1075,11 +1075,11 @@ RECOG.IsSpContained := function( recognise, grp )
 
     # if the dimension is not even, the group cannot be symplectic
     if recognise.d mod 2 <> 0 then
-        recognise.IsSpContained := false;
+        recognise.isSpContained := false;
         return false;
     fi;
 
-    if recognise.IsSpContained = false then
+    if recognise.isSpContained = false then
         return false;
     fi;
 
@@ -1113,13 +1113,13 @@ RECOG.IsSpContained := function( recognise, grp )
     if recognise.QuadraticForm = false and
         First(recognise.ClassicalForms,isSpForm) <> fail then
         # symplectic form
-        recognise.IsSpContained := true;
+        recognise.isSpContained := true;
         recognise.isNotExt := true;
         Info(InfoClassical,2,"The group contains Sp(", recognise.d, ", ",
              recognise.q, ");");
         return true;
     else
-        recognise.IsSpContained := false;
+        recognise.isSpContained := false;
         Info(InfoClassical,2,"The group does not contain Sp(",
              recognise.d, ", ", recognise.q, ");");
         return false;
@@ -1143,7 +1143,7 @@ RECOG.IsSUContained := function( recognise, grp )
 
     # if size of field not a square, the group cannot be unitary
     if LogInt(Size(f),Characteristic(f))  mod 2 <> 0 then
-        recognise.IsSUContained := false;
+        recognise.isSUContained := false;
         return false;
     fi;
 
@@ -1152,7 +1152,7 @@ RECOG.IsSUContained := function( recognise, grp )
 
 
 
-    if recognise.IsSUContained = false then
+    if recognise.isSUContained = false then
         return false;
     fi;
 
@@ -1182,12 +1182,12 @@ RECOG.IsSUContained := function( recognise, grp )
     fi;
 
     if First(recognise.ClassicalForms,isHermForm)<> fail then
-        recognise.IsSUContained := true;
+        recognise.isSUContained := true;
         Info(InfoClassical,2,"The group contains SU(", recognise.d, ", ",
              q0, ");");
         return true;
     else
-        recognise.IsSUContained := false;
+        recognise.isSUContained := false;
         Info(InfoClassical,2,"The group does not contain SU(",
              recognise.d, ", ", q0, ");");
         return false;
@@ -1218,7 +1218,7 @@ RECOG.IsSOContained := function( recognise, grp )
         return false;
     end;
 
-    if recognise.IsSOContained = false then
+    if recognise.isSOContained = false then
         return false;
     fi;
 
@@ -1258,7 +1258,7 @@ RECOG.IsSOContained := function( recognise, grp )
         if recognise.d mod 2 = 0 then return false; fi;
         if recognise.currentgcd <> 1 then return fail; fi;
         recognise.isNotExt := true;
-        recognise.IsSOContained := true;
+        recognise.isSOContained := true;
         Info(InfoClassical,2,"The group contains SO^o(", recognise.d, ", ",
              recognise.q, ");");
         return true;
@@ -1270,7 +1270,7 @@ RECOG.IsSOContained := function( recognise, grp )
         if recognise.d mod 2 <> 0 then return false; fi;
         if recognise.currentgcd <> 2 then return fail; fi;
         recognise.isNotExt := true;
-        recognise.IsSOContained := true;
+        recognise.isSOContained := true;
         Info(InfoClassical,2,"The group contains SO+(", recognise.d, ", ",
              recognise.q, ");");
         return true;
@@ -1282,12 +1282,12 @@ RECOG.IsSOContained := function( recognise, grp )
         if recognise.d mod 2 <> 0 then return false; fi;
         if recognise.currentgcd <> 2 then return fail; fi;
         recognise.isNotExt := true;
-        recognise.IsSOContained := true;
+        recognise.isSOContained := true;
         Info(InfoClassical,2,"The group contains SO-(", recognise.d, ", ",
              recognise.q, ");");
         return true;
     else
-        recognise.IsSOContained := false;
+        recognise.isSOContained := false;
         Info(InfoClassical,2,"The group does not contain SO(",
              recognise.d, ", ", recognise.q, ");");
         return false;
@@ -1341,7 +1341,7 @@ RECOG.NonGenericLinear := function( recognise, grp )
         Info(InfoClassical,2,"The group is not generic");
         Info(InfoClassical,2,"and contains SL(", recognise.d, ", ",
              recognise.q, ");");
-        recognise.IsSLContained := true;
+        recognise.isSLContained := true;
         return true;
     end;
 
@@ -1402,7 +1402,7 @@ RECOG.NonGenericSymplectic := function(recognise, grp)
         Info(InfoClassical,2,"The group is not generic");
         Info(InfoClassical,2,"and contains Sp(", recognise.d, ", ",
              recognise.q, ");");
-        recognise.IsSpContained := true;
+        recognise.isSpContained := true;
         return true;
     end;
 
@@ -1516,7 +1516,7 @@ RECOG.NonGenericUnitary := function(recognise, grp)
               recognise.d, ", ", recognise.q, ");");
         recognise.isSpContained := true;
 
-        recognise.IsSUContained := true;
+        recognise.isSUContained := true;
         return true;
     end;
 
@@ -1611,7 +1611,7 @@ RECOG.NonGenericUnitary := function(recognise, grp)
         if Order(grp) mod 216 = 0 then
             return CheckFlag();
         else
-            recognise.IsSUContained := false;
+            recognise.isSUContained := false;
             return false;
         fi;
     elif d = 3 and q = 9 then
@@ -1715,7 +1715,7 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
         Info(InfoClassical,2,"group contains SO+(",
              recognise.d, ", ", recognise.q, ");");
 
-        recognise.IsSOContained := true;
+        recognise.isSOContained := true;
         return true;
     end;
 
@@ -1938,7 +1938,7 @@ RECOG.NonGenericOrthogonalMinus := function(recognise, grp)
         fi;
         Info(InfoClassical,2,"group contains SO-(",
              recognise.d, ", ", recognise.q, ");");
-        recognise.IsSOContained := true;
+        recognise.isSOContained := true;
         return true;
     end;
 
@@ -2045,7 +2045,7 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
         fi;
         Info(InfoClassical,2,"group contains SOo(",
              recognise.d, ", ", recognise.q, ");");
-        recognise.IsSOContained := true;
+        recognise.isSOContained := true;
         return true;
     end;
 
@@ -2111,7 +2111,7 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
         else
                return CheckFlag();
         fi;
-        recognise.IsSOContained := false;
+        recognise.isSOContained := false;
         return false;
     elif d = 3 and q = 11 then
         if not HasElementsMultipleOf( recognise.orders, [3,11])  then
@@ -2333,10 +2333,10 @@ function( arg )
                    ClassicalForms := [],
                    QuadraticForm := false,
                    QuadraticFormType := "unknown",
-                   IsSLContained := "unknown",
-                   IsSpContained := "unknown",
-                   IsSUContained := "unknown",
-                   IsSOContained := "unknown",
+                   isSLContained := "unknown",
+                   isSpContained := "unknown",
+                   isSUContained := "unknown",
+                   isSOContained := "unknown",
                   );
   merkinfolevel := InfoLevel(InfoMethSel);
   SetInfoLevel(InfoMethSel,0);
@@ -2418,22 +2418,22 @@ DisplayRecog := function( r )
                Print( "porders ", r.porders, "\n");
            fi;
 
-            if r.IsSLContained = true then
+            if r.isSLContained = true then
                 Print("--------> contains SL(", r.d, ",", r.q, ")\n");
             fi;
 
-            if r.IsSpContained = true then
+            if r.isSpContained = true then
                 Print("--------> contains Sp(", r.d, ",", r.q, ")\n");
             fi;
 
 
-            if r.IsSUContained = true then
+            if r.isSUContained = true then
                 q0 := Characteristic(r.field)^
                (LogInt(r.q,Characteristic(r.field))/2);
                 Print("--------> contains SU(", r.d, ",", q0, ")\n");
             fi;
 
-            if r.IsSOContained = true then
+            if r.isSOContained = true then
                 Print("--------> contains SO(", r.d, ",", r.q, ")\n");
             fi;
 

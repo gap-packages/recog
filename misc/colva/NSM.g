@@ -327,13 +327,13 @@ end;
 IsGroupClassical := function(G,classicalrec)
 # Looks in the classicalrec for what I want!
 
- if classicalrec.IsSLContained=true then
+ if classicalrec.isSLContained=true then
    return ClassicalNametoStandardName(G,"linear");
- elif classicalrec.IsSpContained=true then
+ elif classicalrec.isSpContained=true then
    return ClassicalNametoStandardName(G,"symplectic");
- elif classicalrec.IsSUContained=true then
+ elif classicalrec.isSUContained=true then
    return ClassicalNametoStandardName(G,"unitary");
- elif classicalrec.IsSOContained=true then
+ elif classicalrec.isSOContained=true then
    return ClassicalNametoStandardName(G,classicalrec.ClassicalForms[1]);
  else
    return false;
