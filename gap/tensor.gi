@@ -12,7 +12,6 @@
 ##  decompositions of matrix groups.
 ##
 #############################################################################
-## TODO: WHOLE FILE NOT USED? Was probably replaced by d247.gi
 
 RECOG.FindTensorKernel := function(G,onlyone)
   # Assume G respects a tensor product decomposition of its natural

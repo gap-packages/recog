@@ -769,7 +769,7 @@ RECOG.DegreeAlternating := function (orders)
     return [degs, prims];
 end;
 
-# FIXME: dead code? (it's callers are all dead)
+# FIXME: dead code? (its callers are all dead)
 RECOG.RecognizeAlternating := function (orders)
     local   tmp,  degs,  prims,  mindeg,  p1,  p2,  i;
    tmp := RECOG.DegreeAlternating (orders);
