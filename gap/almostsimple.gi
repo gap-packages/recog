@@ -26,85 +26,84 @@ RECOG.ParseNumber := function( number, d, default )
   return default;
 end;
 
-# FIXME: unused?
-RECOG.MakeStabChainHint := function( chain, stdgens )
-  local b,bb,choice,dims,f,gens,grpnum,grps,i,j,lens,llens,m,name,names,nams,nrs,o,orblens,pts,r,size,slps;
-  f := FieldOfMatrixList(stdgens);
-  name := chain[1].name;
-  size := chain[1].order;
-  slps := [];
-  names := [];
-  dims := [];
-  orblens := [];
-  pts := [];
-  gens := stdgens;
-  repeat
-      Print("Working on ",name,"\n");
-      grps := [];
-      nams := [];
-      nrs := [];
-      for i in [1..Length(chain)] do
-          r := chain[i];
-          if IsBound(r.parent) and r.parent = name then
-              Add(grps,ResultOfStraightLineProgram(r.generators,gens));
-              Add(nams,r.name);
-              Add(nrs,i);
-          fi;
-      od;
-      if Length(grps) = 0 then break; fi;
-      Print("Considering subgroups: ",nams,"\n");
-      bb := [];
-      llens := [];
-      grpnum := [];
-      for i in [1..Length(grps)] do
-          # will be left by break in case of success
-          Print("  Considering ",nams[i],"\n");
-          m := GModuleByMats(grps[i],f);
-          if not MTX.IsIrreducible(m) then
-              b := List(MTX.BasesMinimalSubmodules(m),MutableCopyMat);
-              Sort(b,function(a,b) return Length(a) < Length(b); end );
-              Print("    Dimensions: ",List(b,Length),"\n");
-              lens := [];
-              for j in [1..Length(b)] do
-                  TriangulizeMat(b[j]);
-                  if Length(b[j]) = 1 then
-                      o := Orb(gens,b[j][1],OnLines,rec( report := 10000,
-                             treehashsize := 1000, storenumbers := true ));
-                  else
-                      o := Orb(gens,b[j],OnSubspacesByCanonicalBasis,
-                         rec( report := 10000, treehashsize := 1000,
-                              storenumbers := true ));
-                  fi;
-                  Enumerate(o);
-                  Print("    Found orbit of length ",Length(o),"\n");
-                  lens[j] := Length(o);
-              od;
-              Append(bb,b);
-              Append(llens,lens);
-              Append(grpnum,ListWithIdenticalEntries(Length(b),i));
-          else
-              Print("    Restriction is irreducible!\n");
-          fi;
-      od;
-      choice := 1;
-      Print("Dimensions: ",List(bb,Length),"\n");
-      Print("Orbit lengths: ",llens,"\n");
-      Error("now decide which orbit to take, set choice");
-      if choice > 0 then
-          i := grpnum[choice];
-          Add(names,nams[i]);
-          Add(dims,Length(bb[choice]));
-          name := nams[i];
-          gens := grps[i];
-          size := size / llens[choice];
-          Add(orblens,llens[choice]);
-          Add(slps,chain[nrs[i]].generators);
-          Add(pts,bb[choice]);
-      fi;
-  until size = 1 or choice = 0;
-  return rec( slps := slps, names := names, dims := dims, orblens := orblens,
-              pts := pts );
-end;
+# RECOG.MakeStabChainHint := function( chain, stdgens )
+#   local b,bb,choice,dims,f,gens,grpnum,grps,i,j,lens,llens,m,name,names,nams,nrs,o,orblens,pts,r,size,slps;
+#   f := FieldOfMatrixList(stdgens);
+#   name := chain[1].name;
+#   size := chain[1].order;
+#   slps := [];
+#   names := [];
+#   dims := [];
+#   orblens := [];
+#   pts := [];
+#   gens := stdgens;
+#   repeat
+#       Print("Working on ",name,"\n");
+#       grps := [];
+#       nams := [];
+#       nrs := [];
+#       for i in [1..Length(chain)] do
+#           r := chain[i];
+#           if IsBound(r.parent) and r.parent = name then
+#               Add(grps,ResultOfStraightLineProgram(r.generators,gens));
+#               Add(nams,r.name);
+#               Add(nrs,i);
+#           fi;
+#       od;
+#       if Length(grps) = 0 then break; fi;
+#       Print("Considering subgroups: ",nams,"\n");
+#       bb := [];
+#       llens := [];
+#       grpnum := [];
+#       for i in [1..Length(grps)] do
+#           # will be left by break in case of success
+#           Print("  Considering ",nams[i],"\n");
+#           m := GModuleByMats(grps[i],f);
+#           if not MTX.IsIrreducible(m) then
+#               b := List(MTX.BasesMinimalSubmodules(m),MutableCopyMat);
+#               Sort(b,function(a,b) return Length(a) < Length(b); end );
+#               Print("    Dimensions: ",List(b,Length),"\n");
+#               lens := [];
+#               for j in [1..Length(b)] do
+#                   TriangulizeMat(b[j]);
+#                   if Length(b[j]) = 1 then
+#                       o := Orb(gens,b[j][1],OnLines,rec( report := 10000,
+#                              treehashsize := 1000, storenumbers := true ));
+#                   else
+#                       o := Orb(gens,b[j],OnSubspacesByCanonicalBasis,
+#                          rec( report := 10000, treehashsize := 1000,
+#                               storenumbers := true ));
+#                   fi;
+#                   Enumerate(o);
+#                   Print("    Found orbit of length ",Length(o),"\n");
+#                   lens[j] := Length(o);
+#               od;
+#               Append(bb,b);
+#               Append(llens,lens);
+#               Append(grpnum,ListWithIdenticalEntries(Length(b),i));
+#           else
+#               Print("    Restriction is irreducible!\n");
+#           fi;
+#       od;
+#       choice := 1;
+#       Print("Dimensions: ",List(bb,Length),"\n");
+#       Print("Orbit lengths: ",llens,"\n");
+#       Error("now decide which orbit to take, set choice");
+#       if choice > 0 then
+#           i := grpnum[choice];
+#           Add(names,nams[i]);
+#           Add(dims,Length(bb[choice]));
+#           name := nams[i];
+#           gens := grps[i];
+#           size := size / llens[choice];
+#           Add(orblens,llens[choice]);
+#           Add(slps,chain[nrs[i]].generators);
+#           Add(pts,bb[choice]);
+#       fi;
+#   until size = 1 or choice = 0;
+#   return rec( slps := slps, names := names, dims := dims, orblens := orblens,
+#               pts := pts );
+# end;
 
 InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
     local S,b,bra,c,cf,elm,finder,fu,gm,homs,m,max,maxes,maxgens,opt,s,stdgens;
@@ -752,138 +751,134 @@ FindHomMethodsProjective.ThreeLargeElOrders := function(ri,G)
   return fail; # FIXME: fail = TemporaryFailure here really correct?
 end;
 
-RECOG.DegreeAlternating := function (orders)
-    local   degs,  prims,  m,  f,  n;
-    degs := [];
-    prims := [];
-    for m in orders do
-        if m > 1 then
-            f := Collected(Factors(m));
-            Sort(f);
-            n := Sum(f, x->x[1]^x[2]);
-            if f[1][1] = 2 then n := n+2; fi;
-            AddSet(degs,n);
-            UniteSet(prims,Set(f,x->x[1]));
-        fi;
-    od;
-    return [degs, prims];
-end;
-
-# FIXME: dead code? (its callers are all dead)
-RECOG.RecognizeAlternating := function (orders)
-    local   tmp,  degs,  prims,  mindeg,  p1,  p2,  i;
-   tmp := RECOG.DegreeAlternating (orders);
-   degs := tmp[1];
-   prims := tmp[2];
-   if Length(degs) = 0 then
-       return "Unknown";
-   fi;
-   mindeg := Maximum (degs);  # minimal possible degree
-
-   p1 := PrevPrimeInt (mindeg + 1);
-   p2 := PrevPrimeInt (p1);
-   if not p1 in prims or not p2 in prims then
-       return 0;
-   fi;
-   if mindeg mod 2 = 1 then
-       if not (mindeg in orders and  mindeg - 2 in orders) then
-           return 0;
-       fi;
-   else
-       if not mindeg - 1 in orders then
-           return 0;
-       fi;
-   fi;
-
-   for i in [3..Minimum (QuoInt(mindeg,2) - 1, 6)] do
-       if IsPrime (i) and IsPrime (mindeg - i) then
-           if not i * (mindeg - i) in orders then
-               return 0;
-           fi;
-       elif IsPrime (i) and IsPrime (mindeg - i -1) then
-           if not i * (mindeg - i - 1) in orders then
-               return 0;
-           fi;
-       fi;
-   od;
-   return mindeg;
-end;
-
-# FIXME: dead code? (it's callers are all dead)
-SLPforElementFuncsProjective.Alternating := function(ri,x)
-  local y,slp;
-  RecSnAnIsOne := IsOneProjective;
-  RecSnAnEq := IsEqualProjective;
-  y := FindImageAn(ri!.recogSnAnDeg,x,
-                   ri!.recogSnAnRec[2][1], ri!.recogSnAnRec[2][2],
-                   ri!.recogSnAnRec[3][1], ri!.recogSnAnRec[3][2]);
-  RecSnAnIsOne := IsOne;
-  RecSnAnEq := EQ;
-  if y = fail then return fail; fi;
-  slp := SLPforAn(ri!.recogSnAnDeg,y);
-  return slp;
-end;
-
-# FIXME: dead code? (it's callers are all dead)
-SLPforElementFuncsProjective.Symmetric := function(ri,x)
-  local y,slp;
-  RecSnAnIsOne := IsOneProjective;
-  RecSnAnEq := IsEqualProjective;
-  y := FindImageSn(ri!.recogSnAnDeg,x,
-                   ri!.recogSnAnRec[2][1], ri!.recogSnAnRec[2][2],
-                   ri!.recogSnAnRec[3][1], ri!.recogSnAnRec[3][2]);
-  RecSnAnIsOne := IsOne;
-  RecSnAnEq := EQ;
-  if y = fail then return fail; fi;
-  slp := SLPforSn(ri!.recogSnAnDeg,y);
-  return slp;
-end;
-
-# FIXME: unused?
-FindHomMethodsProjective.AlternatingBBByOrders := function(ri,G)
-  local Gm,RecSnAnEq,RecSnAnIsOne,deg,limit,ordersseen,r;
-  if IsBound(ri!.projordersseen) then
-      ordersseen := ri!.projordersseen;
-  else
-      ordersseen := [];
-  fi;
-  limit := QuoInt(3*ri!.dimension,2);
-  while Length(ordersseen) <= limit do
-      Add(ordersseen,RECOG.ProjectiveOrder(PseudoRandom(G)));
-      if Length(ordersseen) mod 20 = 0 or
-         Length(ordersseen) = limit then
-          deg := RECOG.RecognizeAlternating(ordersseen);
-          Info(InfoRecog,2,ordersseen);
-          if deg > 0 then  # we strongly suspect Alt(deg):
-              # Switch blackbox recognition to projective:
-              Info(InfoRecog,2,"Suspect alternating or symmetric group of ",
-                   "degree ",deg,"...");
-              RecSnAnIsOne := IsOneProjective;
-              RecSnAnEq := IsEqualProjective;
-              Gm := GroupWithMemory(G);
-              r := RecogniseSnAn(deg,Gm,1/100);
-              RecSnAnIsOne := IsOne;
-              RecSnAnEq := EQ;
-              if r = fail or r[1] <> "An" then
-                  Info(InfoRecog,2,"AltByOrders: Did not find generators.");
-                  continue;
-              fi;
-              Info(InfoRecog,2,"Found Alt(",deg,")!");
-              ri!.recogSnAnRec := r;
-              ri!.recogSnAnDeg := deg;
-              SetSize(ri,Factorial(deg)/2);
-              Setslpforelement(ri,SLPforElementFuncsProjective.Alternating);
-              Setslptonice(ri,SLPOfElms(Reversed(r[2])));
-              ForgetMemory(r[2]);
-              ForgetMemory(r[3][1]);
-              SetFilterObj(ri,IsLeaf);
-              SetIsSimpleGroup(ri,true);
-              return Success;
-          fi;
-      fi;
-  od;
-  return fail; # FIXME: fail = TemporaryFailure here really correct?
-end;
+# RECOG.DegreeAlternating := function (orders)
+#     local   degs,  prims,  m,  f,  n;
+#     degs := [];
+#     prims := [];
+#     for m in orders do
+#         if m > 1 then
+#             f := Collected(Factors(m));
+#             Sort(f);
+#             n := Sum(f, x->x[1]^x[2]);
+#             if f[1][1] = 2 then n := n+2; fi;
+#             AddSet(degs,n);
+#             UniteSet(prims,Set(f,x->x[1]));
+#         fi;
+#     od;
+#     return [degs, prims];
+# end;
+# 
+# RECOG.RecognizeAlternating := function (orders)
+#     local   tmp,  degs,  prims,  mindeg,  p1,  p2,  i;
+#    tmp := RECOG.DegreeAlternating (orders);
+#    degs := tmp[1];
+#    prims := tmp[2];
+#    if Length(degs) = 0 then
+#        return "Unknown";
+#    fi;
+#    mindeg := Maximum (degs);  # minimal possible degree
+# 
+#    p1 := PrevPrimeInt (mindeg + 1);
+#    p2 := PrevPrimeInt (p1);
+#    if not p1 in prims or not p2 in prims then
+#        return 0;
+#    fi;
+#    if mindeg mod 2 = 1 then
+#        if not (mindeg in orders and  mindeg - 2 in orders) then
+#            return 0;
+#        fi;
+#    else
+#        if not mindeg - 1 in orders then
+#            return 0;
+#        fi;
+#    fi;
+# 
+#    for i in [3..Minimum (QuoInt(mindeg,2) - 1, 6)] do
+#        if IsPrime (i) and IsPrime (mindeg - i) then
+#            if not i * (mindeg - i) in orders then
+#                return 0;
+#            fi;
+#        elif IsPrime (i) and IsPrime (mindeg - i -1) then
+#            if not i * (mindeg - i - 1) in orders then
+#                return 0;
+#            fi;
+#        fi;
+#    od;
+#    return mindeg;
+# end;
+#
+# SLPforElementFuncsProjective.Alternating := function(ri,x)
+#   local y,slp;
+#   RecSnAnIsOne := IsOneProjective;
+#   RecSnAnEq := IsEqualProjective;
+#   y := FindImageAn(ri!.recogSnAnDeg,x,
+#                    ri!.recogSnAnRec[2][1], ri!.recogSnAnRec[2][2],
+#                    ri!.recogSnAnRec[3][1], ri!.recogSnAnRec[3][2]);
+#   RecSnAnIsOne := IsOne;
+#   RecSnAnEq := EQ;
+#   if y = fail then return fail; fi;
+#   slp := SLPforAn(ri!.recogSnAnDeg,y);
+#   return slp;
+# end;
+#
+# SLPforElementFuncsProjective.Symmetric := function(ri,x)
+#   local y,slp;
+#   RecSnAnIsOne := IsOneProjective;
+#   RecSnAnEq := IsEqualProjective;
+#   y := FindImageSn(ri!.recogSnAnDeg,x,
+#                    ri!.recogSnAnRec[2][1], ri!.recogSnAnRec[2][2],
+#                    ri!.recogSnAnRec[3][1], ri!.recogSnAnRec[3][2]);
+#   RecSnAnIsOne := IsOne;
+#   RecSnAnEq := EQ;
+#   if y = fail then return fail; fi;
+#   slp := SLPforSn(ri!.recogSnAnDeg,y);
+#   return slp;
+# end;
+#
+# FindHomMethodsProjective.AlternatingBBByOrders := function(ri,G)
+#   local Gm,RecSnAnEq,RecSnAnIsOne,deg,limit,ordersseen,r;
+#   if IsBound(ri!.projordersseen) then
+#       ordersseen := ri!.projordersseen;
+#   else
+#       ordersseen := [];
+#   fi;
+#   limit := QuoInt(3*ri!.dimension,2);
+#   while Length(ordersseen) <= limit do
+#       Add(ordersseen,RECOG.ProjectiveOrder(PseudoRandom(G)));
+#       if Length(ordersseen) mod 20 = 0 or
+#          Length(ordersseen) = limit then
+#           deg := RECOG.RecognizeAlternating(ordersseen);
+#           Info(InfoRecog,2,ordersseen);
+#           if deg > 0 then  # we strongly suspect Alt(deg):
+#               # Switch blackbox recognition to projective:
+#               Info(InfoRecog,2,"Suspect alternating or symmetric group of ",
+#                    "degree ",deg,"...");
+#               RecSnAnIsOne := IsOneProjective;
+#               RecSnAnEq := IsEqualProjective;
+#               Gm := GroupWithMemory(G);
+#               r := RecogniseSnAn(deg,Gm,1/100);
+#               RecSnAnIsOne := IsOne;
+#               RecSnAnEq := EQ;
+#               if r = fail or r[1] <> "An" then
+#                   Info(InfoRecog,2,"AltByOrders: Did not find generators.");
+#                   continue;
+#               fi;
+#               Info(InfoRecog,2,"Found Alt(",deg,")!");
+#               ri!.recogSnAnRec := r;
+#               ri!.recogSnAnDeg := deg;
+#               SetSize(ri,Factorial(deg)/2);
+#               Setslpforelement(ri,SLPforElementFuncsProjective.Alternating);
+#               Setslptonice(ri,SLPOfElms(Reversed(r[2])));
+#               ForgetMemory(r[2]);
+#               ForgetMemory(r[3][1]);
+#               SetFilterObj(ri,IsLeaf);
+#               SetIsSimpleGroup(ri,true);
+#               return Success;
+#           fi;
+#       fi;
+#   od;
+#   return fail; # FIXME: fail = TemporaryFailure here really correct?
+# end;
 
 RECOG.HomFDPM := function(data,x)
   local r;
@@ -941,56 +936,56 @@ FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
 
 # FIXME: there is dead code below...
 
-  p := Characteristic(f);
-  totry := EmptyPlist(2);
-  if (d+1) mod p <> 0 and d+1 > 10 then
-      Add(totry,d+1);
-  fi;
-  if (d+2) mod p = 0 and d+2 > 10 then
-      Add(totry,d+2);
-  fi;
-
-  for deg in totry do
-      Info(InfoRecog,3,"Looking for Alt/Sym(",deg,")...");
-      RecSnAnIsOne := IsOneProjective;
-      RecSnAnEq := IsEqualProjective;
-      Gm := GroupWithMemory(G);
-      r := RecogniseSnAn(deg,Gm,1/100);
-      RecSnAnIsOne := IsOne;
-      RecSnAnEq := EQ;
-      if r = fail then
-          Info(InfoRecog,2,"AltSym: deg=",deg,": did not find generators.");
-          continue;
-      fi;
-      if r[1] = "An" then
-          Info(InfoRecog,2,"Found Alt(",deg,")!");
-          ri!.recogSnAnRec := r;
-          ri!.recogSnAnDeg := deg;
-          SetSize(ri,Factorial(deg)/2);
-          Setslpforelement(ri,SLPforElementFuncsProjective.Alternating);
-          Setslptonice(ri,SLPOfElms(Reversed(r[2])));
-          ForgetMemory(r[2]);
-          ForgetMemory(r[3][1]);
-          SetFilterObj(ri,IsLeaf);
-          SetIsSimpleGroup(ri,true);
-          ri!.comment := "_Alt";
-          return Success;
-      else   # r[1] = "Sn"
-          Info(InfoRecog,2,"Found Sym(",deg,")!");
-          ri!.recogSnAnRec := r;
-          ri!.recogSnAnDeg := deg;
-          SetSize(ri,Factorial(deg));
-          Setslpforelement(ri,SLPforElementFuncsProjective.Symmetric);
-          Setslptonice(ri,SLPOfElms(Reversed(r[2])));
-          ForgetMemory(r[2]);
-          ForgetMemory(r[3][1]);
-          SetFilterObj(ri,IsLeaf);
-          SetIsAlmostSimpleGroup(ri,true);
-          ri!.comment := "_Sym";
-          return Success;
-      fi;
-  od;
-  return TemporaryFailure;
+#   p := Characteristic(f);
+#   totry := EmptyPlist(2);
+#   if (d+1) mod p <> 0 and d+1 > 10 then
+#       Add(totry,d+1);
+#   fi;
+#   if (d+2) mod p = 0 and d+2 > 10 then
+#       Add(totry,d+2);
+#   fi;
+# 
+#   for deg in totry do
+#       Info(InfoRecog,3,"Looking for Alt/Sym(",deg,")...");
+#       RecSnAnIsOne := IsOneProjective;
+#       RecSnAnEq := IsEqualProjective;
+#       Gm := GroupWithMemory(G);
+#       r := RecogniseSnAn(deg,Gm,1/100);
+#       RecSnAnIsOne := IsOne;
+#       RecSnAnEq := EQ;
+#       if r = fail then
+#           Info(InfoRecog,2,"AltSym: deg=",deg,": did not find generators.");
+#           continue;
+#       fi;
+#       if r[1] = "An" then
+#           Info(InfoRecog,2,"Found Alt(",deg,")!");
+#           ri!.recogSnAnRec := r;
+#           ri!.recogSnAnDeg := deg;
+#           SetSize(ri,Factorial(deg)/2);
+#           Setslpforelement(ri,SLPforElementFuncsProjective.Alternating);
+#           Setslptonice(ri,SLPOfElms(Reversed(r[2])));
+#           ForgetMemory(r[2]);
+#           ForgetMemory(r[3][1]);
+#           SetFilterObj(ri,IsLeaf);
+#           SetIsSimpleGroup(ri,true);
+#           ri!.comment := "_Alt";
+#           return Success;
+#       else   # r[1] = "Sn"
+#           Info(InfoRecog,2,"Found Sym(",deg,")!");
+#           ri!.recogSnAnRec := r;
+#           ri!.recogSnAnDeg := deg;
+#           SetSize(ri,Factorial(deg));
+#           Setslpforelement(ri,SLPforElementFuncsProjective.Symmetric);
+#           Setslptonice(ri,SLPOfElms(Reversed(r[2])));
+#           ForgetMemory(r[2]);
+#           ForgetMemory(r[3][1]);
+#           SetFilterObj(ri,IsLeaf);
+#           SetIsAlmostSimpleGroup(ri,true);
+#           ri!.comment := "_Sym";
+#           return Success;
+#       fi;
+#   od;
+#   return TemporaryFailure;
 end;
 
 # Looking at element orders to determine which sporadic it could be:
@@ -1199,33 +1194,32 @@ RECOG.SporadicsWorkers := [];
 #RECOG.SporadicsWorkers[2] := SporadicsWorkerGenSift;   # M11
 # and same for: M12, M22, J2, HS, Ly, Co3, Co2
 
-# FIXME: unused?
-RECOG.MakeSporadicsInfo := function(name)
-  local ct,i,index,killers,o,orders,p,pos,prob,probs,probscopy,sum;
-  ct := CharacterTable(name);
-  orders := Set(OrdersClassRepresentatives(ct));
-  probs := [];
-  for o in orders do
-      prob := 0;
-      pos := Positions(OrdersClassRepresentatives(ct),o);
-      for p in pos do
-          prob := prob + 1/SizesCentralizers(ct)[p];
-      od;
-      Add(probs,prob);
-  od;
-  index := [1..Length(orders)];
-  probscopy := ShallowCopy(probs);
-  SortParallel(probscopy,index);
-  sum := probscopy[Length(orders)];
-  i := Length(orders);
-  repeat
-      i := i - 1;
-      sum := sum + probscopy[i];
-  until sum > 1/4;
-  killers := index{[i..Length(orders)]};
-  return rec( size := Size(ct), orders := orders,
-              probabilities := probs, killers := killers, name := name );
-end;
+# RECOG.MakeSporadicsInfo := function(name)
+#   local ct,i,index,killers,o,orders,p,pos,prob,probs,probscopy,sum;
+#   ct := CharacterTable(name);
+#   orders := Set(OrdersClassRepresentatives(ct));
+#   probs := [];
+#   for o in orders do
+#       prob := 0;
+#       pos := Positions(OrdersClassRepresentatives(ct),o);
+#       for p in pos do
+#           prob := prob + 1/SizesCentralizers(ct)[p];
+#       od;
+#       Add(probs,prob);
+#   od;
+#   index := [1..Length(orders)];
+#   probscopy := ShallowCopy(probs);
+#   SortParallel(probscopy,index);
+#   sum := probscopy[Length(orders)];
+#   i := Length(orders);
+#   repeat
+#       i := i - 1;
+#       sum := sum + probscopy[i];
+#   until sum > 1/4;
+#   killers := index{[i..Length(orders)]};
+#   return rec( size := Size(ct), orders := orders,
+#               probabilities := probs, killers := killers, name := name );
+# end;
 
 RECOG.RuleOutSmallProjOrder := function(m)
   local l,o,v;
