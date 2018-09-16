@@ -42,49 +42,6 @@ FindHomMethodsPerm.VeryFewPoints := function(ri, G)
   fi;
 end;
 
-RestrictToOrbitHomFuncAway := function(data,el)
-  local result;
-  return RestrictedPerm(el^data[1],[1..data[2]]);
-end;
-
-RestrictToOrbitHomFunc := function(data,el)
-  local result;
-  return PermList(OnTuples([1..data[2]],el^data[1]));
-end;
-
-FindHomMethodsPerm.NonTransitiveByFoot :=
-  function( ri, G )
-    local data,hom,i,image,imgens,l,la,o,oo,p;
-
-    # Then test whether we can do something:
-    if IsTransitive(G) then
-        return NeverApplicable;
-    fi;
-
-    # Otherwise find an orbit and restrict:
-    la := LargestMovedPoint(G);
-    o := Orbit(G,la);
-    l := [];
-    for i in [1..Length(o)] do
-        l[o[i]] := i;
-    od;
-    oo := Difference([1..la],o);
-    for i in [1..Length(oo)] do
-        l[oo[i]] := Length(o)+i;
-    od;
-    p := PermList(l);
-    data := [p,Length(o)];
-
-    # Now map the generators and build a group object:
-    imgens := List(GeneratorsOfGroup(G),x->RestrictToOrbitHomFunc(data,x));
-
-    # Build the homomorphism:
-    hom := GroupHomByFuncWithData(G,Group(imgens),RestrictToOrbitHomFunc,data);
-    SetHomom(ri,hom);
-
-    return Success;
-  end;
-
 FindHomMethodsPerm.NonTransitive :=
   function( ri, G )
     local hom,la,o;
