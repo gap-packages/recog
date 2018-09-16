@@ -12,10 +12,10 @@
 #
 # FIXME: where does this table come from? How was it generated?
 #
-# Mote: It contains many groups multiple times, e.g. it contains
+# Note: It contains many groups multiple times, e.g. it contains
 # these two entries:
-#   [751,376,["l",2,751]
-#   [376,375,["l",2,751]
+#   [751,376,["l",2,751]]
+#   [376,375,["l",2,751]]
 # In fact, some groups occur even more often. The record is set
 # by ["s",14,3] and ["s",16,3], which each occur 19 times.
 #
