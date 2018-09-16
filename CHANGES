@@ -1,12 +1,26 @@
 This file describes changes in the recog package.
 
-1.3 (YYYY-MM-DD)
-  - Require GAP >= 4.9
-  - Merge recogbase package into recog
-  - Remove a lot of dead code
-  - Add comments throughout the codebase (e.g. notes on the origin
+1.3 (2018-09-16)
+  - Requires GAP >= 4.9
+  - Merge the recogbase package into recog
+  - Remove tons of unused code & files
+  - Add many comments throughout the codebase (e.g. notes on the origin
     of some algorithms; FIXME and TODO remarks; ...)
-  - Add input validation to some more homomorphisms
+  - Fix many bugs in the recognition code leading to errors or incorrect recognitions
+  - Replace involution finder for SL_2 in even characteristic (faster & less buggy)
+  - Add more tests
+  - Set up continuous integration using Travis CI, to ensure new code changes
+    are immediately tested for regressions
+  - Introduce self-explanatory names for recognition method results
+    (true -> Success, false -> NeverApplicable, fail -> TemporaryFailure,
+    NotApplicable -> NotEnoughInformation); this revealed various bugs where
+    the wrong values were returned
+  - Refactor CallMethods, to make it easier to understand and work on
+  - Improve the documentation; in particular, the tables of recognition methods
+    with their rankings are now generated from the code, and thus are always
+    up-to-date (previously, they were from that)
+  - Add Randomize methods for non-compressed vectors to support fields with more than 256 elements (fixes issue #15)
+  - Many other small changes, cleanups, etc.
 
 1.2.5 (2016-03-08)
   - Maintenance release

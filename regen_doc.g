@@ -7,6 +7,8 @@ GenerateMethodsXML := function(shortname, desc, db)
 local xmlfile, meth;
 
     xmlfile := Concatenation("doc/methods_", shortname, "_table.xml");
+    xmlfile := OutputTextFile(xmlfile, false);
+    SetPrintFormattingStatus(xmlfile, false);
 
     PrintTo(xmlfile, "<Table Align=\"|l|l|l|l|\">\n");
     AppendTo(xmlfile, "<Caption>", desc, " group find homomorphism methods</Caption>\n");
@@ -24,6 +26,8 @@ local xmlfile, meth;
     od;
 
     AppendTo(xmlfile, "</Table>\n");
+
+    CloseStream(xmlfile);
 
 end;
 

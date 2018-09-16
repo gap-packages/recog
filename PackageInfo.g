@@ -22,8 +22,8 @@ SetPackageInfo( rec(
 
 PackageName := "recog",
 Subtitle := "A collection of group recognition methods",
-Version := "1.3dev",
-Date := "08/03/2016", # dd/mm/yyyy format
+Version := "1.3",
+Date := "16/09/2018", # dd/mm/yyyy format
 
 ##  Information about authors and maintainers.
 Persons := [
@@ -250,7 +250,6 @@ PackageDoc := rec(
 Dependencies := rec(
   GAP := ">=4.9",
   NeededOtherPackages := [
-    ["GAPDoc", ">= 1.2"],
     ["Forms", ">= 1.2"],
     ["genss", ">= 1.3"],
     ["Orb", ">= 3.4"],
