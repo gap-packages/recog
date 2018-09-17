@@ -764,7 +764,8 @@ FindHomMethodsMatrix.GoProjective := function(ri,G)
   SetHomom(ri,hom);
   # Now give hints downward:
   Setmethodsforfactor(ri,FindHomDbProjective);
-
+  # note that RecogniseGeneric detects the use of FindHomDbProjective and
+  # sets ri!.projective := true for the factor
   # the kernel:
   q := Size(ri!.field);
   findgensNmeth(ri).method := FindKernelRandom;
