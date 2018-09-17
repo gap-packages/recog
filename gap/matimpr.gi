@@ -21,36 +21,36 @@
 ##  Compute the orbit of a subspace but return fail if the orbit has
 ##  more than <max> elements.
 ##
-RECOG.OrbitSubspaceWithLimit := function( grp, U, max )
-
-    local   orb,  orbset, new,  pnt,  img,  gen, gens;
-
-    gens := GeneratorsOfGroup(grp);
-
-    # start with the singleton orbit
-    orb := [ U ];
-    orbset := [ U ];
-
-    # loop over all points found
-    for pnt  in orb  do
-
-        # apply all generators <gen>
-        for gen  in gens  do
-            img := OnSubspacesByCanonicalBasis( pnt, gen );
-
-            # add the image <img> to the orbit if it is new
-            # can perhaps be improved (is now)
-            if not img in orbset then
-                Add( orb, img );
-                AddSet( orbset, img );
-                if Length(orb) > max then return fail; fi;
-            fi;
-
-        od;
-
-    od;
-    return orbset;
-end;
+# RECOG.OrbitSubspaceWithLimit := function( grp, U, max )
+# 
+#     local   orb,  orbset, new,  pnt,  img,  gen, gens;
+# 
+#     gens := GeneratorsOfGroup(grp);
+# 
+#     # start with the singleton orbit
+#     orb := [ U ];
+#     orbset := [ U ];
+# 
+#     # loop over all points found
+#     for pnt  in orb  do
+# 
+#         # apply all generators <gen>
+#         for gen  in gens  do
+#             img := OnSubspacesByCanonicalBasis( pnt, gen );
+# 
+#             # add the image <img> to the orbit if it is new
+#             # can perhaps be improved (is now)
+#             if not img in orbset then
+#                 Add( orb, img );
+#                 AddSet( orbset, img );
+#                 if Length(orb) > max then return fail; fi;
+#             fi;
+# 
+#         od;
+# 
+#     od;
+#     return orbset;
+# end;
 
 #
 #  Test if the module hm already has a submodule with a

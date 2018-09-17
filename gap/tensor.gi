@@ -202,51 +202,51 @@ RECOG.IsKroneckerProduct := function(m,blocksize)
   return [true,a,ac];
 end;
 
-RECOG.VerifyTensorDecomposition := function(gens,r)
-  local g,newgens,newgensdec,res,yes;
-  newgens := List(gens,x->r.t * x * r.ti);
-  newgensdec := [];
-  yes := true;
-  for g in newgens do
-      res := RECOG.IsKroneckerProduct(g,r.blocksize);
-      if res[1] = false then
-          Add(newgensdec,fail);
-          yes := false;
-      else
-          Add(newgensdec,[res[2],res[3]]);
-      fi;
-  od;
-  return [yes,newgens,newgensdec];
-end;
-
-RECOG.FindInvolution := function(g)
-  # g a matrix group
-  local i,o,x;
-  for i in [1..100] do
-      x := PseudoRandom(g);
-      o := Order(x);
-      if o mod 2 = 0 then
-          return x^(o/2);
-      fi;
-  od;
-  return fail;
-end;
-
-RECOG.FindCentralisingElementOfInvolution := function(G,x)
-  # x an involution in G
-  local o,r,y,z;
-  r := PseudoRandom(G);
-  y := x^r;
-  # Now x and y generate a dihedral group
-  if x=y then return r; fi;
-  z := x*y;
-  o := Order(z);
-  if IsEvenInt(o) then
-      return z^(o/2);
-  else
-      return z^((o+1)/2)*r^(-1);
-  fi;
-end;
+# RECOG.VerifyTensorDecomposition := function(gens,r)
+#   local g,newgens,newgensdec,res,yes;
+#   newgens := List(gens,x->r.t * x * r.ti);
+#   newgensdec := [];
+#   yes := true;
+#   for g in newgens do
+#       res := RECOG.IsKroneckerProduct(g,r.blocksize);
+#       if res[1] = false then
+#           Add(newgensdec,fail);
+#           yes := false;
+#       else
+#           Add(newgensdec,[res[2],res[3]]);
+#       fi;
+#   od;
+#   return [yes,newgens,newgensdec];
+# end;
+#
+# RECOG.FindInvolution := function(g)
+#   # g a matrix group
+#   local i,o,x;
+#   for i in [1..100] do
+#       x := PseudoRandom(g);
+#       o := Order(x);
+#       if o mod 2 = 0 then
+#           return x^(o/2);
+#       fi;
+#   od;
+#   return fail;
+# end;
+# 
+# RECOG.FindCentralisingElementOfInvolution := function(G,x)
+#   # x an involution in G
+#   local o,r,y,z;
+#   r := PseudoRandom(G);
+#   y := x^r;
+#   # Now x and y generate a dihedral group
+#   if x=y then return r; fi;
+#   z := x*y;
+#   o := Order(z);
+#   if IsEvenInt(o) then
+#       return z^(o/2);
+#   else
+#       return z^((o+1)/2)*r^(-1);
+#   fi;
+# end;
 
 RECOG.IsScalarMat := function(m)
   local i,x;
@@ -262,59 +262,59 @@ RECOG.IsScalarMat := function(m)
   return x;
 end;
 
-RECOG.FindInvolutionCentraliser := function(G,x)
-  # x an involution in G
-  local i,l,y;
-  l := [];
-  for i in [1..20] do   # find 20 generators of the centraliser
-      y := RECOG.FindCentralisingElementOfInvolution(G,x);
-      AddSet(l,y);
-  od;
-  return GroupWithGenerators(l);
-end;
-
-
-RECOG.FindTensorOtherFactor := function(G,N,blocksize)
-  # N a non-scalar normal subgroup of G
-  # Basechange already done such that N is a block scalar matrix meaning
-  # "block-diagonal" and all blocks along the diagonal are equal.
-  local c,i,invs,o,out,timeout,x,z;
-
-  # Find a non-scalar involution in N:
-  timeout := 100;
-  while true do
-      timeout := timeout - 1;
-      if timeout = 0 then return fail; fi;
-      x := RECOG.FindInvolution(N);
-      if x <> fail and RECOG.IsScalarMat(x) = false then
-          break;
-      fi;
-  od;
-
-  invs := [x];
-  for i in [1..5] do
-      Add(invs,x^PseudoRandom(N));
-  od;
-
-  timeout := 100;
-  while true do
-      timeout := timeout - 1;
-      if timeout = 0 then return fail; fi;
-      c := RECOG.FindCentralisingElementOfInvolution(G,invs[1]);
-      o := Order(c);
-      if IsOddInt(o) then continue; fi;
-      c := c^(o/2);
-      i := 2;
-      out := false;
-      while i <= 5 do
-          x := invs[i] * c;
-          o := Order(x);
-          if IsOddInt(o) then break; fi;
-          z := x^(o/2);   # this now commutes with invs[1]..invs[i], because
-                          # it is a power of a product of inv
-      od;
-  od;
-end;
+# RECOG.FindInvolutionCentraliser := function(G,x)
+#   # x an involution in G
+#   local i,l,y;
+#   l := [];
+#   for i in [1..20] do   # find 20 generators of the centraliser
+#       y := RECOG.FindCentralisingElementOfInvolution(G,x);
+#       AddSet(l,y);
+#   od;
+#   return GroupWithGenerators(l);
+# end;
+#
+#
+# RECOG.FindTensorOtherFactor := function(G,N,blocksize)
+#   # N a non-scalar normal subgroup of G
+#   # Basechange already done such that N is a block scalar matrix meaning
+#   # "block-diagonal" and all blocks along the diagonal are equal.
+#   local c,i,invs,o,out,timeout,x,z;
+# 
+#   # Find a non-scalar involution in N:
+#   timeout := 100;
+#   while true do
+#       timeout := timeout - 1;
+#       if timeout = 0 then return fail; fi;
+#       x := RECOG.FindInvolution(N);
+#       if x <> fail and RECOG.IsScalarMat(x) = false then
+#           break;
+#       fi;
+#   od;
+# 
+#   invs := [x];
+#   for i in [1..5] do
+#       Add(invs,x^PseudoRandom(N));
+#   od;
+# 
+#   timeout := 100;
+#   while true do
+#       timeout := timeout - 1;
+#       if timeout = 0 then return fail; fi;
+#       c := RECOG.FindCentralisingElementOfInvolution(G,invs[1]);
+#       o := Order(c);
+#       if IsOddInt(o) then continue; fi;
+#       c := c^(o/2);
+#       i := 2;
+#       out := false;
+#       while i <= 5 do
+#           x := invs[i] * c;
+#           o := Order(x);
+#           if IsOddInt(o) then break; fi;
+#           z := x^(o/2);   # this now commutes with invs[1]..invs[i], because
+#                           # it is a power of a product of inv
+#       od;
+#   od;
+# end;
 
 
 FindHomMethodsProjective.TensorDecomposable := function(ri,G)
