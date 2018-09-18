@@ -22,8 +22,8 @@ SetPackageInfo( rec(
 
 PackageName := "recog",
 Subtitle := "A collection of group recognition methods",
-Version := "1.3",
-Date := "16/09/2018", # dd/mm/yyyy format
+Version := "1.3.1",
+Date := "18/09/2018", # dd/mm/yyyy format
 
 ##  Information about authors and maintainers.
 Persons := [
