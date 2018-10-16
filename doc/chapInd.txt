@@ -1,0 +1,73 @@
+  
+  
+  [1XIndex[101X
+  
+  [2X\in[102X 5.1-2 
+  [2XAddMethod[102X 4.1-1 
+  [2Xcalcnicegens[102X 3.2-17 
+  [2XCalcNiceGens[102X 3.2-20 
+  [2XCalcNiceGensGeneric[102X 3.2-18 
+  [2XCalcNiceGensHomNode[102X 3.2-19 
+  [2XCallMethods[102X 4.2-1 
+  [2XDisplayCompositionFactors[102X 5.1-4 
+  [2Xfhmethsel[102X 3.2-12 
+  [2XfindgensNmeth[102X 3.2-23 
+  [2XFindHomDbBB[102X 3.1-16 
+  [2XFindHomDbMatrix[102X 3.1-10 
+  [2XFindHomDbPerm[102X 3.1-7 
+  [2XFindHomDbProjective[102X 3.1-13 
+  [2XFindHomMethodsBB[102X 3.1-17 
+  [2XFindHomMethodsMatrix[102X 3.1-11 
+  [2XFindHomMethodsPerm[102X 3.1-8 
+  [2XFindHomMethodsProjective[102X 3.1-14 
+  [2XFindHomomorphism[102X 3.3-1 
+  [2XFindKernelDoNothing[102X 3.2-25 
+  [2XFindKernelFastNormalClosure[102X 3.2-26 
+  [2XFindKernelRandom[102X 3.2-24 
+  [2Xforfactor[102X 3.2-30 
+  [2Xforkernel[102X 3.2-29 
+  [2XgensN[102X 3.2-22 
+  [2XgensNslp[102X 3.2-27 
+  [2XGrp[102X 3.2-5 
+  [2XHomom[102X 3.2-6 
+  [2Ximmediateverification[102X 3.2-28 
+  [2Xisequal[102X 3.2-32 
+  [2XIsLeaf[102X 3.2-3 
+  [2Xisone[102X 3.2-31 
+  [2XIsReady[102X 3.2-4 
+  [2XIsRecognitionInfo[102X 3.2-2 
+  [2Xmethodsforfactor[102X 3.2-16 
+  [2XNiceGens[102X 3.2-7 
+  [2Xpregensfac[102X 3.2-8 
+  [5Xrecog[105X 2.  6. 
+  [2XRecogniseBBGroup[102X 3.1-5 
+  [2XRecogniseGeneric[102X 3.1-1 
+  [2XRecogniseGroup[102X 3.1-6 
+  [2XRecogniseMatrixGroup[102X 3.1-3 
+  [2XRecognisePermGroup[102X 3.1-2 
+  [2XRecogniseProjectiveGroup[102X 3.1-4 
+  [2XRecognitionInfoFamily[102X 3.2-1 
+  [2XRecognizeBBGroup[102X 3.1-5 
+  [2XRecognizeGeneric[102X 3.1-1 
+  [2XRecognizeGroup[102X 3.1-6 
+  [2XRecognizeMatrixGroup[102X 3.1-3 
+  [2XRecognizePermGroup[102X 3.1-2 
+  [2XRecognizeProjectiveGroup[102X 3.1-4 
+  [2XRIFac[102X 3.2-9 
+  [2XRIKer[102X 3.2-10 
+  [2XRIParent[102X 3.2-11 
+  [2XSize[102X 5.1-3 
+  [2Xslpforelement[102X 3.2-13 
+  [2XSLPforElement[102X 3.2-14 
+  [2XSLPforElementFuncsBB[102X 3.1-18 
+  [2XSLPforElementFuncsMatrix[102X 3.1-12 
+  [2XSLPforElementFuncsPerm[102X 3.1-9 
+  [2XSLPforElementFuncsProjective[102X 3.1-15 
+  [2XSLPforElementGeneric[102X 3.3-2 
+  [2XSLPforNiceGens[102X 5.1-1 
+  [2Xslptonice[102X 3.2-21 
+  [2XStdPresentation[102X 3.2-15 
+  [2XTryFindHomMethod[102X 3.1-19 
+  
+  
+  -------------------------------------------------------

@@ -1,0 +1,45 @@
+  
+  [1X1 [33X[0;0YIntroduction[133X[101X
+  
+  
+  [1X1.1 [33X[0;0YPhilosophy[133X[101X
+  
+  [33X[0;0YThis  package is about group recognition. It provides a generic framework to
+  implement  methods  of  group  recognition, regardless of what computational
+  representation  is used. This means, that the code in this package is useful
+  at  least  for  permutation groups, matrix groups, projective groups and for
+  the context of black box groups. The setup is described in [NS06].[133X
+  
+  [33X[0;0YThe  framework allows to build composition trees and handles the builtup and
+  usage  of  these trees in a generic way. It also contains a method selection
+  (described  in  Chapter  [14X4[114X)  that  allows  install  recognition methods in a
+  convenient  way  and that automatically tries to try the different available
+  methods in a sensible order.[133X
+  
+  
+  [1X1.2 [33X[0;0YOverview over this manual[133X[101X
+  
+  [33X[0;0YChapter [14X2[114X describes the installation of this package.[133X
+  
+  [33X[0;0YChapter  [14X3[114X  describes  the  generic,  recursive  procedure  used  for  group
+  recognition  throughout  this package. At the heart of this procedure is the
+  definition  of  [21XFindHomomorphism[121X  methods,  which  is also described in that
+  chapter.  For  the choice of the right method for finding a homomorphism (or
+  an isomorphism) we use another generic procedure, the [21Xmethod selection[121X which
+  is not to be confused with the [5XGAP[105X method selection.[133X
+  
+  [33X[0;0YOur  own method selection is described in detail in Chapter [14X4[114X, because it is
+  interesting in its own right and might be useful in other circumstances.[133X
+  
+  [33X[0;0YChapter [14X6[114X describes the avalable [21XFindHomomorphism[121X methods.[133X
+  
+  [33X[0;0YChapter [14X5[114X explains what one can do with a completed recognition tree.[133X
+  
+  [33X[0;0YFinally, Chapter [14X7[114X shows instructive examples for the usage of this package.[133X
+  
+  
+  [1X1.3 [33X[0;0YFeedback[133X[101X
+  
+  [33X[0;0YFor  bug  reports,  feature  requests  and suggestions, please use our issue
+  tracker ([7Xhttps://github.com/gap-packages/recog/issues[107X).[133X
+  

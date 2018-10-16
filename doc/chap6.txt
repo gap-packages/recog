@@ -1,0 +1,458 @@
+  
+  [1X6 [33X[0;0YMethods for recognition[133X[101X
+  
+  
+  [1X6.1 [33X[0;0YMethods for permutation groups[133X[101X
+  
+  [33X[0;0YThe  following  table gives an overview over the installed methods and their
+  rank  (higher  rank  means higher priority, the method is tried earlier, see
+  Chapter [14X4[114X).[133X
+  
+      ┌─────┬──────────────────────┬───────────────────────────────────────────────────────────────────────┬────────┐
+      │ 300 │ [10XTrivialPermGroup[110X     │ just go through generators and compare to the identity                │ [14X6.1-1[114X  │ 
+      ├─────┼──────────────────────┼───────────────────────────────────────────────────────────────────────┼────────┤
+      │ 100 │ [10XThrowAwayFixedPoints[110X │ try to find a huge amount of (possible internal) fixed points         │ [14X6.1-2[114X  │ 
+      ├─────┼──────────────────────┼───────────────────────────────────────────────────────────────────────┼────────┤
+      │ 99  │ [10XFewGensAbelian[110X       │ if very few generators, check IsAbelian and if yes, do KnownNilpotent │ [14X6.2-4[114X  │ 
+      ├─────┼──────────────────────┼───────────────────────────────────────────────────────────────────────┼────────┤
+      │ 97  │ [10XPcgs[110X                 │ use a Pcgs to calculate a StabChain                                   │ [14X6.1-3[114X  │ 
+      ├─────┼──────────────────────┼───────────────────────────────────────────────────────────────────────┼────────┤
+      │ 95  │ [10XVeryFewPoints[110X        │ calculate a stabchain if we act on very few points                    │ [14X6.1-4[114X  │ 
+      ├─────┼──────────────────────┼───────────────────────────────────────────────────────────────────────┼────────┤
+      │ 90  │ [10XNonTransitive[110X        │ try to find non-transitivity and restrict to orbit                    │ [14X6.1-5[114X  │ 
+      ├─────┼──────────────────────┼───────────────────────────────────────────────────────────────────────┼────────┤
+      │ 80  │ [10XGiant[110X                │ tries to find Sn and An                                               │ [14X6.1-6[114X  │ 
+      ├─────┼──────────────────────┼───────────────────────────────────────────────────────────────────────┼────────┤
+      │ 70  │ [10XImprimitive[110X          │ for a imprimitive permutation group, restricts to block system        │ [14X6.1-7[114X  │ 
+      ├─────┼──────────────────────┼───────────────────────────────────────────────────────────────────────┼────────┤
+      │ 60  │ [10XSnkSetswrSr[110X          │ tries to find jellyfish                                               │ [14X6.1-8[114X  │ 
+      ├─────┼──────────────────────┼───────────────────────────────────────────────────────────────────────┼────────┤
+      │ 55  │ [10XStabilizerChain[110X      │ for a permutation group using a stabilizer chain (genss)              │ [14X6.3-12[114X │ 
+      ├─────┼──────────────────────┼───────────────────────────────────────────────────────────────────────┼────────┤
+      │ 50  │ [10XStabChain[110X            │ for a permutation group using a stabilizer chain                      │ [14X6.1-9[114X  │ 
+      └─────┴──────────────────────┴───────────────────────────────────────────────────────────────────────┴────────┘
+  
+       [1XTable:[101X Permutation group find homomorphism methods
+  
+  
+  
+  [1X6.1-1 [33X[0;0Y[10XTrivialPermGroup[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis  method  is successful if and only if all generators of the permutation
+  group  [3XG[103X  are  equal  to the identity. Otherwise it returns [9Xfalse[109X indicating
+  that  it  will  never  succeed.  This method is only installed to handle the
+  trivial  case such that we do not have to take this case into account in the
+  other methods.[133X
+  
+  
+  [1X6.1-2 [33X[0;0Y[10XThrowAwayFixedPoints[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis method defines a homomorphism of a permutation group [3XG[103X to the action on
+  the  moved  points  of  [3XG[103X  if  [3XG[103X does not have too many moved points. In the
+  current  setup,  the homomorphism is defined if the number [22Xk[122X of moved points
+  is  at most [22X1/3[122X of the largest moved point of [3XG[103X, or [22Xk[122X is at most half of the
+  number  of points on which [3XG[103X is stored internally by [5XGAP[105X. The method returns
+  [9Xfalse[109X  if  it  does  not define a homomorphism indicating that it will never
+  succeed.[133X
+  
+  
+  [1X6.1-3 [33X[0;0Y[10XPcgs[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis  is  the  [5XGAP[105X  library  function  to  compute  a stabiliser chain for a
+  solvable  permutation  group.  If  the method is successful then the calling
+  node  becomes a leaf node in the recursive scheme. If the input group is not
+  solvable then the method returns [9Xfalse[109X.[133X
+  
+  
+  [1X6.1-4 [33X[0;0Y[10XVeryFewPoints[110X[101X[1X[133X[101X
+  
+  [33X[0;0YIf  a  permutation  group acts only on a few points (the current limit is at
+  most  10  points)  then a stabiliser chain is computed by the randomized [5XGAP[105X
+  library  function  for  that  purpose.  If the method is successful then the
+  calling node becomes a leaf node in the recursive scheme. If the input group
+  acts on more than 10 points then the method returns [9Xfalse[109X.[133X
+  
+  
+  [1X6.1-5 [33X[0;0Y[10XNontransitive[110X[101X[1X[133X[101X
+  
+  [33X[0;0YIf  a  permutation  group [3XG[103X acts nontransitively then this method computes a
+  homomorphism  to the action of [3XG[103X on the orbit of the largest moved point. If
+  [3XG[103X is transitive then the method returns [9Xfalse[109X.[133X
+  
+  
+  [1X6.1-6 [33X[0;0Y[10XGiant[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThe method tries to determine whether the input group [3XG[103X is a giant (that is,
+  [22XA_n[122X  or  [22XS_n[122X in its natural action on [22Xn[122X points). The output is either a data
+  structure [22XD[122X containing nice generators for [3XG[103X and a procedure to write an SLP
+  for  arbitrary  elements of [3XG[103X from the nice generators; or [9Xfalse[109X if [3XG[103X is not
+  transitive;  or  [9Xfail[109X,  in  the  case that no evidence was found that [3XG[103X is a
+  giant, or evidence was found, but the construction of [22XD[122X was unsuccessful. If
+  the method constructs [22XD[122X then the calling node becomes a leaf.[133X
+  
+  
+  [1X6.1-7 [33X[0;0Y[10XImprimitive[110X[101X[1X[133X[101X
+  
+  [33X[0;0YIf  the  input  group is not known to be transitive then this method returns
+  [9XNotEnoughInformation[109X.  If  the  input  group  is  known to be transitive and
+  primitive  then  the  method  returns  [9Xfalse[109X; otherwise, the method tries to
+  compute  a nontrivial block system. If successful then a homomorphism to the
+  action on the blocks is defined; otherwise, the method returns [9Xfalse[109X. If the
+  method  is successful then it also gives a hint for the children of the node
+  by  determining  whether  the  kernel  of  the action on the block system is
+  solvable.  If  the answer is yes then the default value 20 for the number of
+  random  generators  in the kernel construction is increased by the number of
+  blocks.[133X
+  
+  
+  [1X6.1-8 [33X[0;0Y[10XSnkSetswrSr[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis  method  tries  to  determine  whether  the  input  group  [3XG[103X  is acting
+  primitively  on  [22XN[122X  points, and is isomorphic to a large subgroup of [22XH ≀ S_r[122X
+  where  [22XH[122X  is  [22XS_n[122X  acting on [22Xk[122X-sets and [22XN = {n choose k}^r[122X and [22Xkr > 1[122X. [21XLarge[121X
+  means  that  [3XG[103X  contains a subgroup isomorphic to [22XA_n^r[122X. If [3XG[103X is imprimitive
+  then  the  output  is  [9Xfalse[109X.  If [3XG[103X is primitive then the output is either a
+  homomorphism  into  the  natural imprimitive action of [3XG[103X on [22Xnr[122X points with [22Xr[122X
+  blocks of size [22Xn[122X, or [9Xfail[109X.[133X
+  
+  
+  [1X6.1-9 [33X[0;0Y[10XStabChain[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis  is  the  randomized  [5XGAP[105X  library  function for computing a stabiliser
+  chain.  The  method  selection  process ensures that this function is called
+  only with small-base inputs, where the method works efficiently.[133X
+  
+  
+  [1X6.2 [33X[0;0YMethods for matrix groups[133X[101X
+  
+  [33X[0;0YTHIS CHAPTER IS CURRENTLY A BIT OUT OF DATE![133X
+  
+  [33X[0;0YThe  following  table gives an overview over the installed methods and their
+  rank  (higher  rank  means higher priority, the method is tried earlier, see
+  Chapter  [14X4[114X).  Note  that  there  are not that many methods for matrix groups
+  since  the  system  can  switch  to  projective  groups  by dividing out the
+  subgroup  of  scalar  matrices. The bulk of the recognition methods are then
+  installed es methods for projective groups.[133X
+  
+      ┌──────┬──────────────────────┬───────────────────────────────────────────────────────────────────────┬───────┐
+      │ 3100 │ [10XTrivialMatrixGroup[110X   │ check whether all generators are equal to the identity matrix         │ [14X6.2-1[114X │ 
+      ├──────┼──────────────────────┼───────────────────────────────────────────────────────────────────────┼───────┤
+      │ 1175 │ [10XKnownStabilizerChain[110X │ use an already known stabilizer chain for this group                  │ [14X6.2-2[114X │ 
+      ├──────┼──────────────────────┼───────────────────────────────────────────────────────────────────────┼───────┤
+      │ 1100 │ [10XDiagonalMatrices[110X     │ check whether all generators are multiples of the identity            │ [14X6.2-3[114X │ 
+      ├──────┼──────────────────────┼───────────────────────────────────────────────────────────────────────┼───────┤
+      │ 1050 │ [10XFewGensAbelian[110X       │ if very few generators, check IsAbelian and if yes, do KnownNilpotent │ [14X6.2-4[114X │ 
+      ├──────┼──────────────────────┼───────────────────────────────────────────────────────────────────────┼───────┤
+      │ 1000 │ [10XReducibleIso[110X         │ use the MeatAxe to find invariant subspaces                           │ [14X6.2-5[114X │ 
+      ├──────┼──────────────────────┼───────────────────────────────────────────────────────────────────────┼───────┤
+      │ 900  │ [10XGoProjective[110X         │ divide out scalars and recognise projectively                         │ [14X6.2-8[114X │ 
+      └──────┴──────────────────────┴───────────────────────────────────────────────────────────────────────┴───────┘
+  
+       [1XTable:[101X Matrix group find homomorphism methods
+  
+  
+  
+  [1X6.2-1 [33X[0;0Y[10XTrivialMatrixGroup[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis  method is successful if and only if all generators of a matrix group [3XG[103X
+  are equal to the identity. Otherwise, it returns [9Xfalse[109X.[133X
+  
+  
+  [1X6.2-2 [33X[0;0Y[10XKnownStabilizerChain[110X[101X[1X[133X[101X
+  
+  [33X[0;0YTODO. use an already known stabilizer chain for this group[133X
+  
+  
+  [1X6.2-3 [33X[0;0Y[10XDiagonalMatrices[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis  method is successful if and only if all generators of a matrix group [3XG[103X
+  are diagonal matrices. Otherwise, it returns [9Xfalse[109X.[133X
+  
+  
+  [1X6.2-4 [33X[0;0Y[10XFewGensAbelian[110X[101X[1X[133X[101X
+  
+  [33X[0;0YTODO. if very few generators, check IsAbelian and if yes, do KnownNilpotent[133X
+  
+  
+  [1X6.2-5 [33X[0;0Y[10XReducibleIso[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis  method  determines  whether a matrix group [3XG[103X acts irreducibly. If yes,
+  then  it returns [9Xfalse[109X. If [3XG[103X acts reducibly then a composition series of the
+  underlying module is computed and a base change is performed to write [3XG[103X in a
+  block  lower  triangular  form.  Also, the method passes a hint to the image
+  group  that  it  is in block lower triangular form, so the image immediately
+  can make recursive calls for the actions on the diagonal blocks, and then to
+  the  lower [22Xp[122X-part. For the image the method [10XBlockLowerTriangular[110X (see [14X6.2-6[114X)
+  is used.[133X
+  
+  [33X[0;0YNote  that this method is implemented in a way such that it can also be used
+  as  a  method  for  a  projective group [3XG[103X. In that case the recognition info
+  record  has the [10X!.projective[110X component bound to [9Xtrue[109X and this information is
+  passed down to image and kernel.[133X
+  
+  
+  [1X6.2-6 [33X[0;0Y[10XBlockLowerTriangular[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis  method  is  only  called  when  a hint was passed down from the method
+  [10XReducibleIso[110X (see [14X6.2-5[114X). In that case, it knows that a base change to block
+  lower  triangular  form  has been performed. The method can then immediately
+  find  a  homomorphism  by  mapping  to  the diagonal blocks. It sets up this
+  homomorphism  and gives hints to image and kernel. For the image, the method
+  [10XBlockDiagonal[110X   (see   [14X6.2-7[114X)  is  used  and  for  the  kernel,  the  method
+  [10XLowerLeftPGroup[110X (see [14X6.2-10[114X) is used.[133X
+  
+  [33X[0;0YNote  that this method is implemented in a way such that it can also be used
+  as  a  method  for  a  projective group [3XG[103X. In that case the recognition info
+  record  has the [10X!.projective[110X component bound to [9Xtrue[109X and this information is
+  passed down to image and kernel.[133X
+  
+  
+  [1X6.2-7 [33X[0;0Y[10XBlockDiagonal[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis  method  is  only  called  when  a hint was passed down from the method
+  [10XBlockLowerTriangular[110X  (see  [14X6.2-6[114X). In that case, it knows that the group is
+  in  block  diagonal  form.  The  method  is used both in the matrix- and the
+  projective case.[133X
+  
+  [33X[0;0YThe  method  immediately  delegates  to  projective methods handling all the
+  diagonal blocks projectively. This is done by giving a hint to the factor to
+  use  the  method  [10XBlocksModScalars[110X  (see [14X6.3-4[114X) is given. The method for the
+  kernel then has to deal with only scalar blocks, either projectively or with
+  scalars, which is again done by giving a hint to either use [10XBlockScalar[110X (see
+  [14X6.2-9[114X) or [10XBlockScalarProj[110X (see [14X6.3-13[114X) respectively.[133X
+  
+  [33X[0;0YNote  that this method is implemented in a way such that it can also be used
+  as  a  method  for  a  projective group [3XG[103X. In that case the recognition info
+  record  has the [10X!.projective[110X component bound to [9Xtrue[109X and this information is
+  passed down to image and kernel.[133X
+  
+  
+  [1X6.2-8 [33X[0;0Y[10XGoProjective[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis method defines a homomorphism from a matrix group [3XG[103X into the projective
+  group  [3XG[103X modulo scalar matrices. In fact, since projective groups in [5XGAP[105X are
+  represented  as  matrix groups, the homomorphism is the identity mapping and
+  the only difference is that in the image the projective group methods can be
+  applied.  The  bulk  of  the  work  in  matrix  recognition  is  done in the
+  projective group setting.[133X
+  
+  
+  [1X6.2-9 [33X[0;0Y[10XBlockScalar[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis  method  is  only  called  by a hint. Alongside with the hint it gets a
+  block decomposition respected by the matrix group [3XG[103X to be recognised and the
+  promise  that  all diagonal blocks of all group elements will only be scalar
+  matrices.  This  method  recursively  builds a balanced tree and does scalar
+  recognition in each leaf.[133X
+  
+  
+  [1X6.2-10 [33X[0;0Y[10XLowerLeftPGroup[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis method is only called by a hint from [10XBlockLowerTriangular[110X as the kernel
+  of the homomorphism mapping to the diagonal blocks. The method uses the fact
+  the this kernel is a [22Xp[122X-group where [22Xp[122X is the characteristic of the underlying
+  field.  It  exploits  this fact and uses this special structure to find nice
+  generators and a method to express group elements in terms of these.[133X
+  
+  
+  [1X6.3 [33X[0;0YMethods for projective groups[133X[101X
+  
+  [33X[0;0YTHIS CHAPTER IS CURRENTLY A BIT OUT OF DATE![133X
+  
+  [33X[0;0YThe  following  table gives an overview over the installed methods and their
+  rank  (higher  rank  means higher priority, the method is tried earlier, see
+  Chapter  [14X4[114X).  Note  that  the  recognition  for  matrix  group  switches  to
+  projective recognition rather soon in the recognition process such that most
+  recognition methods in fact are installed as methods for projective groups.[133X
+  
+      ┌──────┬────────────────────────┬───────────────────────────────────────────────────────────────────────┬───────────────────────────┐
+      │ 3000 │ [10XTrivialProjectiveGroup[110X │ check if all generators are scalar multiples of the identity matrix   │ [14X6.3-1[114X                     │ 
+      ├──────┼────────────────────────┼───────────────────────────────────────────────────────────────────────┼───────────────────────────┤
+      │ 1300 │ [10XProjDeterminant[110X        │ find homomorphism to non-zero scalars mod d-th powers                 │ [14X6.3-2[114X                     │ 
+      ├──────┼────────────────────────┼───────────────────────────────────────────────────────────────────────┼───────────────────────────┤
+      │ 1250 │ [10XFewGensAbelian[110X         │ if very few generators, check IsAbelian and if yes, do KnownNilpotent │ [14X6.2-4[114X                     │ 
+      ├──────┼────────────────────────┼───────────────────────────────────────────────────────────────────────┼───────────────────────────┤
+      │ 1200 │ [10XReducibleIso[110X           │ use MeatAxe to find a composition series, do base change              │ [14X6.2-5[114X                     │ 
+      ├──────┼────────────────────────┼───────────────────────────────────────────────────────────────────────┼───────────────────────────┤
+      │ 1100 │ [10XNotAbsolutelyIrred[110X     │ write over a bigger field with smaller degree                         │ [14X6.3-5[114X                     │ 
+      ├──────┼────────────────────────┼───────────────────────────────────────────────────────────────────────┼───────────────────────────┤
+      │ 1050 │ [10XClassicalNatural[110X       │ check whether it is a classical group in its natural representation   │ [14X???ClassicalNatural???[114X    │ 
+      ├──────┼────────────────────────┼───────────────────────────────────────────────────────────────────────┼───────────────────────────┤
+      │ 1000 │ [10XSubfield[110X               │ write over a smaller field with same degree                           │ [14X6.3-6[114X                     │ 
+      ├──────┼────────────────────────┼───────────────────────────────────────────────────────────────────────┼───────────────────────────┤
+      │ 900  │ [10XC3C5[110X                   │ compute a normal subgroup of derived and resolve C3 and C5            │ [14X???C3C5???[114X                │ 
+      ├──────┼────────────────────────┼───────────────────────────────────────────────────────────────────────┼───────────────────────────┤
+      │ 850  │ [10XC6[110X                     │ find either an (imprimitive) action or a symplectic one               │ [14X6.3-9[114X                     │ 
+      ├──────┼────────────────────────┼───────────────────────────────────────────────────────────────────────┼───────────────────────────┤
+      │ 840  │ [10XD247[110X                   │ play games to find a normal subgroup                                  │ [14X???D247???[114X                │ 
+      ├──────┼────────────────────────┼───────────────────────────────────────────────────────────────────────┼───────────────────────────┤
+      │ 820  │ [10XSporadicsByOrders[110X      │ generate a few random elements and compute the proj. orders           │ [14X???SporadicsByOrders???[114X   │ 
+      ├──────┼────────────────────────┼───────────────────────────────────────────────────────────────────────┼───────────────────────────┤
+      │ 810  │ [10XAltSymBBByDegree[110X       │ try BB recognition for dim+1 and/or dim+2 if sensible                 │ [14X???AltSymBBByDegree???[114X    │ 
+      ├──────┼────────────────────────┼───────────────────────────────────────────────────────────────────────┼───────────────────────────┤
+      │ 800  │ [10XTensor[110X                 │ find a tensor decomposition                                           │ [14X6.3-10[114X                    │ 
+      ├──────┼────────────────────────┼───────────────────────────────────────────────────────────────────────┼───────────────────────────┤
+      │ 700  │ [10XFindElmOfEvenNormal[110X    │ find D2, D4 or D7 by finding an element of an even normal subgroup    │ [14X???FindElmOfEvenNormal???[114X │ 
+      ├──────┼────────────────────────┼───────────────────────────────────────────────────────────────────────┼───────────────────────────┤
+      │ 600  │ [10XLowIndex[110X               │ find an (imprimitive) action on subspaces                             │ [14X6.3-8[114X                     │ 
+      ├──────┼────────────────────────┼───────────────────────────────────────────────────────────────────────┼───────────────────────────┤
+      │ 550  │ [10XComputeSimpleSocle[110X     │ compute simple socle of almost simple group                           │ [14X???ComputeSimpleSocle???[114X  │ 
+      ├──────┼────────────────────────┼───────────────────────────────────────────────────────────────────────┼───────────────────────────┤
+      │ 500  │ [10XThreeLargeElOrders[110X     │ look at three large element orders                                    │ [14X???ThreeLargeElOrders???[114X  │ 
+      ├──────┼────────────────────────┼───────────────────────────────────────────────────────────────────────┼───────────────────────────┤
+      │ 400  │ [10XLieTypeNonConstr[110X       │ do non-constructive recognition of Lie type groups                    │ [14X???LieTypeNonConstr???[114X    │ 
+      ├──────┼────────────────────────┼───────────────────────────────────────────────────────────────────────┼───────────────────────────┤
+      │ 100  │ [10XStabilizerChain[110X        │ last resort: compute a stabilizer chain (projectively)                │ [14X6.3-12[114X                    │ 
+      └──────┴────────────────────────┴───────────────────────────────────────────────────────────────────────┴───────────────────────────┘
+  
+       [1XTable:[101X Projective group find homomorphism methods
+  
+  
+  
+  [1X6.3-1 [33X[0;0Y[10XTrivialProjectiveGroup[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis  method  is  successful  if  and only if all generators of a projective
+  group  [3XG[103X are equal to the identity (that is, in the matrix representation of
+  [3XG[103X, all matrices are scalars). Otherwise, it returns [9Xfalse[109X.[133X
+  
+  
+  [1X6.3-2 [33X[0;0Y[10XProjDeterminant[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThe  method  defines  a homomorphism from a projective group [3XG[103X[22Xle PGL(d,q)[122X to
+  the cyclic group [22XGF(q)^*/D[122X, where [22XD[122X is the set of [22Xd[122Xth powers in [22XGF(q)^*[122X. The
+  image of a group element [22Xg ∈ [3XG[103X[122X is the determinant of a matrix representative
+  of [22Xg[122X, modulo [22XD[122X.[133X
+  
+  
+  [1X6.3-3 [33X[0;0Y[10XReducibleIso[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis  method  is the same as the matrix group method with the same name (see
+  [14X6.2-5[114X), which is able to take into account the projective mode.[133X
+  
+  
+  [1X6.3-4 [33X[0;0Y[10XBlocksModScalars[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis  method  is  only  called  when hinted from above. In this method it is
+  understood  that  G  should [13Xneither[113X be recognised as a matrix group [13Xnor[113X as a
+  projective group. Rather, it treats all diagonal blocks modulo scalars which
+  means that two matrices are considered to be equal, if they differ only by a
+  scalar  factor  in  [13Xcorresponding[113X  diagonal  blocks,  and this scalar can be
+  different  for  each  diagonal  block.  This  means  that  the kernel of the
+  homomorphism  mapping  to  a node which is recognised using this method will
+  have only scalar matrices in all diagonal blocks.[133X
+  
+  [33X[0;0YThis  method  does  the  balanced  tree  approach  mapping to subsets of the
+  diagonal blocks and finally using projective recognition to recognise single
+  diagonal block groups.[133X
+  
+  
+  [1X6.3-5 [33X[0;0Y[10XNotAbsolutelyIrred[110X[101X[1X[133X[101X
+  
+  [33X[0;0YIf  an  irreducible projective group [3XG[103X acts absolutely irreducibly then this
+  method returns [9Xfalse[109X. If [3XG[103X is not absolutely irreducible then a homomorphism
+  into  a  smaller  dimensional  representation  over  an  extension  field is
+  defined.  A  hint  is  handed  down  to  the image that no test for absolute
+  irreducibility  has  to be done any more. Another hint is handed down to the
+  kernel  indicating that the only possible kernel elements can be elements in
+  the  centraliser  of  [3XG[103X  in  [22XPGL(d,q)[122X  that come from scalar matrices in the
+  extension field.[133X
+  
+  
+  [1X6.3-6 [33X[0;0Y[10XSubfield[110X[101X[1X[133X[101X
+  
+  [33X[0;0YWhen  this  method runs it knows that the projective group [3XG[103X acts absolutely
+  irreducibly.  It  then tries to realise this group over a smaller field. The
+  algorithm  used  is  the  one  using  the [21Xstandard basis approach[121X known from
+  isomorphism  testing  of  absolutely  irreducible  modules.  It finds a base
+  change to write the projective group over the smallest field possible. Since
+  the group is projective, it may choose to multiply generators with arbitrary
+  scalars to write them over a smaller field.[133X
+  
+  [33X[0;0YHowever,  sometimes the correct scalar can not be guessed. Therefore, if the
+  first  approach  does not work, the method computes the derived subgroup. If
+  the group can be written over a smaller field, then taking commutators loses
+  the  scalars  preventing  a  direct  base  change to work. Therefore, if the
+  derived  subgroup  still  acts  irreducibly, the standard basis approach can
+  find  the  right base change that could also do the job for the whole group.
+  If  it  acts  reducibly,  the  method  [10XDerived[110X (see [14X6.3-7[114X) which is run next
+  already  has  the  computed derived subgroup and can try different things to
+  find a reduction.[133X
+  
+  
+  [1X6.3-7 [33X[0;0Y[10XDerived[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis  method computes the derived subgroup, if this has not yet been done by
+  other  methods.  It  then  uses  the  MeatAxe  to decide whether the derived
+  subgroup  acts  irreducibly  or not. If it acts reducibly, then we can apply
+  Clifford  theory to the natural module. The natural module restricted to the
+  derived  subgroup is a direct sum of simple modules. If all the summands are
+  isomorphic,  we  immediately get either an action of [3XG[103X on blocks or a tensor
+  decomposition.  Otherwise, we get an action of [3XG[103X on the isotypic components.
+  Either way, we find a reduction.[133X
+  
+  [33X[0;0YIf  the  derived  group  acts  irreducibly,  we  return [9Xfalse[109X in the current
+  implementation.[133X
+  
+  
+  [1X6.3-8 [33X[0;0Y[10XLowIndex[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis  method  is  designed  for  the  handling  of  the  Aschbacher class C2
+  (stabiliser  of  a  decomposition  of  the underlying vector space), but may
+  succeed  on other types of input as well. Given [3XG[103X [22Xle PGL(d,q)[122X, the output is
+  either the permutation action of [3XG[103X on a short orbit of subspaces or [9Xfail[109X. In
+  the current setup, [21Xshort orbit[121X is defined to have length at most [22X4d[122X.[133X
+  
+  
+  [1X6.3-9 [33X[0;0Y[10XC6[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis  method  is  designed  for  the  handling  of  the  Aschbacher class C6
+  (normaliser  of  an  extraspecial group). If the input [3XG[103X[22Xle PGL(d,q)[122X does not
+  satisfy  [22Xd=r^n[122X  and  [22Xr|q-1[122X  for  some  prime [22Xr[122X and integer [22Xn[122X then the method
+  returns  [9Xfalse[109X.  Otherwise,  it  returns  either  a  homomorphism  of [3XG[103X into
+  [22XSp(2n,r)[122X,  or  a  homomorphism  into  the  C2  permutation  action of [3XG[103X on a
+  decomposition of [22XGF(q)^d[122X, or [9Xfail[109X.[133X
+  
+  
+  [1X6.3-10 [33X[0;0Y[10XTensor[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis  method  currently  tries  to  find  one  tensor  factor by powering up
+  commutators  of  random  elements  to elements of prime order. This seems to
+  work quite well provided that the two tensor factors are not [21Xlinked[121X too much
+  such that there exist enough elements that act with different orders on both
+  tensor factors.[133X
+  
+  [33X[0;0YThis method and its description needs some improvement.[133X
+  
+  
+  [1X6.3-11 [33X[0;0Y[10XTwoLargeElOrders[110X[101X[1X[133X[101X
+  
+  [33X[0;0YIn  the  case  when the input group [3XG[103X[22Xle PGL(d,p^e)[122X is suspected to be simple
+  but not alternating, this method takes the two largest element orders from a
+  sample of pseudorandom elements of [3XG[103X. From these element orders, it tries to
+  determine  whether [3XG[103X is of Lie type or sporadic, and the characteristic of [3XG[103X
+  if  it  is  of Lie type. In the case when [3XG[103X is of Lie type of characteristic
+  different  from [22Xp[122X or [3XG[103X is sporadic, the method also provides a short list of
+  the possible isomorphism types of [3XG[103X.[133X
+  
+  
+  [1X6.3-12 [33X[0;0Y[10XStabilizerChain[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis method computes a stabiliser chain and a base and strong generating set
+  using  projective  actions.  This  is  a last resort method since for bigger
+  examples  no  short  orbits  can  be found in the natural action. The strong
+  generators are the nice generator in this case and expressing group elements
+  in terms of the nice generators ist just sifting along the stabiliser chain.[133X
+  
+  
+  [1X6.3-13 [33X[0;0Y[10XBlockScalarProj[110X[101X[1X[133X[101X
+  
+  [33X[0;0YThis  method  is  only  called  by a hint. Alongside with the hint it gets a
+  block decomposition respected by the matrix group [3XG[103X to be recognised and the
+  promise  that  all diagonal blocks of all group elements will only be scalar
+  matrices. This method simply norms the last diagonal block in all generators
+  by  multiplying  with a scalar and then delegates to [10XBlockScalar[110X (see [14X6.2-9[114X)
+  and matrix group mode to do the recognition.[133X
+  
+  
+  [1X6.4 [33X[0;0YMethods for black box groups[133X[101X
+  

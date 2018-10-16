@@ -1,0 +1,11 @@
+  
+  
+  [1XReferences[101X
+  
+  [[20XNS06[120X]  [16XNeunh{\"o}ffer,  M.  and  Seress, {.[116X, [17XA data structure for a uniform
+  approach  to  computations  with finite groups[117X, in ISSAC 2006, ACM, New York
+  (2006), 254--261.
+  
+  
+  
+  [32X

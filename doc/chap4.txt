@@ -1,0 +1,179 @@
+  
+  [1X4 [33X[0;0YMethod Selection[133X[101X
+  
+  [33X[0;0YThe  setup  described  in  this chapter is intended for situations, in which
+  lots  of  different  methods are available to fulfill a certain task, but in
+  which  it  is  not  possible  in  the beginning to decide, which one to use.
+  Therefore  this setup regulates, rather than just which method to choose, in
+  which  order  the  various  methods are tried. The methods themselves return
+  whether they were successful and, if not, whether it is sensible to try them
+  again at a later stage.[133X
+  
+  [33X[0;0YThe  design is intentionally kept as simple as possible and at the same time
+  as  versatile  as  possible,  thereby  providing a useful framework for many
+  situations as described above.[133X
+  
+  [33X[0;0YNote the differences to the [5XGAP[105X method selection, which is designed with the
+  idea  in  mind  that it will be quite clear in most situations, which one is
+  [21Xthe  best[121X  method  for a given set of input data, and that we do not want to
+  try  different  things. On the other hand, the [5XGAP[105X method selection is quite
+  complicated,  which  is  to some extend necessary to make sure, that lots of
+  different  information  about  the objects in question can be used to really
+  find the best method.[133X
+  
+  [33X[0;0YOur  setup  here  in  particular has to fulfill the requirement, that in the
+  end,  with  lots  of  methods installed, one still has to be able to have an
+  overview and to [21Xprove[121X, that the whole system always does the right thing.[133X
+  
+  
+  [1X4.1 [33X[0;0YWhat are methods?[133X[101X
+  
+  [33X[0;0YA  method  is  just  a  [5XGAP[105X  function  together with an agreement about what
+  arguments  it  takes  and  what  result  it returns. The agreement about the
+  arguments of course has to be made for every situation in which this generic
+  method  selection  code  is  used,  and the user is completely free there. A
+  method can (and has to) return one of the following four values:[133X
+  
+  [8X[10XSuccess[110X[8X[108X
+        [33X[0;6Ymeans  that  the  method was successful and no more methods have to be
+        tried.[133X
+  
+  [8X[10XNeverApplicable[110X[8X[108X
+        [33X[0;6Ymeans that the method was not successful and that there is no point to
+        call the method again in this situation whatsoever.[133X
+  
+  [8X[10XTemporaryFailure[110X[8X[108X
+        [33X[0;6Ymeans  that  the  method  temporarily failed, that it however could be
+        sensible  to  call  it  again in this situation at a later stage. This
+        value  is  typical for a Las Vegas algorithm using randomised methods,
+        which has failed, but which may succeed when called again.[133X
+  
+  [8X[10XNotEnoughInformation[110X[8X[108X
+        [33X[0;6Ymeans that the method for some reason refused to do its work. However,
+        it is possible that it will become applicable later such that it makes
+        sense to call it again, may when more information is available.[133X
+  
+  [33X[0;0YFor  administration  in  the  method  selection,  a method is described by a
+  record with the following components bound:[133X
+  
+  [8X[10Xmethod[110X[8X[108X
+        [33X[0;6Yholds the function itself.[133X
+  
+  [8X[10Xrank[110X[8X[108X
+        [33X[0;6Yholds an integer used to sort the various methods. Higher numbers mean
+        that  the method is tried earlier. The numbering scheme is left to the
+        user.[133X
+  
+  [8X[10Xstamp[110X[8X[108X
+        [33X[0;6Yholds  a string value that uniquely describes the method. This is used
+        for bookkeeping and to keep track of what has to be tried how often.[133X
+  
+  [8X[10Xcomment[110X[8X[108X
+        [33X[0;6Ya string valued comment. This field is optional and can be left out.[133X
+  
+  [33X[0;0YThe  different  methods for a certain task are collected in so-called [21Xmethod
+  databases[121X.  A  [13Xmethod  database[113X is just a list of records, each describing a
+  method in the format described above. Usually, the ranks will be descending,
+  but that is not necessary.[133X
+  
+  [33X[0;0YThere  is  one  convenience  function  to  put  a  new  method into a method
+  database:[133X
+  
+  [1X4.1-1 AddMethod[101X
+  
+  [33X[1;0Y[29X[2XAddMethod[102X( [3Xdb[103X, [3Xmeth[103X, [3Xrank[103X, [3Xstamp[103X[, [3Xcomment[103X] ) [32X function[133X
+  [6XReturns:[106X  [33X[0;10Ynothing[133X
+  
+  [33X[0;0Y[3Xdb[103X must be a method database (list of records, see above) with non-ascending
+  rank  values.  [3Xmeth[103X is the method function, [3Xrank[103X the rank and [3Xstamp[103X a string
+  valued  stamp.  The  optional  argument [3Xcomment[103X can be a string comment. The
+  record describing the method is created and inserted at the correct position
+  in the method database. Nothing is returned.[133X
+  
+  
+  [1X4.2 [33X[0;0YHow methods are called[133X[101X
+  
+  [33X[0;0YWhenever  the  method  selection  shall  be  used,  one  calls the following
+  function:[133X
+  
+  [1X4.2-1 CallMethods[101X
+  
+  [33X[1;0Y[29X[2XCallMethods[102X( [3Xdb[103X, [3Xlimit[103X[, [3Xfurtherargs[103X] ) [32X function[133X
+  [6XReturns:[106X  [33X[0;10Ya record [10Xms[110X describing this method selection procedure.[133X
+  
+  [33X[0;0YThe argument [3Xdb[103X must be a method database in the sense of Section [14X4.1[114X. [3Xlimit[103X
+  must  be  a non-negative integer. [3Xfurtherargs[103X stands for an arbitrary number
+  of  additional  arguments,  which  are handed down to the called methods. Of
+  course  they  must  fulfill  the  conventions defined for the methods in the
+  database [3Xdb[103X.[133X
+  
+  [33X[0;0YThe  function  first  creates a [21Xmethod selection[121X record keeping track of the
+  things  that happened during the method trying procedure, which is also used
+  during  this  procedure.  Then it calls methods with the algorithm described
+  below and in the end returns the method selection record in its final state.[133X
+  
+  [33X[0;0YThe method selection record has the following components:[133X
+  
+  [8X[10XinapplicableMethods[110X[8X[108X
+        [33X[0;6Ya  record, in which for every method that returned [10XNeverApplicable[110X the
+        value 1 is bound to the component with name the stamp of the method.[133X
+  
+  [8X[10XfailedMethods[110X[8X[108X
+        [33X[0;6Ya  record,  in which for every time a method returned [10XTemporaryFailure[110X
+        the  value bound to the component with name the stamp of the method is
+        increased by 1 (not being bound means zero).[133X
+  
+  [8X[10XsuccessMethod[110X[8X[108X
+        [33X[0;6Ythe  stamp of the method that succeeded, if one did. This component is
+        only bound after successful completion.[133X
+  
+  [8X[10Xresult[110X[8X[108X
+        [33X[0;6Ya  boolean value which is either [10XSuccess[110X or [10XTemporaryFailure[110X depending
+        on  whether  a  successful  method  was found or the procedure gave up
+        respectively.  This  component  is  only bound after completion of the
+        method selection procedure.[133X
+  
+  [8X[10Xtolerance[110X[8X[108X
+        [33X[0;6Ythe number of times all methods failed until one succeeded. See below.[133X
+  
+  [33X[0;0YThe  algorithm  used  by  [2XCallMethods[102X is extremely simple: It sets a counter
+  [10Xtolerance[110X  to  zero.  The  main  loop  starts at the beginning of the method
+  database and runs through the methods in turn. Provided a method did not yet
+  return  [10XNeverApplicable[110X  and  did  not yet return [10XTemporaryFailure[110X more than
+  [10Xtolerance[110X  times before, it is tried. According to the value returned by the
+  method, the following happens:[133X
+  
+  [8X[10XNeverApplicable[110X[8X[108X
+        [33X[0;6Ythis is marked in the method selection record and the main loop starts
+        again at the beginning of the method database.[133X
+  
+  [8X[10XTemporaryFailure[110X[8X[108X
+        [33X[0;6Ythis  is  counted  in  the  method  selection record and the main loop
+        starts again at the beginning of the method database.[133X
+  
+  [8X[10XNotEnoughInformation[110X[8X[108X
+        [33X[0;6Ythe main loop goes to the next method in the method database.[133X
+  
+  [8X[10Xtrue[110X[8X[108X
+        [33X[0;6Ythis  is  marked  in  the  method  selection  record and the procedure
+        returns successfully.[133X
+  
+  [33X[0;0YIf  the  main  loop reaches the end of the method database without calling a
+  method (because all methods have already failed or are not applicable), then
+  the  counter  [10Xtolerance[110X  is  increased by one and everything starts all over
+  again.  This  is repeated until [10Xtolerance[110X is greater than the [10Xlimit[110X which is
+  the  second argument of [2XCallMethods[102X. The last value of the [10Xtolerance[110X counter
+  is returned in the component [10Xtolerance[110X of the method selection record.[133X
+  
+  [33X[0;0YNote that the main loop starts again at the beginning of the method database
+  after  each  failed  method call! However, this does not lead to an infinite
+  loop,  because  the  failure is recorded in the method selection record such
+  that the method is skipped until the [10Xtolerance[110X increases. Once the [10Xtolerance[110X
+  has  been  increased methods having returned [10XTemporaryFailure[110X will be called
+  again. The idea behind this approach is that even failed methods can collect
+  additional  information  about the arguments changing them accordingly. This
+  might  give  methods that come earlier and were not applicable up to now the
+  opportunity  to  begin  working. Therefore one can install very good methods
+  that  depend  on  some  already  known knowledge which will only be acquired
+  during the method selection procedure by other methods, with a high rank.[133X
+  
