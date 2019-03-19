@@ -33,32 +33,6 @@
 ##
 DeclareInfoClass( "InfoRecAnBB" );
 
-DeclareGlobalFunction("AnBB_InitialList");
-DeclareGlobalFunction("AnBB_NextSmallSupportInvolution");
-DeclareGlobalFunction("AnBB_IsProbableThreeCycle");
-DeclareGlobalFunction("AnBB_NextThreeCycle");
-DeclareGlobalFunction("AnBB_NextBolsteringElement");
-DeclareGlobalFunction("AnBB_MatchingLongCycle");
-DeclareGlobalFunction("AnBB_IsFixedPoint");
-DeclareGlobalFunction("AnBB_NextPoint");
-DeclareGlobalFunction("AnBB_AdjustCycle");
-DeclareGlobalFunction("AnBB_AppendPoints");
-DeclareGlobalFunction("AnBB_NiceGenerators");
-DeclareGlobalFunction("AnBB_SnPresentationSatisfied");
-DeclareGlobalFunction("AnBB_AnPresentationSatisfied");
-DeclareGlobalFunction("AnBB_InitialiseIso");
-DeclareGlobalFunction("AnBB_NonCommThreeCycle");
-DeclareGlobalFunction("AnBB_NonCommTCPoints");
-DeclareGlobalFunction("AnBB_CycleNumber");
-DeclareGlobalFunction("AnBB_FindSinglePoint");
-DeclareGlobalFunction("AnBB_PartialImageAn");
-DeclareGlobalFunction("AnBB_EvaluateIso");
-DeclareGlobalFunction("AnBB_SLPForAn");
-DeclareGlobalFunction("AnBB_SLPForSn");
-DeclareGlobalFunction("AnBB_ComputeIsomorphism");
-DeclareGlobalFunction("AnBB_Recognise");
-
-
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU General Public License as published by
