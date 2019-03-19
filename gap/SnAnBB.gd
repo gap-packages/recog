@@ -1,6 +1,6 @@
 #############################################################################
 ##
-##  AnBB.gi
+##  SnAnBB.gd
 ##                              recog package
 ##                                                            Martin Leuner
 ##                                                         Sebastian Jambor
@@ -31,7 +31,7 @@
 ##
 ##  This file is generated automatically.
 ##
-DeclareInfoClass( "InfoRecAnBB" );
+DeclareInfoClass( "InfoRecSnAnBB" );
 
 ##
 ##  This program is free software: you can redistribute it and/or modify

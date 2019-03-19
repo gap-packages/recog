@@ -14,24 +14,8 @@
 ##  This file is free software, see license information at the end.
 ##
 ##
-##  This file provides code for recognising whether a black box group
-##  with degree n \le N for given N is isomorphic to A_n or S_n.
-##
-##  Most of the code is based upon the algorithm presented in the paper
-##  "Fast recognition of alternating groups of unknown degree" by
-##  Sebastian Jambor, Martin Leuner, Alice C. Niemeyer and Wilhelm Plesken.
-##
-##  Several functions, namely AnBB_AnPresentationSatisfied, AnBB_SnPresentationSatisfied,
-##  AnBB_SLPForAn, AnBB_SLPForSn and AnBB_ComputeIsomorphism are based upon
-##  algorithms presented in the paper "A black-box group algorithm for
-##  recognizing finite symmetric and alternating groups. I." by Robert Beals,
-##  Charles R. Leedham-Green, Alice C. Niemeyer, Cheryl E. Praeger and
-##  'Akos Seress.
-##
-##
-##  This file is generated automatically.
-##
-SetInfoLevel( InfoRecAnBB, 0 );
+DeclareInfoClass("InfoRecSnAnBB");
+SetInfoLevel( InfoRecSnAnBB, 0 );
 
 
 
@@ -2602,7 +2586,7 @@ end;	# function AnBB_ComputeIsomorphism
 ## Otherwise it has found the degree n and recognised the group constructively.
 ## In this case it returns the constructive isomorphism.
 ##
-AnBB_Recognise := function( G, N, eps )
+SnAnBB_Recognise := function( G, N, eps )
  local AnBB_Vars, RetVal, try;
 
  try := Log2Int( Int( 1/eps ) + 1 ) + 1;
@@ -2651,7 +2635,29 @@ AnBB_Recognise := function( G, N, eps )
  return fail;
 end;	# function AnBB_Recognise
 
+RECOG.SnAnBBEpsilon := 1/1024; #TODO: For now, this is set globally.
 
+#TODO: What about memory and how to SLPNice?
+FindHomMethodsPerm.SnAnBB :=
+   function(ri,grp)
+   local mp,res;
+   if not IsPermGroup(grp) then #TODO: For now the function is only applicable to PermGroups. 
+      return NeverApplicable;
+   fi;
+   mp := MovedPoints( grp ); #TODO As the group is assumed to be a PermGroup, we can take mp as an upper bound for the degree of the group.
+   res := SnAnBB_Recognise( grp, mp, RECOG.SnAnBBEpsilon );
+   if res = false then
+      return NeverApplicable;
+   elif res = fail then
+      return TemporaryFailure;
+   fi;
+   #Recognition was successful:
+   if res[1] = "An" then
+   #   AnBB_SLPForAn(<element>, res[2]);
+   else
+   #   AnBB_SLPForSn( <element>, res[2]);
+   fi;
+end;
 
 ##
 ##  This program is free software: you can redistribute it and/or modify
