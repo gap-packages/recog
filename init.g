@@ -17,15 +17,10 @@ ReadPackage("recog","gap/base/methsel.gd");
 ReadPackage("recog","gap/base/recognition.gd");
 
 # The following contain generic declarations for different types of groups:
-ReadPackage("recog","gap/base/perm.gd");
-ReadPackage("recog","gap/base/matrix.gd");
 ReadPackage("recog","gap/base/projective.gd");
-ReadPackage("recog","gap/base/blackbox.gd");
-
 
 ReadPackage("recog","gap/matrix.gd");
 ReadPackage("recog","gap/projective.gd");
-ReadPackage("recog","gap/blackbox.gd");
 
 ReadPackage("recog","gap/tensor.gd");
 #ReadPackage("recog","gap/forms.gd");

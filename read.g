@@ -18,13 +18,8 @@ ReadPackage("recog","gap/base/recognition.gi");
 
 # The following contain generic functionality for different types of groups:
 
-# Permutations:
-ReadPackage("recog","gap/base/perm.gi");
-# Matrices/Projective:
-ReadPackage("recog","gap/base/matrix.gi");
+# Projective:
 ReadPackage("recog","gap/base/projective.gi");
-# Black box:
-ReadPackage("recog","gap/base/blackbox.gd");
 
 
 # Some tools:
@@ -59,7 +54,6 @@ ReadPackage("recog","gap/AnSnOnFDPM.gi");
 ReadPackage("recog","gap/perm.gi");
 ReadPackage("recog","gap/matrix.gi");
 ReadPackage("recog","gap/projective.gi");
-ReadPackage("recog","gap/blackbox.gi");
 
 ##
 ##  This program is free software: you can redistribute it and/or modify
