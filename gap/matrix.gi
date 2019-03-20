@@ -20,7 +20,7 @@ SLPforElementFuncsMatrix.TrivialMatrixGroup :=
 FindHomMethodsMatrix.TrivialMatrixGroup := function(ri, G)
   local gens;
   gens := GeneratorsOfGroup(G);
-  if not IsTrivial(G) then
+  if not ForAll(gens, IsOne) then
       return NeverApplicable;
   fi;
   SetSize(ri, 1);

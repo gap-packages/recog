@@ -20,17 +20,15 @@ SLPforElementFuncsPerm.TrivialPermGroup :=
    end;
 
 FindHomMethodsPerm.TrivialPermGroup := function(ri, G)
-  local g,gens;
+  local gens;
   gens := GeneratorsOfGroup(G);
-  for g in gens do
-      if not(IsOne(g)) then
-          return NeverApplicable;
-      fi;
-  od;
-  Setslpforelement(ri,SLPforElementFuncsPerm.TrivialPermGroup);
-  Setslptonice( ri,
-                StraightLineProgramNC([[[1,0]]],Length(GeneratorsOfGroup(G))));
-  SetFilterObj(ri,IsLeaf);
+  if not ForAll(gens, ri!.isone) then
+      return NeverApplicable;
+  fi;
+  SetSize(ri, 1);
+  Setslpforelement(ri, SLPforElementFuncsPerm.TrivialPermGroup);
+  Setslptonice(ri, StraightLineProgramNC([[[1,0]]],Length(gens)));
+  SetFilterObj(ri, IsLeaf);
   return Success;
 end;
 

@@ -20,7 +20,7 @@ SLPforElementFuncsProjective.TrivialProjectiveGroup :=
 FindHomMethodsProjective.TrivialProjectiveGroup := function(ri, G)
   local gens;
   gens := GeneratorsOfGroup(G);
-  if not ForAll(gens, IsOneProjective) then
+  if not ForAll(gens, ri!.isone) then
       return NeverApplicable;
   fi;
   SetSize(ri, 1);
