@@ -8,7 +8,7 @@
 ##  Copyright 2005-2008 by the authors.
 ##  This file is free software, see license information at the end.
 ##
-## This implementation is probably based on the paper
+## TODO: This implementation is probably based on the paper
 ## 'A reduction algorithm for matrix groups with an extraspecial normal subgroup.'
 ## by
 ## Brooksbank, Peter; Niemeyer, Alice C.; Seress, Ákos

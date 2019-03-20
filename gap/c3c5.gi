@@ -9,8 +9,8 @@
 ##  Copyright 2006-2008 by the authors.
 ##  This file is free software, see license information at the end.
 ##
-## Maybe ask Colva about this:
-## This algorithm probably is based on the paper
+## TODO: Maybe ask Colva about this:
+## This algorithm is probably based on the paper
 ## 'A polynomial-time reduction algorithm for groups of semilinear or subfield
 ## class' by Carlson, Jon F. ;Neunhöffer, Max; Roney-Dougal, Colva M. in
 ## J. Algebra 322 (2009), no. 3, 613–637
