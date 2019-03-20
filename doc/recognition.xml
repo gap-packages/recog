@@ -27,10 +27,9 @@ nice generators and then only be interested in the SLP from those
 to <M>g</M>. The framework presented here deals with exactly this
 process.<P/>
 
-The generic framework was designed having four situations in mind:
-permutation groups, matrix groups, projective groups
-and black box groups. Although the
-methods used are quite different for those four cases, there is a common
+The generic framework was designed having three situations in mind:
+permutation groups, matrix groups and projective groups.
+Although the methods used are quite different for those cases, there is a common
 pattern in the procedure of recognition. Namely, first we have to find
 a homomorphism, solve the constructive membership problem
 recursively in image and kernel,
@@ -219,26 +218,14 @@ projective groups, which is stored in the global variable
 </ManSection>
 
 <ManSection>
-<Func Name="RecogniseBBGroup" Arg="H"/>
-<Func Name="RecognizeBBGroup" Arg="H"/>
-<Returns><C>fail</C> for failure or a recognition info record.</Returns>
-<Description>
-<A>H</A> must be a &GAP; black box group object. This function calls
-<Ref Func="RecogniseGeneric"/> with the method database used for
-black box groups, which is stored in the global variable
-<Ref Var="FindHomDbBB"/>, and no prior knowledge.
-</Description>
-</ManSection>
-
-<ManSection>
 <Func Name="RecogniseGroup" Arg="H"/>
 <Func Name="RecognizeGroup" Arg="H"/>
 <Returns><C>fail</C> for failure or a recognition info record.</Returns>
 <Description>
     <A>H</A> must be a &GAP; group object. This function automatically
-    dispatches to one of the three previous functions
-    <Ref Func="RecognisePermGroup"/>, <Ref Func="RecogniseMatrixGroup"/>, or
-    <Ref Func="RecogniseBBGroup"/>, according to the type of the group <A>H</A>.
+    dispatches to one of the two previous functions
+    <Ref Func="RecognisePermGroup"/>, or <Ref Func="RecogniseMatrixGroup"/>,
+    according to the type of the group <A>H</A>.
     Note that since currently there is no implementation of projective
     groups in the &GAP; library, one cannot recognise a matrix group
     <A>H</A> as a projective group using this function.
@@ -345,53 +332,20 @@ black box groups, which is stored in the global variable
 </ManSection>
 
 <ManSection>
-<Var Name="FindHomDbBB"/>
-<Description>
-    This list contains the methods for finding homomorphisms
-    for black box group recognition that are stored in the record
-    <Ref Var="FindHomMethodsBB"/>. As described in Section <Ref
-    Sect="whataremethods"/> each method is described by a record. The list
-    is always sorted with respect to decreasing ranks. The order in this
-    list tells in which order the methods should be applied. Use <Ref
-    Func="AddMethod"/> to add methods to this database.
-</Description>
-</ManSection>
-
-<ManSection>
-<Var Name="FindHomMethodsBB"/>
-<Description>
-    In this global record the functions that are methods for finding
-    homomorphisms for black box group recognition are stored. We collect
-    them all in this record such that we do not use up too many global
-    variable names.
-</Description>
-</ManSection>
-
-<ManSection>
-<Var Name="SLPforElementFuncsBB"/>
-<Description>
-    This global record holds the functions that are methods for writing group
-    elements as straight line programs (SLPs) in terms of the generators
-    after successful black box group recognition. We collect them all in this
-    record such that we do not use up too many global variable names.
-</Description>
-</ManSection>
-
-<ManSection>
 <Func Name="TryFindHomMethod" Arg="H, method, projective"/>
 <Returns><C>fail</C> or <C>false</C> or a recognition info record.</Returns>
 <Description>
 Use this function to try to run a given find homomorphism method
 <A>method</A> on a group <A>H</A>. Indicate by the boolean <A>projective</A>
-whether or not the method works in projective mode. For permutation and
-black box groups give <C>false</C>. The result is either <C>fail</C> or
+whether or not the method works in projective mode. For permutation groups,
+set this to <C>false</C>. The result is either <C>fail</C> or
 <C>false</C> if the method fails or a recognition info record <C>ri</C>.
 If the method created a leaf then <C>ri</C> will be a leaf, otherwise
 it will have the attribute <Ref Attr="Homom"/> set, but no factor or
 kernel have been created or recognised yet. You can use for example
 the methods in <Ref Var="FindHomMethodsPerm"/> or
 <Ref Var="FindHomMethodsMatrix"/> or <Ref Var="FindHomMethodsProjective"/>
-or <Ref Var="FindHomMethodsBB"/> as the <A>method</A> argument.
+as the <A>method</A> argument.
 </Description>
 </ManSection>
 
@@ -1118,13 +1072,6 @@ We are considering only the case of projective groups over finite fields.<P/>
 
 No conventions so far.
 </Section>
-
-<Section Label="convbb">
-    <Heading>Conventions for the recognition of black box groups</Heading>
-
-No conventions so far.
-</Section>
-
 
 
 <!-- ############################################################ -->

@@ -109,11 +109,6 @@ InstallGlobalFunction( RecogniseProjectiveGroup,
     return RecogniseGeneric(G,FindHomDbProjective,"");
   end);
 
-InstallGlobalFunction( RecogniseBBGroup,
-  function(G)
-    return RecogniseGeneric(G,FindHomDbBB,"");
-  end);
-
 InstallGlobalFunction( RecogniseGroup,
   function(G)
     if IsPermGroup(G) then
@@ -121,7 +116,7 @@ InstallGlobalFunction( RecogniseGroup,
     elif IsMatrixGroup(G) then
         return RecogniseGeneric(G,FindHomDbMatrix,"");
     else
-        return RecogniseGeneric(G,FindHomDbBB,"");
+        Error("Only matrix and permutation groups are supported");
     fi;
 
 # TODO: perhaps check if the result does not have IsReady set;

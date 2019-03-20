@@ -89,10 +89,6 @@ BindGlobal( "FindHomMethodsProjective", rec() );
 BindGlobal( "SLPforElementFuncsProjective", rec() );
 BindGlobal( "FindHomDbProjective", [] );
 
-BindGlobal( "FindHomMethodsBB", rec() );
-BindGlobal( "SLPforElementFuncsBB", rec() );
-BindGlobal( "FindHomDbBB", [] );
-
 
 # Our global functions for the main recursion:
 
@@ -104,8 +100,6 @@ DeclareGlobalFunction( "RecogniseMatrixGroup" );
 DeclareSynonym("RecognizeMatrixGroup", RecogniseMatrixGroup);
 DeclareGlobalFunction( "RecogniseProjectiveGroup" );
 DeclareSynonym("RecognizeProjectiveGroup", RecogniseProjectiveGroup);
-DeclareGlobalFunction( "RecogniseBBGroup" );
-DeclareSynonym("RecognizeBBGroup", RecogniseBBGroup);
 DeclareGlobalFunction( "RecogniseGroup" );
 DeclareSynonym("RecognizeGroup", RecogniseGroup);
 DeclareGlobalFunction( "RecogniseGeneric" );
@@ -140,7 +134,6 @@ DeclareOperation( "GetElmPpd", [ IsRecognitionInfo, IsRecord ] );
 DeclareGlobalFunction( "VerifyPermGroup" );
 DeclareGlobalFunction( "VerifyMatrixGroup" );
 DeclareGlobalFunction( "VerifyProjectiveGroup" );
-DeclareGlobalFunction( "VerifyBBGroup" );
 DeclareGlobalFunction( "VerifyGroup" );
 
 # Some more user functions:
