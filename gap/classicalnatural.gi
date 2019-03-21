@@ -33,403 +33,403 @@ InstallMethod( Eigenspaces, "for a field and a memory element matrix",
 
 # Obsolete stuff?
 
-RECOG.RelativePrimeToqm1Part := function(q,n)
-  local x,y;
-  x := (q^n-1)/(q-1);
-  repeat
-      y := x/(q-1);
-      x := NumeratorRat(y);
-  until DenominatorRat(y) = q-1;
-  return x;
-end;
-
-RECOG.SearchForElByCharPolFacts := function(g,f,degs,limit)
-  local count,degrees,factors,pol,y;
-  count := 0;
-  while true do   # will be left by return
-    if InfoLevel(InfoRecog) >= 3 then Print(".\c"); fi;
-    y:=PseudoRandom(g);
-    pol:=CharacteristicPolynomial(f,f,StripMemory(y),1);
-    factors:=Factors(PolynomialRing(f),pol);
-    degrees:=List(factors,Degree);
-    SortParallel(degrees,factors);
-    if degrees = degs then
-      if InfoLevel(InfoRecog) >= 3 then Print("\n"); fi;
-      return rec( el := y, factors := factors, degrees := degrees );
-    fi;
-    count := count + 1;
-    if count >= limit then return fail; fi;
-  od;
-end;
-
-RECOG.SL_Even_godownone:=function(g,subspg,q,d)
-local n,y,yy,yyy,ready,order,es,null,subsph,z,x,a,b,c,h,r,divisors,cent,i,
-pol,factors,degrees;
-
-n:=DimensionOfMatrixGroup(g);
-#d:=Dimension(subspg);
-repeat
-  ready:=false;
-  y:=PseudoRandom(g);
-  pol:=CharacteristicPolynomial(GF(q),GF(q),StripMemory(y),1);
-  factors:=Factors(pol);
-  degrees:=List(factors,Degree);
-  if d-1 in degrees then
-     order:=Order(y);
-     yy:=y^(order/Gcd(order,q-1));
-     if not IsOne(yy) then
-          es:= Eigenspaces(GF(q),StripMemory(yy));
-          es:=Filtered(es,x->Dimension(x)=d-1 and IsSubspace(subspg,x));
-          if Length(es)>0 then
-             subsph:=es[1];
-             ready:=true;
-          fi;
-          yyy:=y^(Gcd(order,q-1));
-     fi;
-  fi;
-until ready;
-
-cent:=[yyy];
-for i in [1..4] do
-    z:=PseudoRandom(g);
-    x:=yy^z;
-    a := x;
-    b := x^yy;
-    c := x^(yy^2);
-    h := Group(a,b,c);
-    ready:=false;
-    repeat
-      r:=PseudoRandom(h);
-      r:=r^(q*(q+1));
-      if not IsOne(r) and r*yy=yy*r then
-         Add(cent,yyy^r);
-         ready:=true;
-      fi;
-    until ready=true;
-od;
-return [Group(cent), subsph];
-end;
-
-RECOG.SL_FindSL2 := function(g,f)
-  local V,a,bas,c,count,ev,gens,genss,genssm,gl4,h,i,j,n,ns,o,pos,pow,pr,q,r,
-        res,sl2gens,sl3,slp,std,v,w,y,z,zz;
-  q := Size(f);
-  n := DimensionOfMatrixGroup(g);
-  if q = 2 then
-      # We look for a transvection:
-      while true do   # will be left by break
-          r := RECOG.SearchForElByCharPolFacts(g,f,[1,1,n-2],3*n+20);
-          if r = fail then return fail; fi;
-          y := r.el^(q^(n-2)-1);
-          if not IsOne(y) and IsOne(y^2) then break; fi;
-      od;
-      # Find a good random conjugate:
-      repeat
-          z := y^PseudoRandom(g);
-      until Order(z*y) = 3;
-      gens := [y,z];
-      o := IdentityMat(n,f);
-      w := [];
-      for i in [1..2] do
-          for j in [1..n] do
-              w[i] := o[j]*gens[i]-o[j];
-              if not(IsZero(w[i])) then break; fi;
-          od;
-      od;
-      return [Group(gens),VectorSpace(GF(q),w)];
-  fi;
-  if q = 3 and n = 3 then
-      std := RECOG.MakeSL_StdGens(3,1,2,3);
-      slp := RECOG.FindStdGensUsingBSGS(g,Concatenation(std.s,std.t),
-                                        false,true);
-      if slp = fail then return fail; fi;
-      h := Group(ResultOfStraightLineProgram(slp,GeneratorsOfGroup(g)));
-      o := IdentityMat(3,f);
-      return [h,VectorSpace(f,o{[1..2]})];
-  fi;
-  if q = 3 and n = 4 then
-      std := RECOG.MakeSL_StdGens(3,1,2,4);
-      slp := RECOG.FindStdGensUsingBSGS(g,Concatenation(std.s,std.t),
-                                        false,true);
-      if slp = fail then return fail; fi;
-      h := Group(ResultOfStraightLineProgram(slp,GeneratorsOfGroup(g)));
-      o := IdentityMat(4,f);
-      return [h,VectorSpace(f,o{[1..2]})];
-  fi;
-  if q = 3 then
-      # We look for a transvection:
-      while true do   # will be left by break
-          r := RECOG.SearchForElByCharPolFacts(g,f,[1,1,n-2],3*n+20);
-          if r = fail then return fail; fi;
-          y := r.el^(q^(n-2)-1);
-          if not IsOne(y) and IsOne(y^3) then break; fi;
-      od;
-      # Find a two good random conjugates:
-      while true do   # will be left by return
-          z := y^PseudoRandom(g);
-          zz := y^PseudoRandom(g);
-          gens := [y,z,zz];
-          o := IdentityMat(n,f);
-          ns := [];
-          for j in [1..3] do
-              for i in [1..n] do
-                  w := o[i]*gens[j]-o[i];
-                  if not(IsZero(w)) then break; fi;
-              od;
-              # Since y has order y at least one basis vector is moved.
-              ns[j] := w;
-          od;
-          V := VectorSpace(f,ns);
-          bas := Basis(V,ns);
-          genss := List(StripMemory(gens),
-                        x->List(ns,i->Coefficients(bas,i*x)));
-          genssm := GeneratorsWithMemory(genss);
-          sl3 := Group(genssm);
-          pr := ProductReplacer(genssm,rec( maxdepth := 400, scramble := 0,
-                                            scramblefactor := 0 ) );
-          sl3!.pseudorandomfunc := [rec(func := Next,args := [pr])];
-          res := RECOG.SL_FindSL2(sl3,f);
-          if res = fail then
-              if InfoLevel(InfoRecog) >= 3 then Print("#\c"); fi;
-              continue;
-          fi;
-          slp := SLPOfElms(GeneratorsOfGroup(res[1]));
-          sl2gens := ResultOfStraightLineProgram(slp,gens);
-          ns := BasisVectors(Basis(res[2])) * ns;
-          ConvertToMatrixRep(ns,q);
-          return [Group(sl2gens),VectorSpace(f,ns)];
-      od;
-  fi;
-  if q = 4 and n = 3 then
-      std := RECOG.MakeSL_StdGens(2,2,2,3);
-      slp := RECOG.FindStdGensUsingBSGS(g,Concatenation(std.s,std.t),
-                                        false,true);
-      if slp = fail then return fail; fi;
-      h := Group(ResultOfStraightLineProgram(slp,GeneratorsOfGroup(g)));
-      o := IdentityMat(3,f);
-      return [h,VectorSpace(f,o{[1..2]})];
-  fi;
-  if q = 5 and n = 4 then
-      std := RECOG.MakeSL_StdGens(5,1,2,4);
-      slp := RECOG.FindStdGensUsingBSGS(g,Concatenation(std.s,std.t),
-                                        false,true);
-      if slp = fail then return fail; fi;
-      h := Group(ResultOfStraightLineProgram(slp,GeneratorsOfGroup(g)));
-      o := IdentityMat(4,f);
-      return [h,VectorSpace(f,o{[1..2]})];
-  fi;
-  if n mod (q-1) <> 0 and q <> 3 then   # The generic case:
-      # We look for an element with n-1 dimensional eigenspace:
-      count := 0;
-      while true do    # will be left by break
-          count := count + 1;
-          if count > 20 then return fail; fi;
-          r := RECOG.SearchForElByCharPolFacts(g,f,[1,n-1],3*n+20);
-          if r = fail then return fail; fi;
-          pow := RECOG.RelativePrimeToqm1Part(q,n-1);
-          y := r.el^pow;
-          o := Order(y);
-          if o mod (q-1) = 0 then
-              y := y^(o/(q-1));
-              break;
-          fi;
-      od;
-      # Now y has order q-1 and and n-1 dimensional eigenspace
-      ev := -Value(r.factors[1],0*Z(q));
-      ns := NullspaceMat(StripMemory(r.el)-ev*StripMemory(One(y)));
-      # this is a 1xn matrix now
-      ns := ns[1];
-      pos := PositionNonZero(ns);
-      ns := (ns[pos]^-1) * ns;
-      count := 0;
-      while true do   # will be left by break
-          count := count + 1;
-          if count > 20 then return fail; fi;
-          a := PseudoRandom(g);
-          v := OnLines(ns,a);
-          z := y^a;
-          if OnLines(v,y) <> v and OnLines(ns,z) <> ns then
-              # Now y and z most probably generate a GL(2,q), we need
-              # the derived subgroup and then check:
-              c := Comm(y,z);
-              sl2gens := FastNormalClosure([y,z],[c],1);
-              V := VectorSpace(f,[ns,v]);
-              bas := Basis(V,[ns,v]);
-              genss := List(sl2gens,x->List([ns,v],i->Coefficients(bas,i*x)));
-              if RECOG.IsThisSL2Natural(genss,f) then break; fi;
-              if InfoLevel(InfoRecog) >= 3 then Print("$\c"); fi;
-          else
-              if InfoLevel(InfoRecog) >= 3 then Print("-\c"); fi;
-          fi;
-      od;
-      if InfoLevel(InfoRecog) >= 3 then Print("\n"); fi;
-      return [Group(sl2gens),VectorSpace(f,[ns,v])];
-  fi;
-  # Now q-1 does divide n, we have to do something else:
-  # We look for an element with n-2 dimensional eigenspace:
-  while true do    # will be left by break
-      r := RECOG.SearchForElByCharPolFacts(g,f,[1,1,n-2],5*n+20);
-      if r = fail then return fail; fi;
-      pow := RECOG.RelativePrimeToqm1Part(q,n-2);
-      y := r.el^pow;
-      o := Order(y);
-      if o mod (q-1) = 0 then
-          y := y^(o/(q-1));
-          if RECOG.IsScalarMat(y) = false then break; fi;
-      fi;
-  od;
-  # Now y has order q-1 and n-2 dimensional eigenspace
-  if r.factors[1] <> r.factors[2] then
-      ev := -Value(r.factors[1],0*Z(q));
-      ns := NullspaceMat(StripMemory(r.el)-ev*StripMemory(One(y)));
-      if not(IsMutable(ns)) then ns := MutableCopyMat(ns); fi;
-      # this is a 1xn matrix now
-      ev := -Value(r.factors[2],0*Z(q));
-      Append(ns,NullspaceMat(StripMemory(r.el)-ev*StripMemory(One(y))));
-      # ns now is a 2xn matrix
-  else
-      ev := -Value(r.factors[1],0*Z(q));
-      ns := NullspaceMat((StripMemory(r.el)
-                                     -ev*StripMemory(One(y)))^2);
-      if not(IsMutable(ns)) then ns := MutableCopyMat(ns); fi;
-  fi;
-
-  count := 0;
-  while true do   # will be left by break
-      count := count + 1;
-      if count > 20 then return fail; fi;
-      if Length(ns) > 2 then ns := ns{[1..2]}; fi;
-      a := PseudoRandom(g);
-      Append(ns,ns * a);
-      if RankMat(ns) < 4 then
-          if InfoLevel(InfoRecog) >= 3 then Print("+\c"); fi;
-          continue;
-      fi;
-      z := y^a;
-      # Now y and z most probably generate a GL(4,q), we need
-      # the derived subgroup and then check:
-      V := VectorSpace(f,ns);
-      bas := Basis(V,ns);
-      genss := List([y,z],x->List(ns,i->Coefficients(bas,i*x)));
-      genssm := GeneratorsWithMemory(genss);
-      gl4 := Group(genssm);
-      pr := ProductReplacer(genssm,rec( maxdepth := 400, scramble := 0,
-                                        scramblefactor := 0 ) );
-      gl4!.pseudorandomfunc := [rec(func := Next,args := [pr])];
-      res := RECOG.SL_FindSL2(gl4,f);
-      if res = fail then
-          if InfoLevel(InfoRecog) >= 3 then Print("#\c"); fi;
-          continue;
-      fi;
-      slp := SLPOfElms(GeneratorsOfGroup(res[1]));
-      sl2gens := ResultOfStraightLineProgram(slp,[y,z]);
-      ns := BasisVectors(Basis(res[2])) * ns;
-      return [Group(sl2gens),VectorSpace(f,ns)];
-  od;
-  return fail;
-end;
-
-
-RECOG.SL_Even_constructdata:=function(g,q)
-local S,a,b,degrees,eva,factors,gens,h,i,n,ns,o,pol,pos,ready,ready2,
-      ready3,subgplist,w,ww,y,yy,z;
-
-n:=DimensionOfMatrixGroup(g);
-
-if q=2 then
-  repeat
-    ready:=false;
-    y:=PseudoRandom(g);
-    pol:=CharacteristicPolynomial(GF(q),GF(q),StripMemory(y),1);
-    factors:=Factors(pol);
-    degrees:=List(factors,Degree);
-    if SortedList(degrees)=[1,1,n-2] then
-       yy := y^(q^(n-2)-1);
-       if not(IsOne(yy)) and IsOne(yy^2) then ready := true; fi;
-    fi;
-  until ready;
-  repeat
-    z := yy^PseudoRandom(g);
-  until Order(z*yy) = 3;
-  o := OneMutable(z);
-  i := 1;
-  while i <= n do
-    w := o[i]*yy-o[i];
-    if not(IsZero(w)) then break; fi;
-    i := i + 1;
-  od;
-  i := 1;
-  while i <= n do
-    ww := o[i]*z-o[i];
-    if not(IsZero(ww)) then break; fi;
-    i := i + 1;
-  od;
-  return [Group(z,yy),VectorSpace(GF(2),[w,ww])];
-else
-  #case of q <> 2
-  repeat
-    ready:=false;
-    y:=PseudoRandom(g);
-    if InfoLevel(InfoRecog) >= 3 then Print(".\c"); fi;
-    pol:=CharacteristicPolynomial(GF(q),GF(q),StripMemory(y),1);
-    factors:=Factors(pol);
-    degrees:=List(factors,Degree);
-    if n-1 in degrees then
-       yy := y^(RECOG.RelativePrimeToqm1Part(q,n-1));
-       o := Order(yy);
-       if o mod (q-1) = 0 then
-           yy := yy^(o/(q-1));
-           ready := true;
-       fi;
-    fi;
-  until ready;
-  if InfoLevel(InfoRecog) >= 3 then Print("\n"); fi;
-
-  ready2:=false;
-  ready3:=false;
-  repeat
-     gens:=[yy];
-     a := PseudoRandom(g);
-     b := PseudoRandom(g);
-     Add(gens,yy^a);
-     Add(gens,yy^b);
-     h:=Group(gens);
-     if q = 4 then
-       S := StabilizerChain(h);
-       if not(Size(S) in [60480,3*60480]) then continue; fi;
-       pos := Position(degrees,1);
-       eva := -Value(factors[pos],0*Z(q));
-       ns := NullspaceMat(StripMemory(y)-eva*One(StripMemory(y)));
-       return [h,
-          VectorSpace(GF(q),[ns[1],ns[1]*StripMemory(a),ns[1]*StripMemory(b)])];
-     fi;
-
-     # Now check using ppd-elements:
-     for i in [1..10] do
-       z:=PseudoRandom(h);
-       pol:=CharacteristicPolynomial(GF(q),GF(q),StripMemory(z),1);
-       factors:=Factors(pol);
-       degrees:=List(factors,Degree);
-       if Maximum(degrees)=2 then
-          ready2:=true;
-       elif Maximum(degrees)=3 then
-          ready3:=true;
-       fi;
-       if ready2 and ready3 then
-           break;
-       fi;
-     od;
-     if not (ready2 and ready3) then
-        ready2:=false;
-        ready3:=false;
-     fi;
-  until ready2 and ready3;
-
-  subgplist:=RECOG.SL_Even_godownone(h,VectorSpace(GF(q),One(g)),q,3);
-fi;
-
-return subgplist;
-end;
+# RECOG.RelativePrimeToqm1Part := function(q,n)
+#   local x,y;
+#   x := (q^n-1)/(q-1);
+#   repeat
+#       y := x/(q-1);
+#       x := NumeratorRat(y);
+#   until DenominatorRat(y) = q-1;
+#   return x;
+# end;
+# 
+# RECOG.SearchForElByCharPolFacts := function(g,f,degs,limit)
+#   local count,degrees,factors,pol,y;
+#   count := 0;
+#   while true do   # will be left by return
+#     if InfoLevel(InfoRecog) >= 3 then Print(".\c"); fi;
+#     y:=PseudoRandom(g);
+#     pol:=CharacteristicPolynomial(f,f,StripMemory(y),1);
+#     factors:=Factors(PolynomialRing(f),pol);
+#     degrees:=List(factors,Degree);
+#     SortParallel(degrees,factors);
+#     if degrees = degs then
+#       if InfoLevel(InfoRecog) >= 3 then Print("\n"); fi;
+#       return rec( el := y, factors := factors, degrees := degrees );
+#     fi;
+#     count := count + 1;
+#     if count >= limit then return fail; fi;
+#   od;
+# end;
+# 
+# RECOG.SL_Even_godownone:=function(g,subspg,q,d)
+# local n,y,yy,yyy,ready,order,es,null,subsph,z,x,a,b,c,h,r,divisors,cent,i,
+# pol,factors,degrees;
+# 
+# n:=DimensionOfMatrixGroup(g);
+# #d:=Dimension(subspg);
+# repeat
+#   ready:=false;
+#   y:=PseudoRandom(g);
+#   pol:=CharacteristicPolynomial(GF(q),GF(q),StripMemory(y),1);
+#   factors:=Factors(pol);
+#   degrees:=List(factors,Degree);
+#   if d-1 in degrees then
+#      order:=Order(y);
+#      yy:=y^(order/Gcd(order,q-1));
+#      if not IsOne(yy) then
+#           es:= Eigenspaces(GF(q),StripMemory(yy));
+#           es:=Filtered(es,x->Dimension(x)=d-1 and IsSubspace(subspg,x));
+#           if Length(es)>0 then
+#              subsph:=es[1];
+#              ready:=true;
+#           fi;
+#           yyy:=y^(Gcd(order,q-1));
+#      fi;
+#   fi;
+# until ready;
+# 
+# cent:=[yyy];
+# for i in [1..4] do
+#     z:=PseudoRandom(g);
+#     x:=yy^z;
+#     a := x;
+#     b := x^yy;
+#     c := x^(yy^2);
+#     h := Group(a,b,c);
+#     ready:=false;
+#     repeat
+#       r:=PseudoRandom(h);
+#       r:=r^(q*(q+1));
+#       if not IsOne(r) and r*yy=yy*r then
+#          Add(cent,yyy^r);
+#          ready:=true;
+#       fi;
+#     until ready=true;
+# od;
+# return [Group(cent), subsph];
+# end;
+# 
+# RECOG.SL_FindSL2 := function(g,f)
+#   local V,a,bas,c,count,ev,gens,genss,genssm,gl4,h,i,j,n,ns,o,pos,pow,pr,q,r,
+#         res,sl2gens,sl3,slp,std,v,w,y,z,zz;
+#   q := Size(f);
+#   n := DimensionOfMatrixGroup(g);
+#   if q = 2 then
+#       # We look for a transvection:
+#       while true do   # will be left by break
+#           r := RECOG.SearchForElByCharPolFacts(g,f,[1,1,n-2],3*n+20);
+#           if r = fail then return fail; fi;
+#           y := r.el^(q^(n-2)-1);
+#           if not IsOne(y) and IsOne(y^2) then break; fi;
+#       od;
+#       # Find a good random conjugate:
+#       repeat
+#           z := y^PseudoRandom(g);
+#       until Order(z*y) = 3;
+#       gens := [y,z];
+#       o := IdentityMat(n,f);
+#       w := [];
+#       for i in [1..2] do
+#           for j in [1..n] do
+#               w[i] := o[j]*gens[i]-o[j];
+#               if not(IsZero(w[i])) then break; fi;
+#           od;
+#       od;
+#       return [Group(gens),VectorSpace(GF(q),w)];
+#   fi;
+#   if q = 3 and n = 3 then
+#       std := RECOG.MakeSL_StdGens(3,1,2,3);
+#       slp := RECOG.FindStdGensUsingBSGS(g,Concatenation(std.s,std.t),
+#                                         false,true);
+#       if slp = fail then return fail; fi;
+#       h := Group(ResultOfStraightLineProgram(slp,GeneratorsOfGroup(g)));
+#       o := IdentityMat(3,f);
+#       return [h,VectorSpace(f,o{[1..2]})];
+#   fi;
+#   if q = 3 and n = 4 then
+#       std := RECOG.MakeSL_StdGens(3,1,2,4);
+#       slp := RECOG.FindStdGensUsingBSGS(g,Concatenation(std.s,std.t),
+#                                         false,true);
+#       if slp = fail then return fail; fi;
+#       h := Group(ResultOfStraightLineProgram(slp,GeneratorsOfGroup(g)));
+#       o := IdentityMat(4,f);
+#       return [h,VectorSpace(f,o{[1..2]})];
+#   fi;
+#   if q = 3 then
+#       # We look for a transvection:
+#       while true do   # will be left by break
+#           r := RECOG.SearchForElByCharPolFacts(g,f,[1,1,n-2],3*n+20);
+#           if r = fail then return fail; fi;
+#           y := r.el^(q^(n-2)-1);
+#           if not IsOne(y) and IsOne(y^3) then break; fi;
+#       od;
+#       # Find a two good random conjugates:
+#       while true do   # will be left by return
+#           z := y^PseudoRandom(g);
+#           zz := y^PseudoRandom(g);
+#           gens := [y,z,zz];
+#           o := IdentityMat(n,f);
+#           ns := [];
+#           for j in [1..3] do
+#               for i in [1..n] do
+#                   w := o[i]*gens[j]-o[i];
+#                   if not(IsZero(w)) then break; fi;
+#               od;
+#               # Since y has order y at least one basis vector is moved.
+#               ns[j] := w;
+#           od;
+#           V := VectorSpace(f,ns);
+#           bas := Basis(V,ns);
+#           genss := List(StripMemory(gens),
+#                         x->List(ns,i->Coefficients(bas,i*x)));
+#           genssm := GeneratorsWithMemory(genss);
+#           sl3 := Group(genssm);
+#           pr := ProductReplacer(genssm,rec( maxdepth := 400, scramble := 0,
+#                                             scramblefactor := 0 ) );
+#           sl3!.pseudorandomfunc := [rec(func := Next,args := [pr])];
+#           res := RECOG.SL_FindSL2(sl3,f);
+#           if res = fail then
+#               if InfoLevel(InfoRecog) >= 3 then Print("#\c"); fi;
+#               continue;
+#           fi;
+#           slp := SLPOfElms(GeneratorsOfGroup(res[1]));
+#           sl2gens := ResultOfStraightLineProgram(slp,gens);
+#           ns := BasisVectors(Basis(res[2])) * ns;
+#           ConvertToMatrixRep(ns,q);
+#           return [Group(sl2gens),VectorSpace(f,ns)];
+#       od;
+#   fi;
+#   if q = 4 and n = 3 then
+#       std := RECOG.MakeSL_StdGens(2,2,2,3);
+#       slp := RECOG.FindStdGensUsingBSGS(g,Concatenation(std.s,std.t),
+#                                         false,true);
+#       if slp = fail then return fail; fi;
+#       h := Group(ResultOfStraightLineProgram(slp,GeneratorsOfGroup(g)));
+#       o := IdentityMat(3,f);
+#       return [h,VectorSpace(f,o{[1..2]})];
+#   fi;
+#   if q = 5 and n = 4 then
+#       std := RECOG.MakeSL_StdGens(5,1,2,4);
+#       slp := RECOG.FindStdGensUsingBSGS(g,Concatenation(std.s,std.t),
+#                                         false,true);
+#       if slp = fail then return fail; fi;
+#       h := Group(ResultOfStraightLineProgram(slp,GeneratorsOfGroup(g)));
+#       o := IdentityMat(4,f);
+#       return [h,VectorSpace(f,o{[1..2]})];
+#   fi;
+#   if n mod (q-1) <> 0 and q <> 3 then   # The generic case:
+#       # We look for an element with n-1 dimensional eigenspace:
+#       count := 0;
+#       while true do    # will be left by break
+#           count := count + 1;
+#           if count > 20 then return fail; fi;
+#           r := RECOG.SearchForElByCharPolFacts(g,f,[1,n-1],3*n+20);
+#           if r = fail then return fail; fi;
+#           pow := RECOG.RelativePrimeToqm1Part(q,n-1);
+#           y := r.el^pow;
+#           o := Order(y);
+#           if o mod (q-1) = 0 then
+#               y := y^(o/(q-1));
+#               break;
+#           fi;
+#       od;
+#       # Now y has order q-1 and and n-1 dimensional eigenspace
+#       ev := -Value(r.factors[1],0*Z(q));
+#       ns := NullspaceMat(StripMemory(r.el)-ev*StripMemory(One(y)));
+#       # this is a 1xn matrix now
+#       ns := ns[1];
+#       pos := PositionNonZero(ns);
+#       ns := (ns[pos]^-1) * ns;
+#       count := 0;
+#       while true do   # will be left by break
+#           count := count + 1;
+#           if count > 20 then return fail; fi;
+#           a := PseudoRandom(g);
+#           v := OnLines(ns,a);
+#           z := y^a;
+#           if OnLines(v,y) <> v and OnLines(ns,z) <> ns then
+#               # Now y and z most probably generate a GL(2,q), we need
+#               # the derived subgroup and then check:
+#               c := Comm(y,z);
+#               sl2gens := FastNormalClosure([y,z],[c],1);
+#               V := VectorSpace(f,[ns,v]);
+#               bas := Basis(V,[ns,v]);
+#               genss := List(sl2gens,x->List([ns,v],i->Coefficients(bas,i*x)));
+#               if RECOG.IsThisSL2Natural(genss,f) then break; fi;
+#               if InfoLevel(InfoRecog) >= 3 then Print("$\c"); fi;
+#           else
+#               if InfoLevel(InfoRecog) >= 3 then Print("-\c"); fi;
+#           fi;
+#       od;
+#       if InfoLevel(InfoRecog) >= 3 then Print("\n"); fi;
+#       return [Group(sl2gens),VectorSpace(f,[ns,v])];
+#   fi;
+#   # Now q-1 does divide n, we have to do something else:
+#   # We look for an element with n-2 dimensional eigenspace:
+#   while true do    # will be left by break
+#       r := RECOG.SearchForElByCharPolFacts(g,f,[1,1,n-2],5*n+20);
+#       if r = fail then return fail; fi;
+#       pow := RECOG.RelativePrimeToqm1Part(q,n-2);
+#       y := r.el^pow;
+#       o := Order(y);
+#       if o mod (q-1) = 0 then
+#           y := y^(o/(q-1));
+#           if RECOG.IsScalarMat(y) = false then break; fi;
+#       fi;
+#   od;
+#   # Now y has order q-1 and n-2 dimensional eigenspace
+#   if r.factors[1] <> r.factors[2] then
+#       ev := -Value(r.factors[1],0*Z(q));
+#       ns := NullspaceMat(StripMemory(r.el)-ev*StripMemory(One(y)));
+#       if not(IsMutable(ns)) then ns := MutableCopyMat(ns); fi;
+#       # this is a 1xn matrix now
+#       ev := -Value(r.factors[2],0*Z(q));
+#       Append(ns,NullspaceMat(StripMemory(r.el)-ev*StripMemory(One(y))));
+#       # ns now is a 2xn matrix
+#   else
+#       ev := -Value(r.factors[1],0*Z(q));
+#       ns := NullspaceMat((StripMemory(r.el)
+#                                      -ev*StripMemory(One(y)))^2);
+#       if not(IsMutable(ns)) then ns := MutableCopyMat(ns); fi;
+#   fi;
+# 
+#   count := 0;
+#   while true do   # will be left by break
+#       count := count + 1;
+#       if count > 20 then return fail; fi;
+#       if Length(ns) > 2 then ns := ns{[1..2]}; fi;
+#       a := PseudoRandom(g);
+#       Append(ns,ns * a);
+#       if RankMat(ns) < 4 then
+#           if InfoLevel(InfoRecog) >= 3 then Print("+\c"); fi;
+#           continue;
+#       fi;
+#       z := y^a;
+#       # Now y and z most probably generate a GL(4,q), we need
+#       # the derived subgroup and then check:
+#       V := VectorSpace(f,ns);
+#       bas := Basis(V,ns);
+#       genss := List([y,z],x->List(ns,i->Coefficients(bas,i*x)));
+#       genssm := GeneratorsWithMemory(genss);
+#       gl4 := Group(genssm);
+#       pr := ProductReplacer(genssm,rec( maxdepth := 400, scramble := 0,
+#                                         scramblefactor := 0 ) );
+#       gl4!.pseudorandomfunc := [rec(func := Next,args := [pr])];
+#       res := RECOG.SL_FindSL2(gl4,f);
+#       if res = fail then
+#           if InfoLevel(InfoRecog) >= 3 then Print("#\c"); fi;
+#           continue;
+#       fi;
+#       slp := SLPOfElms(GeneratorsOfGroup(res[1]));
+#       sl2gens := ResultOfStraightLineProgram(slp,[y,z]);
+#       ns := BasisVectors(Basis(res[2])) * ns;
+#       return [Group(sl2gens),VectorSpace(f,ns)];
+#   od;
+#   return fail;
+# end;
+# 
+# 
+# RECOG.SL_Even_constructdata:=function(g,q)
+# local S,a,b,degrees,eva,factors,gens,h,i,n,ns,o,pol,pos,ready,ready2,
+#       ready3,subgplist,w,ww,y,yy,z;
+# 
+# n:=DimensionOfMatrixGroup(g);
+# 
+# if q=2 then
+#   repeat
+#     ready:=false;
+#     y:=PseudoRandom(g);
+#     pol:=CharacteristicPolynomial(GF(q),GF(q),StripMemory(y),1);
+#     factors:=Factors(pol);
+#     degrees:=List(factors,Degree);
+#     if SortedList(degrees)=[1,1,n-2] then
+#        yy := y^(q^(n-2)-1);
+#        if not(IsOne(yy)) and IsOne(yy^2) then ready := true; fi;
+#     fi;
+#   until ready;
+#   repeat
+#     z := yy^PseudoRandom(g);
+#   until Order(z*yy) = 3;
+#   o := OneMutable(z);
+#   i := 1;
+#   while i <= n do
+#     w := o[i]*yy-o[i];
+#     if not(IsZero(w)) then break; fi;
+#     i := i + 1;
+#   od;
+#   i := 1;
+#   while i <= n do
+#     ww := o[i]*z-o[i];
+#     if not(IsZero(ww)) then break; fi;
+#     i := i + 1;
+#   od;
+#   return [Group(z,yy),VectorSpace(GF(2),[w,ww])];
+# else
+#   #case of q <> 2
+#   repeat
+#     ready:=false;
+#     y:=PseudoRandom(g);
+#     if InfoLevel(InfoRecog) >= 3 then Print(".\c"); fi;
+#     pol:=CharacteristicPolynomial(GF(q),GF(q),StripMemory(y),1);
+#     factors:=Factors(pol);
+#     degrees:=List(factors,Degree);
+#     if n-1 in degrees then
+#        yy := y^(RECOG.RelativePrimeToqm1Part(q,n-1));
+#        o := Order(yy);
+#        if o mod (q-1) = 0 then
+#            yy := yy^(o/(q-1));
+#            ready := true;
+#        fi;
+#     fi;
+#   until ready;
+#   if InfoLevel(InfoRecog) >= 3 then Print("\n"); fi;
+# 
+#   ready2:=false;
+#   ready3:=false;
+#   repeat
+#      gens:=[yy];
+#      a := PseudoRandom(g);
+#      b := PseudoRandom(g);
+#      Add(gens,yy^a);
+#      Add(gens,yy^b);
+#      h:=Group(gens);
+#      if q = 4 then
+#        S := StabilizerChain(h);
+#        if not(Size(S) in [60480,3*60480]) then continue; fi;
+#        pos := Position(degrees,1);
+#        eva := -Value(factors[pos],0*Z(q));
+#        ns := NullspaceMat(StripMemory(y)-eva*One(StripMemory(y)));
+#        return [h,
+#           VectorSpace(GF(q),[ns[1],ns[1]*StripMemory(a),ns[1]*StripMemory(b)])];
+#      fi;
+# 
+#      # Now check using ppd-elements:
+#      for i in [1..10] do
+#        z:=PseudoRandom(h);
+#        pol:=CharacteristicPolynomial(GF(q),GF(q),StripMemory(z),1);
+#        factors:=Factors(pol);
+#        degrees:=List(factors,Degree);
+#        if Maximum(degrees)=2 then
+#           ready2:=true;
+#        elif Maximum(degrees)=3 then
+#           ready3:=true;
+#        fi;
+#        if ready2 and ready3 then
+#            break;
+#        fi;
+#      od;
+#      if not (ready2 and ready3) then
+#         ready2:=false;
+#         ready3:=false;
+#      fi;
+#   until ready2 and ready3;
+# 
+#   subgplist:=RECOG.SL_Even_godownone(h,VectorSpace(GF(q),One(g)),q,3);
+# fi;
+# 
+# return subgplist;
+# end;
 
 RECOG.FindStdGensUsingBSGS := function(g,stdgens,projective,large)
   # stdgens generators for the matrix group g
