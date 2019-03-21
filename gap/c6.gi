@@ -524,43 +524,43 @@ end;
 
 
 
-RECOG.TestAbelianOld := function (n,grp,u)
-
-    local list, x, y, limu, randlist, randgens;
-
-        list := [u];
-        if Length(GeneratorsOfGroup(grp)) > 3 then
-            limu := 16 * n;
-    else
-        limu := 13 * n;
-        fi;
-
-    while limu > 0 do
-            limu := limu - 1;
-            x  := RandomSubproduct(list);
-            y  := RandomSubproduct(list);
-        x  := Comm(x,y);
-        if x <> x[1,1] * One(x) then
-        return [false,x];
-        fi;
-            randlist:= RandomSubproduct(list);
-            if randlist <> One(grp) then
-                if Length(GeneratorsOfGroup(grp)) > 3 then
-                    randgens:= RandomSubproduct(grp);
-                    if randgens <> One(grp) then
-                        Add(list,randlist^randgens);
-                    fi;
-                else # for short generator lists, conjugate with all gens
-                    for randgens in GeneratorsOfGroup(grp) do
-                        Add(list, randlist^randgens);
-                    od;
-                fi;
-            fi;
-    od;
-
-    return [true,u,list];
-
-end;
+# RECOG.TestAbelianOld := function (n,grp,u)
+# 
+#     local list, x, y, limu, randlist, randgens;
+# 
+#         list := [u];
+#         if Length(GeneratorsOfGroup(grp)) > 3 then
+#             limu := 16 * n;
+#     else
+#         limu := 13 * n;
+#         fi;
+# 
+#     while limu > 0 do
+#             limu := limu - 1;
+#             x  := RandomSubproduct(list);
+#             y  := RandomSubproduct(list);
+#         x  := Comm(x,y);
+#         if x <> x[1,1] * One(x) then
+#         return [false,x];
+#         fi;
+#             randlist:= RandomSubproduct(list);
+#             if randlist <> One(grp) then
+#                 if Length(GeneratorsOfGroup(grp)) > 3 then
+#                     randgens:= RandomSubproduct(grp);
+#                     if randgens <> One(grp) then
+#                         Add(list,randlist^randgens);
+#                     fi;
+#                 else # for short generator lists, conjugate with all gens
+#                     for randgens in GeneratorsOfGroup(grp) do
+#                         Add(list, randlist^randgens);
+#                     od;
+#                 fi;
+#             fi;
+#     od;
+# 
+#     return [true,u,list];
+# 
+# end;
 
 
 #############################################################################
