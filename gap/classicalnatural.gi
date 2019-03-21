@@ -3218,7 +3218,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
       ri!.gcd := gcd;
       SetFilterObj(ri,IsLeaf);
       SetSize(ri,(q+1)*(q-1)*q/GcdInt(2,q-1));
-      SetIsSimpleGroup(ri,true);
+      SetIsRecogInfoForSimpleGroup(ri,true);
       Setslpforelement(ri,SLPforElementFuncsProjective.PSL2);
       return Success;
   else   # bigger than 2:
@@ -3247,7 +3247,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
           ri!.gcd := gcd;
           SetFilterObj(ri,IsLeaf);
           SetSize(ri,Product([0..d-1],i->(q^d-q^i))/((q-1)*gcd.gcd));
-          SetIsSimpleGroup(ri,true);
+          SetIsRecogInfoForSimpleGroup(ri,true);
           Setslpforelement(ri,SLPforElementFuncsProjective.PSLd);
           return Success;
       fi;

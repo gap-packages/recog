@@ -24,7 +24,7 @@ FindHomMethodsPerm.Cyclic2 :=
          Setslptonice(StraightLineProgramNC([[[i,1]]],Length(gens)));
          Setslpforelement(ri,SLPforElementFuncsPerm.Cyclic2);
          SetFilterObj(ri,IsLeaf);
-         SetIsSimpleGroup(ri,true);
+         SetIsRecogInfoForSimpleGroup(ri,true);
          return Success;     # this indicates success
      else
          return NeverApplicable;    # do not call us again

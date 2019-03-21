@@ -188,9 +188,9 @@ InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
             Setslpforelement(ri,SLPforElementFuncsProjective.StabilizerChain);
             SetFilterObj(ri,IsLeaf);
             if IsBound(hint.issimple) then
-                SetIsSimpleGroup(ri,hint.issimple);
+                SetIsRecogInfoForSimpleGroup(ri,hint.issimple);
             fi;
-            SetIsAlmostSimpleGroup(ri,true);
+            SetIsRecogInfoForAlmostSimpleGroup(ri,true);
             ri!.comment := Concatenation("_",hint.name);
             return true;
         od;
@@ -872,7 +872,7 @@ end;
 #               ForgetMemory(r[2]);
 #               ForgetMemory(r[3][1]);
 #               SetFilterObj(ri,IsLeaf);
-#               SetIsSimpleGroup(ri,true);
+#               SetIsRecogInfoForSimpleGroup(ri,true);
 #               return Success;
 #           fi;
 #       fi;
@@ -967,7 +967,7 @@ FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
 #           ForgetMemory(r[2]);
 #           ForgetMemory(r[3][1]);
 #           SetFilterObj(ri,IsLeaf);
-#           SetIsSimpleGroup(ri,true);
+#           SetIsRecogInfoForSimpleGroup(ri,true);
 #           ri!.comment := "_Alt";
 #           return Success;
 #       else   # r[1] = "Sn"
@@ -980,7 +980,7 @@ FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
 #           ForgetMemory(r[2]);
 #           ForgetMemory(r[3][1]);
 #           SetFilterObj(ri,IsLeaf);
-#           SetIsAlmostSimpleGroup(ri,true);
+#           SetIsRecogInfoForAlmostSimpleGroup(ri,true);
 #           ri!.comment := "_Sym";
 #           return Success;
 #       fi;

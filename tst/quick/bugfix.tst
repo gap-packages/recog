@@ -25,5 +25,9 @@ gap> G:=ClassicalMaximals("L",3,3)[4];;
 # FIXME: check disabled for now, due to regression
 # gap> ri:=RECOG.TestGroup(G, false, 24);;
 
+# verify issue #38 is resolved
+gap> RECOG.TestGroup(SymmetricGroup(11), false, Factorial(11));
+<recoginfo Giant AlmostSimple Size=39916800>
+
 #
 gap> STOP_TEST("bugfix.tst");

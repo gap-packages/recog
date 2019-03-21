@@ -42,9 +42,9 @@ DeclareAttribute( "RIFac", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "RIKer", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "RIParent", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "StdPresentation", IsRecognitionInfo, "mutable" );    # TODO: implement
-DeclareProperty( "IsSimpleGroup", IsRecognitionInfo );
-DeclareProperty( "IsAlmostSimpleGroup", IsRecognitionInfo );
-InstallTrueMethod( IsAlmostSimpleGroup, IsSimpleGroup );
+DeclareProperty( "IsRecogInfoForSimpleGroup", IsRecognitionInfo );
+DeclareProperty( "IsRecogInfoForAlmostSimpleGroup", IsRecognitionInfo );
+InstallTrueMethod( IsRecogInfoForAlmostSimpleGroup, IsRecogInfoForSimpleGroup );
 
 DeclareAttribute( "pregensfac", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "calcnicegens", IsRecognitionInfo, "mutable" );

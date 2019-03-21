@@ -51,9 +51,9 @@ RECOG_ViewObj := function( level, ri )
             Print(ri!.comment);
         fi;
     fi;
-    if HasIsSimpleGroup(ri) and IsSimpleGroup(ri) then
+    if HasIsRecogInfoForSimpleGroup(ri) and IsRecogInfoForSimpleGroup(ri) then
         Print(" Simple");
-    elif HasIsAlmostSimpleGroup(ri) and IsAlmostSimpleGroup(ri) then
+    elif HasIsRecogInfoForAlmostSimpleGroup(ri) and IsRecogInfoForAlmostSimpleGroup(ri) then
         Print(" AlmostSimple");
     fi;
     if HasSize(ri) then
