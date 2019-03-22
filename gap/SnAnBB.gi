@@ -2637,10 +2637,9 @@ end;	# function AnBB_Recognise
 
 RECOG.SnAnBBEpsilon := 1/1024; #TODO: For now, this is set globally.
 
-#TODO: What about memory and how to SLPNice?
 FindHomMethodsPerm.SnAnBB :=
    function(ri,grp)
-   local mp,res;
+   local mp,res, grpmem;
    if not IsPermGroup(grp) then #TODO: For now the function is only applicable to PermGroups. 
       return NeverApplicable;
    fi;
@@ -2652,12 +2651,48 @@ FindHomMethodsPerm.SnAnBB :=
       return TemporaryFailure;
    fi;
    #Recognition was successful:
+   grpmem := Group(ri!.gensHmem);
+   grpmem!.pseudorandomfunc := [rec(
+      func := function(ri) return RandomElm(ri,"SnAnBB",true).el; end,
+      args := [ri])];
+   SetFilterObj(ri,IsLeaf);
    if res[1] = "An" then
-   #   AnBB_SLPForAn(<element>, res[2]);
+      SetSize(ri,Factorial(res[2])/2);
+      SetIsRecogInfoForSimpleGroup(ri,true);
+     # AnBB_SLPForAn(<element>, res[2]);
    else
-   #   AnBB_SLPForSn( <element>, res[2]);
+      SetSize(ri,Factorial(res[2]));
+      SetIsRecogInfoForAlmostSimpleGroup(ri,true);
+      #AnBB_SLPForSn( <element>, res[2]);
    fi;
+   #Setslpforelement(ri,SLPforElementFuncsPerm.Giant)
+   SetNiceGens(ri,res{[3,4]});
+   #Setslptonice(ri,res.slpnice);
 end;
+
+
+test := function( g )
+local preimage, n, res, inv3, x, y,slp;
+res := SnAnBB_Recognise(g,1000,1/1024);
+n := res[2];
+if res[1] = "An" then
+   inv3 := res[4];
+   x := Random( AlternatingGroup(n));
+   slp := AnBB_SLPForAn(x, n);
+else 
+   inv3 := Comm(res[4],res[3]);
+   x := Random( SymmetricGroup( n) );
+   slp := AnBB_SLPForSn(x, n);
+fi;
+preimage := ResultOfStraightLineProgram( slp, [ res[4], res[3] ] );
+y := AnBB_EvaluateIso( preimage, res[5],n, inv3 );
+if x<>y then  
+   Error("This is a wrong result \n");
+fi;
+
+end;
+
+
 
 ##
 ##  This program is free software: you can redistribute it and/or modify
