@@ -22,8 +22,9 @@ SetPackageInfo( rec(
 
 PackageName := "recog",
 Subtitle := "A collection of group recognition methods",
-Version := "1.3.1",
-Date := "18/09/2018", # dd/mm/yyyy format
+Version := "1.3.2",
+Date := "15/04/2018", # dd/mm/yyyy format
+License := "GPL-3.0-or-later",
 
 ##  Information about authors and maintainers.
 Persons := [
@@ -178,17 +179,16 @@ Persons := [
     FirstNames    := "Max",
     IsAuthor      := false,
     IsMaintainer  := true,
-    Email         := "max.horn@math.uni-giessen.de",
-    WWWHome       := "http://www.quendi.de/math",
+    Email         := "max.horn@uni-siegen.de",
+    WWWHome       := "https://www.quendi.de/math",
     PostalAddress := Concatenation(
-                       "AG Algebra\n",
-                       "Mathematisches Institut\n",
-                       "Justus-Liebig-Universität Gießen\n",
-                       "Arndtstraße 2\n",
-                       "35392 Gießen\n",
+                       "Department Mathematik\n",
+                       "Universität Siegen\n",
+                       "Walter-Flex-Straße 3\n",
+                       "57072 Siegen\n",
                        "Germany" ),
-    Place         := "Gießen",
-    Institution   := "Justus-Liebig-Universität Gießen"
+    Place         := "Siegen",
+    Institution   := "Universität Siegen"
   ),
 ],
 

@@ -6,10 +6,10 @@
                   [1X A collection of group recognition methods [101X
   
   
-                                     1.3.1
+                                     1.3.2
   
   
-                               18 September 2018
+                                 15 April 2018
   
   
                                  Max Neunhöffer
@@ -111,13 +111,12 @@
   
   
   Max Horn
-      Email:    [7Xmailto:max.horn@math.uni-giessen.de[107X
-      Homepage: [7Xhttp://www.quendi.de/math[107X
-      Address:  [33X[0;14YAG Algebra[133X
-                [33X[0;14YMathematisches Institut[133X
-                [33X[0;14YJustus-Liebig-Universität Gießen[133X
-                [33X[0;14YArndtstraße 2[133X
-                [33X[0;14Y35392 Gießen[133X
+      Email:    [7Xmailto:max.horn@uni-siegen.de[107X
+      Homepage: [7Xhttps://www.quendi.de/math[107X
+      Address:  [33X[0;14YDepartment Mathematik[133X
+                [33X[0;14YUniversität Siegen[133X
+                [33X[0;14YWalter-Flex-Straße 3[133X
+                [33X[0;14Y57072 Siegen[133X
                 [33X[0;14YGermany[133X
   
   
@@ -146,21 +145,17 @@
       3.1-2 RecognisePermGroup
       3.1-3 RecogniseMatrixGroup
       3.1-4 RecogniseProjectiveGroup
-      3.1-5 RecogniseBBGroup
-      3.1-6 RecogniseGroup
-      3.1-7 FindHomDbPerm
-      3.1-8 FindHomMethodsPerm
-      3.1-9 SLPforElementFuncsPerm
-      3.1-10 FindHomDbMatrix
-      3.1-11 FindHomMethodsMatrix
-      3.1-12 SLPforElementFuncsMatrix
-      3.1-13 FindHomDbProjective
-      3.1-14 FindHomMethodsProjective
-      3.1-15 SLPforElementFuncsProjective
-      3.1-16 FindHomDbBB
-      3.1-17 FindHomMethodsBB
-      3.1-18 SLPforElementFuncsBB
-      3.1-19 TryFindHomMethod
+      3.1-5 RecogniseGroup
+      3.1-6 FindHomDbPerm
+      3.1-7 FindHomMethodsPerm
+      3.1-8 SLPforElementFuncsPerm
+      3.1-9 FindHomDbMatrix
+      3.1-10 FindHomMethodsMatrix
+      3.1-11 SLPforElementFuncsMatrix
+      3.1-12 FindHomDbProjective
+      3.1-13 FindHomMethodsProjective
+      3.1-14 SLPforElementFuncsProjective
+      3.1-15 TryFindHomMethod
     3.2 [33X[0;0YRecognition info records[133X
       3.2-1 RecognitionInfoFamily
       3.2-2 IsRecognitionInfo
@@ -201,7 +196,6 @@
     3.4 [33X[0;0YConventions for the recognition of permutation groups[133X
     3.5 [33X[0;0YConventions for the recognition of matrix groups[133X
     3.6 [33X[0;0YConventions for the recognition of projective groups[133X
-    3.7 [33X[0;0YConventions for the recognition of black box groups[133X
   4 [33X[0;0YMethod Selection[133X
     4.1 [33X[0;0YWhat are methods?[133X
       4.1-1 AddMethod
@@ -249,7 +243,6 @@
       6.3-11 [33X[0;0Y[10XTwoLargeElOrders[110X[133X
       6.3-12 [33X[0;0Y[10XStabilizerChain[110X[133X
       6.3-13 [33X[0;0Y[10XBlockScalarProj[110X[133X
-    6.4 [33X[0;0YMethods for black box groups[133X
   7 [33X[0;0YExamples[133X
   
   

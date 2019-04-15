@@ -12,15 +12,15 @@
   interested  in  the  SLP from those to [22Xg[122X. The framework presented here deals
   with exactly this process.[133X
   
-  [33X[0;0YThe   generic  framework  was  designed  having  four  situations  in  mind:
-  permutation  groups,  matrix groups, projective groups and black box groups.
-  Although the methods used are quite different for those four cases, there is
-  a  common  pattern in the procedure of recognition. Namely, first we have to
-  find  a  homomorphism, solve the constructive membership problem recursively
-  in  image  and  kernel,  then  put it together. The recursion ends in groups
-  where we can solve the constructive membership problem directly. The general
-  framework  reflects  this  idea  and  separates  it  from  the  rest  of the
-  recognition methods.[133X
+  [33X[0;0YThe  generic  framework  was  designed  having  three  situations  in  mind:
+  permutation  groups,  matrix  groups  and  projective  groups.  Although the
+  methods  used are quite different for those cases, there is a common pattern
+  in   the  procedure  of  recognition.  Namely,  first  we  have  to  find  a
+  homomorphism, solve the constructive membership problem recursively in image
+  and  kernel, then put it together. The recursion ends in groups where we can
+  solve  the  constructive  membership problem directly. The general framework
+  reflects  this  idea  and  separates  it  from  the  rest of the recognition
+  methods.[133X
   
   [33X[0;0YSolution of the constructive membership problem comes in two stages: first a
   [21Xrecognition  phase[121X  and  then  a  [21Xverification  phase[121X. The recognition phase
@@ -165,7 +165,7 @@
   
   [33X[0;0Y[3XH[103X   must   be   a   [5XGAP[105X   permutation  group  object.  This  function  calls
   [2XRecogniseGeneric[102X  ([14X3.1-1[114X)  with  the  method  database  used for permutation
-  groups, which is stored in the global variable [2XFindHomDbPerm[102X ([14X3.1-7[114X), and no
+  groups, which is stored in the global variable [2XFindHomDbPerm[102X ([14X3.1-6[114X), and no
   prior knowledge.[133X
   
   [1X3.1-3 RecogniseMatrixGroup[101X
@@ -176,7 +176,7 @@
   
   [33X[0;0Y[3XH[103X  must  be  a [5XGAP[105X matrix group object. This function calls [2XRecogniseGeneric[102X
   ([14X3.1-1[114X)  with the method database used for matrix groups, which is stored in
-  the global variable [2XFindHomDbMatrix[102X ([14X3.1-10[114X), and no prior knowledge.[133X
+  the global variable [2XFindHomDbMatrix[102X ([14X3.1-9[114X), and no prior knowledge.[133X
   
   [1X3.1-4 RecogniseProjectiveGroup[101X
   
@@ -189,44 +189,34 @@
   recognition  will  however  view the group as the projective group, i.e. the
   matrix   group   modulo   its   scalar   matrices.   This   function   calls
   [2XRecogniseGeneric[102X  ([14X3.1-1[114X)  with  the  method  database  used  for projective
-  groups, which is stored in the global variable [2XFindHomDbProjective[102X ([14X3.1-13[114X),
+  groups, which is stored in the global variable [2XFindHomDbProjective[102X ([14X3.1-12[114X),
   and no prior knowledge.[133X
   
-  [1X3.1-5 RecogniseBBGroup[101X
-  
-  [33X[1;0Y[29X[2XRecogniseBBGroup[102X( [3XH[103X ) [32X function[133X
-  [33X[1;0Y[29X[2XRecognizeBBGroup[102X( [3XH[103X ) [32X function[133X
-  [6XReturns:[106X  [33X[0;10Y[10Xfail[110X for failure or a recognition info record.[133X
-  
-  [33X[0;0Y[3XH[103X must be a [5XGAP[105X black box group object. This function calls [2XRecogniseGeneric[102X
-  ([14X3.1-1[114X)  with the method database used for black box groups, which is stored
-  in the global variable [2XFindHomDbBB[102X ([14X3.1-16[114X), and no prior knowledge.[133X
-  
-  [1X3.1-6 RecogniseGroup[101X
+  [1X3.1-5 RecogniseGroup[101X
   
   [33X[1;0Y[29X[2XRecogniseGroup[102X( [3XH[103X ) [32X function[133X
   [33X[1;0Y[29X[2XRecognizeGroup[102X( [3XH[103X ) [32X function[133X
   [6XReturns:[106X  [33X[0;10Y[10Xfail[110X for failure or a recognition info record.[133X
   
   [33X[0;0Y[3XH[103X  must be a [5XGAP[105X group object. This function automatically dispatches to one
-  of    the    three    previous    functions    [2XRecognisePermGroup[102X   ([14X3.1-2[114X),
-  [2XRecogniseMatrixGroup[102X  ([14X3.1-3[114X), or [2XRecogniseBBGroup[102X ([14X3.1-5[114X), according to the
-  type of the group [3XH[103X. Note that since currently there is no implementation of
-  projective  groups in the [5XGAP[105X library, one cannot recognise a matrix group [3XH[103X
-  as a projective group using this function.[133X
+  of    the    two   previous   functions   [2XRecognisePermGroup[102X   ([14X3.1-2[114X),   or
+  [2XRecogniseMatrixGroup[102X  ([14X3.1-3[114X),  according  to  the type of the group [3XH[103X. Note
+  that  since currently there is no implementation of projective groups in the
+  [5XGAP[105X  library,  one  cannot  recognise a matrix group [3XH[103X as a projective group
+  using this function.[133X
   
-  [1X3.1-7 FindHomDbPerm[101X
+  [1X3.1-6 FindHomDbPerm[101X
   
   [33X[1;0Y[29X[2XFindHomDbPerm[102X[32X global variable[133X
   
   [33X[0;0YThis  list  contains  the  methods for finding homomorphisms for permutation
-  group  recognition that are stored in the record [2XFindHomMethodsPerm[102X ([14X3.1-8[114X).
+  group  recognition that are stored in the record [2XFindHomMethodsPerm[102X ([14X3.1-7[114X).
   As  described  in Section [14X4.1[114X each method is described by a record. The list
   is  always  sorted  with respect to decreasing ranks. The order in this list
   tells in which order the methods should be applied. Use [2XAddMethod[102X ([14X4.1-1[114X) to
   add methods to this database.[133X
   
-  [1X3.1-8 FindHomMethodsPerm[101X
+  [1X3.1-7 FindHomMethodsPerm[101X
   
   [33X[1;0Y[29X[2XFindHomMethodsPerm[102X[32X global variable[133X
   
@@ -235,7 +225,7 @@
   all  in  this  record  such  that  we do not use up too many global variable
   names.[133X
   
-  [1X3.1-9 SLPforElementFuncsPerm[101X
+  [1X3.1-8 SLPforElementFuncsPerm[101X
   
   [33X[1;0Y[29X[2XSLPforElementFuncsPerm[102X[32X global variable[133X
   
@@ -244,18 +234,18 @@
   successful permutation group recognition. We collect them all in this record
   such that we do not use up too many global variable names.[133X
   
-  [1X3.1-10 FindHomDbMatrix[101X
+  [1X3.1-9 FindHomDbMatrix[101X
   
   [33X[1;0Y[29X[2XFindHomDbMatrix[102X[32X global variable[133X
   
   [33X[0;0YThis  list  contains  the methods for finding homomorphisms for matrix group
-  recognition  that are stored in the record [2XFindHomMethodsMatrix[102X ([14X3.1-11[114X). As
+  recognition  that are stored in the record [2XFindHomMethodsMatrix[102X ([14X3.1-10[114X). As
   described  in  Section [14X4.1[114X each method is described by a record. The list is
   always sorted with respect to decreasing ranks. The order in this list tells
   in  which  order the methods should be applied. Use [2XAddMethod[102X ([14X4.1-1[114X) to add
   methods to this database.[133X
   
-  [1X3.1-11 FindHomMethodsMatrix[101X
+  [1X3.1-10 FindHomMethodsMatrix[101X
   
   [33X[1;0Y[29X[2XFindHomMethodsMatrix[102X[32X global variable[133X
   
@@ -263,7 +253,7 @@
   homomorphisms  for  matrix group recognition are stored. We collect them all
   in this record such that we do not use up too many global variable names.[133X
   
-  [1X3.1-12 SLPforElementFuncsMatrix[101X
+  [1X3.1-11 SLPforElementFuncsMatrix[101X
   
   [33X[1;0Y[29X[2XSLPforElementFuncsMatrix[102X[32X global variable[133X
   
@@ -272,18 +262,18 @@
   successful matrix group recognition. We collect them all in this record such
   that we do not use up too many global variable names.[133X
   
-  [1X3.1-13 FindHomDbProjective[101X
+  [1X3.1-12 FindHomDbProjective[101X
   
   [33X[1;0Y[29X[2XFindHomDbProjective[102X[32X global variable[133X
   
   [33X[0;0YThis  list  contains  the  methods  for finding homomorphisms for projective
   group  recognition  that  are  stored in the record [2XFindHomMethodsProjective[102X
-  ([14X3.1-14[114X).  As described in Section [14X4.1[114X each method is described by a record.
+  ([14X3.1-13[114X).  As described in Section [14X4.1[114X each method is described by a record.
   The  list  is  always  sorted with respect to decreasing ranks. The order in
   this  list tells in which order the methods should be applied. Use [2XAddMethod[102X
   ([14X4.1-1[114X) to add methods to this database.[133X
   
-  [1X3.1-14 FindHomMethodsProjective[101X
+  [1X3.1-13 FindHomMethodsProjective[101X
   
   [33X[1;0Y[29X[2XFindHomMethodsProjective[102X[32X global variable[133X
   
@@ -292,7 +282,7 @@
   all  in  this  record  such  that  we do not use up too many global variable
   names.[133X
   
-  [1X3.1-15 SLPforElementFuncsProjective[101X
+  [1X3.1-14 SLPforElementFuncsProjective[101X
   
   [33X[1;0Y[29X[2XSLPforElementFuncsProjective[102X[32X global variable[133X
   
@@ -301,50 +291,20 @@
   successful  projective group recognition. We collect them all in this record
   such that we do not use up too many global variable names.[133X
   
-  [1X3.1-16 FindHomDbBB[101X
-  
-  [33X[1;0Y[29X[2XFindHomDbBB[102X[32X global variable[133X
-  
-  [33X[0;0YThis list contains the methods for finding homomorphisms for black box group
-  recognition  that  are  stored  in  the record [2XFindHomMethodsBB[102X ([14X3.1-17[114X). As
-  described  in  Section [14X4.1[114X each method is described by a record. The list is
-  always sorted with respect to decreasing ranks. The order in this list tells
-  in  which  order the methods should be applied. Use [2XAddMethod[102X ([14X4.1-1[114X) to add
-  methods to this database.[133X
-  
-  [1X3.1-17 FindHomMethodsBB[101X
-  
-  [33X[1;0Y[29X[2XFindHomMethodsBB[102X[32X global variable[133X
-  
-  [33X[0;0YIn   this   global  record  the  functions  that  are  methods  for  finding
-  homomorphisms  for  black  box group recognition are stored. We collect them
-  all  in  this  record  such  that  we do not use up too many global variable
-  names.[133X
-  
-  [1X3.1-18 SLPforElementFuncsBB[101X
-  
-  [33X[1;0Y[29X[2XSLPforElementFuncsBB[102X[32X global variable[133X
-  
-  [33X[0;0YThis  global  record  holds the functions that are methods for writing group
-  elements  as  straight line programs (SLPs) in terms of the generators after
-  successful  black  box group recognition. We collect them all in this record
-  such that we do not use up too many global variable names.[133X
-  
-  [1X3.1-19 TryFindHomMethod[101X
+  [1X3.1-15 TryFindHomMethod[101X
   
   [33X[1;0Y[29X[2XTryFindHomMethod[102X( [3XH[103X, [3Xmethod[103X, [3Xprojective[103X ) [32X function[133X
   [6XReturns:[106X  [33X[0;10Y[10Xfail[110X or [10Xfalse[110X or a recognition info record.[133X
   
   [33X[0;0YUse this function to try to run a given find homomorphism method [3Xmethod[103X on a
   group  [3XH[103X. Indicate by the boolean [3Xprojective[103X whether or not the method works
-  in  projective  mode.  For  permutation and black box groups give [10Xfalse[110X. The
-  result  is  either  [10Xfail[110X  or [10Xfalse[110X if the method fails or a recognition info
-  record [10Xri[110X. If the method created a leaf then [10Xri[110X will be a leaf, otherwise it
-  will have the attribute [2XHomom[102X ([14X3.2-6[114X) set, but no factor or kernel have been
-  created  or  recognised  yet.  You  can  use  for  example  the  methods  in
-  [2XFindHomMethodsPerm[102X    ([14X3.1-8[114X)    or    [2XFindHomMethodsMatrix[102X    ([14X3.1-11[114X)   or
-  [2XFindHomMethodsProjective[102X ([14X3.1-14[114X) or [2XFindHomMethodsBB[102X ([14X3.1-17[114X) as the [3Xmethod[103X
-  argument.[133X
+  in projective mode. For permutation groups, set this to [10Xfalse[110X. The result is
+  either [10Xfail[110X or [10Xfalse[110X if the method fails or a recognition info record [10Xri[110X. If
+  the method created a leaf then [10Xri[110X will be a leaf, otherwise it will have the
+  attribute  [2XHomom[102X  ([14X3.2-6[114X)  set, but no factor or kernel have been created or
+  recognised  yet.  You  can use for example the methods in [2XFindHomMethodsPerm[102X
+  ([14X3.1-7[114X)   or   [2XFindHomMethodsMatrix[102X   ([14X3.1-10[114X)  or  [2XFindHomMethodsProjective[102X
+  ([14X3.1-13[114X) as the [3Xmethod[103X argument.[133X
   
   
   [1X3.2 [33X[0;0YRecognition info records[133X[101X
@@ -962,11 +922,6 @@
   [1X3.6 [33X[0;0YConventions for the recognition of projective groups[133X[101X
   
   [33X[0;0YWe are considering only the case of projective groups over finite fields.[133X
-  
-  [33X[0;0YNo conventions so far.[133X
-  
-  
-  [1X3.7 [33X[0;0YConventions for the recognition of black box groups[133X[101X
   
   [33X[0;0YNo conventions so far.[133X
   

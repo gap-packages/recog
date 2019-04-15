@@ -125,8 +125,6 @@
   
   [1X6.2 [33X[0;0YMethods for matrix groups[133X[101X
   
-  [33X[0;0YTHIS CHAPTER IS CURRENTLY A BIT OUT OF DATE![133X
-  
   [33X[0;0YThe  following  table gives an overview over the installed methods and their
   rank  (higher  rank  means higher priority, the method is tried earlier, see
   Chapter  [14X4[114X).  Note  that  there  are not that many methods for matrix groups
@@ -256,8 +254,6 @@
   
   
   [1X6.3 [33X[0;0YMethods for projective groups[133X[101X
-  
-  [33X[0;0YTHIS CHAPTER IS CURRENTLY A BIT OUT OF DATE![133X
   
   [33X[0;0YThe  following  table gives an overview over the installed methods and their
   rank  (higher  rank  means higher priority, the method is tried earlier, see
@@ -452,7 +448,4 @@
   matrices. This method simply norms the last diagonal block in all generators
   by  multiplying  with a scalar and then delegates to [10XBlockScalar[110X (see [14X6.2-9[114X)
   and matrix group mode to do the recognition.[133X
-  
-  
-  [1X6.4 [33X[0;0YMethods for black box groups[133X[101X
   
