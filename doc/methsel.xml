@@ -172,7 +172,7 @@ to the value returned by the method, the following happens:
           loop starts again at the beginning of the method database.</Item>
     <Mark><C>NotEnoughInformation</C></Mark>
     <Item>the main loop goes to the next method in the method database.</Item>
-    <Mark><C>true</C></Mark>
+    <Mark><C>Success</C></Mark>
     <Item>this is marked in the method selection record and the procedure
           returns successfully.</Item>
 </List>
