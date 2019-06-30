@@ -8,9 +8,8 @@ A GAP package for group recognition
 ## Installation
 
 To get the newest version of this GAP 4 package download the
-archive file
-    recog-x.x.tar.gz
-and unpack it using
+archive file `recog-x.x.tar.gz` and unpack it using
+
     tar xvf recog-x.x.tar.gz
 
 Do this in a directory called `pkg`, preferably (but not necessarily)
@@ -38,5 +37,6 @@ in the recog directory. But this should not be necessary.
 ## Support
 
 For bug reports, feature requests and suggestions, please refer to
+<https://github.com/gap-packages/recog/issues>.
 
-   https://github.com/gap-packages/recog/issues
+
