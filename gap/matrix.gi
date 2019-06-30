@@ -844,7 +844,7 @@ AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.TrivialMatrixGroup,
         "check whether all generators are equal to the identity matrix" );
 AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.DiagonalMatrices,
   1100, "DiagonalMatrices",
-        "check whether all generators are multiples of the identity" );
+        "check whether all generators are diagonal matrices" );
 AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.KnownStabilizerChain,
   1175, "KnownStabilizerChain",
         "use an already known stabilizer chain for this group" );
