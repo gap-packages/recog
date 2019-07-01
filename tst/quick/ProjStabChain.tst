@@ -1,3 +1,3 @@
-gap> gens := AtlasGenerators("HS",9).generators;;
-gap> g := GroupWithGenerators(gens);;
-gap> ri := RECOG.TestGroup(g,true,44352000);;
+gap> ag := AtlasGenerators([ "HS", [ "HSG1-f2r20B0.m1", "HSG1-f2r20B0.m2" ], 1, 2 ]);;
+gap> g := Group(ag.generators);;
+gap> ri := RECOG.TestGroup(g,true,ag.size);;
