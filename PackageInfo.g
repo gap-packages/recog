@@ -231,12 +231,14 @@ ArchiveFormats := ".tar.gz .tar.bz2",
 ##  Please, use '<span class="pkgname">GAP</span>' and
 ##  '<span class="pkgname">MyPKG</span>' for specifing package names.
 ##
-AbstractHTML :=
-  "<p><b>Warning:</b> This package is still under development and \
-   this version is to be considered a working, but preliminary one. </p> \
-   <p>This package contains a collection of methods for the \
-   constructive recognition of groups. It is mostly intended for \
-   permutation groups, matrix groups and projective groups.</p>",
+AbstractHTML := """
+    <p><b>Warning:</b> This package is still under development and
+    this version is to be considered a working, but preliminary one.</p>
+
+    <p>This package contains a collection of methods for the
+    constructive recognition of groups. It is mostly intended for
+    permutation groups, matrix groups and projective groups.</p>
+    """,
 
 PackageDoc := rec(
   BookName  := "recog",
