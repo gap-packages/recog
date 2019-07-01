@@ -3218,7 +3218,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
       ri!.gcd := gcd;
       SetFilterObj(ri,IsLeaf);
       SetSize(ri,(q+1)*(q-1)*q/GcdInt(2,q-1));
-      SetIsRecogInfoForSimpleGroup(ri,true);
+      SetIsRecogInfoForSimpleGroup(ri, q>3);
       Setslpforelement(ri,SLPforElementFuncsProjective.PSL2);
       return Success;
   else   # bigger than 2:

@@ -29,5 +29,32 @@ gap> G:=ClassicalMaximals("L",3,3)[4];;
 gap> RECOG.TestGroup(SymmetricGroup(11), false, Factorial(11));
 <recoginfo Giant AlmostSimple Size=39916800>
 
+# See https://github.com/gap-packages/recog/issues/65
+gap> old:=InfoLevel(InfoRecog);;
+gap> SetInfoLevel(InfoRecog, 0);
+gap> RecogniseGroup(SL(2,2));
+<recoginfo GoProjective Dim=2 Field=2
+ F:<recoginfo (projective) ClassicalNatural_PSL2Even Size=6 Dim=2 Field=2>
+ K:<trivial kernel>
+gap> RecogniseGroup(SL(2,3));
+<recoginfo GoProjective Dim=2 Field=3
+ F:<recoginfo (projective) ClassicalNatural_PSL2Odd Size=12 Dim=2 Field=3>
+ K:<recoginfo DiagonalMatrices Dim=2 Field=3
+    F:<recoginfo Scalar Dim=1 Field=3>
+    K:<trivial kernel>>
+gap> RecogniseGroup(SL(2,4));
+<recoginfo GoProjective Dim=2 Field=4
+ F:<recoginfo (projective) ClassicalNatural_PSL2Even Simple Size=60 Dim=
+2 Field=4>
+ K:<trivial kernel>
+gap> RecogniseGroup(SL(2,5));
+<recoginfo GoProjective Dim=2 Field=5
+ F:<recoginfo (projective) ClassicalNatural_PSL2Odd Simple Size=60 Dim=
+2 Field=5>
+ K:<recoginfo DiagonalMatrices Dim=2 Field=5
+    F:<recoginfo Scalar Dim=1 Field=5>
+    K:<trivial kernel>>
+gap> SetInfoLevel(InfoRecog, old);
+
 #
 gap> STOP_TEST("bugfix.tst");
