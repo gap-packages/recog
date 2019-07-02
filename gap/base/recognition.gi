@@ -296,6 +296,7 @@ InstallMethod( GetElmOrd, "for a recognition info record and a record",
     fi;
   end );
 
+# FIXME: unused?
 InstallMethod( RandomElmPpd,
   "for a recognition info record, a string and a bool",
   [ IsRecognitionInfo, IsString, IsBool ],
@@ -342,6 +343,7 @@ InstallMethod( RandomElmPpd,
     return res;
   end );
 
+# FIXME: unused?
 InstallMethod( GetElmPpd, "for a recognition info record and a record",
   [ IsRecognitionInfo, IsRecord ],
   function( ri, r )
@@ -381,6 +383,7 @@ InstallMethod( RandomOrdersSeen, "for a recognition info record",
     return Compacted(ri!.rando);
   end );
 
+# FIXME: unused?
 InstallMethod( StopStoringRandEls, "for a recognition info record",
   [ IsRecognitionInfo ],
   function(ri)

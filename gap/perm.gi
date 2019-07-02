@@ -12,8 +12,6 @@
 ##
 #############################################################################
 
-# We first want to get rid of the trivial group:
-
 SLPforElementFuncsPerm.TrivialPermGroup :=
    function(ri,g)
      return StraightLineProgram( [ [1,0] ], 1 );
