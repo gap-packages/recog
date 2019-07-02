@@ -677,10 +677,10 @@ InstallGlobalFunction( CalcNiceGens,
 InstallGlobalFunction( CalcNiceGensGeneric,
   # generic function using an slp:
   function(ri,origgens)
-    if not(Hasslptonice(ri)) then
-        return origgens;
-    else
+    if Hasslptonice(ri) then
         return ResultOfStraightLineProgram(slptonice(ri),origgens);
+    else
+        return origgens;
     fi;
   end );
 
