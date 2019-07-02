@@ -970,9 +970,40 @@ InstallGlobalFunction( "GetCompositionTreeNode",
 
 # Testing:
 
-RECOG.TestGroup := function(g,proj,size)
-  local l,r,ri,s,x,count,lvl,seedMT,seedRS,gens;
+RECOG.TestGroupOptions := rec(
+      # Number of times to test whether the recognized size is right
+      sizeTests := 3,
+
+      # Number of random elements in group to check
+      # This is used both for the number of elements in the
+      # group to check, and the number of random elements of
+      # a supergroup to check
+      inTests := 30,
+
+      # The following options are off by default as they fail on
+      # many examples at present
+
+      # if the following is set to true, then we test what happens if  SLPforElement
+      # is called with elements outside the group
+      tryNonGroupElements := false
+  );
+
+
+RECOG.TestGroup := function(g,proj,size, optionlist...)
+  local l,r,ri,s,x,count,lvl,seedMT,seedRS,gens,supergroup, options;
   count := 0;
+  
+  options := ShallowCopy(RECOG.TestGroupOptions);
+
+  if Length(optionlist) > 0 then
+    for r in RecNames(optionlist[1]) do
+        if not IsBound(options.(r)) then
+            ErrorNoReturn("Invalid option to TestGroup: ", r);
+        fi;
+        options.(r) := optionlist[1].(r);
+    od;
+  fi;
+
   lvl:=InfoLevel(InfoRecog);
   SetInfoLevel(InfoRecog, 0);
   repeat
@@ -1017,10 +1048,52 @@ RECOG.TestGroup := function(g,proj,size)
       s := SLPforElement(ri,x);
       if s = fail or not(isequal(ri)(ResultOfStraightLineProgram(s,l),x)) then
           Print("ALARM: set count to -1 to skip test!\n");
+          Print("group := ", g, ";\n");
+          Print("recogsize := ", Size(ri), ";\n");
+          Print("proj := ", proj, ";\n");
+          Print("x := ", x, ";\n");
+          Print("s := ", s, ";\n");
+          if s <> fail then
+            Print("result := ", ResultOfStraightLineProgram(s,l), ";\n");
+          fi;
           Error("Alarm: SLPforElement did not work!\n");
+          
           if count = -1 then return fail; fi;
       fi;
-  until count >= 30;
+  until count >= options.inTests;
+
+  if IsPermGroup(g) then
+    supergroup := SymmetricGroup(LargestMovedPoint(g) + 2);
+  elif IsMatrixGroup(g) then
+    supergroup := GL(DimensionOfMatrixGroup(g), DefaultFieldOfMatrixGroup(g));
+  else
+    supergroup := fail;
+  fi;
+
+  if supergroup <> fail and options.tryNonGroupElements then
+    count := 0;
+    repeat
+        count := count + 1;
+        #Print(".\c");
+        x := PseudoRandom(supergroup);
+        s := SLPforElement(ri,x);
+        if s <> fail and not(isequal(ri)(ResultOfStraightLineProgram(s,l),x)) then
+            Print("ALARM: set count to -1 to skip test!\n");
+            Print("group := ", g, ";\n");
+            Print("recogsize := ", Size(ri), ";\n");
+            Print("proj := ", proj, ";\n");
+            Print("x := ", x, ";\n");
+            Print("s := ", s, ";\n");
+            if s <> fail then
+                Print("result := ", ResultOfStraightLineProgram(s,l), ";\n");
+            fi;
+
+            Error("Alarm: SLPforElement did not work on (possibly) non-group element!\n");
+            if count = -1 then return fail; fi;
+        fi;
+    until count >= options.inTests;
+  fi;
+
   #Print("\n30 random elements successfully sifted!\n");
   SetInfoLevel(InfoRecog, lvl);
   return ri;
