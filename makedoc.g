@@ -8,4 +8,18 @@ if fail = LoadPackage("AutoDoc", ">= 2016.01.21") then
 fi;
 
 Read("regen_doc.g");
-AutoDoc(rec( scaffold := rec( MainPage := false )));
+
+AutoDoc(rec(
+    scaffold := rec(
+        bib := "recog",
+        includes := [
+            "intro.xml",
+            "install.xml",
+            "recognition.xml",
+            "methsel.xml",
+            "afterrecog.xml",
+            "methods.xml",
+            "examples.xml",
+            ],
+        ),
+));
