@@ -70,6 +70,8 @@ DeclareAttribute( "forfactor", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "isone", IsRecognitionInfo, "mutable" );
 # Used to compare group elements after recognition:
 DeclareAttribute( "isequal", IsRecognitionInfo, "mutable" );
+# Used to compute order of group elements after recognition:
+DeclareAttribute( "order", IsRecognitionInfo, "mutable" );
 
 
 

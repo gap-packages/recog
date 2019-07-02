@@ -163,9 +163,11 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     if projective then
         Setisone(ri,IsOneProjective);
         Setisequal(ri,IsEqualProjective);
+        ri!.order := RECOG.ProjectiveOrder;
     else
         Setisone(ri,IsOne);
         Setisequal(ri,\=);
+        ri!.order := Order;
     fi;
     ri!.projective := projective;
     # FIXME: perhaps DON'T set a default for findgensNmeth, to ensure
@@ -243,21 +245,13 @@ InstallMethod( RandomElmOrd,
             if not(IsBound(ri!.randr[pos])) then
                 ri!.randr[pos] := Next(ri!.prodrep);
             fi;
-            if ri!.projective then
-                ri!.rando[pos] := ProjectiveOrder(ri!.randr[pos]!.el)[1];
-            else
-                ri!.rando[pos] := Order(ri!.randr[pos]!.el);
-            fi;
+            ri!.rando[pos] := ri!.order(ri!.randr[pos]!.el);
         fi;
         res := rec( order := ri!.rando[pos], projective := ri!.projective,
                     el := ri!.randr[pos] );
     else
         res := rec( el := Next(ri!.prodrep) );
-        if ri!.projective then
-            res.order := ProjectiveOrder(res.el!.el)[1];
-        else
-            res.order := Order(res.el!.el);
-        fi;
+        res.order := ri!.order(res.el!.el);
         res.projective := ri!.projective;
         Add(ri!.rando,res.order);
     fi;
@@ -273,11 +267,7 @@ InstallMethod( GetElmOrd, "for a recognition info record and a record",
     local x;
     if ri!.randstore and r.nr > 0 then
         if not( IsBound(ri!.rando[r.nr]) ) then
-            if ri!.projective then
-                ri!.rando[r.nr] := ProjectiveOrder(ri!.randr[r.nr]!.el)[1];
-            else
-                ri!.rando[r.nr] := Order(ri!.randr[r.nr]!.el);
-            fi;
+            ri!.rando[r.nr] := ri!.order(ri!.randr[r.nr]!.el);
             r.order := ri!.rando[r.nr];
         else
             r.order := ri!.rando[r.nr];
@@ -288,11 +278,7 @@ InstallMethod( GetElmOrd, "for a recognition info record and a record",
         else
             x := r.el;
         fi;
-        if ri!.projective then
-            r.order := ProjectiveOrder(x)[1];
-        else
-            r.order := Order(x);
-        fi;
+        r.order := ri!.order(x);
     fi;
   end );
 

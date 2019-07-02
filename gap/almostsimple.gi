@@ -1268,11 +1268,7 @@ FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
           return NeverApplicable;
       fi;
       if i <= Length(gens) then
-          if ri!.projective then
-              r.order := ProjectiveOrder(r.el)[1];
-          else
-              r.order := Order(r.el);
-          fi;
+          r.order := ri!.order(r.el);
       else
           GetElmOrd(ri,r);
       fi;
