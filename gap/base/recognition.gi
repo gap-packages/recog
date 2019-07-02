@@ -968,7 +968,7 @@ InstallGlobalFunction( "GetCompositionTreeNode",
 # Testing:
 
 RECOG.TestGroup := function(g,proj,size)
-  local l,r,ri,s,x,count,lvl,seedMT,seedRS;
+  local l,r,ri,s,x,count,lvl,seedMT,seedRS,gens;
   count := 0;
   lvl:=InfoLevel(InfoRecog);
   SetInfoLevel(InfoRecog, 0);
@@ -997,7 +997,12 @@ RECOG.TestGroup := function(g,proj,size)
   #View(ri);
   #Print("\n");
   count := 0;
-  l := CalcNiceGens(ri,GeneratorsOfGroup(g));
+  gens := GeneratorsOfGroup(g);
+  # Handle groups where GeneratorsOfGroup returns empty list
+  if IsEmpty(gens) then
+    gens := [One(g)];
+  fi;
+  l := CalcNiceGens(ri,gens);
   repeat
       count := count + 1;
       #Print(".\c");
