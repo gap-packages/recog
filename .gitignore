@@ -17,6 +17,8 @@ doc/chooser.html
 /doc/*.six
 /doc/*.tex
 /doc/*.toc
+/doc/_*.xml
+/doc/recog.xml
 /doc/manual.pdf
 
 # ignore generated XML files:
