@@ -1,6 +1,4 @@
 # Regenerate parts of the recog documentation from its source code
-
-SetPackagePath("recog", "./");
 LoadPackage("recog");
 
 GenerateMethodsXML := function(shortname, desc, db)
