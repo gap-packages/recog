@@ -985,6 +985,10 @@ RECOG.TestGroup := function(g,proj,size)
       #Print("Time for recognition: ",Runtime()-r,"\n");
       if Size(ri) <> size then
           Print("ALARM: set count to -1 to skip test!\n");
+          Print("group := ", g, ";\n");
+          Print("recogsize := ", Size(ri), ";\n");
+          Print("truesize := ", size, ";\n");
+          Print("proj := ", proj, ";\n");
           Print("seedMT := ", seedMT, ";\n");
           Print("seedRS := ", seedRS, ";\n");
           Error("Alarm: Size not correct!\n");
