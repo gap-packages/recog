@@ -364,7 +364,7 @@ AddMethod(FindHomDbPerm, FindHomMethodsPerm.NonTransitive,
           "try to find non-transitivity and restrict to orbit");
 AddMethod( FindHomDbPerm, FindHomMethodsPerm.Giant,
           80, "Giant",
-          "tries to find Sn and An" );
+          "tries to find Sn and An in their natural actions" );
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.Imprimitive,
           70, "Imprimitive",
           "for a imprimitive permutation group, restricts to block system");

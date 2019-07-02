@@ -459,6 +459,8 @@ end;
 #F  FindHomomorphismMethods.Giant
 ##
 
+# See Corollary 10.2.2 in
+# Akos Seress, Permutation Group Algorithms
 RECOG.IsGiant:=function(g,mp)
   local bound, i, p, cycles, l, x, n;
   n := Length(mp);
@@ -698,6 +700,7 @@ FindHomMethodsPerm.Giant :=
         return NeverApplicable;
     fi;
     mp := MovedPoints(grp);
+    # Decide whether group is a giant
     if RECOG.IsGiant(grp,mp) = fail then
         return TemporaryFailure;
     fi;
@@ -706,6 +709,7 @@ FindHomMethodsPerm.Giant :=
        func := function(ri) return RandomElm(ri,"Giant",true).el; end,
        args := [ri])];
 
+    # Do constructive recognition for giants
     res := RECOG.RecogniseGiant(mp,grpmem,RECOG.GiantEpsilon);
     if res = fail then
         return TemporaryFailure;
