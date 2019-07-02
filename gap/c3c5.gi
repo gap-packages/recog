@@ -479,18 +479,13 @@ FindHomMethodsProjective.KnownNilpotent := function(ri,G)
   # if you find out so. Note that it will return NeverApplicable if G is a p-group
   # for some prime p. Make sure that the !.projective component is set
   # correctly such that we can set the right Order method.
-  local H,cut,data,gens,gens2,gensfac,gensker,gensm,hom,orderfunc,ords,primes;
+  local H,cut,data,gens,gens2,gensfac,gensker,gensm,hom,ords,primes;
   gens := GeneratorsOfGroup(G);
   gensm := GeneratorsWithMemory(gens);
-  if ri!.projective then
-      orderfunc := RECOG.ProjectiveOrder;
-  else
-      orderfunc := Order;
-  fi;
   if IsBound(ri!.primes) then    # this is a message from ourselves from above!
       primes := ri!.primes;
   else
-      ords := List(gens,orderfunc);
+      ords := List(gens,ri!.order);
       primes := Union(List(ords,o->Set(Factors(o))));
       RemoveSet(primes,1);    # in case there were identities!
   fi;
@@ -498,7 +493,7 @@ FindHomMethodsProjective.KnownNilpotent := function(ri,G)
   cut := QuoInt(Length(primes),2);
   data := rec( primesfactor := primes{[1..cut]},
                primeskernel := primes{[cut+1..Length(primes)]},
-               orderfunc := orderfunc );
+               orderfunc := ri!.order );
   gens2 := List(gensm,x->RECOG.DecomposeNilpotent(data,x));
   gensfac := List(gens2,x->StripMemory(x[2]));
   gensker := List(gens2,x->x[1]);
