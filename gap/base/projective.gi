@@ -32,7 +32,9 @@ InstallGlobalFunction( IsEqualProjective,
   function(a,b)
     local p,s,i;
     p := PositionNonZero(a[1]);
-    s := b[1,p] / a[1,p];
+    s := b[1,p];
+    if IsZero(s) then return false; fi;
+    s := s / a[1,p];
     for i in [1..Length(a)] do
         if s*a[i] <> b[i] then return false; fi;
     od;
