@@ -17,6 +17,7 @@
 ##
 #############################################################################
 
+# parse specific string into number
 RECOG.ParseNumber := function( number, d, default )
   if IsInt(number) then
       return number;
@@ -320,6 +321,7 @@ end );
 
 RECOG.AlmostSimpleHints := rec();
 
+# is called in almostsimple/hints.gi to create the database
 InstallGlobalFunction( InstallAlmostSimpleHint,
   function( name, type, re )
     if not(IsBound(RECOG.AlmostSimpleHints.(name))) then
@@ -470,6 +472,7 @@ end;
 #        elordersstart := [31], numberrandgens := 2, tries := 1,
 #        triesforgens := 100, orblenlimit := 32, issimple := true ) );
 
+# if hint in AlmostSimpleHints exits appropriate function is executed
 InstallGlobalFunction( LookupHintForSimple,
   function(ri,G,name)
     local dim,f,hi,j,p,q;
@@ -524,7 +527,7 @@ end;
 
 # Under the assumption that G is an almost simple group,
 # attempt to guess the "natural" characteristic of the
-# group based on the two maximal orders of group elements.
+# group based on the three maximal orders of group elements.
 #
 # Used by FindHomMethodsProjective.ThreeLargeElOrders.
 RECOG.findchar:=function(ri,G,randelfunc)
@@ -632,7 +635,8 @@ RECOG.findchar:=function(ri,G,randelfunc)
 
 end;
 
-
+# just called for PSL (in FindHomMethodsProjective.ThreeLargeElOrders),
+# gives hints
 RECOG.MakePSL2Hint := function( name, G )
   local d,defchar,f,p,q;
   f := DefaultFieldOfMatrixGroup(G);
@@ -649,6 +653,9 @@ RECOG.MakePSL2Hint := function( name, G )
               orblenlimit := 3*(name[3]+1) );
 end;
 
+# is used in FindHomMethodsProjective.ComputeSimpleSocle
+# we guess it computes randomly (so maybe not) the non-abelian
+# simple socle
 RECOG.simplesocle := function(ri,g)
   local x,y,comm,comm2,comm3,gensH;
 
@@ -680,8 +687,10 @@ end;
 #! TODO
 #! @EndChunk
 FindHomMethodsProjective.ComputeSimpleSocle := function(ri,G)
-  # This simply computes the simple socle, stores it and returns false
-  # such that it is never called again for this node.
+  # This simply computes the simple socle, stores it and returns
+  # NeverApplicable such that it is never called again for this
+  # node.
+  # stores more information
   local x;
   RECOG.SetPseudoRandomStamp(G,"ComputeSimpleSocle");
   ri!.simplesocle := Group(RECOG.simplesocle(ri,G));
@@ -698,6 +707,8 @@ FindHomMethodsProjective.ComputeSimpleSocle := function(ri,G)
   return NeverApplicable;
 end;
 
+# computes a random element in the non-abelian simple socle
+# and its projective order
 RECOG.RandElFuncSimpleSocle := function(ri)
   local el,ord;
   ri!.simplesoclerandp := ri!.simplesoclerandp + 1;
