@@ -373,7 +373,12 @@ AddMethod(FindHomDbPerm, FindHomMethodsPerm.SnkSetswrSr,
           "tries to find jellyfish" );
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.StabilizerChain,
           55, "StabilizerChain",
-          "for a permutation group using a stabilizer chain (genss)");
+          Concatenation(
+              "for a permutation group using a stabilizer chain via the ",
+              "<URL Text=\"genss package\">",
+              "https://gap-packages.github.io/genss/",
+              "</URL>"
+          ));
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.StabChain,
           50, "StabChain",
           "for a permutation group using a stabilizer chain");
