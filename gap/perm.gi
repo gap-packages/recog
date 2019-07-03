@@ -191,17 +191,18 @@ FindHomMethodsPerm.StabChain :=
      return Success;
    end;
 
-SLPforElementFuncsPerm.StabilizerChain := function(ri,x)
+SLPforElementFuncsPerm.StabilizerChainPerm := function(ri,x)
   local r;
   r := SiftGroupElementSLP(ri!.stabilizerchain,x);
   return r.slp;
 end;
 
-FindHomMethodsPerm.StabilizerChain := function(ri,G)
+# TODO: merge FindHomMethodsPerm.StabilizerChainPerm and  FindHomMethodsProjective.StabilizerChainProj ?
+FindHomMethodsPerm.StabilizerChainPerm := function(ri,G)
   local Gm,S;
   Gm := Group(ri!.gensHmem);
   Gm!.pseudorandomfunc := [rec(
-     func := function(ri) return RandomElm(ri,"StabilizerChain",true).el; end,
+     func := function(ri) return RandomElm(ri,"StabilizerChainPerm",true).el; end,
      args := [ri])];
   S := StabilizerChain(Gm);
   SetSize(ri,Size(S));
@@ -209,7 +210,7 @@ FindHomMethodsPerm.StabilizerChain := function(ri,G)
   ri!.stabilizerchain := S;
   Setslptonice(ri,SLPOfElms(StrongGenerators(S)));
   ForgetMemory(S);
-  Setslpforelement(ri,SLPforElementFuncsPerm.StabilizerChain);
+  Setslpforelement(ri,SLPforElementFuncsPerm.StabilizerChainPerm);
   SetFilterObj(ri,IsLeaf);
   return Success;
 end;
@@ -369,8 +370,8 @@ AddMethod(FindHomDbPerm, FindHomMethodsPerm.Imprimitive,
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.SnkSetswrSr,
           60, "SnkSetswrSr",
           "tries to find jellyfish" );
-AddMethod(FindHomDbPerm, FindHomMethodsPerm.StabilizerChain,
-          55, "StabilizerChain",
+AddMethod(FindHomDbPerm, FindHomMethodsPerm.StabilizerChainPerm,
+          55, "StabilizerChainPerm",
           Concatenation(
               "for a permutation group using a stabilizer chain via the ",
               "<URL Text=\"genss package\">",

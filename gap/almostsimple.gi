@@ -185,7 +185,7 @@ InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
             SetSize(ri,hint.size);
             ForgetMemory(S);
             Unbind(S!.opt.RandomElmFunc);
-            Setslpforelement(ri,SLPforElementFuncsProjective.StabilizerChain);
+            Setslpforelement(ri,SLPforElementFuncsProjective.StabilizerChainProj);
             SetFilterObj(ri,IsLeaf);
             if IsBound(hint.issimple) then
                 SetIsRecogInfoForSimpleGroup(ri,hint.issimple);

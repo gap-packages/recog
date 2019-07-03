@@ -96,18 +96,19 @@ FindHomMethodsProjective.BlocksModScalars := function(ri,G)
   return Success;
 end;
 
-SLPforElementFuncsProjective.StabilizerChain := function(ri,x)
+SLPforElementFuncsProjective.StabilizerChainProj := function(ri,x)
   local r;
   r := SiftGroupElementSLP(ri!.stabilizerchain,x);
   return r.slp;
 end;
 
-FindHomMethodsProjective.StabilizerChain := function(ri,G)
+# TODO: merge FindHomMethodsPerm.StabilizerChainPerm and  FindHomMethodsProjective.StabilizerChainProj ?
+FindHomMethodsProjective.StabilizerChainProj := function(ri,G)
   local Gm,S,SS,d,f,fu,opt,perms,q;
   d := ri!.dimension;
   f := ri!.field;
   q := Size(f);
-  fu := function() return RandomElm(ri,"StabilizerChain",true).el; end;
+  fu := function() return RandomElm(ri,"StabilizerChainProj",true).el; end;
   opt := rec( Projective := true, RandomElmFunc := fu );
   Gm := GroupWithGenerators(ri!.gensHmem);
   S := StabilizerChain(Gm,opt);
@@ -119,7 +120,7 @@ FindHomMethodsProjective.StabilizerChain := function(ri,G)
       Setslptonice(ri,SLPOfElms(StrongGenerators(S)));
       ForgetMemory(S);
       Unbind(S!.opt.RandomElmFunc);
-      Setslpforelement(ri,SLPforElementFuncsProjective.StabilizerChain);
+      Setslpforelement(ri,SLPforElementFuncsProjective.StabilizerChainProj);
       SetFilterObj(ri,IsLeaf);
   else
       ForgetMemory(S);
@@ -316,8 +317,8 @@ AddMethod( FindHomDbProjective, FindHomMethodsProjective.ThreeLargeElOrders,
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.LieTypeNonConstr,
    400, "LieTypeNonConstr",
         "do non-constructive recognition of Lie type groups" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.StabilizerChain,
-   100, "StabilizerChain",
+AddMethod( FindHomDbProjective, FindHomMethodsProjective.StabilizerChainProj,
+   100, "StabilizerChainProj",
         "last resort: compute a stabilizer chain (projectively)" );
 
 # Old methods which are no longer used:

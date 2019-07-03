@@ -198,8 +198,8 @@ FindHomMethodsProjective.BiggerScalarsOnly := function(ri,G)
   SetHomom(ri,hom);
 
   Add(forfactor(ri).hints,
-      rec( method := FindHomMethodsProjective.StabilizerChain, rank := 4000,
-           stamp := "StabilizerChain" ));
+      rec( method := FindHomMethodsProjective.StabilizerChainProj, rank := 4000,
+           stamp := "StabilizerChainProj" ));
 
   findgensNmeth(ri).method := FindKernelDoNothing;
 
