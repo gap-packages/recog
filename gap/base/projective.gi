@@ -45,3 +45,7 @@ InstallGlobalFunction( IsEqualProjective,
     od;
     return true;
   end );
+
+RECOG.ProjectiveOrder := function(el)
+  return ProjectiveOrder(el)[1];
+end;

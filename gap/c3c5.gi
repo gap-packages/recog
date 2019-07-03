@@ -481,10 +481,6 @@ RECOG.HomForNilpotent := function(data,el)
   fi;
 end;
 
-RECOG.ProjectiveOrder := function(el)
-  return ProjectiveOrder(el)[1];
-end;
-
 RECOG.CalcNiceGensKnownNilpotent := function(ri,origgens)
   local b;
   b := List([1..Length(ri!.waytonice)],i->origgens[i]^ri!.waytonice[i][1]);
