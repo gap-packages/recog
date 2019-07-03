@@ -354,7 +354,7 @@ as the <A>method</A> argument.
 <Section Label="rirecord">
     <Heading>Recognition info records</Heading>
 
-A recognition info record is a &GAP; positional object. It is a member
+A recognition info record is a &GAP; component object. It is a member
 of the family
 
 <ManSection>
