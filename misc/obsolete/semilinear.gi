@@ -1,12 +1,16 @@
 #############################################################################
 ##
-##  semilinear.gi
-##                                recog package
-##                                                        Max Neunhoeffer
-##                                                            Ákos Seress
+##  This file is part of recog, a package for the GAP computer algebra system
+##  which provides a collection of methods for the constructive recognition
+##  of groups.
 ##
-##  Copyright 2006-2008 by the authors.
-##  This file is free software, see license information at the end.
+##  This files's authors include Max Neunhöffer, Ákos Seress.
+##
+##  Copyright of recog belongs to its developers whose names are too numerous
+##  to list here. Please refer to the COPYRIGHT file for details.
+##
+##  SPDX-License-Identifier: GPL-3.0-or-later
+##
 ##
 ##  Handle the (projective) semilinear case.
 ##
@@ -183,19 +187,3 @@ end;
 FindHomMethodsProjective.C3C5 := function(ri,G)
   # We assume that G acts absolutely irreducibly and see what we can
   # do by computing a normal subgroup of the derived subgroup.
-
-##
-##  This program is free software: you can redistribute it and/or modify
-##  it under the terms of the GNU General Public License as published by
-##  the Free Software Foundation, either version 3 of the License, or
-##  (at your option) any later version.
-##
-##  This program is distributed in the hope that it will be useful,
-##  but WITHOUT ANY WARRANTY; without even the implied warranty of
-##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##  GNU General Public License for more details.
-##
-##  You should have received a copy of the GNU General Public License
-##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
-

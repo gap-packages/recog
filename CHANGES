@@ -49,9 +49,9 @@ This file describes changes in the recog package.
   - Remove GAP 4.4 compatibility code
 
 1.2.3 (2014-09-24)
-  - Update Max Neunhoeffer's contact data
+  - Update Max Neunhöffer's contact data
   - Use AutoDoc to generate title page of the manual from PackageInfo.g
-  - Remove Akos' contact data
+  - Remove Ákos' contact data
   - Add Max Horn as a maintainer
 
 1.2.2 (2014-04-04)

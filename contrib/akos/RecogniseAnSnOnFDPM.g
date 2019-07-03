@@ -12,7 +12,7 @@
 ##  'Constructive recognition of finite alternating and symmetric groups
 ##   acting as matrix groups on their natural permutation modules'
 ##  by Robert Beals, Charles R. Leedham-Green, Alice C. Niemeyer,
-##  Cheryl E. Praeger, and 'Akos Seress.
+##  Cheryl E. Praeger, and Ákos Seress.
 ##
 ##  Functions are also provided for constructing the representations
 ##  of An and Sn on their fully deleted permutation modules.
