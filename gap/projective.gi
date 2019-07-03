@@ -348,7 +348,7 @@ AddMethod( FindHomDbProjective, FindHomMethodsProjective.AltSymBBByDegree,
    810, "AltSymBBByDegree",
         "try BB recognition for dim+1 and/or dim+2 if sensible" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.TensorDecomposable,
-   800, "Tensor",
+   800, "TensorDecomposable",
         "find a tensor decomposition" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.FindElmOfEvenNormal,
    700, "FindElmOfEvenNormal",
