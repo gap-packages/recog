@@ -654,8 +654,7 @@ RECOG.MakePSL2Hint := function( name, G )
 end;
 
 # is used in FindHomMethodsProjective.ComputeSimpleSocle
-# we guess it computes randomly (so maybe not) the non-abelian
-# simple socle
+# it computes randomly (so maybe not) the non-abelian simple socle
 RECOG.simplesocle := function(ri,g)
   local x,y,comm,comm2,comm3,gensH;
 
@@ -709,6 +708,8 @@ end;
 
 # computes a random element in the non-abelian simple socle
 # and its projective order
+# first uses the random generator and afterwards generate
+# a new random element
 RECOG.RandElFuncSimpleSocle := function(ri)
   local el,ord;
   ri!.simplesoclerandp := ri!.simplesoclerandp + 1;
@@ -907,6 +908,8 @@ end;
 #   return fail; # FIXME: fail = TemporaryFailure here really correct?
 # end;
 
+# abbreviation stands for homomorphism fully deleted permutation module
+# returns a permutation
 RECOG.HomFDPM := function(data,x)
   local r;
   r := RECOG.FindPermutation(data.cob*x*data.cobi,data.fdpm);
@@ -915,7 +918,8 @@ RECOG.HomFDPM := function(data,x)
 end;
 
 #! @BeginChunk AltSymBBByDegree
-#! TODO
+#! black box recognition of alternating and symmetric group
+#! subroutines are in AnSnOnFDPM.gi and also paper reference
 #! @EndChunk
 FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
   local GG,Gm,RecSnAnEq,RecSnAnIsOne,d,deg,f,fact,hom,newgens,o,orders,p,primes,
@@ -1020,6 +1024,12 @@ end;
 
 # Looking at element orders to determine which sporadic it could be:
 
+# RECOG.SporadicsElementOrders contains the element orders that apear in the
+# corresponding sporadic group in RECOG.SporadicsNames each with the
+# probability in RECOG.SporadicsProbabilities
+# RECOG.SporadicsSizes contains the sizes of the sporadic groups in
+# the order of RECOG.SporadicsNames
+# RECOG.SporadicsKillers contain orders that apear relatively often
 RECOG.SporadicsElementOrders :=
 [ [ 1,2,3,5,6,7,10,11,15,19 ],[ 1,2,3,4,5,6,8,11 ],
   [ 1,2,3,4,5,6,8,10,11 ],
@@ -1188,7 +1198,8 @@ RECOG.SporadicsProbabilities :=
   [ 1/100465920,91/195840,49/19440,1/64,1/30,11/144,5/48,1/18,1/10,
       1/8,1/15,1/17,1/6,1/19,1/12,1/17 ],
   [ 1/17971200,23/30720,1/108,11/384,1/50,1/12,3/16,1/10,1/6,2/13,
-      1/4 ],[ 1/35942400,23/61440,1/216,37/1280,1/100,1/24,3/16,1/20,
+      1/4 ],
+  [ 1/35942400,23/61440,1/216,37/1280,1/100,1/24,3/16,1/20,
       1/4,1/13,1/4,1/10 ] ];
 RECOG.SporadicsNames :=
 [ "J1","M11","M12","J3","M23","M22","J2","He","Ru","HS","M24",
@@ -1251,6 +1262,8 @@ RECOG.SporadicsWorkers := [];
 #               probabilities := probs, killers := killers, name := name );
 # end;
 
+# returns a number (the projective order?) if the order is smaller than
+# 120 otherwise fail
 RECOG.RuleOutSmallProjOrder := function(m)
   local l,o,v;
   if IsPerm(m) then
@@ -1276,7 +1289,10 @@ RECOG.RuleOutSmallProjOrder := function(m)
 end;
 
 #! @BeginChunk SporadicsByOrders
-#! TODO
+#! returns a list of possible sporadic groups that G could be
+#! checks whether G has elements of orders that don't appear in sporadic
+#! groups and otherwise checks whether most common ("killer") orders of
+#! the sporadic groups appear
 #! @EndChunk
 FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
   local count,gens,i,j,jj,k,killers,l,limit,o,ordersseen,pp,r,raus,res,x;
@@ -1324,6 +1340,7 @@ FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
           fi;
           jj := l[j];
           raus := false;
+		  # check whether orders in killers apear
           for k in [1..Length(RECOG.SporadicsElementOrders[jj])] do
               if not(RECOG.SporadicsElementOrders[jj][k] in ordersseen) and
                  (1-RECOG.SporadicsProbabilities[jj][k])^i < limit then
