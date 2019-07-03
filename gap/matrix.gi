@@ -921,7 +921,7 @@ AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.DiagonalMatrices,
 AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.KnownStabilizerChain,
   1175, "KnownStabilizerChain",
         "use an already known stabilizer chain for this group" );
-AddMethod( FindHomDbMatrix, FindHomMethodsProjective.FewGensAbelian,
+AddMethod( FindHomDbMatrix, FindHomMethodsGeneric.FewGensAbelian,
   1050, "FewGensAbelian",
      "if very few generators, check IsAbelian and if yes, do KnownNilpotent");
 AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.ReducibleIso,

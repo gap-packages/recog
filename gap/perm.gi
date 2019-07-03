@@ -393,7 +393,7 @@ AddMethod(FindHomDbPerm, FindHomMethodsGeneric.TrivialGroup,
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.ThrowAwayFixedPoints,
           100, "ThrowAwayFixedPoints",
           "try to find a huge amount of (possible internal) fixed points");
-AddMethod(FindHomDbPerm, FindHomMethodsProjective.FewGensAbelian,
+AddMethod(FindHomDbPerm, FindHomMethodsGeneric.FewGensAbelian,
           99, "FewGensAbelian",
      "if very few generators, check IsAbelian and if yes, do KnownNilpotent");
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.Pcgs,
