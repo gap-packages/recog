@@ -1,3 +1,4 @@
+# See https://github.com/gap-packages/recog/issues/101
 gap> z := Z(5)*0;;
 gap> o := Z(5)^0;;
 gap> s := Z(5^2);;
@@ -222,4 +223,4 @@ gap> for i in gens do ConvertToMatrixRep(i,5^2); od;
 gap> x := PseudoRandom(GL(27,5^2));;
 gap> gens := List(gens,y->y^x);;
 gap> g := GroupWithGenerators(gens);;
-gap> ri := RECOG.TestGroup(g,false,80225312993280);;
+gap> ri := RECOG.TestGroup(g,false,80225312993280);; # FIXME: is this size correct?
