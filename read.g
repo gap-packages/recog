@@ -29,6 +29,8 @@ ReadPackage("recog","gap/tools.gi");
 
 # generic
 ReadPackage("recog","gap/generic/TrivialGroup.gi");
+ReadPackage("recog","gap/generic/FewGensAbelian.gi");
+ReadPackage("recog","gap/generic/KnownNilpotent.gi");
 
 # Permutations:
 ReadPackage("recog","gap/giant.gi");
