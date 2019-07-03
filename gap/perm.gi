@@ -362,6 +362,7 @@ FindHomMethodsPerm.ThrowAwayFixedPoints :=
       o := MovedPoints(G);
       hom := ActionHomomorphism(G,o);
       SetHomom(ri,hom);
+      Setvalidatehomominput(ri, {ri,p} -> IsSubset(o, MovedPoints(p)));
 
       # Initialize the rest of the record:
       findgensNmeth(ri).method := FindKernelDoNothing;
