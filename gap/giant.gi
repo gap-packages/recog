@@ -690,6 +690,17 @@ end;
 
 RECOG.GiantEpsilon := 1/1024;
 
+#! @BeginChunk Giant
+#! The method tries to determine whether the input group <A>G</A> is
+#! a giant (that is, <M>A_n</M> or <M>S_n</M> in its natural action on
+#! <M>n</M> points). The output is either a data structure <M>D</M> containing
+#! nice generators for <A>G</A> and a procedure to write an SLP for arbitrary
+#! elements of <A>G</A> from the nice generators; or <K>false</K> if
+#! <A>G</A> is not transitive; or <K>fail</K>, in the case that no
+#! evidence was found that <A>G</A> is a giant, or evidence was found, but
+#! the construction of <M>D</M> was unsuccessful.
+#! If the method constructs <M>D</M> then the calling node becomes a leaf.
+#! @EndChunk
 FindHomMethodsPerm.Giant :=
   function(ri,grp)
     local grpmem,mp,res;

@@ -317,6 +317,19 @@ end;
 # end;
 
 
+#! @BeginChunk TensorDecomposable
+#! TODO/FIXME: it is unclear if the following description actually belongs
+#! to this method, so be cautious!
+#! 
+#! 
+#! This method currently tries to find one tensor factor by powering up
+#! commutators of random elements to elements of prime order. This seems
+#! to work quite well provided that the two tensor factors are not
+#! <Q>linked</Q> too much such that there exist enough elements that act
+#! with different orders on both tensor factors.
+#! 
+#! This method and its description needs some improvement.
+#! @EndChunk
 FindHomMethodsProjective.TensorDecomposable := function(ri,G)
   local H,N,conjgensG,d,f,hom,kro,r;
 
@@ -390,6 +403,9 @@ RECOG.HomTensorFactor := function(data,m)
   return k[3];
 end;
 
+#! @BeginChunk KroneckerProduct
+#! TODO
+#! @EndChunk
 FindHomMethodsProjective.KroneckerProduct := function(ri,G)
   # We got the hint that this is a Kronecker product, let's take it apart.
   # We first recognise projectively in one tensor factor and then in the
@@ -415,6 +431,9 @@ RECOG.HomTensorKernel := function(data,m)
   return mm;
 end;
 
+#! @BeginChunk KroneckerKernel
+#! TODO
+#! @EndChunk
 FindHomMethodsProjective.KroneckerKernel := function(ri,G)
   # One up in the tree we got the hint about a Kronecker product, this
   # method is called when we have gone to one factor and now are in the

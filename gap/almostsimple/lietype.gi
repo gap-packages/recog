@@ -803,6 +803,10 @@ RECOG.LieType := function (G, p, orders, Nmr)
    return "RO_undecided";
 end;
 
+#! @BeginChunk LieTypeNonConstr
+#! Recognise quasi-simple group of Lie type when characteristic is given.
+#! Based on <Cite Key="BKPS02"/> and <Cite Key="AB01"/>.
+#! @EndChunk
 FindHomMethodsProjective.LieTypeNonConstr := function(ri,G)
     local count,dim,f,i,ords,p,q,r,res;
     RECOG.SetPseudoRandomStamp(G,"LieTypeNonConstr");

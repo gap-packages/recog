@@ -10,6 +10,9 @@ fi;
 Read("regen_doc.g");
 
 AutoDoc(rec(
+    autodoc := rec(
+        scan_dirs := [ "doc", "gap", "gap/almostsimple" ],
+    ),
     scaffold := rec(
         bib := "recog",
         includes := [
@@ -23,3 +26,5 @@ AutoDoc(rec(
             ],
         ),
 ));
+
+

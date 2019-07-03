@@ -3,10 +3,10 @@
 SetPackagePath("recog", "./");
 LoadPackage("recog");
 
-GenerateMethodsXML := function(shortname, desc, db)
+GenerateMethodsTableXML := function(shortname, desc, db)
 local xmlfile, meth;
 
-    xmlfile := Concatenation("doc/methods_", shortname, "_table.xml");
+    xmlfile := Concatenation("doc/_methods_", shortname, "_table.xml");
     xmlfile := OutputTextFile(xmlfile, false);
     SetPrintFormattingStatus(xmlfile, false);
 
@@ -31,6 +31,29 @@ local xmlfile, meth;
 
 end;
 
-GenerateMethodsXML("matrix", "Matrix", FindHomDbMatrix);
-GenerateMethodsXML("perm", "Permutation", FindHomDbPerm);
-GenerateMethodsXML("proj", "Projective", FindHomDbProjective);
+GenerateMethodsListXML := function(shortname, desc, db)
+local xmlfile, meth;
+
+    xmlfile := Concatenation("doc/_methods_", shortname, "_list.xml");
+    xmlfile := OutputTextFile(xmlfile, false);
+    SetPrintFormattingStatus(xmlfile, false);
+
+    for meth in Set(RecNames(db)) do
+        AppendTo(xmlfile, "<Subsection Label=\"", meth, "\">\n");
+        AppendTo(xmlfile, "<Heading><C>", meth, "</C></Heading>\n");
+        AppendTo(xmlfile, "<#Include Label=\"", meth, "\">\n");
+        AppendTo(xmlfile, "</Subsection>\n");
+   od;
+
+    CloseStream(xmlfile);
+
+end;
+
+GenerateMethodsTableXML("matrix", "Matrix", FindHomDbMatrix);
+GenerateMethodsTableXML("perm", "Permutation", FindHomDbPerm);
+GenerateMethodsTableXML("proj", "Projective", FindHomDbProjective);
+
+#GenerateMethodsListXML("generic", "Generic", FindHomMethodsGeneric);
+GenerateMethodsListXML("matrix", "Matrix", FindHomMethodsMatrix);
+GenerateMethodsListXML("perm", "Permutation", FindHomMethodsPerm);
+GenerateMethodsListXML("proj", "Projective", FindHomMethodsProjective);

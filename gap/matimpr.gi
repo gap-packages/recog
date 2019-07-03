@@ -163,6 +163,14 @@ RECOG.SmallHomomorphicImageProjectiveGroup := function ( grp )
 end;
 
 
+#! @BeginChunk LowIndex
+#! This method is designed for the handling of the Aschbacher class C2
+#! (stabiliser of a decomposition of the underlying vector space), but may
+#! succeed on other types of input as well. Given <A>G</A> <M> \le PGL(d,q)</M>,
+#! the output is either the permutation action of <A>G</A> on a short
+#! orbit of subspaces or <K>fail</K>. In the current setup, <Q>short orbit</Q>
+#! is defined to have length at most <M>4d</M>.
+#! @EndChunk
 FindHomMethodsProjective.LowIndex := function(ri,G)
   local res;
   RECOG.SetPseudoRandomStamp(G,"LowIndex");
@@ -197,6 +205,9 @@ FindHomMethodsProjective.LowIndex := function(ri,G)
   fi;
 end;
 
+#! @BeginChunk DoBaseChangeForBlocks
+#! TODO
+#! @EndChunk
 FindHomMethodsProjective.DoBaseChangeForBlocks := function(ri,G)
   # Do the base change:
   local H,iso,newgens,ti;
@@ -220,6 +231,9 @@ FindHomMethodsProjective.DoBaseChangeForBlocks := function(ri,G)
   return Success;
 end;
 
+#! @BeginChunk Blocks
+#! TODO
+#! @EndChunk
 FindHomMethodsProjective.Blocks := function(ri,G)
   # Here we use BlocksModScalars and then get a kernel of scalar blocks
   # altogether mod scalars.
@@ -252,6 +266,9 @@ RECOG.HomBackToMats := function(el)
   return (el[d,d]^-1)*el;
 end;
 
+#! @BeginChunk BlocksBackToMats
+#! TODO
+#! @EndChunk
 FindHomMethodsProjective.BlocksBackToMats := function(ri,G)
   # This is only called as hint from Blocks, so we know that we in fact
   # have scalar blocks along the diagonal and nothing else.

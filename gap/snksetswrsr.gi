@@ -473,6 +473,18 @@ RECOG.JellyHomFunc := function(data,el)
   return RECOG.FindImageJellyfish(el,data.T,data.seen);
 end;
 
+#! @BeginChunk SnkSetswrSr
+#! This method tries to determine whether the input group <A>G</A> is acting
+#! primitively on <M>N</M> points, and
+#! is isomorphic to a large subgroup of <M>H \wr S_r</M> where <M>H</M> is
+#! <M>S_n</M> acting on <M>k</M>-sets and <M>N = {{n \choose k}}^r</M>
+#! and <M>kr > 1</M>. <Q>Large</Q> means that <A>G</A> contains a subgroup
+#! isomorphic to <M>A_n^r</M>. If <A>G</A> is imprimitive then the output is
+#! <K>false</K>. If <A>G</A> is primitive then
+#! the output is either a homomorphism into the
+#! natural imprimitive action of <A>G</A> on <M>nr</M> points with
+#! <M>r</M> blocks of size <M>n</M>, or <K>fail</K>.
+#! @EndChunk
 FindHomMethodsPerm.SnkSetswrSr :=
   function(ri,grp)
     local res,T,seen,imgens,hom;

@@ -3141,6 +3141,9 @@ SLPforElementFuncsProjective.PSLd := function(ri,x)
   return slp;
 end;
 
+#! @BeginChunk ClassicalNatural
+#! TODO
+#! @EndChunk
 FindHomMethodsProjective.ClassicalNatural := function(ri,g)
   local changed,classical,d,det,ext,f,gcd,gens,gg,gm,i,p,pr,q,root,std,stdg,z;
   d := ri!.dimension;

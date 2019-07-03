@@ -24,6 +24,20 @@ RECOG.DerivedSubgroupMonteCarlo := function(g)
   return GroupWithGenerators(gens2);
 end;
 
+#! @BeginChunk Derived
+#! This method computes the derived subgroup, if this has not yet been done
+#! by other methods. It then uses the MeatAxe to decide whether
+#! the derived subgroup acts irreducibly or not. If it acts reducibly,
+#! then we can apply Clifford theory to the natural module. The natural
+#! module restricted to the derived subgroup is a direct sum of simple
+#! modules. If all the summands are isomorphic, we immediately get either
+#! an action of <A>G</A> on blocks or a tensor decomposition. Otherwise,
+#! we get an action of <A>G</A> on the isotypic components. Either way,
+#! we find a reduction.
+#! 
+#! If the derived group acts irreducibly, we return <K>false</K> in the current
+#! implementation.
+#! @EndChunk
 FindHomMethodsProjective.Derived :=
   function(ri,G)
     # We assume G to act absolutely irreducible

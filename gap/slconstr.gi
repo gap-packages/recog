@@ -2460,6 +2460,9 @@ SLPforElementFuncsMatrix.SLConstructive := function(ri,x)
   return SLCR.SLSLPbb(ri!.data,x,ri!.dimension);
 end;
 
+#! @BeginChunk NaturalSL
+#! TODO
+#! @EndChunk
 FindHomMethodsMatrix.NaturalSL := function(ri,G)
   local data,e,genlist,grpmem,i,j,n,p,q,r,il;
 

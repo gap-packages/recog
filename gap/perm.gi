@@ -17,6 +17,13 @@ SLPforElementFuncsPerm.TrivialPermGroup :=
      return StraightLineProgram( [ [1,0] ], 1 );
    end;
 
+#! @BeginChunk TrivialPermGroup
+#! This method is successful if and only if all generators of the permutation
+#! group <A>G</A> are equal to the identity. Otherwise it returns
+#! <K>false</K> indicating that it will never succeed. This method
+#! is only installed to handle the trivial case such that we do not have to
+#! take this case into account in the other methods.
+#! @EndChunk
 FindHomMethodsPerm.TrivialPermGroup := function(ri, G)
   local gens;
   gens := GeneratorsOfGroup(G);
@@ -30,6 +37,13 @@ FindHomMethodsPerm.TrivialPermGroup := function(ri, G)
   return Success;
 end;
 
+#! @BeginChunk VeryFewPoints
+#! If a permutation group acts only on a few points (the current limit is at
+#! most 10 points) then a stabiliser chain is computed by the randomized &GAP;
+#! library function for that purpose. If the method is successful then the
+#! calling node becomes a leaf node in the recursive scheme. If the input group
+#! acts on more than 10 points then the method returns <K>false</K>.
+#! @EndChunk
 FindHomMethodsPerm.VeryFewPoints := function(ri, G)
   if LargestMovedPoint(G) <= 10 then
       return FindHomMethodsPerm.StabChain(ri, G);
@@ -38,6 +52,12 @@ FindHomMethodsPerm.VeryFewPoints := function(ri, G)
   fi;
 end;
 
+#! @BeginChunk NonTransitive
+#! If a permutation group <A>G</A> acts nontransitively then this method
+#! computes a homomorphism to the action of <A>G</A> on the orbit of the
+#! largest moved point. If <A>G</A> is transitive then the method returns
+#! <K>false</K>.
+#! @EndChunk
 FindHomMethodsPerm.NonTransitive :=
   function( ri, G )
     local hom,la,o;
@@ -55,6 +75,20 @@ FindHomMethodsPerm.NonTransitive :=
     return Success;
   end;
 
+#! @BeginChunk Imprimitive
+#! If the input group is not known to be transitive then this method
+#! returns <K>NotEnoughInformation</K>. If the input group is known to be transitive
+#! and primitive then the method returns <K>false</K>; otherwise, the method
+#! tries to compute a nontrivial block system. If successful then a
+#! homomorphism to the action on the blocks is defined; otherwise,
+#! the method returns <K>false</K>.
+#! 
+#! If the method is successful then it also gives a hint for the children of
+#! the node by determining whether the kernel of the action on the
+#! block system is solvable. If the answer is yes then the default value 20
+#! for the number of random generators in the kernel construction is increased
+#! by the number of blocks.
+#! @EndChunk
 FindHomMethodsPerm.Imprimitive :=
   function( ri, G )
     local blocks,hom,pcgs,subgens;
@@ -99,6 +133,9 @@ FindHomMethodsPerm.Imprimitive :=
     return Success;
   end;
 
+#! @BeginChunk PcgsForBlocks
+#! TODO
+#! @EndChunk
 FindHomMethodsPerm.PcgsForBlocks := function(ri,G)
   local blocks,pcgs,subgens;
   blocks := ri!.blocks;   # we know them from above!
@@ -113,6 +150,9 @@ FindHomMethodsPerm.PcgsForBlocks := function(ri,G)
   return NeverApplicable;
 end;
 
+#! @BeginChunk BalTreeForBlocks
+#! TODO
+#! @EndChunk
 FindHomMethodsPerm.BalTreeForBlocks := function(ri,G)
   local blocks,cut,hom,lowerhalf,nrblocks,o,upperhalf,l,n;
 
@@ -162,6 +202,11 @@ DoSafetyCheckStabChain := function(S)
   od;
 end;
 
+#! @BeginChunk StabChain
+#! This is the randomized &GAP; library function for computing a stabiliser
+#! chain. The method selection process ensures that this function is called
+#! only with small-base inputs, where the method works efficiently.
+#! @EndChunk
 FindHomMethodsPerm.StabChain :=
    function( ri, G )
      local Gmem,S,si;
@@ -197,6 +242,9 @@ SLPforElementFuncsPerm.StabilizerChainPerm := function(ri,x)
   return r.slp;
 end;
 
+#! @BeginChunk StabilizerChainPerm
+#! TODO
+#! @EndChunk
 # TODO: merge FindHomMethodsPerm.StabilizerChainPerm and  FindHomMethodsProjective.StabilizerChainProj ?
 FindHomMethodsPerm.StabilizerChainPerm := function(ri,G)
   local Gm,S;
@@ -293,6 +341,17 @@ StoredPointsPerm := function(p)
   fi;
 end;
 
+#! @BeginChunk ThrowAwayFixedPoints
+#! This method defines a homomorphism of a permutation group
+#! <A>G</A> to the action on the moved points of <A>G</A> if
+#! <A>G</A> does not have too many moved points. In the current setup, the
+#! homomorphism is defined if the number <M>k</M> of moved
+#! points is at most <M>1/3</M> of the largest moved point of <A>G</A>,
+#! or  <M>k</M> is at most half of the number of points on which
+#! <A>G</A> is stored internally by &GAP;. The method returns
+#! <K>false</K> if it does not define a homomorphism indicating that it will
+#! never succeed.
+#! @EndChunk
 FindHomMethodsPerm.ThrowAwayFixedPoints :=
   function( ri, G )
       # Check, whether we can throw away fixed points
@@ -314,6 +373,12 @@ FindHomMethodsPerm.ThrowAwayFixedPoints :=
       return Success;
   end;
 
+#! @BeginChunk Pcgs
+#! This is the &GAP; library function to compute a stabiliser chain for a
+#! solvable permutation group. If the method is successful then the calling
+#! node becomes a leaf node in the recursive scheme. If the input group is
+#! not solvable then the method returns <K>false</K>.
+#! @EndChunk
 FindHomMethodsPerm.Pcgs :=
   function( ri, G )
     local GM,S,pcgs;
