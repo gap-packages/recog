@@ -60,7 +60,7 @@ RECOG.InvolutionCentraliser := function(pr,ord,x,nr)
 end;
 
 
-# See http://www.math.rwth-aachen.de/~Max.Neunhoeffer/Publications/pdf/perth09_handout.pdf
+# See https://www.math.rwth-aachen.de/~Max.Neunhoeffer/Publications/pdf/perth09_handout.pdf
 RECOG.InvolutionJumper := function(pr,ord,x,tol,withodd)
   # x an involution in a group g, for which the product replacer pr produces
   # random elements, withodd is true or false, it switches the odd case on or
