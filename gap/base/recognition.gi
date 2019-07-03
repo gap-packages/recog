@@ -980,6 +980,10 @@ RECOG.TestGroupOptions := rec(
   );
 
 
+# Test recognition of a group 'g' with known size 'size'.
+# 'proj' denotes if the group is projective
+# 'optionlist' is an optional list of options overriding
+# RECOG.TestGroupOptions
 RECOG.TestGroup := function(g,proj,size, optionlist...)
   local l,r,ri,s,x,count,lvl,seedMT,seedRS,gens,supergroup, options;
   count := 0;
@@ -1089,6 +1093,53 @@ RECOG.TestGroup := function(g,proj,size, optionlist...)
   SetInfoLevel(InfoRecog, lvl);
   return ri;
 end;
+
+# Call RECOG.TestGroup on all maximal subgroups of a named atlas group.
+# under all known representations which are permutation groups or
+# matrices over finite fields.
+# Optionally give 'options' to pass options to RECOG.TestGroup
+RECOG.testAllMaximalSubgroupsOfAtlasGroup := function(name, options...)
+    local reps, rep, maximal, exhaustList;
+
+    # The following function makes it easy to extract
+    # all results of a function which returns 'fail'
+    # when given too large a value
+    exhaustList := function(F)
+        local l, i, val;
+        l := [];
+        for i in PositiveIntegers do
+            val := F(i);
+            if val = fail then
+                return l;
+            fi;
+            Add(l, val);
+        od;
+    end;
+
+    reps := exhaustList(x -> AtlasGenerators(name, x));
+
+    # Only interested in permutations or finite fields
+    reps := Filtered(reps, x -> (not IsBound(x.ring)) or (IsFinite(x.ring) and IsField(x.ring)));
+    Print("Testing ", Size(reps), " representations\n");
+    for rep in reps do
+        for maximal in exhaustList(x -> AtlasSubgroup(rep, x)) do
+            CallFuncList(RECOG.TestGroup, Concatenation([maximal, false, Size(maximal)], options));
+            Print(".");
+        od;
+        Print("\n");
+    od;
+end;
+
+# Call RECOG.TestGroup on all subgroups up to conjugacy of a group.
+# Optionally give 'options' to pass options to RECOG.TestGroup
+RECOG.testAllSubgroups := function(g, options...)
+    local list, sub;
+    list := List(ConjugacyClassesSubgroups(g), Representative);
+    for sub in list do
+        CallFuncList(RECOG.TestGroup, Concatenation([sub, false, Size(sub)],options));
+    od;
+end;
+
 
 RECOG.TestRecognitionNode := function(ri,stop,recurse)
   local err, grp, x, slp, y, ef, ek, i;
