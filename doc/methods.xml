@@ -460,6 +460,14 @@ a short list of the possible isomorphism types of <A>G</A>.
 
 </Subsection>
 
+<Subsection Label="LieTypeNonConstr">
+<Heading><C>LieTypeNonConstr</C></Heading>
+
+Recognise quasi-simple group of Lie type when characteristic is given.
+Based on <Cite Key="BKPS02"/> and <Cite Key="AB01"/>.
+
+</Subsection>
+
 <Subsection Label="StabilizerChain">
 <Heading><C>StabilizerChain</C></Heading>
 
