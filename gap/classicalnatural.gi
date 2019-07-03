@@ -3230,7 +3230,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
                    "case, handing over to Schreier-Sims.");
               ri!.comment := Concatenation("_SL(",String(d),",",String(q),")",
                                            "_StabilizerChain");
-              return FindHomMethodsProjective.StabilizerChain(ri,g);
+              return FindHomMethodsProjective.StabilizerChainProj(ri,g);
           fi;
           Info(InfoRecog,2,"ClassicalNatural: this is PSL_n!");
           std := RECOG.FindStdGens_SL(gm,f);
