@@ -326,6 +326,26 @@ projective groups, which is stored in the global variable
 </ManSection>
 
 <ManSection>
+<Var Name="FindHomMethodsGeneric"/>
+<Description>
+    In this global record the functions that are methods for finding
+    homomorphisms for generic group recognition are stored. We
+    collect them all in this record such that we do not use up too many
+    global variable names.
+</Description>
+</ManSection>
+
+<ManSection>
+<Var Name="SLPforElementFuncsGeneric"/>
+<Description>
+    This global record holds the functions that are methods for writing group
+    elements as straight line programs (SLPs) in terms of the generators
+    after successful generic group recognition. We collect them all in this
+    record such that we do not use up too many global variable names.
+</Description>
+</ManSection>
+
+<ManSection>
 <Func Name="TryFindHomMethod" Arg="H, method, projective"/>
 <Returns><K>fail</K> or <K>false</K> or a recognition info record.</Returns>
 <Description>

@@ -16,28 +16,6 @@
 ##
 #############################################################################
 
-SLPforElementFuncsMatrix.TrivialMatrixGroup :=
-   function(ri,g)
-     return StraightLineProgramNC( [ [1,0] ], 1 );
-   end;
-
-#! @BeginChunk TrivialMatrixGroup
-#! This method is successful if and only if all generators of a matrix group
-#! <A>G</A> are equal to the identity. Otherwise, it returns <K>false</K>.
-#! @EndChunk
-FindHomMethodsMatrix.TrivialMatrixGroup := function(ri, G)
-  local gens;
-  gens := GeneratorsOfGroup(G);
-  if not ForAll(gens, IsOne) then
-      return NeverApplicable;
-  fi;
-  SetSize(ri, 1);
-  Setslpforelement(ri, SLPforElementFuncsMatrix.TrivialMatrixGroup);
-  Setslptonice(ri, StraightLineProgramNC([[[1,0]]],Length(gens)));
-  SetFilterObj(ri, IsLeaf);
-  return Success;
-end;
-
 RECOG.HomToScalars := function(data,el)
   return ExtractSubMatrix(el,data.poss,data.poss);
 end;
@@ -157,7 +135,7 @@ FindHomMethodsMatrix.Scalar := function(ri, G)
   gens := List(GeneratorsOfGroup(G),x->x[1,1]);
   subset := Filtered([1..Length(gens)],i->not(IsOne(gens[i])));
   if subset = [] then
-      return FindHomMethodsMatrix.TrivialMatrixGroup(ri,G);
+      return FindHomMethodsGeneric.TrivialGroup(ri,G);
   fi;
   gens := gens{subset};
   q := Size(f);
@@ -934,8 +912,8 @@ end;
 #  return true;
 #end;
 
-AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.TrivialMatrixGroup,
-  3100, "TrivialMatrixGroup",
+AddMethod( FindHomDbMatrix, FindHomMethodsGeneric.TrivialGroup,
+  3100, "TrivialGroup",
         "check whether all generators are equal to the identity matrix" );
 AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.DiagonalMatrices,
   1100, "DiagonalMatrices",

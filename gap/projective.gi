@@ -16,29 +16,6 @@
 ##
 #############################################################################
 
-SLPforElementFuncsProjective.TrivialProjectiveGroup :=
-   function(ri,g)
-     return StraightLineProgramNC( [ [1,0] ], 1 );
-   end;
-
-#! @BeginChunk TrivialProjectiveGroup
-#! This method is successful if and only if all generators of a projective group
-#! <A>G</A> are equal to the identity (that is, in the matrix representation
-#! of <A>G</A>, all matrices are scalars). Otherwise, it returns <K>false</K>.
-#! @EndChunk
-FindHomMethodsProjective.TrivialProjectiveGroup := function(ri, G)
-  local gens;
-  gens := GeneratorsOfGroup(G);
-  if not ForAll(gens, ri!.isone) then
-      return NeverApplicable;
-  fi;
-  SetSize(ri, 1);
-  Setslpforelement(ri, SLPforElementFuncsProjective.TrivialProjectiveGroup);
-  Setslptonice(ri, StraightLineProgramNC([[[1,0]]],Length(gens)));
-  SetFilterObj(ri, IsLeaf);
-  return Success;
-end;
-
 #! @BeginChunk BlocksModScalars
 #! This method is only called when hinted from above. In this method it is
 #! understood that G should <E>neither</E>
@@ -67,7 +44,7 @@ FindHomMethodsProjective.BlocksModScalars := function(ri,G)
   if ForAll(ri!.blocks,b->Length(b)=1) then
       # All blocks are projectively trivial, so nothing to do here:
       SetSize(ri,1);
-      Setslpforelement(ri,SLPforElementFuncsProjective.TrivialProjectiveGroup);
+      Setslpforelement(ri,SLPforElementFuncsGeneric.TrivialGroup);
       Setslptonice( ri, StraightLineProgramNC([[[1,0]]],
                                               Length(GeneratorsOfGroup(G))));
       SetFilterObj(ri,IsLeaf);
@@ -303,8 +280,8 @@ end;
 
 # The method installations:
 
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.TrivialProjectiveGroup,
-  3000, "TrivialProjectiveGroup",
+AddMethod( FindHomDbProjective, FindHomMethodsGeneric.TrivialGroup,
+  3000, "TrivialGroup",
         "check if all generators are scalar multiples of the identity matrix" );
 AddMethod( FindHomDbProjective, FindHomMethodsProjective.ProjDeterminant,
   1300, "ProjDeterminant",

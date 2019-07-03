@@ -53,7 +53,7 @@ GenerateMethodsTableXML("matrix", "Matrix", FindHomDbMatrix);
 GenerateMethodsTableXML("perm", "Permutation", FindHomDbPerm);
 GenerateMethodsTableXML("proj", "Projective", FindHomDbProjective);
 
-#GenerateMethodsListXML("generic", "Generic", FindHomMethodsGeneric);
+GenerateMethodsListXML("generic", "Generic", FindHomMethodsGeneric);
 GenerateMethodsListXML("matrix", "Matrix", FindHomMethodsMatrix);
 GenerateMethodsListXML("perm", "Permutation", FindHomMethodsPerm);
 GenerateMethodsListXML("proj", "Projective", FindHomMethodsProjective);
