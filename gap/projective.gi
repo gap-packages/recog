@@ -16,6 +16,13 @@
 ##
 #############################################################################
 
+SLPforElementFuncsProjective.TrivialGroup_BlocksModScalars := function(ri,g)
+    if not IsDiagonalMat(g) then
+        return fail;
+    fi;
+    return StraightLineProgramNC( [ [1,0] ], 1 );
+end;
+
 #! @BeginChunk BlocksModScalars
 #! This method is only called when hinted from above. In this method it is
 #! understood that G should <E>neither</E>
@@ -44,7 +51,7 @@ FindHomMethodsProjective.BlocksModScalars := function(ri,G)
   if ForAll(ri!.blocks,b->Length(b)=1) then
       # All blocks are projectively trivial, so nothing to do here:
       SetSize(ri,1);
-      Setslpforelement(ri,SLPforElementFuncsGeneric.TrivialGroup);
+      Setslpforelement(ri, SLPforElementFuncsProjective.TrivialGroup_BlocksModScalars);
       Setslptonice( ri, StraightLineProgramNC([[[1,0]]],
                                               Length(GeneratorsOfGroup(G))));
       SetFilterObj(ri,IsLeaf);
