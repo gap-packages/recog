@@ -23,7 +23,7 @@ framework to implement methods of group recognition, regardless of
 what computational representation is used. This means, that the code
 in this package is useful at least for permutation groups, matrix
 groups and projective groups.
-The setup is described in <Cite Key="IssacRecog"/>. <P/>
+The setup is described in <Cite Key="NS06"/>. <P/>
 
 The framework allows to build composition trees and handles the builtup
 and usage of these trees in a generic way. It also contains a
