@@ -667,6 +667,8 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
   function(ri)
     local b,curlay,done,el,f,i,l,lens,lvec,nothingnew,pivots,pos,ready,
           rifac,s,v,x,y;
+
+    Info(InfoRecog, 2, "Running FindKernelLowerLeftPGroup...");
     f := ri!.field;
     if not(IsPrimeField(f)) then
         b := CanonicalBasis(f);  # a basis over the prime field

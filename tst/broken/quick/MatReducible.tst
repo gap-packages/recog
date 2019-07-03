@@ -1,3 +1,4 @@
+# See https://github.com/gap-packages/recog/issues/101
 gap> m1 := [[2,0,0,0,0,0,0,0,0,0],
 >        [0,2,0,0,0,0,0,0,0,0],
 >        [1,2,4,0,0,0,0,0,0,0],
@@ -23,4 +24,4 @@ gap> ConvertToMatrixRep(m2);;
 gap> x := PseudoRandom(GL(10,5));;
 gap> gens := [m1^x,m2^x];;
 gap> g := GroupWithGenerators(gens);;
-gap> ri := RECOG.TestGroup(g,true,61035156250000);;
+gap> ri := RECOG.TestGroup(g,false,61035156250000);; # FIXME: is this size correct?
