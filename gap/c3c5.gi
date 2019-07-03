@@ -128,7 +128,7 @@ end;
 
 #! @BeginChunk NotAbsolutelyIrred
 #! If an irreducible projective group <A>G</A> acts absolutely irreducibly
-#! then this method returns <K>false</K>. If <A>G</A> is not absolutely
+#! then this method returns <C>NeverApplicable</C>. If <A>G</A> is not absolutely
 #! irreducible then a homomorphism into a smaller dimensional representation
 #! over an extension field is defined. A hint is handed down to the image that
 #! no test for absolute irreducibility has to be done any more. Another hint

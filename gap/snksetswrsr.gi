@@ -480,10 +480,10 @@ end;
 #! <M>S_n</M> acting on <M>k</M>-sets and <M>N = {{n \choose k}}^r</M>
 #! and <M>kr > 1</M>. <Q>Large</Q> means that <A>G</A> contains a subgroup
 #! isomorphic to <M>A_n^r</M>. If <A>G</A> is imprimitive then the output is
-#! <K>false</K>. If <A>G</A> is primitive then
+#! <C>NeverApplicable</C>. If <A>G</A> is primitive then
 #! the output is either a homomorphism into the
 #! natural imprimitive action of <A>G</A> on <M>nr</M> points with
-#! <M>r</M> blocks of size <M>n</M>, or <K>fail</K>.
+#! <M>r</M> blocks of size <M>n</M>, or <C>TemporaryFailure</C>.
 #! @EndChunk
 FindHomMethodsPerm.SnkSetswrSr :=
   function(ri,grp)
