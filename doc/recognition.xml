@@ -150,7 +150,7 @@ recognition function:
 <ManSection>
 <Func Name="RecogniseGeneric" Arg="H, methoddb, depth [,knowledge]"/>
 <Func Name="RecognizeGeneric" Arg="H, methoddb, depth [,knowledge]"/>
-<Returns><C>fail</C> for failure or a recognition info record.</Returns>
+<Returns><K>fail</K> for failure or a recognition info record.</Returns>
 <Description>
     <A>H</A> must be a &GAP; group object, <A>methoddb</A> must be a
     method database in the sense of Section <Ref Sect="whataremethods"/>
@@ -168,7 +168,7 @@ recognition function:
     about prior knowledge about which find homomorphism method might succeed.
     <P/>
     The function performs the algorithm described above and returns either
-    <C>fail</C> in case of failure or a recognition info record in case
+    <K>fail</K> in case of failure or a recognition info record in case
     of success. For the content and definition of recognition info
     records see Section <Ref Sect="rirecord"/>.
 </Description>
@@ -180,7 +180,7 @@ following convenience functions:
 <ManSection>
 <Func Name="RecognisePermGroup" Arg="H"/>
 <Func Name="RecognizePermGroup" Arg="H"/>
-<Returns><C>fail</C> for failure or a recognition info record.</Returns>
+<Returns><K>fail</K> for failure or a recognition info record.</Returns>
 <Description>
 <A>H</A> must be a &GAP; permutation group object. This function calls
 <Ref Func="RecogniseGeneric"/> with the method database used for
@@ -192,7 +192,7 @@ permutation groups, which is stored in the global variable
 <ManSection>
 <Func Name="RecogniseMatrixGroup" Arg="H"/>
 <Func Name="RecognizeMatrixGroup" Arg="H"/>
-<Returns><C>fail</C> for failure or a recognition info record.</Returns>
+<Returns><K>fail</K> for failure or a recognition info record.</Returns>
 <Description>
 <A>H</A> must be a &GAP; matrix group object. This function calls
 <Ref Func="RecogniseGeneric"/> with the method database used for
@@ -204,7 +204,7 @@ matrix groups, which is stored in the global variable
 <ManSection>
 <Func Name="RecogniseProjectiveGroup" Arg="H"/>
 <Func Name="RecognizeProjectiveGroup" Arg="H"/>
-<Returns><C>fail</C> for failure or a recognition info record.</Returns>
+<Returns><K>fail</K> for failure or a recognition info record.</Returns>
 <Description>
 <A>H</A> must be a &GAP; matrix group object. Since as of now no
 actual projective groups are implemented in the &GAP; library we use
@@ -220,7 +220,7 @@ projective groups, which is stored in the global variable
 <ManSection>
 <Func Name="RecogniseGroup" Arg="H"/>
 <Func Name="RecognizeGroup" Arg="H"/>
-<Returns><C>fail</C> for failure or a recognition info record.</Returns>
+<Returns><K>fail</K> for failure or a recognition info record.</Returns>
 <Description>
     <A>H</A> must be a &GAP; group object. This function automatically
     dispatches to one of the two previous functions
@@ -333,13 +333,13 @@ projective groups, which is stored in the global variable
 
 <ManSection>
 <Func Name="TryFindHomMethod" Arg="H, method, projective"/>
-<Returns><C>fail</C> or <C>false</C> or a recognition info record.</Returns>
+<Returns><K>fail</K> or <K>false</K> or a recognition info record.</Returns>
 <Description>
 Use this function to try to run a given find homomorphism method
 <A>method</A> on a group <A>H</A>. Indicate by the boolean <A>projective</A>
 whether or not the method works in projective mode. For permutation groups,
-set this to <C>false</C>. The result is either <C>fail</C> or
-<C>false</C> if the method fails or a recognition info record <C>ri</C>.
+set this to <K>false</K>. The result is either <K>fail</K> or
+<K>false</K> if the method fails or a recognition info record <C>ri</C>.
 If the method created a leaf then <C>ri</C> will be a leaf, otherwise
 it will have the attribute <Ref Attr="Homom"/> set, but no factor or
 kernel have been created or recognised yet. You can use for example
@@ -479,7 +479,7 @@ elements that are generated from them remember, how they were acquired.
     to find a homomorphism (or isomorphism). It does not have to be set
     in leaf nodes of the recognition tree or if the homomorphism is known to
     be an isomorphism. In the latter case the value of the attribute is
-    set to <C>fail</C>. This attribute value provides the link to the
+    set to <K>fail</K>. This attribute value provides the link to the
     <Q>kernel</Q> subtree of the recognition tree.
 </Description>
 </ManSection>
@@ -743,7 +743,7 @@ find kernel methods.
     Sometimes a find homomorphism has information that it will be difficult
     to create generators for the kernel, for example if it is known that
     the kernel will need lots of generators. In that case this attribute
-    with the default boolean value <C>false</C> can be set to <C>true</C>.
+    with the default boolean value <K>false</K> can be set to <K>true</K>.
     In that case, the generic recursive recognition function will perform
     an immediate verification phase after the kernel has been recognised.
     This is done as follows: A few random elements are created, mapped
@@ -814,7 +814,7 @@ kernel of the found homomorphism:
 This attribute returns a function that tests, whether or not an
 element of the group is equal to the identity or not. Usually this is
 just the operation <Ref Oper="IsOne" BookName="Ref"/> but for projective
-groups it is a special function returning <C>true</C> for scalar matrices. In
+groups it is a special function returning <K>true</K> for scalar matrices. In
 generic code, one should always use the result of this attribute to
 compare an element to the identity such that the code works also for
 projective groups. Find homomorphism methods usually do not have to
@@ -863,7 +863,7 @@ not have to set this attribute.
 <List>
 
 <Mark><C>leavegensNuntouched</C></Mark>
-<Item>If this component is bound to <C>true</C> by a find homomorphism
+<Item>If this component is bound to <K>true</K> by a find homomorphism
     method or a find kernel generators method, the generic mechanism
     to remove duplicates and identities in the generator for the
     kernel is not used. This is important if your methods rely on the
