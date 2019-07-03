@@ -2,12 +2,7 @@
 #/*   Recognise quasi-simple group of Lie type when             */
 #/*   characteristic is given                                   */
 #/*                                                             */
-#/*   Babai, Kantor, Palfy, Seress:
-#/*   "Black-box recognition of finite simple groups of Lie type
-#/*   by statistics of element orders", Journal of Group Theory
-#/*   5.4 (2002): 383-402.
-#/*   Altseimer & Borovik (2001)                                */
-#/*   provide theoretical basis for algorithms                  */
+#/* [BKPS02] & [AB01] provide theoretical basis for algorithms. */
 #/*                                                             */
 #/*   this version developed by Malle & O'Brien March 2001      */
 #/*                                                             */
