@@ -1,15 +1,20 @@
 #############################################################################
 ##
-##  d247.gi
-##                                recog package
-##                                                        Max Neunhoeffer
+##  This file is part of recog, a package for the GAP computer algebra system
+##  which provides a collection of methods for the constructive recognition
+##  of groups.
 ##
-##  Copyright 2006-2008 by the authors.
-##  This file is free software, see license information at the end.
+##  This files's authors include Max Neunhöffer.
+##
+##  Copyright of recog belongs to its developers whose names are too numerous
+##  to list here. Please refer to the COPYRIGHT file for details.
+##
+##  SPDX-License-Identifier: GPL-3.0-or-later
+##
 ##
 ##  Handle the (projective) imprimitive, tensor and tensor-induced cases.
 ##
-##  This implementation is inspired by Max Neunhoeffer's habil thesis
+##  This implementation is inspired by Max Neunhöffer's habil thesis
 ##  and the variations D2, D4 and D7 of the Aschbacher cases. A copy can
 ##  be obtained via Frank Luebeck, LDfM RWTH Aachen.
 ##
@@ -450,19 +455,3 @@ FindHomMethodsProjective.PrototypeForC2C4 := function(ri,G)
   Info(InfoRecog,2,"Proto: Did not find normal subgroup, giving up.");
   return fail;
 end;
-
-##
-##  This program is free software: you can redistribute it and/or modify
-##  it under the terms of the GNU General Public License as published by
-##  the Free Software Foundation, either version 3 of the License, or
-##  (at your option) any later version.
-##
-##  This program is distributed in the hope that it will be useful,
-##  but WITHOUT ANY WARRANTY; without even the implied warranty of
-##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##  GNU General Public License for more details.
-##
-##  You should have received a copy of the GNU General Public License
-##  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-##
-
