@@ -21,7 +21,7 @@ just by looking at the stored attribute values. Moreover, constructive
 membership tests can be performed using the function
 <Ref Func="SLPforElement"/>, thereby writing an arbitrary element
 in terms of the nice generators, which are stored in the attribute
-<Ref Attr="NiceGens"/>. If <C>fail</C> is returned, then the
+<Ref Attr="NiceGens"/>. If <K>fail</K> is returned, then the
 element in question does not lie in the recognised group or
 the recognition made an error.<P/>
 
@@ -91,7 +91,7 @@ generators, you can use the following function:
 
 <ManSection>
 <Meth Name="\in" Arg="x, ri"/>
-<Returns><C>true</C> or <C>false</C></Returns>
+<Returns><K>true</K> or <K>false</K></Returns>
 <Description>
     This method tests, whether the element <A>x</A> lies in the group
     recognised by the recognition info record <A>ri</A>. Note that
