@@ -3,21 +3,6 @@
 ##  PackageInfo.g for the package `recog'
 ##
 
-RecogsFunnyNameFormatterFunction := function(st)
-  if Length(st) = 0 then
-      return st;
-  else
-      return Concatenation(" (",st,")");
-  fi;
-end;
-RecogsFunnyWWWURLFunction := function(re)
-  if IsBound(re.WWWHome) then
-      return re.WWWHome;
-  else
-      return "";
-  fi;
-end;
-
 SetPackageInfo( rec(
 
 PackageName := "recog",
@@ -44,14 +29,14 @@ Persons := [
   rec(
     LastName      := "Ankaralioglu",
     FirstNames    := "Nurullah",
-    IsAuthor      := true,
+    IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "ankarali@atauni.edu.tr",
   ),
   rec(
     LastName      := "Brooksbank",
     FirstNames    := "Peter",
-    IsAuthor      := true,
+    IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "pbrooksb@bucknell.edu",
     PostalAddress := Concatenation( [
@@ -66,7 +51,7 @@ Persons := [
   rec(
     LastName      := "Celler",
     FirstNames    := "Frank",
-    IsAuthor      := true,
+    IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "frank@celler.de",
     Place         := "Aachen",
@@ -75,14 +60,14 @@ Persons := [
   rec(
     LastName      := "Howe",
     FirstNames    := "Stephen",
-    IsAuthor      := true,
+    IsAuthor      := false,
     IsMaintainer  := false,
     PostalAddress := "Unknown",
   ),
   rec(
     LastName      := "Law",
     FirstNames    := "Maska",
-    IsAuthor      := true,
+    IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "maska@maths.uwa.edu.au",
     PostalAddress := Concatenation( [
@@ -98,7 +83,7 @@ Persons := [
   rec(
     LastName      := "Linton",
     FirstNames    := "Steve",
-    IsAuthor      := true,
+    IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "sal@cs.st-andrews.ac.uk",
     WWWHome       := "http://www-groups.dcs.st-and.ac.uk/~sal/",
@@ -114,7 +99,7 @@ Persons := [
   rec(
     LastName      := "Malle",
     FirstNames    := "Gunter",
-    IsAuthor      := true,
+    IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "malle@mathematik.uni-kl.de",
     WWWHome       := "https://www.mathematik.uni-kl.de/~malle/",
@@ -124,7 +109,7 @@ Persons := [
   rec(
     LastName      := "Niemeyer",
     FirstNames    := "Alice",
-    IsAuthor      := true,
+    IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "alice.niemeyer@mathb.rwth-aachen.de",
     WWWHome       := "http://www.math.rwth-aachen.de/~Alice.Niemeyer/",
@@ -140,7 +125,7 @@ Persons := [
   rec(
     LastName      := "O'Brien",
     FirstNames    := "Eamonn",
-    IsAuthor      := true,
+    IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "e.obrien@auckland.ac.nz",
     WWWHome       := "https://www.math.auckland.ac.nz/~obrien/",
@@ -150,7 +135,7 @@ Persons := [
   rec(
     LastName      := "Roney-Dougal",
     FirstNames    := "Colva M.",
-    IsAuthor      := true,
+    IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "colva@mcs.st-and.ac.uk",
     WWWHome       := "http://www-groups.dcs.st-and.ac.uk/~colva",
@@ -251,31 +236,6 @@ Dependencies := rec(
   ExternalConditions := []
 ),
 
-##  The LoadPackage mechanism can produce a default banner from the info
-##  in this file. If you are not happy with it, you can provide a string
-##  here that is used as a banner. GAP decides when the banner is shown and
-##  when it is not shown. *optional* (note the ~-syntax in this example)
-BannerString := Concatenation(
-  "----------------------------------------------------------------------",
-  "-------\n",
-  "Loading  recog ", ~.Version, " - methods for constructive recognition\n\n",
-  "by ", ~.Persons[1].FirstNames, " ", ~.Persons[1].LastName,
-        " (", ~.Persons[1].WWWHome, ") and\n",
-  "   ", ~.Persons[2].FirstNames, " ", ~.Persons[2].LastName,
-        "\n",
-  "with contributed code by:\n",
-  Concatenation(Concatenation(List(~.Persons{[3..Length(~.Persons)-1]},
-       p->["     ",p.FirstNames," ",p.LastName,
-       RecogsFunnyNameFormatterFunction(
-         RecogsFunnyWWWURLFunction(p)),",\n"]))),
-  " and ",~.Persons[Length(~.Persons)].FirstNames," ",
-  ~.Persons[Length(~.Persons)].LastName,
-  RecogsFunnyNameFormatterFunction(
-    RecogsFunnyWWWURLFunction(~.Persons[Length(~.Persons)])),".\n",
-  "-----------------------------------------------------------------------",
-  "------\n"
-),
-
 AvailabilityTest := ReturnTrue,
 TestFile := "tst/testall.g",
 
@@ -295,5 +255,3 @@ AutoDoc := rec(
 ),
 
 ));
-Unbind(RecogsFunnyNameFormatterFunction);
-Unbind(RecogsFunnyWWWURLFunction);
