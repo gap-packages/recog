@@ -206,7 +206,7 @@ FindHomMethodsPerm.StabChain :=
      StripStabChain(S);
      SetNiceGens(ri,S.labels);
      MakeImmutable(S);
-     SetStabChainImmutable(G,S);
+     ri!.stabilizerchain := S;
      Setslpforelement(ri,SLPforElementFuncsPerm.StabChain);
      SetFilterObj(ri,IsLeaf);
      SetSize(G,SizeStabChain(S));
@@ -298,12 +298,11 @@ end;
 SLPforElementFuncsPerm.StabChain :=
   function( ri, g )
     # we know that g is an element of Grp(ri) all without memory.
-    # we know that Grp(ri) has an immutable StabChain and
+    # we know that ri!.stabilizerchain is an immutable StabChain and
     # ri!.stronggensslp is bound to a slp that expresses the strong generators
     # in that StabChain in terms of the GeneratorsOfGroup(Grp(ri)).
-    local G,S,s;
-    G := ri!.Gnomem;
-    S := StabChainImmutable(G);
+    local S,s;
+    S := ri!.stabilizerchain;
     return SLPinLabels(S,g);
   end;
 
@@ -375,7 +374,7 @@ FindHomMethodsPerm.Pcgs :=
     StripStabChain(S);
     SetNiceGens(ri,S.labels);
     MakeImmutable(S);
-    SetStabChainImmutable(G,S);
+    ri!.stabilizerchain := S;
     Setslpforelement(ri,SLPforElementFuncsPerm.StabChain);
     SetFilterObj(ri,IsLeaf);
     SetSize(G,SizeStabChain(S));
