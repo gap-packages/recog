@@ -3,8 +3,8 @@
 ##  Call this with GAP from within the package directory.
 ##
 
-if fail = LoadPackage("AutoDoc", ">= 2016.01.21") then
-    Error("AutoDoc 2016.01.21 or newer is required");
+if fail = LoadPackage("AutoDoc", ">= 2019.07.03") then
+    Error("AutoDoc 2019.07.03 or newer is required");
 fi;
 
 Read("regen_doc.g");
