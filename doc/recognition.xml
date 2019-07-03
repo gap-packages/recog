@@ -249,6 +249,15 @@ kernel have been created or recognised yet. You can use for example
 the methods in <Ref Var="FindHomMethodsPerm"/> or
 <Ref Var="FindHomMethodsMatrix"/> or <Ref Var="FindHomMethodsProjective"/>
 as the <A>method</A> argument.
+
+<P/>GAP homomorphisms are not required to give a sensible answer when
+given a value not in their source, and in practice often enter the break
+loop, or return an incorrect answer. This causes problems when checking
+if a value is not in the represented group. To avoid this problem,
+<Ref Attr="validatehomominput"/> can be set to a function.
+This function is used to filter possible group elements,
+before they are
+passed to <Ref Attr="Homom"/>.
 </Description>
 </ManSection>
 
@@ -295,6 +304,45 @@ The following attributes are defined for recognition info records:
 <#Include Label="SLPforElement">
 <#Include Label="StdPresentation">
 <#Include Label="methodsforfactor">
+
+<ManSection>
+<Attr Name="validatehomominput" Arg="ri, x"/>
+<Description>
+
+The value of this attribute, if there is any, must be a function with
+two arguments: a recognition record <A>ri</A>, and an element <A>x</A>.
+The function must return a boolean. If it returns <K>false</K>, then
+this means that <A>x</A> is not in the source of the homomorphism
+returned by <Ref Attr="Homom"/>. If <K>true</K> is returned, then
+either <A>x</A> is in the source of that homomorphism, or passing
+<A>x</A> to the homomorphism returns <K>fail</K>.</P>
+
+For example,
+if <A>ri</A> represents a matrix group that preserves a subspace, then
+the source of <Ref Attr="Homom"/> will be matrices which preserve that
+subspace, and passing matrices which do not preserve this subspace
+to <Ref Attr="Homom"/> may produce incorrect answers.
+<Ref Attr="validatehomominput"/> can be used to filter out such elements.
+
+The function <Ref Func="ValidateHomomInput"/> provides a simple wrapper
+to this attribute, which calls <Ref Attr="validatehomominput"/> unless
+it is not defined, in which case <Ref Func="ValidateHomomInput"/>
+returns true.
+</Description>
+</ManSection>
+
+
+<ManSection>
+<Func Name="ValidateHomomInput" Arg="ri, x"/>
+<Returns>a boolean.
+</Returns>
+<Description>
+    This is a wrapper function which calls <Ref Attr="validatehomominput"/>
+    of <A>ri</A> with <A>x</A>, or returns true if <A>ri</A> does not define
+    <Ref Attr="validatehomominput"/>.
+</Description>
+</ManSection>
+
 
 The following two attributes are concerned with the relation between
 the original generators and the nice generators for a node.
@@ -657,7 +705,10 @@ A successful find homomorphism method has the following duties:
     group in the attribute <Ref Attr="Homom"/>. Note that if your homomorphism
     changes the representation (for example going from matrix groups to
     permutation groups), you will have to set the attribute
-    <Ref Attr="methodsforfactor"/> accordingly.
+    <Ref Attr="methodsforfactor"/> accordingly. Also,
+    <Ref Attr="ValidateHomomInput"/> may be set to a function which returns
+    <C>false</C> for values which may cause <Ref Attr="Homom"/> to
+    produce the wrong answer, or error.
 </Item>
 <Mark>for non-leaves: kernel generators</Mark>
 <Item>

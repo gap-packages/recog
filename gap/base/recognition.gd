@@ -195,6 +195,7 @@ InstallTrueMethod( IsRecogInfoForAlmostSimpleGroup, IsRecogInfoForSimpleGroup );
 ## </ManSection>
 ## <#/GAPDoc>
 DeclareAttribute( "pregensfac", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "validatehomominput", IsRecognitionInfo);
 
 ## <#GAPDoc Label="calcnicegens">
 ## <ManSection>
@@ -500,6 +501,7 @@ DeclareGlobalFunction( "TryFindHomMethod" );
 ## </ManSection>
 ## <#/GAPDoc>
 DeclareGlobalFunction( "CalcNiceGens" );
+DeclareGlobalFunction( "ValidateHomomInput" );
 
 ## <#GAPDoc Label="CalcNiceGensGeneric">
 ## <ManSection>

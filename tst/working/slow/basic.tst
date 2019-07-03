@@ -40,13 +40,13 @@ gap> ri := RECOG.TestGroup(g,false,24^32);;
 
 # Test for ThrowAwayFixedPoints:
 gap> g := Group( (100,101,102,103,104,105,106,107,108,109,110), (100,101) );;
-gap> ri := RECOG.TestGroup(g,false,Factorial(11));;
+gap> ri := RECOG.TestGroup(g,false,Factorial(11), rec(tryNonGroupElements := true));;
 
 # Test for ThrowAwayFixedPoints 2:
 gap> x := PermList(Concatenation([2..1000],[1],[1002,1003,1001]))^1000;;
 gap> y := PermList(Concatenation([2..1000],[1],[1001,1002,1004,1005,1003]))^1000;;
 gap> g := Group( x,y );;
-gap> ri := RECOG.TestGroup(g,false,60);;
+gap> ri := RECOG.TestGroup(g,false,60, rec(tryNonGroupElements := true));;
 
 #
 gap> gg := PrimitiveGroup(102,1);;

@@ -689,6 +689,7 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
     rifac := RIFac(ri);
     while nothingnew < 10 do
         x := RandomElm(ri,"KERNEL",true).el;
+        Assert(2, ValidateHomomInput(ri, x));
         s := SLPforElement(rifac,ImageElm( Homom(ri), x!.el ));
         y := ResultOfStraightLineProgram(s,
                  ri!.genswithmem{[ri!.nrgensH+1..Length(ri!.genswithmem)]});

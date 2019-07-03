@@ -528,6 +528,7 @@ InstallGlobalFunction( RecogniseGeneric,
               counter,").");
         fi;
         Add(depth,'F');
+        Assert(2, ForAll(GeneratorsOfGroup(H), x->ValidateHomomInput(ri, x)));
         rifac := RecogniseGeneric(
                   Group(List(GeneratorsOfGroup(H), x->ImageElm(Homom(ri),x))),
                   methodsforfactor(ri), depth, forfactor(ri) ); # TODO: change forfactor to hintsForFactor??)
@@ -628,6 +629,7 @@ InstallGlobalFunction( RecogniseGeneric,
                 # We must use different random elements than the kernel
                 # finding routines!
                 x := RandomElm(ri,"KERNELANDVERIFY",true).el;
+                Assert(2, ValidateHomomInput(ri, x));
                 s := SLPforElement(rifac,ImageElm( Homom(ri), x!.el ));
                 if s = fail then
                     ErrorNoReturn("Very bad: factor was wrongly recognised and we ",
@@ -674,6 +676,15 @@ InstallGlobalFunction( RecogniseGeneric,
     # StopStoringRandEls(ri);
     return ri;
   end);
+
+InstallGlobalFunction( ValidateHomomInput,
+  function(ri,x)
+    if Hasvalidatehomominput(ri) then
+        return validatehomominput(ri)(ri,x);
+    else
+        return true;
+    fi;
+  end );
 
 InstallGlobalFunction( CalcNiceGens,
   function(ri,origgens)
@@ -723,6 +734,11 @@ InstallGlobalFunction( SLPforElementGeneric,
     local gg,n,rifac,riker,s,s1,s2,y,nr1,nr2;
     rifac := RIFac(ri);
     riker := RIKer(ri);   # note: might be fail
+
+    if not ValidateHomomInput(ri, g) then
+        return fail;
+    fi;
+
     gg := ImageElm(Homom(ri),g);
     if gg = fail then
         return fail;
@@ -764,6 +780,7 @@ InstallGlobalFunction( FindKernelRandom,
     rifac := RIFac(ri);
     for i in [1..n] do
         x := RandomElm(ri,"KERNELANDVERIFY",true).el;
+        Assert(2, ValidateHomomInput(ri, x));
         s := SLPforElement(rifac,ImageElm( Homom(ri), x!.el ));
         if s = fail then
             return false;
