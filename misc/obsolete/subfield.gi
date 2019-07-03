@@ -650,8 +650,26 @@ SUBFIELD.HomDoBaseAndFieldChangeWithScalarFinding := function(data,el)
   return SUBFIELD.ForceToOtherField(m,Size(data.field));
 end;
 
-FindHomMethodsProjective.Subfield :=
-  function(ri,G)
+#! @BeginChunk Subfield
+#! When this method runs it knows that the projective group <A>G</A> acts
+#! absolutely irreducibly. It then tries to realise this group over a smaller
+#! field. The algorithm used is the one using the <Q>standard basis approach</Q>
+#! known from isomorphism testing of absolutely irreducible modules. It
+#! finds a base change to write the projective group over the smallest
+#! field possible. Since the group is projective, it may choose to
+#! multiply generators with arbitrary scalars to write them over a smaller field.
+#! 
+#! However, sometimes the correct scalar can not be guessed. Therefore, if the
+#! first approach does not work, the method computes the derived subgroup.
+#! If the group can be written over a smaller field, then taking commutators
+#! loses the scalars preventing a direct base change to work. Therefore,
+#! if the derived subgroup still acts irreducibly, the standard basis approach
+#! can find the right base change that could also do the job for the whole
+#! group. If it acts reducibly, the method <C>Derived</C> (see
+#! <Ref Subsect="Derived"/>) which is run next already has the computed
+#! derived subgroup and can try different things to find a reduction.
+#! @EndChunk
+FindHomMethodsProjective.Subfield := function(ri,G)
     # We assume G to be absolutely irreducible, although this is not
     # necessary:
     local Gprime,H,b,dim,f,hom,mo,newgens,pf,r;

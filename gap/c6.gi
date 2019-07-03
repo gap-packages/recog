@@ -713,6 +713,15 @@ RECOG.New2RecogniseC6 := function(grp)
 
 end;
 
+#! @BeginChunk C6
+#! This method is designed for the handling of the Aschbacher class C6
+#! (normaliser of an extraspecial group). If the input <A>G</A><M>\le PGL(d,q)</M>
+#! does not satisfy <M>d=r^n</M> and <M>r|q-1</M> for some prime <M>r</M>
+#! and integer <M>n</M> then the method
+#! returns <K>false</K>. Otherwise, it returns either a homomorphism of
+#! <A>G</A> into <M>Sp(2n,r)</M>, or a homomorphism into the C2 permutation
+#! action of <A>G</A> on a decomposition of <M>GF(q)^d</M>, or <K>fail</K>.
+#! @EndChunk
 FindHomMethodsProjective.C6 := function(ri,G)
     local r,re,hom;
 
@@ -766,7 +775,7 @@ end;
 ##
 ## Look for an invariant bilinear form of the absolutely irreducible
 ## GModule module. Return fail, or the matrix of the form.
-SMTX_InvariantBilinearForm := function ( module  )
+SMTX_InvariantBilinearForm := function ( module )
    local DM, iso;
 
    if not SMTX.IsMTXModule(module) or

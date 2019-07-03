@@ -17,6 +17,11 @@ SLPforElementFuncsProjective.TrivialProjectiveGroup :=
      return StraightLineProgramNC( [ [1,0] ], 1 );
    end;
 
+#! @BeginChunk TrivialProjectiveGroup
+#! This method is successful if and only if all generators of a projective group
+#! <A>G</A> are equal to the identity (that is, in the matrix representation
+#! of <A>G</A>, all matrices are scalars). Otherwise, it returns <K>false</K>.
+#! @EndChunk
 FindHomMethodsProjective.TrivialProjectiveGroup := function(ri, G)
   local gens;
   gens := GeneratorsOfGroup(G);
@@ -30,6 +35,21 @@ FindHomMethodsProjective.TrivialProjectiveGroup := function(ri, G)
   return Success;
 end;
 
+#! @BeginChunk BlocksModScalars
+#! This method is only called when hinted from above. In this method it is
+#! understood that G should <E>neither</E>
+#! be recognised as a matrix group <E>nor</E> as a projective group.
+#! Rather, it treats all diagonal blocks modulo scalars which means that
+#! two matrices are considered to be equal, if they differ only by a scalar
+#! factor in <E>corresponding</E> diagonal blocks, and this scalar can
+#! be different for each diagonal block. This means that the kernel of
+#! the homomorphism mapping to a node which is recognised using this
+#! method will have only scalar matrices in all diagonal blocks.
+#!
+#! This method does the balanced tree approach mapping to subsets of the
+#! diagonal blocks and finally using projective recognition to recognise
+#! single diagonal block groups.
+#! @EndChunk
 FindHomMethodsProjective.BlocksModScalars := function(ri,G)
   # We assume that ri!.blocks is a list of ranges where the diagonal
   # blocks are. Note that their length does not have to sum up to
@@ -102,6 +122,14 @@ SLPforElementFuncsProjective.StabilizerChainProj := function(ri,x)
   return r.slp;
 end;
 
+#! @BeginChunk StabilizerChainProj
+#! This method computes a stabiliser chain and a base and strong generating
+#! set using projective actions. This is a last resort method since for
+#! bigger examples no short orbits can be found in the natural action.
+#! The strong generators are the nice generator in this case and expressing
+#! group elements in terms of the nice generators ist just sifting along
+#! the stabiliser chain.
+#! @EndChunk
 # TODO: merge FindHomMethodsPerm.StabilizerChainPerm and  FindHomMethodsProjective.StabilizerChainProj ?
 FindHomMethodsProjective.StabilizerChainProj := function(ri,G)
   local Gm,S,SS,d,f,fu,opt,perms,q;
@@ -137,6 +165,13 @@ RECOG.HomProjDet := function(data,m)
   return data.c ^ (x mod data.gcd);
 end;
 
+#! @BeginChunk ProjDeterminant
+#! The method defines a homomorphism from a projective group <A>G</A><M> \le
+#! PGL(d,q)</M> to the cyclic group <M>GF(q)^*/D</M>, where <M>D</M> is the set
+#! of <M>d</M>th powers in <M>GF(q)^*</M>. The image of a group
+#! element <M>g \in <A>G</A></M> is the determinant of a matrix representative of
+#! <M>g</M>, modulo <M>D</M>.
+#! @EndChunk
 FindHomMethodsProjective.ProjDeterminant := function(ri,G)
   local H,c,d,detsadd,f,gcd,hom,newgens,q,z;
   f := ri!.field;
@@ -192,6 +227,15 @@ RECOG.HomNormLastBlock := function(data, x)
   return x;
 end;
 
+#! @BeginChunk BlockScalarProj
+#! This method is only called by a hint. Alongside with the hint it gets
+#! a block decomposition respected by the matrix group <A>G</A> to be recognised
+#! and the promise that all diagonal blocks of all group elements
+#! will only be scalar matrices. This method simply norms the last diagonal
+#! block in all generators by multiplying with a scalar and then
+#! delegates to <C>BlockScalar</C> (see <Ref Subsect="BlockScalar"/>)
+#! and matrix group mode to do the recognition.
+#! @EndChunk
 FindHomMethodsProjective.BlockScalarProj := function(ri,G)
   # We just norm the last block and go to matrix methods.
   local H,data,hom,newgens,g;

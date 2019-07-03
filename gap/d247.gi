@@ -340,6 +340,9 @@ RECOG.SortOutReducibleSecondNormalSubgroup :=
     return fail; # FIXME: fail = TemporaryFailure here really correct?
   end;
 
+#! @BeginChunk D247
+#! TODO
+#! @EndChunk
 FindHomMethodsProjective.D247 := function(ri,G)
   # We try to produce an element of a normal subgroup by playing
   # tricks.
@@ -409,7 +412,9 @@ FindHomMethodsProjective.D247 := function(ri,G)
   return TemporaryFailure;
 end;
 
-# FIXME: PrototypeForC2C4 is not used anywhere
+#! @BeginChunk PrototypeForC2C4
+#! TODO/FIXME: PrototypeForC2C4 is not used anywhere
+#! @EndChunk
 FindHomMethodsProjective.PrototypeForC2C4 := function(ri,G)
   # We try to produce an element of a normal subgroup by playing
   # tricks.

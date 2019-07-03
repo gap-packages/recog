@@ -672,6 +672,9 @@ RECOG.simplesocle := function(ri,g)
   return gensH;
 end;
 
+#! @BeginChunk ComputeSimpleSocle
+#! TODO
+#! @EndChunk
 FindHomMethodsProjective.ComputeSimpleSocle := function(ri,G)
   # This simply computes the simple socle, stores it and returns false
   # such that it is never called again for this node.
@@ -710,6 +713,17 @@ end;
 # "Large element orders and the characteristic of Lie-type simple groups."
 # by Kantor and Seress, Journal of Algebra 322 (2009) 802–832.
 #
+#! @BeginChunk ThreeLargeElOrders
+#! In the case when the input group <A>G</A><M> \le PGL(d,p^e)</M> is
+#! suspected to be
+#! simple but not alternating, this method takes the three
+#! largest element orders from a sample of pseudorandom elements of
+#! <A>G</A>. From these element orders, it tries to determine whether <A>G</A>
+#! is of Lie type or sporadic, and the characteristic of <A>G</A> if it is of
+#! Lie type. In the case when <A>G</A> is of Lie type of characteristic
+#! different from <M>p</M> or <A>G</A> is sporadic, the method also provides
+#! a short list of the possible isomorphism types of <A>G</A>.
+#! @EndChunk
 FindHomMethodsProjective.ThreeLargeElOrders := function(ri,G)
   local hint,name,namecat,p,res;
   RECOG.SetPseudoRandomStamp(G,"ThreeLargeElOrders");
@@ -887,6 +901,9 @@ RECOG.HomFDPM := function(data,x)
   return r[2];
 end;
 
+#! @BeginChunk AltSymBBByDegree
+#! TODO
+#! @EndChunk
 FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
   local GG,Gm,RecSnAnEq,RecSnAnIsOne,d,deg,f,fact,hom,newgens,o,orders,p,primes,
         r,totry;
@@ -1245,6 +1262,9 @@ RECOG.RuleOutSmallProjOrder := function(m)
   return l;
 end;
 
+#! @BeginChunk SporadicsByOrders
+#! TODO
+#! @EndChunk
 FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
   local count,gens,i,j,jj,k,killers,l,limit,o,ordersseen,pp,r,raus,res,x;
 

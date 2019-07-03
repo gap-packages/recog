@@ -17,6 +17,10 @@ SLPforElementFuncsMatrix.TrivialMatrixGroup :=
      return StraightLineProgramNC( [ [1,0] ], 1 );
    end;
 
+#! @BeginChunk TrivialMatrixGroup
+#! This method is successful if and only if all generators of a matrix group
+#! <A>G</A> are equal to the identity. Otherwise, it returns <K>false</K>.
+#! @EndChunk
 FindHomMethodsMatrix.TrivialMatrixGroup := function(ri, G)
   local gens;
   gens := GeneratorsOfGroup(G);
@@ -34,6 +38,10 @@ RECOG.HomToScalars := function(data,el)
   return ExtractSubMatrix(el,data.poss,data.poss);
 end;
 
+#! @BeginChunk DiagonalMatrices
+#! This method is successful if and only if all generators of a matrix group
+#! <A>G</A> are diagonal matrices. Otherwise, it returns <K>false</K>.
+#! @EndChunk
 FindHomMethodsMatrix.DiagonalMatrices := function(ri, G)
   local H,d,f,gens,hom,i,isscalars,j,newgens,upperleft;
 
@@ -130,6 +138,9 @@ SLPforElementFuncsMatrix.DiscreteLog := function(ri,x)
   return StraightLineProgramNC([[1,log]],1);
 end;
 
+#! @BeginChunk Scalar
+#! TODO
+#! @EndChunk
 FindHomMethodsMatrix.Scalar := function(ri, G)
   local f,gcd,generator,gens,i,l,o,pows,q,rep,slp,subset,z;
   if ri!.dimension > 1 then
@@ -211,6 +222,13 @@ RECOG.HomToDiagonalBlock := function(data,el)
   return ExtractSubMatrix(el,data.poss,data.poss);
 end;
 
+#! @BeginChunk BlockScalar
+#! This method is only called by a hint. Alongside with the hint it gets
+#! a block decomposition respected by the matrix group <A>G</A> to be recognised
+#! and the promise that all diagonal blocks of all group elements
+#! will only be scalar matrices. This method recursively builds a balanced tree
+#! and does scalar recognition in each leaf.
+#! @EndChunk
 FindHomMethodsMatrix.BlockScalar := function(ri,G)
   # We assume that ri!.blocks is a list of ranges where the non-trivial
   # scalar blocks are. Note that their length does not have to sum up to
@@ -387,6 +405,22 @@ RECOG.FindAdjustedBasis := function(l)
   return rec(base := seb.vectors, baseinv := seb.vectors^-1, blocks := blocks);
 end;
 
+#! @BeginChunk ReducibleIso
+#! This method determines whether a matrix group <A>G</A> acts irreducibly.
+#! If yes, then it returns <K>false</K>. If <A>G</A> acts reducibly then
+#! a composition series of the underlying module is computed and a base
+#! change is performed to write <A>G</A> in a block lower triangular form.
+#! Also, the method passes a hint to the image group that it is in
+#! block lower triangular form, so the image immediately can make
+#! recursive calls for the actions on the diagonal blocks, and then to the
+#! lower <M>p</M>-part. For the image the method <C>BlockLowerTriangular</C>
+#! (see <Ref Subsect="BlockLowerTriangular"/>) is used.
+#! 
+#! Note that this method is implemented in a way such that it can also be
+#! used as a method for a projective group <A>G</A>. In that case the
+#! recognition info record has the <C>!.projective</C> component bound
+#! to <K>true</K> and this information is passed down to image and kernel.
+#! @EndChunk
 FindHomMethodsMatrix.ReducibleIso := function(ri,G)
   # First we use the MeatAxe to find an invariant subspace:
   local H,bc,compseries,f,hom,isirred,m,newgens;
@@ -476,6 +510,23 @@ RECOG.HomOntoBlockDiagonal := function(data,el)
   return m;
 end;
 
+#! @BeginChunk BlockLowerTriangular
+#! This method is only called when a hint was passed down from the method
+#! <C>ReducibleIso</C> (see
+#! <Ref Subsect="ReducibleIso"/>). In that case, it knows that a base change
+#! to block lower triangular form has been performed. The method can then
+#! immediately find a homomorphism by mapping to the diagonal blocks. It sets
+#! up this homomorphism and gives hints to image and kernel. For the image,
+#! the method <C>BlockDiagonal</C> (see <Ref Subsect="BlockDiagonal"/>)
+#! is used and for the kernel,
+#! the method <C>LowerLeftPGroup</C> (see <Ref Subsect="LowerLeftPGroup"/>)
+#! is used.
+#! 
+#! Note that this method is implemented in a way such that it can also be
+#! used as a method for a projective group <A>G</A>. In that case the
+#! recognition info record has the <C>!.projective</C> component bound
+#! to <K>true</K> and this information is passed down to image and kernel.
+#! @EndChunk
 FindHomMethodsMatrix.BlockLowerTriangular := function(ri,G)
   # This is only used coming from a hint, we know what to do:
   # A base change was done to get block lower triangular shape.
@@ -502,6 +553,26 @@ FindHomMethodsMatrix.BlockLowerTriangular := function(ri,G)
   return Success;
 end;
 
+#! @BeginChunk BlockDiagonal
+#! This method is only called when a hint was passed down from the method
+#! <C>BlockLowerTriangular</C> (see <Ref Subsect="BlockLowerTriangular"/>).
+#! In that case, it knows that the group is in block diagonal form.
+#! The method is used both in the matrix- and the projective case.
+#! 
+#! The method immediately delegates to projective methods handling
+#! all the diagonal blocks projectively. This is done by giving a hint
+#! to the factor to use the method
+#! <C>BlocksModScalars</C> (see <Ref Subsect="BlocksModScalars"/>) is
+#! given. The method for the kernel then has to deal with only scalar blocks,
+#! either projectively or with scalars, which is again done by giving a hint to
+#! either use <C>BlockScalar</C> (see <Ref Subsect="BlockScalar"/>)
+#! or <C>BlockScalarProj</C> (see <Ref Subsect="BlockScalarProj"/>) respectively.
+#! 
+#! Note that this method is implemented in a way such that it can also be
+#! used as a method for a projective group <A>G</A>. In that case the
+#! recognition info record has the <C>!.projective</C> component bound
+#! to <K>true</K> and this information is passed down to image and kernel.
+#! @EndChunk
 FindHomMethodsMatrix.BlockDiagonal := function(ri,G)
   # This is only called by a hint, so we know what we have to do:
   # We do all the blocks projectively and thus are left with scalar blocks.
@@ -740,6 +811,14 @@ SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
   fi;
 end;
 
+#! @BeginChunk LowerLeftPGroup
+#! This method is only called by a hint from <C>BlockLowerTriangular</C>
+#! as the kernel of the homomorphism mapping to the diagonal blocks.
+#! The method uses the fact the this kernel is a <M>p</M>-group where
+#! <M>p</M> is the characteristic of the underlying field. It exploits
+#! this fact and uses this special structure to find nice generators
+#! and a method to express group elements in terms of these.
+#! @EndChunk
 FindHomMethodsMatrix.LowerLeftPGroup := function(ri,G)
   local f,p;
   # Do we really have our favorite situation?
@@ -757,6 +836,15 @@ FindHomMethodsMatrix.LowerLeftPGroup := function(ri,G)
   return Success;
 end;
 
+#! @BeginChunk GoProjective
+#! This method defines a homomorphism from a matrix group <A>G</A>
+#! into the projective group <A>G</A> modulo scalar matrices. In fact, since
+#! projective groups in &GAP; are represented as matrix groups, the
+#! homomorphism is the identity mapping and the only difference is that in
+#! the image the projective group methods can be applied.
+#! The bulk of the work in matrix recognition is done in the projective group
+#! setting.
+#! @EndChunk
 FindHomMethodsMatrix.GoProjective := function(ri,G)
   local hom,q;
   Info(InfoRecog,2,"Going projective...");
@@ -773,6 +861,9 @@ FindHomMethodsMatrix.GoProjective := function(ri,G)
   return Success;
 end;
 
+#! @BeginChunk KnownStabilizerChain
+#! TODO. use an already known stabilizer chain for this group
+#! @EndChunk
 FindHomMethodsMatrix.KnownStabilizerChain := function(ri,G)
   local S,hom;
   if HasStoredStabilizerChain(G) then

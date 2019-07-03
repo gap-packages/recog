@@ -17,15 +17,12 @@ doc/chooser.html
 /doc/*.six
 /doc/*.tex
 /doc/*.toc
-/doc/_*.xml
-/doc/recog.xml
 /doc/manual.pdf
 
 # ignore generated XML files:
+/doc/_*.xml
+/doc/recog.xml
 /doc/title.xml
-/doc/methods_matrix_table.xml
-/doc/methods_perm_table.xml
-/doc/methods_proj_table.xml
 
 /gh-pages/
 /tmp/

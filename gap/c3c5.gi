@@ -123,6 +123,16 @@ ConvertToVectorRep(inforec.sample,inforec.qd);
   return rec( newgens := newgens, inforec := inforec );
 end;
 
+#! @BeginChunk NotAbsolutelyIrred
+#! If an irreducible projective group <A>G</A> acts absolutely irreducibly
+#! then this method returns <K>false</K>. If <A>G</A> is not absolutely
+#! irreducible then a homomorphism into a smaller dimensional representation
+#! over an extension field is defined. A hint is handed down to the image that
+#! no test for absolute irreducibility has to be done any more. Another hint
+#! is handed down to the kernel indicating that the only possible kernel
+#! elements can be elements in the centraliser of <A>G</A> in <M>PGL(d,q)</M>
+#! that come from scalar matrices in the extension field.
+#! @EndChunk
 FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
   local H,f,hom,m,r;
 
@@ -185,6 +195,9 @@ RECOG.HomBCToDiagonalBlock := function(data,x)
   return ExtractSubMatrix(el,data.poss,data.poss);
 end;
 
+#! @BeginChunk BiggerScalarsOnly
+#! TODO
+#! @EndChunk
 FindHomMethodsProjective.BiggerScalarsOnly := function(ri,G)
   # We come here only hinted, we project to a little square block in the
   # upper left corner and know that there is no kernel:
@@ -366,8 +379,10 @@ RECOG.HomDoBaseAndFieldChangeWithScalarFinding := function(data,el)
   return RECOG.ForceToOtherField(m,Size(data.field));
 end;
 
-FindHomMethodsProjective.Subfield :=
-  function(ri,G)
+#! @BeginChunk Subfield
+#! TODO
+#! @EndChunk
+FindHomMethodsProjective.Subfield :=  function(ri,G)
     # We assume G to be absolutely irreducible, although this is not
     # necessary:
     local Gprime,H,b,dim,f,hom,mo,newgens,pf,r;
@@ -474,6 +489,9 @@ RECOG.CalcNiceGensKnownNilpotent := function(ri,origgens)
                        CalcNiceGens(RIKer(ri),b));
 end;
 
+#! @BeginChunk KnownNilpotent
+#! TODO
+#! @EndChunk
 FindHomMethodsProjective.KnownNilpotent := function(ri,G)
   # Hint to this method if you know G to be nilpotent or call it directly
   # if you find out so. Note that it will return NeverApplicable if G is a p-group
@@ -516,6 +534,9 @@ FindHomMethodsProjective.KnownNilpotent := function(ri,G)
   return Success;
 end;
 
+#! @BeginChunk FewGensAbelian
+#! TODO. if very few generators, check IsAbelian and if yes, do KnownNilpotent
+#! @EndChunk
 FindHomMethodsProjective.FewGensAbelian := function(ri,G)
   # If the number of generators is less than or equal to 200, then check
   # abelian and if so, hint to KnownNilpotent to write it as a direct
@@ -536,6 +557,9 @@ FindHomMethodsProjective.FewGensAbelian := function(ri,G)
 end;
 
 
+#! @BeginChunk C3C5
+#! TODO
+#! @EndChunk
 FindHomMethodsProjective.C3C5 := function(ri,G)
   # We assume that G acts absolutely irreducibly and that the matrix group
   # G cannot be realised over a smaller field. However, it might still be

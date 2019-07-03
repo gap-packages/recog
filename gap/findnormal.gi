@@ -716,6 +716,9 @@ end );
 #   return fail; # FIXME: fail = TemporaryFailure here really correct?
 # end;
 
+#! @BeginChunk FindElmOfEvenNormal
+#! TODO
+#! @EndChunk
 FindHomMethodsProjective.FindElmOfEvenNormal := function(ri,G)
   local cf,count,f,m,mm,r,res,rr;
   RECOG.SetPseudoRandomStamp(G,"FindElmOfEvenNormal");
