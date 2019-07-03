@@ -11,7 +11,13 @@ Read("regen_doc.g");
 
 AutoDoc(rec(
     autodoc := rec(
-        scan_dirs := [ "doc", "gap", "gap/almostsimple" ],
+        scan_dirs := [
+            "doc",
+            "gap",
+            "gap/almostsimple",
+            "gap/base",
+            "gap/generic",
+            ],
     ),
     scaffold := rec(
         bib := "recog",

@@ -16,31 +16,6 @@
 ##
 #############################################################################
 
-SLPforElementFuncsPerm.TrivialPermGroup :=
-   function(ri,g)
-     return StraightLineProgram( [ [1,0] ], 1 );
-   end;
-
-#! @BeginChunk TrivialPermGroup
-#! This method is successful if and only if all generators of the permutation
-#! group <A>G</A> are equal to the identity. Otherwise it returns
-#! <K>false</K> indicating that it will never succeed. This method
-#! is only installed to handle the trivial case such that we do not have to
-#! take this case into account in the other methods.
-#! @EndChunk
-FindHomMethodsPerm.TrivialPermGroup := function(ri, G)
-  local gens;
-  gens := GeneratorsOfGroup(G);
-  if not ForAll(gens, ri!.isone) then
-      return NeverApplicable;
-  fi;
-  SetSize(ri, 1);
-  Setslpforelement(ri, SLPforElementFuncsPerm.TrivialPermGroup);
-  Setslptonice(ri, StraightLineProgramNC([[[1,0]]],Length(gens)));
-  SetFilterObj(ri, IsLeaf);
-  return Success;
-end;
-
 #! @BeginChunk VeryFewPoints
 #! If a permutation group acts only on a few points (the current limit is at
 #! most 10 points) then a stabiliser chain is computed by the randomized &GAP;
@@ -412,8 +387,8 @@ FindHomMethodsPerm.Pcgs :=
 
 # The following commands install the above methods into the database:
 
-AddMethod(FindHomDbPerm, FindHomMethodsPerm.TrivialPermGroup,
-          300, "TrivialPermGroup",
+AddMethod(FindHomDbPerm, FindHomMethodsGeneric.TrivialGroup,
+          300, "TrivialGroup",
           "just go through generators and compare to the identity");
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.ThrowAwayFixedPoints,
           100, "ThrowAwayFixedPoints",

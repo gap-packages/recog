@@ -96,6 +96,9 @@ BindGlobal( "FindHomMethodsProjective", rec() );
 BindGlobal( "SLPforElementFuncsProjective", rec() );
 BindGlobal( "FindHomDbProjective", [] );
 
+BindGlobal( "FindHomMethodsGeneric", rec() );
+BindGlobal( "SLPforElementFuncsGeneric", rec() );
+
 
 # Our global functions for the main recursion:
 

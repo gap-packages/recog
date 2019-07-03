@@ -9,6 +9,18 @@ This is the chapter of the documentation describing the methods.
 <Index><Package>recog</Package></Index>
 
 <Section Label="permmethods">
+<Heading>Methods for generic groups</Heading>
+
+The following methods can be equally applied to permutation, matrix and
+projective groups. We do not refer to them as black-box groups here, as
+they are allowed to contain code that only works for inputs of the
+listed types.
+
+<#Include SYSTEM "_methods_generic_list.xml">
+
+</Section>
+
+<Section Label="permmethods">
 <Heading>Methods for permutation groups</Heading>
 
 The following table gives an overview over the installed methods and their

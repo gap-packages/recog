@@ -27,6 +27,9 @@ ReadPackage("recog","gap/base/projective.gi");
 # Some tools:
 ReadPackage("recog","gap/tools.gi");
 
+# generic
+ReadPackage("recog","gap/generic/TrivialGroup.gi");
+
 # Permutations:
 ReadPackage("recog","gap/giant.gi");
 ReadPackage("recog","gap/snksetswrsr.gi");
