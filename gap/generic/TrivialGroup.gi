@@ -14,7 +14,10 @@
 #############################################################################
 
 SLPforElementFuncsGeneric.TrivialGroup := function(ri,g)
-  return StraightLineProgramNC( [ [1,0] ], 1 );
+    if not ri!.isone(g) then
+        return fail;
+    fi;
+    return StraightLineProgramNC( [ [1,0] ], 1 );
 end;
 
 #! @BeginChunk TrivialGroup
