@@ -8,7 +8,7 @@ This is the chapter of the documentation describing the methods.
 <Heading>Methods for recognition</Heading>
 <Index><Package>recog</Package></Index>
 
-<Section Label="permmethods">
+<Section Label="genericmethods">
 <Heading>Methods for generic groups</Heading>
 
 The following methods can be equally applied to permutation, matrix and
