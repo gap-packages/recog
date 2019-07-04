@@ -412,7 +412,7 @@ AddMethod(FindHomDbPerm, FindHomMethodsPerm.Imprimitive,
           "for a imprimitive permutation group, restricts to block system");
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.SnkSetswrSr,
           60, "SnkSetswrSr",
-          "tries to find jellyfish" );
+          "recognises large-base primitive permutation groups" );
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.StabilizerChainPerm,
           55, "StabilizerChainPerm",
           Concatenation(
