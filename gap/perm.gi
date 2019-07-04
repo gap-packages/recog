@@ -120,7 +120,7 @@ FindHomMethodsPerm.PcgsForBlocks := function(ri,G)
   blocks := ri!.blocks;   # we know them from above!
   subgens := List(GeneratorsOfGroup(G),g->RestrictedPerm(g,blocks[1]));
   pcgs := Pcgs(Group(subgens));
-  if subgens <> fail then
+  if pcgs <> fail then
       # We now know that the kernel is solvable, go directly to
       # the Pcgs method:
       return FindHomMethodsPerm.Pcgs(ri,G);
