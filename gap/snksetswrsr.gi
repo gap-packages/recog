@@ -474,12 +474,21 @@ RECOG.JellyHomFunc := function(data,el)
 end;
 
 #! @BeginChunk SnkSetswrSr
-#! This method tries to determine whether the input group <A>G</A> is acting
-#! primitively on <M>N</M> points, and
-#! is isomorphic to a large subgroup of <M>H \wr S_r</M> where <M>H</M> is
-#! <M>S_n</M> acting on <M>k</M>-sets and <M>N = {{n \choose k}}^r</M>
-#! and <M>kr > 1</M>. <Q>Large</Q> means that <A>G</A> contains a subgroup
-#! isomorphic to <M>A_n^r</M>. If <A>G</A> is imprimitive then the output is
+#! This method tries to determine whether the input group <A>G</A> is a
+#! large-base primitive group that neither is a symmetric nor an alternating
+#! group in its natural action.
+#! This method is an implementation of <Cite Key="LNPS06"/>.
+#!
+#! A primitive group <M>H</M> acting on <M>N</M> points is called <E>large</E> if
+#! there exist <M>n</M>, <M>k</M>, and <M>r</M> with
+#! <M>N = \{n \choose k\}^r</M>, and up to a permutational isomorphism <M>H</M>
+#! is a subgroup of the product action wreath product <M>S_n \wr S_r</M>,
+#! and an overgroup of <M>(A_n) ^ r</M> where <M>S_n</M> and <M>A_n</M> act on
+#! the <M>k</M>-subsets of <M>\{1, ..., n\}</M>.
+#! This algorithm recognises large primitive groups with <M>r \cdot k > 1</M>
+#! and <M>2 \cdot r \cdot k^2 \le n</M>.
+#!
+#! If <A>G</A> is imprimitive then the output is
 #! <C>NeverApplicable</C>. If <A>G</A> is primitive then
 #! the output is either a homomorphism into the
 #! natural imprimitive action of <A>G</A> on <M>nr</M> points with
