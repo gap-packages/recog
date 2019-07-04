@@ -687,8 +687,8 @@ about the kernel:
     to the list of arguments in <C>args</C>. That is, the following
     code is used to call the method:
 <Listing>
-    methgensN := findmethgensN(ri);
-    CallFuncList(methgensN(ri).method,Concatenation([ri],methgensN.args));
+    gensNmeth := findgensNmeth(ri);
+    CallFuncList(gensNmeth.method,Concatenation([ri],gensNmeth.args));
 </Listing>
 The record is initialised upon creation of the recognition info record
 to calling <Ref Func="FindKernelRandom"/> with one argument of 20 (FIXME: is 20 correct?) (in addition
