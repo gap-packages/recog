@@ -683,13 +683,11 @@ RECOG.simplesocle := function(ri,g)
 end;
 
 #! @BeginChunk ComputeSimpleSocle
-#! TODO
+#! This method computes the non-abelian simple socle and stores
+#! it along with additional information if it is called for an
+#! almost simple group and returns <K>NeverApplicable</K>.
 #! @EndChunk
 FindHomMethodsProjective.ComputeSimpleSocle := function(ri,G)
-  # This simply computes the simple socle, stores it and returns
-  # NeverApplicable such that it is never called again for this
-  # node.
-  # stores more information
   local x;
   RECOG.SetPseudoRandomStamp(G,"ComputeSimpleSocle");
   ri!.simplesocle := Group(RECOG.simplesocle(ri,G));
@@ -918,9 +916,10 @@ RECOG.HomFDPM := function(data,x)
 end;
 
 #! @BeginChunk AltSymBBByDegree
-#! black box recognition of alternating and symmetric group
-#! subroutines are in AnSnOnFDPM.gi and also paper reference
+#! This method is a black box constructive (?) recognition of alternating
+#! and symmetric groups.
 #! @EndChunk
+# subroutines are in AnSnOnFDPM.gi and also paper reference
 FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
   local GG,Gm,RecSnAnEq,RecSnAnIsOne,d,deg,f,fact,hom,newgens,o,orders,p,primes,
         r,totry;
@@ -1289,10 +1288,13 @@ RECOG.RuleOutSmallProjOrder := function(m)
 end;
 
 #! @BeginChunk SporadicsByOrders
-#! returns a list of possible sporadic groups that G could be
-#! checks whether G has elements of orders that don't appear in sporadic
+#! This method prints a list of sporadic simple groups that <A>G</A>
+#! possibly could be. Therefore it checks whether
+#! <A>G</A> has elements of orders that do not appear in sporadic
 #! groups and otherwise checks whether most common ("killer") orders of
-#! the sporadic groups appear
+#! the sporadic groups appear.
+#! Afterwards it creates hints that come out of a table for the sporadic
+#! simple groups.
 #! @EndChunk
 FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
   local count,gens,i,j,jj,k,killers,l,limit,o,ordersseen,pp,r,raus,res,x;
