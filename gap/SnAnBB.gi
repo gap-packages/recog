@@ -15,11 +15,7 @@
 ##  This file provides code for recognising whether a black box group
 ##  with known degree n is isomorphic to A_n or S_n.
 ##
-##  The code is based upon the algorithm presented in the paper
-##       "A black-box group algorithm for recognizing
-##        finite symmetric and alternating groups. I."
-##  by Robert Beals, Charles R. Leedham-Green, Alice C. Niemeyer,
-##     Cheryl E. Praeger and Ákos Seress.
+##  The code is based upon the algorithm presented in the paper [BLGN+03].
 ##
 ##
 # DeclareInfoClass( "InfoRecSnAn" );

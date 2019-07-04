@@ -59,7 +59,7 @@ return output;
 end;
 
 ##############################################################################
-##                                                                          ##
+## TODO Find and input the appropriate reference for this                   ##
 ## This is the implementation of the Kantor-Seress algorithm for PSL(d,q)   ##
 ##                                                                          ##
 ##############################################################################

@@ -459,8 +459,7 @@ end;
 #F  FindHomomorphismMethods.Giant
 ##
 
-# See Corollary 10.2.2 in
-# Ákos Seress, Permutation Group Algorithms
+# See Corollary 10.2.2 in [Ser03].
 RECOG.IsGiant:=function(g,mp)
   local bound, i, p, cycles, l, x, n;
   n := Length(mp);

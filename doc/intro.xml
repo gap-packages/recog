@@ -61,6 +61,34 @@ For bug reports, feature requests and suggestions, please use our
 
 </Section>
 
+<Section Label="literature">
+<Heading>Literature (temporary)</Heading>
+
+TODO Find the appropriate place to put these references, so that they appear
+in the bibliography:
+<Cite Key="LNPS06"/>
+<Cite Key="BLS97"/>
+<Cite Key="JLNP13"/>
+<Cite Key="DLGLO13"/>
+<Cite Key="LGO09"/>
+<Cite Key="BLGN+05"/>
+<Cite Key="BLGN+03"/>
+<Cite Key="NP98"/>
+<Cite Key="NP99"/>
+<Cite Key="NP97"/>
+<Cite Key="Pra99"/>
+<Cite Key="CLG97a"/>
+<Cite Key="CLG97b"/>
+<Cite Key="CLGM+95"/>
+<Cite Key="BNS06"/>
+<Cite Key="CNRD09"/>
+<Cite Key="BHLGO15"/>
+<Cite Key="Neu09"/>
+<Cite Key="Ser03"/>
+<Cite Key="KK15"/>
+
+</Section>
+
 <!-- ############################################################ -->
 
 </Chapter>

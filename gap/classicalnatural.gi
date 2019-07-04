@@ -1214,8 +1214,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   fi;
   if torig = false then
     # if no involution t has been given, compute one, using Proposition 4 from
-    # "Black box groups isomorphic to PGL(2,2^e)" by Kantor & Kassabov,
-    # Journal of Algebra, 421 (2015) 16–26.
+    # [KK15].
     repeat
         am:=PseudoRandom(g);
     until not IsOneProjective(am);
