@@ -11,6 +11,7 @@
 #  2B2, 2E6, 2F4, 2G2, 3D4, E6, E7, E8, F4, G2, l, o, o+, o-, s, u
 #
 # FIXME: where does this table come from? How was it generated?
+# The mathematics underpinning this file seems to come from [KS09].
 #
 # Note: It contains many groups multiple times, e.g. it contains
 # these two entries:
