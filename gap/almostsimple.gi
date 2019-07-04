@@ -17,7 +17,7 @@
 ##
 #############################################################################
 
-# parse specific string into number
+# parses certain strings and numbers into a number
 RECOG.ParseNumber := function( number, d, default )
   if IsInt(number) then
       return number;
@@ -321,7 +321,9 @@ end );
 
 RECOG.AlmostSimpleHints := rec();
 
-# is called in almostsimple/hints.gi to create the database
+# is called in almostsimple/hints.gi to create a database in
+# RECOG.AlmostSimpleHints to store hints about almost simple groups.
+# Currently just sporadic simple groups are contained.
 InstallGlobalFunction( InstallAlmostSimpleHint,
   function( name, type, re )
     if not(IsBound(RECOG.AlmostSimpleHints.(name))) then
@@ -472,7 +474,7 @@ end;
 #        elordersstart := [31], numberrandgens := 2, tries := 1,
 #        triesforgens := 100, orblenlimit := 32, issimple := true ) );
 
-# if hint in AlmostSimpleHints exits appropriate function is executed
+# if hint in AlmostSimpleHints exists appropriate function is executed
 InstallGlobalFunction( LookupHintForSimple,
   function(ri,G,name)
     local dim,f,hi,j,p,q;
@@ -654,7 +656,10 @@ RECOG.MakePSL2Hint := function( name, G )
 end;
 
 # is used in FindHomMethodsProjective.ComputeSimpleSocle
-# it computes randomly (so maybe not) the non-abelian simple socle
+# it computes the non-abelian simple socle randomly (it might
+# underestimates it)
+# if called for an abelian group (even a group with nilpotence class smaller
+# than 3?) it runs in an infinite loop
 RECOG.simplesocle := function(ri,g)
   local x,y,comm,comm2,comm3,gensH;
 
@@ -683,9 +688,11 @@ RECOG.simplesocle := function(ri,g)
 end;
 
 #! @BeginChunk ComputeSimpleSocle
-#! This method computes the non-abelian simple socle and stores
-#! it along with additional information if it is called for an
-#! almost simple group and returns <K>NeverApplicable</K>.
+#! This method randomly computes the non-abelian simple socle and
+#! stores it along with additional information if it is called for
+#! an almost simple group. Once the non-abelian simple socle is
+#! computed the function does not need to be called again for this
+#! node and therefore returns <K>NeverApplicable</K>.
 #! @EndChunk
 FindHomMethodsProjective.ComputeSimpleSocle := function(ri,G)
   local x;
@@ -906,7 +913,7 @@ end;
 #   return fail; # FIXME: fail = TemporaryFailure here really correct?
 # end;
 
-# abbreviation stands for homomorphism fully deleted permutation module
+# abbreviation stands for "homomorphism fully deleted permutation module";
 # returns a permutation
 RECOG.HomFDPM := function(data,x)
   local r;
@@ -918,6 +925,8 @@ end;
 #! @BeginChunk AltSymBBByDegree
 #! This method is a black box constructive (?) recognition of alternating
 #! and symmetric groups.
+#! 
+#! This algorithm is probably based on the paper <Cite Key="BLGN+05"/>.
 #! @EndChunk
 # subroutines are in AnSnOnFDPM.gi and also paper reference
 FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
@@ -1023,12 +1032,14 @@ end;
 
 # Looking at element orders to determine which sporadic it could be:
 
-# RECOG.SporadicsElementOrders contains the element orders that apear in the
-# corresponding sporadic group in RECOG.SporadicsNames each with the
-# probability in RECOG.SporadicsProbabilities
-# RECOG.SporadicsSizes contains the sizes of the sporadic groups in
-# the order of RECOG.SporadicsNames
-# RECOG.SporadicsKillers contain orders that apear relatively often
+# RECOG.SporadicsElementOrders[i] contains all appearing element orders
+# in the sporadic simple group RECOG.SporadicsNames[i].
+# RECOG.SporadicsElementOrders[i][j] contains an element order of the
+# sporadic simple group RECOG.SporadicsNames[i] with
+# probability RECOG.SporadicsProbabilities[i][j].
+# RECOG.SporadicsSizes[i] is the size of the sporadic simple group
+# RECOG.SporadicsNames[i].
+# RECOG.SporadicsKillers contain orders that appear relatively often.
 RECOG.SporadicsElementOrders :=
 [ [ 1,2,3,5,6,7,10,11,15,19 ],[ 1,2,3,4,5,6,8,11 ],
   [ 1,2,3,4,5,6,8,10,11 ],
@@ -1261,7 +1272,7 @@ RECOG.SporadicsWorkers := [];
 #               probabilities := probs, killers := killers, name := name );
 # end;
 
-# returns a number (the projective order?) if the order is smaller than
+# returns a number (the projective order of <m>?) if the order is smaller than
 # 120 otherwise fail
 RECOG.RuleOutSmallProjOrder := function(m)
   local l,o,v;
@@ -1291,8 +1302,8 @@ end;
 #! This method prints a list of sporadic simple groups that <A>G</A>
 #! possibly could be. Therefore it checks whether
 #! <A>G</A> has elements of orders that do not appear in sporadic
-#! groups and otherwise checks whether most common ("killer") orders of
-#! the sporadic groups appear.
+#! groups and otherwise checks whether the most common ("killer") orders
+#! of the sporadic groups appear.
 #! Afterwards it creates hints that come out of a table for the sporadic
 #! simple groups.
 #! @EndChunk
@@ -1342,7 +1353,7 @@ FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
           fi;
           jj := l[j];
           raus := false;
-		  # check whether orders in killers apear
+          # check whether orders appear in killers
           for k in [1..Length(RECOG.SporadicsElementOrders[jj])] do
               if not(RECOG.SporadicsElementOrders[jj][k] in ordersseen) and
                  (1-RECOG.SporadicsProbabilities[jj][k])^i < limit then
