@@ -527,7 +527,7 @@ end;
 
 # Under the assumption that G is an almost simple group,
 # attempt to guess the "natural" characteristic of the
-# group based on the three maximal orders of group elements.
+# group based on the two or three maximal orders of group elements.
 #
 # Used by FindHomMethodsProjective.ThreeLargeElOrders.
 RECOG.findchar:=function(ri,G,randelfunc)
