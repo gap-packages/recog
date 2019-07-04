@@ -130,8 +130,13 @@ FindHomMethodsPerm.PcgsForBlocks := function(ri,G)
 end;
 
 #! @BeginChunk BalTreeForBlocks
-#! This method creates a balanced tree with left (kernel) node acting on
-#! roughly half of the blocks.
+#! This method creates a balanced composition tree for the kernel of an
+#! imprimitive group. This is guaranteed as
+#! <C>FindHomMethodsPerm.BalTreeForBlocks</C> is
+#! just called from <C>FindHomMethodsPerm.Imprimitive</C> and itself.
+#! The homomorphism for the split in the composition tree used is
+#! induced by the action of G on
+#! half of its blocks.
 #! @EndChunk
 FindHomMethodsPerm.BalTreeForBlocks := function(ri,G)
   local blocks,cut,hom,lowerhalf,nrblocks,o,upperhalf,l,n;
@@ -173,6 +178,8 @@ end;
 
 # Now to the small base groups using stabilizer chains:
 
+# Checks whether the Schreier tree labels coincide on all the levels of the
+# stabilizer chain <S>
 DoSafetyCheckStabChain := function(S)
   while IsBound(S.stabilizer) do
       if not(IsIdenticalObj(S.labels,S.stabilizer.labels)) then
@@ -243,6 +250,8 @@ FindHomMethodsPerm.StabilizerChainPerm := function(ri,G)
   return Success;
 end;
 
+# creates recursively a word for <g> using the Schreier tree labels
+# from the stabilizerchain <S>
 WordinLabels := function(word,S,g)
   local i,point,start;
   if not(IsBound(S.orbit) and IsBound(S.orbit[1])) then
@@ -269,6 +278,8 @@ WordinLabels := function(word,S,g)
   return word;
 end;
 
+# creates a straight line program for an element <g> using the
+# Schreier tree labels from the stabilizerchain <S>
 SLPinLabels := function(S,g)
   local i,j,l,line,word;
   word := WordinLabels([],S,g);
