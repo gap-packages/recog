@@ -626,6 +626,7 @@ end;
 #end;
 #
 RECOG.ExtractLowStuff := function(m,layer,blocks,lens,canbas)
+  #canbas ... canonical basis
   local block,i,j,k,l,pos,v,what,where;
   v := ZeroVector(lens[layer],m[1]);
   pos := 0;
@@ -642,6 +643,9 @@ RECOG.ExtractLowStuff := function(m,layer,blocks,lens,canbas)
       od;
   od;
   if canbas <> fail then
+      # needed because we assume for example in
+	  # SLPforElementFuncsMatrix.LowerLeftPGroup that we work
+	  # over a field of order p (not a p power)
       return BlownUpVector(canbas,v);
   else
       return v;
@@ -763,6 +767,11 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
     return true;
   end );
 
+# computes a straight line program (SLP) of <g> for a p-group in <ri> (that
+# correspond to a lower left triangular matrix;
+# The SLP is constructed by using the elementar matrices to cancel out the
+# entries in <g>. The coefficents of the process create the SLP.
+# TODO Max H. wants to rewrite the code
 SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
   # First project and calculate the vector:
   local done,h,i,l,layer,pow;
@@ -798,7 +807,7 @@ end;
 #! @BeginChunk LowerLeftPGroup
 #! This method is only called by a hint from <C>BlockLowerTriangular</C>
 #! as the kernel of the homomorphism mapping to the diagonal blocks.
-#! The method uses the fact the this kernel is a <M>p</M>-group where
+#! The method uses the fact that this kernel is a <M>p</M>-group where
 #! <M>p</M> is the characteristic of the underlying field. It exploits
 #! this fact and uses this special structure to find nice generators
 #! and a method to express group elements in terms of these.
@@ -846,7 +855,12 @@ FindHomMethodsMatrix.GoProjective := function(ri,G)
 end;
 
 #! @BeginChunk KnownStabilizerChain
-#! TODO. use an already known stabilizer chain for this group
+#! If a stabilizer chain is already known, then the kernel node is given
+#! knowledge about this known stabilizer chain, and the factor node is told to
+#! use homomorphism methods from the database for permutation groups.
+#! If a stabilizer chain of a parent node is already known this is used for
+#! the computation of a stabilizer chain of this node. This stabilizer chain
+#! is then used in the same way as above.
 #! @EndChunk
 FindHomMethodsMatrix.KnownStabilizerChain := function(ri,G)
   local S,hom;

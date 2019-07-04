@@ -251,7 +251,7 @@ FindHomMethodsPerm.StabilizerChainPerm := function(ri,G)
 end;
 
 # creates recursively a word for <g> using the Schreier tree labels
-# from the stabilizerchain <S>
+# from the stabilizer chain <S>
 WordinLabels := function(word,S,g)
   local i,point,start;
   if not(IsBound(S.orbit) and IsBound(S.orbit[1])) then
@@ -279,7 +279,7 @@ WordinLabels := function(word,S,g)
 end;
 
 # creates a straight line program for an element <g> using the
-# Schreier tree labels from the stabilizerchain <S>
+# Schreier tree labels from the stabilizer chain <S>
 SLPinLabels := function(S,g)
   local i,j,l,line,word;
   word := WordinLabels([],S,g);
