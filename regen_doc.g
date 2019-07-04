@@ -1,7 +1,21 @@
 # Regenerate parts of the recog documentation from its source code
 
-SetPackagePath("recog", "./");
-LoadPackage("recog");
+# we need the precise version of GAP in this directory; if recog is not
+# yet loaded, that's no problem; otherwise, we need to work a bit to
+# verify that this is the case, and otherwise exit with an error
+if not IsBound(GAPInfo.PackagesLoaded.recog) then
+    SetPackagePath("recog", "./");
+    LoadPackage("recog");
+else
+    loadedPath := GAPInfo.PackagesLoaded.recog[1];
+    # ask bash whether that path corresponds to the current directory
+    res := Process( DirectoryCurrent(), "/bin/test",
+                    InputTextNone(), OutputTextNone(),
+                    [ GAPInfo.PackagesLoaded.recog[1], "-ef", "." ] );
+    if res <> 0 then
+        Error("A different version of recog was already loaded; please start GAP with the -A option!\n");
+    fi;
+fi;
 
 GenerateMethodsTableXML := function(shortname, desc, db)
 local xmlfile, meth;
