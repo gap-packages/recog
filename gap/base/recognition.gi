@@ -288,85 +288,84 @@ InstallMethod( GetElmOrd, "for a recognition info record and a record",
   end );
 
 # FIXME: unused?
-InstallMethod( RandomElmPpd,
-  "for a recognition info record, a string and a bool",
-  [ IsRecognitionInfo, IsString, IsBool ],
-  function(ri, s, mem)
-    local pos,res;
-    if ri!.randstore then
-        if not(IsBound(ri!.randppt.(s))) then
-            ri!.randppt.(s) := 1;
-            pos := 1;
-        else
-            ri!.randppt.(s) := ri!.randppt.(s) + 1;
-            pos := ri!.randppt.(s);
-        fi;
-        if not(IsBound(ri!.randp[pos])) then
-            if not(IsBound(ri!.randr[pos])) then
-                ri!.randr[pos] := Next(ri!.prodrep);
-            fi;
-            if not(IsMatrix(ri!.randr[pos])) then
-                Error("ppd elements only make sense for matrices");
-            fi;
-            res := rec( el := ri!.randr[pos] );
-            res.charpoly := CharacteristicPolynomial(ri!.field,ri!.field,
-                                                     res.el!.el,1);
-            res.factors := Factors(PolynomialRing(ri!.field), res.charpoly);
-            res.degrees := List(res.factors,Degree);
-            res.degset := Set(res.degrees);
-            ri!.randp[pos] := ShallowCopy(res);
-            Unbind(ri!.randp[pos].el);
-        else
-            res := ShallowCopy(ri!.randp[pos]);
-            res.el := ri!.randr[pos];
-        fi;
-    else
-        res := rec( el := Next(ri!.prodrep) );
-        res.charpoly := CharacteristicPolynomial(ri!.field,ri!.field,
-                                                 res.el!.el,1);
-        res.factors := Factors(PolynomialRing(ri!.field), res.charpoly);
-        res.degrees := List(res.factors,Degree);
-        res.degset := Set(res.degrees);
-    fi;
-    if not(mem) then
-        res.el := res.el!.el;
-    fi;
-    return res;
-  end );
+# InstallMethod( RandomElmPpd,
+#   "for a recognition info record, a string and a bool",
+#   [ IsRecognitionInfo, IsString, IsBool ],
+#   function(ri, s, mem)
+#     local pos,res;
+#     if ri!.randstore then
+#         if not(IsBound(ri!.randppt.(s))) then
+#             ri!.randppt.(s) := 1;
+#             pos := 1;
+#         else
+#             ri!.randppt.(s) := ri!.randppt.(s) + 1;
+#             pos := ri!.randppt.(s);
+#         fi;
+#         if not(IsBound(ri!.randp[pos])) then
+#             if not(IsBound(ri!.randr[pos])) then
+#                 ri!.randr[pos] := Next(ri!.prodrep);
+#             fi;
+#             if not(IsMatrix(ri!.randr[pos])) then
+#                 Error("ppd elements only make sense for matrices");
+#             fi;
+#             res := rec( el := ri!.randr[pos] );
+#             res.charpoly := CharacteristicPolynomial(ri!.field,ri!.field,
+#                                                      res.el!.el,1);
+#             res.factors := Factors(PolynomialRing(ri!.field), res.charpoly);
+#             res.degrees := List(res.factors,Degree);
+#             res.degset := Set(res.degrees);
+#             ri!.randp[pos] := ShallowCopy(res);
+#             Unbind(ri!.randp[pos].el);
+#         else
+#             res := ShallowCopy(ri!.randp[pos]);
+#             res.el := ri!.randr[pos];
+#         fi;
+#     else
+#         res := rec( el := Next(ri!.prodrep) );
+#         res.charpoly := CharacteristicPolynomial(ri!.field,ri!.field,
+#                                                  res.el!.el,1);
+#         res.factors := Factors(PolynomialRing(ri!.field), res.charpoly);
+#         res.degrees := List(res.factors,Degree);
+#         res.degset := Set(res.degrees);
+#     fi;
+#     if not(mem) then
+#         res.el := res.el!.el;
+#     fi;
+#     return res;
+#   end );
 
 # FIXME: unused?
-InstallMethod( GetElmPpd, "for a recognition info record and a record",
-  [ IsRecognitionInfo, IsRecord ],
-  function( ri, r )
-    local x;
-    if IsObjWithMemory(r.el) then
-        x := r.el!.el;
-    else
-        x := r.el;
-    fi;
-    if ri!.randstore and r.nr > 0 then
-        if not( IsBound(ri!.randp[r.nr]) ) then
-            r.charpoly := CharacteristicPolynomial(ri!.field,ri!.field,x,1);
-            r.factors := Factors(PolynomialRing(ri!.field), r.charpoly);
-            r.degrees := List(r.factors,Degree);
-            r.degset := Set(r.degrees);
-            ri!.randp[r.nr] := ShallowCopy(r);
-            Unbind(ri!.randp[r.nr].el);
-            Unbind(ri!.randp[r.nr].nr);
-        else
-            r.charpoly := ri!.randp[r.nr].charpoly;
-            r.factors := ri!.randp[r.nr].factors;
-            r.degrees := ri!.randp[r.nr].degrees;
-            r.degset := ri!.randp[r.nr].degset;
-        fi;
-    else
-        r.charpoly := CharacteristicPolynomial(ri!.field,ri!.field,x,1);
-        r.factors := Factors(PolynomialRing(ri!.field), r.charpoly);
-        r.degrees := List(r.factors,Degree);
-        r.degset := Set(r.degrees);
-    fi;
-  end );
-
+# InstallMethod( GetElmPpd, "for a recognition info record and a record",
+#   [ IsRecognitionInfo, IsRecord ],
+#   function( ri, r )
+#     local x;
+#     if IsObjWithMemory(r.el) then
+#         x := r.el!.el;
+#     else
+#         x := r.el;
+#     fi;
+#     if ri!.randstore and r.nr > 0 then
+#         if not( IsBound(ri!.randp[r.nr]) ) then
+#             r.charpoly := CharacteristicPolynomial(ri!.field,ri!.field,x,1);
+#             r.factors := Factors(PolynomialRing(ri!.field), r.charpoly);
+#             r.degrees := List(r.factors,Degree);
+#             r.degset := Set(r.degrees);
+#             ri!.randp[r.nr] := ShallowCopy(r);
+#             Unbind(ri!.randp[r.nr].el);
+#             Unbind(ri!.randp[r.nr].nr);
+#         else
+#             r.charpoly := ri!.randp[r.nr].charpoly;
+#             r.factors := ri!.randp[r.nr].factors;
+#             r.degrees := ri!.randp[r.nr].degrees;
+#             r.degset := ri!.randp[r.nr].degset;
+#         fi;
+#     else
+#         r.charpoly := CharacteristicPolynomial(ri!.field,ri!.field,x,1);
+#         r.factors := Factors(PolynomialRing(ri!.field), r.charpoly);
+#         r.degrees := List(r.factors,Degree);
+#         r.degset := Set(r.degrees);
+#     fi;
+#   end );
 
 InstallMethod( RandomOrdersSeen, "for a recognition info record",
   [ IsRecognitionInfo ],
@@ -375,18 +374,18 @@ InstallMethod( RandomOrdersSeen, "for a recognition info record",
   end );
 
 # FIXME: unused?
-InstallMethod( StopStoringRandEls, "for a recognition info record",
-  [ IsRecognitionInfo ],
-  function(ri)
-    ri!.randstore := false;
-    Unbind(ri!.randr);
-    Unbind(ri!.randp);
-    Unbind(ri!.randrpt);
-    Unbind(ri!.randopt);
-    Unbind(ri!.randppt);
-    ri!.rando := Compacted(ri!.rando);
-    # Note that we keep the random element orders seen!
-  end );
+# InstallMethod( StopStoringRandEls, "for a recognition info record",
+#   [ IsRecognitionInfo ],
+#   function(ri)
+#     ri!.randstore := false;
+#     Unbind(ri!.randr);
+#     Unbind(ri!.randp);
+#     Unbind(ri!.randrpt);
+#     Unbind(ri!.randopt);
+#     Unbind(ri!.randppt);
+#     ri!.rando := Compacted(ri!.rando);
+#     # Note that we keep the random element orders seen!
+#   end );
 
 InstallGlobalFunction( PrintTreePos,
   function(mark,depth,H)
