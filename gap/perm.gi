@@ -130,7 +130,8 @@ FindHomMethodsPerm.PcgsForBlocks := function(ri,G)
 end;
 
 #! @BeginChunk BalTreeForBlocks
-#! TODO
+#! This method creates a balanced tree with left (kernel) node acting on
+#! roughly half of the blocks.
 #! @EndChunk
 FindHomMethodsPerm.BalTreeForBlocks := function(ri,G)
   local blocks,cut,hom,lowerhalf,nrblocks,o,upperhalf,l,n;
