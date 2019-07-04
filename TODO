@@ -1,103 +1,16 @@
-Use other methods for going down in dimension 3 in SL code
-  --> See Ákos email 29 Jul 2011
-Finalize FindAllPPD method
-
-
-Today:
-
-  - Look at documentation: StdGens, StdPresentation
-  - Bug with loading of single packages
-  - Systematic test of classical natural
   - Tensor und Subfield tests fail because SL(4,5) does not find an SL2
-  - Use RECOG.RandomSubProduct everywhere
-  - eMail Alice because of deleted perm rep A_n
-  - Look at all PseudoRandoms (still TODO)
-  - nonconstructive Lie type
-  - decide about names for attributes
-  - revisit examples/challenges
-  - balanced trees
-  - fix new FindElmOf method with respect to PseudoRandom
-  - implement sl2 natural
-  - look at Pete's code (blackbox classical)
-  - DisplayCompositionFactors is seriously broken e.g. in the projective
-    case
-
-
-  - Alice+Steve fuer Sn auf k-sets
-
-Later TODO list:
-
-  - implement sl2 natural for odd characteristic
-  - early cheap stabchain method? --> first groundwork in genss
-  - look at Pete's code (blackbox classical)
-  - balanced trees
-  - Investigate maxdepth behaviour and length of SLPs, sensible?
+  - Use RECOG.RandomSubproduct everywhere
   - FindSL2 does not work for q=5, ==> SL(6,5) does not work (FindSL2)
     reason: we power up to order 4, square of y is -1 thus y and z=y^x
             mod -1 is dihedral rather than SL(2,5)
-  - DisplayCompositionFactors is seriously broken e.g. in the projective
-    case
-  - look at AltSymBB for next rep up if deleted perm went wrong?
   - Look at Product Replacers again (--> orb): no need for accus during mixing
-  - implement classical natural for odd case (--> LG OB)
   - genss: Make call to StabilizerChain which is guaranteed to be quick
     possible
-  - more reps for specific hint (-> covers and non-atlasrep reps)
-  - think about BrauerCharacterValue method
-  - adjoint rep of sl_n
-  - verification/presentations
-  - example12 needs extremely long, why?
-  - Cleanup matrix.gi (e.g. remove det code)
- - Pete Sp -> send mail
- - PCGS with memory: Luks, Murray, Cooperman implementation
- - Hash functions for vectors over finite fields 257 <= q <= 65536
-   -> NumberFFVector
- - do more C9 cases
-
-========================================================================
-
-Future:
-
-improvements of library in library
-
-to change once the new vector/matrix interface is in place:
-
-  FieldOfMatrixGroup/DefaultFieldOfMatrixGroup
-
-
-########################################################################
-########################################################################
-########################################################################
-
-From former recogbase TODO:
-
-If isomorphism: calc preimages "rascher"
-Calculating preimages: Bessere Anzeige wie viele...
-
-========================================================================
-
-Future:
-
-Think whether the changing of gensN after creation might hurt other
-places than LowerLeftPGroup.
-
-SLPforElement methods without evaluation --> like in SiftAsWord ???
-
-IsMember for (ri,x) recursively
-Make things into functions???
-
-========================================================================
-
-to talk ???:
-
-  Convention: SLPforElement guarantees that a returned slp does the job
+  - Think whether the changing of gensN after creation might hurt other
+    places than LowerLeftPGroup.
+  - SLPforElement methods without evaluation --> like in SiftAsWord ???
+  - Convention: SLPforElement guarantees that a returned slp does the job
     ==> \in is easier, does not have to evaluate the slp
     ==> in StabChain code we divide up labels
     ==> in Hom code we divide up preimage of the image, go to kernel
     ==> doable everywhere (in fact done everywhere)
-
-  FindKernelFastNormalClosure always?
-
-
-========================================================================
-
