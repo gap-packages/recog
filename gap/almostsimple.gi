@@ -713,10 +713,6 @@ RECOG.RandElFuncSimpleSocle := function(ri)
   return rec( el := el, order := ord );
 end;
 
-# The following recognition method is based on the paper
-# "Large element orders and the characteristic of Lie-type simple groups."
-# by Kantor and Seress, Journal of Algebra 322 (2009) 802–832.
-#
 #! @BeginChunk ThreeLargeElOrders
 #! In the case when the input group <A>G</A><M> \le PGL(d,p^e)</M> is
 #! suspected to be
@@ -727,6 +723,8 @@ end;
 #! Lie type. In the case when <A>G</A> is of Lie type of characteristic
 #! different from <M>p</M> or <A>G</A> is sporadic, the method also provides
 #! a short list of the possible isomorphism types of <A>G</A>.
+#!
+#! This recognition method is based on the paper <Cite Key="KS09"/>.
 #! @EndChunk
 FindHomMethodsProjective.ThreeLargeElOrders := function(ri,G)
   local hint,name,namecat,p,res;

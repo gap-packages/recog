@@ -16,48 +16,18 @@
 ##
 ##
 ##  This file contains  an implementation  of the recognition  algorithms for
-##  classical groups by Niemeyer and Praeger.  A description  of them  can be
-##  found in
+##  classical groups by Niemeyer and Praeger.
 ##
-##  [1] Alice C. Niemeyer and  Cheryl E. Praeger
-##      "A Recognition Algorithm for Classical Groups over Finite Fields",
-##      Proc. London Math. Soc (3) 77, 1998, 117-169.
+##  A description of them can be found in [NP97], [NP98], and [NP99].
 ##
-##  [2] Alice C. Niemeyer and  Cheryl E. Praeger
-##      "Implementing a Recognition Algorithm for Classical Groups"
-##      "Groups and Computation II", Amer. Math. Soc. DIMACS Series 28, 1997.
+##  This implementation uses some algorithms described elsewhere, in:
+##  [CLG97a], [CLG97b], and [CLGM+95].
 ##
-##  [3] Alice C. Niemeyer and  Cheryl E. Praeger
-##      "A Recognition Algorithm for Non-Generic Classical Groups over
-##       Finite Fields", J. Austral. Math. Soc. (Series A)67 , 223-253, 1999.
+##  - In this implementation we use the irreducibility test of the algorithm
+##    described in [CLG97b], which can often avoid an application  of the
+##    Meataxe algorithm.
 ##
-##  This implementation uses some algorithms described elsewhere:
-##
-##  [4] Frank Celler and C.R. Leedham-Green
-##      "Calculating the order of an invertible matrix",
-##      "Groups and Computation II", Amer. Math. Soc. DIMACS Series 28, 1997.
-##
-##  [5] Frank Celler and C.R. Leedham-Green
-##      "A non-constructive recognition algorithm for the special linear
-##      and other classical groups"
-##      "Groups and Computation II", Amer. Math. Soc. DIMACS Series 28, 1997.
-##
-##    In this implementation we use the irreducibility test of the algorithm
-##    described in [5], which can often avoid an application  of the Meataxe
-##    algorithm.
-##
-##  [6] Frank Celler and Charles R. Leedham-Green and Scott H. Murray
-##      and Alice C. Niemeyer and E.A. O'Brien
-##      "Generating random elements of a finite group"
-##      Comm. Algebra 23,  4931--4948 (1995)
-##
-##  For an overview see also
-##
-##  [7] Cheryl E. Praeger,
-##      "Primitive prime divisor elements in finite classical groups",
-##       Proc. of Groups St. Andrews 1997 in Bath II,
-##       Eds: C.M. Campbell, E.F. Robertson, N. Ruskuc and G.C. Smith,
-##       London Math. Soc. Lecture Note Series 261, 605--623.
+##  For an overview, see also [Pra99].
 ##
 #############################################################################
 

@@ -13,10 +13,7 @@
 ##
 ##
 ## TODO: Maybe ask Colva about this:
-## This algorithm is probably based on the paper
-## 'A polynomial-time reduction algorithm for groups of semilinear or subfield
-## class' by Carlson, Jon F.; Neunhöffer, Max; Roney-Dougal, Colva M. in
-## J. Algebra 322 (2009), no. 3, 613–637
+## This algorithm is probably based on the paper [CNRD09].
 ##
 ##  Handle the (projective) semilinear and subfield cases.
 ##

@@ -29,7 +29,7 @@ SetInfoLevel( InfoJellyfish, 1 );
 ##
 ##  Computes all [n,k,r] such that N = Binomial(n,k)^r. Returns those
 ##  satisfying k*r > 1 and 2*r*k^2 < n (sufficient condition from
-##  BLS (Lemma 2.10) that ensures that there is a unique minimal and a
+##  [BLS97] (Lemma 2.10) that ensures that there is a unique minimal and a
 ##  unique maximal suborbit of the form which is needed). Note that
 ##  this last condition can be changed in the last line of the code.
 

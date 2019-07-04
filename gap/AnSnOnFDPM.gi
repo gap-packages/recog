@@ -15,11 +15,7 @@
 ##
 ##  This file contains an implementation of an algorithm for recognising
 ##  An or Sn acting as matrix groups on their fully deleted permutation
-##  modules. The particular algorithm is described in the paper
-##  'Constructive recognition of finite alternating and symmetric groups
-##   acting as matrix groups on their natural permutation modules'
-##  by Robert Beals, Charles R. Leedham-Green, Alice C. Niemeyer,
-##  Cheryl E. Praeger, and Ákos Seress.
+##  modules. The particular algorithm is described in the paper [BLGN+05].
 ##
 #############################################################################
 

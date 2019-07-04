@@ -14,9 +14,9 @@
 ##
 ##  Handle the (projective) imprimitive, tensor and tensor-induced cases.
 ##
-##  This implementation is inspired by Max Neunhöffer's habil thesis
-##  and the variations D2, D4 and D7 of the Aschbacher cases. A copy can
-##  be obtained via Frank Luebeck, LDfM RWTH Aachen.
+##  This implementation is inspired by Max Neunhöffer's habilitation thesis
+##  [Neu09], and the variations D2, D4 and D7 of the Aschbacher cases. A
+##  copy of the thesis is available online; see the bibliography.
 ##
 #############################################################################
 
