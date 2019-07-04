@@ -5,7 +5,7 @@ This chapter covers the recursive, generic recognition procedure.
 -->
 
 <Chapter Label="recognition">
-<Heading>Group Recognition</Heading>
+<Heading>Group recognition</Heading>
 
 This chapter describes a generic framework for group recognition.
 The basic problem is, we want to solve the constructive membership
@@ -52,14 +52,10 @@ the way methods to find homomorphism have to be implemented. Finally,
 we have four sections in which we collect conventions for the
 recognition of different types of groups.<P/>
 
-No actual recognition methods are implemented in this package. See the
-<Package>recog</Package> package for an implementation and
-description of them.
-
 <Section Label="techrecog">
     <Heading>The recursive procedure</Heading>
 
-As explained at the beginning of this section, the heart of the recognition
+At the heart of the recognition
 procedure is a function called <Ref Func="RecogniseGeneric"/> which gets
 a &GAP; group object and returns a
 so-called <Q>recognition info record</Q> (see Subsection
