@@ -760,32 +760,43 @@ RECOG.ExpressInStd_SL := function(m,std)
   return SLPOfElm(std.left);
 end;
 
-InstallOtherMethod( \*, "for two funny product objects",
-  [ IsFunnyProductObject, IsFunnyProductObject ],
-  function(a,b)
-    return Objectify(FunnyProductObjsType,[a![1]+a![2]*b![1],a![2]*b![2]]);
-  end );
 
-InstallOtherMethod( InverseSameMutability, "for a funny product object",
-  [ IsFunnyProductObject ],
-  function(a)
-    local i;
-    i := a![2]^-1;
-    return Objectify(FunnyProductObjsType,[-i*a![1],i]);
-  end );
 
-InstallOtherMethod( OneMutable, "for a funny product object",
-  [ IsFunnyProductObject ],
-  function(a)
-    return Objectify(FunnyProductObjsType,[Zero(a![1]),OneMutable(a![2])]);
-  end );
-
-InstallMethod( FunnyProductObj, "for two arbitrary objects",
-  [ IsObject, IsObject ],
-  function(a,b)
-    return Objectify(FunnyProductObjsType,[a,b]);
-  end );
-
+# BindGlobal("FunnyProductObjsFamily",NewFamily("FunnyProductObjsFamily"));
+# DeclareCategory("IsFunnyProductObject",
+#    IsPositionalObjectRep and IsMultiplicativeElement and
+#    IsMultiplicativeElementWithInverse );
+# BindGlobal("FunnyProductObjsType",
+#    NewType(FunnyProductObjsFamily,IsFunnyProductObject));
+# DeclareOperation("FunnyProductObj",[IsObject,IsObject]);
+# 
+# 
+# InstallOtherMethod( \*, "for two funny product objects",
+#   [ IsFunnyProductObject, IsFunnyProductObject ],
+#   function(a,b)
+#     return Objectify(FunnyProductObjsType,[a![1]+a![2]*b![1],a![2]*b![2]]);
+#   end );
+# 
+# InstallOtherMethod( InverseSameMutability, "for a funny product object",
+#   [ IsFunnyProductObject ],
+#   function(a)
+#     local i;
+#     i := a![2]^-1;
+#     return Objectify(FunnyProductObjsType,[-i*a![1],i]);
+#   end );
+# 
+# InstallOtherMethod( OneMutable, "for a funny product object",
+#   [ IsFunnyProductObject ],
+#   function(a)
+#     return Objectify(FunnyProductObjsType,[Zero(a![1]),OneMutable(a![2])]);
+#   end );
+# 
+# InstallMethod( FunnyProductObj, "for two arbitrary objects",
+#   [ IsObject, IsObject ],
+#   function(a,b)
+#     return Objectify(FunnyProductObjsType,[a,b]);
+#   end );
+# 
 # FIXME: unused? but see misc/work/DOWORK.
 # Perhaps this was / is meant as a replacement for RECOG.FindStdGens_SL
 # in even characteristic.
