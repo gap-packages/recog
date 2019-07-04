@@ -174,7 +174,7 @@ end;
 # positions indicated by poss.
 RECOG.IsDiagonalBlockOfMatrix := function(mat,poss)
   local z, i, j;
-  z := Zero(mat[1,1]);
+  z := ZeroOfBaseDomain(mat);
   for i in poss do
     for j in [1..Length(mat)] do
       if i in poss then continue; fi;
@@ -456,7 +456,7 @@ end;
 RECOG.IsBlockLowerTriangularWithBlocks := function(mat, blocks)
   local z, b, col, row;
   Assert(0, Concatenation(blocks) = [1..Length(mat)]);
-  z := Zero(mat[1,1]);
+  z := ZeroOfBaseDomain(mat);
   for b in blocks do
     # Verify that there are only zeros above each block
     for row in [1..b[1]-1] do
