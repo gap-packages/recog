@@ -9,11 +9,15 @@ if not IsBound(GAPInfo.PackagesLoaded.recog) then
 else
     loadedPath := GAPInfo.PackagesLoaded.recog[1];
     # ask bash whether that path corresponds to the current directory
-    res := Process( DirectoryCurrent(), "/bin/test",
+    testPath := DirectoriesSystemPrograms();
+    testPath := Filename(testPath, "test");
+    res := Process( DirectoryCurrent(), testPath,
                     InputTextNone(), OutputTextNone(),
                     [ GAPInfo.PackagesLoaded.recog[1], "-ef", "." ] );
     if res <> 0 then
-        Error("A different version of recog was already loaded; please start GAP with the -A option!\n");
+        Error("a different version of recog was already loaded or you ",
+              "started GAP in the wrong directory; try ",
+              "`gap -A regen_doc.g` or `gap -A makedoc.g`");
     fi;
 fi;
 
