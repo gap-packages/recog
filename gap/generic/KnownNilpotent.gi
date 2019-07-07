@@ -63,10 +63,11 @@ RECOG.HomForNilpotent := function(data,el)
 end;
 
 RECOG.CalcNiceGensKnownNilpotent := function(ri,origgens)
-  local b;
-  b := List([1..Length(ri!.waytonice)],i->origgens[i]^ri!.waytonice[i][1]);
-  return Concatenation(CalcNiceGens(RIFac(ri),origgens),
-                       CalcNiceGens(RIKer(ri),b));
+  local kernelgens;
+  kernelgens := List([1..Length(ri!.decompositionExponents)],
+                     i -> origgens[i]^ri!.decompositionExponents[i][1]);
+  return Concatenation(CalcNiceGens(RIFac(ri), origgens),
+                       CalcNiceGens(RIKer(ri), kernelgens));
 end;
 
 #! @BeginChunk KnownNilpotent
@@ -74,10 +75,10 @@ end;
 #! @EndChunk
 FindHomMethodsGeneric.KnownNilpotent := function(ri,G)
   # Hint to this method if you know G to be nilpotent or call it directly
-  # if you find out so. Note that it will return NeverApplicable if G is a p-group
-  # for some prime p. Make sure that the !.projective component is set
+  # if you find out so. Note that it will return NeverApplicable if G is a
+  # p-group for some prime p. Make sure that the !.projective component is set
   # correctly such that we can set the right Order method.
-  local H,cut,data,gens,gens2,gensfac,gensker,gensm,hom,ords,primes;
+  local H,cut,data,gens,decompositionData,gensfac,gensker,gensm,hom,ords,primes;
   gens := GeneratorsOfGroup(G);
   gensm := GeneratorsWithMemory(gens);
   if IsBound(ri!.primes) then    # this is a message from ourselves from above!
@@ -92,10 +93,10 @@ FindHomMethodsGeneric.KnownNilpotent := function(ri,G)
   data := rec( primesfactor := primes{[1..cut]},
                primeskernel := primes{[cut+1..Length(primes)]},
                orderfunc := ri!.order );
-  gens2 := List(gensm,x->RECOG.DecomposeNilpotent(data,x));
-  gensfac := List(gens2,x->StripMemory(x[2]));
-  gensker := List(gens2,x->x[1]);
-  ri!.waytonice := List(gens2,x->x{[3,4]});
+  decompositionData := List(gensm, x-> RECOG.DecomposeNilpotent(data,x));
+  gensfac := List(decompositionData,x -> StripMemory(x[2]));
+  gensker := List(decompositionData,x -> x[1]);
+  ri!.decompositionExponents := List(decompositionData, x -> x{[3,4]});
   H := GroupWithGenerators(gensfac);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomForNilpotent,data);
   SetHomom(ri,hom);
