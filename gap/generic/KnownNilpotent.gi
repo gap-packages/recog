@@ -39,7 +39,10 @@ RECOG.DecomposeNilpotent := function(data,el)
   b := Product(ker);
   # Now a and b are coprime
   r := Gcdex(a,b);
-  if r.gcd <> 1 then Error("Absolutely impossible!"); fi;
+  if r.gcd <> 1 then
+      Error("<data> corrupt, Product(<data.primesfactor>) and ",
+            "Product(<data.primeskernel>) are not coprime");
+  fi;
   # now r.coeff1 * a + r.coeff2 * b = 1
   # that is, el = el^(r.coeff1 * a) * el^(r.coeff2 * b)
   # and el^(r.coeff1*a) has order not divisible by a prime in primesfactor
