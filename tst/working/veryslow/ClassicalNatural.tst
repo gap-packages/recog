@@ -61,11 +61,7 @@ gap> TestRecogGL(8,3);;
 Stamp: ClassicalNatural
 gap> TestRecogGL(9,3);;
 Stamp: ClassicalNatural
-gap> TestRecogGL(10,3);;
-Stamp: ClassicalNatural
 gap> TestRecogGL(17,3);;
-Stamp: ClassicalNatural
-gap> TestRecogGL(18,3);;
 Stamp: ClassicalNatural
 gap> TestRecogGL(19,3);;
 Stamp: ClassicalNatural
@@ -219,8 +215,6 @@ gap> #TestRecogGL(19,25);; # disabled to speedup this .tst file
 
 #
 gap> TestRecogGL(2,27);;
-Stamp: ClassicalNatural
-gap> TestRecogGL(3,27);;
 Stamp: ClassicalNatural
 gap> TestRecogGL(4,27);;
 Stamp: ClassicalNatural
