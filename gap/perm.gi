@@ -394,7 +394,7 @@ AddMethod(FindHomDbPerm, FindHomMethodsPerm.ThrowAwayFixedPoints,
           "try to find a huge amount of (possible internal) fixed points");
 AddMethod(FindHomDbPerm, FindHomMethodsGeneric.FewGensAbelian,
           99, "FewGensAbelian",
-     "if very few generators, check IsAbelian and if yes, do KnownNilpotent");
+         "if very few generators, check IsAbelian and if yes, do KnownNilpotent");
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.Pcgs,
           97, "Pcgs",
           "use a Pcgs to calculate a StabChain" );
@@ -410,8 +410,8 @@ AddMethod( FindHomDbPerm, FindHomMethodsPerm.Giant,
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.Imprimitive,
           70, "Imprimitive",
           "for a imprimitive permutation group, restricts to block system");
-AddMethod(FindHomDbPerm, FindHomMethodsPerm.SnkSetswrSr,
-          60, "SnkSetswrSr",
+AddMethod(FindHomDbPerm, FindHomMethodsPerm.LargeBasePrimitive,
+          60, "LargeBasePrimitive",
           "recognises large-base primitive permutation groups" );
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.StabilizerChainPerm,
           55, "StabilizerChainPerm",

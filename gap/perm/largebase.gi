@@ -466,14 +466,14 @@ end;
 
 ########################################################################
 ##
-#F  FindHomMethodsPerm.SnkSetswrSr
+#F  FindHomMethodsPerm.LargeBasePrimitive
 ##
 
 RECOG.JellyHomFunc := function(data,el)
   return RECOG.FindImageJellyfish(el,data.T,data.seen);
 end;
 
-#! @BeginChunk SnkSetswrSr
+#! @BeginChunk LargeBasePrimitive
 #! This method tries to determine whether the input group <A>G</A> is a
 #! large-base primitive group that neither is a symmetric nor an alternating
 #! group in its natural action.
@@ -494,7 +494,7 @@ end;
 #! natural imprimitive action of <A>G</A> on <M>nr</M> points with
 #! <M>r</M> blocks of size <M>n</M>, or <C>TemporaryFailure</C>.
 #! @EndChunk
-FindHomMethodsPerm.SnkSetswrSr :=
+FindHomMethodsPerm.LargeBasePrimitive :=
   function(ri,grp)
     local res,T,seen,imgens,hom;
     if not IsPermGroup(grp) then
