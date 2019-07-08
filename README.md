@@ -19,8 +19,8 @@ subdirectory called `recog`.
 This is all which is needed if you installed the package in the standard
 `pkg` subdirectory.
 
-Note that the recog package needs the `orb`, `genss`, `FactInt`,
-`AtlasRep` and `Forms` packages to work.
+Note that the recog package needs the `AtlasRep`, `FactInt`, `Forms`,
+`genss`, and `orb` packages to work.
 
 If you installed the package in another `pkg` directory than the standard
 `pkg` directory in your GAP 4 installation, then you have to add the path
@@ -34,9 +34,14 @@ startup script.
 Recompiling the documentation is possible by the command `gap makedoc.g`
 in the recog directory. But this should not be necessary.
 
-## Support
+## Feedback and support
 
-For bug reports, feature requests and suggestions, please refer to
-<https://github.com/gap-packages/recog/issues>.
+If you have any bug reports, feature requests, or suggestions, then please
+tell us via the
+[issue tracker on GitHub](https://github.com/gap-packages/recog/issues).
 
-
+In addition, the recog package has a mailing list, at
+<recog@gap-system.org>, which can be used for holding discussions,
+sharing information, and asking questions about the package.  You can find
+more information, and register to receive the mail sent to this list, at
+<https://mail.gap-system.org/mailman/listinfo/recog>.
