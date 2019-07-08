@@ -54,11 +54,18 @@ usage of this package.<P/>
 </Section>
 
 <Section Label="feedback">
-<Heading>Feedback</Heading>
+<Heading>Feedback and support</Heading>
 
-If you have any bug reports, feature requests, or suggestions about the
-package, please use our
-<URL Text="issue tracker">https://github.com/gap-packages/recog/issues</URL>.
+If you have any bug reports, feature requests, or suggestions, then please
+tell us via the <URL Text="issue tracker on
+GitHub">https://github.com/gap-packages/recog/issues</URL>. <P/>
+
+In addition, the <Package>recog</Package> package has a mailing list, at
+<URL Text="recog@gap-system.org">mailto:recog@gap-system.org</URL>,
+which can be used for holding discussions, sharing information, and asking
+questions about the package.  You can find more information, and register to
+receive the mail sent to this list, at
+<URL>https://mail.gap-system.org/mailman/listinfo/recog</URL>.
 
 </Section>
 
