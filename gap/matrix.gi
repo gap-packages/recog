@@ -625,7 +625,7 @@ end;
 #  return true;
 #end;
 #
-RECOG.ExtractLowStuff := function(m,layer,blocks,lens,canbas)
+RECOG.ExtractLowStuff := function(m,layer,blocks,lens,basisOfFieldExtension)
   local block,i,j,k,l,pos,v,what,where;
   v := ZeroVector(lens[layer],m[1]);
   pos := 0;
@@ -641,11 +641,11 @@ RECOG.ExtractLowStuff := function(m,layer,blocks,lens,canbas)
           pos := pos + Length(what);
       od;
   od;
-  if canbas <> fail then
+  if basisOfFieldExtension <> fail then
       # needed because we assume for example in
       # SLPforElementFuncsMatrix.LowerLeftPGroup that we work
       # over a field of order p (not a p power)
-      return BlownUpVector(canbas,v);
+      return BlownUpVector(basisOfFieldExtension, v);
   else
       return v;
   fi;
@@ -668,23 +668,22 @@ end;
 
 InstallGlobalFunction( FindKernelLowerLeftPGroup,
   function(ri)
-    local b,curlay,done,el,f,i,l,lens,lvec,nothingnew,pivots,pos,ready,
+    local basisOfFieldExtension,curlay,done,el,f,i,l,lens,lvec,nothingnew,pivots,pos,ready,
           rifac,s,v,x,y;
 
     Info(InfoRecog, 2, "Running FindKernelLowerLeftPGroup...");
     f := ri!.field;
-    if not(IsPrimeField(f)) then
-        b := CanonicalBasis(f);  # a basis over the prime field
-    else
-        b := fail;
-    fi;
     l := [];       # here we collect generators of N
     lvec := [];    # the linear part of the layer cleaned out by the gens
     pivots := [];  # pairs of numbers indicating the layer and pivot columns
                    # this will stay strictly increasing (lexicographically)
     lens := RECOG.ComputeExtractionLayerLengths(ri!.blocks);
-    if b <> fail then
-        lens := lens * Length(b);
+
+    if not IsPrimeField(f) then
+        basisOfFieldExtension := CanonicalBasis(f);  # a basis over the prime field
+        lens := lens * Length(basisOfFieldExtension);
+    else
+        basisOfFieldExtension := fail;
     fi;
 
     nothingnew := 0;   # we count until we produced 10 new generators
@@ -699,7 +698,7 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
 
         # Now clean out this vector and remember what we did:
         curlay := 1;
-        v := RECOG.ExtractLowStuff(x,curlay,ri!.blocks,lens,b);
+        v := RECOG.ExtractLowStuff(x,curlay,ri!.blocks,lens,basisOfFieldExtension);
         pos := PositionNonZero(v);
         i := 1;
         done := 0*[1..Length(lvec)];   # this refers to the current gens
@@ -709,7 +708,7 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
             while pos > Length(v) and not(ready) do
                 curlay := curlay + 1;
                 if curlay <= Length(lens) then
-                    v := RECOG.ExtractLowStuff(x,curlay,ri!.blocks,lens,b);
+                    v := RECOG.ExtractLowStuff(x,curlay,ri!.blocks,lens,basisOfFieldExtension);
                     pos := PositionNonZero(v);
                 else
                     ready := true;   # x is now equal to the identity!
@@ -759,7 +758,7 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
     forkernel(ri).gensNpivots := pivots;
     forkernel(ri).blocks := ri!.blocks;
     forkernel(ri).lens := lens;
-    forkernel(ri).canonicalbasis := b;
+    forkernel(ri).basisOfFieldExtension := basisOfFieldExtension;
     # this is stored on the upper level:
     SetgensN(ri,l);
     ri!.leavegensNuntouched := true;
@@ -785,7 +784,7 @@ SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
   i := 1;
   for layer in [1..Length(ri!.lens)] do
       h := RECOG.ExtractLowStuff(g,layer,ri!.blocks,ri!.lens,
-                                 ri!.canonicalbasis);
+                                 ri!.basisOfFieldExtension);
       while i <= Length(ri!.gensNvectors) and ri!.gensNpivots[i][1] = layer do
           done := h[ri!.gensNpivots[i][2]];
           if not(IsZero(done)) then
@@ -818,7 +817,7 @@ FindHomMethodsMatrix.LowerLeftPGroup := function(ri,G)
   local f,p;
   # Do we really have our favorite situation?
   if not(IsBound(ri!.blocks) and IsBound(ri!.lens) and
-         IsBound(ri!.canonicalbasis) and IsBound(ri!.gensNvectors) and
+         IsBound(ri!.basisOfFieldExtension) and IsBound(ri!.gensNvectors) and
          IsBound(ri!.gensNpivots)) then
       return NotEnoughInformation;
   fi;
