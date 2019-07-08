@@ -113,7 +113,11 @@ FindHomMethodsPerm.Imprimitive :=
   end;
 
 #! @BeginChunk PcgsForBlocks
-#! TODO
+#! This method is called after a hint is set in
+#! <C>FindHomMethodsPerm.Imprimitive</C>. Therefore the group <A>G</A> preserves
+#! a non-trivial block system. The method checks whether or not the restriction
+#! of <A>G</A> on one block is solvable. If so <C>FindHomMethodsPerm.Pcgs</C> is
+#! called and otherwise <C>NeverApplicable</C> is returned.
 #! @EndChunk
 FindHomMethodsPerm.PcgsForBlocks := function(ri,G)
   local blocks,pcgs,subgens;
@@ -131,11 +135,11 @@ end;
 
 #! @BeginChunk BalTreeForBlocks
 #! This method creates a balanced composition tree for the kernel of an
-#! imprimitive group. This is guaranteed as
-#! <C>FindHomMethodsPerm.BalTreeForBlocks</C> is
-#! just called from <C>FindHomMethodsPerm.Imprimitive</C> and itself.
+#! imprimitive group. This is guaranteed as the method is just called
+#! from <C>FindHomMethodsPerm.Imprimitive</C>
+#! (see <Ref Subsect="Imprimitive"/>) and itself.
 #! The homomorphism for the split in the composition tree used is
-#! induced by the action of G on
+#! induced by the action of <A>G</A> on
 #! half of its blocks.
 #! @EndChunk
 FindHomMethodsPerm.BalTreeForBlocks := function(ri,G)
@@ -178,8 +182,10 @@ end;
 
 # Now to the small base groups using stabilizer chains:
 
-# Checks whether the Schreier tree labels coincide on all the levels of the
-# stabilizer chain <S>
+# The GAP manual suggests that the labels at each level of a stabiliser chain
+# are identical GAP objects, but it does not promise this.
+# This function tests whether the stabiliser chain has this property, and
+# gives an error if not.
 DoSafetyCheckStabChain := function(S)
   while IsBound(S.stabilizer) do
       if not(IsIdenticalObj(S.labels,S.stabilizer.labels)) then
