@@ -33,8 +33,8 @@ ReadPackage("recog","gap/generic/FewGensAbelian.gi");
 ReadPackage("recog","gap/generic/KnownNilpotent.gi");
 
 # Permutations:
-ReadPackage("recog","gap/giant.gi");
-ReadPackage("recog","gap/snksetswrsr.gi");
+ReadPackage("recog","gap/perm/giant.gi");
+ReadPackage("recog","gap/perm/largebase.gi");
 
 # Up to now there is not much here:
 ReadPackage("recog","gap/SnAnBB.gi");
