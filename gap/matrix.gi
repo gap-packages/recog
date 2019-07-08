@@ -395,8 +395,8 @@ end;
 #! Also, the method passes a hint to the image group that it is in
 #! block lower triangular form, so the image immediately can make
 #! recursive calls for the actions on the diagonal blocks, and then to the
-#! lower <M>p</M>-part. For the image the method <C>BlockLowerTriangular</C>
-#! (see <Ref Subsect="BlockLowerTriangular"/>) is used.
+#! lower <M>p</M>-part. For the image the method
+#! <Ref Subsect="BlockLowerTriangular" Style="Text"/> is used.
 #! 
 #! Note that this method is implemented in a way such that it can also be
 #! used as a method for a projective group <A>G</A>. In that case the
@@ -494,14 +494,12 @@ end;
 
 #! @BeginChunk BlockLowerTriangular
 #! This method is only called when a hint was passed down from the method
-#! <C>ReducibleIso</C> (see
-#! <Ref Subsect="ReducibleIso"/>). In that case, it knows that a base change
-#! to block lower triangular form has been performed. The method can then
-#! immediately find a homomorphism by mapping to the diagonal blocks. It sets
-#! up this homomorphism and gives hints to image and kernel. For the image,
-#! the method <C>BlockDiagonal</C> (see <Ref Subsect="BlockDiagonal"/>)
-#! is used and for the kernel,
-#! the method <C>LowerLeftPGroup</C> (see <Ref Subsect="LowerLeftPGroup"/>)
+#! <Ref Subsect="ReducibleIso" Style="Text"/>. In that case, it knows that a
+#! base change to block lower triangular form has been performed. The method
+#! can then immediately find a homomorphism by mapping to the diagonal blocks.
+#! It sets up this homomorphism and gives hints to image and kernel. For the
+#! image, the method <Ref Subsect="BlockDiagonal" Style="Text"/> is used and
+#! for the kernel, the method <Ref Subsect="LowerLeftPGroup" Style="Text"/>
 #! is used.
 #! 
 #! Note that this method is implemented in a way such that it can also be
@@ -537,18 +535,18 @@ end;
 
 #! @BeginChunk BlockDiagonal
 #! This method is only called when a hint was passed down from the method
-#! <C>BlockLowerTriangular</C> (see <Ref Subsect="BlockLowerTriangular"/>).
+#! <Ref Subsect="BlockLowerTriangular" Style="Text"/>.
 #! In that case, it knows that the group is in block diagonal form.
 #! The method is used both in the matrix- and the projective case.
 #! 
 #! The method immediately delegates to projective methods handling
 #! all the diagonal blocks projectively. This is done by giving a hint
 #! to the factor to use the method
-#! <C>BlocksModScalars</C> (see <Ref Subsect="BlocksModScalars"/>) is
+#! <Ref Subsect="BlocksModScalars" Style="Text"/> is
 #! given. The method for the kernel then has to deal with only scalar blocks,
-#! either projectively or with scalars, which is again done by giving a hint to
-#! either use <C>BlockScalar</C> (see <Ref Subsect="BlockScalar"/>)
-#! or <C>BlockScalarProj</C> (see <Ref Subsect="BlockScalarProj"/>) respectively.
+#! either projectively or with scalars, which is again done by giving a hint
+#! to either use <Ref Subsect="BlockScalar" Style="Text"/> or
+#! <Ref Subsect="BlockScalarProj" Style="Text"/> respectively.
 #! 
 #! Note that this method is implemented in a way such that it can also be
 #! used as a method for a projective group <A>G</A>. In that case the
@@ -806,7 +804,7 @@ SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
 end;
 
 #! @BeginChunk LowerLeftPGroup
-#! This method is only called by a hint from <C>BlockLowerTriangular</C>
+#! This method is only called by a hint from <Ref Subsect="BlockLowerTriangular" Style="Text"/>
 #! as the kernel of the homomorphism mapping to the diagonal blocks.
 #! The method uses the fact that this kernel is a <M>p</M>-group where
 #! <M>p</M> is the characteristic of the underlying field. It exploits

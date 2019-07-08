@@ -14,7 +14,9 @@
 #############################################################################
 
 #! @BeginChunk FewGensAbelian
-#! TODO. if very few generators, check IsAbelian and if yes, do KnownNilpotent
+#! If there are not too may generators (right now that means at most 200),
+#! check whether they commute; if yes, dispatch to <C>FindHomMethodsGeneric.KnownNilpotent</C>,
+#! otherwise return <C>NeverApplicable</C>.
 #! @EndChunk
 FindHomMethodsGeneric.FewGensAbelian := function(ri,G)
   # If the number of generators is less than or equal to 200, then check
