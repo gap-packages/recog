@@ -626,7 +626,6 @@ end;
 #end;
 #
 RECOG.ExtractLowStuff := function(m,layer,blocks,lens,canbas)
-  #canbas ... canonical basis
   local block,i,j,k,l,pos,v,what,where;
   v := ZeroVector(lens[layer],m[1]);
   pos := 0;
@@ -644,8 +643,8 @@ RECOG.ExtractLowStuff := function(m,layer,blocks,lens,canbas)
   od;
   if canbas <> fail then
       # needed because we assume for example in
-	  # SLPforElementFuncsMatrix.LowerLeftPGroup that we work
-	  # over a field of order p (not a p power)
+      # SLPforElementFuncsMatrix.LowerLeftPGroup that we work
+      # over a field of order p (not a p power)
       return BlownUpVector(canbas,v);
   else
       return v;
@@ -767,11 +766,14 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
     return true;
   end );
 
-# computes a straight line program (SLP) of <g> for a p-group in <ri> (that
-# correspond to a lower left triangular matrix;
-# The SLP is constructed by using the elementar matrices to cancel out the
+# computes a straight line program (SLP) for an element <g> of a p-group
+# described by <ri> (that corresponds to a matrix group consisting of lower
+# triangular matrices).
+# The SLP is constructed by using matrices forming a pcgs (polycyclic
+# generating sequence) to cancel out the
 # entries in <g>. The coefficents of the process create the SLP.
-# TODO Max H. wants to rewrite the code
+# TODO Max H. wants to rewrite the code to work row-by-row
+# instead of blockwise; that should result in both simple and faster code.
 SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
   # First project and calculate the vector:
   local done,h,i,l,layer,pow;
