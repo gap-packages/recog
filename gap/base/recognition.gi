@@ -676,19 +676,19 @@ InstallGlobalFunction( CalcNiceGensGeneric,
 
 InstallGlobalFunction( CalcNiceGensHomNode,
   # function for the situation on a homomorphism node (non-Leaf):
-  function(ri,origgens)
-    local origkergens,rifac,riker,pregensfactor;
-    # Is there a non-trivial kernel?
-    rifac := RIFac(ri);
+  function(ri, origgens)
+    local nicegens, kernelgens;
+    # compute preimages of the nicegens of the factor group
+    nicegens := CalcNiceGens(RIFac(ri), origgens);
+    # Is there a non-trivial kernel? then add its nicegens
     if HasRIKer(ri) and RIKer(ri) <> fail then
-        pregensfactor := CalcNiceGens(rifac,origgens);
-        riker := RIKer(ri);
-        origkergens := ResultOfStraightLineProgram( gensNslp(ri), origgens );
-        return Concatenation( pregensfactor,
-                              CalcNiceGens(riker,origkergens) );
-    else
-        return CalcNiceGens(rifac,origgens);
+        # we cannot just use gensN(RIKer(ri)) here, as those values are defined
+        # relative to the original generators we used during recognition; but
+        # the origgens passed to this function might differ
+        kernelgens := ResultOfStraightLineProgram(gensNslp(ri), origgens);
+        Append(nicegens, CalcNiceGens(RIKer(ri), kernelgens));
     fi;
+    return nicegens;
   end );
 
 InstallGlobalFunction( SLPforElement,
