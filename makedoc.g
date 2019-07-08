@@ -17,6 +17,9 @@ AutoDoc(rec(
             "gap/almostsimple",
             "gap/base",
             "gap/generic",
+            "gap/matrix",
+            "gap/perm",
+            "gap/projective",
             ],
     ),
     scaffold := rec(
