@@ -65,7 +65,7 @@ end;
 RECOG.CalcNiceGensKnownNilpotent := function(ri,origgens)
   local kernelgens;
   kernelgens := List([1..Length(ri!.decompositionExponents)],
-                     i -> origgens[i]^ri!.decompositionExponents[i][1]);
+                     i -> origgens[i]^ri!.decompositionExponents[i]);
   return Concatenation(CalcNiceGens(RIFac(ri), origgens),
                        CalcNiceGens(RIKer(ri), kernelgens));
 end;
@@ -96,7 +96,7 @@ FindHomMethodsGeneric.KnownNilpotent := function(ri,G)
   decompositionData := List(gensm, x-> RECOG.DecomposeNilpotent(data,x));
   gensfac := List(decompositionData,x -> StripMemory(x[2]));
   gensker := List(decompositionData,x -> x[1]);
-  ri!.decompositionExponents := List(decompositionData, x -> x{[3,4]});
+  ri!.decompositionExponents := List(decompositionData, x -> x[3]);
   H := GroupWithGenerators(gensfac);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomForNilpotent,data);
   SetHomom(ri,hom);
