@@ -50,6 +50,7 @@ FindHomMethodsPerm.NonTransitive :=
     o := Orb(G,la,OnPoints);
     Enumerate(o);
     hom := OrbActionHomomorphism(G,o);
+    Setvalidatehomominput(ri, {ri,p} -> ForAll(o, x -> (x^p in o)));
     SetHomom(ri,hom);
     return Success;
   end;
