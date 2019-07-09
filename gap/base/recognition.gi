@@ -528,7 +528,11 @@ InstallGlobalFunction( RecogniseGeneric,
               counter,").");
         fi;
         Add(depth,'F');
-        Assert(2, ForAll(GeneratorsOfGroup(H), x->ValidateHomomInput(ri, x)));
+        if ForAny(GeneratorsOfGroup(H), x->not ValidateHomomInput(ri, x)) then
+            # Our group fails to contain some of the generators of H!
+            return fail;
+        fi;
+
         rifac := RecogniseGeneric(
                   Group(List(GeneratorsOfGroup(H), x->ImageElm(Homom(ri),x))),
                   methodsforfactor(ri), depth, forfactor(ri) ); # TODO: change forfactor to hintsForFactor??)
