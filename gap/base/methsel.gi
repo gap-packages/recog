@@ -40,10 +40,7 @@ InstallGlobalFunction( "AddMethod", function(arg)
   if p = fail then
       Add(db,mr);
   else
-      for i in [l,l-1..p] do
-          db[i+1] := db[i];
-      od;
-      db[i] := mr;
+      Add(db,mr,p);
   fi;
 end);
 
