@@ -487,6 +487,9 @@ RECOG.SLPforSn :=  function( n, pi )
     if IsOne(pi) then
         return StraightLineProgramNC( [[1,0]], 2 );
     fi;
+    if LargestMovedPoint(pi) > n then
+        return fail;
+    fi;
 
     # we need the cycles of pi of length > 1 to be written such
     # that the minimum point is the initial point of the cycle
@@ -555,6 +558,9 @@ RECOG.SLPforAn :=  function( n, pi )
         return StraightLineProgramNC( [[1,0]], 2 );
     fi;
     if SignPerm( pi ) = -1 then
+        return fail;
+    fi;
+    if LargestMovedPoint(pi) > n then
         return fail;
     fi;
 
