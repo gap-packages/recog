@@ -146,7 +146,7 @@ end;
 #! half of its blocks.
 #! @EndChunk
 FindHomMethodsPerm.BalTreeForBlocks := function(ri,G)
-  local blocks,cut,hom,lowerhalf,nrblocks,o,upperhalf,l,n;
+  local blocks,cut,hom,lowerhalf,nrblocks,o,upperhalf,l,n,seto;
 
   blocks := ri!.blocks;
 
@@ -161,7 +161,12 @@ FindHomMethodsPerm.BalTreeForBlocks := function(ri,G)
   lowerhalf := blocks{[1..cut]};
   upperhalf := blocks{[cut+1..nrblocks]};
   o := Concatenation(upperhalf);
+  # The order of 'o' in the homom must align with forfactor(ri).blocks below
   hom := ActionHomomorphism(G,o);
+
+  # Make a set so checking validatehomominput is faster
+  seto := Immutable(Set(o));
+  Setvalidatehomominput(ri, {ri,p} -> ForAll(o, x -> x^p in seto));
   SetHomom(ri,hom);
   Setimmediateverification(ri,true);
   findgensNmeth(ri).args[1] := 3+cut;
