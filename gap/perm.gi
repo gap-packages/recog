@@ -99,6 +99,7 @@ FindHomMethodsPerm.Imprimitive :=
 
     # Find the homomorphism:
     hom := ActionHomomorphism(G,blocks,OnSets);
+    Setvalidatehomominput(ri, {ri,p} -> OnSetsSets(blocks, p) = blocks);
     SetHomom(ri,hom);
 
     # Now we want to help recognising the kernel, we first check, whether
