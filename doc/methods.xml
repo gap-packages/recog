@@ -6,7 +6,6 @@ This is the chapter of the documentation describing the methods.
 
 <Chapter Label="methods">
 <Heading>Methods for recognition</Heading>
-<Index><Package>recog</Package></Index>
 
 <Section Label="genericmethods">
 <Heading>Methods for generic groups</Heading>
