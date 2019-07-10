@@ -34,23 +34,8 @@
 BindGlobal( "ClassicalMethDb", [] );
 #
 ###
-## Test whether n is a power of the prime p
-##
-IsPowerOfPrime := function( n, p )
-
-    local x;
-
-    if n <= 0 then return false; fi;
-
-    repeat
-        x := QuotientRemainder( n, p );
-        if x[2] <> 0 then return false; fi;
-        n := x[1];
-    until n = 1;
-
-    return true;
-
-end;
+# Test whether <n> (assumed integer) is a power of <p> (assumed positive prime)
+IsPowerOfPrime := {n, p} -> n > 1 and p ^ PVALUATION_INT(n, p) = n;
 
 
 # Check if m > 5 and the order of a basic lppd(d,q;e) element
