@@ -26,10 +26,6 @@ matrix:
           - gcc-multilib
           - g++-multilib
 
-branches:
-  only:
-    - master
-
 before_script:
   - export GAPROOT="$HOME/gap"
   - git clone https://github.com/gap-system/pkg-ci-scripts.git scripts
