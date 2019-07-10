@@ -969,7 +969,7 @@ end;
 #           zf := yf;
 #           if not(IsZero(z[n,n])) or not(IsOne(z[n,n+1])) or
 #              not(IsZero(z[n+1,n+1])) or not(IsOne(z[n+1,n])) then
-#               Error("How on earth could this happen???");
+#               ErrorNoReturn("How on earth could this happen???");
 #           fi;
 #       else  # q > 2
 #           while true do   # will be left by break when we had success!
@@ -1253,7 +1253,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
 
   ch := Factors(CharacteristicPolynomial(f,f,t,1));
   if Length(ch) <> 2 or ch[1] <> ch[2] then
-      Error("matrix is not triagonalizable - this should never happen!");
+      ErrorNoReturn("matrix is not triagonalizable - this should never happen!");
   fi;
 
   one := OneMutable(t);
@@ -1342,7 +1342,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
               x[2] := x[2] + x[1] * el;
               if x <> bas*StripMemory(xm)*bas^-1 then
                 # FIXME: sometimes triggered by RecognizeGroup(GL(2,16));
-                Error("!!!");
+                ErrorNoReturn("!!!");
               fi;
           fi;
           # now x[2,2] is equal to One(f)
@@ -1961,7 +1961,7 @@ RECOG.SLn_UpStep := function(w)
             fi;
         od;
     else
-        Error("either i or j must be equal to n");
+        ErrorNoReturn("either i or j must be equal to n");
     fi;
     return el;
   end;
@@ -1991,7 +1991,7 @@ RECOG.SLn_UpStep := function(w)
             fi;
         od;
     else
-        Error("either i or j must be equal to n");
+        ErrorNoReturn("either i or j must be equal to n");
     fi;
     return el;
   end;
@@ -2020,7 +2020,7 @@ RECOG.SLn_UpStep := function(w)
             sf := w.slnstdf[2*w.ext+1];
           fi;
       else
-          Error("this program only works for odd n or n=2");
+          ErrorNoReturn("this program only works for odd n or n=2");
       fi;
   else
       # In this case the n-1-cycle is the identity, so we take a transvection:
@@ -2417,7 +2417,7 @@ end;
 #   one := One(f);
 #   gram := ZeroMatrix(l,l,vecs);
 #   n := RowLength(vecs)/2;
-#   Assert(1,IsInt(n),Error("RowLength must be even"));
+#   Assert(1,IsInt(n),ErrorNoReturn("RowLength must be even"));
 #   for i in [1..l] do
 #     for j in [i+1..l] do
 #       v := zero;
@@ -2700,7 +2700,7 @@ end;
 #           fi;
 #         else
 #           if Size(s.f) = 2 then
-#             Error("This does not work for GF(2).");
+#             ErrorNoReturn("This does not work for GF(2).");
 #           fi;
 #           t := t * s.delta;
 #           v[2*n-1] := v[2*n-1] * zeta;
@@ -2713,7 +2713,7 @@ end;
 #           fi;
 #           coeff := zeta;
 #         fi;
-#         Assert(1,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 0"));
+#         Assert(1,v=vorig*t and (M = fail or Morig*t=M),ErrorNoReturn("Hallo 0"));
 #       fi;
 #       if IsZero(v[ei]) or not(IsZero(coeff-v[fI])) then
 #         # The first easy case:
@@ -2733,7 +2733,7 @@ end;
 #               M[l,2*n] := M[l,2*n] + sc2;
 #             od;
 #           fi;
-#           Assert(1,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 1"));
+#           Assert(1,v=vorig*t and (M = fail or Morig*t=M),ErrorNoReturn("Hallo 1"));
 #         fi;
 #         # Now kill v[fI] if need be:
 #         if not(IsZero(v[fI])) then
@@ -2751,7 +2751,7 @@ end;
 #               M[l,2*n] := M[l,2*n] + sc2;
 #             od;
 #           fi;
-#           Assert(1,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 2"));
+#           Assert(1,v=vorig*t and (M = fail or Morig*t=M),ErrorNoReturn("Hallo 2"));
 #         fi;
 #       elif not(IsZero(one+v[ei])) then
 #         # The second easy case:
@@ -2771,7 +2771,7 @@ end;
 #             M[l,2*n] := M[l,2*n] + sc2;
 #           od;
 #         fi;
-#         Assert(1,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 3"));
+#         Assert(1,v=vorig*t and (M = fail or Morig*t=M),ErrorNoReturn("Hallo 3"));
 #         # Now kill v[ei] if need be:
 #         sc := -v[ei]/coeff;
 #         si := IntVecFFE(Coefficients(s.can,sc));
@@ -2787,7 +2787,7 @@ end;
 #             M[l,2*n] := M[l,2*n] + sc2;
 #           od;
 #         fi;
-#         Assert(1,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 4"));
+#         Assert(1,v=vorig*t and (M = fail or Morig*t=M),ErrorNoReturn("Hallo 4"));
 #       fi;
 #       if coeff = zeta then
 #         # Fix the e_n coefficient again:
@@ -2800,7 +2800,7 @@ end;
 #             M[l,2*n] := M[l,2*n] * zeta;
 #           od;
 #         fi;
-#         Assert(1,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 5"));
+#         Assert(1,v=vorig*t and (M = fail or Morig*t=M),ErrorNoReturn("Hallo 5"));
 #       fi;
 #     od;
 #     # Finally arrange fn component to 0:
@@ -2816,7 +2816,7 @@ end;
 #           M[l,2*n] := M[l,2*n] + M[l,2*n-1] * sc;
 #         od;
 #       fi;
-#       Assert(1,v=vorig*t and (M = fail or Morig*t=M),Error("Hallo 6"));
+#       Assert(1,v=vorig*t and (M = fail or Morig*t=M),ErrorNoReturn("Hallo 6"));
 #     fi;
 #     return t;
 #   end;
@@ -3190,7 +3190,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
       if not(IsOne(det)) then
           root := RECOG.ComputeRootInFiniteField(det,gcd.gcd,f);
           if root = fail then
-              Error("Should not have happened, 15634, tell Max!");
+              ErrorNoReturn("Should not have happened, 15634, tell Max!");
           fi;
           gens[i] := gens[i] * root;
           changed := true;

@@ -52,10 +52,10 @@ RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
   local F,bas,d,dim,e,fac,facs,gens,i,inforec,j,k,mp,mu,new,newgens,pr,q,v;
 
   if not(MTX.IsIrreducible(m)) then
-      Error("cannot work for reducible modules");
+      ErrorNoReturn("cannot work for reducible modules");
   fi;
   if MTX.IsAbsolutelyIrreducible(m) = true then
-      Error("cannot work for absolutely irreducible modules");
+      ErrorNoReturn("cannot work for absolutely irreducible modules");
   fi;
 
   F := MTX.Field(m);
@@ -351,7 +351,7 @@ RECOG.ForceToOtherField := function(m,fieldsize)
       w := List(v,x->x);  # this unpacks
       # Note: we used to call ConvertToVectorRep(w,fieldsize), which
       # also would save us work down the line; however, unfortunately
-      # this may run into an Error instead of returning fail, so we have
+      # this may run into an error instead of returning fail, so we have
       # to resort to the following, which is somewhat less efficient if
       # some rows are already defined over subfields.
       q := ConvertToVectorRep(w);
@@ -627,12 +627,12 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
       collf := MTX.CollectedFactors(m);
       if Length(collf) = 1 then    # only one homogeneous component!
           if MTX.Dimension(collf[1][1]) = 1 then
-              Error("This should never have happened (2), tell Max.");
+              ErrorNoReturn("This should never have happened (2), tell Max.");
               # This should have been caught by the scalar test above.
           fi;
           Info(InfoRecog,2,"Restriction to H is homogeneous.");
           if not(MTX.IsAbsolutelyIrreducible(collf[1][1])) then
-              Error("Is this really possible??? G acts absolutely irred!");
+              ErrorNoReturn("Is this really possible??? G acts absolutely irred!");
           fi;
           homs := MTX.Homomorphisms(collf[1][1],m);
           basis := Concatenation(homs);
@@ -648,7 +648,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
           if not(ForAll(kro,k->k[1] = true)) then
               Info(InfoRecog,1,"VERY, VERY, STRANGE!");
               Info(InfoRecog,1,"False alarm, was not a tensor decomposition.");
-              Error("This should never have happened (3), tell Max.");
+              ErrorNoReturn("This should never have happened (3), tell Max.");
           fi;
 
           H := GroupWithGenerators(conjgensG);

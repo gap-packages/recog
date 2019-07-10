@@ -189,7 +189,7 @@ end;
 DoSafetyCheckStabChain := function(S)
   while IsBound(S.stabilizer) do
       if not(IsIdenticalObj(S.labels,S.stabilizer.labels)) then
-          Error("Alert! labels not identical on different levels!");
+          ErrorNoReturn("Alert! labels not identical on different levels!");
       fi;
       S := S.stabilizer;
   od;
@@ -333,7 +333,7 @@ StoredPointsPerm := function(p)
   elif IsPerm2Rep(p) then
       return s/2;   # permutation stored with 2 bytes per point
   else
-      Error("StoredPointsPerm: input is not an internal permutation");
+      ErrorNoReturn("StoredPointsPerm: input is not an internal permutation");
   fi;
 end;
 

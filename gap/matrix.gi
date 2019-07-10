@@ -286,7 +286,7 @@ ExtendToBasisOfFullRowspace := function(m,f)
   fi;
   v := ZeroMutable(m[1]);
   if RankMat(m) < Length(m) then
-      Error("No basis!");
+      ErrorNoReturn("No basis!");
   fi;
   i := 1;
   o := One(f);

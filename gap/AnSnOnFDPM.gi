@@ -1490,8 +1490,8 @@ RECOG.RecogniseFDPM := function(group, field, eps)
     # check fdpm.dim is largest for IsPreDoubleTransposition to
     # work
     if fdpm.dim < 6 then
-      Error( "This function only works for matrix groups of dimension",
-            " at least 6 over a field of this characteristic.");
+      ErrorNoReturn( "This function only works for matrix groups of dimension",
+                     " at least 6 over a field of this characteristic.");
       return fail;
     fi;
     # search for double transpositions
@@ -1503,8 +1503,8 @@ RECOG.RecogniseFDPM := function(group, field, eps)
   else
     # check fdpm.dim is largest for IsPre3Cycle to work
     if fdpm.dim < 4 then
-      Error( "This function only works for matrix groups of dimension",
-            " at least 4 over a field of this characteristic.");
+      ErrorNoReturn( "This function only works for matrix groups of dimension",
+                     " at least 4 over a field of this characteristic.");
       return fail;
     fi;
     # search for a 3-cycle

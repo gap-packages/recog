@@ -4,7 +4,7 @@
 ##
 
 if fail = LoadPackage("AutoDoc", ">= 2019.07.03") then
-    Error("AutoDoc 2019.07.03 or newer is required");
+    ErrorNoReturn("AutoDoc 2019.07.03 or newer is required");
 fi;
 
 Read("regen_doc.g");
