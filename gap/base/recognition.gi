@@ -30,6 +30,22 @@ InstallValue( RecognitionInfoType,
 # Objectify(RecognitionInfoType,r);
 
 
+InstallValue( FindHomMethodsPerm, rec() );
+InstallValue( SLPforElementFuncsPerm, rec() );
+InstallValue( FindHomDbPerm, [] );
+
+InstallValue( FindHomMethodsMatrix, rec() );
+InstallValue( SLPforElementFuncsMatrix, rec() );
+InstallValue( FindHomDbMatrix, [] );
+
+InstallValue( FindHomMethodsProjective, rec() );
+InstallValue( SLPforElementFuncsProjective, rec() );
+InstallValue( FindHomDbProjective, [] );
+
+InstallValue( FindHomMethodsGeneric, rec() );
+InstallValue( SLPforElementFuncsGeneric, rec() );
+
+
 # a nice view method:
 RECOG_ViewObj := function( level, ri )
     local ms;
@@ -940,7 +956,7 @@ InstallGlobalFunction( "DisplayCompositionFactors", function(arg)
   fi;
 end );
 
-BindGlobal( "SLPforNiceGens", function(ri)
+InstallGlobalFunction( "SLPforNiceGens", function(ri)
   local l,ll,s;
   l := List( [1..Length(GeneratorsOfGroup(Grp(ri)))], x->() );
   l := GeneratorsWithMemory(l);

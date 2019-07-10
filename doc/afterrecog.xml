@@ -70,18 +70,7 @@ methods.
 If you need an element explicitly written in terms of the original
 generators, you can use the following function:
 
-<ManSection>
-<Func Name="SLPforNiceGens" Arg="ri"/>
-<Returns>an SLP expressing the nice generators in the original ones</Returns>
-<Description>
-    This function assembles a possibly quite large straight line program
-    expressing the nice generators in terms of the original ones by using
-    the locally stored information in the recognition tree recursively.<P/>
-    You can concatenate straight line programs in the nice generators with
-    the result of this function to explicitly write an element in terms
-    of the original generators.
-</Description>
-</ManSection>
+<#Include Label="SLPforNiceGens">
 
 <ManSection>
 <Meth Name="\in" Arg="x, ri"/>
@@ -106,17 +95,7 @@ generators, you can use the following function:
 </Description>
 </ManSection>
 
-<ManSection>
-<Func Name="DisplayCompositionFactors" Arg="ri"/>
-<Returns>nothing</Returns>
-<Description>
-    This function displays a composition series by using the recursive
-    recognition tree. It only works, if the usual operation
-    <Ref Oper="CompositionSeries" BookName="ref"/> works for all
-    leaves. THIS DOES CURRENTLY NOT WORK FOR PROJECTIVE GROUPS AND
-    THUS FOR MATRIX GROUPS!
-</Description>
-</ManSection>
+<#Include Label="DisplayCompositionFactors">
 
 </Section>
 
