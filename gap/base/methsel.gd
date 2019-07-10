@@ -20,7 +20,43 @@
 
 DeclareInfoClass( "InfoMethSel" );
 SetInfoLevel(InfoMethSel,1);
+
+## <#GAPDoc Label="AddMethod">
+## <ManSection>
+## <Func Name="AddMethod" Arg="db, meth, rank, stamp [,comment]"/>
+## <Returns>nothing</Returns>
+## <Description>
+##     <A>db</A> must be a method database (list of records, see above) with
+##     non-ascending rank values. <A>meth</A> is the method function,
+##     <A>rank</A> the rank and <A>stamp</A> a string valued stamp. The
+##     optional argument <A>comment</A> can be a string comment. The record
+##     describing the method is created and inserted at the correct position
+##     in the method database. Nothing is returned.
+## </Description>
+## </ManSection>
+## <#/GAPDoc>
 DeclareGlobalFunction( "AddMethod" );
+
+## <#GAPDoc Label="CallMethods">
+## <ManSection>
+## <Func Name="CallMethods" Arg="db, limit [,furtherargs]"/>
+## <Returns>a record <C>ms</C> describing this method selection procedure.
+## </Returns>
+## <Description>
+##     The argument <A>db</A> must be a method database in the sense of
+##     Section <Ref Sect="whataremethods"/>. <A>limit</A> must be a non-negative
+##     integer. <A>furtherargs</A> stands for an arbitrary number of additional
+##     arguments, which are handed down to the called methods. Of course they
+##     must fulfill the conventions defined for the methods in the database
+##     <A>db</A>.<P/>
+##     The function first creates a <Q>method selection</Q> record keeping track
+##     of the things that happened during the method trying procedure,
+##     which is also used during this procedure. Then it calls methods with
+##     the algorithm described below and in the end returns the method
+##     selection record in its final state.
+## </Description>
+## </ManSection>
+## <#/GAPDoc>
 DeclareGlobalFunction( "CallMethods" );
 
 
