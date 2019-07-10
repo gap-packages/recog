@@ -304,7 +304,6 @@ InstallGlobalFunction( IsPpdElement, function( F, m, d, p, a )
 
     # return if we failed to find one
     if c = false  then
-        #Error("a1");
         return false;
     fi;
 
@@ -321,7 +320,6 @@ InstallGlobalFunction( IsPpdElement, function( F, m, d, p, a )
 
     ## if g is one there is no ppd involved
     if IsOne(g) then
-        #Error("a2");
         return false;
     fi;
 
@@ -332,7 +330,6 @@ InstallGlobalFunction( IsPpdElement, function( F, m, d, p, a )
         ## we know that all primes dividing pm.ppds are large
         ## and hence we know <m> is a large ppd-element
         islarge := true;
-                #Error("a3");
         return [e, islarge];
     fi;
 
@@ -348,13 +345,11 @@ InstallGlobalFunction( IsPpdElement, function( F, m, d, p, a )
     if IsOne(g)  then
         ## (e+1) is the only ppd dividing |<m>| and only once
         islarge := false;
-                #Error("a4");
         return [ e, islarge ];
     else
         ## Either another ppd also divides |<m>| and this one is large or
         ## (e+1)^2 divides |<m>| and hence still large
         islarge := true;
-                #Error("a5");
         return [ e, islarge  ];
     fi;
 

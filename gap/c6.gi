@@ -172,7 +172,7 @@ RECOG.RadBasis:=function(r,n,q,rad)
         action := TransposedMatMutable(action);
 
 if Length(action) <> Length(nicebasis) then
-    Error("what's wrong?");
+    ErrorNoReturn("what's wrong?");
 fi;
 
     # The identical rows of action correspond to vectors in
@@ -180,7 +180,7 @@ fi;
     s := Set( action );
 
 if Length(nicebasis) mod Length(s)  <> 0 then
-    Error("what's wrong2?");
+    ErrorNoReturn("what's wrong2?");
 fi;
     # all vectors in nicebasis whose rows in action are
     # identical form a block
@@ -779,8 +779,8 @@ SMTX_InvariantBilinearForm := function ( module )
 
    if not SMTX.IsMTXModule(module) or
                             not SMTX.IsAbsolutelyIrreducible(module) then
-      Error(
- "Argument of InvariantBilinearForm is not an absolutely irreducible module");
+      ErrorNoReturn("Argument of InvariantBilinearForm is not an absolutely",
+                    " irreducible module");
    fi;
    if IsBound(module.InvariantBilinearForm) then
      return module.InvariantBilinearForm;
@@ -829,20 +829,20 @@ RECOG.MakeC6Group := function(g,over,p)
     f := DefaultFieldOfMatrixGroup(g);
     r := Characteristic(f);
     if Size(f) <> r then
-        Error("Must be over prime field");
+        ErrorNoReturn("Must be over prime field");
     fi;
     if p = r then
-        Error("Must be another characteristic");
+        ErrorNoReturn("Must be another characteristic");
     fi;
     if p =2 or r =2 then
-        Error("Odd characteristics only please");
+        ErrorNoReturn("Odd characteristics only please");
     fi;
     q := p;
     while (q-1) mod r <> 0 do
         q := q*p;
     od;
     if q > 65536 then
-        Error("field too big");
+        ErrorNoReturn("field too big");
     fi;
     zeta := Z(q)^((q-1)/r);
     #
@@ -851,7 +851,7 @@ RECOG.MakeC6Group := function(g,over,p)
     gm := GModuleByMats(GeneratorsOfGroup(over),f);
     M := MTX.InvariantBilinearForm(gm);
     if TransposedMat(M) <> -M then
-        Error("form not symplectic");
+        ErrorNoReturn("form not symplectic");
     fi;
     #
     # Now convert that into the "standard" symplectic form

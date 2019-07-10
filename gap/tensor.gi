@@ -127,7 +127,7 @@ RECOG.FindTensorDecomposition := function(G,N)
       # This will not be reached, since we have made sure that
       # semilinear already caught this. (Lemma: If one tensor factor is
       # semilinear, then the product is.)
-      Error("This should never have happened (1), talk to Max.");
+      ErrorNoReturn("This should never have happened (1), talk to Max.");
   fi;
   # homsimg is a basis of an N-homogenous component.
   # We move that one around with G to find a basis of the natural module:

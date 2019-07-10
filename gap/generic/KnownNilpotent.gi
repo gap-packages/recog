@@ -40,8 +40,8 @@ RECOG.DecomposeNilpotent := function(data,el)
   # Now a and b are coprime
   r := Gcdex(a,b);
   if r.gcd <> 1 then
-      Error("<data> corrupt, Product(<data.primesfactor>) and ",
-            "Product(<data.primeskernel>) are not coprime");
+      ErrorNoReturn("<data> corrupt, Product(<data.primesfactor>) and ",
+                    "Product(<data.primeskernel>) are not coprime");
   fi;
   # now r.coeff1 * a + r.coeff2 * b = 1
   # that is, el = el^(r.coeff1 * a) * el^(r.coeff2 * b)

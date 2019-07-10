@@ -6,7 +6,7 @@ TestGroup := function(name,rep,n)
   ag := AtlasGenerators(name,rep);
   g := Group(ag.generators);
   SetSize(g, ag.size);
-  if g = fail then Error("something is wrong with the group"); fi;
+  if g = fail then ErrorNoReturn("something is wrong with the group"); fi;
   r := Runtime();
   l := [];
   for i in [1..n] do

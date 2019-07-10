@@ -26,7 +26,7 @@ InstallGlobalFunction( "AddMethod", function(arg)
   # the comment.
   local comment,db,i,l,mr,p;
   if Length(arg) < 4 or Length(arg) > 5 then
-      Error("Usage: AddMethod(database,method,rank,stamp [,comment] );");
+      ErrorNoReturn("Usage: AddMethod(database,method,rank,stamp [,comment] );");
   fi;
   db := arg[1];
   mr := rec(method := arg[2],rank := arg[3],stamp := arg[4]);
@@ -74,7 +74,7 @@ InstallGlobalFunction( "CallMethods", function(arg)
     local i, methargs, ms, result, tolerance, tolerancelimit, db;
 
     if Length(arg) < 2 then
-        Error("CallMethods needs at least two arguments");
+        ErrorNoReturn("CallMethods needs at least two arguments");
     fi;
     db := arg[1];
     ms := rec(failedMethods := rec(), inapplicableMethods := rec());
@@ -146,7 +146,7 @@ InstallGlobalFunction( "CallMethods", function(arg)
                 return ms;
 
             else
-                Error("Recognition method return invalid result: ", result);
+                ErrorNoReturn("Recognition method return invalid result: ", result);
             fi;
         od;
         # Nothing worked, increase tolerance:

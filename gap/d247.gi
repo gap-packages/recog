@@ -224,7 +224,7 @@ RECOG.SortOutReducibleNormalSubgroup :=
         fi;
         Info(InfoRecog,2,"D247:Restriction to normal subgroup is homogeneous.");
         if not(MTX.IsAbsolutelyIrreducible(collf[1][1])) then
-            Error("Is this really possible??? G acts absolutely irred!");
+            ErrorNoReturn("Is this really possible??? G acts absolutely irred!");
         fi;
         homs := MTX.Homomorphisms(collf[1][1],m);
         basis := Concatenation(homs);
@@ -241,7 +241,7 @@ RECOG.SortOutReducibleNormalSubgroup :=
         if not(ForAll(kro,k->k[1] = true)) then
             Info(InfoRecog,1,"VERY, VERY, STRANGE!");
             Info(InfoRecog,1,"False alarm, was not a tensor decomposition.");
-            Error("This should never have happened (346), tell Max.");
+            ErrorNoReturn("This should never have happened (346), tell Max.");
         fi;
 
         H := GroupWithGenerators(conjgensG);

@@ -217,7 +217,8 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
       repeat
           i := i + 1;
           if i > 10000 then
-              Error("possible infinite loop in DoHintedLowIndex, wrong hints?");
+              ErrorNoReturn("possible infinite loop in DoHintedLowIndex, ",
+                            "wrong hints?");
           fi;
           x := PseudoRandom(G);
       until Order(x) in hint.elordersstart;

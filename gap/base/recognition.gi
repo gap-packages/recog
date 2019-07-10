@@ -121,7 +121,7 @@ InstallGlobalFunction( RecogniseGroup,
     elif IsMatrixGroup(G) then
         return RecogniseGeneric(G,FindHomDbMatrix,"");
     else
-        Error("Only matrix and permutation groups are supported");
+        ErrorNoReturn("Only matrix and permutation groups are supported");
     fi;
 
 # TODO: perhaps check if the result does not have IsReady set;
@@ -306,7 +306,7 @@ InstallMethod( GetElmOrd, "for a recognition info record and a record",
 #                 ri!.randr[pos] := Next(ri!.prodrep);
 #             fi;
 #             if not(IsMatrix(ri!.randr[pos])) then
-#                 Error("ppd elements only make sense for matrices");
+#                 ErrorNoReturn("ppd elements only make sense for matrices");
 #             fi;
 #             res := rec( el := ri!.randr[pos] );
 #             res.charpoly := CharacteristicPolynomial(ri!.field,ri!.field,
@@ -614,8 +614,8 @@ InstallGlobalFunction( RecogniseGeneric,
                 x := RandomElm(ri,"KERNELANDVERIFY",true).el;
                 s := SLPforElement(rifac,ImageElm( Homom(ri), x!.el ));
                 if s = fail then
-                    Error("Very bad: factor was wrongly recognised and we ",
-                          "found out too late");
+                    ErrorNoReturn("Very bad: factor was wrongly recognised and we ",
+                                  "found out too late");
                 fi;
                 y := ResultOfStraightLineProgram(s,
                    ri!.genswithmem{[ri!.nrgensH+1..Length(ri!.genswithmem)]});
@@ -637,8 +637,8 @@ InstallGlobalFunction( RecogniseGeneric,
                 Info(InfoRecog,2,"Have now ",Length(gensN(ri)),
                      " generators for kernel, recognising...");
                 if succ = false then
-                    Error("Very bad: factor was wrongly recognised and we ",
-                          "found out too late");
+                    ErrorNoReturn("Very bad: factor was wrongly recognised and we ",
+                                  "found out too late");
                 fi;
             fi;
         fi;
@@ -782,12 +782,12 @@ InstallGlobalFunction( RandomSubproduct, function(a)
     elif IsList(a) then
         if Length(a) = 0 or
             not IsMultiplicativeElementWithInverse(a[1]) then
-            Error("<a> must be a nonempty list of group elements");
+            ErrorNoReturn("<a> must be a nonempty list of group elements");
         fi;
         prod := One(a[1]);
         list := a;
     else
-        Error("<a> must be a group or a nonempty list of group elements");
+        ErrorNoReturn("<a> must be a group or a nonempty list of group elements");
     fi;
 
     for g in list do
@@ -871,7 +871,7 @@ InstallOtherMethod( Size, "for a recognition info record",
 InstallOtherMethod( Size, "for a failed recognition info record",
   [IsRecognitionInfo],
   function(ri)
-    Error("the recognition described by this info record has failed!");
+    ErrorNoReturn("the recognition described by this info record has failed!");
   end);
 
 InstallOtherMethod( \in, "for a group element and a recognition info record",
@@ -893,7 +893,7 @@ InstallOtherMethod( \in, "for a group element and a recognition info record",
 InstallOtherMethod( \in, "for a group element and a recognition info record",
   [IsObject, IsRecognitionInfo],
   function( el, ri )
-    Error("the recognition described by this info record has failed!");
+    ErrorNoReturn("the recognition described by this info record has failed!");
   end);
 
 InstallGlobalFunction( "DisplayCompositionFactors", function(arg)
@@ -1156,7 +1156,7 @@ RECOG.TestRecognitionNode := function(ri,stop,recurse)
           y := ResultOfStraightLineProgram(slp,NiceGens(ri));
       fi;
       if slp = fail or not(ri!.isone(x/y)) then
-          if stop then Error("Error found, look at x, slp and y"); fi;
+          if stop then ErrorNoReturn("ErrorNoReturn found, look at x, slp and y"); fi;
           err := err + 1;
           Print("X\c");
       else

@@ -15,9 +15,9 @@ else
                     InputTextNone(), OutputTextNone(),
                     [ GAPInfo.PackagesLoaded.recog[1], "-ef", "." ] );
     if res <> 0 then
-        Error("a different version of recog was already loaded or you ",
-              "started GAP in the wrong directory; try ",
-              "`gap -A regen_doc.g` or `gap -A makedoc.g`");
+        ErrorNoReturn("a different version of recog was already loaded or you ",
+                      "started GAP in the wrong directory; try ",
+                      "`gap -A regen_doc.g` or `gap -A makedoc.g`");
     fi;
 fi;
 
