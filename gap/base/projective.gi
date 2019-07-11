@@ -19,8 +19,8 @@
 InstallGlobalFunction( IsOneProjective,
   function(el)
     local s, n, i, j, zero;
-    n := Length(el[1]);
-    Assert(1, DimensionsMat(el) = [n,n]);
+    n := NrRows(el);
+    Assert(0, n = NrCols(el));
     s := el[1,1];
     if IsZero(s) then return false; fi;
     zero := Zero(s);
@@ -48,4 +48,18 @@ InstallGlobalFunction( IsEqualProjective,
 
 RECOG.ProjectiveOrder := function(el)
   return ProjectiveOrder(el)[1];
+end;
+
+RECOG.IsScalarMat := function(m)
+  local i,x;
+  if not(IsDiagonalMat(m)) then
+      return false;
+  fi;
+  x := m[1,1];
+  for i in [2..Length(m)] do
+      if m[i,i] <> x then
+          return false;
+      fi;
+  od;
+  return x;
 end;

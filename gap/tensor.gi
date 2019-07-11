@@ -251,21 +251,7 @@ end;
 #       return z^((o+1)/2)*r^(-1);
 #   fi;
 # end;
-
-RECOG.IsScalarMat := function(m)
-  local i,x;
-  if not(IsDiagonalMat(m)) then
-      return false;
-  fi;
-  x := m[1,1];
-  for i in [2..Length(m)] do
-      if m[i,i] <> x then
-          return false;
-      fi;
-  od;
-  return x;
-end;
-
+#
 # RECOG.FindInvolutionCentraliser := function(G,x)
 #   # x an involution in G
 #   local i,l,y;
