@@ -1,0 +1,1989 @@
+#created automatically from code
+2part uses:
+
+AbPastAb uses:
+
+AbPastAbSamePrime uses:
+    MyEmbedding
+    SanityCheck
+    VectortoPc
+    overgroup
+
+ActionOnSubspace uses:
+
+AddScalarstoKernel uses:
+    InfoRecognition
+    IsDirectProduct
+    MyEmbedding
+    NumberOfDPComponents
+
+AlmostSimpleMaps uses:
+    ConstructCosets
+    ElementInNormalSubgroup
+    IdentifySimple
+    ImageInPerfectGroup
+    ImageInQuotient
+    ScalarMap
+    StableDerivative
+
+AlternateBasisMatrix uses:
+
+AlternatingGroupOnFDPM uses:
+    FullyDeletedPermutationMatrices
+
+BBGpAsPQuotientBBGp uses:
+    IsBBGp
+
+BBGpElmFromList uses:
+
+C6Maps uses:
+    MaptoEAGroup
+    NSM
+    RECOG.HomFuncrewriteones
+    ScalarMap
+
+Chain uses:
+    IsPermBBGp
+
+ClassicalNametoStandardName uses:
+
+Co2G1find1 uses:
+
+Co3G1find1 uses:
+
+Commutators uses:
+
+Commute uses:
+
+Conj uses:
+    Mult
+
+ConjInv uses:
+    Mult
+
+ConjProg uses:
+    InvProg
+    ProdProg
+
+Construct3Cycle uses:
+    IsPre3Cycle
+    LinearFactors
+    LogRat
+
+ConstructActionMatrices uses:
+    overgroup
+
+ConstructCosets uses:
+    ElementInNormalSubgroup
+
+ConstructDoubleTransposition uses:
+    IsPreDoubleTransposition
+    LinearFactors
+    LogRat
+
+DegreeAlternating uses:
+
+DetermineFieldSize uses:
+    FindFieldSize
+    SmallCentralizer
+
+DiGroup uses:
+
+DirectProductOfMatrixGroup uses:
+
+DisplayRecog uses:
+
+DoSafetyCheckStabChain uses:
+
+DoubleAndShrink uses:
+    Commute
+    Conj
+    LogRat
+    Mult
+
+ElementInNormalClosure uses:
+    PseudoRandomNormalClosureElement
+
+ElementInNormalSubgroup uses:
+
+ElementOfCoprimeOrder uses:
+
+ElementsCommutingWithInvolution uses:
+
+EqualsModPCore uses:
+
+ExpectedForm uses:
+    PositionsNot
+
+ExtendToBasisEchelon uses:
+    RowSpaceBasis
+
+ExtendToBasisOfFullRowspace uses:
+
+ExtractBlockMap uses:
+
+FindBase uses:
+
+FindBaseC2 uses:
+
+FindBasis uses:
+    ExtendToBasisEchelon
+    IsIntervalVector
+    Mult
+
+FindBasisElement uses:
+    DoubleAndShrink
+    FixedPointSubspace
+    LogRat
+    Mult
+    SubspaceIntersection
+
+FindCounterExample uses:
+    TestRandomElement
+    recognise
+
+FindFieldSize uses:
+    ProbablyGroupExponent
+
+FindGammaInv uses:
+    IsScalarMatrix
+
+FindHomMethodsProjective.AltSymBBByDegree uses:
+    RECOG.HomFDPM
+    RECOG.RecogniseFDPM
+    RECOG.SetPseudoRandomStamp
+
+FindHomMethodsProjective.BiggerScalarsOnly uses:
+    FindHomMethodsProjective.StabilizerChainProj
+    RECOG.HomBCToDiagonalBlock
+
+FindHomMethodsProjective.BlockScalarProj uses:
+    RECOG.HomNormLastBlock
+
+FindHomMethodsProjective.Blocks uses:
+    FindHomMethodsProjective.BlocksBackToMats
+    FindHomMethodsProjective.BlocksModScalars
+
+FindHomMethodsProjective.BlocksBackToMats uses:
+    RECOG.HomBackToMats
+
+FindHomMethodsProjective.BlocksModScalars uses:
+    FindHomMethodsProjective.BlocksModScalars
+    RECOG.HomToDiagonalBlock
+
+FindHomMethodsProjective.C3C5 uses:
+    FindHomMethodsProjective.KroneckerProduct
+    RECOG.BaseChangeForSmallestPossibleField
+    RECOG.HomActionFieldAuto
+    RECOG.HomCommutator
+    RECOG.HomDoBaseAndFieldChangeWithScalarFinding
+    RECOG.HomDoBaseChange
+    RECOG.IsKroneckerProduct
+    RECOG.IsScalarMat
+    RECOG.ScalarsToMultiplyIntoSmallerField
+    RECOG.SetPseudoRandomStamp
+
+FindHomMethodsProjective.C6 uses:
+    FindHomMethodsProjective.DoBaseChangeForBlocks
+    RECOG.HomFuncActionOnBlocks
+    RECOG.HomFuncrewriteones
+    RECOG.New2RecogniseC6
+    RECOG.SetPseudoRandomStamp
+
+FindHomMethodsProjective.ClassicalNatural uses:
+    FindHomMethodsProjective.StabilizerChainProj
+    RECOG.ComputeRootInFiniteField
+    RECOG.FindStdGens_SL
+    RECOG.InitSLfake
+    RECOG.IsThisSL2Natural
+    RECOG.MakeSL_StdGens
+    RECOG.RecogniseSL2NaturalEvenChar
+    RECOG.RecogniseSL2NaturalOddCharUsingBSGS
+    RECOG.SetPseudoRandomStamp
+
+FindHomMethodsProjective.ComputeSimpleSocle uses:
+    RECOG.SetPseudoRandomStamp
+    RECOG.simplesocle
+
+FindHomMethodsProjective.D247 uses:
+    RECOG.InvolutionJumper
+    RECOG.InvolutionSearcher
+    RECOG.IsPower
+    RECOG.ProjectiveOrder
+    RECOG.SetPseudoRandomStamp
+    RECOG.SortOutReducibleNormalSubgroup
+    RECOG.SortOutReducibleSecondNormalSubgroup
+
+FindHomMethodsProjective.DoBaseChangeForBlocks uses:
+    FindHomMethodsProjective.Blocks
+    RECOG.HomDoBaseChange
+
+FindHomMethodsProjective.FindElmOfEvenNormal uses:
+    RECOG.IsPower
+    RECOG.SetPseudoRandomStamp
+    RECOG.SortOutReducibleNormalSubgroup
+    RECOG.SortOutReducibleSecondNormalSubgroup
+
+FindHomMethodsProjective.KroneckerKernel uses:
+    RECOG.HomTensorKernel
+
+FindHomMethodsProjective.KroneckerProduct uses:
+    FindHomMethodsProjective.KroneckerKernel
+    RECOG.HomTensorFactor
+
+FindHomMethodsProjective.LieTypeNonConstr uses:
+    RECOG.LieType
+    RECOG.SetPseudoRandomStamp
+
+FindHomMethodsProjective.LowIndex uses:
+    FindHomMethodsProjective.DoBaseChangeForBlocks
+    RECOG.SetPseudoRandomStamp
+    RECOG.SmallHomomorphicImageProjectiveGroup
+
+FindHomMethodsProjective.NotAbsolutelyIrred uses:
+    FindHomMethodsProjective.BiggerScalarsOnly
+    RECOG.SetPseudoRandomStamp
+    RECOG.WriteOverBiggerFieldWithSmallerDegree
+    RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder
+
+FindHomMethodsProjective.ProjDeterminant uses:
+    RECOG.HomProjDet
+
+FindHomMethodsProjective.PrototypeForC2C4 uses:
+    RECOG.SetPseudoRandomStamp
+    RECOG.SortOutReducibleNormalSubgroup
+
+FindHomMethodsProjective.SporadicsByOrders uses:
+    RECOG.RuleOutSmallProjOrder
+    RECOG.SetPseudoRandomStamp
+    RECOG.SporadicsElementOrders
+    RECOG.SporadicsKillers
+    RECOG.SporadicsNames
+    RECOG.SporadicsProbabilities
+    RECOG.SporadicsSizes
+    RECOG.SporadicsWorkers
+
+FindHomMethodsProjective.StabilizerChainProj uses:
+
+FindHomMethodsProjective.Subfield uses:
+    RECOG.BaseChangeForSmallestPossibleField
+    RECOG.HomDoBaseAndFieldChange
+    RECOG.SetPseudoRandomStamp
+
+FindHomMethodsProjective.TensorDecomposable uses:
+    FindHomMethodsProjective.KroneckerProduct
+    RECOG.FindTensorDecomposition
+    RECOG.FindTensorKernel
+    RECOG.HomDoBaseChange
+    RECOG.IsKroneckerProduct
+    RECOG.SetPseudoRandomStamp
+
+FindHomMethodsProjective.ThreeLargeElOrders uses:
+    RECOG.MakePSL2Hint
+    RECOG.RandElFuncSimpleSocle
+    RECOG.SetPseudoRandomStamp
+    RECOG.findchar
+    SLCR.FindHom
+
+FindHomMethodsProjective.TwoLargeElOrders uses:
+    RECOG.MakePSL2Hint
+    RECOG.TableOfTwoLargestGroupElementOrdersWithDegreeBound
+    SLCR.FindHom
+
+FindPermutation uses:
+    ExpectedForm
+
+FindPoint uses:
+    IdTest
+    MyOrder
+    MyProjection
+    NumberOfDPComponents
+
+FindPoint uses:
+    IsScalarMatrix
+
+Finish uses:
+
+FixedPointSubspace uses:
+    Mult
+
+FrequentOrdersSimp uses:
+
+FullyDeletedPermutationMatrices uses:
+
+FullyDeletedPermutationRepresentation uses:
+    FullyDeletedPermutationMatrices
+    \
+
+GFOrderSimp uses:
+
+GeneratorsCo3Max3 uses:
+
+GeneratorsCo3Max4 uses:
+
+GeneratorsCo3Max6 uses:
+
+GenericParameters uses:
+    InitRecog
+    recognise
+
+GpAsBBGp uses:
+
+GroupCentralisedSpace uses:
+
+GroupSupport uses:
+
+HSfinder uses:
+
+HSm4mod5 uses:
+    Maker
+
+HasChain uses:
+    Chain
+
+HasElementsMultipleOf uses:
+
+HasLBGgt5 uses:
+
+HasNaturalFlag uses:
+    NaturalFlag
+
+IdTest uses:
+    IsScalarMatrix
+
+IdentifySimple uses:
+    DerivedSubgroupApproximation
+    FindFieldSize
+    IsProbablyPerfect
+    IsRecognitionOutcome
+    LieType
+    NR2
+    PossiblyProjectiveOrder
+    RecognizeAlternating
+    RecognizeSporadic
+    RemoveSome
+    SmallCentralizer
+    WhichL2q
+
+ImageInPerfectGroup uses:
+
+ImageInQuotient uses:
+
+InfoFDPM uses:
+
+InitRecog uses:
+
+InsertBlock uses:
+
+InsertSubTree uses:
+    Setovergroup
+    SolvePcWord
+    overgroup
+
+InvProg uses:
+    PowerProg
+
+InvolutionCentraliser uses:
+    ElementsCommutingWithInvolution
+    IsCentralisedBy
+    IsScalarMatrix
+
+InvolutionModCenter uses:
+
+IsAlternating uses:
+    FindCounterExample
+    recognise
+
+IsBBGp uses:
+    IsBBGpElmColl
+
+IsBBGpElm uses:
+
+IsBBGpElmColl uses:
+    IsBBGpElm
+
+IsCentralisedBy uses:
+
+IsDirectProduct uses:
+
+IsExtensionField uses:
+    InitRecog
+    RuledOutExtFieldParamaters
+    TestRandomElement
+    recognise
+
+IsGeneric uses:
+    InitRecog
+    TestRandomElement
+    recognise
+
+IsGenericNearlySimple uses:
+    InitRecog
+    IsAlternating
+    IsMatthieu
+    recognise
+
+IsGroupClassical uses:
+    ClassicalNametoStandardName
+
+IsImageTrivial uses:
+    IsScalarGroup
+
+IsImageTrivial uses:
+    IsImageTrivial
+    IsScalarGroup
+    MyProjection
+    NumberOfDPComponents
+
+IsIntervalVector uses:
+
+IsMatrixBBGp uses:
+    IsBBGp
+    IsMatrixBBGpElmColl
+
+IsMatrixBBGpElm uses:
+    IsBBGpElm
+
+IsMatrixBBGpElmColl uses:
+    IsMatrixBBGpElm
+
+IsMatthieu uses:
+    FindCounterExample
+    recognise
+
+IsNaturalPermBBGp uses:
+    IsBBGp
+    IsNaturalPermBBGpElmColl
+
+IsNaturalPermBBGpElm uses:
+    IsBBGpElm
+
+IsNaturalPermBBGpElmColl uses:
+    IsNaturalPermBBGpElm
+
+IsNonSimpleClassical uses:
+
+IsPQuotientBBGp uses:
+    IsBBGp
+    IsPQuotientBBGpElmColl
+
+IsPQuotientBBGpElm uses:
+    IsBBGpElm
+
+IsPQuotientBBGpElmColl uses:
+    IsPQuotientBBGpElm
+
+IsPSL uses:
+    FindCounterExample
+    recognise
+
+IsPermBBGp uses:
+    IsBBGp
+    IsPermBBGpElmColl
+
+IsPermBBGpElm uses:
+    IsBBGpElm
+
+IsPermBBGpElmColl uses:
+    IsPermBBGpElm
+
+IsPowerOfPrime uses:
+
+IsPre3Cycle uses:
+
+IsPreDoubleTransposition uses:
+
+IsPrimitivePrimeDivisor uses:
+
+IsReducible uses:
+    recognise
+
+IsScalarGroup uses:
+    IsScalarMatrix
+
+IsScalarMatrix uses:
+
+IsSolubleTree uses:
+    IsSolubleTree
+
+IterateWithRandomElements uses:
+
+J2G1find1 uses:
+
+KroneckerFactors uses:
+
+LeastRank uses:
+
+LinearFactors uses:
+    \
+
+LogRat uses:
+
+LowIndexMaps uses:
+    NSM
+    PermGrpMaps
+
+Lym3mod5 uses:
+    Maker
+
+M11finder uses:
+
+M12G1find1 uses:
+
+M12m6mod5 uses:
+    Maker
+
+M22G1find1 uses:
+
+M24m2mod7 uses:
+    Maker
+
+M24m7mod2 uses:
+    Maker
+
+MakeAnotherBigRepresentation uses:
+    f
+
+MakeBigRepresentation uses:
+    f
+
+MakeGroups uses:
+
+MakeSituation uses:
+    RECOG.MakeSL_StdGens
+
+MakeTensorProduct uses:
+
+MakeTest uses:
+    RECOG.MakeSL_StdGens
+
+Maker uses:
+
+MaptoEAGroup uses:
+
+MinBlocks uses:
+
+MinimalDimBoundCrossCharSimp uses:
+    MinimalDimBoundCrossCharSimp
+
+MoreBasisVectors uses:
+    Mult
+    Power
+    VectorImages
+    VectorImagesUnder
+
+Mult uses:
+
+MyActionOnSubspace uses:
+
+MyCommutator uses:
+
+MyDirectProductOfSLPs uses:
+
+MyDirectProductOfSLPsList uses:
+    MyDirectProductOfSLPs
+
+MyEmbedding uses:
+
+MyIsInnerAutomorphism uses:
+    ElementOfCoprimeOrder
+    IsDirectProduct
+    MyEmbedding
+    MyProjection
+    SchurMultiplierOrder
+
+MyOrder uses:
+
+MyProjection uses:
+
+MySocleAction uses:
+    PermAction
+
+NMR_COMM uses:
+
+NMR_GENS uses:
+
+NPPsi uses:
+
+NR1 uses:
+
+NR2 uses:
+
+NRINV uses:
+
+NaturalFlag uses:
+    IsPermBBGp
+
+NonAbPastAb uses:
+
+NonGenericLinear uses:
+    InitRecog
+    TestRandomElement
+    recognise
+
+NtoPadic uses:
+
+NumberOfDPComponents uses:
+
+OrderTree uses:
+    IsSolubleTree
+    PushDown
+    SanityCheck
+    SetTFordered
+
+OuterOrderBound uses:
+    A
+    B
+    C
+    L
+    O
+    U
+    findnpe
+
+PPDAnalysis uses:
+    NPPsi
+
+PPDIrreducibleFactor uses:
+
+PPDIrreducibleFactorD2 uses:
+
+PQuotientEqualsBBGp uses:
+
+PadictoN uses:
+
+PastNonAb uses:
+    IsDirectProduct
+    MyIsInnerAutomorphism
+    PermAction
+
+PermAction uses:
+    FindPoint
+
+PermAction uses:
+    FindPoint
+    MyOrder
+    MyProjection
+    NumberOfDPComponents
+
+PermAltProd uses:
+    PermInverseBBGp
+
+PermEqualsBBGp uses:
+
+PermGrpMaps uses:
+    IdentifySimple
+
+PermInverseBBGp uses:
+
+PermProductBBGp uses:
+    PermAltProd
+    PermInverseBBGp
+
+PositionsNot uses:
+
+PossibleCrossCharTypes uses:
+    GFOrderSimp
+    LeastRank
+    MinimalDimBoundCrossCharSimp
+
+PossibleqNoA1 uses:
+    GFOrderSimp
+    q
+
+Power uses:
+    Mult
+
+PowerProg uses:
+
+PrimitivePrimeDivisors uses:
+
+ProbGenAb uses:
+
+ProbGenNonAb uses:
+    OuterOrderBound
+    SimpleGroupOrder
+
+ProbablyGroupExponent uses:
+
+ProdProg uses:
+
+PushDown uses:
+    AbPastAbSamePrime
+    PushDown
+    PushIntoSocle
+    SanityCheck
+    SetTFordered
+    SwapFactors
+
+PushIntoSocle uses:
+    MyDirectProductOfSLPsList
+    MyEmbedding
+    MyProjection
+    SanityCheck
+    Setovergroup
+    overgroup
+
+RECOG.ActionOnBlocks uses:
+
+RECOG.AddInformationAboutDegree uses:
+    RECOG.ListOfGroupsCrossCharRepsByBound
+    RECOG.TableOfTwoLargestGroupElementOrders
+
+RECOG.AllJellyfish uses:
+    RECOG.FirstJellyfish
+    RECOG.GetAllJellyfish
+    RECOG.NkrGetParameters
+    RECOG.NkrOrbitsOfStabiliser
+    RECOG.NkrSchreierTree
+
+RECOG.AlmostSimpleHints uses:
+
+RECOG.ArtinInvariants uses:
+    RECOG.LieTypeOrderFunc
+    RECOG.OMppdset
+
+RECOG.BaseChangeForSmallestPossibleField uses:
+    RECOG.CleanRow
+
+RECOG.BinomialTab uses:
+
+RECOG.BlindDescent uses:
+    RECOG.TestAbelian
+
+RECOG.BlindDescentStep uses:
+    RECOG.RandomSubproduct
+
+RECOG.CalcNiceGensKnownNilpotent uses:
+
+RECOG.CentralisingElementOfInvolution uses:
+
+RECOG.CheckFingerPrint uses:
+    RECOG.BinomialTab
+
+RECOG.ClassicalForms uses:
+
+RECOG.CleanRow uses:
+
+RECOG.CommonDiagonal2 uses:
+
+RECOG.Commute uses:
+
+RECOG.ComputeArtin uses:
+
+RECOG.ComputeExtractionLayerLengths uses:
+
+RECOG.ComputeRootInFiniteField uses:
+
+RECOG.Conj uses:
+
+RECOG.ConjEltAnEven uses:
+
+RECOG.ConjEltAnOdd uses:
+
+RECOG.ConjEltSn uses:
+
+RECOG.ConjInv uses:
+
+RECOG.Construct3Cycle uses:
+    RECOG.IsPre3Cycle
+    RECOG.LinearFactors
+    RECOG.LogRat
+
+RECOG.ConstructDoubleTransposition uses:
+    RECOG.IsPreDoubleTransposition
+    RECOG.LinearFactors
+    RECOG.LogRat
+
+RECOG.DecomposeNilpotent uses:
+
+RECOG.DirectFactorsAction uses:
+
+RECOG.DirectFactorsFinder uses:
+
+RECOG.DistinguishAtlasReps uses:
+
+RECOG.DistinguishSpO uses:
+    RECOG.LieTypeOrderFunc
+    RECOG.OMppdset
+    RECOG.VerifyOrders
+
+RECOG.DoColOp_SL uses:
+    RECOG.FindFFCoeffs
+
+RECOG.DoRowOp_SL uses:
+    RECOG.FindFFCoeffs
+
+RECOG.DoubleAndShrink uses:
+    RECOG.Commute
+    RECOG.Conj
+    RECOG.LogRat
+
+RECOG.ElementOrderStats uses:
+
+RECOG.ExpectedForm uses:
+    RECOG.PositionsNot
+
+RECOG.ExpressInStd_SL uses:
+    RECOG.DoRowOp_SL
+
+RECOG.ExpressInStd_SL2 uses:
+    RECOG.DoRowOp_SL
+
+RECOG.ExtendToBasisEchelon uses:
+    RECOG.RowSpaceBasis
+
+RECOG.ExtractLowStuff uses:
+
+RECOG.FindAdjustedBasis uses:
+    RECOG.CleanRow
+
+RECOG.FindBasis uses:
+    RECOG.ExtendToBasisEchelon
+    RECOG.IsIntervalVector
+
+RECOG.FindBasisElement uses:
+    RECOG.DoubleAndShrink
+    RECOG.FixedPointSubspace
+    RECOG.LogRat
+    RECOG.SubspaceIntersection
+
+RECOG.FindFFCoeffs uses:
+
+RECOG.FindImageJellyfish uses:
+
+RECOG.FindPermutation uses:
+    RECOG.ExpectedForm
+
+RECOG.FindStdGensUsingBSGS uses:
+
+RECOG.FindStdGens_SL uses:
+    RECOG.FindStdGensUsingBSGS
+    RECOG.LinearAction
+    RECOG.MakeSL_StdGens
+    RECOG.RecogniseSL2NaturalEvenChar
+    RECOG.RecogniseSL2NaturalOddCharUsingBSGS
+    RECOG.SLn_UpStep
+    RECOG.SLn_constructsl2
+
+RECOG.FindTensorDecomposition uses:
+
+RECOG.FindTensorKernel uses:
+
+RECOG.FirstJellyfish uses:
+    RECOG.NkrTraceSchreierTree
+
+RECOG.FixedPointSubspace uses:
+
+RECOG.ForceToOtherField uses:
+
+RECOG.GetAllJellyfish uses:
+
+RECOG.GiantEpsilon uses:
+
+RECOG.GuessProjSL2ElmOrder uses:
+
+RECOG.HomActionFieldAuto uses:
+
+RECOG.HomBCToDiagonalBlock uses:
+
+RECOG.HomBackToMats uses:
+
+RECOG.HomCommutator uses:
+    RECOG.IsScalarMat
+
+RECOG.HomDoBaseAndFieldChange uses:
+    RECOG.ForceToOtherField
+
+RECOG.HomDoBaseAndFieldChangeWithScalarFinding uses:
+    RECOG.ForceToOtherField
+
+RECOG.HomDoBaseChange uses:
+
+RECOG.HomFDPM uses:
+    RECOG.FindPermutation
+
+RECOG.HomForNilpotent uses:
+    RECOG.DecomposeNilpotent
+
+RECOG.HomFuncActionOnBlocks uses:
+    RECOG.ActionOnBlocks
+
+RECOG.HomFuncrewriteones uses:
+    RECOG.rewriteones
+
+RECOG.HomNormLastBlock uses:
+    RECOG.IsBlockScalarMatrix
+
+RECOG.HomOntoBlockDiagonal uses:
+    RECOG.IsBlockLowerTriangularWithBlocks
+
+RECOG.HomProjDet uses:
+
+RECOG.HomTensorFactor uses:
+    RECOG.IsKroneckerProduct
+
+RECOG.HomTensorKernel uses:
+
+RECOG.HomToDiagonalBlock uses:
+    RECOG.IsDiagonalBlockOfMatrix
+
+RECOG.HomToScalars uses:
+
+RECOG.IndexMaxSub uses:
+
+RECOG.InitBinomialTab uses:
+    RECOG.BinomialTab
+
+RECOG.InitSLfake uses:
+    RECOG.InitSLstd
+
+RECOG.InitSLstd uses:
+    RECOG.ResetSLstd
+
+RECOG.InvolutionCentraliser uses:
+    RECOG.CentralisingElementOfInvolution
+
+RECOG.InvolutionJumper uses:
+
+RECOG.InvolutionSearcher uses:
+
+RECOG.IsBlockLowerTriangularWithBlocks uses:
+
+RECOG.IsBlockScalarMatrix uses:
+
+RECOG.IsDiagonalBlockOfMatrix uses:
+
+RECOG.IsGeneric uses:
+
+RECOG.IsGenericParameters uses:
+
+RECOG.IsGiant uses:
+
+RECOG.IsIntervalVector uses:
+
+RECOG.IsKroneckerProduct uses:
+
+RECOG.IsNotAlternating uses:
+
+RECOG.IsNotMathieu uses:
+
+RECOG.IsNotPSL uses:
+
+RECOG.IsPower uses:
+
+RECOG.IsPre3Cycle uses:
+
+RECOG.IsPreDoubleTransposition uses:
+
+RECOG.IsReducible uses:
+
+RECOG.IsSLContained uses:
+
+RECOG.IsSOContained uses:
+
+RECOG.IsSUContained uses:
+
+RECOG.IsScalarMat uses:
+
+RECOG.IsSpContained uses:
+
+RECOG.IsThisSL2Natural uses:
+    RECOG.GuessProjSL2ElmOrder
+    RECOG.IsScalarMat
+    RECOG.RandomSubproduct
+
+RECOG.IterateWithRandomElements uses:
+
+RECOG.JellyHomFunc uses:
+    RECOG.FindImageJellyfish
+
+RECOG.LieType uses:
+    RECOG.ArtinInvariants
+    RECOG.DistinguishSpO
+    RECOG.LieTypeNmrTrials
+    RECOG.LieTypeSampleSize
+    RECOG.OMinus8vsSPvsO
+    RECOG.OPlus82vsS62
+    RECOG.OPlus83vsO73vsSP63
+    RECOG.OPlus8vsO7vsSP6
+    RECOG.PSLvsPSP
+    RECOG.VerifyOrders
+
+RECOG.LieTypeNmrTrials uses:
+
+RECOG.LieTypeOrderFunc uses:
+    RECOG.ProjectiveOrder
+
+RECOG.LieTypeSampleSize uses:
+
+RECOG.LinearAction uses:
+    RECOG.LinearAction
+
+RECOG.LinearAction uses:
+
+RECOG.LinearFactors uses:
+    \
+
+RECOG.ListOfGroupsCrossCharRepsByBound uses:
+
+RECOG.LogRat uses:
+
+RECOG.MYRANDOMSUBPRODUCTPOWERS uses:
+
+RECOG.MakeAlternatingMatrixReps uses:
+
+RECOG.MakeC6Group uses:
+
+RECOG.MakePSL2Hint uses:
+
+RECOG.MakeSL_StdGens uses:
+
+RECOG.MakeSymmetricMatrixReps uses:
+
+RECOG.MeatAxe uses:
+
+RECOG.MoreBasisVectors uses:
+    RECOG.Power
+    RECOG.VectorImages
+    RECOG.VectorImagesUnder
+
+RECOG.New2RecogniseC6 uses:
+    RECOG.BlindDescent
+    RECOG.basis2
+    RECOG.rewriteones
+
+RECOG.NiceGeneratorsAnEven uses:
+
+RECOG.NiceGeneratorsAnOdd uses:
+
+RECOG.NiceGeneratorsSn uses:
+
+RECOG.NkrGetParameters uses:
+
+RECOG.NkrOrbitsOfStabiliser uses:
+    RECOG.NkrTraceSchreierTree
+
+RECOG.NkrSchreierTree uses:
+
+RECOG.NkrTraceSchreierTree uses:
+
+RECOG.NoClassicalForms uses:
+
+RECOG.NonGenericLinear uses:
+
+RECOG.NonGenericOrthogonalCircle uses:
+
+RECOG.NonGenericOrthogonalMinus uses:
+
+RECOG.NonGenericOrthogonalPlus uses:
+
+RECOG.NonGenericSymplectic uses:
+
+RECOG.NonGenericUnitary uses:
+
+RECOG.NormaliseScalarForPSLd uses:
+
+RECOG.OMinus8vsSPvsO uses:
+    RECOG.DistinguishSpO
+    RECOG.VerifyOrders
+    RECOG.ppdSample
+
+RECOG.OMppdset uses:
+
+RECOG.OPlus82vsS62 uses:
+    RECOG.OrderSample
+    RECOG.VerifyOrders
+
+RECOG.OPlus83vsO73vsSP63 uses:
+    RECOG.DistinguishSpO
+    RECOG.OrderSample
+
+RECOG.OPlus8vsO7vsSP6 uses:
+    RECOG.ComputeArtin
+    RECOG.DistinguishSpO
+    RECOG.LieTypeOrderFunc
+    RECOG.VerifyOrders
+
+RECOG.OrderSample uses:
+    RECOG.LieTypeOrderFunc
+
+RECOG.OtherGetAllJellyfish uses:
+
+RECOG.PSLvsPSP uses:
+    RECOG.LieTypeOrderFunc
+    RECOG.VerifyOrders
+    RECOG.ppdSample
+
+RECOG.ParseNumber uses:
+
+RECOG.PositionsNot uses:
+
+RECOG.Power uses:
+
+RECOG.PrintGenericStabChainHint uses:
+
+RECOG.ProduceTrivialStabChainHint uses:
+
+RECOG.ProjectiveOrder uses:
+
+RECOG.RadBasis uses:
+    RECOG.CommonDiagonal2
+
+RECOG.RandElFuncSimpleSocle uses:
+
+RECOG.RandomSubproduct uses:
+    RECOG.RANDOMSUBPRODUCTPOWERS
+
+RECOG.RecogniseAn uses:
+    RECOG.ConjEltAnEven
+    RECOG.ConjEltAnOdd
+    RECOG.NiceGeneratorsAnEven
+    RECOG.NiceGeneratorsAnOdd
+
+RECOG.RecogniseFDPM uses:
+    RECOG.Construct3Cycle
+    RECOG.ConstructDoubleTransposition
+    RECOG.FindBasis
+    RECOG.FindBasisElement
+    RECOG.IterateWithRandomElements
+    RECOG.LogRat
+    RECOG.MoreBasisVectors
+
+RECOG.RecogniseGiant uses:
+    RECOG.RecogniseAn
+    RECOG.RecogniseSn
+
+RECOG.RecogniseSL2NaturalEvenChar uses:
+
+RECOG.RecogniseSL2NaturalOddCharUsingBSGS uses:
+    RECOG.FindStdGensUsingBSGS
+    RECOG.MakeSL_StdGens
+
+RECOG.RecogniseSn uses:
+    RECOG.ConjEltSn
+    RECOG.NiceGeneratorsSn
+
+RECOG.ResetSLstd uses:
+
+RECOG.RowSpaceBasis uses:
+
+RECOG.RuleOutSmallProjOrder uses:
+
+RECOG.RuledOutExtField uses:
+
+RECOG.SLPforAn uses:
+
+RECOG.SLPforSn uses:
+
+RECOG.SLn_UpStep uses:
+    RECOG.DoColOp_SL
+    RECOG.DoRowOp_SL
+    RECOG.InitSLstd
+    RECOG.ResetSLstd
+
+RECOG.SLn_constructppd2 uses:
+    RECOG.SLn_godown
+
+RECOG.SLn_constructsl2 uses:
+    RECOG.SLn_constructppd2
+    RECOG.SLn_constructsl4
+    RECOG.SLn_exceptionalgodown
+    RECOG.SLn_godownfromd
+
+RECOG.SLn_constructsl4 uses:
+
+RECOG.SLn_exceptionalgodown uses:
+
+RECOG.SLn_godown uses:
+
+RECOG.SLn_godownfromd uses:
+    RECOG.LinearAction
+
+RECOG.ScalarToMultiplyIntoSmallerField uses:
+
+RECOG.ScalarsToMultiplyIntoSmallerField uses:
+    RECOG.ScalarToMultiplyIntoSmallerField
+
+RECOG.SetPseudoRandomStamp uses:
+
+RECOG.SetupNormalisationListForPSLd uses:
+
+RECOG.SmallHomomorphicImageProjectiveGroup uses:
+    RECOG.IndexMaxSub
+
+RECOG.SortOutReducibleNormalSubgroup uses:
+    FindHomMethodsProjective.KroneckerProduct
+    RECOG.HomDoBaseChange
+    RECOG.IsKroneckerProduct
+
+RECOG.SortOutReducibleSecondNormalSubgroup uses:
+    RECOG.DirectFactorsAction
+    RECOG.DirectFactorsFinder
+
+RECOG.SporadicsElementOrders uses:
+
+RECOG.SporadicsKillers uses:
+
+RECOG.SporadicsNames uses:
+
+RECOG.SporadicsProbabilities uses:
+
+RECOG.SporadicsSizes uses:
+
+RECOG.SporadicsWorkers uses:
+
+RECOG.SubspaceIntersection uses:
+
+RECOG.TableOfTwoLargestGroupElementOrders uses:
+
+RECOG.TableOfTwoLargestGroupElementOrdersWithDegreeBound uses:
+
+RECOG.TestAbelian uses:
+
+RECOG.TestGroup uses:
+    RECOG.TestGroupOptions
+
+RECOG.TestGroupOptions uses:
+
+RECOG.TestRandomElement uses:
+
+RECOG.TestRecognitionNode uses:
+    RECOG.TestRecognitionNode
+
+RECOG.VectorImages uses:
+
+RECOG.VectorImagesUnder uses:
+    RECOG.VectorImages
+
+RECOG.VerifyOrders uses:
+
+RECOG.WriteOverBiggerFieldWithSmallerDegree uses:
+
+RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder uses:
+    RECOG.CleanRow
+    RECOG.WriteOverBiggerFieldWithSmallerDegree
+
+RECOG.basis uses:
+    RECOG.RadBasis
+    RECOG.whichpower
+
+RECOG.basis2 uses:
+    RECOG.RadBasis
+    RECOG.whichpower
+
+RECOG.check uses:
+
+RECOG.check2 uses:
+
+RECOG.commondiagonal uses:
+
+RECOG.exponents uses:
+    RECOG.whichpower
+
+RECOG.findchar uses:
+    RECOG.grouplist
+    RECOG.shortorbit
+
+RECOG.grouplist uses:
+
+RECOG.multiplicity uses:
+
+RECOG.ppdSample uses:
+    RECOG.ComputeArtin
+
+RECOG.rewriteones uses:
+    RECOG.ActionOnBlocks
+    RECOG.check
+    RECOG.exponents
+
+RECOG.shortorbit uses:
+
+RECOG.simplesocle uses:
+
+RECOG.testAllMaximalSubgroupsOfAtlasGroup uses:
+    RECOG.TestGroup
+
+RECOG.testAllSubgroups uses:
+    RECOG.TestGroup
+
+RECOG.whichpower uses:
+
+RECOG_ViewObj uses:
+
+RandomConjugate uses:
+
+RandomFullyDeletedPermutationRepresentation uses:
+    FullyDeletedPermutationRepresentation
+
+RandomGensDerived uses:
+    NMR_COMM
+
+RandomInvModCenter uses:
+    InvolutionModCenter
+    NRINV
+    PossiblyProjectiveOrder
+
+RandomOrders uses:
+
+RandomProjectiveOrders uses:
+
+RandomSymmetricGroupOnFDPM uses:
+
+RearrangeTopFactors uses:
+    HasTFordered
+    IsDirectProduct
+    MySocleAction
+    PastNonAb
+    RefineMap
+    SetTFordered
+    SwapFactors
+    TFordered
+    overgroup
+
+RecogniseAlternating uses:
+    RecognizeAlternating
+
+RecogniseClassicalNPCase uses:
+    GenericParameters
+    InitRecog
+    IsExtensionField
+    IsGeneric
+    IsGenericNearlySimple
+    recognise
+
+RecogniseMatrixGroup uses:
+    ConjInv
+    Construct3Cycle
+    ConstructDoubleTransposition
+    FindBasis
+    FindBasisElement
+    FindPermutation
+    IterateWithRandomElements
+    LogRat
+    MoreBasisVectors
+
+RecognisePcGroup uses:
+
+RecogniseQuasiSimple uses:
+    A
+    FindImageAn
+    RecogniseSnAn
+    SLPforAn
+
+RecogniseQuasiSimpleDP uses:
+    FindGammaInv
+    FindPoint
+    IsImageTrivial
+    MyDirectProductOfSLPsList
+    PermAction
+    RecogniseQuasiSimple
+    RecogniseTrivialGroup
+    RefineMap
+    WhichPowerIsModuleIsoModScalars
+
+RecogniseSporadic uses:
+    RecognizeSporadic
+
+RecogniseTrivialGroup uses:
+    IsScalarMatrix
+
+RecognizeAlternating uses:
+    DegreeAlternating
+
+RecognizeSporadic uses:
+    SporadicGroupData
+    o
+
+ReducibleCOB uses:
+
+ReducibleMaps uses:
+    ExtractBlockMap
+    NSM
+    ReducibleCOB
+
+RefineElementaryAbelianLayers uses:
+    ConstructActionMatrices
+    InsertSubTree
+    RefineElementaryAbelianLayers
+    VectortoPc
+
+RefineMap uses:
+
+RefineMap uses:
+    MyOrder
+    MyProjection
+    NumberOfDPComponents
+
+RefineSolubleLayers uses:
+    InsertSubTree
+    RefineSolubleLayers
+
+RemoveSome uses:
+    RemoveSome
+
+RemoveTrivialLayers uses:
+    RemoveTrivialLayers
+
+RequiredNumberOfGens uses:
+    ProbGenAb
+    ProbGenNonAb
+
+RowSpaceBasis uses:
+
+RuledOutExtFieldParamaters uses:
+    recognise
+
+SLCR uses:
+
+SLCR.AppendTran uses:
+
+SLCR.AttachSLNewgens uses:
+    SLCR.SLLabelPoint
+
+SLCR.BoundedOrder uses:
+
+SLCR.CommutesWith uses:
+
+SLCR.ComputeGamma uses:
+
+SLCR.ConstructTranGroup uses:
+    SLCR.AppendTran
+
+SLCR.Dislodge uses:
+
+SLCR.EqualPoints uses:
+
+SLCR.FindGoodElement uses:
+
+SLCR.FindHom uses:
+    SLCR.SLDataStructure
+
+SLCR.IS_IN_CENTRE uses:
+
+SLCR.InvProg uses:
+    SLCR.PowerProg
+
+SLCR.IsInQ uses:
+    SLCR.CommutesWith
+
+SLCR.IsOnAxis uses:
+
+SLCR.LDataStructure uses:
+    SLCR.SL2DataStructure
+
+SLCR.MatrixOfEndo uses:
+    SLCR.NtoPadic
+
+SLCR.NtoPadic uses:
+
+SLCR.PadictoN uses:
+
+SLCR.PowerProg uses:
+
+SLCR.ProdProg uses:
+
+SLCR.QuickSL3DataStructure uses:
+    SLCR.ComputeGamma
+    SLCR.SL3ConstructQ
+
+SLCR.SL2DataStructure uses:
+    SLCR.ConstructTranGroup
+    SLCR.Dislodge
+    SLCR.PowerProg
+    SLCR.SL2ReOrder
+    SLCR.SL2Search
+    SLCR.SLSprog
+    SLCR.Standardize
+
+SLCR.SL2ReOrder uses:
+    SLCR.MatrixOfEndo
+    SLCR.PadictoN
+    SLCR.extractgen
+
+SLCR.SL2Search uses:
+    SLCR.BoundedOrder
+    SLCR.IS_IN_CENTRE
+
+SLCR.SL3ConstructQ uses:
+    SLCR.AppendTran
+    SLCR.CommutesWith
+
+SLCR.SL3DataStructure uses:
+    SLCR.ComputeGamma
+    SLCR.FindGoodElement
+    SLCR.LDataStructure
+    SLCR.SL3ConstructQ
+    SLCR.SLConstructBasisQ
+    SLCR.SLFinishConstruction
+
+SLCR.SL4FindGoodElement uses:
+    SLCR.IS_IN_CENTRE
+
+SLCR.SLConjInQ uses:
+    SLCR.AppendTran
+    SLCR.EqualPoints
+    SLCR.IsInQ
+
+SLCR.SLConstructBasisQ uses:
+
+SLCR.SLConstructGammaTransv uses:
+    SLCR.EqualPoints
+
+SLCR.SLDataStructure uses:
+    SLCR.FindGoodElement
+    SLCR.QuickSL3DataStructure
+    SLCR.SL2DataStructure
+    SLCR.SL3DataStructure
+    SLCR.SL4FindGoodElement
+    SLCR.SLConstructBasisQ
+    SLCR.SLDataStructure
+    SLCR.SLExchangeL
+    SLCR.SLFindGenerators
+    SLCR.SLFinishConstruction
+
+SLCR.SLExchangeL uses:
+    SLCR.AppendTran
+
+SLCR.SLFindGenerators uses:
+    SLCR.AppendTran
+    SLCR.EqualPoints
+    SLCR.SLConjInQ
+
+SLCR.SLFinishConstruction uses:
+    SLCR.AttachSLNewgens
+    SLCR.ProdProg
+    SLCR.SLConstructGammaTransv
+    SLCR.SLSLP
+    SLCR.SLSprog
+
+SLCR.SLLabelPoint uses:
+    SLCR.EqualPoints
+    SLCR.IsOnAxis
+    SLCR.SLConjInQ
+    SLCR.SLLinearCombQ
+
+SLCR.SLLinearCombQ uses:
+
+SLCR.SLSLP uses:
+    SLCR.InvProg
+    SLCR.PowerProg
+    SLCR.ProdProg
+
+SLCR.SLSLPbb uses:
+    SLCR.EqualPoints
+    SLCR.InvProg
+    SLCR.IsInQ
+    SLCR.IsOnAxis
+    SLCR.PowerProg
+    SLCR.ProdProg
+    SLCR.SLConjInQ
+    SLCR.SLLinearCombQ
+    SLCR.SLSLP
+
+SLCR.SLSprog uses:
+    SLCR.ProdProg
+
+SLCR.Standardize uses:
+
+SLCR.extractgen uses:
+
+SLPinLabels uses:
+
+SLnUpStep uses:
+    RECOG.DoColOp_SL
+    RECOG.DoRowOp_SL
+    RECOG.InitSLstd
+    RECOG.ResetSLstd
+
+SMTX_InvariantBilinearForm uses:
+
+SanityCheck uses:
+
+ScalarGroupMaps uses:
+    IsScalarGroup
+    ScalarMap
+
+ScalarMap uses:
+
+SchurMultiplierOrder uses:
+    A
+    L
+    S
+    U
+    findnpe
+
+SetChain uses:
+    Chain
+
+SetNaturalFlag uses:
+    NaturalFlag
+
+SetReturnNPFlags uses:
+    recognise
+
+SimpleGroupOrder uses:
+    A
+    L
+    O
+    S
+    U
+    findnpe
+
+SmallCentralizer uses:
+    Commutators
+    InvolutionModCenter
+    NMR_GENS
+    PossiblyProjectiveOrder
+    RandomGensDerived
+    RandomInvModCenter
+
+SolveLeafDP uses:
+    FindGammaInv
+    FindPoint
+    MyDirectProductOfSLPsList
+    MyEmbedding
+    MyProjection
+    NumberOfDPComponents
+    PermAction
+    RecogniseLeaf
+    RefineMap
+    WhichPowerIsModuleIsoModScalars
+    overgroup
+
+SolveLeafPc uses:
+
+SolveLeafTrivial uses:
+    IsScalarMatrix
+    SolveLeafPc
+
+SolvePcWord uses:
+
+SporadicGroupData uses:
+
+StableDerivative uses:
+    IsProbablyPerfect
+    PseudoRandomNormalClosureElement
+
+StoredPointsPerm uses:
+
+SubGpAsBBGp uses:
+    IsBBGp
+
+SubgroupChainsCo1 uses:
+    Finish
+
+SubgroupChainsCo2 uses:
+    Finish
+
+SubgroupChainsCo3 uses:
+    Finish
+    GeneratorsCo3Max3
+    GeneratorsCo3Max4
+    GeneratorsCo3Max6
+
+SubgroupChainsFi22 uses:
+    Finish
+
+SubgroupChainsFi23 uses:
+    Finish
+
+SubgroupChainsFi24 uses:
+    Finish
+
+SubgroupChainsHN uses:
+    Finish
+
+SubgroupChainsHS uses:
+    Finish
+
+SubgroupChainsHe uses:
+    Finish
+
+SubgroupChainsJ1 uses:
+    Finish
+
+SubgroupChainsJ2 uses:
+    Finish
+
+SubgroupChainsJ3 uses:
+    Finish
+
+SubgroupChainsJ4 uses:
+    Finish
+
+SubgroupChainsLy uses:
+    Finish
+
+SubgroupChainsM11 uses:
+    Finish
+
+SubgroupChainsM12 uses:
+    Finish
+
+SubgroupChainsM22 uses:
+    Finish
+
+SubgroupChainsM23 uses:
+    Finish
+
+SubgroupChainsM24 uses:
+    Finish
+
+SubgroupChainsMcL uses:
+    Finish
+
+SubgroupChainsON uses:
+    Finish
+    MyCommutator
+
+SubgroupChainsRu uses:
+    Finish
+
+SubgroupChainsSuz uses:
+    Finish
+
+SubgroupChainsTh uses:
+    Finish
+
+SubspaceIntersection uses:
+
+SwapFactors uses:
+    SanityCheck
+    Setovergroup
+    overgroup
+
+SymmetricGroupOnFDPM uses:
+    FullyDeletedPermutationMatrices
+
+TensorMaps uses:
+    NSM
+    RECOG.FindTensorDecomposition
+    RECOG.FindTensorKernel
+    RECOG.IsKroneckerProduct
+
+TensorProductOfMatrixGroup uses:
+
+TestGroup uses:
+
+TestRandomElement uses:
+    IsReducible
+    recognise
+
+UnipotentMaps uses:
+    ReducibleCOB
+
+VectorImages uses:
+    Mult
+
+VectorImagesUnder uses:
+    VectorImages
+
+VectortoPc uses:
+
+WhichL2q uses:
+    NR1
+    PossiblyProjectiveOrder
+
+WhichPowerIsModuleIsoModScalars uses:
+    ElementOfCoprimeOrder
+    SchurMultiplierOrder
+
+WordinLabels uses:
+
+WreathProductOfMatrixGroupTensor uses:
+
+addToNNRBasis uses:
+
+agens uses:
+    a
+
+alg4 uses:
+    addToNNRBasis
+
+alg8 uses:
+    alg4
+
+bgens uses:
+    b
+
+check uses:
+
+constructdata uses:
+    godownone
+
+constructsl46 uses:
+    godown
+
+cross uses:
+
+expected uses:
+
+expectedspor uses:
+
+extraspecial uses:
+
+findchar uses:
+    shortorbit
+
+findnpe uses:
+
+first uses:
+
+gen uses:
+
+generatorsOfGroup uses:
+    z
+
+gens uses:
+    gens
+    x
+    xi
+
+gens uses:
+
+gens1 uses:
+
+gens2 uses:
+    gens
+    r
+    ri
+
+gens2 uses:
+    gens
+
+gens8 uses:
+    c
+    gens
+
+gensd uses:
+    gens1
+
+gensd uses:
+    gensd
+
+gensp uses:
+
+gensp uses:
+    gensp
+
+genssemi uses:
+    gens8
+    x
+    xi
+
+genssl uses:
+
+glMakers uses:
+    generatorsOfGroup
+
+glMakers2 uses:
+    generatorsOfGroup
+
+glMakers3 uses:
+
+glMakers4 uses:
+
+glxsp uses:
+    TensorProductOfMatrixGroup
+    gl
+    sp
+
+godown uses:
+    first
+
+godownone uses:
+
+grouplistpr uses:
+
+guck uses:
+    HSm4mod5
+    MakeTensorProduct
+
+guck uses:
+
+magmasp45 uses:
+    f
+
+maximals11 uses:
+    f
+
+maximals13 uses:
+    f
+
+maximals5 uses:
+    f
+
+maximals7 uses:
+    f
+
+minusc6 uses:
+    c6
+
+minusextraspecial uses:
+
+really_good uses:
+
+recognise uses:
+
+rislxsp uses:
+    RECOG.TestGroup
+    sl
+    slxsp
+    sp
+
+rislxsp uses:
+    RECOG.TestGroup
+    gl
+    glxsp
+    sp
+
+sfex1 uses:
+    gens
+
+sfex2 uses:
+    gens2
+
+sgens uses:
+
+shortorbit uses:
+
+skew uses:
+
+skewedG uses:
+    temp
+
+sl2 uses:
+    genssl
+
+slxsp uses:
+    TensorProductOfMatrixGroup
+    sl
+    sp
+
+stdgens uses:
+    l
+    r
+
+temp uses:
+
+testPossibleCrossCharTypes uses:
+    MinimalDimBoundCrossCharSimp
+    PossibleCrossCharTypes
+
+tglgl3 uses:
+    MakeTensorProduct
+
+truncated uses:
+
+truncated2 uses:
+
+tsl2sl25 uses:
+    MakeTensorProduct
+    sl2
+
+tslgl5 uses:
+    MakeTensorProduct
+
+tslsl7 uses:
+    MakeTensorProduct
+
