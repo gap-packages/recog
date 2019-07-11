@@ -9,19 +9,20 @@ fi;
 
 Read("regen_doc.g");
 
+scan_dirs := [
+    "doc",
+    "gap",
+    "gap/almostsimple",
+    "gap/base",
+    "gap/generic",
+    "gap/matrix",
+    "gap/perm",
+    "gap/projective",
+    ];
+
 AutoDoc(rec(
-    autodoc := rec(
-        scan_dirs := [
-            "doc",
-            "gap",
-            "gap/almostsimple",
-            "gap/base",
-            "gap/generic",
-            "gap/matrix",
-            "gap/perm",
-            "gap/projective",
-            ],
-    ),
+    autodoc := rec( scan_dirs := scan_dirs ),
+    gapdoc := rec( scan_dirs := scan_dirs ),
     scaffold := rec(
         bib := "recog",
         includes := [
