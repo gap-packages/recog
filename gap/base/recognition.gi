@@ -871,10 +871,7 @@ end );
 InstallGlobalFunction( FindKernelFastNormalClosure,
   # Used in the generic recursive routine.
   function(ri,n1,n2)
-    local succ;
-
-    succ := FindKernelRandom(ri,n1);
-    if succ = false then
+    if not FindKernelRandom(ri, n1) then
         return false;
     fi;
 
