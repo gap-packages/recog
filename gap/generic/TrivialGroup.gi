@@ -23,7 +23,7 @@ end;
 #! @BeginChunk TrivialGroup
 #! This method is successful if and only if all generators of a group
 #! <A>G</A> are equal to the identity. Otherwise, it returns
-#! <C>NeverApplicable</C> indicating that it will never succeed. This method
+#! <K>NeverApplicable</K> indicating that it will never succeed. This method
 #! is only installed to handle the trivial case such that we do not have to
 #! take this case into account in the other methods.
 #! @EndChunk

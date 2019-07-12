@@ -489,10 +489,10 @@ end;
 #! and <M>2 \cdot r \cdot k^2 \le n</M>.
 #!
 #! If <A>G</A> is imprimitive then the output is
-#! <C>NeverApplicable</C>. If <A>G</A> is primitive then
+#! <K>NeverApplicable</K>. If <A>G</A> is primitive then
 #! the output is either a homomorphism into the
 #! natural imprimitive action of <A>G</A> on <M>nr</M> points with
-#! <M>r</M> blocks of size <M>n</M>, or <C>TemporaryFailure</C>.
+#! <M>r</M> blocks of size <M>n</M>, or <K>TemporaryFailure</K>.
 #! @EndChunk
 FindHomMethodsPerm.LargeBasePrimitive :=
   function(ri,grp)

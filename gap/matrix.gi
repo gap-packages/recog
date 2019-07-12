@@ -22,7 +22,7 @@ end;
 
 #! @BeginChunk DiagonalMatrices
 #! This method is successful if and only if all generators of a matrix group
-#! <A>G</A> are diagonal matrices. Otherwise, it returns <C>NeverApplicable</C>.
+#! <A>G</A> are diagonal matrices. Otherwise, it returns <K>NeverApplicable</K>.
 #! @EndChunk
 FindHomMethodsMatrix.DiagonalMatrices := function(ri, G)
   local H,d,f,gens,hom,i,isscalars,j,newgens,upperleft;
@@ -389,7 +389,7 @@ end;
 
 #! @BeginChunk ReducibleIso
 #! This method determines whether a matrix group <A>G</A> acts irreducibly.
-#! If yes, then it returns <C>NeverApplicable</C>. If <A>G</A> acts reducibly then
+#! If yes, then it returns <K>NeverApplicable</K>. If <A>G</A> acts reducibly then
 #! a composition series of the underlying module is computed and a base
 #! change is performed to write <A>G</A> in a block lower triangular form.
 #! Also, the method passes a hint to the image group that it is in

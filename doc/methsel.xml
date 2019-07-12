@@ -43,18 +43,18 @@ user is completely free there. A method can (and has to) return
 one of the following four values:<P/>
 
 <List>
-<Mark><C>Success</C></Mark>
+<Mark><K>Success</K></Mark>
 <Item>means that the method was successful and no more methods have to be
     tried.</Item>
-<Mark><C>NeverApplicable</C></Mark>
+<Mark><K>NeverApplicable</K></Mark>
 <Item>means that the method was not successful and that there is no point
     to call the method again in this situation whatsoever.</Item>
-<Mark><C>TemporaryFailure</C></Mark>
+<Mark><K>TemporaryFailure</K></Mark>
 <Item>means that the method temporarily failed, that it however could be
     sensible to call it again in this situation at a later stage. This
     value is typical for a Las Vegas algorithm using randomised methods,
     which has failed, but which may succeed when called again.</Item>
-<Mark><C>NotEnoughInformation</C></Mark>
+<Mark><K>NotEnoughInformation</K></Mark>
 <Item>means that the method for some reason refused to do its work. However,
     it is possible that it will become applicable later such that it makes
     sense to call it again, may when more information is available.</Item>
@@ -102,18 +102,18 @@ The method selection record has the following components:
 
 <List>
     <Mark><C>inapplicableMethods</C></Mark>
-    <Item>a record, in which for every method that returned <C>NeverApplicable</C>
+    <Item>a record, in which for every method that returned <K>NeverApplicable</K>
         the value 1 is bound to the component with name the stamp
         of the method.</Item>
     <Mark><C>failedMethods</C></Mark>
-    <Item>a record, in which for every time a method returned <C>TemporaryFailure</C>
+    <Item>a record, in which for every time a method returned <K>TemporaryFailure</K>
         the value bound to the component with name the stamp of the method
         is increased by 1 (not being bound means zero).</Item>
     <Mark><C>successMethod</C></Mark>
     <Item>the stamp of the method that succeeded, if one did. This component
         is only bound after successful completion.</Item>
     <Mark><C>result</C></Mark>
-    <Item>a boolean value which is either <C>Success</C> or <C>TemporaryFailure</C>
+    <Item>a boolean value which is either <K>Success</K> or <K>TemporaryFailure</K>
         depending on whether a successful method was found or the procedure
         gave up respectively. This component is only bound after
         completion of the method selection procedure.</Item>
@@ -125,20 +125,20 @@ The method selection record has the following components:
 The algorithm used by <Ref Func="CallMethods"/> is extremely simple:
 It sets a counter <C>tolerance</C> to zero. The main loop starts at the
 beginning of the method database and runs through the methods in turn.
-Provided a method did not yet return <C>NeverApplicable</C> and did not yet return
-<C>TemporaryFailure</C> more than <C>tolerance</C> times before, it is tried. According
+Provided a method did not yet return <K>NeverApplicable</K> and did not yet return
+<K>TemporaryFailure</K> more than <C>tolerance</C> times before, it is tried. According
 to the value returned by the method, the following happens:
 
 <List>
-    <Mark><C>NeverApplicable</C></Mark>
+    <Mark><K>NeverApplicable</K></Mark>
     <Item>this is marked in the method selection record and the main
           loop starts again at the beginning of the method database.</Item>
-    <Mark><C>TemporaryFailure</C></Mark>
+    <Mark><K>TemporaryFailure</K></Mark>
     <Item>this is counted in the method selection record and the main
           loop starts again at the beginning of the method database.</Item>
-    <Mark><C>NotEnoughInformation</C></Mark>
+    <Mark><K>NotEnoughInformation</K></Mark>
     <Item>the main loop goes to the next method in the method database.</Item>
-    <Mark><C>Success</C></Mark>
+    <Mark><K>Success</K></Mark>
     <Item>this is marked in the method selection record and the procedure
           returns successfully.</Item>
 </List>
@@ -157,7 +157,7 @@ after each failed method call! However, this does not lead to an infinite
 loop, because the failure is recorded in the method selection record such
 that the method is skipped until the <C>tolerance</C> increases. Once the
 <C>tolerance</C> has been increased methods having returned
-<C>TemporaryFailure</C> will be called again. The idea behind this approach is
+<K>TemporaryFailure</K> will be called again. The idea behind this approach is
 that even failed methods can collect additional information about the
 arguments changing them accordingly. This might give methods that come
 earlier and were not applicable up to now the opportunity to begin
