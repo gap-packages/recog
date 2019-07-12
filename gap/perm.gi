@@ -17,18 +17,22 @@
 #############################################################################
 
 #! @BeginChunk VeryFewPoints
-#! If a permutation group acts only on a few points (the current limit is at
-#! most 10 points) then a stabiliser chain is computed by the randomized &GAP;
-#! library function for that purpose. If the method is successful then the
-#! calling node becomes a leaf node in the recursive scheme. If the input group
-#! acts on more than 10 points then the method returns <K>NeverApplicable</K>.
+#! If a permutation group moves only small points
+#! (currently, this means that its largest moved point is at most 10),
+#! then this method computes a stabilizer chain for the group via
+#! <Ref Subsect="StabChain" Style="Text"/>.
+#! This is because the most convenient way of solving constructive membership
+#! in such a group is via a stabilizer chain.
+#! In this case, the calling node becomes a leaf node of the composition tree.
+#!
+#! If the input group moves a large point (currently, this means a point
+#! larger than 10), then this method returns <K>NeverApplicable</K>.
 #! @EndChunk
 FindHomMethodsPerm.VeryFewPoints := function(ri, G)
   if LargestMovedPoint(G) <= 10 then
       return FindHomMethodsPerm.StabChain(ri, G);
-  else
-      return NeverApplicable;
   fi;
+  return NeverApplicable;
 end;
 
 #! @BeginChunk NonTransitive
@@ -417,10 +421,10 @@ AddMethod(FindHomDbPerm, FindHomMethodsGeneric.FewGensAbelian,
          "if very few generators, check IsAbelian and if yes, do KnownNilpotent");
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.Pcgs,
           97, "Pcgs",
-          "use a Pcgs to calculate a StabChain" );
+          "use a Pcgs to calculate a stabilizer chain" );
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.VeryFewPoints,
           95, "VeryFewPoints",
-          "calculate a stabchain if we act on very few points");
+          "calculate a stabilizer chain if only small points are moved");
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.NonTransitive,
           90, "NonTransitive",
           "try to find non-transitivity and restrict to orbit");
