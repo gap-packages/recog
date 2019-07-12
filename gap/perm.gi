@@ -114,10 +114,12 @@ FindHomMethodsPerm.Imprimitive :=
 
 #! @BeginChunk PcgsForBlocks
 #! This method is called after a hint is set in
-#! <C>FindHomMethodsPerm.Imprimitive</C>. Therefore the group <A>G</A> preserves
-#! a non-trivial block system. The method checks whether or not the restriction
-#! of <A>G</A> on one block is solvable. If so <C>FindHomMethodsPerm.Pcgs</C> is
-#! called and otherwise <K>NeverApplicable</K> is returned.
+#! <Ref Subsect="Imprimitive" Style="Text"/>.
+#! Therefore, the group <A>G</A> preserves a non-trivial block system.
+#! This method checks whether or not the restriction of <A>G</A> on one block
+#! is solvable.
+#! If so, then <Ref Subsect="Pcgs" Style="Text"/> is called,
+#! and otherwise <K>NeverApplicable</K> is returned.
 #! @EndChunk
 FindHomMethodsPerm.PcgsForBlocks := function(ri,G)
   local blocks,pcgs,subgens;
@@ -136,8 +138,7 @@ end;
 #! @BeginChunk BalTreeForBlocks
 #! This method creates a balanced composition tree for the kernel of an
 #! imprimitive group. This is guaranteed as the method is just called
-#! from <C>FindHomMethodsPerm.Imprimitive</C>
-#! (see <Ref Subsect="Imprimitive"/>) and itself.
+#! from <Ref Subsect="Imprimitive" Style="Text"/> and itself.
 #! The homomorphism for the split in the composition tree used is
 #! induced by the action of <A>G</A> on
 #! half of its blocks.
