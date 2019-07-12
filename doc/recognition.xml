@@ -315,7 +315,7 @@ The function must return a boolean. If it returns <K>false</K>, then
 this means that <A>x</A> is not in the source of the homomorphism
 returned by <Ref Attr="Homom"/>. If <K>true</K> is returned, then
 either <A>x</A> is in the source of that homomorphism, or passing
-<A>x</A> to the homomorphism returns <K>fail</K>.</P>
+<A>x</A> to the homomorphism returns <K>fail</K>.<P/>
 
 For example,
 if <A>ri</A> represents a matrix group that preserves a subspace, then
