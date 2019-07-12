@@ -16,50 +16,53 @@
 ##
 #############################################################################
 
+# Assumes <m> is a non-empty square matrix defined over a field. <m> defines a
+# projective one iff it is a non-zero scalar multiple of the identity matrix.
 InstallGlobalFunction( IsOneProjective,
-  function(el)
-    local s, n, i, j, zero;
-    n := NrRows(el);
-    Assert(0, n = NrCols(el));
-    s := el[1,1];
-    if IsZero(s) then return false; fi;
-    zero := Zero(s);
-    for i in [1..n] do
-        if el[i,i] <> s then return false; fi;
-        for j in [1..n] do
-            if i <> j and el[i,j] <> zero then return false; fi;
-        od;
-    od;
-    return true;
+  function(m)
+    Assert(1, NrRows(m) > 0 and NrRows(m) = NrCols(m));
+    return not IsZero(m[1,1]) and RECOG.IsScalarMat(m) <> false;
   end );
 
+# Assumes <a> and <b> are non-empty equal-dimension square matrices over equal
+# fields, and that the first row of <a> contains a non-zero entry.
+#
+# <a> and <b> define equal projective elements, or are "equal modulo scalars",
+# iff there exists a (non-zero) scalar <s> in the field such that <s * a = b>.
 InstallGlobalFunction( IsEqualProjective,
-  function(a,b)
-    local p,s,i;
-    p := PositionNonZero(a[1]);
-    s := b[1,p];
-    if IsZero(s) then return false; fi;
-    s := s / a[1,p];
-    for i in [1..Length(a)] do
-        if s*a[i] <> b[i] then return false; fi;
-    od;
-    return true;
+  function(a, b)
+    local n, p, s;
+    n := NrRows(a);
+    Assert(1, n > 0 and n = NrRows(b) and n = NrCols(a) and n = NrCols(b));
+    p := First([1..n], i -> not IsZero(a[1,i])); # Find non-zero entry in <a[1]>
+    Assert(1, p <> fail);
+    s := b[1,p] / a[1,p]; # The unique scalar <s> with <s * a[1,p] = b[1,p]>.
+    return not IsZero(s)
+           and ForAll([1..n], i -> ForAll([1..n], j -> s * a[i,j] = b[i,j]));
   end );
 
-RECOG.ProjectiveOrder := function(el)
-  return ProjectiveOrder(el)[1];
-end;
+# The projective order of an invertible square matrix <m> over a finite field is
+# the least positive integer <k> such that <m ^ k> is a projective one.
+RECOG.ProjectiveOrder := m -> ProjectiveOrder(m)[1];
 
+# Assumes <m> is a non-empty square matrix over a field.
+#
+# <m> is a scalar matrix iff it is a scalar multiple of the identity matrix,
+# i.e. a diagonal square matrix with the same value along its main diagonal.
+#
+# If <m> is a scalar matrix, then this function returns the scalar that appears
+# on its main diagonal. Otherwise, this function returns <false>.
 RECOG.IsScalarMat := function(m)
-  local i,x;
-  if not(IsDiagonalMat(m)) then
-      return false;
-  fi;
+  local x;
+  Assert(1, NrRows(m) > 0 and NrRows(m) = NrCols(m));
   x := m[1,1];
-  for i in [2..Length(m)] do
-      if m[i,i] <> x then
-          return false;
-      fi;
-  od;
+  if ForAny([2..NrRows(m)], i -> m[i,i] <> x) or not IsDiagonalMat(m) then
+    return false;
+  fi;
   return x;
 end;
+
+# FIXME This should be removed once recog requires GAP 4.11.
+# Until then, this allows us to call <IsDiagonalMat> on matrices with memory.
+InstallOtherMethod(BaseDomain, "for a matrix with memory", true,
+[IsMatrix and IsObjWithMemory], m -> BaseDomain(m!.el));
