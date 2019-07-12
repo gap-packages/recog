@@ -21,7 +21,7 @@
 #! most 10 points) then a stabiliser chain is computed by the randomized &GAP;
 #! library function for that purpose. If the method is successful then the
 #! calling node becomes a leaf node in the recursive scheme. If the input group
-#! acts on more than 10 points then the method returns <C>NeverApplicable</C>.
+#! acts on more than 10 points then the method returns <K>NeverApplicable</K>.
 #! @EndChunk
 FindHomMethodsPerm.VeryFewPoints := function(ri, G)
   if LargestMovedPoint(G) <= 10 then
@@ -35,7 +35,7 @@ end;
 #! If a permutation group <A>G</A> acts nontransitively then this method
 #! computes a homomorphism to the action of <A>G</A> on the orbit of the
 #! largest moved point. If <A>G</A> is transitive then the method returns
-#! <C>NeverApplicable</C>.
+#! <K>NeverApplicable</K>.
 #! @EndChunk
 FindHomMethodsPerm.NonTransitive :=
   function( ri, G )
@@ -57,10 +57,10 @@ FindHomMethodsPerm.NonTransitive :=
 #! @BeginChunk Imprimitive
 #! If the input group is not known to be transitive then this method
 #! returns <K>NotEnoughInformation</K>. If the input group is known to be transitive
-#! and primitive then the method returns <C>NeverApplicable</C>; otherwise, the method
+#! and primitive then the method returns <K>NeverApplicable</K>; otherwise, the method
 #! tries to compute a nontrivial block system. If successful then a
 #! homomorphism to the action on the blocks is defined; otherwise,
-#! the method returns <C>NeverApplicable</C>.
+#! the method returns <K>NeverApplicable</K>.
 #! 
 #! If the method is successful then it also gives a hint for the children of
 #! the node by determining whether the kernel of the action on the
@@ -117,7 +117,7 @@ FindHomMethodsPerm.Imprimitive :=
 #! <C>FindHomMethodsPerm.Imprimitive</C>. Therefore the group <A>G</A> preserves
 #! a non-trivial block system. The method checks whether or not the restriction
 #! of <A>G</A> on one block is solvable. If so <C>FindHomMethodsPerm.Pcgs</C> is
-#! called and otherwise <C>NeverApplicable</C> is returned.
+#! called and otherwise <K>NeverApplicable</K> is returned.
 #! @EndChunk
 FindHomMethodsPerm.PcgsForBlocks := function(ri,G)
   local blocks,pcgs,subgens;
@@ -345,7 +345,7 @@ end;
 #! points is at most <M>1/3</M> of the largest moved point of <A>G</A>,
 #! or  <M>k</M> is at most half of the number of points on which
 #! <A>G</A> is stored internally by &GAP;. The method returns
-#! <C>NeverApplicable</C> if it does not define a homomorphism indicating that it will
+#! <K>NeverApplicable</K> if it does not define a homomorphism indicating that it will
 #! never succeed.
 #! @EndChunk
 FindHomMethodsPerm.ThrowAwayFixedPoints :=
@@ -374,7 +374,7 @@ FindHomMethodsPerm.ThrowAwayFixedPoints :=
 #! This is the &GAP; library function to compute a stabiliser chain for a
 #! solvable permutation group. If the method is successful then the calling
 #! node becomes a leaf node in the recursive scheme. If the input group is
-#! not solvable then the method returns <C>NeverApplicable</C>.
+#! not solvable then the method returns <K>NeverApplicable</K>.
 #! @EndChunk
 FindHomMethodsPerm.Pcgs :=
   function( ri, G )

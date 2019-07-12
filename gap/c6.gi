@@ -717,7 +717,7 @@ end;
 #! (normaliser of an extraspecial group). If the input <A>G</A><M>\le PGL(d,q)</M>
 #! does not satisfy <M>d=r^n</M> and <M>r|q-1</M> for some prime <M>r</M>
 #! and integer <M>n</M> then the method
-#! returns <C>NeverApplicable</C>. Otherwise, it returns either a homomorphism of
+#! returns <K>NeverApplicable</K>. Otherwise, it returns either a homomorphism of
 #! <A>G</A> into <M>Sp(2n,r)</M>, or a homomorphism into the C2 permutation
 #! action of <A>G</A> on a decomposition of <M>GF(q)^d</M>, or <K>fail</K>.
 #! @EndChunk
