@@ -15,7 +15,8 @@
 
 #! @BeginChunk FewGensAbelian
 #! If there are not too may generators (right now that means at most 200),
-#! check whether they commute; if yes, dispatch to <C>FindHomMethodsGeneric.KnownNilpotent</C>,
+#! check whether they commute; if yes, dispatch to
+#! <Ref Subsect="KnownNilpotent" Style="Text"/>,
 #! otherwise return <K>NeverApplicable</K>.
 #! @EndChunk
 FindHomMethodsGeneric.FewGensAbelian := function(ri,G)
