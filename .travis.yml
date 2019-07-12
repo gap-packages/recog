@@ -1,10 +1,6 @@
-dist: trusty
+dist: xenial
 
 language: c
-env:
-  global:
-    - GAPROOT=gaproot
-    - COVDIR=coverage
 
 addons:
   apt:
@@ -15,19 +11,11 @@ addons:
 
 matrix:
   include:
-    - env: CFLAGS="-O2"
-    - env: CFLAGS="-O2" ABI=32
-      addons:
-        apt:
-          packages:
-          - libgmp-dev:i386
-          - libreadline-dev:i386
-          - zlib1g-dev:i386
-          - gcc-multilib
-          - g++-multilib
+    - env: GAPBRANCH=master
+    - env: GAPBRANCH=stable-4.9
+    - env: GAPBRANCH=stable-4.10
 
 before_script:
-  - export GAPROOT="$HOME/gap"
   - git clone https://github.com/gap-system/pkg-ci-scripts.git scripts
   - scripts/build_gap.sh
 script:
