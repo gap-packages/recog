@@ -16,7 +16,7 @@
 ##
 #############################################################################
 
-#! @BeginChunk VeryFewPoints
+#! @BeginChunk MovesOnlySmallPoints
 #! If a permutation group moves only small points
 #! (currently, this means that its largest moved point is at most 10),
 #! then this method computes a stabilizer chain for the group via
@@ -28,7 +28,7 @@
 #! If the input group moves a large point (currently, this means a point
 #! larger than 10), then this method returns <K>NeverApplicable</K>.
 #! @EndChunk
-FindHomMethodsPerm.VeryFewPoints := function(ri, G)
+FindHomMethodsPerm.MovesOnlySmallPoints := function(ri, G)
   if LargestMovedPoint(G) <= 10 then
       return FindHomMethodsPerm.StabChain(ri, G);
   fi;
@@ -422,8 +422,8 @@ AddMethod(FindHomDbPerm, FindHomMethodsGeneric.FewGensAbelian,
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.Pcgs,
           97, "Pcgs",
           "use a Pcgs to calculate a stabilizer chain" );
-AddMethod(FindHomDbPerm, FindHomMethodsPerm.VeryFewPoints,
-          95, "VeryFewPoints",
+AddMethod(FindHomDbPerm, FindHomMethodsPerm.MovesOnlySmallPoints,
+          95, "MovesOnlySmallPoints",
           "calculate a stabilizer chain if only small points are moved");
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.NonTransitive,
           90, "NonTransitive",

@@ -1,7 +1,7 @@
 #
 gap> START_TEST("basic.tst");
 
-# Test for VeryFewPoints:
+# Test for MovesOnlySmallPoints:
 gap> g := SymmetricGroup(5);;
 gap> ri := RECOG.TestGroup(g,false,120);;
 
@@ -17,15 +17,15 @@ gap> ri := RECOG.TestGroup(g,false,Factorial(5)*Factorial(6));;
 gap> g := WreathProduct(SymmetricGroup(5),SymmetricGroup(12));;
 gap> ri := RECOG.TestGroup(g,false,Factorial(5)^12*Factorial(12));;
 
-# Test for VeryFewPoints:
+# Test for MovesOnlySmallPoints:
 gap> g := WreathProduct(SymmetricGroup(2),SymmetricGroup(100));;
 gap> ri := RECOG.TestGroup(g,false,Factorial(2)^100*Factorial(100));;
 
-# Test for VeryFewPoints:
+# Test for MovesOnlySmallPoints:
 gap> g := WreathProduct(SymmetricGroup(5),SymmetricGroup(32));;
 gap> ri := RECOG.TestGroup(g,false,Factorial(5)^32*Factorial(32));;
 
-# Test for VeryFewPoints:
+# Test for MovesOnlySmallPoints:
 gap> g := WreathProduct(AlternatingGroup(5),SymmetricGroup(32));;
 gap> ri := RECOG.TestGroup(g,false,(Factorial(5)/2)^32 * Factorial(32));;
 
