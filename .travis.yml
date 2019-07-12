@@ -16,7 +16,6 @@ addons:
 matrix:
   include:
     - env: GAPBRANCH=master
-    - env: GAPBRANCH=stable-4.9
     - env: GAPBRANCH=stable-4.10
 
 before_script:

@@ -224,7 +224,7 @@ PackageDoc := rec(
 ),
 
 Dependencies := rec(
-  GAP := ">=4.9",
+  GAP := ">=4.10",
   NeededOtherPackages := [
     ["AtlasRep", ">= 1.4.0"],
     ["FactInt", ">= 1.5.2"],
