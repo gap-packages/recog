@@ -27,7 +27,7 @@ Group([ (1,2,3,4,5,6,7,8,9,10,11,12), (1,2), (13,14,15,16,17), (13,14) ])
 gap> ri := RecogniseGroup(g);
 #I  Finished rank 90 method "NonTransitive": success.
 #I  Going to the factor (depth=0, try=1).
-#I  Finished rank 95 method "VeryFewPoints": success.
+#I  Finished rank 95 method "MovesOnlySmallPoints": success.
 #I  Back from factor (depth=0).
 #I  Calculating preimages of nice generators.
 #I  Creating 20 random generators for kernel.
@@ -36,7 +36,7 @@ gap> ri := RecogniseGroup(g);
 #I  Finished rank 80 method "Giant": success.
 #I  Back from kernel (depth=0).
 <recoginfo NonTransitive
- F:<recoginfo VeryFewPoints Size=120>
+ F:<recoginfo MovesOnlySmallPoints Size=120>
  K:<recoginfo Giant Size=479001600>>]]>
 </Log>
 
