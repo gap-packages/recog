@@ -1027,11 +1027,7 @@ RECOG.IsSpContained := function( recognise, grp )
 
     local isSpForm;
 
-    isSpForm := function(f)
-        if not IsSesquilinearForm(f) then return false; fi;
-        if IsSymplecticForm(f) then return true; fi;
-        return false;
-    end;
+    isSpForm := f -> IsSesquilinearForm(f) and IsSymplecticForm(f);
 
     # if the dimension is not even, the group cannot be symplectic
     if recognise.d mod 2 <> 0 then
@@ -1092,12 +1088,7 @@ RECOG.IsSUContained := function( recognise, grp )
 
     local f, isHermForm, q0;
 
-    isHermForm := function(f)
-        if not IsSesquilinearForm(f) then return false; fi;
-        if IsHermitianForm(f) then return true; fi;
-        return false;
-    end;
-
+    isHermForm := f -> IsSesquilinearForm(f) and IsHermitianForm(f);
 
     f := recognise.field;
 
@@ -1160,23 +1151,9 @@ RECOG.IsSOContained := function( recognise, grp )
 
     local f, isParForm, isEllForm, isHypForm;
 
-    isParForm := function(f)
-        if not IsSesquilinearForm(f) then return false; fi;
-        if IsParabolicForm(f) then return true; fi;
-        return false;
-    end;
-
-    isEllForm := function(f)
-        if not IsSesquilinearForm(f) then return false; fi;
-        if IsEllipticForm(f) then return true; fi;
-        return false;
-    end;
-
-    isHypForm := function(f)
-        if not IsSesquilinearForm(f) then return false; fi;
-        if IsHyperbolicForm(f) then return true; fi;
-        return false;
-    end;
+    isParForm := f -> IsSesquilinearForm(f) and IsParabolicForm(f);
+    isEllForm := f -> IsSesquilinearForm(f) and IsEllipticForm(f);
+    isHypForm := f -> IsSesquilinearForm(f) and IsHyperbolicForm(f);
 
     if recognise.isSOContained = false then
         return false;
@@ -1343,12 +1320,7 @@ RECOG.NonGenericSymplectic := function(recognise, grp)
 
     local d, q, CheckFlag, isSpForm;
 
-    isSpForm := function(f)
-        if not IsSesquilinearForm(f) then return false; fi;
-        if IsSymplecticForm(f) then return true; fi;
-        return false;
-    end;
-
+    isSpForm := f -> IsSesquilinearForm(f) and IsSymplecticForm(f);
 
     CheckFlag := function( )
         if recognise.isReducible = "unknown" then
@@ -1457,11 +1429,7 @@ RECOG.NonGenericUnitary := function(recognise, grp)
 
     local d, q,  g, f1, f2, o, CheckFlag, isHermForm, str;
 
-    isHermForm := function(f)
-        if not IsSesquilinearForm(f) then return false; fi;
-        if IsHermitianForm(f) then return true; fi;
-        return false;
-    end;
+    isHermForm := f -> IsSesquilinearForm(f) and IsHermitianForm(f);
 
     CheckFlag := function( )
         if recognise.isReducible = "unknown" then
@@ -1657,11 +1625,7 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
 
     local d, q, gp1, gp2, CheckFlag, pgrp, orbs, isHypForm;
 
-    isHypForm := function(f)
-        if not IsSesquilinearForm(f) then return false; fi;
-        if IsHyperbolicForm(f) then return true; fi;
-        return false;
-    end;
+    isHypForm := f -> IsSesquilinearForm(f) and IsHyperbolicForm(f);
 
     CheckFlag := function( )
         if recognise.isReducible = "unknown" then
@@ -1881,11 +1845,7 @@ RECOG.NonGenericOrthogonalMinus := function(recognise, grp)
     local d, q,  orbs, pgrp, h,  g, ppd,  CheckFlag, isEllForm;
 
 
-    isEllForm := function(f)
-        if not IsSesquilinearForm(f) then return false; fi;
-        if IsEllipticForm(f) then return true; fi;
-        return false;
-    end;
+    isEllForm := f -> IsSesquilinearForm(f) and IsEllipticForm(f);
 
     CheckFlag := function( )
         if recognise.isReducible = "unknown" then
@@ -1985,11 +1945,7 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
 
     local d, q, g, s, CheckFlag, isParForm;
 
-    isParForm := function(f)
-        if not IsSesquilinearForm(f) then return false; fi;
-        if IsParabolicForm(f) then return true; fi;
-        return false;
-    end;
+    isParForm := f -> IsSesquilinearForm(f) and IsParabolicForm(f);
 
     if not IsOddInt(recognise.d) then return false; fi;
     if not IsOddInt(recognise.q) then return false; fi;
