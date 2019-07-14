@@ -44,7 +44,9 @@ HasLBGgt5 := function( m, p, a, e )
 
     local pm, i,  ppds;
 
-    if m <= 5 then return false; fi;
+    if m <= 5 then
+        return false;
+    fi;
 
     # Find the basic ppds of p^(ae)-1
     pm := PrimitivePrimeDivisors(a*e, p);
@@ -211,9 +213,11 @@ RECOG.IsGeneric := function (recognise, grp)
         return false;
     fi;
 
-    if Length(recognise.E) < 2 then return fail; fi;
-    if Length(recognise.LE) < 1 then return fail; fi;
-    if Length(recognise.BE) < 1 then return fail; fi;
+    if Length(recognise.E) < 2 or
+       Length(recognise.LE) = 0 or
+       Length(recognise.BE) = 0 then
+        return fail;
+    fi;
 
     recognise.isGeneric := true;
 
@@ -587,7 +591,9 @@ IsPrimitivePrimeDivisor := function( b, a, p )
 
     if (b^a-1) mod p <> 0 then return false; fi;
     for i in [ 1 .. a-1 ] do
-        if (b^i-1) mod p = 0 then return false; fi;
+        if b^i-1 mod p = 0 then
+            return false;
+        fi;
     od;
 
     return true;
@@ -1983,7 +1989,9 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
         return fail;
     fi;
 
-    if d = 3 then recognise.needLB := true; fi;
+    if d = 3 then
+        recognise.needLB := true;
+    fi;
 
 
     if d = 7 and q = 3 then

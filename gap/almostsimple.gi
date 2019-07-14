@@ -779,7 +779,9 @@ FindHomMethodsProjective.ThreeLargeElOrders := function(ri,G)
           fi;
           res := LookupHintForSimple(ri,G,namecat);
       fi;
-      if res = true then return Success; fi;
+      if res = true then
+          return Success;
+      fi;
   od;
   Info(InfoRecog,2,"Did not succeed with hints, giving up...");
   return fail; # FIXME: fail = TemporaryFailure here really correct?
@@ -919,7 +921,9 @@ end;
 RECOG.HomFDPM := function(data,x)
   local r;
   r := RECOG.FindPermutation(data.cob*x*data.cobi,data.fdpm);
-  if r = fail then return fail; fi;
+  if r = fail then
+      return fail;
+  fi;
   return r[2];
 end;
 
@@ -1279,7 +1283,9 @@ RECOG.RuleOutSmallProjOrder := function(m)
   local l,o,v;
   if IsPerm(m) then
       o := Order(m);
-      if o > 119 then return fail; fi;
+      if o > 119 then
+          return fail;
+      fi;
       return o;
   fi;
   v := ShallowCopy(m[1]);
@@ -1287,15 +1293,21 @@ RECOG.RuleOutSmallProjOrder := function(m)
   ORB_NormalizeVector(v);
   o := Orb([m],v,OnLines,rec( hashlen := 300, report := 0 ));
   Enumerate(o,121);
-  if not(IsClosed(o)) then return fail; fi;
+  if not IsClosed(o) then
+      return fail;
+  fi;
   l := Length(o);
   Randomize(v);
   ORB_NormalizeVector(v);
   o := Orb([m],v,OnLines,rec( hashlen := 300, report := 0 ));
   Enumerate(o,121);
-  if not(IsClosed(o)) then return fail; fi;
+  if not IsClosed(o) then
+      return fail;
+  fi;
   l := Lcm(l,Length(o));
-  if l > 119 then return fail; fi;
+  if l > 119 then
+      return fail;
+  fi;
   return l;
 end;
 

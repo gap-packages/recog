@@ -423,7 +423,9 @@ FindHomMethodsMatrix.ReducibleIso := function(ri,G)
   # Save the MeatAxe module for later use:
   ri!.meataxemodule := m;
   # Report enduring failure if irreducible:
-  if isirred then return NeverApplicable; fi;
+  if isirred then
+      return NeverApplicable;
+  fi;
 
   # Now compute a composition series:
   compseries := MTX.BasesCompositionSeries(m);
@@ -793,7 +795,9 @@ SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
           fi;
           i := i + 1;
       od;
-      if not(IsZero(h)) then return fail; fi;
+      if not IsZero(h) then
+          return fail;
+      fi;
   od;
   if Length(l) = 0 then
       return StraightLineProgramNC([[1,0]],Length(ri!.gensNvectors));
