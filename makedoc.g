@@ -1,7 +1,21 @@
-##  this creates the documentation, needs: GAPDoc and AutoDoc packages, pdflatex
+#############################################################################
 ##
-##  Call this with GAP from within the package directory.
+##  This file is part of recog, a package for the GAP computer algebra system
+##  which provides a collection of methods for the constructive recognition
+##  of groups.
 ##
+##  Copyright of recog belongs to its developers whose names are too numerous
+##  to list here. Please refer to the COPYRIGHT file for details.
+##
+##  SPDX-License-Identifier: GPL-3.0-or-later
+##
+##
+##  This files builds the documentation of the recog package. Running it
+##  requires the GAPDoc and AutoDoc GAP packages, as well as pdflatex.
+##
+##  Run it with GAP from within the package directory.
+##
+#############################################################################
 
 if fail = LoadPackage("AutoDoc", ">= 2019.07.03") then
     ErrorNoReturn("AutoDoc 2019.07.03 or newer is required");

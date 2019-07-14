@@ -1,8 +1,23 @@
-# Regenerate parts of the recog documentation from its source code
+#############################################################################
+##
+##  This file is part of recog, a package for the GAP computer algebra system
+##  which provides a collection of methods for the constructive recognition
+##  of groups.
+##
+##  Copyright of recog belongs to its developers whose names are too numerous
+##  to list here. Please refer to the COPYRIGHT file for details.
+##
+##  SPDX-License-Identifier: GPL-3.0-or-later
+##
+##
+##  Regenerate parts of the recog documentation from its source code
+##
+#############################################################################
 
-# we need the precise version of GAP in this directory; if recog is not
-# yet loaded, that's no problem; otherwise, we need to work a bit to
-# verify that this is the case, and otherwise exit with an error
+# We need the precise version of recog contained in the current directory; if
+# recog is not yet loaded, that's no problem; otherwise, we need to work a bit
+# to verify that this is the case, and otherwise exit with an error Reading
+# the implementation part of the recog package.
 if not IsBound(GAPInfo.PackagesLoaded.recog) then
     SetPackagePath("recog", "./");
     LoadPackage("recog");
