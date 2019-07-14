@@ -319,9 +319,8 @@ SLPinLabels := function(S,g)
   l := Length(S!.labels);
   if Length(word) = 0 then
       return StraightLineProgramNC( [ [1,0] ], l );
-  else
-      return StraightLineProgramNC( [ line, [l+1,-1] ], l );
   fi;
+  return StraightLineProgramNC( [ line, [l+1,-1] ], l );
 end;
 
 
@@ -344,9 +343,8 @@ StoredPointsPerm := function(p)
       return s/4;   # permutation stored with 4 bytes per point
   elif IsPerm2Rep(p) then
       return s/2;   # permutation stored with 2 bytes per point
-  else
-      ErrorNoReturn("StoredPointsPerm: input is not an internal permutation");
   fi;
+  ErrorNoReturn("StoredPointsPerm: input is not an internal permutation");
 end;
 
 #! @BeginChunk ThrowAwayFixedPoints
