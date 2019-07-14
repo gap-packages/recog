@@ -43,7 +43,9 @@ RECOG.CentralisingElementOfInvolution := function(pr,ord,x)
   r := Next(pr);
   y := x^r;
   # Now x and y generate a dihedral group
-  if x=y then return r; fi;
+  if x = y then
+      return r;
+  fi;
   z := x*y;
   o := ord(z);
   if IsEvenInt(o) then
@@ -73,11 +75,15 @@ RECOG.InvolutionJumper := function(pr,ord,x,tol,withodd)
       y := Next(pr);
       c := Comm(x,y);
       o := ord(c);
-      if o = 1 then continue; fi;
+      if o = 1 then
+          continue;
+      fi;
       if IsEvenInt(o) then
           return c^(o/2);
       fi;
-      if not(withodd) then continue; fi;
+      if not(withodd) then
+          continue;
+      fi;
       z := y*c^((o-1)/2);
       o := ord(z);
       if IsEvenInt(o) then

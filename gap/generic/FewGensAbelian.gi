@@ -26,7 +26,9 @@ FindHomMethodsGeneric.FewGensAbelian := function(ri,G)
   local gens,i,j,l;
   gens := GeneratorsOfGroup(G);
   l := Length(gens);
-  if l > 200 then return NeverApplicable; fi;
+  if l > 200 then
+      return NeverApplicable;
+  fi;
   for i in [1..l-1] do
       for j in [i+1..l] do
           if not(ri!.isequal(gens[i]*gens[j],gens[j]*gens[i])) then

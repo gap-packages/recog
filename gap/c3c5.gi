@@ -230,12 +230,16 @@ RECOG.ScalarToMultiplyIntoSmallerField := function(m,k)
   # such that r.mat = r.scalar * m and r.mat has entries in r.field
   # and r.field is a field contained in Field(m).
   local f,mm,pos,s;
-  if IsPrimeField(k) then return fail; fi;
+  if IsPrimeField(k) then
+      return fail;
+  fi;
   pos := PositionNonZero(m[1]);
   s := m[1][pos]^-1;
   mm := s * m;
   f := FieldOfMatrixList([mm]);
-  if k = f then return fail; fi;
+  if k = f then
+      return fail;
+  fi;
   return rec( mat := mm, scalar := s, field := f );
 end;
 
@@ -251,7 +255,9 @@ RECOG.ScalarsToMultiplyIntoSmallerField := function(l,k)
   f := PrimeField(k);
   for i in [1..Length(l)] do
       r := RECOG.ScalarToMultiplyIntoSmallerField(l[i],k);
-      if r = fail then return fail; fi;
+      if r = fail then
+          return fail;
+      fi;
       if not(IsSubset(f,r.field)) then
           f := ClosureField(f,r.field);
           if f = k then
@@ -340,7 +346,9 @@ RECOG.BaseChangeForSmallestPossibleField := function(grp,mtx,k)
   bi := b^-1;
   newgens := List(GeneratorsOfGroup(grp),x->b*x*bi);
   f := FieldOfMatrixList(newgens);
-  if f = k then return fail; fi;
+  if f = k then
+      return fail;
+  fi;
   return rec( newgens := newgens, field := f, t := b, ti := bi );
 end;
 
@@ -421,14 +429,18 @@ RECOG.HomActionFieldAuto := function(data,el)
   local pos,y;
   y := data.cgen ^ el;
   pos := Position(data.c,y);
-  if pos = fail then return fail; fi;
+  if pos = fail then
+      return fail;
+  fi;
   return data.cyc^data.cc[pos];
 end;
 
 RECOG.HomCommutator := function(data,el)
   local y;
   y := Comm(data.x,el);
-  if RECOG.IsScalarMat(y) = false then return fail; fi;
+  if RECOG.IsScalarMat(y) = false then
+      return fail;
+  fi;
   return ExtractSubMatrix(y,[1],[1]);
 end;
 
