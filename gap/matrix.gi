@@ -212,7 +212,7 @@ end;
 #! will only be scalar matrices. This method recursively builds a balanced tree
 #! and does scalar recognition in each leaf.
 #! @EndChunk
-FindHomMethodsMatrix.BlockScalar := function(ri,G)
+FindHomMethodsMatrix.BlockScalar := function(ri, G)
   # We assume that ri!.blocks is a list of ranges where the non-trivial
   # scalar blocks are. Note that their length does not have to sum up to
   # the dimension, because some blocks at the end might already be trivial.
@@ -558,9 +558,7 @@ FindHomMethodsMatrix.BlockDiagonal := function(ri,G)
   # We do all the blocks projectively and thus are left with scalar blocks.
   # In the projective case we still do the same, the BlocksModScalars
   # will automatically take care of the projectiveness!
-  local hom;
-  hom := IdentityMapping(G);
-  SetHomom(ri,hom);
+  SetHomom(ri, IdentityMapping(G));
   # Now give hints downward:
   forfactor(ri).blocks := ri!.blocks;
   Add(forfactor(ri).hints,
@@ -803,9 +801,9 @@ SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
       fi;
   od;
   if Length(l) = 0 then
-      return StraightLineProgramNC([[1,0]],Length(ri!.gensNvectors));
+      l := [1, 0];
   fi;
-  return StraightLineProgramNC([l],Length(ri!.gensNvectors));
+  return StraightLineProgramNC([l], Length(ri!.gensNvectors));
 end;
 
 #! @BeginChunk LowerLeftPGroup
@@ -819,9 +817,11 @@ end;
 FindHomMethodsMatrix.LowerLeftPGroup := function(ri,G)
   local f,p;
   # Do we really have our favorite situation?
-  if not(IsBound(ri!.blocks) and IsBound(ri!.lens) and
-         IsBound(ri!.basisOfFieldExtension) and IsBound(ri!.gensNvectors) and
-         IsBound(ri!.gensNpivots)) then
+  if not (IsBound(ri!.blocks) and
+          IsBound(ri!.lens) and
+          IsBound(ri!.basisOfFieldExtension) and
+          IsBound(ri!.gensNvectors) and
+          IsBound(ri!.gensNpivots)) then
       return NotEnoughInformation;
   fi;
   # We are done, because we can do linear algebra:

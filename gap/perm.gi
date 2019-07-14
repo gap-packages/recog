@@ -318,9 +318,9 @@ SLPinLabels := function(S,g)
   od;
   l := Length(S!.labels);
   if Length(word) = 0 then
-      return StraightLineProgramNC( [ [1,0] ], l );
+      return StraightLineProgramNC([[1, 0]], l);
   fi;
-  return StraightLineProgramNC( [ line, [l+1,-1] ], l );
+  return StraightLineProgramNC([line, [l + 1, -1]], l);
 end;
 
 

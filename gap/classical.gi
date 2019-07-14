@@ -357,7 +357,7 @@ RECOG.IsNotAlternating := function( recognise, grp )
     fi;
 
     if q = 2 then
-       if Size(grp) <> 3*4*5*6*7 then
+       if Size(grp) <> 2520 then  # 2520 = 3*4*5*6*7 = |A7|
            Info( InfoClassical, 2, "G is not an alternating group" );
            recognise.isNotAlternating := true;
            return false;
@@ -826,7 +826,7 @@ RECOG.IsReducible := function( recognise, grp )
     local deg, dims, g;
 
     # compute the degrees of the irreducible factors
-    deg := List(Factors(recognise.cpol), i-> Degree(i));
+    deg := List(Factors(recognise.cpol), Degree);
 
     # compute all possible dimensions
     dims := [0];
@@ -2098,10 +2098,10 @@ AddMethod( ClassicalMethDb, RECOG.TestRandomElement, 100, "TestRandomElement",
            "makes new random element and stores it and its char poly" );
 
 AddMethod( ClassicalMethDb, RECOG.IsGenericParameters,90,"IsGenericParameters",
-           "tests whether grp has  generic parameters" );
+           "tests whether group has generic parameters" );
 
 AddMethod( ClassicalMethDb, RECOG.IsGeneric, 89, "IsGeneric",
-           "tests whether grp is generic" );
+           "tests whether group is generic" );
 
 AddMethod( ClassicalMethDb, RECOG.IsReducible, 80, "IsReducible",
            "tests whether current random element rules out reducible" );
@@ -2112,11 +2112,11 @@ AddMethod( ClassicalMethDb, RECOG.RuledOutExtField, 81,
 
 AddMethod( ClassicalMethDb, RECOG.IsNotMathieu, 82,
            "IsNotMathieu",
-           "tests whether Mathieu Groups are ruled out" );
+           "tests whether Mathieu groups are ruled out" );
 
 AddMethod( ClassicalMethDb, RECOG.IsNotAlternating, 83,
            "IsNotAlternating",
-           "tests whether Alternating Groups are ruled out" );
+           "tests whether alternating groups are ruled out" );
 
 AddMethod( ClassicalMethDb, RECOG.IsNotPSL, 84,
            "IsNotPSL",
