@@ -564,8 +564,9 @@ FindHomMethodsMatrix.BlockDiagonal := function(ri,G)
   # Now give hints downward:
   forfactor(ri).blocks := ri!.blocks;
   Add(forfactor(ri).hints,
-      rec( method := FindHomMethodsProjective.BlocksModScalars,
-           rank := 2000, stamp := "BlocksModScalars" ) );
+      rec(method := FindHomMethodsProjective.BlocksModScalars,
+          rank   := 2000,
+          stamp  := "BlocksModScalars"));
   # We go to projective, although it would not matter here, because we
   # gave a working hint anyway:
   Setmethodsforfactor(ri,FindHomDbProjective);
@@ -579,10 +580,13 @@ FindHomMethodsMatrix.BlockDiagonal := function(ri,G)
   if ri!.projective then
       Add(forkernel(ri).hints,
           rec(method := FindHomMethodsProjective.BlockScalarProj,
-              rank := 2000,stamp := "BlockScalarProj"));
+              rank   := 2000,
+              stamp  := "BlockScalarProj"));
   else
-      Add(forkernel(ri).hints,rec(method := FindHomMethodsMatrix.BlockScalar,
-                                  rank := 2000,stamp := "BlockScalar"));
+      Add(forkernel(ri).hints,
+          rec(method := FindHomMethodsMatrix.BlockScalar,
+              rank   := 2000,
+              stamp  := "BlockScalar"));
   fi;
   forkernel(ri).blocks := ri!.blocks;
   return Success;
