@@ -155,8 +155,8 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
       return NeverApplicable;
   fi;
 
-  Info(InfoRecog,2,"Rewriting generators over larger field with smaller",
-       " degree, factor=",MTX.DegreeSplittingField(m));
+  Info(InfoRecog,2, "Rewriting generators over larger field with smaller ",
+                    "degree, factor=", MTX.DegreeSplittingField(m));
 
   r := RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder(m);
   H := GroupWithGenerators(r.newgens);
@@ -408,8 +408,9 @@ FindHomMethodsProjective.Subfield :=  function(ri,G)
     pf := PrimeField(f);
     b := RECOG.BaseChangeForSmallestPossibleField(G,ri!.meataxemodule,f);
     if b <> fail then
-        Info(InfoRecog,2,"Conjugating group from GL(",dim,",",f,
-             ") into GL(",dim,",",b.field,").");
+        Info(InfoRecog, 2, StringFormatted(
+             "Conjugating group from GL({},{}) into GL({},{}).",
+             dim, f, dim, b.field));
         # Do base change isomorphism:
         H := GroupWithGenerators(b.newgens);
         hom := GroupHomByFuncWithData(G,H,RECOG.HomDoBaseAndFieldChange,b);
@@ -527,7 +528,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
   pr2 := ProductReplacer(GeneratorsOfGroup(G),rec(noaccu := true));
   pr := ProductReplacer(coms,rec(normalin := pr2));
   nr := Minimum(Maximum(5,QuoInt(dim*Log2Int(Size(f)),20)),40);
-  Info( InfoRecog, 3, "C3C5: computing ",nr," generators for N...");
+  Info(InfoRecog, 3, "C3C5: computing ", nr," generators for N...");
   Hgens := ShallowCopy(coms);
   for i in [1..nr] do
       Add(Hgens,Next(pr));
@@ -553,14 +554,16 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
       if not IsPrimeField(f) then
           b := RECOG.BaseChangeForSmallestPossibleField(H,m,f);
           if b <> fail then   # Yes! N is realisable!
-                Info(InfoRecog,2,"Can conjugate H subgroup from GL(",dim,
-                     ",",f,") into GL(",dim,",",b.field,").");
+                Info(InfoRecog, 2, StringFormatted(
+                     "Can conjugate H subgroup from GL({},{}) into GL({},{}).",
+                     dim, f, dim, b.field));
                 # Now do base change for generators of G:
               newgens := List(gens,x->b.t*x*b.ti);
               r := RECOG.ScalarsToMultiplyIntoSmallerField(newgens,f);
               if r <> fail then   # Yes again! This works!
-                  Info(InfoRecog,2,"Conjugating group from GL(",dim,",",f,
-                       ") into GL(",dim,",",r.field,").");
+                  Info(InfoRecog, 2, StringFormatted(
+                       "Conjugating group from GL({},{}) into GL({},{}).",
+                       dim, f, dim, r.field));
 
                   # Set up an isomorphism:
                   H := GroupWithGenerators(newgens);
@@ -575,14 +578,14 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
           fi;
       fi;
       # We now know that G is not C5!
-      Info(InfoRecog,2,"G is not C5 (subfield).");
+      Info(InfoRecog, 2, "G is not C5 (subfield).");
 
       # Check whether m is not absolutely irreducible, then G is C3,
       # otherwise not!
       if MTX.IsAbsolutelyIrreducible(m) then
           # We fail, G is neither C3 nor C5, and we do not find a way
           # for any reduction using H:
-          Info(InfoRecog,2,"G is not C3 (semilinear).");
+          Info(InfoRecog, 2, "G is not C3 (semilinear).");
           return NeverApplicable;
       fi;
 
@@ -607,14 +610,14 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
           x := cgen^g;
           pos := Position(c,x);
           if pos = fail then   # something is wrong!
-              Info( InfoRecog, 1, "Sudden failure, G should be C3 but isn't! ",
-                    "C3C5 gives up for the moment." );
+              Info(InfoRecog, 1, "Sudden failure, G should be C3 but isn't! ",
+                                 "C3C5 gives up for the moment." );
               return TemporaryFailure;
           fi;
           Add(gensim,cyc^cc[pos]);
       od;
-      Info( InfoRecog, 2, "G is C3, found action as field auts of size ",
-            deg,".");
+      Info(InfoRecog, 2, StringFormatted(
+           "G is C3, found action as field auts of size {}.", deg));
       HH := GroupWithGenerators(gensim);
       hom := GroupHomByFuncWithData(G,HH,RECOG.HomActionFieldAuto,
                   rec( c := c,cc := cc,cgen := cgen, cyc := cyc ) );
@@ -642,7 +645,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
               ErrorNoReturn("This should never have happened (2), tell Max.");
               # This should have been caught by the scalar test above.
           fi;
-          Info(InfoRecog,2,"Restriction to H is homogeneous.");
+          Info(InfoRecog, 2, "Restriction to H is homogeneous.");
           if not MTX.IsAbsolutelyIrreducible(collf[1][1]) then
               ErrorNoReturn("Is this really possible??? G acts absolutely irred!");
           fi;
@@ -658,8 +661,8 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
           conjgensG := List(gens,x->r.t * x * r.ti);
           kro := List(conjgensG,g->RECOG.IsKroneckerProduct(g,r.blocksize));
           if not ForAll(kro, k -> k[1]) then
-              Info(InfoRecog,1,"VERY, VERY, STRANGE!");
-              Info(InfoRecog,1,"False alarm, was not a tensor decomposition.");
+              Info(InfoRecog, 1, "VERY, VERY, STRANGE!");
+              Info(InfoRecog, 1, "False alarm, was not a tensor decomposition.");
               ErrorNoReturn("This should never have happened (3), tell Max.");
           fi;
 
@@ -678,8 +681,9 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
           findgensNmeth(ri).method := FindKernelDoNothing;
           return Success;
       fi;
-      Info(InfoRecog,2,"Using action on the set of homogeneous components",
-           " (",Length(collf)," elements)...");
+      Info(InfoRecog, 2, StringFormatted(
+           "Using action on the set of homogeneous components ({} elements)...",
+           Length(collf)));
       # Now find a homogeneous component to act on it:
       homs := MTX.Homomorphisms(collf[1][1],m);
       homsimg := BasisVectors(Basis(VectorSpace(f,Concatenation(homs))));
