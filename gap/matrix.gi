@@ -644,9 +644,8 @@ RECOG.ExtractLowStuff := function(m,layer,blocks,lens,basisOfFieldExtension)
       # SLPforElementFuncsMatrix.LowerLeftPGroup that we work
       # over a field of order p (not a p power)
       return BlownUpVector(basisOfFieldExtension, v);
-  else
-      return v;
   fi;
+  return v;
 end;
 
 RECOG.ComputeExtractionLayerLengths := function(blocks)
@@ -801,9 +800,8 @@ SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
   od;
   if Length(l) = 0 then
       return StraightLineProgramNC([[1,0]],Length(ri!.gensNvectors));
-  else
-      return StraightLineProgramNC([l],Length(ri!.gensNvectors));
   fi;
+  return StraightLineProgramNC([l],Length(ri!.gensNvectors));
 end;
 
 #! @BeginChunk LowerLeftPGroup
