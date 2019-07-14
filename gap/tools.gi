@@ -52,8 +52,8 @@ RECOG.ElementOrderStats := function(pr,order,n,k)
   od;
   pos := PositionSorted(sums,QuoInt(n,2));
   return rec( exponent := Lcm(ords), colorders := col,
-              allorders := Set(List(col,x->x[1])),
-              freqorders := Set(List(col{[1..pos]},x->x[1])),
+              allorders := Set(col,x->x[1]),
+              freqorders := Set(col{[1..pos]},x->x[1]),
               probability := sums[pos] / n, samplesize := n,
               independencek := k );
 end;
