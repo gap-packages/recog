@@ -397,12 +397,12 @@ FindHomMethodsProjective.Subfield :=  function(ri,G)
     RECOG.SetPseudoRandomStamp(G,"Subfield");
     f := ri!.field;
     if IsPrimeField(f) then
-        return false;     # nothing to do
+        return NeverApplicable;     # nothing to do
     elif not IsBound(ri!.meataxemodule) then
         ri!.meataxemodule := GModuleByMats(GeneratorsOfGroup(G),f);
     fi;
     if not MTX.IsIrreducible(ri!.meataxemodule) then
-        return false;     # not our case
+        return NeverApplicable;     # not our case
     fi;
     dim := ri!.dimension;
     pf := PrimeField(f);
@@ -421,7 +421,8 @@ FindHomMethodsProjective.Subfield :=  function(ri,G)
         return Success;
     fi;
 
-    return false;   # nothing more to do for us, C3C5 takes care of the rest!
+    # nothing more to do for us, C3C5 takes care of the rest!
+    return NeverApplicable;
   end;
 
 RECOG.HomActionFieldAuto := function(data,el)
