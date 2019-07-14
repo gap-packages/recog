@@ -410,7 +410,7 @@ end;
 # decompose a vector space into a sum of common eigenspaces
 # rad is generator list for an abelian matrix group
 RECOG.commondiagonal:=function(q,rad)
-    local xxx, int, es, int2, vs, nicebasis, i, j, k;
+    local int, es, int2, vs, nicebasis, i, j, k;
 
     Info(InfoRecog,3,"enter diagonalization");
 
