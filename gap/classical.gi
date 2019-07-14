@@ -800,8 +800,7 @@ RECOG.TestRandomElement := function (recognise, grp)
             if recognise.kf = "unknown" then
                 recognise.needKF := true;
                 return fail;
-            fi;
-            if recognise.kf = false then
+            elif recognise.kf = false then
                 return fail;
             fi;
             kf := recognise.kf;
