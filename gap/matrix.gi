@@ -472,7 +472,7 @@ end;
 
 # Homomorphism method used by FindHomMethodsMatrix.BlockLowerTriangular.
 RECOG.HomOntoBlockDiagonal := function(data,el)
-  local dim,i,m;
+  local m, x;
 
   # Verify el is in the domain of definition of this homomorphism.
   # Assuming the recognition result is correct, this is of course always
@@ -482,13 +482,10 @@ RECOG.HomOntoBlockDiagonal := function(data,el)
     return fail;
   fi;
 
-  dim := Length(el);
   m := ZeroMutable(el);
-  for i in [1..Length(data.blocks)] do
-      CopySubMatrix(el,m,data.blocks[i],data.blocks[i],
-                         data.blocks[i],data.blocks[i]);
+  for x in data.blocks do
+    CopySubMatrix(el, m, x, x, x, x);
   od;
-
   return m;
 end;
 
