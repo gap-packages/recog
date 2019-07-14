@@ -201,13 +201,12 @@ end;
 FindHomMethodsProjective.BiggerScalarsOnly := function(ri,G)
   # We come here only hinted, we project to a little square block in the
   # upper left corner and know that there is no kernel:
-  local H,data,hom,newgens;
+  local H, data, hom;
   data := rec(poss := [1..ri!.degsplittingfield],
               bas  := ri!.biggerscalarsbas,
               basi := ri!.biggerscalarsbasi);
-  newgens := List(GeneratorsOfGroup(G),x->RECOG.HomBCToDiagonalBlock(data,x));
-  H := Group(newgens);
-  hom := GroupHomByFuncWithData(G,H,RECOG.HomBCToDiagonalBlock,data);
+  H := List(GeneratorsOfGroup(G), x-> RECOG.HomBCToDiagonalBlock(data, x));
+  hom := GroupHomByFuncWithData(G, Group(H), RECOG.HomBCToDiagonalBlock, data);
   SetHomom(ri,hom);
 
   Add(forfactor(ri).hints,
@@ -296,11 +295,11 @@ RECOG.BaseChangeForSmallestPossibleField := function(grp,mtx,k)
   element := false ;
   a := Zero(GeneratorsOfGroup(grp)[1]);
   dim := Length(a);
-  while ( element = false ) do
-    a := a + Random ( f ) * PseudoRandom ( grp ) ;
+  while element = false do
+    a := a + Random(f) * PseudoRandom(grp);
 
     # Check char. polynomial of a to make sure it lies in smallField [ x ]
-    charPoly := CharacteristicPolynomial ( a ) ;
+    charPoly := CharacteristicPolynomial(a);
     field := Field(CoefficientsOfLaurentPolynomial(charPoly)[1]);
     if not IsSubset(f, field) then
         f := ClosureField(f,field);
@@ -336,7 +335,7 @@ RECOG.BaseChangeForSmallestPossibleField := function(grp,mtx,k)
   while Length(b) < dim do
       for g in GeneratorsOfGroup(grp) do
           w := b[i] * g;
-          if RECOG.CleanRow( seb, ShallowCopy(w), true, fail ) = false then
+          if not RECOG.CleanRow(seb, ShallowCopy(w), true, fail) then
               Add(b,w);
           fi;
       od;
@@ -647,7 +646,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
           fi;
           Info(InfoRecog, 2, "Restriction to H is homogeneous.");
           if not MTX.IsAbsolutelyIrreducible(collf[1][1]) then
-              ErrorNoReturn("Is this really possible??? G acts absolutely irred!");
+              ErrorNoReturn("Is this really possible? G acts absolutely irred!");
           fi;
           homs := MTX.Homomorphisms(collf[1][1],m);
           basis := Concatenation(homs);

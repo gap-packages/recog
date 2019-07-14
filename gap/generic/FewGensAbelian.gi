@@ -19,11 +19,11 @@
 #! <Ref Subsect="KnownNilpotent" Style="Text"/>,
 #! otherwise return <K>NeverApplicable</K>.
 #! @EndChunk
-FindHomMethodsGeneric.FewGensAbelian := function(ri,G)
+FindHomMethodsGeneric.FewGensAbelian := function(ri, G)
   # If the number of generators is less than or equal to 200, then check
   # abelian and if so, hint to KnownNilpotent to write it as a direct
   # product of Sylow subgroups
-  local gens,i,j,l;
+  local gens, i, j, l;
   gens := GeneratorsOfGroup(G);
   l := Length(gens);
   if l > 200 then
@@ -37,5 +37,5 @@ FindHomMethodsGeneric.FewGensAbelian := function(ri,G)
       od;
   od;
   # We call KnownNilpotent:
-  return FindHomMethodsGeneric.KnownNilpotent(ri,G);
+  return FindHomMethodsGeneric.KnownNilpotent(ri, G);
 end;

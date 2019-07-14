@@ -51,7 +51,7 @@ RECOG.CentralisingElementOfInvolution := function(pr,ord,x)
   if IsEvenInt(o) then
       return z^(o/2);
   fi;
-  return z^((o+1)/2)*r^(-1);
+  return z ^ ((o+1)/2) * (r^-1);
 end;
 
 RECOG.InvolutionCentraliser := function(pr, ord, x, nr)
