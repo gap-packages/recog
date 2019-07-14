@@ -1030,12 +1030,8 @@ RECOG.IsSpContained := function( recognise, grp )
     isSpForm := f -> IsSesquilinearForm(f) and IsSymplecticForm(f);
 
     # if the dimension is not even, the group cannot be symplectic
-    if recognise.d mod 2 <> 0 then
+    if recognise.d mod 2 <> 0 or recognise.isSpContained = false then
         recognise.isSpContained := false;
-        return false;
-    fi;
-
-    if recognise.isSpContained = false then
         return false;
     fi;
 
