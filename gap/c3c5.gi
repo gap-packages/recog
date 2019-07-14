@@ -51,7 +51,7 @@ RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
   # m a MeatAxe-module
   local F,bas,d,dim,e,fac,facs,gens,i,inforec,j,k,mp,mu,new,newgens,pr,q,v;
 
-  if not(MTX.IsIrreducible(m)) then
+  if not MTX.IsIrreducible(m) then
       ErrorNoReturn("cannot work for reducible modules");
   fi;
   if MTX.IsAbsolutelyIrreducible(m) = true then
@@ -83,8 +83,8 @@ RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
   while Length(bas) < dim do
       for j in [1..Length(gens)] do
           new := bas[i] * gens[j];
-          if not(RECOG.CleanRow(mu,ShallowCopy(new),true,fail)) then
-          #if not(IsContainedInSpan(mu,new)) then
+          if not RECOG.CleanRow(mu, ShallowCopy(new), true, fail) then
+          #if not IsContainedInSpan(mu, new) then
               Add(bas,new);
               #CloseMutableBasis(mu,new);
               for k in [1..d-1] do
@@ -147,7 +147,7 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
 
   # This usually comes after "ReducibleIso", which provides the following,
   # however, just to be sure:
-  if not(IsBound(ri!.meataxemodule)) then
+  if not IsBound(ri!.meataxemodule) then
       ri!.meataxemodule := GModuleByMats(GeneratorsOfGroup(G),f);
   fi;
 
@@ -258,7 +258,7 @@ RECOG.ScalarsToMultiplyIntoSmallerField := function(l,k)
       if r = fail then
           return fail;
       fi;
-      if not(IsSubset(f,r.field)) then
+      if not IsSubset(f, r.field) then
           f := ClosureField(f,r.field);
           if f = k then
               return fail;
@@ -302,7 +302,7 @@ RECOG.BaseChangeForSmallestPossibleField := function(grp,mtx,k)
     # Check char. polynomial of a to make sure it lies in smallField [ x ]
     charPoly := CharacteristicPolynomial ( a ) ;
     field := Field(CoefficientsOfLaurentPolynomial(charPoly)[1]);
-    if not(IsSubset(f,field)) then
+    if not IsSubset(f, field) then
         f := ClosureField(f,field);
         if Size(f) >= Size(k) then
             return fail;
@@ -399,10 +399,10 @@ FindHomMethodsProjective.Subfield :=  function(ri,G)
     if IsPrimeField(f) then
         return false;     # nothing to do
     fi;
-    if not(IsBound(ri!.meataxemodule)) then
+    if not IsBound(ri!.meataxemodule) then
         ri!.meataxemodule := GModuleByMats(GeneratorsOfGroup(G),f);
     fi;
-    if not(MTX.IsIrreducible(ri!.meataxemodule)) then
+    if not MTX.IsIrreducible(ri!.meataxemodule) then
         return false;     # not our case
     fi;
     dim := ri!.dimension;
@@ -459,10 +459,10 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
   RECOG.SetPseudoRandomStamp(G,"C3C5");
 
   f := ri!.field;
-  if not(IsBound(ri!.meataxemodule)) then
+  if not IsBound(ri!.meataxemodule) then
       ri!.meataxemodule := GModuleByMats(GeneratorsOfGroup(G),f);
   fi;
-  if not(MTX.IsIrreducible(ri!.meataxemodule)) then
+  if not MTX.IsIrreducible(ri!.meataxemodule) then
       return NeverApplicable;     # not our case
   fi;
   dim := ri!.dimension;
@@ -550,7 +550,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
       # So, we first test for C5 in either case and only if this does not
       # work we settle C3:
 
-      if not(IsPrimeField(f)) then
+      if not IsPrimeField(f) then
           b := RECOG.BaseChangeForSmallestPossibleField(H,m,f);
           if b <> fail then   # Yes! N is realisable!
                 Info(InfoRecog,2,"Can conjugate H subgroup from GL(",dim,
@@ -643,7 +643,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
               # This should have been caught by the scalar test above.
           fi;
           Info(InfoRecog,2,"Restriction to H is homogeneous.");
-          if not(MTX.IsAbsolutelyIrreducible(collf[1][1])) then
+          if not MTX.IsAbsolutelyIrreducible(collf[1][1]) then
               ErrorNoReturn("Is this really possible??? G acts absolutely irred!");
           fi;
           homs := MTX.Homomorphisms(collf[1][1],m);
@@ -657,7 +657,7 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
           # Now we believe to have a tensor decomposition:
           conjgensG := List(gens,x->r.t * x * r.ti);
           kro := List(conjgensG,g->RECOG.IsKroneckerProduct(g,r.blocksize));
-          if not(ForAll(kro,k->k[1] = true)) then
+          if not ForAll(kro, k -> k[1]) then
               Info(InfoRecog,1,"VERY, VERY, STRANGE!");
               Info(InfoRecog,1,"False alarm, was not a tensor decomposition.");
               ErrorNoReturn("This should never have happened (3), tell Max.");

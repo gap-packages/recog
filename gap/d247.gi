@@ -81,7 +81,7 @@ RECOG.InvolutionJumper := function(pr,ord,x,tol,withodd)
       if IsEvenInt(o) then
           return c^(o/2);
       fi;
-      if not(withodd) then
+      if not withodd then
           continue;
       fi;
       z := y*c^((o-1)/2);
@@ -106,7 +106,7 @@ RECOG.DirectFactorsFinder := function(gens,facgens,k,eq)
           while i <= 4 do
               Add(fgens,Next(pr),1);
               if ForAny([2..Length(fgens)],
-                        j->not(eq(fgens[1]*fgens[j],fgens[j]*fgens[1]))) then
+                        j -> not eq(fgens[1]*fgens[j], fgens[j]*fgens[1])) then
                   break;
               fi;
               i := i + 1;
@@ -121,7 +121,7 @@ RECOG.DirectFactorsFinder := function(gens,facgens,k,eq)
   fi;
 
   equal := function(a,b)
-    return ForAny(b,y-> not(eq(a*y,y*a)));
+    return ForAny(b, y -> not eq(a*y, y*a));
   end;
 
   # Enumerate orbit:
@@ -132,7 +132,7 @@ RECOG.DirectFactorsFinder := function(gens,facgens,k,eq)
     for j in [1..Length(gens)] do
       z := o[i][1]^gens[j];
       l := 1;
-      while l <= Length(o) and not(equal(z,o[l])) do
+      while l <= Length(o) and not equal(z, o[l]) do
           l := l + 1;
       od;
       pgens[j][i] := l;
@@ -166,14 +166,14 @@ RECOG.DirectFactorsAction := function(data,el)
   o := data.o;
 
   equal := function(a,b)
-    return ForAny(b,y-> not(eq(a*y,y*a)));
+    return ForAny(b, y -> not eq(a*y, y*a));
   end;
 
   res := EmptyPlist(Length(o));
   for i in [1..Length(o)] do
     z := o[i][1]^el;
     j := 1;
-    while j <= Length(o) and not(equal(z,o[j])) do
+    while j <= Length(o) and not equal(z, o[j]) do
         j := j + 1;
     od;
     if j <= Length(o) then
@@ -225,7 +225,7 @@ RECOG.SortOutReducibleNormalSubgroup :=
             return TemporaryFailure;
         fi;
         Info(InfoRecog,2,"D247:Restriction to normal subgroup is homogeneous.");
-        if not(MTX.IsAbsolutelyIrreducible(collf[1][1])) then
+        if not MTX.IsAbsolutelyIrreducible(collf[1][1]) then
             ErrorNoReturn("Is this really possible??? G acts absolutely irred!");
         fi;
         homs := MTX.Homomorphisms(collf[1][1],m);
@@ -240,7 +240,7 @@ RECOG.SortOutReducibleNormalSubgroup :=
         # Now we believe to have a tensor decomposition:
         conjgensG := List(GeneratorsOfGroup(G),x->r.t * x * r.ti);
         kro := List(conjgensG,g->RECOG.IsKroneckerProduct(g,r.blocksize));
-        if not(ForAll(kro,k->k[1] = true)) then
+        if not ForAll(kro, k -> k[1]) then
             Info(InfoRecog,1,"VERY, VERY, STRANGE!");
             Info(InfoRecog,1,"False alarm, was not a tensor decomposition.");
             ErrorNoReturn("This should never have happened (346), tell Max.");
@@ -276,7 +276,7 @@ ConvertToMatrixRep(homcomp,Size(f));
     TriangulizeMat(homcomp);
     o := Orb(G,homcomp,OnSubspacesByCanonicalBasis,rec(storenumbers := true));
     Enumerate(o,QuoInt(ri!.dimension,Length(homcomp)));
-    if not(IsClosed(o)) then
+    if not IsClosed(o) then
         Info(InfoRecog,2,"D247:Obviously did not get normal subgroup!");
         return TemporaryFailure;
     fi;
@@ -364,7 +364,7 @@ FindHomMethodsProjective.D247 := function(ri,G)
     ngens := FastNormalClosure(GeneratorsOfGroup(G),[x],4);
     m := GModuleByMats(ngens,f);
     if MTX.IsIrreducible(m) then
-        if not(ispower) then
+        if not ispower then
             Info(InfoRecog,4,"Dimension is no power!");
             return fail; # FIXME: fail = TemporaryFailure here really correct?
         fi;
@@ -382,7 +382,7 @@ FindHomMethodsProjective.D247 := function(ri,G)
         od;
         nngens := FastNormalClosure(ngens,[y],2);
         mm := GModuleByMats(nngens,f);
-        if not(MTX.IsIrreducible(mm)) then
+        if not MTX.IsIrreducible(mm) then
             return RECOG.SortOutReducibleSecondNormalSubgroup(ri,G,nngens,mm);
         fi;
         return fail; # FIXME: fail = TemporaryFailure here really correct?
@@ -435,7 +435,7 @@ FindHomMethodsProjective.PrototypeForC2C4 := function(ri,G)
     local m,ngens;
     ngens := FastNormalClosure(GeneratorsOfGroup(G),x,4);
     m := GModuleByMats(ngens,f);
-    if not(IsIrreducible(m)) then
+    if not IsIrreducible(m) then
         Info(InfoRecog,2,"Proto: Seem to have found something!");
         return RECOG.SortOutReducibleNormalSubgroup(ri,G,ngens,m);
     else

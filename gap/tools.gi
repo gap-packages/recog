@@ -86,7 +86,7 @@ RECOG.CheckFingerPrint := function(fp,orders)
         if ForAny(orders,o->fp.size mod o <> 0) then return 0; fi;
     fi;
     if IsBound(fp.allorders) then
-        if ForAny(orders,o->not(o in fp.allorders)) then return 0; fi;
+        if ForAny(orders,o->not o in fp.allorders) then return 0; fi;
     fi;
     count := Number(orders,o->o in fp.freqorders);
     return RECOG.BinomialTab[Length(orders)][count+1]/2^(Length(orders));

@@ -200,7 +200,7 @@ end;
 # gives an error if not.
 DoSafetyCheckStabChain := function(S)
   while IsBound(S.stabilizer) do
-      if not(IsIdenticalObj(S.labels,S.stabilizer.labels)) then
+      if not IsIdenticalObj(S.labels, S.stabilizer.labels) then
           ErrorNoReturn("Alert! labels not identical on different levels!");
       fi;
       S := S.stabilizer;
@@ -272,13 +272,13 @@ end;
 # from the stabilizer chain <S>
 WordinLabels := function(word,S,g)
   local i,point,start;
-  if not(IsBound(S.orbit) and IsBound(S.orbit[1])) then
+  if not (IsBound(S.orbit) and IsBound(S.orbit[1])) then
       return fail;
   fi;
   start := S.orbit[1];
   point := start^g;
   while point <> start do
-      if not(IsBound(S.translabels[point])) then
+      if not IsBound(S.translabels[point]) then
           return fail;
       fi;
       i := S.translabels[point];
@@ -288,7 +288,7 @@ WordinLabels := function(word,S,g)
   od;
   # now g is in the first stabilizer
   if g <> S.identity then
-      if not(IsBound(S.stabilizer)) then
+      if not IsBound(S.stabilizer) then
           return fail;
       fi;
       return WordinLabels(word,S.stabilizer,g);

@@ -31,7 +31,7 @@ FindHomMethodsGeneric.FewGensAbelian := function(ri,G)
   fi;
   for i in [1..l-1] do
       for j in [i+1..l] do
-          if not(ri!.isequal(gens[i]*gens[j],gens[j]*gens[i])) then
+          if not ri!.isequal(gens[i] * gens[j], gens[j] * gens[i]) then
               return NeverApplicable;
           fi;
       od;
