@@ -53,15 +53,11 @@ RECOG.CentralisingElementOfInvolution := function(pr,ord,x)
   fi;
 end;
 
-RECOG.InvolutionCentraliser := function(pr,ord,x,nr)
-  # x an involution in G
-  local i,l,y;
-  l := [];
-  for i in [1..nr] do   # find 20 generators of the centraliser
-      y := RECOG.CentralisingElementOfInvolution(pr,ord,x);
-      AddSet(l,y);
-  od;
-  return l;
+RECOG.InvolutionCentraliser := function(pr, ord, x, nr)
+  # x is an involution in G.
+  # Choose <nr> elements (with possible repeats) of the centraliser of <x>,
+  # in the hope that they generate the centraliser.
+  return Set([1..nr], i -> RECOG.CentralisingElementOfInvolution(pr, ord, x));
 end;
 
 
