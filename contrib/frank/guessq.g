@@ -611,7 +611,7 @@ end;
 ro := RandomProjectiveOrders;
 
 testPossibleCrossCharTypes := function(typ, rk, q, dim)
-  local g, i, mm, nonew, o, mm1, ords;
+  local g, i, mm, nonew, o, mm1, ords, possibleChars;
   if typ in ["A","~A"] then
     g := SL(rk+1, q);
   elif typ in ["2A","2~A"] then
@@ -643,15 +643,15 @@ testPossibleCrossCharTypes := function(typ, rk, q, dim)
       nonew := 0;
     fi;
     mm := mm1;
+    # the possible characteristics (i.e. primes)
+    possibleChars := Set(mm, a -> SmallestRootInt(a[1])); 
     if nonew = 30 then
-      return [i-29, Set(List(mm, a-> SmallestRootInt(a[1]))),
-              ords{[1..i-29]}, mm];
-    fi;
-    if Length(Set(List(mm, a-> SmallestRootInt(a[1])))) = 1 then
-      return [i, Set(List(mm, a-> SmallestRootInt(a[1]))), ords, mm];
+      return [i-29, possibleChars, ords{[1..i-29]}, mm];
+    elif Length(x) = 1 then
+      return [i, possibleChars, ords, mm];
     fi;
   od;
-  return [i, Set(List(mm, a-> SmallestRootInt(a[1]))), ords, mm];
+  return [i, possibleChars, ords, mm];
 end;
 
 MakeGroups := function(dat)
