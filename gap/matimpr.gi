@@ -79,7 +79,7 @@ RECOG.IndexMaxSub := function( hm, grp, d )
         orb := Orb(grp,sub,OnSubspacesByCanonicalBasis,
                    rec(storenumbers := true, hashlen := NextPrimeInt(8*d)));
         Enumerate(orb,4*d);
-        if not(IsClosed(orb)) then
+        if not IsClosed(orb) then
             Info(InfoRecog,2,"Did not find nice orbit.");
             if lastsub = fail then return fail; fi;
             return rec( orb := lastorb,
@@ -348,7 +348,7 @@ end;
 #FindHomMethodsMatrix.InducedOnSubspace := function(ri,G)
 #  local H,dim,gens,hom,newgens,gen,data;
 #  # Are we applicable?
-#  if not(IsBound(ri!.subdim)) then
+#  if not IsBound(ri!.subdim) then
 #      return NotEnoughInformation;
 #  fi;
 #

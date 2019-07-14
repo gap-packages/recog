@@ -327,7 +327,7 @@ RECOG.AlmostSimpleHints := rec();
 # Currently just sporadic simple groups are contained.
 InstallGlobalFunction( InstallAlmostSimpleHint,
   function( name, type, re )
-    if not(IsBound(RECOG.AlmostSimpleHints.(name))) then
+    if not IsBound(RECOG.AlmostSimpleHints.(name)) then
         RECOG.AlmostSimpleHints.(name) := [];
     fi;
     re.type := type;
@@ -432,7 +432,7 @@ end;
 
 
 # This is for the released AtlasRep package:
-if not(IsBound(AGR_TablesOfContents)) then
+if not IsBound(AGR_TablesOfContents) then
     AGR_TablesOfContents := fail;
     AGR_InfoForName := fail;
 fi;
@@ -554,7 +554,7 @@ RECOG.findchar:=function(ri,G,randelfunc)
     vs:=VectorSpace(GF(p),mat);
     repeat
         vec:=Random(vs);
-    until not(IsZero(vec));
+    until not IsZero(vec);
 
     if RECOG.shortorbit(vec,Product(GeneratorsOfGroup(G)), 3*d) = 3*d then
         return p;
@@ -719,7 +719,7 @@ end;
 RECOG.RandElFuncSimpleSocle := function(ri)
   local el,ord;
   ri!.simplesoclerandp := ri!.simplesoclerandp + 1;
-  if not(IsBound(ri!.simplesoclerand[ri!.simplesoclerandp])) then
+  if not IsBound(ri!.simplesoclerand[ri!.simplesoclerandp]) then
       el := Next(ri!.simplesoclepr);
       ri!.simplesoclerand[ri!.simplesoclerandp] := el;
       ord := ProjectiveOrder(el)[1];
@@ -960,7 +960,7 @@ FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
           # Now make a homomorphism object:
           newgens := List(GeneratorsOfGroup(G),
                           x->RECOG.HomFDPM(r,x));
-          if not(fail in newgens) then
+          if not fail in newgens then
               GG := GroupWithGenerators(newgens);
               hom := GroupHomByFuncWithData(G,GG,RECOG.HomFDPM,r);
 
@@ -1368,7 +1368,7 @@ FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
           raus := false;
           # check whether orders appear in killers
           for k in [1..Length(RECOG.SporadicsElementOrders[jj])] do
-              if not(RECOG.SporadicsElementOrders[jj][k] in ordersseen) and
+              if not RECOG.SporadicsElementOrders[jj][k] in ordersseen and
                  (1-RECOG.SporadicsProbabilities[jj][k])^i < limit then
                   Info(InfoRecog,3,"Have thrown out ",RECOG.SporadicsNames[jj],
                        " (did not see order ",
@@ -1377,7 +1377,7 @@ FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
                   break;
               fi;
           od;
-          if not(raus) and IsBound(RECOG.SporadicsKillers[jj]) then
+          if not raus and IsBound(RECOG.SporadicsKillers[jj]) then
             for killers in RECOG.SporadicsKillers[jj] do
               if Intersection(ordersseen,
                               RECOG.SporadicsElementOrders[jj]{killers})=[]

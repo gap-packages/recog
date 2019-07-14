@@ -53,7 +53,7 @@ FindHomMethodsMatrix.DiagonalMatrices := function(ri, G)
       i := i + 1;
   od;
 
-  if not(isscalars) then
+  if not isscalars then
       # We quickly know that we want to make a balanced tree:
       ri!.blocks := List([1..d],i->[i]);
       # Note that we cannot tell the upper levels that they should better
@@ -133,7 +133,7 @@ FindHomMethodsMatrix.Scalar := function(ri, G)
   f := ri!.field;
   o := One(f);
   gens := List(GeneratorsOfGroup(G),x->x[1,1]);
-  subset := Filtered([1..Length(gens)],i->not(IsOne(gens[i])));
+  subset := Filtered([1..Length(gens)], i -> not IsOne(gens[i]));
   if subset = [] then
       return FindHomMethodsGeneric.TrivialGroup(ri,G);
   fi;
@@ -282,7 +282,7 @@ ExtendToBasisOfFullRowspace := function(m,f)
   # FIXME:
   # This function has to be improved with respect to performance:
   local i,o,v,z;
-  if not(IsMutable(m)) then
+  if not IsMutable(m) then
       m := MutableCopyMat(m);
   fi;
   v := ZeroMutable(m[1]);
@@ -600,7 +600,7 @@ end;
 #FindHomMethodsMatrix.InducedOnFactor := function(ri,G)
 #  local H,dim,gens,hom,newgens,gen,data;
 #  # Are we applicable?
-#  if not(IsBound(ri!.subdim)) then
+#  if not IsBound(ri!.subdim) then
 #      return NotEnoughInformation;
 #  fi;
 #
@@ -702,9 +702,9 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
         i := 1;
         done := 0*[1..Length(lvec)];   # this refers to the current gens
         ready := false;
-        while not(ready) do
+        while not ready do
             # Find out where there is something left:
-            while pos > Length(v) and not(ready) do
+            while pos > Length(v) and not ready do
                 curlay := curlay + 1;
                 if curlay <= Length(lens) then
                     v := RECOG.ExtractLowStuff(x,curlay,ri!.blocks,lens,basisOfFieldExtension);
@@ -721,7 +721,7 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
                 if pivots[i][1] = curlay then
                     # we might have jumped over a layer
                     done := -v[pivots[i][2]];
-                    if not(IsZero(done)) then
+                    if not IsZero(done) then
                         AddRowVector(v,lvec[i],done);
                         x := x * l[i]^IntFFE(done);
                     fi;
@@ -776,7 +776,7 @@ SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
   # First project and calculate the vector:
   local done,h,i,l,layer,pow;
   # Take care of the projective case:
-  if ri!.projective and not(IsOne(g[1,1])) then
+  if ri!.projective and not IsOne(g[1,1]) then
       g := (g[1,1]^-1) * g;
   fi;
   l := [];
@@ -786,7 +786,7 @@ SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
                                  ri!.basisOfFieldExtension);
       while i <= Length(ri!.gensNvectors) and ri!.gensNpivots[i][1] = layer do
           done := h[ri!.gensNpivots[i][2]];
-          if not(IsZero(done)) then
+          if not IsZero(done) then
               AddRowVector(h,ri!.gensNvectors[i],-done);
               pow := IntFFE(done);
               g := NiceGens(ri)[i]^(-pow) * g;
@@ -901,7 +901,7 @@ end;
 #  v := FullRowSpace(f,d);
 #  repeat
 #      w := Random(v);
-#  until not(IsZero(w));
+#  until not IsZero(w);
 #  o := Orbit(G,w,OnRight);
 #  hom := ActionHomomorphism(G,o,OnRight);
 #

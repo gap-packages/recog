@@ -63,7 +63,7 @@ RECOG.FindTensorKernel := function(G,onlyone)
       N := GroupWithGenerators(FastNormalClosure(GeneratorsOfGroup(G),[c],10));
       if onlyone and
          (ForAny(GeneratorsOfGroup(N),m->IsZero(m[1,1]) or
-                                         not(IsOne(m*(m[1,1])^-1)))) then
+                                         not IsOne(m*(m[1,1])^-1))) then
           # we found a non-scalar normal subgroup:
           #Print("\n");
           return N;
@@ -148,7 +148,7 @@ RECOG.FindTensorDecomposition := function(G,N)
   while Length(h) < d/Length(homsimg) and i <= Length(l) do
       for g in gens do
           c := OnSubspacesByCanonicalBasis(l[i],g);
-          if not(c in lset) then
+          if not c in lset then
               Add(h,h[i]*g);
               Add(l,c);
               AddSet(lset,c);
@@ -360,7 +360,7 @@ FindHomMethodsProjective.TensorDecomposable := function(ri,G)
   # Now we believe to have a tensor decomposition:
   conjgensG := List(GeneratorsOfGroup(G),x->r.t * x * r.ti);
   kro := List(conjgensG,g->RECOG.IsKroneckerProduct(g,r.blocksize));
-  if not(ForAll(kro,k->k[1] = true)) then
+  if not ForAll(kro, k -> k[1]) then
       Info(InfoRecog,1,"VERY, VERY, STRANGE!");
       Info(InfoRecog,1,"False alarm, was not a tensor decomposition.",
            " Found at least a perm action.");
