@@ -172,13 +172,14 @@ end;
 # is valid -- that is, whether the rows and columns in
 # the set poss contain only zero elements outside of the
 # positions indicated by poss.
-RECOG.IsDiagonalBlockOfMatrix := function(mat,poss)
-  local z, i, j;
-  z := ZeroOfBaseDomain(mat);
+RECOG.IsDiagonalBlockOfMatrix := function(m, poss)
+  local n, outside, z, i, j;
+  Assert(1, NrRows(m) = NrCols(m) and IsSubset([1..NrRows(m)], poss));
+  outside := Difference([1..NrRows(m)], poss);
+  z := ZeroOfBaseDomain(m);
   for i in poss do
-    for j in [1..Length(mat)] do
-      if i in poss then continue; fi;
-      if mat[i,j] <> z or mat[j,i] <> z then
+    for j in outside do
+      if m[i,j] <> z or m[j,i] <> z then
         return false;
       fi;
     od;
