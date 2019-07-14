@@ -51,11 +51,15 @@ RECOG.ElementOrderStats := function(pr,order,n,k)
       Add(sums,sums[i-1] + col[i][2]);
   od;
   pos := PositionSorted(sums,QuoInt(n,2));
-  return rec( exponent := Lcm(ords), colorders := col,
-              allorders := Set(col,x->x[1]),
-              freqorders := Set(col{[1..pos]},x->x[1]),
-              probability := sums[pos] / n, samplesize := n,
-              independencek := k );
+  return rec(
+             allorders     := Set(col, x -> x[1]),
+             colorders     := col,
+             exponent      := Lcm(ords),
+             freqorders    := Set(col{[1..pos]}, x -> x[1]),
+             independencek := k,
+             probability   := sums[pos] / n,
+             samplesize    := n,
+            );
 end;
 
 RECOG.BinomialTab := [];

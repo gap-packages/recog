@@ -178,8 +178,9 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
   # Also, doing normal closure will not help!
   findgensNmeth(ri).args := [5,0];
   Add(forkernel(ri).hints,
-      rec( method := FindHomMethodsProjective.BiggerScalarsOnly, rank := 2000,
-           stamp := "BiggerScalarsOnly" ));
+      rec(method := FindHomMethodsProjective.BiggerScalarsOnly,
+          rank   := 2000,
+          stamp  := "BiggerScalarsOnly"));
   forkernel(ri).degsplittingfield := MTX.DegreeSplittingField(m)
                                    / DegreeOverPrimeField(f);
   forkernel(ri).biggerscalarsbas := r.inforec.bas;
@@ -201,17 +202,18 @@ FindHomMethodsProjective.BiggerScalarsOnly := function(ri,G)
   # We come here only hinted, we project to a little square block in the
   # upper left corner and know that there is no kernel:
   local H,data,hom,newgens;
-  data := rec( poss := [1..ri!.degsplittingfield],
-               bas := ri!.biggerscalarsbas,
-               basi := ri!.biggerscalarsbasi );
+  data := rec(poss := [1..ri!.degsplittingfield],
+              bas  := ri!.biggerscalarsbas,
+              basi := ri!.biggerscalarsbasi);
   newgens := List(GeneratorsOfGroup(G),x->RECOG.HomBCToDiagonalBlock(data,x));
   H := Group(newgens);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomBCToDiagonalBlock,data);
   SetHomom(ri,hom);
 
   Add(forfactor(ri).hints,
-      rec( method := FindHomMethodsProjective.StabilizerChainProj, rank := 4000,
-           stamp := "StabilizerChainProj" ));
+      rec(method := FindHomMethodsProjective.StabilizerChainProj,
+          rank   := 4000,
+          stamp  := "StabilizerChainProj"));
 
   findgensNmeth(ri).method := FindKernelDoNothing;
 
@@ -265,7 +267,7 @@ RECOG.ScalarsToMultiplyIntoSmallerField := function(l,k)
       scalars[i] := r.scalar;
       newgens[i] := r.mat;
   od;
-  return rec(scalars := scalars, newgens := newgens, field := f );
+  return rec(scalars := scalars, newgens := newgens, field := f);
 end;
 
 RECOG.BaseChangeForSmallestPossibleField := function(grp,mtx,k)
@@ -668,8 +670,9 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
           forfactor(ri).blocksize := r.blocksize;
           forfactor(ri).generatorskronecker := kro;
           Add( forfactor(ri).hints,
-               rec( method := FindHomMethodsProjective.KroneckerProduct,
-                    rank := 4000, stamp := "KroneckerProduct" ) );
+               rec(method := FindHomMethodsProjective.KroneckerProduct,
+                   rank   := 4000,
+                   stamp  := "KroneckerProduct"));
           # This is an isomorphism:
           findgensNmeth(ri).method := FindKernelDoNothing;
           return Success;
