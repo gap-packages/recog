@@ -21,12 +21,10 @@
 RECOG.ParseNumber := function( number, d, default )
   if IsInt(number) then
       return number;
-  fi;
-  if IsString(number) then
-      if number = "logd" then return LogInt(d,2); fi;
-      if number[Length(number)] = 'd' then
-          return d * Int(number{[1..Length(number)-1]});
-      fi;
+  elif number = "logd" then
+      return LogInt(d, 2);
+  elif IsString(number) and EndsWith(number, "d") then
+      return d * Int(number{[1..Length(number)-1]});
   fi;
   return default;
 end;
@@ -1341,8 +1339,7 @@ FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
       if o = fail then
           Info(InfoRecog,2,"Ruled out all sporadic groups.");
           return NeverApplicable;
-      fi;
-      if i <= Length(gens) then
+      elif i <= Length(gens) then
           r.order := ri!.order(r.el);
       else
           GetElmOrd(ri,r);
@@ -1400,8 +1397,7 @@ FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
       if l = [] then
           Info(InfoRecog,2,"Ruled out all sporadic groups.");
           return NeverApplicable;
-      fi;
-      if Length(l) = 1 then
+      elif Length(l) = 1 then
         count := count + 1;
         if count >= 9 then
           Info(InfoRecog,2,"I guess that this is the sporadic simple group ",

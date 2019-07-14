@@ -53,8 +53,7 @@ RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
 
   if not MTX.IsIrreducible(m) then
       ErrorNoReturn("cannot work for reducible modules");
-  fi;
-  if MTX.IsAbsolutelyIrreducible(m) = true then
+  elif MTX.IsAbsolutelyIrreducible(m) then
       ErrorNoReturn("cannot work for absolutely irreducible modules");
   fi;
 
@@ -257,8 +256,7 @@ RECOG.ScalarsToMultiplyIntoSmallerField := function(l,k)
       r := RECOG.ScalarToMultiplyIntoSmallerField(l[i],k);
       if r = fail then
           return fail;
-      fi;
-      if not IsSubset(f, r.field) then
+      elif not IsSubset(f, r.field) then
           f := ClosureField(f,r.field);
           if f = k then
               return fail;
@@ -398,8 +396,7 @@ FindHomMethodsProjective.Subfield :=  function(ri,G)
     f := ri!.field;
     if IsPrimeField(f) then
         return false;     # nothing to do
-    fi;
-    if not IsBound(ri!.meataxemodule) then
+    elif not IsBound(ri!.meataxemodule) then
         ri!.meataxemodule := GModuleByMats(GeneratorsOfGroup(G),f);
     fi;
     if not MTX.IsIrreducible(ri!.meataxemodule) then

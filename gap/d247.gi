@@ -77,11 +77,9 @@ RECOG.InvolutionJumper := function(pr,ord,x,tol,withodd)
       o := ord(c);
       if o = 1 then
           continue;
-      fi;
-      if IsEvenInt(o) then
+      elif IsEvenInt(o) then
           return c^(o/2);
-      fi;
-      if not withodd then
+      elif not withodd then
           continue;
       fi;
       z := y*c^((o-1)/2);
