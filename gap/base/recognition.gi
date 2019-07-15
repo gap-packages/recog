@@ -84,7 +84,7 @@ RECOG_ViewObj := function( level, ri )
         Print(" Dim=",ri!.dimension);
         Print(" Field=",Size(ri!.field));
     fi;
-    if not(IsLeaf(ri)) then
+    if not IsLeaf(ri) then
         Print("\n",String("",level)," F:");
         if HasRIFac(ri) then
             RECOG_ViewObj(level+3, RIFac(ri));
@@ -228,14 +228,14 @@ InstallMethod( RandomElm, "for a recognition info record, a string and a bool",
   function(ri, s, mem)
     local pos,el;
     if ri!.randstore then
-        if not(IsBound(ri!.randrpt.(s))) then
+        if not IsBound(ri!.randrpt.(s)) then
             ri!.randrpt.(s) := 1;
             pos := 1;
         else
             ri!.randrpt.(s) := ri!.randrpt.(s) + 1;
             pos := ri!.randrpt.(s);
         fi;
-        if not(IsBound(ri!.randr[pos])) then
+        if not IsBound(ri!.randr[pos]) then
             ri!.randr[pos] := Next(ri!.prodrep);
         fi;
         el := ri!.randr[pos];
@@ -255,15 +255,15 @@ InstallMethod( RandomElmOrd,
   function(ri, s, mem)
     local pos,res;
     if ri!.randstore then
-        if not(IsBound(ri!.randopt.(s))) then
+        if not IsBound(ri!.randopt.(s)) then
             ri!.randopt.(s) := 1;
             pos := 1;
         else
             ri!.randopt.(s) := ri!.randopt.(s) + 1;
             pos := ri!.randopt.(s);
         fi;
-        if not(IsBound(ri!.rando[pos])) then
-            if not(IsBound(ri!.randr[pos])) then
+        if not IsBound(ri!.rando[pos]) then
+            if not IsBound(ri!.randr[pos]) then
                 ri!.randr[pos] := Next(ri!.prodrep);
             fi;
             ri!.rando[pos] := ri!.order(ri!.randr[pos]!.el);
@@ -276,7 +276,7 @@ InstallMethod( RandomElmOrd,
         res.projective := ri!.projective;
         Add(ri!.rando,res.order);
     fi;
-    if not(mem) then
+    if not mem then
         res.el := res.el!.el;
     fi;
     return res;
@@ -287,7 +287,7 @@ InstallMethod( GetElmOrd, "for a recognition info record and a record",
   function( ri, r )
     local x;
     if ri!.randstore and r.nr > 0 then
-        if not( IsBound(ri!.rando[r.nr]) ) then
+        if not IsBound(ri!.rando[r.nr]) then
             ri!.rando[r.nr] := ri!.order(ri!.randr[r.nr]!.el);
             r.order := ri!.rando[r.nr];
         else
@@ -310,18 +310,18 @@ InstallMethod( GetElmOrd, "for a recognition info record and a record",
 #   function(ri, s, mem)
 #     local pos,res;
 #     if ri!.randstore then
-#         if not(IsBound(ri!.randppt.(s))) then
+#         if not IsBound(ri!.randppt.(s)) then
 #             ri!.randppt.(s) := 1;
 #             pos := 1;
 #         else
 #             ri!.randppt.(s) := ri!.randppt.(s) + 1;
 #             pos := ri!.randppt.(s);
 #         fi;
-#         if not(IsBound(ri!.randp[pos])) then
-#             if not(IsBound(ri!.randr[pos])) then
+#         if not IsBound(ri!.randp[pos]) then
+#             if not IsBound(ri!.randr[pos]) then
 #                 ri!.randr[pos] := Next(ri!.prodrep);
 #             fi;
-#             if not(IsMatrix(ri!.randr[pos])) then
+#             if not IsMatrix(ri!.randr[pos]) then
 #                 ErrorNoReturn("ppd elements only make sense for matrices");
 #             fi;
 #             res := rec( el := ri!.randr[pos] );
@@ -344,7 +344,7 @@ InstallMethod( GetElmOrd, "for a recognition info record and a record",
 #         res.degrees := List(res.factors,Degree);
 #         res.degset := Set(res.degrees);
 #     fi;
-#     if not(mem) then
+#     if not mem then
 #         res.el := res.el!.el;
 #     fi;
 #     return res;
@@ -361,7 +361,7 @@ InstallMethod( GetElmOrd, "for a recognition info record and a record",
 #         x := r.el;
 #     fi;
 #     if ri!.randstore and r.nr > 0 then
-#         if not( IsBound(ri!.randp[r.nr]) ) then
+#         if not IsBound(ri!.randp[r.nr]) then
 #             r.charpoly := CharacteristicPolynomial(ri!.field,ri!.field,x,1);
 #             r.factors := Factors(PolynomialRing(ri!.field), r.charpoly);
 #             r.degrees := List(r.factors,Degree);
@@ -466,14 +466,14 @@ InstallGlobalFunction( RecogniseGeneric,
     # Handle the leaf case:
     if IsLeaf(ri) then
         # If nobody has set how we produce preimages of the nicegens:
-        if not(Hascalcnicegens(ri)) then
+        if not Hascalcnicegens(ri) then
             Setcalcnicegens(ri,CalcNiceGensGeneric);
         fi;
         if Hasslptonice(ri) then
             SlotUsagePattern(slptonice(ri));
         fi;
         # Handle the case that nobody set nice generators:
-        if not(HasNiceGens(ri)) then
+        if not HasNiceGens(ri) then
             if Hasslptonice(ri) then
                 SetNiceGens(ri,ResultOfStraightLineProgram(slptonice(ri),
                                             GeneratorsOfGroup(H)));
@@ -537,7 +537,7 @@ InstallGlobalFunction( RecogniseGeneric,
             Info(InfoRecog,2,"Back from factor (depth=",depth,").");
         fi;
 
-        if not(IsReady(rifac)) then
+        if not IsReady(rifac) then
             # the recognition of the factor failed, also give up here:
             if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
             return ri;
@@ -563,21 +563,21 @@ InstallGlobalFunction( RecogniseGeneric,
     until succ;
 
     # If nobody has set how we produce preimages of the nicegens:
-    if not(Hascalcnicegens(ri)) then
+    if not Hascalcnicegens(ri) then
         Setcalcnicegens(ri,CalcNiceGensHomNode);
     fi;
 
     # Do a little bit of preparation for the generators of N:
     l := gensN(ri);
-    if not(IsBound(ri!.leavegensNuntouched)) then
+    if not IsBound(ri!.leavegensNuntouched) then
         Sort(l,SortFunctionWithMemory);   # this favours "shorter" memories!
         # FIXME: For projective groups different matrices might stand
         #        for the same element, we might overlook this here!
         # remove duplicates:
         ll := [];
         for i in [1..Length(l)] do
-            if not(isone(ri)(l[i])) and
-               (i = 1 or not(isequal(ri)(l[i],l[i-1]))) then
+            if not isone(ri)(l[i]) and
+               (i = 1 or not isequal(ri)(l[i],l[i-1])) then
                 Add(ll,l[i]);
             fi;
         od;
@@ -642,7 +642,7 @@ InstallGlobalFunction( RecogniseGeneric,
                 fi;
             od;
             if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;
-            if not(done) then
+            if not done then
                 succ := FindKernelFastNormalClosure(ri,5,5);
                 Info(InfoRecog,2,"Have now ",Length(gensN(ri)),
                      " generators for kernel, recognising...");
@@ -835,9 +835,9 @@ InstallGlobalFunction( FastNormalClosure , function( grpgens, list, n )
       else
         randlist:=RandomSubproduct(list2);
       fi;
-      if not(IsOne(randlist)) then
+      if not IsOne(randlist) then
         randgens:=RandomSubproduct(grpgens);
-        if not(IsOne(randgens)) then
+        if not IsOne(randgens) then
           Add(list2,randlist^randgens);
         fi;
       fi;
@@ -849,7 +849,7 @@ InstallGlobalFunction( FastNormalClosure , function( grpgens, list, n )
       else
         randlist:=RandomSubproduct(list2);
       fi;
-      if not(IsOne(randlist)) then
+      if not IsOne(randlist) then
          for randgens in grpgens do
              Add(list2, randlist^randgens);
          od;
@@ -931,7 +931,7 @@ InstallGlobalFunction( "DisplayCompositionFactors", function(arg)
       homs := arg[3];
       ksize := arg[4];
   fi;
-  if not(IsReady(ri)) then
+  if not IsReady(ri) then
       for j in [1..homs] do Print("-> "); od;
       Print("Recognition failed\n");
       return;
@@ -1067,7 +1067,7 @@ RECOG.TestGroup := function(g,proj,size, optionlist...)
       #Print(".\c");
       x := PseudoRandom(g);
       s := SLPforElement(ri,x);
-      if s = fail or not(isequal(ri)(ResultOfStraightLineProgram(s,l),x)) then
+      if s = fail or not isequal(ri)(ResultOfStraightLineProgram(s,l),x) then
           Print("ALARM: set count to -1 to skip test!\n");
           Print("group := ", g, ";\n");
           Print("recogsize := ", Size(ri), ";\n");
@@ -1098,7 +1098,7 @@ RECOG.TestGroup := function(g,proj,size, optionlist...)
         #Print(".\c");
         x := PseudoRandom(supergroup);
         s := SLPforElement(ri,x);
-        if s <> fail and not(isequal(ri)(ResultOfStraightLineProgram(s,l),x)) then
+        if s <> fail and not isequal(ri)(ResultOfStraightLineProgram(s,l),x) then
             Print("ALARM: set count to -1 to skip test!\n");
             Print("group := ", g, ";\n");
             Print("recogsize := ", Size(ri), ";\n");
@@ -1177,7 +1177,7 @@ RECOG.TestRecognitionNode := function(ri,stop,recurse)
       if slp <> fail then
           y := ResultOfStraightLineProgram(slp,NiceGens(ri));
       fi;
-      if slp = fail or not(ri!.isone(x/y)) then
+      if slp = fail or not ri!.isone(x/y) then
           if stop then ErrorNoReturn("ErrorNoReturn found, look at x, slp and y"); fi;
           err := err + 1;
           Print("X\c");

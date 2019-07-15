@@ -831,7 +831,7 @@ FindHomMethodsProjective.LieTypeNonConstr := function(ri,G)
     ords := Set(ri!.simplesoclerando);
     while true do   # will be left by return
         r := RECOG.LieType(ri!.simplesocle,p,ords,30+10*dim);
-        if not(IsString(r)) or r{[1..3]} <> "RO_" then
+        if not IsString(r) or r{[1..3]} <> "RO_" then
             # We found something:
             Info(InfoRecog,2,"LieTypeNonConstr: found ",r,
                  ", lookup up hints...");

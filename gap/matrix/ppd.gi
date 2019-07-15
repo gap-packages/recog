@@ -148,7 +148,7 @@ end;
 #     # compute the deriviative to make it square free:
 #     while true do
 #         der := Derivative( c );
-#         if not(IsZero(der)) then break; fi;
+#         if not IsZero(der) then break; fi;
 #         ext := ShallowCopy(ExtRepNumeratorRatFun(c));
 #         for i in [1,3..Length(ext)-1] do
 #             ext[i] := [ext[i][1],ext[i][2]/char];
@@ -179,7 +179,7 @@ end;
 #             # This removes all irreducible factors of degree e from c
 #             # The product of those that divided c is gcd
 #             for div in DivisorsInt(e) do
-#               if not(div in result) then
+#               if not div in result then
 #                 #Print("Doing ",div," as divisor of ",e,"\n");
 #                 pm := PrimitivePrimeDivisors( div*a, p );
 #                 ## pm contains two fields, noppds and ppds.
@@ -190,7 +190,7 @@ end;
 #                 ## g will be x^noppds in F[x]/<gcd>
 #                 g := PowerMod( px, RemovePrimes(p^(a*e)-1,pm.ppds), gcd );
 # 
-#                 if not(IsOne(g)) then
+#                 if not IsOne(g) then
 #                     #Print("g=",g," adding ",div,"\n");
 #                     AddSet(result,div);
 #                 fi;
@@ -203,13 +203,13 @@ end;
 #         # replace <pow> by x^(q^(i+1))
 #         pow := PowerMod( pow, Size(F), c );
 #     od;
-#     if not(IsOne(c)) then
+#     if not IsOne(c) then
 #       for div in DivisorsInt(Degree(c)) do;
-#         if not(div in result) then
+#         if not div in result then
 #           # There might be one large degree factor, it is necessarily irred.:
 #           pm := PrimitivePrimeDivisors( div*a, p );
 #           g := PowerMod( px, RemovePrimes(p^(Degree(c)*a)-1,pm.ppds), c );
-#           if not(IsOne(g)) then
+#           if not IsOne(g) then
 #               AddSet(result,div);
 #           fi;
 #         fi;
@@ -244,7 +244,7 @@ end;
 #     for f  in facts do
 #         e := Degree(f);
 #         for div in DivisorsInt(e) do
-#             if not(div in result) then
+#             if not div in result then
 #                 pm := PrimitivePrimeDivisors( div*a, p );
 #                 ## pm contains two fields, noppds and ppds.
 #                 ## ppds is the product of all ppds of p^(ae)-1
@@ -253,7 +253,7 @@ end;
 #                 ## get rid of the non-ppd part
 #                 ## g will be x^noppds in F[x]/<gcd>
 #                 g := PowerMod( px, RemovePrimes(p^(a*e)-1,pm.ppds), f );
-#                 if not(IsOne(g)) then
+#                 if not IsOne(g) then
 #                     AddSet(result,div);
 #                 fi;
 #             fi;

@@ -45,7 +45,7 @@ RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
   # m a MeatAxe-module
   local F,bas,d,dim,e,fac,facs,gens,i,inforec,j,k,mp,mu,new,newgens,pr,q,v;
 
-  if not(MTX.IsIrreducible(m)) then
+  if not MTX.IsIrreducible(m) then
       Error("cannot work for reducible modules");
   fi;
   if MTX.IsAbsolutelyIrreducible(m) = true then
@@ -77,8 +77,8 @@ RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
   while Length(bas) < dim do
       for j in [1..Length(gens)] do
           new := bas[i] * gens[j];
-          if not(RECOG.CleanRow(mu,ShallowCopy(new),true,fail)) then
-          #if not(IsContainedInSpan(mu,new)) then
+          if not RECOG.CleanRow(mu,ShallowCopy(new),true,fail) then
+          #if not IsContainedInSpan(mu,new) then
               Add(bas,new);
               #CloseMutableBasis(mu,new);
               for k in [1..d-1] do
@@ -125,7 +125,7 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
   f := ri!.field;
 
   # Just to be sure:
-  if not(IsBound(ri!.meataxemodule)) then
+  if not IsBound(ri!.meataxemodule) then
       ri!.meataxemodule := GModuleByMats(GeneratorsOfGroup(G),f);
   fi;
 

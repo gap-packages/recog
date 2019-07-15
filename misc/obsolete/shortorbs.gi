@@ -309,7 +309,7 @@ FindHomMethodsMatrix.ShortOrbits := function(ri,g)
           # Now throw away this orbit:
           ThrowAwayOrbit(i);
           # we intentionally do not increase i here!
-      elif not(found) then
+      elif not found then
           i := i + 1;
       fi;
       if i > nrorbs then

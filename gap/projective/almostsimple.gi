@@ -486,13 +486,13 @@ InstallGlobalFunction( LookupHintForSimple,
         q := Size(f);
         dim := ri!.dimension;
         while j <= Length(hi) do
-            if (not(IsBound(hi[j].characteristics)) or
+            if (not IsBound(hi[j].characteristics) or
                 p in hi[j].characteristics) and
-               (not(IsBound(hi[j].fields)) or
+               (not IsBound(hi[j].fields) or
                 q in hi[j].fields) and
-               (not(IsBound(hi[j].dimensiondivs)) or
+               (not IsBound(hi[j].dimensiondivs) or
                 ForAny(hi[j].dimensiondivs,d->dim mod d = 0)) and
-               (not(IsBound(hi[j].dimensions)) or
+               (not IsBound(hi[j].dimensions) or
                 dim in hi[j].dimensions) then
                 # This hint is applicable!
                 if hi[j].type = "LowIndexHint" then

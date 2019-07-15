@@ -137,7 +137,7 @@ InstallMethod( Eigenspaces, "for a field and a memory element matrix",
 #       for i in [1..2] do
 #           for j in [1..n] do
 #               w[i] := o[j]*gens[i]-o[j];
-#               if not(IsZero(w[i])) then break; fi;
+#               if not IsZero(w[i]) then break; fi;
 #           od;
 #       od;
 #       return [Group(gens),VectorSpace(GF(q),w)];
@@ -178,7 +178,7 @@ InstallMethod( Eigenspaces, "for a field and a memory element matrix",
 #           for j in [1..3] do
 #               for i in [1..n] do
 #                   w := o[i]*gens[j]-o[i];
-#                   if not(IsZero(w)) then break; fi;
+#                   if not IsZero(w) then break; fi;
 #               od;
 #               # Since y has order y at least one basis vector is moved.
 #               ns[j] := w;
@@ -286,7 +286,7 @@ InstallMethod( Eigenspaces, "for a field and a memory element matrix",
 #   if r.factors[1] <> r.factors[2] then
 #       ev := -Value(r.factors[1],0*Z(q));
 #       ns := NullspaceMat(StripMemory(r.el)-ev*StripMemory(One(y)));
-#       if not(IsMutable(ns)) then ns := MutableCopyMat(ns); fi;
+#       if not IsMutable(ns) then ns := MutableCopyMat(ns); fi;
 #       # this is a 1xn matrix now
 #       ev := -Value(r.factors[2],0*Z(q));
 #       Append(ns,NullspaceMat(StripMemory(r.el)-ev*StripMemory(One(y))));
@@ -295,7 +295,7 @@ InstallMethod( Eigenspaces, "for a field and a memory element matrix",
 #       ev := -Value(r.factors[1],0*Z(q));
 #       ns := NullspaceMat((StripMemory(r.el)
 #                                      -ev*StripMemory(One(y)))^2);
-#       if not(IsMutable(ns)) then ns := MutableCopyMat(ns); fi;
+#       if not IsMutable(ns) then ns := MutableCopyMat(ns); fi;
 #   fi;
 # 
 #   count := 0;
@@ -349,7 +349,7 @@ InstallMethod( Eigenspaces, "for a field and a memory element matrix",
 #     degrees:=List(factors,Degree);
 #     if SortedList(degrees)=[1,1,n-2] then
 #        yy := y^(q^(n-2)-1);
-#        if not(IsOne(yy)) and IsOne(yy^2) then ready := true; fi;
+#        if not IsOne(yy) and IsOne(yy^2) then ready := true; fi;
 #     fi;
 #   until ready;
 #   repeat
@@ -359,13 +359,13 @@ InstallMethod( Eigenspaces, "for a field and a memory element matrix",
 #   i := 1;
 #   while i <= n do
 #     w := o[i]*yy-o[i];
-#     if not(IsZero(w)) then break; fi;
+#     if not IsZero(w) then break; fi;
 #     i := i + 1;
 #   od;
 #   i := 1;
 #   while i <= n do
 #     ww := o[i]*z-o[i];
-#     if not(IsZero(ww)) then break; fi;
+#     if not IsZero(ww) then break; fi;
 #     i := i + 1;
 #   od;
 #   return [Group(z,yy),VectorSpace(GF(2),[w,ww])];
@@ -400,7 +400,7 @@ InstallMethod( Eigenspaces, "for a field and a memory element matrix",
 #      h:=Group(gens);
 #      if q = 4 then
 #        S := StabilizerChain(h);
-#        if not(Size(S) in [60480,3*60480]) then continue; fi;
+#        if not Size(S) in [60480,3*60480] then continue; fi;
 #        pos := Position(degrees,1);
 #        eva := -Value(factors[pos],0*Z(q));
 #        ns := NullspaceMat(StripMemory(y)-eva*One(StripMemory(y)));
@@ -469,7 +469,7 @@ end;
 RECOG.ResetSLstd := function(r)
   r.left := One(r.a);
   r.right := One(r.a);
-  if not(IsBound(r.cache)) then
+  if not IsBound(r.cache) then
       r.cache := [EmptyPlist(100),EmptyPlist(100),
                   List([1..r.ext],i->[]),     # rowopcache
                   List([1..r.ext],i->[])];    # colopcache
@@ -543,7 +543,7 @@ RECOG.DoRowOp_SL := function(m,i,j,lambda,std)
   newnew := std.One;
   coeffs := RECOG.FindFFCoeffs(std,lambda);
   for k in [1..std.ext] do
-      if not(IsZero(coeffs[k])) then
+      if not IsZero(coeffs[k]) then
           if IsBound(std.cache[3][k][i]) and
              IsBound(std.cache[3][k][i][j]) then
               new := std.cache[3][k][i][j];
@@ -568,7 +568,7 @@ RECOG.DoRowOp_SL := function(m,i,j,lambda,std)
                   if i > j+1 then new := Getbj(i-j-1) * new; fi;
                   if j > 1 then new := Getai(j-1) * new; fi;
               fi;
-              if not(IsBound(std.cache[3][k][i])) then
+              if not IsBound(std.cache[3][k][i]) then
                   std.cache[3][k][i] := [];
               fi;
               std.cache[3][k][i][j] := new;
@@ -577,7 +577,7 @@ RECOG.DoRowOp_SL := function(m,i,j,lambda,std)
           newnew := new^coeffs[k] * newnew;
       fi;
   od;
-  if m <> false and not(IsZero(lambda)) then m[i] := m[i] + m[j] * lambda; fi;
+  if m <> false and not IsZero(lambda) then m[i] := m[i] + m[j] * lambda; fi;
   return newnew;
 end;
 
@@ -620,7 +620,7 @@ RECOG.DoColOp_SL := function(m,i,j,lambda,std)
   newnew := std.One;
   coeffs := RECOG.FindFFCoeffs(std,lambda);
   for k in [1..std.ext] do
-      if not(IsZero(coeffs[k])) then
+      if not IsZero(coeffs[k]) then
           if IsBound(std.cache[4][k][i]) and
              IsBound(std.cache[4][k][i][j]) then
               new := std.cache[4][k][i][j];
@@ -645,7 +645,7 @@ RECOG.DoColOp_SL := function(m,i,j,lambda,std)
                   if i > j+1 then new := Getbj(i-j-1) * new; fi;
                   if j > 1 then new := Getai(j-1) * new; fi;
               fi;
-              if not(IsBound(std.cache[4][k][i])) then
+              if not IsBound(std.cache[4][k][i]) then
                   std.cache[4][k][i] := [];
               fi;
               std.cache[4][k][i][j] := new;
@@ -654,7 +654,7 @@ RECOG.DoColOp_SL := function(m,i,j,lambda,std)
           newnew := newnew * new^coeffs[k];
       fi;
   od;
-  if m <> false and not(IsZero(lambda)) then
+  if m <> false and not IsZero(lambda) then
       for k in [1..Length(m)] do
           m[k][j] := m[k][j] + m[k][i] * lambda;
       od;
@@ -704,7 +704,7 @@ RECOG.ExpressInStd_SL2 := function(m,std)
       mi := InverseMutable(m);
   fi;
   std.left := std.One;
-  if not(IsOne(mi[1,1])) then
+  if not IsOne(mi[1,1]) then
       if IsZero(mi[2,1]) then
           RECOG.DoRowOp_SL(mi,2,1,std.one,std);
           # Now mi[2,1] is non-zero
@@ -712,11 +712,11 @@ RECOG.ExpressInStd_SL2 := function(m,std)
       RECOG.DoRowOp_SL(mi,1,2,(std.one-mi[1,1])/mi[2,1],std);
   fi;
   # Now mi[1,1] is equal to one
-  if not(IsZero(mi[2,1])) then
+  if not IsZero(mi[2,1]) then
       RECOG.DoRowOp_SL(mi,2,1,-mi[2,1],std);
   fi;
   # Now mi[2,1] is equal to zero and thus mi[2,2] equal to one
-  if not(IsZero(mi[1,2])) then
+  if not IsZero(mi[1,2]) then
       RECOG.DoRowOp_SL(mi,1,2,-mi[1,2],std);
   fi;
   # Now mi is the identity matrix, the element collected in std
@@ -738,7 +738,7 @@ RECOG.ExpressInStd_SL := function(m,std)
   std.left := std.One;
   d := Length(m);
   for i in [1..d] do
-      if not(IsOne(mi[i,i])) then
+      if not IsOne(mi[i,i]) then
           pos := First([i+1..d],k->not IsZero(mi[k,i]));
           if pos = fail then
               pos := i+1;
@@ -748,7 +748,7 @@ RECOG.ExpressInStd_SL := function(m,std)
       fi;
       # Now mi[i,i] is equal to one
       for j in Concatenation([1..i-1],[i+1..d]) do
-          if not(IsZero(mi[j,i])) then
+          if not IsZero(mi[j,i]) then
               RECOG.DoRowOp_SL(mi,j,i,-mi[j,i],std);
           fi;
       od;
@@ -818,7 +818,7 @@ end;
 #   q := Size(f);
 #   ext := DegreeOverPrimeField(f);
 #   d := DimensionOfMatrixGroup(sld);
-#   if not(IsObjWithMemory(GeneratorsOfGroup(sld)[1])) then
+#   if not IsObjWithMemory(GeneratorsOfGroup(sld)[1]) then
 #       sld := GroupWithMemory(sld);
 #   fi;
 # 
@@ -907,7 +907,7 @@ end;
 # 
 #           # w is supposed to become the next basis vector number n+1.
 #           # So we need to throw away one of bas{[n+1..d]}:
-#           i := First([n+1..d],i->not(IsZero(ScalarProduct(w,basit[i]))));
+#           i := First([n+1..d],i->not IsZero(ScalarProduct(w,basit[i])));
 #           Remove(bas,i);
 #           Add(bas,w,n+1);
 #           # However, we want that the rest of them bas{[n+2..d]} is invariant
@@ -916,7 +916,7 @@ end;
 #           pos := PositionNonZero(diffw);
 #           for i in [n+2..d] do
 #               diffv := bas[i]*y-bas[i];
-#               if not(IsZero(diffv)) then
+#               if not IsZero(diffv) then
 #                   bas[i] := bas[i] - (diffv[pos]/diffw[pos]) * w;
 #               fi;
 #           od;
@@ -967,8 +967,8 @@ end;
 #           yf := std.left * yf * std.right;
 #           z := yy+One(yy);
 #           zf := yf;
-#           if not(IsZero(z[n,n])) or not(IsOne(z[n,n+1])) or
-#              not(IsZero(z[n+1,n+1])) or not(IsOne(z[n+1,n])) then
+#           if not IsZero(z[n,n]) or not IsOne(z[n,n+1]) or
+#              not IsZero(z[n+1,n+1]) or not IsOne(z[n+1,n]) then
 #               ErrorNoReturn("How on earth could this happen???");
 #           fi;
 #       else  # q > 2
@@ -1074,13 +1074,13 @@ end;
 #       std.right := std.One;
 #       # Now we clean out the last row of z:
 #       for i in [1..n-1] do
-#           if not(IsZero(z[n+1,i])) then
+#           if not IsZero(z[n+1,i]) then
 #               RECOG.DoColOp_SL(z,n,i,-z[n+1,i],std);
 #           fi;
 #       od;
 #       # Now we clean out the second last row of z:
 #       for i in [1..n-1] do
-#           if not(IsZero(z[n,i])) then
+#           if not IsZero(z[n,i]) then
 #               RECOG.DoRowOp_SL(z,n,i,-z[n,i],std);
 #           fi;
 #       od;
@@ -1114,7 +1114,7 @@ RECOG.FindStdGens_SL := function(sld,f)
   q := Size(f);
   ext := DegreeOverPrimeField(f);
   d := DimensionOfMatrixGroup(sld);
-  if not(IsObjWithMemory(GeneratorsOfGroup(sld)[1])) then
+  if not IsObjWithMemory(GeneratorsOfGroup(sld)[1]) then
       sld := GroupWithMemory(sld);
   fi;
 
@@ -1290,12 +1290,12 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
               xm := o[j];
               j := j + 1;
               c := Comm(tm,xm);
-          until not(IsOne(c^2));
+          until not IsOne(c^2);
           xm := xm * c^(((q-1)*(q+1)-1)/2);
           x := StripMemory(xm);
           xb := bas*x*bas^-1;
           co := Coefficients(can,xb[2,1]);
-      until not(IsContainedInSpan(mb,co));
+      until not IsContainedInSpan(mb,co);
       CloseMutableBasis(mb,co);
       Add(tt,x);
       Add(ttm,xm);
@@ -1329,13 +1329,13 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
               xm := o[j];
               j := j + 1;
               x := MutableCopyMat(bas*StripMemory(xm)*bas^-1);
-          until not(IsZero(x[1,2]));
+          until not IsZero(x[1,2]);
 
-          if not(IsOne(x[2,2])) then
+          if not IsOne(x[2,2]) then
               el := (One(f)-x[2,2])/x[1,2];
               co := Coefficients(can,el) * mati;
               for i in [1..Length(co)] do
-                  if not(IsZero(co[i])) then
+                  if not IsZero(co[i]) then
                       xm := ttm[i] * xm;
                   fi;
               od;
@@ -1354,7 +1354,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
           el := x[2,1];
           co2 := Coefficients(can,el) * mati;
           for i in [1..Length(co2)] do
-              if not(IsZero(co2[i])) then
+              if not IsZero(co2[i]) then
                   xm := xm * ttm[i];
               fi;
           od;
@@ -1420,7 +1420,7 @@ end;
 #       j := p[2]-1;
 #       while j >= 0 do
 #           z := y^(s/p[1]^(p[2]-j));
-#           if not(IsOne(z)) then break; fi;
+#           if not IsOne(z) then break; fi;
 #           j := j - 1;
 #       od;
 #       o := o * p[1]^(j+1);
@@ -1455,7 +1455,7 @@ RECOG.GuessProjSL2ElmOrder := function(x,f)
       j := p[2]-1;
       while j >= 0 do
           z := y^(s/p[1]^(p[2]-j));
-          if not(IsOneProjective(z)) then break; fi;
+          if not IsOneProjective(z) then break; fi;
           j := j - 1;
       od;
       o := o * p[1]^(j+1);
@@ -1482,13 +1482,13 @@ RECOG.IsThisSL2Natural := function(gens,f)
       fi;
       if o = p or o <= 5 then return false; fi;
       if (q+1) mod o = 0 then
-          if not(seenqp1) then
+          if not seenqp1 then
               Info(InfoRecog,4,"SL2: Found element of order dividing q+1.");
               seenqp1 := true;
               if seenqm1 and notA5 then return true; fi;
           fi;
       else
-          if not(seenqm1) then
+          if not seenqm1 then
               Info(InfoRecog,4,"SL2: Found element of order dividing q-1.");
               seenqm1 := true;
               if seenqp1 and notA5 then return true; fi;
@@ -1904,11 +1904,11 @@ RECOG.SLn_UpStep := function(w)
   # Before we begin, we upgrade the data structure with a few internal
   # things:
 
-  if not(IsBound(w.can)) then w.can := CanonicalBasis(w.f); fi;
-  if not(IsBound(w.canb)) then w.canb := BasisVectors(w.can); fi;
-  if not(IsBound(w.One)) then w.One := One(w.slnstdf[1]); fi;
-  if not(IsBound(w.transh)) then w.transh := []; fi;
-  if not(IsBound(w.transv)) then w.transv := []; fi;
+  if not IsBound(w.can) then w.can := CanonicalBasis(w.f); fi;
+  if not IsBound(w.canb) then w.canb := BasisVectors(w.can); fi;
+  if not IsBound(w.One) then w.One := One(w.slnstdf[1]); fi;
+  if not IsBound(w.transh) then w.transh := []; fi;
+  if not IsBound(w.transv) then w.transv := []; fi;
   # Update our cache of *,n and n,* transvections because we need them
   # all over the place:
   std := RECOG.InitSLstd(w.f,w.n,
@@ -1919,12 +1919,12 @@ RECOG.SLn_UpStep := function(w)
   for i in [1..w.n-1] do
       for k in [1..w.ext] do
           pos := (i-1)*w.ext + k;
-          if not(IsBound(w.transh[pos])) then
+          if not IsBound(w.transh[pos]) then
               RECOG.ResetSLstd(std);
               RECOG.DoColOp_SL(false,w.n,i,w.canb[k],std);
               w.transh[pos] := std.right;
           fi;
-          if not(IsBound(w.transv[pos])) then
+          if not IsBound(w.transv[pos]) then
               RECOG.ResetSLstd(std);
               RECOG.DoRowOp_SL(false,i,w.n,w.canb[k],std);
               w.transv[pos] := std.left;
@@ -1941,7 +1941,7 @@ RECOG.SLn_UpStep := function(w)
     coeffs := IntVecFFE(Coefficients(w.can,lambda));
     if i = w.n then
         for k in [1..w.ext] do
-            if not(IsZero(coeffs[k])) then
+            if not IsZero(coeffs[k]) then
                 if IsOne(coeffs[k]) then
                     el := el * w.transh[(j-1)*w.ext+k];
                 else
@@ -1951,7 +1951,7 @@ RECOG.SLn_UpStep := function(w)
         od;
     elif j = w.n then
         for k in [1..w.ext] do
-            if not(IsZero(coeffs[k])) then
+            if not IsZero(coeffs[k]) then
                 if IsOne(coeffs[k]) then
                     el := el * w.transv[(i-1)*w.ext+k];
                 else
@@ -1971,7 +1971,7 @@ RECOG.SLn_UpStep := function(w)
     coeffs := IntVecFFE(Coefficients(w.can,lambda));
     if j = w.n then
         for k in [1..w.ext] do
-            if not(IsZero(coeffs[k])) then
+            if not IsZero(coeffs[k]) then
                 if IsOne(coeffs[k]) then
                     el := w.transv[(i-1)*w.ext+k] * el;
                 else
@@ -1981,7 +1981,7 @@ RECOG.SLn_UpStep := function(w)
         od;
     elif i = w.n then
         for k in [1..w.ext] do
-            if not(IsZero(coeffs[k])) then
+            if not IsZero(coeffs[k]) then
                 if IsOne(coeffs[k]) then
                     el := w.transh[(j-1)*w.ext+k] * el;
                 else
@@ -2052,7 +2052,7 @@ RECOG.SLn_UpStep := function(w)
               int1 := Intersection(Fixc,Vn);
               for i in [1..Dimension(int1)] do
                   v := Basis(int1)[i];
-                  if not(IsZero(v[w.n])) then break; fi;
+                  if not IsZero(v[w.n]) then break; fi;
               od;
               if IsZero(v[w.n]) then
                   Info(InfoRecog,2,"Ooops: Component n was zero!");
@@ -2081,7 +2081,7 @@ RECOG.SLn_UpStep := function(w)
       i := 1;
       pivots := EmptyPlist(newdim);
       while i <= Length(newpart) and NrBasisVectors(MB) < newdim do
-          if not(IsContainedInSpan(MB,newpart[i])) then
+          if not IsContainedInSpan(MB,newpart[i]) then
               Add(pivots,i);
               CloseMutableBasis(MB,newpart[i]);
           fi;
@@ -2115,7 +2115,7 @@ RECOG.SLn_UpStep := function(w)
       i := 1;
       pivots2 := EmptyPlist(newdim);
       while i <= Length(cii) and NrBasisVectors(MB) < newdim do
-          if not(IsContainedInSpan(MB,cii[i])) then
+          if not IsContainedInSpan(MB,cii[i]) then
               Add(pivots2,i);
               CloseMutableBasis(MB,cii[i]);
           fi;
@@ -2140,7 +2140,7 @@ RECOG.SLn_UpStep := function(w)
   # standard generators, namely newbas^-1 * std * newbas.
   newbasf := w.One;
   for i in [1..w.n-1] do
-      if not(IsZero(v[i])) then
+      if not IsZero(v[i]) then
           newbasf := DoColOp_n(newbasf,w.n,i,v[i],w);
       fi;
   od;
@@ -2180,7 +2180,7 @@ RECOG.SLn_UpStep := function(w)
           vals := BlownUpVector(w.can,cii[i]*lambda);
           for j in [1..w.ext * newdim] do
               pow := IntFFE(vals[j]);
-              if not(IsZero(pow)) then
+              if not IsZero(pow) then
                   if IsOne(pow) then
                       tf := tf * trans[j];
                   else
@@ -2209,7 +2209,7 @@ RECOG.SLn_UpStep := function(w)
       for j in [1..newdim] do
           coeffs := IntVecFFE(Coefficients(w.can,-ci[w.n+j,w.n]));
           for k in [1..w.ext] do
-              if not(IsZero(coeffs[k])) then
+              if not IsZero(coeffs[k]) then
                   if IsOne(coeffs[k]) then
                       tf := transd[(j-1)*w.ext + k] * tf;
                   else
@@ -2230,7 +2230,7 @@ RECOG.SLn_UpStep := function(w)
       for j in [1..newdim] do
           coeffs := IntVecFFE(Coefficients(w.can,ci[w.n+j,w.n]));
           for k in [1..w.ext] do
-              if not(IsZero(coeffs[k])) then
+              if not IsZero(coeffs[k]) then
                   if IsOne(coeffs[k]) then
                       tf := tf * transd[(j-1)*w.ext + k];
                   else
@@ -2272,7 +2272,7 @@ RECOG.SLn_UpStep := function(w)
               tf:=transd[(i-1)*w.ext+1]^-1*transr[i]*transd[(i-1)*w.ext+1]^-1;
           fi;
           s := s * tf;
-          flag := not(flag);
+          flag := not flag;
       od;
 
       # Finally put together the new 2n-1-cycle and 2n-2-cycle:
@@ -2302,7 +2302,7 @@ RECOG.SLn_UpStep := function(w)
           tf := transd[(i-1)*w.ext+1]^-1*transr[i]*transd[(i-1)*w.ext+1]^-1;
       fi;
       s := s * tf;
-      flag := not(flag);
+      flag := not flag;
   od;
 
   # Finally put together the new 2n-1-cycle and 2n-2-cycle:
@@ -2441,7 +2441,7 @@ end;
 #   for i in [1,3..d-1] do
 #     j := i+1;
 #     while j <= d do
-#       if not(IsZero(gram[i,j])) then
+#       if not IsZero(gram[i,j]) then
 #         s := gram[i,j]^-1;
 #         MultRowVector(bas[j],s);
 #         MultRowVector(gram[j],s);
@@ -2467,7 +2467,7 @@ end;
 #     if j > d then return [fail,"degenerate"]; fi;
 #     # Now i,i+1 is a symplectic pair, clean out the rest:
 #     for j in [i+2..d] do
-#       if not(IsZero(gram[i,j])) then
+#       if not IsZero(gram[i,j]) then
 #         s := gram[i,j];
 #         AddRowVector(bas[j],bas[i+1],-s);
 #         AddRowVector(gram[j],gram[i+1],-s);
@@ -2476,7 +2476,7 @@ end;
 #         od;
 #         Assert(1,gram = RECOG.ComputeGramSymplecticStandardForm(bas*vecs));
 #       fi;
-#       if not(IsZero(gram[i+1,j])) then
+#       if not IsZero(gram[i+1,j]) then
 #         s := gram[i+1,j];
 #         AddRowVector(bas[j],bas[i],s);
 #         AddRowVector(gram[j],gram[i],s);
@@ -2714,10 +2714,10 @@ end;
 #         fi;
 #         Assert(1,v=vorig*t and (M = fail or Morig*t=M),ErrorNoReturn("Hallo 0"));
 #       fi;
-#       if IsZero(v[ei]) or not(IsZero(coeff-v[fI])) then
+#       if IsZero(v[ei]) or not IsZero(coeff-v[fI]) then
 #         # The first easy case:
 #         # First kill v[ei] if need be:
-#         if not(IsZero(v[ei])) then
+#         if not IsZero(v[ei]) then
 #           sc := -v[ei]/(coeff-v[fI]);
 #           si := IntVecFFE(Coefficients(s.can,sc));
 #           for k in [1..ext] do
@@ -2735,7 +2735,7 @@ end;
 #           Assert(1,v=vorig*t and (M = fail or Morig*t=M),ErrorNoReturn("Hallo 1"));
 #         fi;
 #         # Now kill v[fI] if need be:
-#         if not(IsZero(v[fI])) then
+#         if not IsZero(v[fI]) then
 #           sc := -v[fI]/coeff;
 #           si := IntVecFFE(Coefficients(s.can,sc));
 #           for k in [1..ext] do
@@ -2752,7 +2752,7 @@ end;
 #           fi;
 #           Assert(1,v=vorig*t and (M = fail or Morig*t=M),ErrorNoReturn("Hallo 2"));
 #         fi;
-#       elif not(IsZero(one+v[ei])) then
+#       elif not IsZero(one+v[ei]) then
 #         # The second easy case:
 #         # Here v[fI] = 1 and v[ei] <> 0:
 #         # First kill v[fI]:
@@ -2803,7 +2803,7 @@ end;
 #       fi;
 #     od;
 #     # Finally arrange fn component to 0:
-#     if not(IsZero(v[2*n])) then
+#     if not IsZero(v[2*n]) then
 #       sc := -v[2*n];
 #       si := IntVecFFE(Coefficients(s.can,sc));
 #       for k in [1..ext] do
@@ -3038,7 +3038,7 @@ SLPforElementFuncsProjective.PSL2 := function(ri,x)
   fi;
   y := ri!.nicebas * x * ri!.nicebasi;
   det := DeterminantMat(y);
-  if not(IsOne(det)) then
+  if not IsOne(det) then
       z := PrimitiveRoot(ri!.field);
       log := LogFFE(det,z);
       y := y * z^(-log*ri!.gcd.coeff1/ri!.gcd.gcd);
@@ -3046,7 +3046,7 @@ SLPforElementFuncsProjective.PSL2 := function(ri,x)
   # At this point, y has determinant 1; but we consider it modulo scalars.
   # To make sure that different coset reps behave the same, we scale it
   # with a suitable primitive d-th root of unity.
-  if not(IsBound(ri!.normlist)) then
+  if not IsBound(ri!.normlist) then
       ri!.normlist := RECOG.SetupNormalisationListForPSLd(ri!.field,
                                                           ri!.gcd.gcd);
   fi;
@@ -3129,7 +3129,7 @@ SLPforElementFuncsProjective.PSLd := function(ri,x)
   fi;
   y := ri!.nicebas * x * ri!.nicebasi;
   det := DeterminantMat(y);
-  if not(IsOne(det)) then
+  if not IsOne(det) then
       # At this point, y is in the kernel of the determinant map *mod scalars*.
       # That means that det may not be 1 -- it can be any d-th power.
       # We thus can compute a d-th root of 1/det, and scale y with it,
@@ -3144,7 +3144,7 @@ SLPforElementFuncsProjective.PSLd := function(ri,x)
   # At this point, y has determinant 1; but we consider it modulo scalars.
   # To make sure that different coset reps behave the same, we scale it
   # with a suitable primitive d-th root of unity.
-  if not(IsBound(ri!.normlist)) then
+  if not IsBound(ri!.normlist) then
       ri!.normlist := RECOG.SetupNormalisationListForPSLd(ri!.field,
                                                           ri!.gcd.gcd);
   fi;
@@ -3167,7 +3167,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
 
   # First check whether we are applicable:
   if d = 2 then
-      if not(RECOG.IsThisSL2Natural(GeneratorsOfGroup(g),f)) then
+      if not RECOG.IsThisSL2Natural(GeneratorsOfGroup(g),f) then
           Info(InfoRecog,2,"ClassicalNatural: Is not PSL_2.");
           return fail; # FIXME: fail = TemporaryFailure here really correct?
       fi;
@@ -3186,7 +3186,7 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
   gcd := Gcdex(d,q-1);
   for i in [1..Length(gens)] do
       det := DeterminantMat(gens[i]);
-      if not(IsOne(det)) then
+      if not IsOne(det) then
           root := RECOG.ComputeRootInFiniteField(det,gcd.gcd,f);
           if root = fail then
               ErrorNoReturn("Should not have happened, 15634, tell Max!");

@@ -566,7 +566,7 @@ function(arg)
             toSEMISTD := false;
             break;
         until false;
-        if not(toSEMISTD) then break; fi;
+        if not toSEMISTD then break; fi;
     until false;
 
     return els{[2,3]};

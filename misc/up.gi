@@ -40,11 +40,11 @@ SLnUpStep := function(w)
   # Before we begin, we upgrade the data structure with a few internal
   # things:
 
-  if not(IsBound(w.can)) then w.can := CanonicalBasis(w.f); fi;
-  if not(IsBound(w.canb)) then w.canb := BasisVectors(w.can); fi;
-  if not(IsBound(w.One)) then w.One := One(w.slnstdf[1]); fi;
-  if not(IsBound(w.transh)) then w.transh := []; fi;
-  if not(IsBound(w.transv)) then w.transv := []; fi;
+  if not IsBound(w.can) then w.can := CanonicalBasis(w.f); fi;
+  if not IsBound(w.canb) then w.canb := BasisVectors(w.can); fi;
+  if not IsBound(w.One) then w.One := One(w.slnstdf[1]); fi;
+  if not IsBound(w.transh) then w.transh := []; fi;
+  if not IsBound(w.transv) then w.transv := []; fi;
   # Update our cache of *,n and n,* transvections because we need them
   # all over the place:
   std := RECOG.InitSLstd(w.f,w.n,
@@ -55,12 +55,12 @@ SLnUpStep := function(w)
   for i in [1..w.n-1] do
       for k in [1..w.ext] do
           pos := (i-1)*w.ext + k;
-          if not(IsBound(w.transh[pos])) then
+          if not IsBound(w.transh[pos]) then
               RECOG.ResetSLstd(std);
               RECOG.DoColOp_SL(false,w.n,i,w.canb[k],std);
               w.transh[pos] := std.right;
           fi;
-          if not(IsBound(w.transv[pos])) then
+          if not IsBound(w.transv[pos]) then
               RECOG.ResetSLstd(std);
               RECOG.DoRowOp_SL(false,i,w.n,w.canb[k],std);
               w.transv[pos] := std.left;
@@ -77,7 +77,7 @@ SLnUpStep := function(w)
     coeffs := IntVecFFE(Coefficients(w.can,lambda));
     if i = w.n then
         for k in [1..w.ext] do
-            if not(IsZero(coeffs[k])) then
+            if not IsZero(coeffs[k]) then
                 if IsOne(coeffs[k]) then
                     el := el * w.transh[(j-1)*w.ext+k];
                 else
@@ -87,7 +87,7 @@ SLnUpStep := function(w)
         od;
     elif j = w.n then
         for k in [1..w.ext] do
-            if not(IsZero(coeffs[k])) then
+            if not IsZero(coeffs[k]) then
                 if IsOne(coeffs[k]) then
                     el := el * w.transv[(i-1)*w.ext+k];
                 else
@@ -107,7 +107,7 @@ SLnUpStep := function(w)
     coeffs := IntVecFFE(Coefficients(w.can,lambda));
     if j = w.n then
         for k in [1..w.ext] do
-            if not(IsZero(coeffs[k])) then
+            if not IsZero(coeffs[k]) then
                 if IsOne(coeffs[k]) then
                     el := w.transv[(i-1)*w.ext+k] * el;
                 else
@@ -117,7 +117,7 @@ SLnUpStep := function(w)
         od;
     elif i = w.n then
         for k in [1..w.ext] do
-            if not(IsZero(coeffs[k])) then
+            if not IsZero(coeffs[k]) then
                 if IsOne(coeffs[k]) then
                     el := w.transh[(j-1)*w.ext+k] * el;
                 else
@@ -188,7 +188,7 @@ SLnUpStep := function(w)
               int1 := Intersection(Fixc,Vn);
               for i in [1..Dimension(int1)] do
                   v := Basis(int1)[i];
-                  if not(IsZero(v[w.n])) then break; fi;
+                  if not IsZero(v[w.n]) then break; fi;
               od;
               if IsZero(v[w.n]) then
                   Print("Ooops: Component n was zero!\n");
@@ -217,7 +217,7 @@ SLnUpStep := function(w)
       i := 1;
       pivots := EmptyPlist(newdim);
       while i <= Length(newpart) and NrBasisVectors(MB) < newdim do
-          if not(IsContainedInSpan(MB,newpart[i])) then
+          if not IsContainedInSpan(MB,newpart[i]) then
               Add(pivots,i);
               CloseMutableBasis(MB,newpart[i]);
           fi;
@@ -248,7 +248,7 @@ SLnUpStep := function(w)
       i := 1;
       pivots2 := EmptyPlist(newdim);
       while i <= Length(cii) and NrBasisVectors(MB) < newdim do
-          if not(IsContainedInSpan(MB,cii[i])) then
+          if not IsContainedInSpan(MB,cii[i]) then
               Add(pivots2,i);
               CloseMutableBasis(MB,cii[i]);
           fi;
@@ -275,7 +275,7 @@ SLnUpStep := function(w)
   # standard generators, namely newbas^-1 * std * newbas.
   newbasf := w.One;
   for i in [1..w.n-1] do
-      if not(IsZero(v[i])) then
+      if not IsZero(v[i]) then
           newbasf := DoColOp_n(newbasf,w.n,i,v[i],w);
       fi;
   od;
@@ -319,7 +319,7 @@ SLnUpStep := function(w)
           vals := BlownUpVector(w.can,cii[i]*lambda);
           for j in [1..w.ext * newdim] do
               pow := IntFFE(vals[j]);
-              if not(IsZero(pow)) then
+              if not IsZero(pow) then
                   if IsOne(pow) then
                       tf := tf * trans[j];
                   else
@@ -350,7 +350,7 @@ SLnUpStep := function(w)
       for j in [1..newdim] do
           coeffs := IntVecFFE(Coefficients(w.can,-ci[w.n+j][w.n]));
           for k in [1..w.ext] do
-              if not(IsZero(coeffs[k])) then
+              if not IsZero(coeffs[k]) then
                   if IsOne(coeffs[k]) then
                       tf := transd[(j-1)*w.ext + k] * tf;
                   else
@@ -371,7 +371,7 @@ SLnUpStep := function(w)
       for j in [1..newdim] do
           coeffs := IntVecFFE(Coefficients(w.can,ci[w.n+j][w.n]));
           for k in [1..w.ext] do
-              if not(IsZero(coeffs[k])) then
+              if not IsZero(coeffs[k]) then
                   if IsOne(coeffs[k]) then
                       tf := tf * transd[(j-1)*w.ext + k];
                   else
@@ -415,7 +415,7 @@ SLnUpStep := function(w)
               tf:=transd[(i-1)*w.ext+1]^-1*transr[i]*transd[(i-1)*w.ext+1]^-1;
           fi;
           s := s * tf;
-          flag := not(flag);
+          flag := not flag;
       od;
 
       # Finally put together the new 2n-1-cycle and 2n-2-cycle:
@@ -445,7 +445,7 @@ SLnUpStep := function(w)
           tf := transd[(i-1)*w.ext+1]^-1*transr[i]*transd[(i-1)*w.ext+1]^-1;
       fi;
       s := s * tf;
-      flag := not(flag);
+      flag := not flag;
   od;
 
   # Finally put together the new 2n-1-cycle and 2n-2-cycle:
