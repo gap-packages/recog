@@ -117,25 +117,25 @@ InstallMethod( ViewObj, "for recognition infos", [IsRecognitionInfo],
 
 InstallGlobalFunction( RecognisePermGroup,
   function(G)
-    return RecogniseGeneric(G,FindHomDbPerm,"");
+    return RecogniseGeneric(G, FindHomDbPerm, "", rec());
   end);
 
 InstallGlobalFunction( RecogniseMatrixGroup,
   function(G)
-    return RecogniseGeneric(G,FindHomDbMatrix,"");
+    return RecogniseGeneric(G, FindHomDbMatrix, "", rec());
   end);
 
 InstallGlobalFunction( RecogniseProjectiveGroup,
   function(G)
-    return RecogniseGeneric(G,FindHomDbProjective,"");
+    return RecogniseGeneric(G, FindHomDbProjective, "", rec());
   end);
 
 InstallGlobalFunction( RecogniseGroup,
   function(G)
     if IsPermGroup(G) then
-        return RecogniseGeneric(G,FindHomDbPerm,"");
+        return RecogniseGeneric(G, FindHomDbPerm, "", rec());
     elif IsMatrixGroup(G) then
-        return RecogniseGeneric(G,FindHomDbMatrix,"");
+        return RecogniseGeneric(G, FindHomDbMatrix, "", rec());
     else
         ErrorNoReturn("Only matrix and permutation groups are supported");
     fi;
@@ -420,21 +420,12 @@ InstallGlobalFunction( PrintTreePos,
   end );
 
 InstallGlobalFunction( RecogniseGeneric,
-  function(arg)
+  function(H, methoddb, depthString, knowledge)
     # Assume all the generators have no memory!
-    local H,N,depthString,depth,done,i,knowledge,l,ll,gensNmeth,methoddb,allmethods,
+    local N,depth,done,i,l,ll,gensNmeth,allmethods,
           proj1,proj2,ri,rifac,riker,s,x,y,z,succ,counter;
 
-    # Look after arguments:
-    H := arg[1];
-    methoddb := arg[2];
-    depthString := arg[3];    # FIXME: why is this a string? perhaps rename to depthString? or indentString...
     depth := Length(depthString);
-    if Length(arg) = 4 then
-        knowledge := arg[4];
-    else
-        knowledge := rec();
-    fi;
 
     PrintTreePos("E",depthString,H);
     Info(InfoRecog,4,"Recognising: ",H);
