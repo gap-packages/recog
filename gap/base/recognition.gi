@@ -404,17 +404,17 @@ InstallMethod( RandomOrdersSeen, "for a recognition info record",
 #   end );
 
 InstallGlobalFunction( PrintTreePos,
-  function(mark,depth,H)
+  function(mark,depthString,H)
     if InfoLevel(InfoRecog) = 1 then
         if IsMatrixGroup(H) then
             Print(mark," dim=",String(DimensionOfMatrixGroup(H),4),
                   " field=",Size(FieldOfMatrixGroup(H))," ",
-                  String(Length(depth),2)," ",depth,"   \r");
+                  String(Length(depthString),2)," ",depthString,"   \r");
         elif IsPermGroup(H) then
             Print(mark," pts=",String(LargestMovedPoint(H),6)," ",
-                  String(Length(depth),2)," ",depth,"   \r");
+                  String(Length(depthString),2)," ",depthString,"   \r");
         else
-            Print(mark," ",String(Length(depth),2)," ",depth,"   \r");
+            Print(mark," ",String(Length(depthString),2)," ",depthString,"   \r");
         fi;
     fi;
   end );
@@ -422,20 +422,21 @@ InstallGlobalFunction( PrintTreePos,
 InstallGlobalFunction( RecogniseGeneric,
   function(arg)
     # Assume all the generators have no memory!
-    local H,N,depth,done,i,knowledge,l,ll,gensNmeth,methoddb,allmethods,
+    local H,N,depthString,depth,done,i,knowledge,l,ll,gensNmeth,methoddb,allmethods,
           proj1,proj2,ri,rifac,riker,s,x,y,z,succ,counter;
 
     # Look after arguments:
     H := arg[1];
     methoddb := arg[2];
-    depth := arg[3];    # FIXME: why is this a string? perhaps rename to depthString? or indentString...
+    depthString := arg[3];    # FIXME: why is this a string? perhaps rename to depthString? or indentString...
+    depth := Length(depthString);
     if Length(arg) = 4 then
         knowledge := arg[4];
     else
         knowledge := rec();
     fi;
 
-    PrintTreePos("E",depth,H);
+    PrintTreePos("E",depthString,H);
     Info(InfoRecog,4,"Recognising: ",H);
 
     if Length(GeneratorsOfGroup(H)) = 0 then
@@ -448,8 +449,6 @@ InstallGlobalFunction( RecogniseGeneric,
     else
         ri := EmptyRecognitionInfoRecord(knowledge,H,false);
     fi;
-    ri!.depth := Length(depth);
-    ri!.depthst := depth;   # FIXME: rename depthst to depthString or so?
     # was here earlier: Setcalcnicegens(ri,CalcNiceGensGeneric);
     Setmethodsforfactor(ri,methoddb);
 
@@ -469,7 +468,7 @@ InstallGlobalFunction( RecogniseGeneric,
         # FIXME: shouldn't we print an error here? at least if the user called us...
         # Perhaps yes: this is an ri which does NOT have IsReady set, and may be useful for debugging...
         SetFilterObj(ri,IsLeaf);
-        if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
+        if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
         return ri;
     fi;
 
@@ -499,7 +498,7 @@ InstallGlobalFunction( RecogniseGeneric,
         # if it means that the leaf is "guaranteed" to be mathematically correct,
         # then we need to verify that this is really always the case (for some
         # methods, one might doubt this...)
-        if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
+        if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
         # StopStoringRandEls(ri);
         return ri;
     fi;
@@ -513,21 +512,19 @@ InstallGlobalFunction( RecogniseGeneric,
         counter := counter + 1;
         if counter > 10 then
             Info(InfoRecog,1,"Giving up desperately...");
-            if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
+            if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
             return ri;
         fi;
 
         if IsMatrixGroup(Image(Homom(ri))) then
-            Info(InfoRecog,2,"Going to the factor (depth=",
-              Length(depth),", try=",
+            Info(InfoRecog,2,"Going to the factor (depth=",depth,", try=",
               counter,", dim=",DimensionOfMatrixGroup(Image(Homom(ri))),
               ", field=",Size(FieldOfMatrixGroup(Image(Homom(ri)))),").");
         else
-            Info(InfoRecog,2,"Going to the factor (depth=",
-              Length(depth),", try=",
+            Info(InfoRecog,2,"Going to the factor (depth=",depth,", try=",
               counter,").");
         fi;
-        Add(depth,'F');
+        Add(depthString,'F');
         if ForAny(GeneratorsOfGroup(H), x->not ValidateHomomInput(ri, x)) then
             # Our group fails to contain some of the generators of H!
             return fail;
@@ -535,23 +532,23 @@ InstallGlobalFunction( RecogniseGeneric,
 
         rifac := RecogniseGeneric(
                   Group(List(GeneratorsOfGroup(H), x->ImageElm(Homom(ri),x))),
-                  methodsforfactor(ri), depth, forfactor(ri) ); # TODO: change forfactor to hintsForFactor??)
-        Remove(depth);
-        PrintTreePos("F",depth,H);
+                  methodsforfactor(ri), depthString, forfactor(ri) ); # TODO: change forfactor to hintsForFactor??)
+        Remove(depthString);
+        PrintTreePos("F",depthString,H);
         SetRIFac(ri,rifac);
         SetRIParent(rifac,ri);
 
         if IsMatrixGroup(H) then
-            Info(InfoRecog,2,"Back from factor (depth=",Length(depth),
+            Info(InfoRecog,2,"Back from factor (depth=",depth,
                  ", dim=",ri!.dimension,", field=",
                  Size(ri!.field),").");
         else
-            Info(InfoRecog,2,"Back from factor (depth=",Length(depth),").");
+            Info(InfoRecog,2,"Back from factor (depth=",depth,").");
         fi;
 
         if not(IsReady(rifac)) then
             # the recognition of the factor failed, also give up here:
-            if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
+            if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
             return ri;
         fi;
 
@@ -598,17 +595,17 @@ InstallGlobalFunction( RecogniseGeneric,
     if Length(gensN(ri)) = 0 then
         # We found out that N is the trivial group!
         # In this case we do nothing, kernel is fail indicating this.
-        Info(InfoRecog,2,"Found trivial kernel (depth=",Length(depth),").");
+        Info(InfoRecog,2,"Found trivial kernel (depth=",depth,").");
         SetRIKer(ri,fail);
         # We have to learn from the factor, what our nice generators are:
         SetNiceGens(ri,pregensfac(ri));
         SetFilterObj(ri,IsReady);
-        if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
+        if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
         # StopStoringRandEls(ri);
         return ri;
     fi;
 
-    Info(InfoRecog,2,"Going to the kernel (depth=",Length(depth),").");
+    Info(InfoRecog,2,"Going to the kernel (depth=",depth,").");
     repeat
         # Now we go on as usual:
         SetgensNslp(ri,SLPOfElms(gensN(ri)));
@@ -617,13 +614,13 @@ InstallGlobalFunction( RecogniseGeneric,
         # This is now in terms of the generators of H!
         N := Group(StripMemory(gensN(ri)));
 
-        Add(depth,'K');
-        riker := RecogniseGeneric( N, methoddb, depth, forkernel(ri) );
-        Remove(depth);
-        PrintTreePos("K",depth,H);
+        Add(depthString,'K');
+        riker := RecogniseGeneric( N, methoddb, depthString, forkernel(ri) );
+        Remove(depthString);
+        PrintTreePos("K",depthString,H);
         SetRIKer(ri,riker);
         SetRIParent(riker,ri);
-        Info(InfoRecog,2,"Back from kernel (depth=",Length(depth),").");
+        Info(InfoRecog,2,"Back from kernel (depth=",depth,").");
 
         done := true;
         if IsReady(riker) and immediateverification(ri) then
@@ -650,7 +647,7 @@ InstallGlobalFunction( RecogniseGeneric,
                     Add(gensN(ri),z);
                     Info(InfoRecog,2,
                          "Alarm: Found unexpected kernel element! (depth=",
-                         Length(depth),")");
+                         depth,")");
                 fi;
             od;
             if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;
@@ -676,7 +673,7 @@ InstallGlobalFunction( RecogniseGeneric,
         #ri!.proj2 := StraightLineProgramNC([ll],Length(NiceGens(ri)));
         SetFilterObj(ri,IsReady);
     fi;
-    if InfoLevel(InfoRecog) = 1 and depth = "" then Print("\n"); fi;
+    if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
     # StopStoringRandEls(ri);
     return ri;
   end);

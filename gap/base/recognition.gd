@@ -547,17 +547,18 @@ DeclareSynonym("RecognizeGroup", RecogniseGroup);
 
 ## <#GAPDoc Label="RecogniseGeneric">
 ## <ManSection>
-## <Func Name="RecogniseGeneric" Arg="H, methoddb, depth [,knowledge]"/>
-## <Func Name="RecognizeGeneric" Arg="H, methoddb, depth [,knowledge]"/>
+## <Func Name="RecogniseGeneric" Arg="H, methoddb, depthString [,knowledge]"/>
+## <Func Name="RecognizeGeneric" Arg="H, methoddb, depthString [,knowledge]"/>
 ## <Returns><K>fail</K> for failure or a recognition info record.</Returns>
 ## <Description>
 ##     <A>H</A> must be a &GAP; group object, <A>methoddb</A> must be a
 ##     method database in the sense of Section <Ref Sect="whataremethods"/>
 ##     containing <C>FindHomomorphism</C> methods in the sense of Section
-##     <Ref Sect="findhomo"/>. <A>depth</A> is an integer which measures
-##     the depth in the recognition tree. It will be increased by one for
-##     each step we go into the tree. The top level has depth 0.
-##     <A>knowledge</A> is an optional record the
+##     <Ref Sect="findhomo"/>. <A>depthString</A> is a string whose length
+##     measures the depth in the recognition tree. It will be increased by one
+##     character for each step we go into the tree, namely by <C>F</C> for
+##     a factor node, and <C>K</C> for a kernel. The top level begins with an
+##     empty string. <A>knowledge</A> is an optional record the
 ##     components of which are copied into the new recognition info record
 ##     which is created for the group <A>H</A>. Especially the component
 ##     <C>hints</C> can contain a list of additional find homomorphism
