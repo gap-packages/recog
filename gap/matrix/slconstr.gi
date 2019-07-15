@@ -437,8 +437,8 @@ SLCR.CommutesWith := function (bbg, S, x)
 local s;
    for s in S do
       # was: if not One(bbg) = Comm( s , x )  then
-      if not(s*x=x*s) then
-         return false ;
+      if s*x <> x*s then
+         return false;
       fi;
    od;
 return true;

@@ -47,7 +47,7 @@ FindHomMethodsProjective.Derived :=
     # We assume G to act absolutely irreducible
     local H,a,basis,collf,conjgensG,f,hom,homcomp,homs,homsimg,kro,o,r,subdim;
     f := ri!.field;
-    if not(IsBound(ri!.derived)) then
+    if not IsBound(ri!.derived) then
       ri!.derived := RECOG.DerivedSubgroupMonteCarlo(G);
       ri!.derived_mtx := GModuleByMats(GeneratorsOfGroup(ri!.derived),f);
     fi;
@@ -56,7 +56,7 @@ FindHomMethodsProjective.Derived :=
         return false;
     fi;
     if MTX.IsIrreducible(ri!.derived_mtx) then
-        if not(MTX.IsAbsolutelyIrreducible(ri!.derived_mtx)) then
+        if not MTX.IsAbsolutelyIrreducible(ri!.derived_mtx) then
             # FIXME: Check for field automorphisms:
             return false;
             Error("not yet done");

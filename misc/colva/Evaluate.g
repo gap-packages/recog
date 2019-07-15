@@ -234,7 +234,7 @@ InstallGlobalFunction( NormalTree,
 
      Info(InfoRecognition,1,"Back from factor (depth=",depth,").");
 
-     if not(IsReady(rifac)) then
+     if not IsReady(rifac) then
           # the recognition of the factor failed, also give up here:
           return ri;
      fi;
@@ -264,7 +264,7 @@ InstallGlobalFunction( NormalTree,
 
     # Do a little bit of preparation for the generators of N:
     l := gensN(ri);
-    if not(IsBound(ri!.leavegensNuntouched)) then
+    if not IsBound(ri!.leavegensNuntouched) then
         Sort(l,SortFunctionWithMemory);   # this favours "shorter" memories!
         # remove duplicates:
         ll := [];

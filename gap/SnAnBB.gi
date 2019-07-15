@@ -45,7 +45,7 @@
 #     t := r;
 #     while j <= n/2 do
 #         t := t * r;
-#         if not(RecSnAnIsOne(Comm(s,t)^2)) then
+#         if not RecSnAnIsOne(Comm(s,t)^2) then
 #             Info( InfoRecSnAn, 1, "does not satisfy presentation");
 #             return false;
 #         fi;
@@ -508,7 +508,7 @@
 #
 #     cnt := 0;
 #     for k in [ 1 .. 4 ] do
-#         if not(RecSnAnEq(t1z*s[k],s[k]*t1z)) then
+#         if not RecSnAnEq(t1z*s[k],s[k]*t1z) then
 #             cnt := cnt + 1;
 #         fi;
 #     od;
@@ -516,7 +516,7 @@
 #
 #     cnt := 0;
 #     for k in [ 1 .. 4 ] do
-#         if not(RecSnAnEq(t2z*s[k],s[k]*t2z)) then
+#         if not RecSnAnEq(t2z*s[k],s[k]*t2z) then
 #             cnt := cnt + 1;
 #         fi;
 #     od;
@@ -1004,7 +1004,7 @@
 #
 #     cnt := 0;
 #     for k in [ 1 .. 5 ] do
-#         if not(RecSnAnEq(t1z*sc[k],sc[k]*t1z)) then
+#         if not RecSnAnEq(t1z*sc[k],sc[k]*t1z) then
 #             cnt := cnt + 1;
 #         fi;
 #     od;
@@ -1012,7 +1012,7 @@
 #
 #     cnt := 0;
 #     for k in [ 1 .. 5 ] do
-#         if not(RecSnAnEq(t2z*sc[k],sc[k]*t2z)) then
+#         if not RecSnAnEq(t2z*sc[k],sc[k]*t2z) then
 #             cnt := cnt + 1;
 #         fi;
 #     od;
@@ -1399,7 +1399,7 @@
 #             if gl = fail then return fail; fi;
 #             slp := SLPforSn( n, gl );
 #             eval := ResultOfStraightLineProgram(slp, [gens[2],gens[1]]);
-#             if not(RecSnAnEq(eval,g)) then return fail; fi;
+#             if not RecSnAnEq(eval,g) then return fail; fi;
 #         od;
 #         return [ "Sn", [gens[1],gens[2]], xis ];
 #     else
@@ -1425,7 +1425,7 @@
 #                         if gl = fail then return fail; fi;
 #                         slp := SLPforSn(n, gl);
 #                         eval := ResultOfStraightLineProgram(slp,[h,b]);
-#                         if not(RecSnAnEq(eval,g)) then return fail; fi;
+#                         if not RecSnAnEq(eval,g) then return fail; fi;
 #                     od;
 #                     return [ "Sn", [b,h] ,xis ];
 #                 else
@@ -1434,7 +1434,7 @@
 #             else
 #                 slp := SLPforAn( n, gl );
 #                 eval:=ResultOfStraightLineProgram(slp,[gens[2],gens[1]]);
-#                 if not(RecSnAnEq(eval,g)) then return fail; fi;
+#                 if not RecSnAnEq(eval,g) then return fail; fi;
 #             fi;
 #         od;
 #

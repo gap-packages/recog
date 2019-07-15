@@ -52,7 +52,7 @@ SUBFIELD.ScalarsToMultiplyIntoSmallerField := function(l,k)
   for i in [1..Length(l)] do
       r := SUBFIELD.ScalarToMultiplyIntoSmallerField(l[i],k);
       if r = fail then return fail; fi;
-      if not(IsSubset(f,r.field)) then
+      if not IsSubset(f,r.field) then
           f := ClosureField(f,r.field);
           if f = k then
               return fail;
@@ -96,7 +96,7 @@ SUBFIELD.BaseChangeForSmallestPossibleField := function(grp,mtx,k)
     # Check char. polynomial of a to make sure it lies in smallField [ x ]
     charPoly := CharacteristicPolynomial ( a ) ;
     field := Field(CoefficientsOfLaurentPolynomial(charPoly)[1]);
-    if not(IsSubset(f,field)) then
+    if not IsSubset(f,field) then
         f := ClosureField(f,field);
         if Size(f) >= Size(k) then
             return fail;
@@ -236,7 +236,7 @@ SUBFIELD.alg4 := function ( matrixGroup , smallField , bigField )
     # Check char. polynomial of a to make sure it lies in smallField [ x ]
     charPoly := CharacteristicPolynomial ( a ) ;
     field := Field(CoefficientsOfLaurentPolynomial(charPoly)[1]);
-    if not(IsSubset(smallField,field)) then
+    if not IsSubset(smallField,field) then
         smallField := ClosureField(smallField,field);
         if Size(smallField) >= Size(bigField) then
             return fail;
@@ -327,7 +327,7 @@ SUBFIELD.alg4 := function ( matrixGroup , smallField , bigField )
     temp := b * g * binverse ;
     Add(newgens,temp);
     field := FieldOfMatrixList([temp]);
-    if not(IsSubset(smallField,field)) then
+    if not IsSubset(smallField,field) then
         smallField := ClosureField(smallField,field);
         if Size(smallField) >= Size(bigField) then
             return fail;
@@ -676,10 +676,10 @@ FindHomMethodsProjective.Subfield := function(ri,G)
     if IsPrimeField(f) then
         return false;     # nothing to do
     fi;
-    if not(IsBound(ri!.meataxemodule)) then
+    if not IsBound(ri!.meataxemodule) then
         ri!.meataxemodule := GModuleByMats(GeneratorsOfGroup(G),f);
     fi;
-    if not(MTX.IsIrreducible(ri!.meataxemodule)) then
+    if not MTX.IsIrreducible(ri!.meataxemodule) then
         return false;     # not our case
     fi;
     dim := ri!.dimension;
@@ -701,7 +701,7 @@ FindHomMethodsProjective.Subfield := function(ri,G)
     Info(InfoRecog,2,"Computing derived subgroup...");
     Gprime := RECOG.DerivedSubgroupMonteCarlo(G);
     mo := GModuleByMats(GeneratorsOfGroup(Gprime),f);
-    if not(MTX.IsIrreducible(mo)) then
+    if not MTX.IsIrreducible(mo) then
         # Handle reducible case
         ri!.derived := Gprime;
         ri!.derived_mtx := mo;

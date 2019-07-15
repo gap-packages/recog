@@ -49,14 +49,14 @@ InstallValue( FINDEVENNORMALOPTS, rec(
 # InstallGlobalFunction( RECOG_IsNormal,
 #   function(g,h,projective)
 #     local S,x,y;
-#     if HasStoredStabilizerChain(h) and not(projective) then
+#     if HasStoredStabilizerChain(h) and not projective then
 #         S := StoredStabilizerChain(h);
 #     else
 #         S := StabilizerChain(h,rec( Projective := projective ));
 #     fi;
 #     for x in GeneratorsOfGroup(g) do
 #         for y in GeneratorsOfGroup(h) do
-#             if not(y^x in S) then return false; fi;
+#             if not y^x in S then return false; fi;
 #         od;
 #     od;
 #     return true;
@@ -199,7 +199,7 @@ InstallValue( FINDEVENNORMALOPTS, rec(
 #                           blind := z;
 #                       else
 #                           w := blind^-1*z*blind*z;   # = Comm(blind,z)
-#                           if not(opt.IsOne(w)) then
+#                           if not opt.IsOne(w) then
 #                               blind := w;
 #                           fi;
 #                       fi;
@@ -219,7 +219,7 @@ InstallValue( FINDEVENNORMALOPTS, rec(
 #                               blind := z;
 #                           else
 #                               w := blind^-1*z*blind*z;   # = Comm(blind,z)
-#                               if not(opt.IsOne(w)) then
+#                               if not opt.IsOne(w) then
 #                                   blind := w;
 #                               fi;
 #                           fi;
@@ -270,7 +270,7 @@ InstallValue( FINDEVENNORMALOPTS, rec(
 #                   Info(InfoFindEvenNormal,2,"Looking through ",Size(S),
 #                        " central involutions...");
 #                   for y in iter do
-#                       if not(opt.IsOne(y)) then
+#                       if not opt.IsOne(y) then
 #                           r := TestElement(y);
 #                           if r <> fail then return r; fi;
 #                       fi;
@@ -280,7 +280,7 @@ InstallValue( FINDEVENNORMALOPTS, rec(
 #               else
 #                   for i in [1..20] do
 #                       y := Random(S);
-#                       if not(opt.IsOne(y)) then
+#                       if not opt.IsOne(y) then
 #                           r := TestElement(y);
 #                           if r <> fail then return r; fi;
 #                       fi;
@@ -302,19 +302,19 @@ InstallValue( FINDEVENNORMALOPTS, rec(
 # 
 #   # Set some defaults:
 #   if IsBound(opt.Projective) and opt.Projective then
-#       if not(IsBound(opt.IsOne)) then opt.IsOne := IsOneProjective; fi;
-#       if not(IsBound(opt.Eq)) then opt.Eq := IsEqualProjective; fi;
-#       if not(IsBound(opt.Order)) then opt.Order := RECOG.ProjectiveOrder; fi;
+#       if not IsBound(opt.IsOne) then opt.IsOne := IsOneProjective; fi;
+#       if not IsBound(opt.Eq) then opt.Eq := IsEqualProjective; fi;
+#       if not IsBound(opt.Order) then opt.Order := RECOG.ProjectiveOrder; fi;
 #   fi;
 #   GENSS_CopyDefaultOptions( FINDEVENNORMALOPTS, opt );
 # 
 #   # Initialise a product replacer:
-#   if not(IsBound(opt.pr)) then
+#   if not IsBound(opt.pr) then
 #       opt.pr := ProductReplacer(GeneratorsOfGroup(g));
 #   fi;
 # 
 #   # First make sure we have an involution list:
-#   if not(IsBound(opt.invols)) then
+#   if not IsBound(opt.invols) then
 #       opt.invols := [];
 #   fi;
 # 
@@ -363,7 +363,7 @@ RECOG.RandomSubproduct := function(a,opt)
     allone := true;
     repeat
         for g in a do
-            if not(isone(g)) then
+            if not isone(g) then
                 allone := false;
                 if Random( rs, [ true, false ] )  then
                     if dopowers then
@@ -379,7 +379,7 @@ RECOG.RandomSubproduct := function(a,opt)
                 fi;
             fi;
         od;
-    until allone or not(isone(prod));
+    until allone or not isone(prod);
     return prod;
 end;
 
@@ -402,7 +402,7 @@ RECOG.BlindDescentStep := function(G,x,y,opt)
   fi;
 
   c := Comm(x,y);
-  if not(isone(c)) then
+  if not isone(c) then
       return rec( el := c, Ngens := [c], Nready := false, central := false,
                   isknownproper := false );
   fi;
@@ -422,7 +422,7 @@ RECOG.BlindDescentStep := function(G,x,y,opt)
     fi;
     Add(l,xx);
     c := Comm(xx,y);
-    if not(isone(c)) then
+    if not isone(c) then
         return rec( el := c, central := false, Ngens := l, Nready := false,
                     isknownproper := false );
     fi;
@@ -592,12 +592,12 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
               else
                   Info(InfoFindEvenNormal,3,"...done, size is ",Size(S),".");
               fi;
-              if not(IsString(S)) and Size(S) <= opt.SizeLimitAllInvols then
+              if not IsString(S) and Size(S) <= opt.SizeLimitAllInvols then
                   iter := GroupIteratorByStabilizerChain(S);
                   Info(InfoFindEvenNormal,2,"Looking through ",Size(S),
                        " central involutions...");
                   for y in iter do
-                      if not(opt.IsOne(y)) then
+                      if not opt.IsOne(y) then
                           UseElement(y);
                           if blindr.isknownproper then return blindr; fi;
                       fi;
@@ -613,7 +613,7 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
                       else
                           y := Random(S);
                       fi;
-                      if not(opt.IsOne(y)) then
+                      if not opt.IsOne(y) then
                           UseElement(y);
                           if blindr.isknownproper then return blindr; fi;
                       fi;
@@ -635,16 +635,16 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
 
   # Set some defaults:
   if IsBound(opt.Projective) and opt.Projective then
-      if not(IsBound(opt.IsOne)) then opt.IsOne := IsOneProjective; fi;
-      if not(IsBound(opt.Eq)) then opt.Eq := IsEqualProjective; fi;
-      if not(IsBound(opt.Order)) then opt.Order := RECOG.ProjectiveOrder; fi;
+      if not IsBound(opt.IsOne) then opt.IsOne := IsOneProjective; fi;
+      if not IsBound(opt.Eq) then opt.Eq := IsEqualProjective; fi;
+      if not IsBound(opt.Order) then opt.Order := RECOG.ProjectiveOrder; fi;
   fi;
   GENSS_CopyDefaultOptions( FINDEVENNORMALOPTS, opt );
 
   # First test whether or not we are abelian:
-  if not(IsBound(opt.SkipTrivAbelian)) then
+  if not IsBound(opt.SkipTrivAbelian) then
       gens := GeneratorsOfGroup(g);
-      pos := First([1..Length(gens)],i->not(opt.IsOne(gens[i])));
+      pos := First([1..Length(gens)],i->not opt.IsOne(gens[i]));
       if pos = fail then
           res := rec( success := fail, msg := "Group is trivial" );
       fi;
@@ -653,7 +653,7 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
       while abelian and i < Length(gens) do
           j := i+1;
           while abelian and j <= Length(gens) do
-              if not(opt.Eq(gens[i]*gens[j],gens[j]*gens[i])) then
+              if not opt.Eq(gens[i]*gens[j],gens[j]*gens[i]) then
                   abelian := false;
               fi;
               j := j + 1;
@@ -689,7 +689,7 @@ end );
 #   if r.success then
 #       f := ri!.field;
 #       m := GModuleByMats(r.Ngens,f);
-#       if not(MTX.IsIrreducible(m)) then
+#       if not MTX.IsIrreducible(m) then
 #           Info(InfoRecog,2,
 #                "FindEvenNormal: Found reducible proper normal subgroup!");
 #           return RECOG.SortOutReducibleNormalSubgroup(ri,G,r.Ngens,m);
@@ -732,12 +732,12 @@ FindHomMethodsProjective.FindElmOfEvenNormal := function(ri,G)
   if r.success = fail then # FIXME: fail = TemporaryFailure here really correct?
       return fail; # FIXME: fail = TemporaryFailure here really correct?
   fi;
-  if not IsBound(r.Nready) or not(r.Nready) then
+  if not IsBound(r.Nready) or not r.Nready then
       r.Ngens := FastNormalClosure(GeneratorsOfGroup(G),[r.el],20);
   fi;
   f := ri!.field;
   m := GModuleByMats(r.Ngens,f);
-  if not(MTX.IsIrreducible(m)) then
+  if not MTX.IsIrreducible(m) then
       Info(InfoRecog,2,
            "FindElmOfEvenNormal: Found reducible proper normal subgroup!");
       return RECOG.SortOutReducibleNormalSubgroup(ri,G,r.Ngens,m);
@@ -755,7 +755,7 @@ FindHomMethodsProjective.FindElmOfEvenNormal := function(ri,G)
               rr := FindElmOfEvenNormalSubgroup(Group(r.Ngens),
                            rec( Projective:=true, SkipTrivAbelian := true ));
               if rr.success = fail then continue; fi;
-              if not IsBound(rr.Nready) or not(rr.Nready) then
+              if not IsBound(rr.Nready) or not rr.Nready then
                   rr.Ngens := FastNormalClosure(r.Ngens,[rr.el],20);
               fi;
               mm := GModuleByMats(rr.Ngens,f);

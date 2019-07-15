@@ -45,7 +45,7 @@ RECOG.NiceGeneratorsSn := function ( mp, grp, N )
         fi;
 
         if IsBound(y) = false and IsBound(cyclen[1]) and cyclen[1] = 1 and
-               ForAll([1..QuoInt(n,2)-1],i->not(IsBound(cyclen[2*i+1])))
+               ForAll([1..QuoInt(n,2)-1],i->not IsBound(cyclen[2*i+1]))
                # was: Filtered( cyclen, x -> x[1] mod 2 = 0 ) = [ [ 2,1 ] ]
         then
             # we can get a transposition
@@ -168,7 +168,7 @@ RECOG.NiceGeneratorsAnEven := function ( mp, grp, N )
 
         if IsBound(b) = false and IsBound(cyclen[2]) and cyclen[2] = 1 and
                # Filtered( cyclen, x -> x[1] mod 3 = 0 ) = [ [ 3,1 ] ]
-               ForAll( [2..QuoInt(n,3)], x->not(IsBound(cyclen[3*x-1])) )
+               ForAll( [2..QuoInt(n,3)], x->not IsBound(cyclen[3*x-1]) )
         then
             # we can get a $3$-cycle
             #b := t^(Lcm(List(cyclen,x->x[1]))/3);
@@ -233,7 +233,7 @@ RECOG.NiceGeneratorsAnOdd := function ( mp, grp, N )
 
         if IsBound(b) = false and IsBound(cyclen[2]) and cyclen[2] = 1 and
                # was: Filtered( cyclen, x -> x[1] mod 3 = 0 ) = [ [ 3,1 ] ]
-               ForAll( [2..QuoInt(n,3)], x->not(IsBound(cyclen[3*x-1])) )
+               ForAll( [2..QuoInt(n,3)], x->not IsBound(cyclen[3*x-1]) )
         then
             # we can get a $3$-cycle
             #b := t^(Lcm(List(cyclen,x->x[1]))/3);
