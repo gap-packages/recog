@@ -283,7 +283,7 @@ Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
       until i = limit;
    else
        z:=p^(e*(d-2))-1;
-       primes:=Set(FactorsInt(e*(d-2)));
+       primes:=PrimeDivisors(e*(d-2));
 
        collect2s:=function( n )
        # the 2-part of n
@@ -463,7 +463,7 @@ local   bbg, p, e, r, m, rand, primes, count, out;
    if Length(arg) = 4 then
       out.tran := arg[4];
    fi;
-   primes := Set(FactorsInt(p^e -1));
+   primes := PrimeDivisors(p^e -1);
    m:=6*(p^e);
    count:=1;
 
