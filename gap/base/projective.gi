@@ -37,8 +37,13 @@ InstallGlobalFunction( IsEqualProjective,
     p := First([1..n], i -> not IsZero(a[1,i])); # Find non-zero entry in <a[1]>
     Assert(1, p <> fail);
     s := b[1,p] / a[1,p]; # The unique scalar <s> with <s * a[1,p] = b[1,p]>.
-    return not IsZero(s)
-           and ForAll([1..n], i -> ForAll([1..n], j -> s * a[i,j] = b[i,j]));
+    if IsZero(s) then
+      return false; # <a[1,p] <> 0 = b[1,p]>, so <a> and <b> are not equal.
+    elif IsRowListMatrix(a) and IsRowListMatrix(b) then
+      # Separate case for performance reasons
+      return ForAll([1 .. n], i -> s * a[i] = b[i]);
+    fi;
+    return s * a = b;
   end );
 
 # The projective order of an invertible square matrix <m> over a finite field is
