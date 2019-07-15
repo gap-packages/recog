@@ -26,12 +26,12 @@ Read("regen_doc.g");
 scan_dirs := [
     "doc",
     "gap",
-    "gap/almostsimple",
     "gap/base",
     "gap/generic",
     "gap/matrix",
     "gap/perm",
     "gap/projective",
+    "gap/projective/almostsimple",
     ];
 
 AutoDoc(rec(
