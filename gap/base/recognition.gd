@@ -474,16 +474,108 @@ DeclareGlobalVariable( "SLPforElementFuncsGeneric" );
 
 DeclareGlobalFunction( "EmptyRecognitionInfoRecord" );
 
+## <#GAPDoc Label="RecognisePermGroup">
+## <ManSection>
+## <Func Name="RecognisePermGroup" Arg="H"/>
+## <Func Name="RecognizePermGroup" Arg="H"/>
+## <Returns><K>fail</K> for failure or a recognition info record.</Returns>
+## <Description>
+## <A>H</A> must be a &GAP; permutation group object. This function calls
+## <Ref Func="RecogniseGeneric"/> with the method database used for
+## permutation groups, which is stored in the global variable
+## <Ref Var="FindHomDbPerm"/>, and no prior knowledge.
+## </Description>
+## </ManSection>
+## <#/GAPDoc>
 DeclareGlobalFunction( "RecognisePermGroup" );
 DeclareSynonym("RecognizePermGroup", RecognisePermGroup);
+
+## <#GAPDoc Label="RecogniseMatrixGroup">
+## <ManSection>
+## <Func Name="RecogniseMatrixGroup" Arg="H"/>
+## <Func Name="RecognizeMatrixGroup" Arg="H"/>
+## <Returns><K>fail</K> for failure or a recognition info record.</Returns>
+## <Description>
+## <A>H</A> must be a &GAP; matrix group object. This function calls
+## <Ref Func="RecogniseGeneric"/> with the method database used for
+## matrix groups, which is stored in the global variable
+## <Ref Var="FindHomDbMatrix"/>, and no prior knowledge.
+## </Description>
+## </ManSection>
+## <#/GAPDoc>
 DeclareGlobalFunction( "RecogniseMatrixGroup" );
 DeclareSynonym("RecognizeMatrixGroup", RecogniseMatrixGroup);
+
+## <#GAPDoc Label="RecogniseProjectiveGroup">
+## <ManSection>
+## <Func Name="RecogniseProjectiveGroup" Arg="H"/>
+## <Func Name="RecognizeProjectiveGroup" Arg="H"/>
+## <Returns><K>fail</K> for failure or a recognition info record.</Returns>
+## <Description>
+## <A>H</A> must be a &GAP; matrix group object. Since as of now no
+## actual projective groups are implemented in the &GAP; library we use
+## matrix groups instead. The recognition will however view the group as
+## the projective group, i.e. the matrix group modulo its scalar
+## matrices. This function calls
+## <Ref Func="RecogniseGeneric"/> with the method database used for
+## projective groups, which is stored in the global variable
+## <Ref Var="FindHomDbProjective"/>, and no prior knowledge.
+## </Description>
+## </ManSection>
+## <#/GAPDoc>
 DeclareGlobalFunction( "RecogniseProjectiveGroup" );
 DeclareSynonym("RecognizeProjectiveGroup", RecogniseProjectiveGroup);
+
+## <#GAPDoc Label="RecogniseGroup">
+## <ManSection>
+## <Func Name="RecogniseGroup" Arg="H"/>
+## <Func Name="RecognizeGroup" Arg="H"/>
+## <Returns><K>fail</K> for failure or a recognition info record.</Returns>
+## <Description>
+##     <A>H</A> must be a &GAP; group object. This function automatically
+##     dispatches to one of the two previous functions
+##     <Ref Func="RecognisePermGroup"/>, or <Ref Func="RecogniseMatrixGroup"/>,
+##     according to the type of the group <A>H</A>.
+##     Note that since currently there is no implementation of projective
+##     groups in the &GAP; library, one cannot recognise a matrix group
+##     <A>H</A> as a projective group using this function.
+## </Description>
+## </ManSection>
+## <#/GAPDoc>
 DeclareGlobalFunction( "RecogniseGroup" );
 DeclareSynonym("RecognizeGroup", RecogniseGroup);
+
+## <#GAPDoc Label="RecogniseGeneric">
+## <ManSection>
+## <Func Name="RecogniseGeneric" Arg="H, methoddb, depth [,knowledge]"/>
+## <Func Name="RecognizeGeneric" Arg="H, methoddb, depth [,knowledge]"/>
+## <Returns><K>fail</K> for failure or a recognition info record.</Returns>
+## <Description>
+##     <A>H</A> must be a &GAP; group object, <A>methoddb</A> must be a
+##     method database in the sense of Section <Ref Sect="whataremethods"/>
+##     containing <C>FindHomomorphism</C> methods in the sense of Section
+##     <Ref Sect="findhomo"/>. <A>depth</A> is an integer which measures
+##     the depth in the recognition tree. It will be increased by one for
+##     each step we go into the tree. The top level has depth 0.
+##     <A>knowledge</A> is an optional record the
+##     components of which are copied into the new recognition info record
+##     which is created for the group <A>H</A>. Especially the component
+##     <C>hints</C> can contain a list of additional find homomorphism
+##     methods (described by records as in Section <Ref Sect="whataremethods"/>)
+##     which is prepended to the method database in <A>methoddb</A> before
+##     the recognition starts. This feature is intended to give hints
+##     about prior knowledge about which find homomorphism method might succeed.
+##     <P/>
+##     The function performs the algorithm described above and returns either
+##     <K>fail</K> in case of failure or a recognition info record in case
+##     of success. For the content and definition of recognition info
+##     records see Section <Ref Sect="rirecord"/>.
+## </Description>
+## </ManSection>
+## <#/GAPDoc>
 DeclareGlobalFunction( "RecogniseGeneric" );
 DeclareSynonym("RecognizeGeneric", RecogniseGeneric);
+
 DeclareGlobalFunction( "PrintTreePos" );
 DeclareGlobalFunction( "TryFindHomMethod" );
 
