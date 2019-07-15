@@ -39,7 +39,7 @@ PrimitivePrimeDivisors := function(d, q)
 
     # Throughout the loop ppds * noppds = q^d-1;
     # Eventually ppds will contain the ppds and noppds the others
-    ddivs :=  Unique(FactorsInt(d));
+    ddivs :=  PrimeDivisors(d);
     for c in ddivs do
         a := Gcd( ppds, q^(d/c)-1);
          # all primes in a are not ppds

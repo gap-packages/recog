@@ -768,11 +768,11 @@ RECOG.TestRandomElement := function (recognise, grp)
             fi;
             if ( (q+1) mod o1 = 0 and (q+1) mod o2 = 0) then
                 if not IsPowerOfPrime(q+1,2) and q <> 8 then
-                    if  not ForAny( Unique(FactorsInt(o1)), r ->
+                    if  not ForAny( PrimeDivisors(o1), r ->
                       IsPrimitivePrimeDivisor(p,2*recognise.a,r)) then
                         return false;
                     fi;
-                    if not ForAny( Unique(FactorsInt(o2)), r ->
+                    if not ForAny( PrimeDivisors(o2), r ->
                       IsPrimitivePrimeDivisor(p,2*recognise.a,r)) then
                         return false;
                     fi;
