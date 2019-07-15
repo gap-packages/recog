@@ -40,22 +40,21 @@ ReadPackage("recog","gap/perm/largebase.gi");
 ReadPackage("recog","gap/SnAnBB.gi");
 
 # Matrices/Projective:
-ReadPackage("recog","gap/findnormal.gi");
-ReadPackage("recog","gap/matimpr.gi");
-ReadPackage("recog","gap/c6.gi");
-ReadPackage("recog","gap/tensor.gi");
-# ReadPackage("recog","gap/forms.gi");
-ReadPackage("recog","gap/ppd.gi");
-ReadPackage("recog","gap/classical.gi");
-ReadPackage("recog","gap/slconstr.gi");
-ReadPackage("recog","gap/c3c5.gi");
-ReadPackage("recog","gap/d247.gi");
-ReadPackage("recog","gap/almostsimple/twoelorders.gi");
-ReadPackage("recog","gap/almostsimple.gi");
-ReadPackage("recog","gap/almostsimple/lietype.gi");
-ReadPackage("recog","gap/almostsimple/hints.gi");
-ReadPackage("recog","gap/classicalnatural.gi");
-ReadPackage("recog","gap/AnSnOnFDPM.gi");
+ReadPackage("recog","gap/projective/findnormal.gi");
+ReadPackage("recog","gap/matrix/matimpr.gi");
+ReadPackage("recog","gap/projective/c6.gi");
+ReadPackage("recog","gap/projective/tensor.gi");
+ReadPackage("recog","gap/matrix/ppd.gi");
+ReadPackage("recog","gap/matrix/classical.gi");
+ReadPackage("recog","gap/matrix/slconstr.gi");
+ReadPackage("recog","gap/projective/c3c5.gi");
+ReadPackage("recog","gap/projective/d247.gi");
+ReadPackage("recog","gap/projective/almostsimple/twoelorders.gi");
+ReadPackage("recog","gap/projective/almostsimple.gi");
+ReadPackage("recog","gap/projective/almostsimple/lietype.gi");
+ReadPackage("recog","gap/projective/almostsimple/hints.gi");
+ReadPackage("recog","gap/projective/classicalnatural.gi");
+ReadPackage("recog","gap/projective/AnSnOnFDPM.gi");
 
 # All the method installations are now here:
 ReadPackage("recog","gap/perm.gi");

@@ -23,10 +23,8 @@ ReadPackage("recog","gap/base/projective.gd");
 
 ReadPackage("recog","gap/matrix.gd");
 
-#ReadPackage("recog","gap/forms.gd");
-ReadPackage("recog","gap/ppd.gd");
-ReadPackage("recog","gap/classical.gd");
-ReadPackage("recog","gap/almostsimple.gd");
-ReadPackage("recog","gap/findnormal.gd");
-ReadPackage("recog","gap/classicalnatural.gd");
-ReadPackage("recog","gap/AnSnOnFDPM.gd");
+ReadPackage("recog","gap/matrix/ppd.gd");
+ReadPackage("recog","gap/matrix/classical.gd");
+ReadPackage("recog","gap/projective/almostsimple.gd");
+ReadPackage("recog","gap/projective/findnormal.gd");
+ReadPackage("recog","gap/projective/AnSnOnFDPM.gd");
