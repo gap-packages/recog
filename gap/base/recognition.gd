@@ -547,8 +547,8 @@ DeclareSynonym("RecognizeGroup", RecogniseGroup);
 
 ## <#GAPDoc Label="RecogniseGeneric">
 ## <ManSection>
-## <Func Name="RecogniseGeneric" Arg="H, methoddb, depthString [,knowledge]"/>
-## <Func Name="RecognizeGeneric" Arg="H, methoddb, depthString [,knowledge]"/>
+## <Func Name="RecogniseGeneric" Arg="H, methoddb, depthString, knowledge"/>
+## <Func Name="RecognizeGeneric" Arg="H, methoddb, depthString, knowledge"/>
 ## <Returns><K>fail</K> for failure or a recognition info record.</Returns>
 ## <Description>
 ##     <A>H</A> must be a &GAP; group object, <A>methoddb</A> must be a
