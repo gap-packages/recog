@@ -1,6 +1,7 @@
 # Issue #36
 # Incorrect size of matrix
 
+gap> old:=InfoLevel(InfoRecog);;
 gap> SetInfoLevel(InfoRecog, 0);
 gap> seedMT :=
 > [
@@ -123,3 +124,4 @@ gap> g := GroupWithGenerators(gens);;
 gap> #repeat ri:=RecognizeGroup(g); until Size(ri)<>Size(g);
 gap> ri:=RecognizeGroup(g);;
 gap> Assert(0, Size(ri) = Size(g));
+gap> SetInfoLevel(InfoRecog, old);

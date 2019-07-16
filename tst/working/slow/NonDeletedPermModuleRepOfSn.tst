@@ -1,3 +1,4 @@
+gap> old:=InfoLevel(InfoRecog);;
 gap> SetInfoLevel(InfoRecog, 0);;
 gap> gens := GeneratorsOfGroup;;
 gap> l := gens(SymmetricGroup(10));;
@@ -11,3 +12,4 @@ gap> g := Group(c[i].generators);;
 gap> ri := RecognizeGroup(g);;
 gap> Size(ri);
 3628800
+gap> SetInfoLevel(InfoRecog, old);
