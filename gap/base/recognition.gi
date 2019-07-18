@@ -415,15 +415,15 @@ InstallGlobalFunction( RecogniseGeneric,
     Setmethodsforfactor(ri,methoddb);
 
     # Find a possible homomorphism (or recognise this group as leaf)
+    allmethods := methoddb;
     if IsBound(knowledge.hints) and Length(knowledge.hints) > 0 then
-        allmethods := Concatenation(knowledge.hints,methoddb);
+        allmethods := Concatenation(knowledge.hints,allmethods);
         SortBy(allmethods, a -> -a.rank);
-        Setfhmethsel(ri,CallMethods( allmethods, 10, ri, H));
-    else
-        Setfhmethsel(ri,CallMethods( methoddb, 10, ri, H ));
-        # TODO: extract the value 10 into a named constant, and / or make it
-        #       an option parameter to the func
     fi;
+    Setfhmethsel(ri, CallMethods( allmethods, 10, ri, H ));
+    # TODO: extract the value 10 into a named constant, and / or make it
+    #       an option parameter to the func
+
     # Reset the pseudo random stamp:
     RECOG.SetPseudoRandomStamp(Grp(ri),"PseudoRandom");
     if fhmethsel(ri).result = TemporaryFailure then
