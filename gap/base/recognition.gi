@@ -143,7 +143,6 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     local ri;
     ri := ShallowCopy(r);
     Objectify( RecognitionInfoType, ri );
-    ri!.nrgensH := Length(GeneratorsOfGroup(H));
     SetGrp(ri,H);
     Setslpforelement(ri,SLPforElementGeneric);
     SetgensN(ri,[]);       # this will grow over time
@@ -516,16 +515,8 @@ InstallGlobalFunction( RecogniseGeneric,
 
         # Now we want to have preimages of the new generators in the factor:
         Info(InfoRecog,2,"Calculating preimages of nice generators.");
-        Setpregensfac( ri, CalcNiceGens(rifac,ri!.gensHmem) );
-        ri!.genswithmem := Concatenation(ri!.gensHmem,pregensfac(ri));  # FIXME: what is genswithmem? document it?
-        # TODO: somehow here is the hidden assumption that pregensfac()
-        # contains (at least initially) generators with memory; and then
-        # we strip this memory away. That's bad design
-        # TODO: rewrite this code to not need ForgetMemory at all
-
-        # replace the entries of the list pregensfac(ri) with
-        # generators without memory
-        ForgetMemory(pregensfac(ri));   # TODO: get rid of ForgetMemory here!
+        ri!.pregensfacwithmem := CalcNiceGens(rifac, ri!.gensHmem);
+        Setpregensfac(ri, StripMemory(ri!.pregensfacwithmem));
 
         # Now create the kernel generators with the stored method:
         gensNmeth := findgensNmeth(ri);
@@ -598,8 +589,7 @@ InstallGlobalFunction( RecogniseGeneric,
                     ErrorNoReturn("Very bad: factor was wrongly recognised and we ",
                                   "found out too late");
                 fi;
-                y := ResultOfStraightLineProgram(s,
-                   ri!.genswithmem{[ri!.nrgensH+1..Length(ri!.genswithmem)]});
+                y := ResultOfStraightLineProgram(s, ri!.pregensfacwithmem);
                 z := x*y^-1;
                 s := SLPforElement(riker,z!.el);
                 if InfoLevel(InfoRecog) >= 2 then Print(".\c"); fi;
@@ -748,8 +738,7 @@ InstallGlobalFunction( FindKernelRandom,
         if s = fail then
             return false;
         fi;
-        y := ResultOfStraightLineProgram(s,
-                 ri!.genswithmem{[ri!.nrgensH+1..Length(ri!.genswithmem)]});
+        y := ResultOfStraightLineProgram(s, ri!.pregensfacwithmem);
         Add(l,x^-1*y);
         if InfoLevel(InfoRecog) >= 2 then
             Print(".\c");
@@ -838,7 +827,7 @@ InstallGlobalFunction( FindKernelFastNormalClosure,
         return false;
     fi;
 
-    SetgensN(ri,FastNormalClosure(ri!.genswithmem,gensN(ri),n2));
+    SetgensN(ri,FastNormalClosure(ri!.gensHmem,gensN(ri),n2));
 
     return true;
   end);
