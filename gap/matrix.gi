@@ -692,8 +692,7 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
         x := RandomElm(ri,"KERNEL",true).el;
         Assert(2, ValidateHomomInput(ri, x));
         s := SLPforElement(rifac,ImageElm( Homom(ri), x!.el ));
-        y := ResultOfStraightLineProgram(s,
-                 ri!.genswithmem{[ri!.nrgensH+1..Length(ri!.genswithmem)]});
+        y := ResultOfStraightLineProgram(s, ri!.pregensfacwithmem);
         x := x^-1 * y;   # this is in the kernel
 
         # Now clean out this vector and remember what we did:
