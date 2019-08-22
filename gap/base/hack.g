@@ -54,11 +54,15 @@ InstallMethod( PseudoRandom, "for a group object with generators, use func",
 # than 256 elements; needed by RECOG.RuleOutSmallProjOrder
 InstallOtherMethod( Randomize, "for a mutable FFE vector",
   [ IsFFECollection and IsPlistRep and IsMutable ],
-  v -> Randomize(v, GlobalMersenneTwister));
+  v -> Randomize(GlobalMersenneTwister, v));
 
 InstallOtherMethod( Randomize, "for a mutable FFE vector and a random source",
   [ IsFFECollection and IsPlistRep and IsMutable, IsRandomSource ],
-  function( v, rs )
+  { v, rs } -> Randomize(rs, v) );
+
+InstallOtherMethod( Randomize, "for a random source and a mutable FFE vector",
+  [ IsRandomSource, IsFFECollection and IsPlistRep and IsMutable ],
+  function( rs, v )
     local f,i;
     f := DefaultField(v);
     for i in [1..Length(v)] do v[i] := Random(rs,f); od;
