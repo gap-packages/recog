@@ -1,0 +1,12 @@
+<Chapter Label="Renaming">
+<Heading>Renaming</Heading>
+
+Many of the names in the recog package are found 
+to be unintuitive or inconsistent with other names.
+For these reasons the names were changed to be more descriptive
+and to follow the internal consistency of &GAP;.
+In this chapter a dictionary from old to new names is included.
+The meanings of certain old names are described in the paper
+"Components of the recognition info record" of <Cite Key="NS06"/> in Section 2.6.
+
+<#Include SYSTEM "renaming_table.xml">
