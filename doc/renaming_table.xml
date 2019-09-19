@@ -1,0 +1,10 @@
+<Table Align="|l|l|">
+<Caption> renaming of functions</Caption>
+<HorLine/>
+<Row>
+	<Item> <E>Old Name</E> </Item>
+	<Item> <E>New Name</E> </Item>
+</Row>
+<HorLine/>
+</Table>
+</Chapter>

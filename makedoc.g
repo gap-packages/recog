@@ -42,6 +42,7 @@ AutoDoc(rec(
         includes := [
             "intro.xml",
             "install.xml",
+            "renaming.xml",
             "recognition.xml",
             "methsel.xml",
             "afterrecog.xml",
