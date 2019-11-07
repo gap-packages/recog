@@ -4,92 +4,27 @@
 ## which provides a collection of methods for the constructive recognition
 ## of groups.
 ## 
-## This files's authors include Sergio Siccha, Friedrich Rober
-## Work on this file started in Summer School Matrix Group Recognition 2019
+## This files's authors include Sergio Siccha, Friedrich Rober.
+## Work on this file started in Summer School Matrix Group Recognition 2019.
+## This is project 14 on
+## https://lbfm-rwth.github.io/Summer-School-MGRP/projects/
 ## 
 ## Copyright of recog belongs to its developers whose names are too numerous
 ## to list here. Please refer to the COPYRIGHT file for details.
 ## 
 ## SPDX-License-Identifier: GPL-3.0-or-later
 ## 
-## --------------------------------------------------------------------------
-## DESCRIPTION:
-## 
-## This file renames functions of the recog package and generates 
-## a table of renamed functions for the documentation.
-## The renamings_to_execute.csv file specifies how to rename.
-## The renamings_history.csv file stores the history of renamings
-## and is used for the generation of the renaming table in the documentation.
-## --------------------------------------------------------------------------
-## INSTRUCTIONS:
-## 
-## Run it with GAP from within the package directory.
-## There are two possible applications for running this file.
-## --------------------------------------------------------------------------
-## APPLICATIONS:
-## 
-## The first one adresses the developers of the recog package.
-## They can use the renamings_to_execute.csv file in order to
-## discuss new names for functions and afterwards to apply the name changes
-## in the recog package by running this file as instructed.
-## Below an example of this application is included.
-## 
-## The second one adresses people who use the recog package as a dependency.
-## They can run this file with an empty renamings_to_execute.csv file
-## to apply all name changes that are stored in the renamings_history.csv 
-## file to their own projects.
-## --------------------------------------------------------------------------
-## DETAILS:
-## 
-## This file reads the renamings_to_execute.csv file that specifies how to
-## rename. If it is empty, this file attempts to do the renamings specified
-## in the renamings_history.csv file. 
-## The further explanations apply if the file is not empty.
-## 
-## First this file checks if the renamings_to_execute.csv file is correct.
-## The renamings_to_execute.csv file has the following form:
-##     - First column 'OLD NAME' contains the old name.
-##     - Second column 'NEW NAME' contains the new name that is used now.
-##     - Third column 'TYPE' contains the type used for Ref in GAPDoc.
-## Then further checks are done and on failure Errors/Warnings are printed.
-## Primarily they are done to ensure that the renamings_history.csv file 
-## always has duplicate-free columns after merging. 
-## After successful checks all matches on word boundaries of the old name get
-## replaced with the new name. The replacements are executed in all files with 
-## extensions .g/.gd/.gi/.tst/.xml found in the directory tree rooted at '.' 
-## whereas all files in the .git folder are ignored.
-## Afterwards the rows from the renamings_to_execute.csv file are added to 
-## the renamings_history.csv file. Then the renaming table for the 
-## documentation is generated from the renamings_history.csv file whereby
-## renamings of the form 'X_1 -> X_2 -> ... -> X_n' are printed 
-## in the documentation as 'X_1 -> X_n'.
-## --------------------------------------------------------------------------
-## EXAMPLE:
-## 
-## renamings_to_execute.csv :
-## OLD NAME,NEW NAME,TYPE
-## undesciptive,descriptive,Attr
-## 
-## First add and commit the renamings_to_execute.csv file. -- Commit 1
-## Then discuss on github if the suggested names are suitable.
-## After approval run rename.g from within the package directory.
-## Run tst/testquick.g or tst/testall.g and ensure everything is still working.
-## On failure you can always roll back to Commit 1, i.e. the version before 
-## applying the renamings. 
-## On success add and commit the changed files. -- Commit 2
+## Details can be found in RENAME.md
 ##
 #############################################################################
-
-DeclareSynonym("Yes", true);
-DeclareSynonym("No", false);
 
 GetInputFromUser := function(message)
 local input;
 
     input := InputFromUser(message);
-    if input = No then
+    if input = false then
         return false;
-    elif input = Yes then
+    elif input = true then
         return true;
     else
         Print("Input is not valid.\n");
@@ -181,10 +116,6 @@ local colOldInHistory, colNewInHistory, colOldInToExecute, colNewInToExecute, co
     foundWarning := false;
     foundError := false;
 
-    message := "ERROR : Attempt to use a new name that was once an old name of a function.";
-    failedCheck := CheckRenamingTableForDuplicates(colOldInHistory, colNewInToExecute, "OLD NAME", "NEW NAME", true, message);
-    foundError := foundError or failedCheck;
-
     message := "ERROR : Attempt to rename a function twice.";
     failedCheck := CheckRenamingTableForDuplicates(colOldInToExecute, colOldInToExecute, "OLD NAME", "OLD NAME", false, message);
     foundError := foundError or failedCheck;
@@ -214,6 +145,10 @@ local colOldInHistory, colNewInHistory, colOldInToExecute, colNewInToExecute, co
         foundWarning := true;
     od;
 
+    message := "WARNING : Attempt to use a new name that was once an old name of a function.";
+    failedCheck := CheckRenamingTableForDuplicates(colOldInHistory, colNewInToExecute, "OLD NAME", "NEW NAME", true, message);
+    foundError := foundError or failedCheck;
+
     message := "WARNING : Attempt to rename a function again. This is a renaming of the form X -> Y -> Z.";
     failedCheck := CheckRenamingTableForDuplicates(colNewInHistory, colOldInToExecute, "NEW NAME", "OLD NAME", true, message);
     foundWarning := foundWarning or failedCheck;
@@ -221,7 +156,7 @@ local colOldInHistory, colNewInHistory, colOldInToExecute, colNewInToExecute, co
     foundWarning := foundWarning or failedCheck;
 
     if foundWarning then
-        message := "Detected Warnings. Do you want to continue? [Yes/No]\n";
+        message := "Detected Warnings. Do you want to continue? [true/false]\n";
         if GetInputFromUser(message) = false then
             Print("Aborting.\n");
             return true;
@@ -304,7 +239,7 @@ local csvHistory, csvToExecute, message;
     csvToExecute := ReadCSV("renamings_to_execute.csv");
 
     if IsEmpty(csvToExecute) then
-        message := "The renamings_to_execute.csv is empty.\nDo you want to rename functions as specified in renamings_history.csv instead? [Yes/No]\n";
+        message := "The renamings_to_execute.csv is empty.\nDo you want to rename functions as specified in renamings_history.csv instead? [true/false]\n";
         if GetInputFromUser(message) = true then
             RenameFiles(csvHistory);
         else
