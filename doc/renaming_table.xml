@@ -2,8 +2,8 @@
 <Caption> renaming of functions</Caption>
 <HorLine/>
 <Row>
-	<Item> <E>OLD NAME</E> </Item>
-	<Item> <E>NEW NAME</E> </Item>
+	<Item> <E>Old Name</E> </Item>
+	<Item> <E>New Name</E> </Item>
 </Row>
 <HorLine/>
 </Table>

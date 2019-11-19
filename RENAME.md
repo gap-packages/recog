@@ -29,12 +29,12 @@ They can apply the name changes that were executed inside the recog package to t
 The renamings_to_execute.csv and renamings_history.csv file have the following form:
 * First column `OLD NAME` contains the old name.
 * Second column `NEW NAME` contains the new name that is used now.
-* Third column `TYPE` contains the type used for Ref in GAPDoc.
+* Third column `TYPE` contains the type used for GAPDoc references, e.g. `Func` or `Attr`.
 
 First let us discuss the case where the `renamings_to_execute.csv` file is not empty.
 The other case can be explained afterwards.
 
-First the `rename.g` file checks if the `renamings_to_execute.csv` file is correct.
+First the `rename.g` file checks if the `renamings_to_execute.csv` file is syntactically correct.
 Then further sanity checks are done and on failure Errors/Warnings are printed.
 After successful checks all matches on word boundaries of the old name get
 replaced with the new name. The replacements are executed in all files with
@@ -44,26 +44,24 @@ Afterwards the rows from the `renamings_to_execute.csv` file are added to
 the `renamings_history.csv` file. Then the renaming table for the
 documentation is generated from the `renamings_history.csv` file whereby
 renamings of the form `X_1 -> X_2 -> ... -> X_n` are printed
-in the documentation as `X_1 -> X_n`.
+in the documentation as `X_1 -> X_n`. Then the documentation of the recog package is regenerated.
 
 Now let us discuss the case where the `renamings_to_execute.csv` file is empty.
-Then the `rename.g` file attempts to do the renamings specified
-in the `renamings_history.csv` file.
+Then the `rename.g` file attempts to execute the renamings in the order specified
+by the `renamings_history.csv` file. This is useful if you are developing code that is not yet integrated into the `recog` package, already performed some renamings and need to catch up with the latest ones.
 The replacements are executed as described in the first case.
 
 ## EXAMPLE
 
 This example covers the use case for developers of the recog package.
 
-Change the `renamings_to_execute.csv` file, so it looks like this:
+Create the `renamings_to_execute.csv` file, so it looks like this:
 
     OLD NAME,NEW NAME,TYPE
     FindHomDbPerm,MoreDescriptiveNewName,Attr
 
 Inside the package directory do:
 
-    git add renamings_to_execute.csv
-    git commit -m "Rename Functions"
     gap rename.g
 
 Now the renamings that were stored inside the `renamings_to_execute.csv` file have been executed.
@@ -76,7 +74,8 @@ It is recommended to run `gap tst/testquick.g` or `gap tst/testall.g` and ensure
 On failure you can always roll back to the last commit, i.e. the version before
 applying the renamings. For example one could type in the command `git reset --hard`.
 
-On success add the changed files:
+On success add and commit the changed files but make sure not to add the `renamings_to_execute.csv`:
 
     git add *
-    git commit --amend
+    git reset renamings_to_execute.csv
+    git commit

@@ -32,51 +32,44 @@ local input;
     fi;
 end;
 
-# Returns true on failed check. Helper method of CheckRenamingTable.
-# Check fails if there exist duplicate entries in colA and colB.
-# If isFirstInHistory is true, then colA is from the renamings_history.csv file,
-# otherwise from the renamings_to_execute.csv file.
-# colB is always from the renamins_to_execute.csv file.
-CheckRenamingTableForDuplicates := function(colA, colB, colNameA, colNameB, isFirstInHistory, message)
-local failedCheck, toTest, word, posA, posB, fileA, fileB;
+# Checks a column col as follows.
+# The columns is from the renamings_to_execute.csv file.
+# The function checks whether col contains any word twice or more times.
+# If a duplicate is found the function returns true.
+# This is a helper function of CheckRenamingTable.
+CheckRenamingTableForDuplicates := function(col, colName, message)
+local failedCheck, toTest, word, i;
     
-    if colNameA = colNameB and isFirstInHistory = false then
-        toTest := Filtered(DuplicateFreeList(colA), x -> Number(colA, y -> y = x) > 1);
-    else
-        toTest := Intersection(colA, colB);
-    fi;
+    toTest := Filtered(DuplicateFreeList(col), x -> Number(col, y -> y = x) > 1);
     failedCheck := not IsEmpty(toTest);
     while not IsEmpty(toTest) do
         word := Remove(toTest);
-        if isFirstInHistory then
-            posA := First([1..Length(colA)], i -> colA[i] = word);
-            fileA := "renamings_history.csv";
-            posB := First([1..Length(colB)], i -> colB[i] = word);
-            fileB := "renamings_to_execute.csv";
-        else
-            posA := First([1..Length(colA)], i -> colA[i] = word);
-            fileA := "renamings_to_execute.csv";
-            if colNameA = colNameB then
-                posB := First([1..Length(colB)] + posA, i -> colB[i] = word);
-                fileB := "renamings_to_execute.csv";
-            else
-                posB := First([1..Length(colB)], i -> colB[i] = word);
-                fileB := "renamings_to_execute.csv";
+        Print(message,"\n\tThe word \'",word,"\' is located \n");
+        for i in [1..Length(col)] do
+            if col[i] = word then
+                Print("\tin line ",i+1," in column \'",colName,"\' in file \'","renamings_to_execute.csv","\'\n");
             fi;
-        fi;
-
-        Print(message,"\n\tThe word \'",word,"\' is located \n\tin line ",posA+1," in column \'",colNameA,"\' in file \'",fileA,"\' and\n\tin line ",posB+1," in column \'",colNameB,"\' in file \'",fileB,"\'\n");
+        od;
     od;
     return failedCheck;
 end;
 
-# Returns true on failed check. Helper method of CheckRenamingTable.
-# Check fails if grep returns failureInt on search of a word in col.
-# failureInt is either 0 or 1.
-CheckExistenceOfWord := function(col, colName, failureInt, message)
-local failedCheck, pos, word, result, dir, grep, streamIn, streamOut;
+# Checks a column col as follows.
+# The column is from the renamings_to_execute.csv file.
+# The parameter shouldExist is a boolean that determines the output of the function.
+# If shouldExist is true and all words in col exist in the recog package,
+# then the function returns false.
+# If shouldExist is false and all words in col do not exist in the recog package,
+# then the function returns false.
+# This is a helper function of CheckRenamingTable.
+CheckExistenceOfWord := function(col, colName, shouldExist, message)
+local failedCheck, failureInt, pos, word, result, dir, grep, streamIn, streamOut;
 
     failedCheck := false;
+    failureInt := 0;
+    if shouldExist = true then
+        failureInt := 1;
+    fi;
     for pos in [1..Length(col)] do
         word := col[pos];
         dir := DirectoryCurrent();
@@ -97,8 +90,8 @@ local failedCheck, pos, word, result, dir, grep, streamIn, streamOut;
 end;
 
 # Returns true on failed check.
-CheckRenamingTable := function(csvHistory, csvToExecute)
-local colOldInHistory, colNewInHistory, colOldInToExecute, colNewInToExecute, colTypeInToExecute,
+CheckRenamingTable := function(csvToExecute)
+local colOld, colNew, colType,
       foundWarning, foundError, failedCheck, toTest, message, typeList, wrongTypes, wrongType;
 
     if NamesOfComponents(csvToExecute[1]) <> ["OLD_NAME","NEW_NAME","TYPE"] then
@@ -107,29 +100,23 @@ local colOldInHistory, colNewInHistory, colOldInToExecute, colNewInToExecute, co
        return true;
     fi;
 
-    colOldInHistory := List([1..Length(csvHistory)], i -> csvHistory[i].OLD_NAME);
-    colNewInHistory := List([1..Length(csvHistory)], i -> csvHistory[i].NEW_NAME);
-    colOldInToExecute := List([1..Length(csvToExecute)], i -> csvToExecute[i].OLD_NAME);
-    colNewInToExecute := List([1..Length(csvToExecute)], i -> csvToExecute[i].NEW_NAME);
-    colTypeInToExecute := List([1..Length(csvToExecute)], i -> csvToExecute[i].TYPE);
+    colOld := List([1..Length(csvToExecute)], i -> csvToExecute[i].OLD_NAME);
+    colNew := List([1..Length(csvToExecute)], i -> csvToExecute[i].NEW_NAME);
+    colType := List([1..Length(csvToExecute)], i -> csvToExecute[i].TYPE);
 
     foundWarning := false;
     foundError := false;
 
     message := "ERROR : Attempt to rename a function twice.";
-    failedCheck := CheckRenamingTableForDuplicates(colOldInToExecute, colOldInToExecute, "OLD NAME", "OLD NAME", false, message);
+    failedCheck := CheckRenamingTableForDuplicates(colOld, "OLD NAME", message);
     foundError := foundError or failedCheck;
 
     message := "ERROR : Attempt to use a new name twice.";
-    failedCheck := CheckRenamingTableForDuplicates(colNewInToExecute, colNewInToExecute, "NEW NAME", "NEW NAME", false, message);
+    failedCheck := CheckRenamingTableForDuplicates(colNew, "NEW NAME", message);
     foundError := foundError or failedCheck;
 
     message := "ERROR : Attempt to rename to an existing function.";
-    failedCheck := CheckExistenceOfWord(colNewInToExecute, "NEW NAME", 0, message);
-    foundError := foundError or failedCheck;
-
-    message := "ERROR : Attempt to rename a non-existent function.";
-    failedCheck := CheckExistenceOfWord(colOldInToExecute, "OLD NAME", 1, message);
+    failedCheck := CheckExistenceOfWord(colNew, "NEW NAME", false, message);
     foundError := foundError or failedCheck;
 
     if foundError then
@@ -138,21 +125,15 @@ local colOldInHistory, colNewInHistory, colOldInToExecute, colNewInToExecute, co
     fi;
 
     typeList := ["Func", "Constr", "Meth", "Filt", "Prop", "Attr", "Var", "Fam", "InfoClass"];
-    wrongTypes := Filtered([1..Length(csvToExecute)], i -> not colTypeInToExecute[i] in typeList);
+    wrongTypes := Filtered([1..Length(csvToExecute)], i -> not colType[i] in typeList);
     while not IsEmpty(wrongTypes) do
         wrongType := Remove(wrongTypes);
-        Print("WARNING : Non-valid attribute for the Ref element in GAPDoc.\n\tThe wrong type is \'",colTypeInToExecute[wrongType],"\'\n\tin line ", wrongType+1," in column \'","TYPE","\' in file \'","renamings_to_execute.csv","\'\n");
+        Print("WARNING : Non-valid type for GAPDoc references.\n\tThe wrong type is \'",colType[wrongType],"\'\n\tin line ", wrongType+1," in column \'","TYPE","\' in file \'","renamings_to_execute.csv","\'\n");
         foundWarning := true;
     od;
 
-    message := "WARNING : Attempt to use a new name that was once an old name of a function.";
-    failedCheck := CheckRenamingTableForDuplicates(colOldInHistory, colNewInToExecute, "OLD NAME", "NEW NAME", true, message);
-    foundError := foundError or failedCheck;
-
-    message := "WARNING : Attempt to rename a function again. This is a renaming of the form X -> Y -> Z.";
-    failedCheck := CheckRenamingTableForDuplicates(colNewInHistory, colOldInToExecute, "NEW NAME", "OLD NAME", true, message);
-    foundWarning := foundWarning or failedCheck;
-    failedCheck := CheckRenamingTableForDuplicates(colNewInToExecute, colOldInToExecute, "NEW NAME", "OLD NAME", false, message);
+    message := "WARNING : Attempt to rename a non-existent function.";
+    failedCheck := CheckExistenceOfWord(colOld, "OLD NAME", true, message);
     foundWarning := foundWarning or failedCheck;
 
     if foundWarning then
@@ -186,17 +167,27 @@ local stringOut, dir, find, streamIn, streamOut, files, file, i;
 end;
 
 # Simplifies renamings of the form X_1 -> X_2 -> ... -> X_n by replacing them with X_1 -> X_n.
-# The csv file is considered to have duplicate-free columns 'OLD NAME' and 'NEW NAME'.
+# The csv is the current renamings_history.csv.
 SimplifyCSVForRenamingTable := function(csv)
-local colNew, colOld, word, posInNew, posInOld;
+local i, j, word;
 
-    colNew := List([1..Length(csv)], i -> csv[i].NEW_NAME);
-    colOld := List([1..Length(csv)], i -> csv[i].OLD_NAME);
-    for word in Intersection(colNew, colOld) do
-        posInNew := First([1..Length(csv)], i -> csv[i].NEW_NAME = word);
-        posInOld := First([1..Length(csv)], i -> csv[i].OLD_NAME = word);
-        csv[posInNew] := rec(OLD_NAME := csv[posInNew].OLD_NAME, NEW_NAME := csv[posInOld].NEW_NAME, TYPE := csv[posInOld].TYPE);
-        Remove(csv, posInOld);
+    i := 1;
+    while i <= Length(csv) do
+        word := csv[i].NEW_NAME;
+        j := i + 1;
+        while j <= Length(csv) do
+            if csv[j].OLD_NAME = word then
+                if csv[i].TYPE <> csv[j].TYPE then
+                    Print("WARNING : A type has changed in a renaming of the form 'X -> Y -> Z'.\n\tThe type has changed for the word 'Y' = \'",word,"\'\n");
+                fi;
+                csv[i] := rec(OLD_NAME := csv[i].OLD_NAME, NEW_NAME := csv[j].NEW_NAME, TYPE := csv[j].TYPE);
+                word := csv[i].NEW_NAME;
+                Remove(csv, j);
+            else
+                j := j + 1;
+            fi;
+        od;
+        i := i + 1;
     od;
 end;
 
@@ -212,8 +203,8 @@ local xmlfile, csv, i;
     AppendTo(xmlfile, "<HorLine/>\n");
 
     AppendTo(xmlfile, "<Row>\n");
-    AppendTo(xmlfile, "\t<Item> <E>","OLD NAME","</E> </Item>\n");
-    AppendTo(xmlfile, "\t<Item> <E>","NEW NAME","</E> </Item>\n");
+    AppendTo(xmlfile, "\t<Item> <E>","Old Name","</E> </Item>\n");
+    AppendTo(xmlfile, "\t<Item> <E>","New Name","</E> </Item>\n");
     AppendTo(xmlfile, "</Row>\n");
     AppendTo(xmlfile, "<HorLine/>\n");
 
@@ -236,23 +227,24 @@ RunRenaming := function()
 local csvHistory, csvToExecute, message;
 
     csvHistory := ReadCSV("renamings_history.csv");
-    csvToExecute := ReadCSV("renamings_to_execute.csv");
 
-    if IsEmpty(csvToExecute) then
-        message := "The renamings_to_execute.csv is empty.\nDo you want to rename functions as specified in renamings_history.csv instead? [true/false]\n";
+    if Filename( [DirectoryCurrent()], "renamings_to_execute.csv" ) = fail then
+        message := "The renamings_to_execute.csv does not exist.\nDo you want to rename functions as specified in renamings_history.csv instead? [true/false]\n";
         if GetInputFromUser(message) = true then
             RenameFiles(csvHistory);
         else
             Print("Aborting.\n");
         fi;
-    elif CheckRenamingTable(csvHistory, csvToExecute) = false then
-        RenameFiles(csvToExecute);
+    else
+        csvToExecute := ReadCSV("renamings_to_execute.csv");
+        if CheckRenamingTable(csvToExecute) = false then
+            RenameFiles(csvToExecute);
         
-        PrintCSV("renamings_history.csv", Concatenation(csvHistory, csvToExecute), ["OLD_NAME", "NEW_NAME", "TYPE"]);
-        PrintTo("renamings_to_execute.csv", "OLD NAME,NEW NAME,TYPE");
+            PrintCSV("renamings_history.csv", Concatenation(csvHistory, csvToExecute), ["OLD_NAME", "NEW_NAME", "TYPE"]);
 
-        GenerateRenamingTable();
-        Read("makedoc.g");
+            GenerateRenamingTable();
+            Read("makedoc.g");
+        fi;
     fi;
 end;
 
