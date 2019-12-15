@@ -43,13 +43,6 @@ Persons := [
     IsAuthor      := false,
     IsMaintainer  := false, 
     Email         := "bernhardt@mathb.rwth-aachen.de",
-    PostalAddress := Concatenation( [
-                     "Dominik Bernhardt\n",
-                     "RWTH Aachen University\n",
-                     "Lehrstuhl B für Mathematik\n",
-                     "Pontdriesch 10-16\n",
-                     "52062 Aachen\n",
-                     "Germany" ] ),
     Place         := "Aachen",
     Institution   := "RWTH Aachen University"
   ),
@@ -66,12 +59,6 @@ Persons := [
     IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "pbrooksb@bucknell.edu",
-    PostalAddress := Concatenation( [
-                       "Peter A. Brooksbank\n",
-                       "Mathematics Department\n",
-                       "Bucknell University\n",
-                       "Lewisburg, PA 17837\n",
-                       "USA" ] ),
     Place         := "Lewisburg",
     Institution   := "Bucknell University"
   ),
@@ -91,12 +78,6 @@ rec(
     IsMaintainer  := false,
     Email         := "paula.haehndel@mathematik.uni-halle.de",
     WWWHome       := "https://algebra.mathematik.uni-halle.de/haehndel/",
-    PostalAddress := Concatenation( [
-                       "Paula Hähndel\n",
-                       "Georg-Cantor-Haus\n",
-                       "Theodor-Lieser-Str. 5\n",
-                       "06120 Halle (Saale)\n",
-                       "Germany" ] ),
     Place         := "Halle (Saale)",
     Institution   := "Martin Luther University of Halle-Wittenberg"
   ),
@@ -107,13 +88,6 @@ rec(
     IsMaintainer  := false,
     Email         := "hulpke@colostate.edu",
     WWWHome       := "https://www.math.colostate.edu/~hulpke/",
-    PostalAddress := Concatenation( [
-                       "Alexander Hulpke\n",
-                       "Department of Mathematics\n",
-                       "Colorado State University\n",
-                       "1874 Campus Delivery\n",
-                       "Fort Collins, CO 80523-1874\n",
-                       "USA" ] ),
     Place         := "Fort Collins",
     Institution   := "Colorado State University"
   ),
@@ -131,14 +105,6 @@ rec(
     IsMaintainer  := false,
     Email         := "caj21@st-andrews.ac.uk",
     WWWHome       := "https://caj.host.cs.st-andrews.ac.uk",
-    PostalAddress := Concatenation( [
-                       "Christopher Jefferson\n",
-                       "Jack Cole Building\n",
-                       "Colorado State University\n",
-                       "North Haugh\n",
-                       "St. Andrews\n",
-                       "KY16 9SX\n",
-                       "UK" ] ),
     Place         := "St. Andrews",
     Institution   := "University of St. Andrews"
   ),
@@ -148,13 +114,6 @@ rec(
     IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "maska@maths.uwa.edu.au",
-    PostalAddress := Concatenation( [
-                       "Maska Law\n",
-                       "University of Western Australia\n",
-                       "School of Mathematics and Statistics\n",
-                       "35 Stirling Highway\n",
-                       "Crawley 6009\n",
-                       "Western Australia" ] ),
     Place         := "Perth",
     Institution   := "University of Western Australia"
   ),
@@ -165,12 +124,6 @@ rec(
     IsMaintainer  := false,
     Email         := "sal@cs.st-andrews.ac.uk",
     WWWHome       := "http://www-groups.dcs.st-and.ac.uk/~sal/",
-    PostalAddress := Concatenation( [
-                       "School of Computer Science\n",
-                       "Jack Cole Building\n",
-                       "North Haugh\n",
-                       "St Andrews, Fife KY16 9SX\n",
-                       "Scotland, UK" ] ),
     Place         := "St Andrews",
     Institution   := "University of St Andrews"
   ),
@@ -191,13 +144,6 @@ rec(
     IsMaintainer  := false,
     Email         := "alice.niemeyer@mathb.rwth-aachen.de",
     WWWHome       := "http://www.math.rwth-aachen.de/~Alice.Niemeyer/",
-    PostalAddress := Concatenation( [
-                       "Alice Niemeyer\n",
-                       "RWTH Aachen University\n",
-                       "Lehrstuhl B für Mathematik\n",
-                       "Pontdriesch 10-16\n",
-                       "52062 Aachen\n",
-                       "Germany" ] ),
     Place         := "Aachen",
     Institution   := "RWTH Aachen University"
   ),
@@ -218,12 +164,6 @@ rec(
     IsMaintainer  := false,
     Email         := "colva@mcs.st-and.ac.uk",
     WWWHome       := "http://www-groups.dcs.st-and.ac.uk/~colva",
-    PostalAddress := Concatenation( [
-                       "School of Mathematics and Statistics\n",
-                       "Mathematical Institute\n",
-                       "North Haugh\n",
-                       "St Andrews, Fife KY16 9SS\n",
-                       "Scotland, UK" ] ),
     Place         := "St Andrews",
     Institution   := "University of St Andrews"
   ),
@@ -234,12 +174,6 @@ rec(
     IsMaintainer  := true,
     Email         := "max.horn@uni-siegen.de",
     WWWHome       := "https://www.quendi.de/math",
-    PostalAddress := Concatenation(
-                       "Department Mathematik\n",
-                       "Universität Siegen\n",
-                       "Walter-Flex-Straße 3\n",
-                       "57072 Siegen\n",
-                       "Germany" ),
     Place         := "Siegen",
     Institution   := "Universität Siegen"
   ),
@@ -250,11 +184,6 @@ rec(
     IsMaintainer  := false,
     Email         := "sergio@mathb.rwth-aachen.de",
     WWWHome       := "https://www.mathematik.rwth-aachen.de/go/id/bkbg/gguid/0x28CF75713F0B7744BEF1377FB3F6748E/ikz/11/allou/1/lidx/1/",
-    PostalAddress := Concatenation(
-                       "Lehr- und Forschungsgebiet Algebra",
-                       "Pontdriesch 10-16\n",
-                       "Aachen\n",
-                       "Germany" ),
     Place         := "Aachen",
     Institution   := "RWTH Aachen University"
   ), 
@@ -265,11 +194,6 @@ rec(
     IsMaintainer  := false,
     Email         := "wilfred.wilson@mathematik.uni-halle.de",
     WWWHome       := "https://www2.mathematik.uni-halle.de/wilson/",
-    PostalAddress := Concatenation(
-                       "Wilf Wilson\n",
-                       "Theodor-Lieser-Straße 5\n",
-                       "06120 Halle (Saale)\n",
-                       "Germany" ),
     Place         := "Halle",
     Institution   := "Martin Luther University of Halle-Wittenberg"
   ),
