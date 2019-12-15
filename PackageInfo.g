@@ -38,6 +38,22 @@ Persons := [
     IsMaintainer  := false,
   ),
   rec(
+    LastName      := "Bernhardt",
+    FirstNames    := "Dominik",
+    IsAuthor      := false,
+    IsMaintainer  := false, 
+    Email         := "bernhardt@mathb.rwth-aachen.de",
+    PostalAddress := Concatenation( [
+                     "Dominik Bernhardt\n",
+                     "RWTH Aachen University\n",
+                     "Lehrstuhl B für Mathematik\n",
+                     "Pontdriesch 10-16\n",
+                     "52062 Aachen\n",
+                     "Germany" ] ),
+    Place         := "Aachen",
+    Institution   := "RWTH Aachen University"
+  ),
+  rec(
     LastName      := "Ankaralioglu",
     FirstNames    := "Nurullah",
     IsAuthor      := false,
@@ -68,12 +84,63 @@ Persons := [
     Place         := "Aachen",
     Institution   := "Lehrstuhl D für Mathematik, RWTH Aachen",
   ),
+rec(
+    LastName      := "Hähndel",
+    FirstNames    := "Paula",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "paula.haehndel@mathematik.uni-halle.de",
+    WWWHome       := "https://algebra.mathematik.uni-halle.de/haehndel/",
+    PostalAddress := Concatenation( [
+                       "Paula Hähndel\n",
+                       "Georg-Cantor-Haus\n",
+                       "Theodor-Lieser-Str. 5\n",
+                       "06120 Halle (Saale)\n",
+                       "Germany" ] ),
+    Place         := "Halle (Saale)",
+    Institution   := "Martin Luther University of Halle-Wittenberg"
+  ),
+  rec(
+    LastName      := "Hulpke",
+    FirstNames    := "Alexander",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "hulpke@colostate.edu",
+    WWWHome       := "https://www.math.colostate.edu/~hulpke/",
+    PostalAddress := Concatenation( [
+                       "Alexander Hulpke\n",
+                       "Department of Mathematics\n",
+                       "Colorado State University\n",
+                       "1874 Campus Delivery\n",
+                       "Fort Collins, CO 80523-1874\n",
+                       "USA" ] ),
+    Place         := "Fort Collins",
+    Institution   := "Colorado State University"
+  ),
   rec(
     LastName      := "Howe",
     FirstNames    := "Stephen",
     IsAuthor      := false,
     IsMaintainer  := false,
     PostalAddress := "Unknown",
+  ),
+  rec(
+    LastName      := "Jefferson",
+    FirstNames    := "Christopher",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "caj21@st-andrews.ac.uk",
+    WWWHome       := "https://caj.host.cs.st-andrews.ac.uk",
+    PostalAddress := Concatenation( [
+                       "Christopher Jefferson\n",
+                       "Jack Cole Building\n",
+                       "Colorado State University\n",
+                       "North Haugh\n",
+                       "St. Andrews\n",
+                       "KY16 9SX\n",
+                       "UK" ] ),
+    Place         := "St. Andrews",
+    Institution   := "University of St. Andrews"
   ),
   rec(
     LastName      := "Law",
@@ -125,8 +192,9 @@ Persons := [
     Email         := "alice.niemeyer@mathb.rwth-aachen.de",
     WWWHome       := "http://www.math.rwth-aachen.de/~Alice.Niemeyer/",
     PostalAddress := Concatenation( [
-                       "Lehrstuhl B für Mathematik\n",
+                       "Alice Niemeyer\n",
                        "RWTH Aachen University\n",
+                       "Lehrstuhl B für Mathematik\n",
                        "Pontdriesch 10-16\n",
                        "52062 Aachen\n",
                        "Germany" ] ),
@@ -174,6 +242,46 @@ Persons := [
                        "Germany" ),
     Place         := "Siegen",
     Institution   := "Universität Siegen"
+  ),
+ rec(
+    LastName      := "Siccha",
+    FirstNames    := "Sergio",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "sergio@mathb.rwth-aachen.de",
+    WWWHome       := "https://www.mathematik.rwth-aachen.de/go/id/bkbg/gguid/0x28CF75713F0B7744BEF1377FB3F6748E/ikz/11/allou/1/lidx/1/",
+    PostalAddress := Concatenation(
+                       "Lehr- und Forschungsgebiet Algebra",
+                       "Pontdriesch 10-16\n",
+                       "Aachen\n",
+                       "Germany" ),
+    Place         := "Aachen",
+    Institution   := "RWTH Aachen University"
+  ), 
+  rec(
+    LastName      := "Wilson",
+    FirstNames    := "Wilf",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "wilfred.wilson@mathematik.uni-halle.de",
+    WWWHome       := "https://www2.mathematik.uni-halle.de/wilson/",
+    PostalAddress := Concatenation(
+                       "Wilf Wilson\n",
+                       "Theodor-Lieser-Straße 5\n",
+                       "06120 Halle (Saale)\n",
+                       "Germany" ),
+    Place         := "Halle",
+    Institution   := "Martin Luther University of Halle-Wittenberg"
+  ),
+rec(
+    LastName      := "Whybrow",
+    FirstNames    := "Madeleine",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "madeleine.whybrow@famnit.upr.si",
+    WWWHome       := "https://madeleinewhybrow.wordpress.com/contact/",
+    Place         := "Primorska",
+    Institution   := "University of Primorska"
   ),
 ],
 
