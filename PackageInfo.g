@@ -17,7 +17,7 @@
 SetPackageInfo( rec(
 
 PackageName := "recog",
-Subtitle := "A collection of group recognition methods",
+Subtitle := "A package for constructive recognition of permutation and matrix groups",
 Version := "1.3.2dev",
 Date := "09/07/2019", # dd/mm/yyyy format
 License := "GPL-3.0-or-later",
