@@ -96,7 +96,6 @@ rec(
     FirstNames    := "Stephen",
     IsAuthor      := false,
     IsMaintainer  := false,
-    PostalAddress := "Unknown",
   ),
   rec(
     LastName      := "Jefferson",
@@ -105,8 +104,8 @@ rec(
     IsMaintainer  := false,
     Email         := "caj21@st-andrews.ac.uk",
     WWWHome       := "https://caj.host.cs.st-andrews.ac.uk",
-    Place         := "St. Andrews",
-    Institution   := "University of St. Andrews"
+    Place         := "St Andrews",
+    Institution   := "University of St Andrews"
   ),
   rec(
     LastName      := "Law",
@@ -192,10 +191,8 @@ rec(
     FirstNames    := "Wilf",
     IsAuthor      := false,
     IsMaintainer  := false,
-    Email         := "wilfred.wilson@mathematik.uni-halle.de",
-    WWWHome       := "https://www2.mathematik.uni-halle.de/wilson/",
-    Place         := "Halle",
-    Institution   := "Martin Luther University of Halle-Wittenberg"
+    Email         := "gap@wilf-wilson.net",
+    WWWHome       := "http://wilf.me"
   ),
 rec(
     LastName      := "Whybrow",
