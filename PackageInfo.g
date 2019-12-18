@@ -17,7 +17,7 @@
 SetPackageInfo( rec(
 
 PackageName := "recog",
-Subtitle := "A collection of group recognition methods",
+Subtitle := "A package for constructive recognition of permutation and matrix groups",
 Version := "1.3.2dev",
 Date := "09/07/2019", # dd/mm/yyyy format
 License := "GPL-3.0-or-later",
@@ -38,6 +38,16 @@ Persons := [
     IsMaintainer  := false,
   ),
   rec(
+    LastName      := "Bernhardt",
+    FirstNames    := "Dominik",
+    IsAuthor      := false,
+    IsMaintainer  := false, 
+    Email         := "bernhardt@mathb.rwth-aachen.de",
+    Place         := "Aachen",
+    Institution   := "RWTH Aachen University",
+    WWWHome       := "https://www.mathb.rwth-aachen.de/cms/MATHB/Der-Lehrstuhl/Team/Wissenschaftliche-Beschaeftigte/~rnsg/Dominik-Bernhardt/lidx/1/"
+  ),
+  rec(
     LastName      := "Ankaralioglu",
     FirstNames    := "Nurullah",
     IsAuthor      := false,
@@ -50,12 +60,6 @@ Persons := [
     IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "pbrooksb@bucknell.edu",
-    PostalAddress := Concatenation( [
-                       "Peter A. Brooksbank\n",
-                       "Mathematics Department\n",
-                       "Bucknell University\n",
-                       "Lewisburg, PA 17837\n",
-                       "USA" ] ),
     Place         := "Lewisburg",
     Institution   := "Bucknell University"
   ),
@@ -68,12 +72,41 @@ Persons := [
     Place         := "Aachen",
     Institution   := "Lehrstuhl D für Mathematik, RWTH Aachen",
   ),
+rec(
+    LastName      := "Hähndel",
+    FirstNames    := "Paula",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "paula.haehndel@mathematik.uni-halle.de",
+    WWWHome       := "https://algebra.mathematik.uni-halle.de/haehndel/",
+    Place         := "Halle (Saale)",
+    Institution   := "Martin-Luther-Universität Halle-Wittenberg"
+  ),
+  rec(
+    LastName      := "Hulpke",
+    FirstNames    := "Alexander",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "hulpke@colostate.edu",
+    WWWHome       := "https://www.math.colostate.edu/~hulpke/",
+    Place         := "Fort Collins",
+    Institution   := "Colorado State University"
+  ),
   rec(
     LastName      := "Howe",
     FirstNames    := "Stephen",
     IsAuthor      := false,
     IsMaintainer  := false,
-    PostalAddress := "Unknown",
+  ),
+  rec(
+    LastName      := "Jefferson",
+    FirstNames    := "Christopher",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "caj21@st-andrews.ac.uk",
+    WWWHome       := "https://caj.host.cs.st-andrews.ac.uk",
+    Place         := "St Andrews",
+    Institution   := "University of St Andrews"
   ),
   rec(
     LastName      := "Law",
@@ -81,13 +114,6 @@ Persons := [
     IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "maska@maths.uwa.edu.au",
-    PostalAddress := Concatenation( [
-                       "Maska Law\n",
-                       "University of Western Australia\n",
-                       "School of Mathematics and Statistics\n",
-                       "35 Stirling Highway\n",
-                       "Crawley 6009\n",
-                       "Western Australia" ] ),
     Place         := "Perth",
     Institution   := "University of Western Australia"
   ),
@@ -98,12 +124,6 @@ Persons := [
     IsMaintainer  := false,
     Email         := "sal@cs.st-andrews.ac.uk",
     WWWHome       := "http://www-groups.dcs.st-and.ac.uk/~sal/",
-    PostalAddress := Concatenation( [
-                       "School of Computer Science\n",
-                       "Jack Cole Building\n",
-                       "North Haugh\n",
-                       "St Andrews, Fife KY16 9SX\n",
-                       "Scotland, UK" ] ),
     Place         := "St Andrews",
     Institution   := "University of St Andrews"
   ),
@@ -124,12 +144,6 @@ Persons := [
     IsMaintainer  := false,
     Email         := "alice.niemeyer@mathb.rwth-aachen.de",
     WWWHome       := "http://www.math.rwth-aachen.de/~Alice.Niemeyer/",
-    PostalAddress := Concatenation( [
-                       "Lehrstuhl B für Mathematik\n",
-                       "RWTH Aachen University\n",
-                       "Pontdriesch 10-16\n",
-                       "52062 Aachen\n",
-                       "Germany" ] ),
     Place         := "Aachen",
     Institution   := "RWTH Aachen University"
   ),
@@ -150,12 +164,6 @@ Persons := [
     IsMaintainer  := false,
     Email         := "colva@mcs.st-and.ac.uk",
     WWWHome       := "http://www-groups.dcs.st-and.ac.uk/~colva",
-    PostalAddress := Concatenation( [
-                       "School of Mathematics and Statistics\n",
-                       "Mathematical Institute\n",
-                       "North Haugh\n",
-                       "St Andrews, Fife KY16 9SS\n",
-                       "Scotland, UK" ] ),
     Place         := "St Andrews",
     Institution   := "University of St Andrews"
   ),
@@ -166,14 +174,36 @@ Persons := [
     IsMaintainer  := true,
     Email         := "max.horn@uni-siegen.de",
     WWWHome       := "https://www.quendi.de/math",
-    PostalAddress := Concatenation(
-                       "Department Mathematik\n",
-                       "Universität Siegen\n",
-                       "Walter-Flex-Straße 3\n",
-                       "57072 Siegen\n",
-                       "Germany" ),
     Place         := "Siegen",
     Institution   := "Universität Siegen"
+  ),
+ rec(
+    LastName      := "Siccha",
+    FirstNames    := "Sergio",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "sergio@mathb.rwth-aachen.de",
+    WWWHome       := "https://www.mathematik.rwth-aachen.de/go/id/bkbg/gguid/0x28CF75713F0B7744BEF1377FB3F6748E/ikz/11/allou/1/lidx/1/",
+    Place         := "Aachen",
+    Institution   := "RWTH Aachen University"
+  ), 
+  rec(
+    LastName      := "Wilson",
+    FirstNames    := "Wilf",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "gap@wilf-wilson.net",
+    WWWHome       := "http://wilf.me"
+  ),
+rec(
+    LastName      := "Whybrow",
+    FirstNames    := "Madeleine",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "madeleine.whybrow@famnit.upr.si",
+    WWWHome       := "https://madeleinewhybrow.wordpress.com/contact/",
+    Place         := "Primorska",
+    Institution   := "University of Primorska"
   ),
 ],
 
