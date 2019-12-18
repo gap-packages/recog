@@ -44,7 +44,8 @@ Persons := [
     IsMaintainer  := false, 
     Email         := "bernhardt@mathb.rwth-aachen.de",
     Place         := "Aachen",
-    Institution   := "RWTH Aachen University"
+    Institution   := "RWTH Aachen University",
+    WWWHome       := "https://www.mathb.rwth-aachen.de/cms/MATHB/Der-Lehrstuhl/Team/Wissenschaftliche-Beschaeftigte/~rnsg/Dominik-Bernhardt/lidx/1/"
   ),
   rec(
     LastName      := "Ankaralioglu",
@@ -79,7 +80,7 @@ rec(
     Email         := "paula.haehndel@mathematik.uni-halle.de",
     WWWHome       := "https://algebra.mathematik.uni-halle.de/haehndel/",
     Place         := "Halle (Saale)",
-    Institution   := "Martin Luther University of Halle-Wittenberg"
+    Institution   := "Martin-Luther-Universität Halle-Wittenberg"
   ),
   rec(
     LastName      := "Hulpke",
