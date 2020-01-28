@@ -20,8 +20,6 @@
 DeclareInfoClass("InfoFindEvenNormal");
 SetInfoLevel(InfoFindEvenNormal,0);
 
-DeclareGlobalVariable("FINDEVENNORMALOPTS");
-
 # DeclareGlobalFunction("RECOG_IsNormal");
 
 # DeclareOperation( "FindEvenNormalSubgroup", [ IsGroup, IsRecord ] );

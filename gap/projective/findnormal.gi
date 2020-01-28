@@ -17,7 +17,7 @@
 ##
 #############################################################################
 
-InstallValue( FINDEVENNORMALOPTS, rec(
+BindGlobal( "FINDEVENNORMALOPTS", rec(
   # Try up to this limit random elements to find an involution:
   NonCentInvSearchLimit := 20,
   # Number of random elements for normal closure computation:
