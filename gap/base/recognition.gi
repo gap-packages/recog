@@ -17,35 +17,6 @@
 #############################################################################
 
 
-# First some technical preparations:
-
-# The type:
-
-InstallValue( RecognitionInfoType,
-  NewType(RecognitionInfoFamily, IsRecognitionInfo and IsAttributeStoringRep));
-
-
-# one can now create objects by doing:
-# r := rec( ... )
-# Objectify(RecognitionInfoType,r);
-
-
-InstallValue( FindHomMethodsPerm, rec() );
-InstallValue( SLPforElementFuncsPerm, rec() );
-InstallValue( FindHomDbPerm, [] );
-
-InstallValue( FindHomMethodsMatrix, rec() );
-InstallValue( SLPforElementFuncsMatrix, rec() );
-InstallValue( FindHomDbMatrix, [] );
-
-InstallValue( FindHomMethodsProjective, rec() );
-InstallValue( SLPforElementFuncsProjective, rec() );
-InstallValue( FindHomDbProjective, [] );
-
-InstallValue( FindHomMethodsGeneric, rec() );
-InstallValue( SLPforElementFuncsGeneric, rec() );
-
-
 # a nice view method:
 RECOG_ViewObj := function( level, ri )
     local ms;

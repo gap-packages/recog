@@ -17,9 +17,7 @@
 ##
 #############################################################################
 
-# DeclareGlobalVariable( "SUBFIELD" );  # for the subfield code
-
-InstallValue( SUBFIELD, rec() );
+BindGlobal( "SUBFIELD", rec() );
 
 SUBFIELD.ScalarToMultiplyIntoSmallerField := function(m,k)
   # This assumes that m is an invertible matrix over a finite field k.

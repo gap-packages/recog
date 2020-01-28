@@ -18,11 +18,12 @@
 
 # The category:
 DeclareCategory( "IsRecognitionInfo", IsObject );
-# The type:
-DeclareGlobalVariable( "RecognitionInfoType" );
 # The family:
 BindGlobal( "RecognitionInfoFamily",
   NewFamily("RecognitionInfoFamily", IsRecognitionInfo));
+# The type:
+BindGlobal( "RecognitionInfoType",
+  NewType(RecognitionInfoFamily, IsRecognitionInfo and IsAttributeStoringRep));
 
 
 # The info class:
@@ -328,7 +329,7 @@ DeclareAttribute( "order", IsRecognitionInfo, "mutable" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareGlobalVariable( "FindHomMethodsPerm" );
+BindGlobal( "FindHomMethodsPerm", rec() );
 
 ## <#GAPDoc Label="SLPforElementFuncsPerm">
 ## <ManSection>
@@ -341,7 +342,7 @@ DeclareGlobalVariable( "FindHomMethodsPerm" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareGlobalVariable( "SLPforElementFuncsPerm" );
+BindGlobal( "SLPforElementFuncsPerm", rec() );
 
 ## <#GAPDoc Label="FindHomDbPerm">
 ## <ManSection>
@@ -357,7 +358,7 @@ DeclareGlobalVariable( "SLPforElementFuncsPerm" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareGlobalVariable( "FindHomDbPerm" );
+BindGlobal( "FindHomDbPerm", [] );
 
 ## <#GAPDoc Label="FindHomMethodsMatrix">
 ## <ManSection>
@@ -370,7 +371,7 @@ DeclareGlobalVariable( "FindHomDbPerm" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareGlobalVariable( "FindHomMethodsMatrix" );
+BindGlobal( "FindHomMethodsMatrix", rec() );
 
 ## <#GAPDoc Label="SLPforElementFuncsMatrix">
 ## <ManSection>
@@ -383,7 +384,7 @@ DeclareGlobalVariable( "FindHomMethodsMatrix" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareGlobalVariable( "SLPforElementFuncsMatrix" );
+BindGlobal( "SLPforElementFuncsMatrix", rec() );
 
 ## <#GAPDoc Label="FindHomDbMatrix">
 ## <ManSection>
@@ -399,7 +400,7 @@ DeclareGlobalVariable( "SLPforElementFuncsMatrix" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareGlobalVariable( "FindHomDbMatrix" );
+BindGlobal( "FindHomDbMatrix", [] );
 
 ## <#GAPDoc Label="FindHomMethodsProjective">
 ## <ManSection>
@@ -412,7 +413,7 @@ DeclareGlobalVariable( "FindHomDbMatrix" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareGlobalVariable( "FindHomMethodsProjective" );
+BindGlobal( "FindHomMethodsProjective", rec() );
 
 ## <#GAPDoc Label="SLPforElementFuncsProjective">
 ## <ManSection>
@@ -425,7 +426,7 @@ DeclareGlobalVariable( "FindHomMethodsProjective" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareGlobalVariable( "SLPforElementFuncsProjective" );
+BindGlobal( "SLPforElementFuncsProjective", rec() );
 
 ## <#GAPDoc Label="FindHomDbProjective">
 ## <ManSection>
@@ -441,7 +442,7 @@ DeclareGlobalVariable( "SLPforElementFuncsProjective" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareGlobalVariable( "FindHomDbProjective" );
+BindGlobal( "FindHomDbProjective", [] );
 
 ## <#GAPDoc Label="FindHomMethodsGeneric">
 ## <ManSection>
@@ -454,7 +455,7 @@ DeclareGlobalVariable( "FindHomDbProjective" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareGlobalVariable( "FindHomMethodsGeneric" );
+BindGlobal( "FindHomMethodsGeneric", rec() );
 
 ## <#GAPDoc Label="SLPforElementFuncsGeneric">
 ## <ManSection>
@@ -467,7 +468,7 @@ DeclareGlobalVariable( "FindHomMethodsGeneric" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareGlobalVariable( "SLPforElementFuncsGeneric" );
+BindGlobal( "SLPforElementFuncsGeneric", rec() );
 
 
 # Our global functions for the main recursion:
