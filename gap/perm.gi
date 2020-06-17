@@ -415,43 +415,118 @@ FindHomMethodsPerm.Pcgs :=
 
 # The following commands install the above methods into the database:
 
-AddMethod(FindHomDbPerm, FindHomMethodsGeneric.TrivialGroup,
-          300, "TrivialGroup",
-          "just go through generators and compare to the identity");
-AddMethod(FindHomDbPerm, FindHomMethodsPerm.ThrowAwayFixedPoints,
-          100, "ThrowAwayFixedPoints",
-          "try to find a huge amount of (possible internal) fixed points");
-AddMethod(FindHomDbPerm, FindHomMethodsGeneric.FewGensAbelian,
-          99, "FewGensAbelian",
-         "if very few generators, check IsAbelian and if yes, do KnownNilpotent");
-AddMethod(FindHomDbPerm, FindHomMethodsPerm.Pcgs,
-          97, "Pcgs",
-          "use a Pcgs to calculate a stabilizer chain" );
-AddMethod(FindHomDbPerm, FindHomMethodsPerm.MovesOnlySmallPoints,
-          95, "MovesOnlySmallPoints",
-          "calculate a stabilizer chain if only small points are moved");
-AddMethod(FindHomDbPerm, FindHomMethodsPerm.NonTransitive,
-          90, "NonTransitive",
-          "try to find non-transitivity and restrict to orbit");
-AddMethod( FindHomDbPerm, FindHomMethodsPerm.Giant,
-          80, "Giant",
-          "tries to find Sn and An in their natural actions" );
-AddMethod(FindHomDbPerm, FindHomMethodsPerm.Imprimitive,
-          70, "Imprimitive",
-          "for a imprimitive permutation group, restricts to block system");
-AddMethod(FindHomDbPerm, FindHomMethodsPerm.LargeBasePrimitive,
-          60, "LargeBasePrimitive",
-          "recognises large-base primitive permutation groups" );
-AddMethod(FindHomDbPerm, FindHomMethodsPerm.StabilizerChainPerm,
-          55, "StabilizerChainPerm",
-          Concatenation(
-              "for a permutation group using a stabilizer chain via the ",
-              "<URL Text=\"genss package\">",
-              "https://gap-packages.github.io/genss/",
-              "</URL>"
-          ));
-AddMethod(FindHomDbPerm, FindHomMethodsPerm.StabChain,
-          50, "StabChain",
-          "for a permutation group using a stabilizer chain");
+AddMethod(
+    FindHomDbPerm,
+    rec(
+        method := FindHomMethodsGeneric.TrivialGroup,
+        rank := 300,
+        stamp := "TrivialGroup",
+        comment := "just go through generators and compare to the identity",
+    )
+);
+AddMethod(
+    FindHomDbPerm,
+    rec(
+        method := FindHomMethodsPerm.ThrowAwayFixedPoints,
+        rank := 100,
+        stamp := "ThrowAwayFixedPoints",
+        comment := "try to find a huge amount of (possible internal) fixed points",
+    )
+);
+
+AddMethod(
+    FindHomDbPerm,
+    rec(
+        method := FindHomMethodsGeneric.FewGensAbelian,
+        rank := 99,
+        stamp := "FewGensAbelian",
+        comment := "if very few generators, check IsAbelian and if yes, do KnownNilpotent",
+    )
+);
+
+AddMethod(
+    FindHomDbPerm,
+    rec(
+        method := FindHomMethodsPerm.Pcgs,
+        rank := 97,
+        stamp := "Pcgs",
+        comment := "use a Pcgs to calculate a stabilizer chain",
+    )
+);
+
+AddMethod(
+    FindHomDbPerm,
+    rec(
+        method := FindHomMethodsPerm.MovesOnlySmallPoints,
+        rank := 95,
+        stamp := "MovesOnlySmallPoints",
+        comment := "calculate a stabilizer chain if only small points are moved",
+    )
+);
+
+AddMethod(
+    FindHomDbPerm,
+    rec(
+        method := FindHomMethodsPerm.NonTransitive,
+        rank := 90,
+        stamp := "NonTransitive",
+        comment := "try to find non-transitivity and restrict to orbit",
+    )
+);
+
+AddMethod(
+    FindHomDbPerm,
+    rec(
+        method := FindHomMethodsPerm.Giant,
+        rank := 80,
+        stamp := "Giant",
+        comment := "tries to find Sn and An in their natural actions",
+    )
+);
+
+AddMethod(
+    FindHomDbPerm,
+    rec(
+        method := FindHomMethodsPerm.Imprimitive,
+        rank := 70,
+        stamp := "Imprimitive",
+        comment := "for a imprimitive permutation group, restricts to block system",
+    )
+);
+
+AddMethod(
+    FindHomDbPerm,
+    rec(
+        method := FindHomMethodsPerm.LargeBasePrimitive,
+        rank := 60,
+        stamp := "LargeBasePrimitive",
+        comment := "recognises large-base primitive permutation groups",
+    )
+);
+
+AddMethod(
+    FindHomDbPerm,
+    rec(
+        method := FindHomMethodsPerm.StabilizerChainPerm,
+        rank := 55,
+        stamp := "StabilizerChainPerm",
+        comment := Concatenation(
+            "for a permutation group using a stabilizer chain via the ",
+            "<URL Text=\"genss package\">",
+            "https://gap-packages.github.io/genss/",
+            "</URL>"
+        ),
+    )
+);
+AddMethod(
+    FindHomDbPerm,
+    rec(
+        method := FindHomMethodsPerm.StabChain,
+        rank := 50,
+        stamp := "StabChain",
+        comment := "for a permutation group using a stabilizer chain",
+    )
+);
+
 
 # Note that the last one will always succeed!

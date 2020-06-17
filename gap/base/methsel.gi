@@ -20,28 +20,22 @@
 # Add a method to a database with "AddMethod" and call a method from a
 # database with "CallMethods".
 #
-InstallGlobalFunction( "AddMethod", function(arg)
-  # First argument is the method database, second is the method itself,
-  # third is the rank, fourth is the stamp. An optional 5th argument is
-  # the comment.
-  local comment,db,i,l,mr,p;
-  if Length(arg) < 4 or Length(arg) > 5 then
-      ErrorNoReturn("Usage: AddMethod(database,method,rank,stamp [,comment] );");
-  fi;
-  db := arg[1];
-  mr := rec(method := arg[2],rank := arg[3],stamp := arg[4]);
-  if Length(arg) = 5 then
-      mr.comment := arg[5];
-  else
-      mr.comment := "";
-  fi;
-  l := Length(db);
-  p := First([1..l],i->db[i].rank <= mr.rank);
-  if p = fail then
-      Add(db,mr);
-  else
-      Add(db,mr,p);
-  fi;
+InstallGlobalFunction("AddMethod", function(methodDb, method)
+    local l, pos;
+    if not IsSubsetSet(NamesOfComponents(method),
+                       ["method", "rank", "stamp"]) then
+        ErrorNoReturn("<method> must have components",
+                      " method, rank, and stamp");
+    fi;
+    if not IsBound(method.comment) then
+        method.comment := "";
+    fi;
+    l := Length(methodDb);
+    pos := First([1 .. l], i -> methodDb[i].rank <= method.rank);
+    if pos = fail then
+        pos := l + 1;
+    fi;
+    Add(methodDb, method, pos);
 end);
 
 
