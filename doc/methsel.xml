@@ -82,8 +82,9 @@ a record with the following components bound:
 
 The different methods for a certain task are collected in so-called
 <Q>method databases</Q>. A <E>method database</E> is just a list of records,
-each describing a method in the format described above. Usually, the
-ranks will be descending, but that is not necessary.<P/>
+each describing a method in the format described above. During method selection,
+the methods are tried in the order in which they are stored in the database.
+Thus they should be stored in rank-descending order.<P/>
 
 There is one convenience function to put a new method into a method database:
 
