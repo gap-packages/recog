@@ -932,24 +932,65 @@ end;
 #  return true;
 #end;
 
-AddMethod( FindHomDbMatrix, FindHomMethodsGeneric.TrivialGroup,
-  3100, "TrivialGroup",
-        "check whether all generators are equal to the identity matrix" );
-AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.DiagonalMatrices,
-  1100, "DiagonalMatrices",
-        "check whether all generators are diagonal matrices" );
-AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.KnownStabilizerChain,
-  1175, "KnownStabilizerChain",
-        "use an already known stabilizer chain for this group" );
-AddMethod( FindHomDbMatrix, FindHomMethodsGeneric.FewGensAbelian,
-  1050, "FewGensAbelian",
-     "if very few generators, check IsAbelian and if yes, do KnownNilpotent");
-AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.ReducibleIso,
-  1000, "ReducibleIso",
-        "use the MeatAxe to find invariant subspaces" );
-AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.GoProjective,
-   900, "GoProjective",
-        "divide out scalars and recognise projectively" );
+AddMethod(
+    FindHomDbMatrix,
+    rec(
+        method := FindHomMethodsGeneric.TrivialGroup,
+        rank := 3100,
+        stamp := "TrivialGroup",
+        comment := "check whether all generators are equal to the identity matrix",
+    )
+);
+
+AddMethod(
+    FindHomDbMatrix,
+    rec(
+        method := FindHomMethodsMatrix.DiagonalMatrices,
+        rank := 1100,
+        stamp := "DiagonalMatrices",
+        comment := "check whether all generators are diagonal matrices",
+    )
+);
+
+AddMethod(
+    FindHomDbMatrix,
+    rec(
+        method := FindHomMethodsMatrix.KnownStabilizerChain,
+        rank := 1175,
+        stamp := "KnownStabilizerChain",
+        comment := "use an already known stabilizer chain for this group",
+    )
+);
+
+AddMethod(
+    FindHomDbMatrix,
+    rec(
+        method := FindHomMethodsGeneric.FewGensAbelian,
+        rank := 1050,
+        stamp := "FewGensAbelian",
+        comment := "if very few generators, check IsAbelian and if yes, do KnownNilpotent",
+    )
+);
+
+AddMethod(
+    FindHomDbMatrix,
+    rec(
+        method := FindHomMethodsMatrix.ReducibleIso,
+        rank := 1000,
+        stamp := "ReducibleIso",
+        comment := "use the MeatAxe to find invariant subspaces",
+    )
+);
+
+AddMethod(
+    FindHomDbMatrix,
+    rec(
+        method := FindHomMethodsMatrix.GoProjective,
+        rank := 900,
+        stamp := "GoProjective",
+        comment := "divide out scalars and recognise projectively",
+    )
+);
 
 ###AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.SmallVectorSpace,
 ###           700, "SmallVectorSpace",

@@ -3,7 +3,7 @@
 ############################################################################
 
 FindHomMethodsPerm.Cyclic2 :=
-   function(ri,H)
+   function(ri, H)
      local gens,i;
      # Test applicability (this would no longer be necessary, because we
      # are called only for permutation groups anyway. However, this is an
@@ -32,18 +32,19 @@ FindHomMethodsPerm.Cyclic2 :=
    end;
 
 SLPforElementFuncsPerm.Cyclic2 :=
-   function( ri, g )
+   function(ri, g)
      if IsOne(g) then
-         return StraightLineProgram( [ [1,0] ], 1 );
+         return StraightLineProgram([[1, 0]], 1);
      else
-         return StraightLineProgram( [ [1,1] ], 1 );
+         return StraightLineProgram([[1, 1]], 1);
      fi;
    end;
 
 # The following would install this method with a very low rank if we would
 # like to:
 #
-# AddMethod( FindHomDbPerm, FindHomMethodsPerm.Cyclic2,
-#            1, "Cyclic2",
-#            "cheat: find a Cyclic2" );
-
+# AddMethod(FindHomDbPerm,
+#           rec(method := FindHomMethodsPerm.Cyclic2,
+#               rank := 1,
+#               stamp := "Cyclic2",
+#               comment := "find a Cyclic2"));

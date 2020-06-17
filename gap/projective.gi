@@ -287,71 +287,204 @@ end;
 
 # The method installations:
 
-AddMethod( FindHomDbProjective, FindHomMethodsGeneric.TrivialGroup,
-  3000, "TrivialGroup",
-        "check if all generators are scalar multiples of the identity matrix" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.ProjDeterminant,
-  1300, "ProjDeterminant",
-        "find homomorphism to non-zero scalars mod d-th powers" );
-AddMethod( FindHomDbProjective, FindHomMethodsGeneric.FewGensAbelian,
-  1250, "FewGensAbelian",
-     "if very few generators, check IsAbelian and if yes, do KnownNilpotent");
+AddMethod(
+    FindHomDbProjective,
+    rec(
+        method := FindHomMethodsGeneric.TrivialGroup,
+        rank := 3000,
+        stamp := "TrivialGroup",
+        comment := "check if all generators are scalar multiples of the identity matrix",
+    )
+);
+
+AddMethod(
+    FindHomDbProjective,
+    rec(
+        method := FindHomMethodsProjective.ProjDeterminant,
+        rank := 1300,
+        stamp := "ProjDeterminant",
+        comment := "find homomorphism to non-zero scalars mod d-th powers",
+    )
+);
+
+AddMethod(
+    FindHomDbProjective,
+    rec(
+        method := FindHomMethodsGeneric.FewGensAbelian,
+        rank := 1250,
+        stamp := "FewGensAbelian",
+        comment := "if very few generators, check IsAbelian and if yes, do KnownNilpotent",
+    )
+);
+
 # Note that we *can* in fact use the Matrix method here, because it
 # will do the right thing when used in projective mode:
-AddMethod( FindHomDbProjective, FindHomMethodsMatrix.ReducibleIso,
-  1200, "ReducibleIso",
-        "use MeatAxe to find a composition series, do base change" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.NotAbsolutelyIrred,
-  1100, "NotAbsolutelyIrred",
-        "write over a bigger field with smaller degree" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.ClassicalNatural,
-  1050, "ClassicalNatural",
-        "check whether it is a classical group in its natural representation" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.Subfield,
-  1000, "Subfield",
-        "write over a smaller field with same degree" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.C3C5,
-  900, "C3C5",
-        "compute a normal subgroup of derived and resolve C3 and C5" );
+AddMethod(
+    FindHomDbProjective,
+    rec(
+        method := FindHomMethodsMatrix.ReducibleIso,
+        rank := 1200,
+        stamp := "ReducibleIso",
+        comment := "use MeatAxe to find a composition series, do base change",
+    )
+);
+
+AddMethod(
+    FindHomDbProjective,
+    rec(
+        method := FindHomMethodsProjective.NotAbsolutelyIrred,
+        rank := 1100,
+        stamp := "NotAbsolutelyIrred",
+        comment := "write over a bigger field with smaller degree",
+    )
+);
+
+AddMethod(
+    FindHomDbProjective,
+    rec(
+        method := FindHomMethodsProjective.ClassicalNatural,
+        rank := 1050,
+        stamp := "ClassicalNatural",
+        comment := "check whether it is a classical group in its natural representation",
+    )
+);
+
+AddMethod(
+    FindHomDbProjective,
+    rec(
+        method := FindHomMethodsProjective.Subfield,
+        rank := 1000,
+        stamp := "Subfield",
+        comment := "write over a smaller field with same degree",
+    )
+);
+
+AddMethod(
+    FindHomDbProjective,
+    rec(
+        method := FindHomMethodsProjective.C3C5,
+        rank := 900,
+        stamp := "C3C5",
+        comment := "compute a normal subgroup of derived and resolve C3 and C5",
+    )
+);
+
 #AddMethod( FindHomDbProjective, FindHomMethodsProjective.Derived,
 #   900, "Derived",
 #        "restrict to derived subgroup" );
 # Superseded by C3C5.
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.C6,
-   850, "C6",
-        "find either an (imprimitive) action or a symplectic one" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.D247,
-   840, "D247",
-        "play games to find a normal subgroup" );
+AddMethod(
+    FindHomDbProjective,
+    rec(
+        method := FindHomMethodsProjective.C6,
+        rank := 850,
+        stamp := "C6",
+        comment := "find either an (imprimitive) action or a symplectic one",
+    )
+);
+
+AddMethod(
+    FindHomDbProjective,
+    rec(
+        method := FindHomMethodsProjective.D247,
+        rank := 840,
+        stamp := "D247",
+        comment := "play games to find a normal subgroup",
+    )
+);
+
 # We can do the following early on since it will quickly fail for
 # non-sporadic groups:
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.SporadicsByOrders,
-   820, "SporadicsByOrders",
-        "generate a few random elements and compute the proj. orders" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.AltSymBBByDegree,
-   810, "AltSymBBByDegree",
-        "try BB recognition for dim+1 and/or dim+2 if sensible" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.TensorDecomposable,
-   800, "TensorDecomposable",
-        "find a tensor decomposition" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.FindElmOfEvenNormal,
-   700, "FindElmOfEvenNormal",
-        "find D2, D4 or D7 by finding an element of an even normal subgroup" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.LowIndex,
-   600, "LowIndex",
-        "find an (imprimitive) action on subspaces" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.ComputeSimpleSocle,
-   550, "ComputeSimpleSocle",
-        "compute simple socle of almost simple group" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.ThreeLargeElOrders,
-   500, "ThreeLargeElOrders",
-        "look at three large element orders" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.LieTypeNonConstr,
-   400, "LieTypeNonConstr",
-        "do non-constructive recognition of Lie type groups" );
-AddMethod( FindHomDbProjective, FindHomMethodsProjective.StabilizerChainProj,
-   100, "StabilizerChainProj",
-        "last resort: compute a stabilizer chain (projectively)" );
+AddMethod(
+    FindHomDbProjective,
+    rec(
+        method := FindHomMethodsProjective.SporadicsByOrders,
+        rank := 820,
+        stamp := "SporadicsByOrders",
+        comment := "generate a few random elements and compute the proj. orders",
+    )
+);
+
+AddMethod(
+    FindHomDbProjective,
+    rec(
+        method := FindHomMethodsProjective.AltSymBBByDegree,
+        rank := 810,
+        stamp := "AltSymBBByDegree",
+        comment := "try BB recognition for dim+1 and/or dim+2 if sensible",
+    )
+);
+
+AddMethod(
+    FindHomDbProjective,
+    rec(
+        method := FindHomMethodsProjective.TensorDecomposable,
+        rank := 800,
+        stamp := "TensorDecomposable",
+        comment := "find a tensor decomposition",
+    )
+);
+
+AddMethod(
+    FindHomDbProjective,
+    rec(
+        method := FindHomMethodsProjective.FindElmOfEvenNormal,
+        rank := 700,
+        stamp := "FindElmOfEvenNormal",
+        comment := "find D2, D4 or D7 by finding an element of an even normal subgroup",
+    )
+);
+
+AddMethod(
+    FindHomDbProjective,
+    rec(
+        method := FindHomMethodsProjective.LowIndex,
+        rank := 600,
+        stamp := "LowIndex",
+        comment := "find an (imprimitive) action on subspaces",
+    )
+);
+
+AddMethod(
+    FindHomDbProjective,
+    rec(
+        method := FindHomMethodsProjective.ComputeSimpleSocle,
+        rank := 550,
+        stamp := "ComputeSimpleSocle",
+        comment := "compute simple socle of almost simple group",
+    )
+);
+
+AddMethod(
+    FindHomDbProjective,
+    rec(
+        method := FindHomMethodsProjective.ThreeLargeElOrders,
+        rank := 500,
+        stamp := "ThreeLargeElOrders",
+        comment := "look at three large element orders",
+    )
+);
+
+AddMethod(
+    FindHomDbProjective,
+    rec(
+        method := FindHomMethodsProjective.LieTypeNonConstr,
+        rank := 400,
+        stamp := "LieTypeNonConstr",
+        comment := "do non-constructive recognition of Lie type groups",
+    )
+);
+
+AddMethod(
+    FindHomDbProjective,
+    rec(
+        method := FindHomMethodsProjective.StabilizerChainProj,
+        rank := 100,
+        stamp := "StabilizerChainProj",
+        comment := "last resort: compute a stabilizer chain (projectively)",
+    )
+);
+
 
 # Old methods which are no longer used:
 

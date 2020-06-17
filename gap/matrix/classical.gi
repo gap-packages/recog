@@ -2094,80 +2094,218 @@ end;
 #
 # 1 - 10 Workers
 
-AddMethod( ClassicalMethDb, RECOG.TestRandomElement, 100, "TestRandomElement",
-           "makes new random element and stores it and its char poly" );
+AddMethod(
+    ClassicalMethDb,
+    rec(
+        method := RECOG.TestRandomElement,
+        rank := 100,
+        stamp := "TestRandomElement",
+        comment := "makes new random element and stores it and its char poly",
+    )
+);
 
-AddMethod( ClassicalMethDb, RECOG.IsGenericParameters,90,"IsGenericParameters",
-           "tests whether group has generic parameters" );
+AddMethod(
+    ClassicalMethDb,
+    rec(
+        method := RECOG.IsGenericParameters,
+        rank := 90,
+        stamp := "IsGenericParameters",
+        comment := "tests whether group has generic parameters",
+    )
+);
 
-AddMethod( ClassicalMethDb, RECOG.IsGeneric, 89, "IsGeneric",
-           "tests whether group is generic" );
+AddMethod(
+    ClassicalMethDb,
+    rec(
+        method := RECOG.IsGeneric,
+        rank := 89,
+        stamp := "IsGeneric",
+        comment := "tests whether group is generic",
+    )
+);
 
-AddMethod( ClassicalMethDb, RECOG.IsReducible, 80, "IsReducible",
-           "tests whether current random element rules out reducible" );
+AddMethod(
+    ClassicalMethDb,
+    rec(
+        method := RECOG.IsReducible,
+        rank := 80,
+        stamp := "IsReducible",
+        comment := "tests whether current random element rules out reducible",
+    )
+);
 
-AddMethod( ClassicalMethDb, RECOG.RuledOutExtField, 81,
-           "RuledOutExtField",
-           "tests whether extension field case is ruled out" );
+AddMethod(
+    ClassicalMethDb,
+    rec(
+        method := RECOG.RuledOutExtField,
+        rank := 81,
+        stamp := "RuledOutExtField",
+        comment := "tests whether extension field case is ruled out",
+    )
+);
 
-AddMethod( ClassicalMethDb, RECOG.IsNotMathieu, 82,
-           "IsNotMathieu",
-           "tests whether Mathieu groups are ruled out" );
+AddMethod(
+    ClassicalMethDb,
+    rec(
+        method := RECOG.IsNotMathieu,
+        rank := 82,
+        stamp := "IsNotMathieu",
+        comment := "tests whether Mathieu groups are ruled out",
+    )
+);
 
-AddMethod( ClassicalMethDb, RECOG.IsNotAlternating, 83,
-           "IsNotAlternating",
-           "tests whether alternating groups are ruled out" );
+AddMethod(
+    ClassicalMethDb,
+    rec(
+        method := RECOG.IsNotAlternating,
+        rank := 83,
+        stamp := "IsNotAlternating",
+        comment := "tests whether alternating groups are ruled out",
+    )
+);
 
-AddMethod( ClassicalMethDb, RECOG.IsNotPSL, 84,
-           "IsNotPSL",
-           "tests whether PSL groups are ruled out" );
-
-
-AddMethod( ClassicalMethDb, RECOG.NoClassicalForms, 85,
-           "NoClassicalForms",
-           "tests whether we can rule out certain forms" );
-
-AddMethod( ClassicalMethDb, RECOG.MeatAxe, 9,
-           "MeatAxe", "Test irreducibility" );
-
-AddMethod( ClassicalMethDb, RECOG.ClassicalForms, 8 ,
-           "ClassicalForms", "Find the invariant forms" );
-
-AddMethod( ClassicalMethDb, RECOG.NonGenericLinear, 10, "NonGenericLinear",
-           "tests whether group is non-generic Linear" );
-
-AddMethod( ClassicalMethDb, RECOG.NonGenericUnitary, 11, "NonGenericUnitary",
-           "tests whether group is non-generic Unitary" );
-
-AddMethod( ClassicalMethDb, RECOG.NonGenericSymplectic, 12,
-            "NonGenericSymplectic",
-           "tests whether group is non-generic Symplectic" );
-
-AddMethod( ClassicalMethDb, RECOG.NonGenericOrthogonalPlus, 13,
-           "NonGenericOrthogonalPlus",
-           "tests whether group is non-generic O+" );
-
-
-AddMethod( ClassicalMethDb, RECOG.NonGenericOrthogonalMinus, 14,
-           "NonGenericOrthogonalMinus",
-           "tests whether group is non-generic O-" );
+AddMethod(
+    ClassicalMethDb,
+    rec(
+        method := RECOG.IsNotPSL,
+        rank := 84,
+        stamp := "IsNotPSL",
+        comment := "tests whether PSL groups are ruled out",
+    )
+);
 
 
-AddMethod( ClassicalMethDb, RECOG.NonGenericOrthogonalCircle, 15,
-           "NonGenericOrthogonalCircle",
-           "tests whether group is non-generic Oo" );
+AddMethod(
+    ClassicalMethDb,
+    rec(
+        method := RECOG.NoClassicalForms,
+        rank := 85,
+        stamp := "NoClassicalForms",
+        comment := "tests whether we can rule out certain forms",
+    )
+);
 
-AddMethod( ClassicalMethDb, RECOG.IsSLContained, 16, "IsSLContained",
-           "tests whether group contains SL" );
+AddMethod(
+    ClassicalMethDb,
+    rec(
+        method := RECOG.MeatAxe,
+        rank := 9,
+        stamp := "MeatAxe",
+        comment := "Test irreducibility",
+    )
+);
 
-AddMethod( ClassicalMethDb, RECOG.IsSpContained, 17, "IsSpContained",
-           "tests whether group contains Sp" );
+AddMethod(
+    ClassicalMethDb,
+    rec(
+        method := RECOG.ClassicalForms,
+        rank := 8,
+        stamp := "ClassicalForms",
+        comment := "Find the invariant forms",
+    )
+);
 
-AddMethod( ClassicalMethDb, RECOG.IsSUContained, 18, "IsSUContained",
-           "tests whether group contains SU" );
+AddMethod(
+    ClassicalMethDb,
+    rec(
+        method := RECOG.NonGenericLinear,
+        rank := 10,
+        stamp := "NonGenericLinear",
+        comment := "tests whether group is non-generic Linear",
+    )
+);
 
-AddMethod( ClassicalMethDb, RECOG.IsSOContained, 19, "IsSOContained",
-           "tests whether group contains SO" );
+AddMethod(
+    ClassicalMethDb,
+    rec(
+        method := RECOG.NonGenericUnitary,
+        rank := 11,
+        stamp := "NonGenericUnitary",
+        comment := "tests whether group is non-generic Unitary",
+    )
+);
+
+AddMethod(
+    ClassicalMethDb,
+    rec(
+        method := RECOG.NonGenericSymplectic,
+        rank := 12,
+        stamp := "NonGenericSymplectic",
+        comment := "tests whether group is non-generic Symplectic",
+    )
+);
+
+AddMethod(
+    ClassicalMethDb,
+    rec(
+        method := RECOG.NonGenericOrthogonalPlus,
+        rank := 13,
+        stamp := "NonGenericOrthogonalPlus",
+        comment := "tests whether group is non-generic O+",
+    )
+);
+
+
+AddMethod(
+    ClassicalMethDb,
+    rec(
+        method := RECOG.NonGenericOrthogonalMinus,
+        rank := 14,
+        stamp := "NonGenericOrthogonalMinus",
+        comment := "tests whether group is non-generic O-",
+    )
+);
+
+
+AddMethod(
+    ClassicalMethDb,
+    rec(
+        method := RECOG.NonGenericOrthogonalCircle,
+        rank := 15,
+        stamp := "NonGenericOrthogonalCircle",
+        comment := "tests whether group is non-generic Oo",
+    )
+);
+
+AddMethod(
+    ClassicalMethDb,
+    rec(
+        method := RECOG.IsSLContained,
+        rank := 16,
+        stamp := "IsSLContained",
+        comment := "tests whether group contains SL",
+    )
+);
+
+AddMethod(
+    ClassicalMethDb,
+    rec(
+        method := RECOG.IsSpContained,
+        rank := 17,
+        stamp := "IsSpContained",
+        comment := "tests whether group contains Sp",
+    )
+);
+
+AddMethod(
+    ClassicalMethDb,
+    rec(
+        method := RECOG.IsSUContained,
+        rank := 18,
+        stamp := "IsSUContained",
+        comment := "tests whether group contains SU",
+    )
+);
+
+AddMethod(
+    ClassicalMethDb,
+    rec(
+        method := RECOG.IsSOContained,
+        rank := 19,
+        stamp := "IsSOContained",
+        comment := "tests whether group contains SO",
+    )
+);
 
 
 

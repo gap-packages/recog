@@ -23,15 +23,20 @@ SetInfoLevel(InfoMethSel,1);
 
 ## <#GAPDoc Label="AddMethod">
 ## <ManSection>
-## <Func Name="AddMethod" Arg="db, meth, rank, stamp [,comment]"/>
+## <Func Name="AddMethod" Arg="methodDb, method"/>
 ## <Returns>nothing</Returns>
 ## <Description>
-##     <A>db</A> must be a method database (list of records, see above) with
-##     non-ascending rank values. <A>meth</A> is the method function,
-##     <A>rank</A> the rank and <A>stamp</A> a string valued stamp. The
-##     optional argument <A>comment</A> can be a string comment. The record
-##     describing the method is created and inserted at the correct position
-##     in the method database. Nothing is returned.
+#  <A>methodDb</A> must be a method database as in Section
+#  <Ref Sect="whataremethods"/>.
+#  <A>method</A> must be a record with the following components.
+#  <A>method</A> is the method function,
+#  <A>rank</A> the rank and <A>stamp</A> a string valued stamp, that is
+#  <A>stamp</A> uniquely identifies the method among all other methods.
+#  Optionally the component <A>comment</A> can be bound to a string.
+#  <P/>
+#  The method record <A>method</A> is inserted according to its rank, assuming
+#  that the method database <A>methodDb</A> is in rank-descending order.
+#  Nothing is returned.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
