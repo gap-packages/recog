@@ -4,28 +4,30 @@
 # on the simple observation that the product of two involutions t1, t2, which
 # only move one common point, squares to a 3-cycle.
 #
-# Either returns a list of elements of G or NeverApplicable
-# TODO: Rewrite this to a kind of iterator function since each candidate is tested one by one
-BindGlobal("ThreeCycleCandidates",
-function(G, eps, N, groupIsOne, groupIsEq)
+# TODO: take care of duplicate candidates?
+# Creates and returns a function, here called oneThreeCycleCandidate. The
+# function oneThreeCycleCandidate returns one of the following:
+# - a three cycle candidate, i.e. an element of G
+# - TemporaryFailure, if we exhausted all attempts
+# - NeverApplicable, if we found out that G can't be an Sn or An
+BindGlobal("ThreeCycleCandidatesIterator",
+    function(G, eps, N, groupIsOne, groupIsEq)
     local
-        # list, a set of three cycle candidates
-        threeCycleCandidates,
-        # list, a set of involutions
-        involutions,
-        # integers, number of iterations
-        M,B,T,C,
+        # involution
+        t,
+        # integers, controlling the number of iterations
+        M, B, T, C, logInt2N,
         # integer, prime, loop variable
         p,
-        # integer, loop variable
-        i,a,
-        # elements, in G
-        r,t,tPower,tPowerOld,c,
-        # integer, max power we need to consider in 3. Step
-        maxPower,
-        # integer, loop variables in 4. Step
-        nrNewCandidates, nrIterations;
-    # 1. Step
+        # counters
+        nrInvolutions, nrTriedConjugates, nrThreeCycleCandidates,
+        # helper functions
+        tryThreeCycleCandidate, oneThreeCycleCandidate;
+    # Step 1: Initialization
+    # The current involution t_i
+    t := fail;
+
+    # Constants
     # TODO: better iteration over primes
     M := 1;
     p := 3;
@@ -36,46 +38,82 @@ function(G, eps, N, groupIsOne, groupIsEq)
     B := Int(Ceil(13 * Log2(Float(N)) * Log2(3 / Float(eps))));
     T := Int(Ceil(3 * Log2(3 / Float(eps))));
     C := Int(Ceil(Float(3 * N * T / 5)));
-    # 2. + 3. Step
-    # construct involutions
-    involutions := [];
-    maxPower := LogInt(N, 2);
-    for i in [1 .. B] do
-        r := PseudoRandom(G);
-        t := r^M;
-        a := 0;
-        tPower := t;
-        # invariant: tPower = t ^ (2 ^ a)
-        repeat
-            a := a + 1;
-            tPowerOld := tPower;
-            tPower := tPower ^ 2;
-        until a = maxPower or groupIsOne(tPower);
-        if a = maxPower then
-            return NeverApplicable;
-        fi;
-        Add(involutions, tPowerOld);
-    od;
-    # 4. + 5. Step
-    # use the observation described in the comment above this function to
-    # generate candidate for three-cycles from the involutions.
-    threeCycleCandidates := [];
-    for t in involutions do
-        nrNewCandidates := 0;
-        nrIterations := 0;
-        while nrIterations < C and nrNewCandidates < T do
-            c := t ^ PseudoRandom(G);
-            # TODO: form a set. Can we assume that group elements have an
-            # ordering and simply call Set? Benchmark this with groups that are
-            # so small that we possibly generate lots of the same elements.
-            if not groupIsEq(t * c, c * t) then
-                Add(threeCycleCandidates, (t * c) ^ 2);
-                nrNewCandidates := nrNewCandidates + 1;
+    logInt2N := LogInt(N, 2);
+
+    # Counters
+    # Counts the constructed involutions t_i in steps 2 & 3.
+    nrInvolutions := 0;
+    # Counts the elements c in step 4 that we use to conjugate the current
+    # involution t_i.  We initialize nrTriedConjugates to C such that "steps 2
+    # & 3" in tryThreeCycleCandidate immediately construct an involution.
+    nrTriedConjugates := C;
+    # counts the size of the set Gamma_i in step 4 for the current involution
+    # t_i
+    nrThreeCycleCandidates := 0;
+
+    # Helper functions
+    # tryThreeCycleCandidate returns one of the following:
+    # - a three cycle candidate, i.e. an element of G
+    # - fail, if the random conjugate c from step 4 and t commute
+    # - NeverApplicable, if G can not be an Sn or An
+    tryThreeCycleCandidate := function()
+        local
+            # integer, loop variable
+            a,
+            # elements, in G
+            r, tPower, tPowerOld, c;
+        # Steps 2 & 3: New involution
+        # Check if we either tried enough conjugates or constructed enough
+        # three cycle candidates for the current involution t.
+        # If this is the case, we need to construct the next involution
+        if nrTriedConjugates >= C or nrThreeCycleCandidates >= T then
+            r := PseudoRandom(G);
+            a := 0;
+            tPower := r ^ M;
+            # Invariant: tPower = (r ^ M) ^ (2 ^ a)
+            repeat
+                a := a + 1;
+                tPowerOld := tPower;
+                tPower := tPower ^ 2;
+            until a = logInt2N or groupIsOne(tPower);
+            if a = logInt2N then
+                return NeverApplicable;
             fi;
-            nrIterations := nrIterations + 1;
-        od;
-    od;
-    return threeCycleCandidates;
+            t := tPowerOld;
+            nrInvolutions := nrInvolutions + 1;
+            nrTriedConjugates := 0;
+            nrThreeCycleCandidates := 0;
+        fi;
+        # Steps 4 & 5: new three cycle candidate
+        # Try to construct a three cycle candidate via a conjugate of t. See
+        # the comment above this function.
+        nrTriedConjugates := nrTriedConjugates + 1;
+        c := t ^ PseudoRandom(G);
+        if not groupIsEq(t * c, c * t) then
+            nrThreeCycleCandidates := nrThreeCycleCandidates + 1;
+            return (t * c) ^ 2;
+        else
+            return fail;
+        fi;
+    end;
+    # construct the iterator
+    oneThreeCycleCandidate := function()
+        local candidate;
+        repeat
+            if nrInvolutions >= B
+                and (nrTriedConjugates >= C or nrThreeCycleCandidates >= T)
+            then
+                # We are done and were not able to recognize Sn or An.
+                return TemporaryFailure;
+            fi;
+            candidate := tryThreeCycleCandidate();
+            if candidate = NeverApplicable then
+                return NeverApplicable;
+            fi;
+        until candidate <> fail;
+        return candidate;
+    end;
+    return oneThreeCycleCandidate;
 end);
 
 # G: the group to recognize

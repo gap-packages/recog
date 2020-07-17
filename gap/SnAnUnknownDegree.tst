@@ -1,6 +1,6 @@
-#@local testFunction, permToPermMat, degreesToTest, isos;
-#@local nonIsomorphicGroups;
-#@local g, c, r, i;
+#@local testFunction, degreesToTest, permToPermMat, isos
+#@local altAndSymGroups, nonAltOrSymGroups
+#@local g, c, r, i
 #
 # testing matrix:
 # - isomorphic: yes, no
@@ -13,36 +13,43 @@
 # TODO: Use RECOG.TestGroup?
 gap> testFunction := function(G, eps, N)
 >     local C, i;
->     C := ThreeCycleCandidates(G, eps, N, IsOne, EQ);
->     if C <> NeverApplicable then
+>     iterator := ThreeCycleCandidatesIterator(G, eps, N, IsOne, EQ);
+>     candidate := iterator();
+>     if candidate <> NeverApplicable then
 >         for i in [1 .. 10] do
 >             BolsteringElements(G, PseudoRandom(C), eps, N, IsOne, EQ);
 >         od;
 >     fi;
 > end;;
 gap> degreesToTest := Concatenation(
->     [10, 20, 30, 40, 50, 60, 70],
+>     [10, 11, 12, 20, 21, 30, 31, 40, 41, 50, 51],
 >     Primes{[5 .. 15]}
 > );;
 # TODO: more non-isomorphic examples
-gap> nonIsomorphicGroups := [
+gap> altAndSymGroups := Concatenation(
+>     List(degrees, AlternatingGroup),
+>     List(degrees, SymmetricGroup));;
+gap> permToPermMat :=
+>   {x, deg, field}
+>   ->
+>   ImmutableMatrix(field, PermutationMat(x, deg, field));;
+# TODO: add a projective group
+gap> nonAltOrSymGroups := [
 >     DihedralGroup(IsPermGroup,10),
 >     DihedralGroup(IsPcGroup, 10),
 >     DihedralGroup(IsPermGroup, 2000),
 >     DihedralGroup(IsPcGroup, 2000),
 >     SL(3,5),
 > ];;
-gap> permToPermMat :=
->   {x, deg, field}
->   ->
->   ImmutableMatrix(field, PermutationMat(x, deg, field));;
 gap> # TODO: use permToPermMat with varying degrees and fields
-gap> isos := [];;
-
 
 # ThreeCycleCandidates
 gap> for i in [1 .. Length(testGroups)] do
->     ThreeCycleCandidates(testGroups[i], 1/100, degrees[i], IsOne, EQ);
+>     ThreeCycleCandidatesIterator(testGroups[i],
+>                                  1/100,
+>                                  degrees[i],
+>                                  IsOne,
+>                                  EQ);
 > od;
 
 # BolsteringElements
