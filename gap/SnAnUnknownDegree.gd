@@ -1,3 +1,3 @@
-DeclareGlobalName("ThreeCycleCandidates");
+DeclareGlobalName("ThreeCycleCandidatesIterator");
 DeclareGlobalName("BolsteringElements");
 DeclareGlobalName("IsFixedPoint");
