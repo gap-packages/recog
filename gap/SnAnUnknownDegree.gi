@@ -11,7 +11,7 @@
 # - TemporaryFailure, if we exhausted all attempts
 # - NeverApplicable, if we found out that G can't be an Sn or An
 BindGlobal("ThreeCycleCandidatesIterator",
-    function(G, eps, N, groupIsOne, groupIsEq)
+    function(ri, eps, N)
     local
         # involution
         t,
@@ -35,6 +35,7 @@ BindGlobal("ThreeCycleCandidatesIterator",
         M := M * p ^ LogInt(N, p);
         p := NextPrimeInt(p);
     od;
+    # FIXME: Probably B can be chosen smaller
     B := Int(Ceil(13 * Log2(Float(N)) * Log2(3 / Float(eps))));
     T := Int(Ceil(3 * Log2(3 / Float(eps))));
     C := Int(Ceil(Float(3 * N * T / 5)));
@@ -67,7 +68,7 @@ BindGlobal("ThreeCycleCandidatesIterator",
         # three cycle candidates for the current involution t.
         # If this is the case, we need to construct the next involution
         if nrTriedConjugates >= C or nrThreeCycleCandidates >= T then
-            r := PseudoRandom(G);
+            r := RandomElm(ri,"simplesocle",true)!.el;
             a := 0;
             tPower := r ^ M;
             # Invariant: tPower = (r ^ M) ^ (2 ^ a)
@@ -75,7 +76,7 @@ BindGlobal("ThreeCycleCandidatesIterator",
                 a := a + 1;
                 tPowerOld := tPower;
                 tPower := tPower ^ 2;
-            until a = logInt2N or groupIsOne(tPower);
+            until a = logInt2N or isone(ri)(tPower);
             if a = logInt2N then
                 return NeverApplicable;
             fi;
@@ -88,8 +89,8 @@ BindGlobal("ThreeCycleCandidatesIterator",
         # Try to construct a three cycle candidate via a conjugate of t. See
         # the comment above this function.
         nrTriedConjugates := nrTriedConjugates + 1;
-        c := t ^ PseudoRandom(G);
-        if not groupIsEq(t * c, c * t) then
+        c := t ^ RandomElm(ri,"simplesocle",true)!.el;
+        if not isequal(ri)(t * c, c * t) then
             nrThreeCycleCandidates := nrThreeCycleCandidates + 1;
             return (t * c) ^ 2;
         else
@@ -122,7 +123,7 @@ end);
 # symmetric group and c is a 3-cycle, then this function returns a list of
 # bolstering elements with respect to c.
 BindGlobal("BolsteringElements",
-function(G, c, eps, N, groupIsOne, groupIsEq)
+function(ri, c, eps, N)
     local result, R, S, prebolsteringElms, i, r, cr, cr2;
     result := [];
     R := Int(Ceil(7 / 4 * Log2(Float(eps ^ -1))));
@@ -131,14 +132,14 @@ function(G, c, eps, N, groupIsOne, groupIsEq)
     i := 0;
     # find pre-bolstering elements
     while i <= S and Length(prebolsteringElms) <= R do
-        r := PseudoRandom(G);
+        r := RandomElm(ri,"simplesocle",true)!.el;
         # test whether r is pre-bolstering
         cr := c ^ r;
         cr2 := c ^ (r ^ 2);
-        if not groupIsOne(Comm(cr, c))
-                and not groupIsEq(cr2, c)
-                and not groupIsEq(cr2, c ^ 2)
-                and groupIsOne(Comm(cr2, c))
+        if not isone(ri)(Comm(cr, c))
+                and not isequal(ri)(cr2, c)
+                and not isequal(ri)(cr2, c ^ 2)
+                and isone(ri)(Comm(cr2, c))
         then
             Add(prebolsteringElms, r);
         fi;
@@ -146,7 +147,7 @@ function(G, c, eps, N, groupIsOne, groupIsEq)
     od;
     # construct bolstering elements
     for r in prebolsteringElms do
-        if groupIsOne((c ^ (r * c * r)
+        if isone(ri)((c ^ (r * c * r)
                       * c ^ (r * c ^ (r ^ 2) * c)) ^ 3)
         then
             Add(result, c ^ 2 * r);
@@ -164,7 +165,7 @@ end);
 # Let phi be an isomorphism from G to a natural alternating or symmetric group.
 # This function decides whether alpha is a fixed point of phi(r).
 BindGlobal("IsFixedPoint",
-function(g, c, r, groupIsOne, groupIsEq)
+function(ri, g, c, r)
     local
         # respectively c ^ (g ^ i)
         cg, cg2, cg3, cg4,
@@ -173,13 +174,13 @@ function(g, c, r, groupIsOne, groupIsEq)
         # (sets of) elements of G
         H1, H2, x1, x2, x3,
         # helper function
-        isElmPassingTest;
+        commutesWithAtMostOne;
     # Helper function
-    isElmPassingTest := function(x, H, groupIsOne)
+    commutesWithAtMostOne := function(ri, x, H)
         local nrTrivialComm, h;
         nrTrivialComm := 0;
         for h in H do
-            if groupIsOne(Comm(x, h)) then
+            if isone(ri)(Comm(x, h)) then
                 nrTrivialComm := nrTrivialComm + 1;
             fi;
             if nrTrivialComm >= 2 then
@@ -196,17 +197,17 @@ function(g, c, r, groupIsOne, groupIsEq)
     # Test whether an elm of the set X commutes with at least
     # two elements of H1.
     x1 := c ^ r;
-    if not isElmPassingTest(x1, H1, groupIsOne) then return false; fi;
+    if not commutesWithAtMostOne(ri, x1, H1) then return false; fi;
     x2 := cg2 ^ r;
-    if not isElmPassingTest(x2, H1, groupIsOne) then return false; fi;
+    if not commutesWithAtMostOne(ri, x2, H1) then return false; fi;
     x3 := ((cg2 ^ cg3) ^ cg4) ^ r;
-    if not isElmPassingTest(x3, H1, groupIsOne) then return false; fi;
+    if not commutesWithAtMostOne(ri, x3, H1) then return false; fi;
     # Test whether an elm of the set X commutes with at least
     # two elements of H2.
     H2 := [c, cg, ~[2] ^ cg3, ~[3] ^ cg3, ~[4] ^ cg4];
-    if not isElmPassingTest(x1, H2, groupIsOne) then return false; fi;
-    if not isElmPassingTest(x2, H2, groupIsOne) then return false; fi;
-    if not isElmPassingTest(x3, H2, groupIsOne) then return false; fi;
+    if not commutesWithAtMostOne(ri, x1, H2) then return false; fi;
+    if not commutesWithAtMostOne(ri, x2, H2) then return false; fi;
+    if not commutesWithAtMostOne(ri, x3, H2) then return false; fi;
     return true;
 end);
 
@@ -219,35 +220,42 @@ end);
 # then the algorithm returns a conjugate r^x such that r fixes the points 1, 2
 # but not the point 3.
 BindGlobal("AdjustCycle",
-function(g, c, r, k, groupIsOne, groupIsEq)
+function(ri, g, c, r, k)
     local
         # list of 4 booleans, is point j fixed point
-        F,
+        F4,
         # smallest fixed point
         f1,
         # second smallest fixed point
         f2,
         # smallest non-fixed point
         m,
+        # bool, false if |F| < 2 or |F| = k
+        success,
         # integer, loop variable over [1 .. k]
         j,
         # element of G, loop variable
         t,
         # conjugating element
         x;
-    F := [false, false, false, false];
+    # According to the paper we have:
+    # F := { 1 \leq j \leq k | IsFixedPoint(g, c ^ (g ^ (j - 3)), r) = true }
+    # f1 := smallest number in F
+    # f2 := second smallest number in F
+    # m := smallest number *not* in F
+    # We do not store F explicitely. Instead we store the intersection of F and
+    # {1, 2, 3, 4} in the variable F4.
+    F4 := [false, false, false, false];
     f1 := fail;
     f2 := fail;
     m := fail;
-    j := 0;
     t := c ^ (g ^ -3);
-    # invariant: t = c ^ (g ^ (j - 3))
-    repeat
-        j := j + 1;
+    for j in [1 .. k] do
+        # invariant: t = c ^ (g ^ (j - 3))
         t := t ^ g;
-        if IsFixedPoint(g, t, r, groupIsOne, groupIsEq) then
+        if IsFixedPoint(ri, g, t, r) then
             if j <= 4 then
-                F[j] := true;
+                F4[j] := true;
             fi;
             if f1 = fail then
                 f1 := j;
@@ -257,23 +265,31 @@ function(g, c, r, k, groupIsOne, groupIsEq)
         elif m = fail then
             m := j;
         fi;
-    until j >= k or (j >= 4 and f1 <> fail and f2 <> fail and m <> fail);
-    if f1 = fail or f2 = fail or m =fail then
+        # f1 and f2 not being fail is equivalent to |F| >= 2
+        # m not being fail is equivalent to |F| < k
+        success := f1 <> fail and f2 <> fail and m <> fail;
+        if success then
+            if j >= 4 then
+                break;
+            # 2. Case, we do not need to compute F4[4]
+            elif f1 = 1 and f2 = 2 and m = 3 then
+                return r;
+            fi;
+        fi;
+    od;
+    if not success then
         return fail;
     fi;
     # case distinction on F as in the table of Algorithm 4.20
-    if F[1] then
-        if F[2] then
-            if F[3] then
-                # 1. Case
-                x := c ^ ((g * c ^ 2) ^ (m - 3) * c) * c;
-            else
-                # 2. Case
-                x := One(c);
-            fi;
+    # via a decision tree
+    if F4[1] then
+        if F4[2] then
+            # We are in the 1. Case, since the 2. Case is handled during the
+            # computation of F4 above.
+            x := c ^ ((g * c ^ 2) ^ (m - 3) * c) * c;
         else
-            if F[3] then
-                if F[4] then
+            if F4[3] then
+                if F4[4] then
                     # 3. Case
                     x := c ^ g;
                 else
@@ -286,12 +302,12 @@ function(g, c, r, k, groupIsOne, groupIsEq)
             fi;
         fi;
     else
-        if F[2] then
-            if F[4] then
+        if F4[2] then
+            if F4[4] then
                 # 6. Case
                 x := c ^ (c ^ g);
             else
-                if F[3] then
+                if F4[3] then
                     # 7. Case
                     x := (c ^ 2) ^ (c ^ g);
                 else
@@ -300,7 +316,7 @@ function(g, c, r, k, groupIsOne, groupIsEq)
                 fi;
             fi;
         else
-            if F[3] then
+            if F4[3] then
                 # 9. Case
                 x := (c ^ 2) ^ ((g * c ^ 2) ^ (f2 - 3)) * c ^ 2;
             else
@@ -310,4 +326,256 @@ function(g, c, r, k, groupIsOne, groupIsEq)
         fi;
     fi;
     return r^x;
+end);
+
+# g: a k-cycle matching c of a group G
+# c: a 3-cycle of a group G
+# r: return value of AdjustCycle. If e.g. g = (1, 2, ..., k), then r would be a
+# cycle fixing 1 and 2 and moving 3
+# The algorithm AppendPoints appends new points to the cycle g. Since g will
+# always be a cycle of odd length, new points can only be appended in pairs.
+#
+# We identify the point j in {1, ..., k} with the 3-cycle c ^ (g ^ (j - 3)).
+# We store new points in the storage cycle sTilde until we have found two
+# different points. Then we append these to g.
+#
+# We return a list consisting of:
+# - gTilde, the new g
+# - sTilde, since we may call AppendPoints several times and may not have used
+# the last sTilde.
+# - kTilde, the length of gTilde
+BindGlobal("AppendPoints",
+function(ri, g, c, r, s, k, k0)
+    local gTilde, sTilde, kTilde, gc2, x, j;
+    gTilde := g;
+    sTilde := s;
+    kTilde := k;
+    x := c;
+    for j in [1 .. k0 - 1] do
+        # invariant: x = c ^ (r ^ j)
+        x := x ^ r;
+        if isone(ri)(Comm(x, gTilde * c ^ 2)) then
+            # If sTilde doesn't already store a point, then store x.
+            if isone(ri)(sTilde) then
+                sTilde := x;
+            fi;
+            # Do we now have two different points? If so, append them.
+            if not isone(ri)(sTilde) and not isequal(ri)(sTilde, x) then
+                kTilde := kTilde + 2;
+                gTilde := gTilde * sTilde ^ (x ^ 2);
+                sTilde := One(gTilde);
+            fi;
+        fi;
+    od;
+    return [gTilde, sTilde, kTilde];
+end);
+
+# ri : recog info record
+# g : element of a group
+# p : prime
+# We return true, if g is an element of order p.
+BindGlobal("IsElmOfPrimeOrder",
+function(ri, g, p)
+    if not isone(ri)(g) and isone(ri)(g ^ p) then
+        return true;
+    else
+        return false;
+    fi;
+end);
+
+# c: a 3-cycle of a group G
+# x : bolstering element with respect to c
+# The algorithm BuildCycle determines a cycle g of length k matching c.
+# We return either fail or a list consisting of:
+# - g, cycle matching c
+# - k, length of cycle g.
+BindGlobal("BuildCycle",
+function(ri, c, x, N)
+    local
+        # Floor(N / 2)
+        N2,
+        # min(alpha, beta)
+        m,
+        # d = c ^ (x ^ (m + 1))
+        d,
+        # y = c * c ^ x * c ^ (x ^ 2) * ... * c ^ (x ^ m)
+        y,
+        # is false, if m >= N/2
+        isMinInitialized,
+        # dx = d ^ x = c ^ (x ^ (m + 2))
+        dx,
+        # element defined as in the case distinction
+        e,
+        # d ^ e
+        z,
+        # z ^ (x ^ 2 * (mDash - 1))
+        zxMinus,
+        # z ^ (x ^ 2 * (mDash))
+        zx,
+        # z ^ (x ^ 2 * (mDash + 1))
+        zxPlus,
+        # integer computed as in Remark 4.9
+        mDash,
+        # cycle matching c
+        g;
+    # Here we set m := 0
+    N2 := Int(Floor(Float(N) / 2.));
+    y := c;
+    d := c ^ x;
+    isMinInitialized := false;
+    for m in [1 .. N2] do
+        y := y * d;
+        d := d ^ x;
+        if not IsElmOfPrimeOrder(ri, d * c, 5) then
+            isMinInitialized := true;
+            break;
+        fi;
+    od;
+    if not isMinInitialized then
+        return fail;
+    fi;
+    # Case |alpha - beta| = 0
+    if isequal(ri)(d, c) or isequal(ri)(d, c ^ 2) then
+        return [y, 2 * m + 3];
+    fi;
+    # Case |alpha - beta| = 1
+    dx := d ^ x;
+    if not IsElmOfPrimeOrder(ri, dx * c, 5) then
+        return [y, 2 * m + 3];
+    fi;
+    # Case |alpha - beta| >= 2
+    # Case distinction on element e
+    if IsElmOfPrimeOrder(ri, d * c, 2) then
+        # w not in v ^ <x>
+        if isone(ri)(Comm(dx, d ^ c)) then
+            # Case 4, alpha < beta
+            e := (d ^ (x * c)) ^ 2;
+        else
+            # Case 3, alpha > beta
+            e := d ^ (x * c ^ 2);
+        fi;
+    else
+        # w in v ^ <x>
+        if isone(ri)(Comm(dx, d ^ c)) then
+            # Case 1, alpha > beta
+            e := d ^ (x * c);
+        else
+            # Case 2, alpha < beta
+            e := (d ^ (x * c ^ 2)) ^ 2;
+        fi;
+    fi;
+    z := d ^ e;
+    # Here we set mDash := 1
+    zxMinus := z;
+    zx := zxMinus ^ (x ^ 2);
+    zxPlus := zx ^ (x ^ 2);
+    g := y * zxMinus;
+    for mDash in [1 .. N2] do
+        if not IsElmOfPrimeOrder(ri, zxPlus, 5) then
+            return [g, 2 * mDash + 2 * m + 3];
+        fi;
+        zxMinus := zx;
+        zx := zxPlus;
+        zxPlus := zxPlus ^ (x ^ 2);
+        g := y * zxMinus;
+    od;
+    # mDash >= N / 2
+    return fail;
+end);
+
+# ri : recog info record
+# c : three-cycle
+# eps : error probability
+# N : upper bound for degree of the group
+# We return either fail or a list consisting of:
+# - g, cycle matching c
+# - k, length of cycle g.
+BindGlobal("ConstructLongCycle",
+function(ri, c, eps, N)
+    local g, k, tmp, B, x;
+    B := BolsteringElements(ri, c, Float(eps) / 2., N);
+    if Length(B) < Int(Ceil(7./4. * Log(2. / Float(eps)))) then
+        return fail;
+    fi;
+    k := 0;
+    for x in B do
+        tmp := BuildCycle(ri, c, x, N);
+        if tmp = fail then
+            return fail;
+        elif tmp[2] > k then
+            g := tmp[1];
+            k := tmp[2];
+        fi;
+    od;
+    return [g, k];
+end);
+
+# ri : recog info record
+# g : cycle matching c
+# c : three-cycle
+BindGlobal("StandardGenerators",
+function(ri, g, c, k, eps, N)
+    local s, k0, c2, r, kTilde, gTilde, i, x, m, tmp, cTilde;
+    s := One(g);
+    k0 := k - 2;
+    c2 := c ^ 2;
+    r := g * c2;
+    kTilde := k;
+    gTilde := g;
+    for i in [1 .. Int(Ceil(Log(10. / 3.) ^ (-1) * (Log(Float(N)) + Log(1 / Float(eps)))))] do
+        x := r ^ RandomElm(ri,"simplesocle",true)!.el;
+        m := AdjustCycle(ri, gTilde, c, x, kTilde);
+        if m = fail then return fail; fi;
+        tmp := AppendPoints(ri, gTilde, c, m, s, kTilde, k0);
+        gTilde := tmp[1];
+        s := tmp[2];
+        kTilde := tmp[3];
+        if kTilde > N then return fail; fi;
+    od;
+    if isone(ri)(s) then
+        gTilde := c2 * gTilde;
+        cTilde := c;
+    else
+        kTilde := kTilde + 1;
+        gTilde := gTilde * s;
+        cTilde := s;
+    fi;
+    if SatisfiesAnPresentation(ri, gTilde, cTilde, kTilde) then
+        return [gTilde, cTilde, kTilde];
+    else
+        return fail;
+    fi;
+end);
+
+# UNFINISHED
+# currently returns standard gens of An
+BindGlobal("RecogniseSnAn",
+function(ri, eps, N)
+    local T, c, tmp, g, k, n, iterator;
+    T := Int(Ceil(Log(1 / Float(eps))));
+    repeat
+        T := T - 1;
+        iterator := ThreeCycleCandidatesIterator(ri, eps, N);
+        c := iterator();
+        while c <> TemporaryFailure do
+            if c = NeverApplicable then return NeverApplicable; fi;
+            tmp := ConstructLongCycle(ri, c, 1. / 8., N);
+            if tmp = fail then
+                c := iterator();
+                continue;
+            fi;
+            g := tmp[1];
+            k := tmp[2];
+            tmp := StandardGenerators(ri, g, c, k, 1. / 8., N);
+            if tmp = fail then
+                c := iterator();
+                continue;
+            fi;
+            g := tmp[1];
+            c := tmp[2];
+            n := tmp[3];
+            return [g, c, n];
+        od;
+    until T = 0;
+    return fail;
 end);
