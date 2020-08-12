@@ -57,7 +57,7 @@ one of the following four values:<P/>
 <Mark><K>NotEnoughInformation</K></Mark>
 <Item>means that the method for some reason refused to do its work. However,
     it is possible that it will become applicable later such that it makes
-    sense to call it again, may when more information is available.</Item>
+    sense to call it again, for example when more information is available.</Item>
 </List>
 
 For administration in the method selection, a method is described by
