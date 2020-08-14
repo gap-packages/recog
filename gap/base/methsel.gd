@@ -17,9 +17,13 @@
 #############################################################################
 
 # Our own method selection code:
-
 DeclareInfoClass( "InfoMethSel" );
 SetInfoLevel(InfoMethSel,1);
+
+# InfoClass so that we can for example check whether every method checks
+# whether its input is valid.
+DeclareInfoClass( "InfoAddMethod" );
+SetInfoLevel(InfoAddMethod, 0);
 
 ## <#GAPDoc Label="AddMethod">
 ## <ManSection>
