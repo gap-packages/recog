@@ -2483,15 +2483,21 @@ FindHomMethodsMatrix.NaturalSL := function(ri,G)
     fi;
 
 
+  # Try the recognition method
   n:=ri!.dimension;
   q:=Size(ri!.field);
   p:=Factors(q)[1];
   e:=LogInt(q,p);
   grpmem := GroupWithMemory(G);
-  repeat
-      data:=SLCR.SLDataStructure(grpmem,p,e,n);
-  until data <> fail;
-  genlist:=List(data.gens,x->x[1]);
+  # TODO find a reasonable number of tries
+  for i in [1 .. 10] do
+    data := SLCR.SLDataStructure(grpmem, p, e, n);
+    if data <> fail then break; fi;
+  od;
+  if data = fail then
+    return TemporaryFailure;
+  fi;
+  genlist := List(data.gens, x->x[1]);
 
   # Now clean out the memory everywhere in data:
   for i in [1..Length(data.gens)] do
@@ -2509,6 +2515,7 @@ FindHomMethodsMatrix.NaturalSL := function(ri,G)
   data.t21invtran := StripMemory(data.t21invtran);
   data.sinv := StripMemory(data.sinv);
 
+  # Return
   ri!.data:=data;
   ri!.dimension:=n;
   Setslpforelement(ri,SLPforElementFuncsMatrix.SLConstructive);
