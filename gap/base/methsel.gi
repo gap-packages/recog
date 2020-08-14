@@ -30,6 +30,12 @@ InstallGlobalFunction("AddMethod", function(methodDb, method)
     if not IsBound(method.comment) then
         method.comment := "";
     fi;
+    # method.validatesOrAlwaysValidInput for now only stores meta-information.
+    # It may be used in the future, see github issue #184.
+    if not IsBound(method.validatesOrAlwaysValidInput) then
+        Info(InfoAddMethod, 1, "AddMethod, ", method.stamp,
+             ": validatesOrAlwaysValidInput not bound");
+    fi;
     l := Length(methodDb);
     pos := First([1 .. l], i -> methodDb[i].rank <= method.rank);
     if pos = fail then
