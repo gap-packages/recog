@@ -563,9 +563,11 @@ DeclareSynonym("RecognizeGroup", RecogniseGroup);
 ##     components of which are copied into the new recognition info record
 ##     which is created for the group <A>H</A>. Especially the component
 ##     <C>hints</C> can contain a list of additional find homomorphism
-##     methods (described by records as in Section <Ref Sect="whataremethods"/>)
-##     which is prepended to the method database in <A>methoddb</A> before
-##     the recognition starts. This feature is intended to give hints
+##     methods (described by records as in Section <Ref Sect="whataremethods"/>).
+#      The methods in <C>hints</C> and in <A>methoddb</A> are merged and sorted
+#      into rank-descending order. The result is passed to
+#      <Ref Func="CallMethods"/>.
+##     This feature is intended to give hints
 ##     about prior knowledge about which find homomorphism method might succeed.
 ##     <P/>
 ##     The function performs the algorithm described above and returns either
