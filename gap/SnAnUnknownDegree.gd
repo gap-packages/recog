@@ -5,3 +5,8 @@ DeclareGlobalName("AdjustCycle");
 DeclareGlobalName("AppendPoints");
 DeclareGlobalName("BuildCycle");
 DeclareGlobalName("IsElmOfPrimeOrder");
+DeclareGlobalName("ConstructLongCycle");
+DeclareGlobalName("StandardGenerators");
+DeclareGlobalName("SatisfiesAnPresentation");
+DeclareGlobalName("RecogniseSnAn");
+
