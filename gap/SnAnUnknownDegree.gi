@@ -117,11 +117,16 @@ BindGlobal("ThreeCycleCandidatesIterator",
     return oneThreeCycleCandidate;
 end);
 
-# G: the group to recognize
-# c: possibly a 3-cycle
-# returns a list of group elements. If G is isomorphic to an alternating or
-# symmetric group and c is a 3-cycle, then this function returns a list of
-# bolstering elements with respect to c.
+# ri : recog info record with group G
+# c : element of G,
+#     should be a 3-cycle
+# eps : real number, the error bound
+# N : integer, upper bound for the degree of G
+#
+# Returns a list of elements of G.
+#
+# If the input is as assumed, then this function returns a list of bolstering
+# elements with respect to c.
 BindGlobal("BolsteringElements",
 function(ri, c, eps, N)
     local result, R, S, prebolsteringElms, i, r, cr, cr2;
@@ -158,12 +163,18 @@ function(ri, c, eps, N)
     return result;
 end);
 
-# g: a cycle matching c of a group G
-# c: a 3-cycle of a group G
-# r: arbitrary element of a group G
-# The supports of c and c^(g^2) have exactly one point, say alpha, in common.
-# Let phi be an isomorphism from G to a natural alternating or symmetric group.
-# This function decides whether alpha is a fixed point of phi(r).
+# ri : recog info record with group G
+# g : element of G,
+#     should be a cycle matching c
+# c : element of G,
+#     should be a 3-cycle
+# r : element of G
+#
+# Returns a boolean.
+#
+# If the input is as assumed, then the supports of c and c^(g^2) have exactly
+# one point, say alpha, in common and this function returns whether alpha is a
+# fixed point of r.
 BindGlobal("IsFixedPoint",
 function(ri, g, c, r)
     local
@@ -211,14 +222,22 @@ function(ri, g, c, r)
     return true;
 end);
 
-# g: a k-cycle matching c of a group G
-# c: a 3-cycle of a group G
-# r: element of a group G
+# ri : recog info record with group G
+# g : element of G,
+#     should be a k-cycle matching c
+# c : element of G,
+#     should be a 3-cycle
+# r : element of G,
+#     should have at least one moved point in common with g and should fix at
+#     least two moved points of g
+# k : integer,
+#     should be length of cycle g
+#
+# Returns fail or a conjugate of r.
+#
 # W.l.o.g. let g = (1, ..., k) and c = (1, 2, 3).
-# If the support of g has at least one point in common with the support of r
-# and at least two points of support of g are fixed by r,
-# then the algorithm returns a conjugate r^x such that r fixes the points 1, 2
-# but not the point 3.
+# If the input is as assumed, then the algorithm returns a conjugate r ^ x such
+# that r ^ x fixes the points 1, 2 but not the point 3.
 BindGlobal("AdjustCycle",
 function(ri, g, c, r, k)
     local
@@ -328,22 +347,36 @@ function(ri, g, c, r, k)
     return r^x;
 end);
 
-# g: a k-cycle matching c of a group G
-# c: a 3-cycle of a group G
-# r: return value of AdjustCycle. If e.g. g = (1, 2, ..., k), then r would be a
-# cycle fixing 1 and 2 and moving 3
-# The algorithm AppendPoints appends new points to the cycle g. Since g will
-# always be a cycle of odd length, new points can only be appended in pairs.
+# ri : recog info record with group G
+# g : element of G,
+#     should be a k-cycle matching c
+# c : element of G,
+#     should be a 3-cycle
+# r : element of G,
+#     should be a cycle as in the return value of AdjustCycle. If e.g.
+#     g = (1, 2, ..., k), then r would be a cycle fixing 1 and 2 and moving 3.
+# s : element of group G,
+#     should be a storage cycle
+# k : integer,
+#     should be length of cycle g
+# k0 : integer,
+#      should be length of cycle r
 #
-# We identify the point j in {1, ..., k} with the 3-cycle c ^ (g ^ (j - 3)).
-# We store new points in the storage cycle sTilde until we have found two
-# different points. Then we append these to g.
+# Returns a list consisting of:
+# - gTilde: element of G,
+#           should be a cycle matching g
+# - sTilde: element of G,
+#           should be current storage cycle, since we may call AppendPoints
+#           several times and may not have used the last sTilde.
+# - kTilde: integer,
+#           should be the length of gTilde
 #
-# We return a list consisting of:
-# - gTilde, the new g
-# - sTilde, since we may call AppendPoints several times and may not have used
-# the last sTilde.
-# - kTilde, the length of gTilde
+# The algorithm appends new points to the cycle g. Since g will always be a
+# cycle of odd length, new points can only be appended in pairs. We identify
+# the point j in {1, ..., k} with the 3-cycle c ^ (g ^ (j - 3)). We store new
+# points in the storage cycle sTilde until we have found two different points.
+# Then we append these to g.
+
 BindGlobal("AppendPoints",
 function(ri, g, c, r, s, k, k0)
     local gTilde, sTilde, kTilde, gc2, x, j;
@@ -370,10 +403,10 @@ function(ri, g, c, r, s, k, k0)
     return [gTilde, sTilde, kTilde];
 end);
 
-# ri : recog info record
-# g : element of a group
+# ri : recog info record with group G
+# g : element of G
 # p : prime
-# We return true, if g is an element of order p.
+# Returns whether g is an element of order p.
 BindGlobal("IsElmOfPrimeOrder",
 function(ri, g, p)
     if not isone(ri)(g) and isone(ri)(g ^ p) then
@@ -383,12 +416,17 @@ function(ri, g, p)
     fi;
 end);
 
-# c: a 3-cycle of a group G
+# ri : recog info record with group G
+# c : a 3-cycle of a group G
 # x : bolstering element with respect to c
-# The algorithm BuildCycle determines a cycle g of length k matching c.
-# We return either fail or a list consisting of:
+# N : upper bound for degree of G
+# returns either fail or a list consisting of:
 # - g, cycle matching c
 # - k, length of cycle g.
+#
+# We return fail if one of the following holds:
+# - N is not an upper bound for the degree of G
+# - c is not a 3-cycle
 BindGlobal("BuildCycle",
 function(ri, c, x, N)
     local
@@ -483,24 +521,39 @@ function(ri, c, x, N)
     return fail;
 end);
 
-# ri : recog info record
-# c : three-cycle
-# eps : error probability
-# N : upper bound for degree of the group
-# We return either fail or a list consisting of:
-# - g, cycle matching c
-# - k, length of cycle g.
+# NOTE: Output in paper is reversed.
+#
+# ri : recog info record with group G
+# c : element of G,
+#     should be a 3-cycle
+# eps : real number, the error bound
+# N : integer, upper bound for the degree of G
+#
+# Returns fail or a list consisting of:
+# - g: element of G,
+#      should be a k-cycle matching c
+# - k: integer,
+#      should be length of cycle g.
+#
+# We return fail if one of the following holds:
+# - the list of bolstering elements is too small
+# - N is not an upper bound for the degree of G
+# - c is not a 3-cycle
 BindGlobal("ConstructLongCycle",
 function(ri, c, eps, N)
     local g, k, tmp, B, x;
     B := BolsteringElements(ri, c, Float(eps) / 2., N);
     if Length(B) < Int(Ceil(7./4. * Log(2. / Float(eps)))) then
+        # the list of bolstering elements is too small
         return fail;
     fi;
     k := 0;
     for x in B do
         tmp := BuildCycle(ri, c, x, N);
         if tmp = fail then
+            # One of the following holds:
+            # - N is not an upper bound for the degree of G
+            # - c is not a 3-cycle
             return fail;
         elif tmp[2] > k then
             g := tmp[1];
