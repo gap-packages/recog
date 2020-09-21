@@ -311,7 +311,8 @@ DeclareAttribute( "isone", IsRecognitionInfo, "mutable" );
 DeclareAttribute( "isequal", IsRecognitionInfo, "mutable" );
 # Used to compute order of group elements after recognition:
 DeclareAttribute( "order", IsRecognitionInfo, "mutable" );
-
+# Used to check whether two group elements commute:
+DeclareAttribute( "arecommuting", IsRecognitionInfo, "mutable" );
 
 
 #############################################################################
@@ -663,7 +664,6 @@ DeclareOperation( "RandomOrdersSeen", [ IsRecognitionInfo ] );
 DeclareOperation( "StopStoringRandEls", [ IsRecognitionInfo ] );
 DeclareOperation( "GetElmOrd", [ IsRecognitionInfo, IsRecord ] );
 DeclareOperation( "GetElmPpd", [ IsRecognitionInfo, IsRecord ] );
-
 
 
 # Finally the generic verification procedure:

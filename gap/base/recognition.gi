@@ -160,6 +160,7 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
         Setisequal(ri,\=);
         ri!.order := Order;
     fi;
+    Setarecommuting(ri,function(x,y) return isequal(ri)(x*y, y*x); end);
     ri!.projective := projective;
     # FIXME: perhaps DON'T set a default for findgensNmeth, to ensure
     # people always set a value? Or at least find some way so that
