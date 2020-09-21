@@ -1,3 +1,31 @@
+# FIXME: Move me into GAP
+# Helper function to compute all primes up to a given integer via a prime sieve
+BindGlobal("AllPrimesUpTo",
+function(n)
+    local i, j, sieve, result;
+    if n <= 1000 then
+      return Primes{[1..PositionSorted(Primes, n+1)-1]};
+    fi;
+    sieve := BlistList([1..n], [1..n]);
+    sieve[1] := false;
+    for i in [2..Int(n/2)] do
+        sieve[i*2] := false;
+    od;
+    i := 3;
+    while i * i <= n do
+        if sieve[i] then
+            j := 3*i;
+            while j <= n do
+                sieve[j] := false;
+                j := j + 2*i;
+            od;
+        fi;
+        i := i + 2;
+    od;
+    return ListBlist([1..n], sieve);
+end);
+
+
 # Input: Group G, upper error bound eps, upper degree bound N
 #
 # The following algorithm constructs a set of possible 3-cycles. It is based
@@ -17,8 +45,8 @@ BindGlobal("ThreeCycleCandidatesIterator",
         t,
         # integers, controlling the number of iterations
         M, B, T, C, logInt2N,
-        # integer, prime, loop variable
-        p,
+        # iteration over all primes up to N
+        allPrimes, i, p,
         # counters
         nrInvolutions, nrTriedConjugates, nrThreeCycleCandidates,
         # helper functions
@@ -30,10 +58,10 @@ BindGlobal("ThreeCycleCandidatesIterator",
     # Constants
     # TODO: better iteration over primes
     M := 1;
-    p := 3;
-    while p <= N do
+    allPrimes := AllPrimesUpTo(N);
+    for i in [2 .. Length(allPrimes)] do
+        p := allPrimes[i];
         M := M * p ^ LogInt(N, p);
-        p := NextPrimeInt(p);
     od;
     # FIXME: Probably B can be chosen smaller
     B := Int(Ceil(13 * Log2(Float(N)) * Log2(3 / Float(eps))));

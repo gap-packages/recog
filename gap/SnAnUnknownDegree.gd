@@ -1,3 +1,4 @@
+DeclareGlobalName("AllPrimesUpTo");
 DeclareGlobalName("ThreeCycleCandidatesIterator");
 DeclareGlobalName("BolsteringElements");
 DeclareGlobalName("IsFixedPoint");
