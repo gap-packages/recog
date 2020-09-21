@@ -129,14 +129,14 @@ end);
 # elements with respect to c.
 BindGlobal("BolsteringElements",
 function(ri, c, eps, N)
-    local result, R, S, NrPrebolsteringElms, i, r, cr, cr2;
+    local result, R, S, nrPrebolsteringElms, i, r, cr, cr2;
     result := [];
     R := Int(Ceil(7 / 4 * Log2(Float(eps ^ -1))));
     S := 7 * N * R;
-    NrPrebolsteringElms := 0;
+    nrPrebolsteringElms := 0;
     i := 0;
     # find pre-bolstering elements
-    while i <= S and NrPrebolsteringElms <= R do
+    while i <= S and nrPrebolsteringElms <= R do
         r := RandomElm(ri,"simplesocle",true)!.el;
         # test whether r is pre-bolstering
         cr := c ^ r;
@@ -146,7 +146,7 @@ function(ri, c, eps, N)
                 and not isequal(ri)(cr2, c ^ 2)
                 and isone(ri)(Comm(cr2, c))
         then
-            NrPrebolsteringElms := NrPrebolsteringElms + 1;
+            nrPrebolsteringElms := nrPrebolsteringElms + 1;
             if isone(ri)((cr ^ (c * r)
                       * cr ^ (cr2 * c)) ^ 3)
             then
