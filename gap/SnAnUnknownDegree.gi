@@ -427,46 +427,34 @@ end);
 BindGlobal("BuildCycle",
 function(ri, c, x, N)
     local
-        # Floor(N / 2)
-        N2,
-        # min(alpha, beta)
-        m,
-        # d = c ^ (x ^ (m + 1))
-        d,
-        # y = c * c ^ x * c ^ (x ^ 2) * ... * c ^ (x ^ m)
-        y,
-        # is false, if m >= N/2
-        isMinInitialized,
-        # dx = d ^ x = c ^ (x ^ (m + 2))
-        dx,
-        # element defined as in the case distinction
-        e,
-        # d ^ e
-        z,
-        # z ^ (x ^ 2 * (mDash - 1))
-        zxMinus,
-        # z ^ (x ^ 2 * (mDash))
-        zx,
-        # z ^ (x ^ 2 * (mDash + 1))
-        zxPlus,
-        # integer computed as in Remark 4.9
-        mDash,
-        # cycle matching c
-        g;
-    # Here we set m := 0
-    N2 := Int(Floor(Float(N) / 2.));
-    y := c;
-    d := c ^ x;
-    isMinInitialized := false;
-    for m in [1 .. N2] do
-        y := y * d;
-        d := d ^ x;
-        if not IsElmOfPrimeOrder(ri, d * c, 5) then
-            isMinInitialized := true;
+        # integers
+        m, mDash,
+        # group elements
+        d, y, dx, e, z, f, g, xSquared;
+    # Compute m.
+    # m is the least natural number such that with
+    # d = c ^ (x ^ (m + 1))
+    # we have Order(d * c) <> 5. Note that m >= 1.
+    # We also compute
+    # y = c * (c ^ x) * (c ^ (x ^ 2)) * ... * (c ^ (x ^ m)).
+    # The next three lines correspond to m = 1
+    # We use x ^ 2 several times.
+    xSquared := x ^ 2;
+    m := 1;
+    y := c * (c ^ x);
+    d := c ^ xSquared;
+    while true do
+        if m >= N / 2 then
+            return fail;
+        elif IsElmOfPrimeOrder(ri, d * c, 5) then
+            m := m + 1;
+        else
             break;
         fi;
+        y := y * d;
+        d := d ^ x;
     od;
-    if not isMinInitialized then
+    if m = 1 then
         return fail;
     fi;
     # Case |alpha - beta| = 0
@@ -480,42 +468,48 @@ function(ri, c, x, N)
     fi;
     # Case |alpha - beta| >= 2
     # Case distinction on element e
-    if IsElmOfPrimeOrder(ri, d * c, 2) then
-        # w not in v ^ <x>
+    # w in v ^ <x>
+    if not IsElmOfPrimeOrder(ri, d * c, 2) then
+        # Case 1, alpha > beta
         if docommute(ri)(dx, d ^ c) then
-            # Case 4, alpha < beta
-            e := (d ^ (x * c)) ^ 2;
+            e := dx ^ c;
+        # Case 2, alpha < beta
         else
-            # Case 3, alpha > beta
-            e := d ^ (x * c ^ 2);
+            e := (dx ^ (c ^ 2)) ^ 2;
         fi;
+    # w not in v ^ <x>
     else
-        # w in v ^ <x>
-        if docommute(ri)(dx, d ^ c) then
-            # Case 1, alpha > beta
-            e := d ^ (x * c);
+        # Case 3, alpha > beta
+        if not docommute(ri)(dx, d ^ c) then
+            e := dx ^ (c ^ 2);
+        # Case 4, alpha < beta
         else
-            # Case 2, alpha < beta
-            e := (d ^ (x * c ^ 2)) ^ 2;
+            e := (dx ^ c) ^ 2;
         fi;
     fi;
     z := d ^ e;
-    # Here we set mDash := 1
-    zxMinus := z;
-    zx := zxMinus ^ (x ^ 2);
-    zxPlus := zx ^ (x ^ 2);
-    g := y * zxMinus;
-    for mDash in [1 .. N2] do
-        if not IsElmOfPrimeOrder(ri, zxPlus, 5) then
-            return [g, 2 * mDash + 2 * m + 3];
+    # Compute m' (here mDash).
+    # mDash is the least natural number such that with
+    # f := z ^ (x ^ (2 * mDash))
+    # we have Order(f * c) <> 5. Note that mDash >= 1.
+    # We also compute
+    # g = y * z * (z ^ (x ^ 2)) * ... * (z ^ (x ^ (2 * (mDash - 1)))).
+    # The next three lines correspond to mDash = 1
+    mDash := 1;
+    g := y * z;
+    f := z ^ xSquared;
+    while true do
+        if mDash >= N / 2 then
+            return fail;
+        elif IsElmOfPrimeOrder(ri, f * c, 5) then
+            mDash := mDash + 1;
+        else
+            break;
         fi;
-        zxMinus := zx;
-        zx := zxPlus;
-        zxPlus := zxPlus ^ (x ^ 2);
-        g := y * zxMinus;
+        g := g * f;
+        f := f ^ xSquared;
     od;
-    # mDash >= N / 2
-    return fail;
+    return [g, 2 * mDash + 2 * m + 3];
 end);
 
 # NOTE: Output in paper is reversed.
