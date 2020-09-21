@@ -141,10 +141,10 @@ function(ri, c, eps, N)
         # test whether r is pre-bolstering
         cr := c ^ r;
         cr2 := cr ^ r;
-        if not isone(ri)(Comm(cr, c))
+        if not docommute(ri)(cr, c)
                 and not isequal(ri)(cr2, c)
                 and not isequal(ri)(cr2, c ^ 2)
-                and isone(ri)(Comm(cr2, c))
+                and docommute(ri)(cr2, c)
         then
             nrPrebolsteringElms := nrPrebolsteringElms + 1;
             if isone(ri)((cr ^ (c * r)
@@ -188,7 +188,7 @@ function(ri, g, c, r)
         local nrTrivialComm, h;
         nrTrivialComm := 0;
         for h in H do
-            if isone(ri)(Comm(x, h)) then
+            if docommute(ri)(x, h) then
                 nrTrivialComm := nrTrivialComm + 1;
             fi;
             if nrTrivialComm >= 2 then
@@ -384,7 +384,7 @@ function(ri, g, c, r, s, k, k0)
     for j in [1 .. k0 - 1] do
         # invariant: x = c ^ (r ^ j)
         x := x ^ r;
-        if isone(ri)(Comm(x, gTilde * c ^ 2)) then
+        if docommute(ri)(x, gTilde * c ^ 2) then
             # If sTilde doesn't already store a point, then store x.
             if isone(ri)(sTilde) then
                 sTilde := x;
@@ -482,7 +482,7 @@ function(ri, c, x, N)
     # Case distinction on element e
     if IsElmOfPrimeOrder(ri, d * c, 2) then
         # w not in v ^ <x>
-        if isone(ri)(Comm(dx, d ^ c)) then
+        if docommute(ri)(dx, d ^ c) then
             # Case 4, alpha < beta
             e := (d ^ (x * c)) ^ 2;
         else
@@ -491,7 +491,7 @@ function(ri, c, x, N)
         fi;
     else
         # w in v ^ <x>
-        if isone(ri)(Comm(dx, d ^ c)) then
+        if docommute(ri)(dx, d ^ c) then
             # Case 1, alpha > beta
             e := d ^ (x * c);
         else
