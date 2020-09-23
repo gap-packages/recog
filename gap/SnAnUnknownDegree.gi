@@ -641,7 +641,7 @@ function(ri, eps, N)
     T := Int(Ceil(Log(1 / Float(eps))));
     repeat
         T := T - 1;
-        iterator := ThreeCycleCandidatesIterator(ri, eps, N);
+        iterator := ThreeCycleCandidatesIterator(ri, 1. / 4., N);
         c := iterator();
         while c <> TemporaryFailure do
             if c = NeverApplicable then return NeverApplicable; fi;
