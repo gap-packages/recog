@@ -562,17 +562,13 @@ BindGlobal("ConstructLongCycle",
 function(ri, c, eps, N)
     local g, k, tmp, B, x;
     B := BolsteringElements(ri, c, Float(eps) / 2., N);
-    if Length(B) < Int(Ceil(7./4. * Log(2. / Float(eps)))) then
-        # the list of bolstering elements is too small
+    if Length(B) < Int(Ceil(7. / 4. * Log(2. / Float(eps)))) then
         return fail;
     fi;
     k := 0;
     for x in B do
         tmp := BuildCycle(ri, c, x, N);
         if tmp = fail then
-            # One of the following holds:
-            # - N is not an upper bound for the degree of G
-            # - c is not a 3-cycle
             return fail;
         elif tmp[2] > k then
             g := tmp[1];
