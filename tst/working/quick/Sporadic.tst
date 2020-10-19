@@ -56,8 +56,6 @@ gap> TestSporadic("Suz.2");
 [ "Suz.2" ]
 gap> TestSporadic("Fi22.2");
 [ "Fi22.2" ]
-gap> TestSporadic("ON.2");
-[ "ON.2" ]
 gap> TestSporadic("J3.2");
 [ "J3.2" ]
 gap> TestSporadic("2F4(2)'");
