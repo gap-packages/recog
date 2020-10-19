@@ -28,6 +28,8 @@ gap> TestSporadic("HN.2"); # FIXME: sometimes gives "B"
 [ "HN.2" ]
 gap> TestSporadic("HS.2"); # FIXME: sometimes "recognized" as McL.2
 [ "HS.2"]
+gap> TestSporadic("ON.2"); # FIXME: sometimes gives "B"
+[ "ON.2" ]
 
 gap> #TestSporadic("HN"); # FIXME: very slow
 gap> #TestSporadic("Ly"); # FIXME: very slow
