@@ -633,14 +633,61 @@ function(ri, g, c, k, eps, N)
     fi;
 end);
 
-# UNFINISHED
-# currently returns standard gens of An
+# TODO: Use FindImageAn or FindImageSn to compute SLPs in nice gens.
+# This function is taken from the function RecogniseSnAn in gap/SnAnBB.gi
+# FIXME: describe return values etc
+BindGlobal("ConstructSnAnIsomorphism",
+function(ri, n, gens)
+    local grp, xis, gl, slp, eval, h, b, g;
+    grp := GroupWithMemory(Grp(ri));
+    # TODO: strip here?
+    xis := ConstructXiAn(n, gens[1], gens[2]);
+    for g in GeneratorsOfGroup(grp) do
+        # TODO: can we take g, gens, xis to be without memory? Like this?
+        # gens := StripMemory(gens); xis := StripMemory(xis);
+        gl := FindImageAn(ri, n, g, gens[1], gens[2], xis[1], xis[2]);
+        if gl = fail then return fail; fi;
+        if SignPerm(gl) = -1 then
+            # we found an odd permutation,
+            # so the group cannot be An
+            slp := RECOG.SLPforAn(n, (1,2) * gl);
+            eval:=ResultOfStraightLineProgram(slp, [gens[2], gens[1]]);
+            h :=  eval * g ^ -1;
+            if n mod 2 <> 0 then
+                b := gens[1] * gens[2];
+            else
+                b := h * gens[1] * gens[2];
+            fi;
+            if SatisfiesSnPresentation(ri, n, b, h) then
+                xis := ConstructXiSn(n, b, h);
+                for g in GeneratorsOfGroup(grp) do
+                    gl := FindImageSn(ri, n, g, b, h, xis[1], xis[2]);
+                    if gl = fail then return fail; fi;
+                    slp := RECOG.SLPforSn(n, gl);
+                    eval := ResultOfStraightLineProgram(slp, [h, b]);
+                    if not isequal(ri)(eval, g) then return fail; fi;
+                od;
+                return ["Sn", [b, h], xis];
+            else
+                return fail;
+            fi;
+        else
+            slp := RECOG.SLPforAn(n, gl);
+            eval:=ResultOfStraightLineProgram(slp, [gens[2], gens[1]]);
+            if not isequal(ri)(eval, g) then return fail; fi;
+        fi;
+    od;
+
+    return ["An", [gens[1], gens[2]], xis];
+end);
+
+# FIXME: describe function
 BindGlobal("RecogniseSnAn",
 function(ri, eps, N)
-    local T, c, tmp, g, k, n, iterator;
+    local T, foundPreImagesOfStdGens, iterator, c, tmp, isoData, i;
     T := Int(Ceil(Log(1 / Float(eps))));
-    repeat
-        T := T - 1;
+    foundPreImagesOfStdGens := false;
+    for i in [1 .. T] do
         iterator := ThreeCycleCandidatesIterator(ri, 1. / 4., N);
         c := iterator();
         while c <> fail do
@@ -650,18 +697,21 @@ function(ri, eps, N)
                 c := iterator();
                 continue;
             fi;
-            g := tmp[1];
-            k := tmp[2];
-            tmp := StandardGenerators(ri, g, c, k, 1. / 8., N);
+            # Now tmp contains [g, k] where
+            #   g corresponds to a long cycle
+            #   k is its length
+            tmp := StandardGenerators(ri, tmp[1], c, tmp[2], 1. / 8., N);
             if tmp = fail then
                 c := iterator();
                 continue;
             fi;
-            g := tmp[1];
-            c := tmp[2];
-            n := tmp[3];
-            return [g, c, n];
+            # Now tmp contains [g, c, n] where
+            #   g, c correspond to standard generators of An
+            isoData := ConstructSnAnIsomorphism(ri, tmp[3], tmp{[1,2]});
+            if isoData = fail then continue; fi;
+            Add(isoData, tmp[3]);
+            return isoData;
         od;
-    until T = 0;
-    return fail;
+    od;
+    return TemporaryFailure;
 end);
