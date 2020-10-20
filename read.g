@@ -36,10 +36,8 @@ ReadPackage("recog","gap/generic/KnownNilpotent.gi");
 # Permutations:
 ReadPackage("recog","gap/perm/giant.gi");
 ReadPackage("recog","gap/perm/largebase.gi");
-ReadPackage("recog","gap/SnAnUnknownDegree.gi");
-
-# Up to now there is not much here:
 ReadPackage("recog","gap/SnAnBB.gi");
+ReadPackage("recog","gap/SnAnUnknownDegree.gi");
 
 # Matrices/Projective:
 ReadPackage("recog","gap/projective/findnormal.gi");
