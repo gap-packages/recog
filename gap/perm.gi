@@ -326,13 +326,10 @@ end;
 
 SLPforElementFuncsPerm.StabChain :=
   function( ri, g )
-    # we know that g is an element of Grp(ri) all without memory.
     # we know that ri!.stabilizerchain is an immutable StabChain and
     # ri!.stronggensslp is bound to a slp that expresses the strong generators
     # in that StabChain in terms of the GeneratorsOfGroup(Grp(ri)).
-    local S,s;
-    S := ri!.stabilizerchain;
-    return SLPinLabels(S,g);
+    return SLPinLabels(ri!.stabilizerchain,g);
   end;
 
 StoredPointsPerm := function(p)
