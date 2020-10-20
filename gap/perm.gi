@@ -85,7 +85,7 @@ FindHomMethodsPerm.Imprimitive :=
 
     # We test for known non-primitivity:
     if HasIsPrimitive(G) and IsPrimitive(G) then
-        return NeverApplicable;   # never call us again
+        return NeverApplicable;
     fi;
 
     RECOG.SetPseudoRandomStamp(G,"Imprimitive");
@@ -94,7 +94,7 @@ FindHomMethodsPerm.Imprimitive :=
     blocks := MaximalBlocks(G,MovedPoints(G));
     if Length(blocks) = 1 then
         SetIsPrimitive(G,true);
-        return NeverApplicable;   # never call us again
+        return NeverApplicable;
     fi;
 
     # Find the homomorphism:
