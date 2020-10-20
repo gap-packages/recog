@@ -431,6 +431,7 @@ AddMethod(
         rank := 100,
         stamp := "ThrowAwayFixedPoints",
         comment := "try to find a huge amount of (possible internal) fixed points",
+        validatesOrAlwaysValidInput := true,
     )
 );
 
@@ -451,6 +452,7 @@ AddMethod(
         rank := 97,
         stamp := "Pcgs",
         comment := "use a Pcgs to calculate a stabilizer chain",
+        validatesOrAlwaysValidInput := true,
     )
 );
 
@@ -461,6 +463,8 @@ AddMethod(
         rank := 95,
         stamp := "MovesOnlySmallPoints",
         comment := "calculate a stabilizer chain if only small points are moved",
+        # delegates to StabChain
+        validatesOrAlwaysValidInput := true,
     )
 );
 
@@ -471,6 +475,7 @@ AddMethod(
         rank := 90,
         stamp := "NonTransitive",
         comment := "try to find non-transitivity and restrict to orbit",
+        validatesOrAlwaysValidInput := true,
     )
 );
 
@@ -481,6 +486,7 @@ AddMethod(
         rank := 80,
         stamp := "Giant",
         comment := "tries to find Sn and An in their natural actions",
+        validatesOrAlwaysValidInput := true,
     )
 );
 
@@ -491,6 +497,7 @@ AddMethod(
         rank := 70,
         stamp := "Imprimitive",
         comment := "for a imprimitive permutation group, restricts to block system",
+        validatesOrAlwaysValidInput := true,
     )
 );
 
@@ -501,6 +508,7 @@ AddMethod(
         rank := 60,
         stamp := "LargeBasePrimitive",
         comment := "recognises large-base primitive permutation groups",
+        validatesOrAlwaysValidInput := true,
     )
 );
 
@@ -516,6 +524,7 @@ AddMethod(
             "https://gap-packages.github.io/genss/",
             "</URL>"
         ),
+        validatesOrAlwaysValidInput := true,
     )
 );
 AddMethod(
@@ -525,6 +534,7 @@ AddMethod(
         rank := 50,
         stamp := "StabChain",
         comment := "for a permutation group using a stabilizer chain",
+        validatesOrAlwaysValidInput := true,
     )
 );
 
