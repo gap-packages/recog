@@ -85,7 +85,8 @@ BindGlobal("ThreeCycleCandidatesIterator",
     # Helper functions
     # tryThreeCycleCandidate returns one of the following:
     # - a three cycle candidate, i.e. an element of G
-    # - fail, if the random conjugate c from step 4 and t commute
+    # - fail, if the random conjugate c from step 4 and t commute. Then we have
+    #   to call tryThreeCycleCandidate again
     # - NeverApplicable, if G can not be an Sn or An
     tryThreeCycleCandidate := function()
         local
@@ -124,6 +125,7 @@ BindGlobal("ThreeCycleCandidatesIterator",
             nrThreeCycleCandidates := nrThreeCycleCandidates + 1;
             return (t * c) ^ 2;
         else
+            # we have to call tryThreeCycleCandidate again
             return fail;
         fi;
     end;
@@ -134,8 +136,9 @@ BindGlobal("ThreeCycleCandidatesIterator",
             if nrInvolutions >= B
                 and (nrTriedConjugates >= C or nrThreeCycleCandidates >= T)
             then
-                # We are done and were not able to recognize Sn or An.
-                return TemporaryFailure;
+                # With probability at least 1 - eps we constructed at least one
+                # three cycle with this iterator.
+                return fail;
             fi;
             candidate := tryThreeCycleCandidate();
             if candidate = NeverApplicable then
@@ -643,7 +646,7 @@ function(ri, eps, N)
         T := T - 1;
         iterator := ThreeCycleCandidatesIterator(ri, 1. / 4., N);
         c := iterator();
-        while c <> TemporaryFailure do
+        while c <> fail do
             if c = NeverApplicable then return NeverApplicable; fi;
             tmp := ConstructLongCycle(ri, c, 1. / 8., N);
             if tmp = fail then
