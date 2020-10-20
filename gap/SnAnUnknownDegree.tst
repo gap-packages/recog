@@ -1,6 +1,7 @@
 #@local testFunction, degrees
 #@local altGroups, symGroups, permMatGroup, altMatGroups, nonAltOrSymGroups
 #@local ri, g, c, r, i, x
+#@local sets, S11On2Sets, res, isoData, gensWithMem, g1, img1, g2, img2
 #
 # testing matrix:
 # - isomorphic: yes, no
@@ -172,3 +173,22 @@ gap> BuildCycle(ri, c, x, 10);
 gap> x := (2,4,5,6,10,3,7,8);;
 gap> BuildCycle(ri, c, x, 10);
 [ (1,2,3,4,7,5,8,6,10), 9 ]
+
+# Construct isomorphism between S_11 on 2-sets and S_11 in natural
+# representation.
+gap> sets := Combinations([1 .. 11], 2);;
+gap> S11On2Sets := Action(SymmetricGroup(11), sets, OnSets);;
+gap> ri := EmptyRecognitionInfoRecord(rec(), S11On2Sets, false);;
+gap> res := RecogniseSnAn(ri, 1/10, 20);;
+gap> isoData := ConstructSnAnIsomorphism(ri, res[3], [res[1], res[2]]);;
+gap> gensWithMem := GeneratorsWithMemory(GeneratorsOfGroup(S11On2Sets));;
+gap> g1 := gensWithMem[1];;
+gap> img1 := FindImageSn(ri, 11, g1, isoData[2][1], isoData[2][2],
+>                        isoData[3][1], isoData[3][2]);;
+gap> CycleStructurePerm(img1);
+[ ,,,,,,,,, 1 ]
+gap> g2 := gensWithMem[2];;
+gap> img2 := FindImageSn(ri, 11, g2, isoData[2][1], isoData[2][2],
+>                        isoData[3][1], isoData[3][2]);;
+gap> CycleStructurePerm(img2);
+[ 1 ]
