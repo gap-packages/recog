@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/gap-packages/recog.svg?branch=master)](https://travis-ci.org/gap-packages/recog)
+[![Build Status](https://travis-ci.com/gap-packages/recog.svg?branch=master)](https://travis-ci.com/gap-packages/recog)
 [![Code Coverage](https://codecov.io/github/gap-packages/recog/coverage.svg?branch=master&token=)](https://codecov.io/gh/gap-packages/recog)
 
 # recog
