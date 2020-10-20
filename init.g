@@ -21,8 +21,6 @@ ReadPackage("recog","gap/base/recognition.gd");
 # The following contain generic declarations for different types of groups:
 ReadPackage("recog","gap/base/projective.gd");
 
-ReadPackage("recog","gap/SnAnUnknownDegree.gd");
-
 ReadPackage("recog","gap/matrix.gd");
 
 ReadPackage("recog","gap/matrix/ppd.gd");
