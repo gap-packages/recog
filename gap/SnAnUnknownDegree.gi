@@ -166,10 +166,8 @@ function(ri, c, eps, N)
     result := [];
     R := Int(Ceil(7 / 4 * Log2(Float(eps ^ -1))));
     S := 7 * N * R;
-    nrPrebolsteringElms := 0;
-    i := 0;
     # find pre-bolstering elements
-    while i <= S and nrPrebolsteringElms <= R do
+    for i in [0 .. S] do
         r := RandomElm(ri, "simplesocle", true)!.el;
         # test whether r is pre-bolstering
         cr := c ^ r;
@@ -179,7 +177,6 @@ function(ri, c, eps, N)
                 and not isequal(ri)(cr2, c ^ 2)
                 and docommute(ri)(cr2, c)
         then
-            nrPrebolsteringElms := nrPrebolsteringElms + 1;
             if isone(ri)((cr ^ (c * r)
                       * cr ^ (cr2 * c)) ^ 3)
             then
@@ -188,7 +185,7 @@ function(ri, c, eps, N)
                 Add(result, cr);
             fi;
         fi;
-        i := i + 1;
+        if Length(result) > R then break; fi;
     od;
     return result;
 end);
@@ -235,7 +232,7 @@ function(ri, g, c, r)
     cg3 := cg2 ^ g;
     cg4 := cg3 ^ g;
     H1 := [ c ^ 2, c ^ cg, ~[2] ^ cg3, ~[3] ^ cg3, ~[4] ^ cg4 ];
-    # Test whether an elm of the set X commutes with at least
+    # Test whether an element of the set X commutes with at least
     # two elements of H1.
     x1 := c ^ r;
     if not commutesWithAtMostOne(ri, x1, H1) then return false; fi;
@@ -320,7 +317,7 @@ function(ri, g, c, r, k)
         if success then
             if j >= 4 then
                 break;
-            # 2. Case, we do not need to compute F4[4]
+            # case 2, we do not need to compute F4[4]
             elif f1 = 1 and f2 = 2 and m = 3 then
                 return r;
             fi;
@@ -333,43 +330,43 @@ function(ri, g, c, r, k)
     # via a decision tree
     if F4[1] then
         if F4[2] then
-            # We are in the 1. Case, since the 2. Case is handled during the
+            # We are in case 1, since case 2 is handled during the
             # computation of F4 above.
             x := c ^ ((g * c ^ 2) ^ (m - 3) * c) * c;
         else
             if F4[3] then
                 if F4[4] then
-                    # 3. Case
+                    # case 3
                     x := c ^ g;
                 else
-                    # 4. Case
+                    # case 4
                     x := (c ^ 2) ^ g;
                 fi;
             else
-                # 5. Case
+                # case 5
                 x := c ^ ((g * c ^ 2) ^ (f2 - 3) * c);
             fi;
         fi;
     else
         if F4[2] then
             if F4[4] then
-                # 6. Case
+                # case 6
                 x := c ^ (c ^ g);
             else
                 if F4[3] then
-                    # 7. Case
+                    # case 7
                     x := (c ^ 2) ^ (c ^ g);
                 else
-                    # 8. Case
+                    # case 8
                     x := c ^ ((g * c ^ 2) ^ (f2 - 3) * c ^ g);
                 fi;
             fi;
         else
             if F4[3] then
-                # 9. Case
+                # case 9
                 x := (c ^ 2) ^ ((g * c ^ 2) ^ (f2 - 3)) * c ^ 2;
             else
-                # 10. Case
+                # case 10
                 x := c ^ ((g * c ^ 2) ^ (f2 - 3)) * c ^ ((g * c ^ 2) ^ (f1 - 3));
             fi;
         fi;
@@ -490,32 +487,32 @@ function(ri, c, x, N)
     if m = 1 then
         return fail;
     fi;
-    # Case |alpha - beta| = 0
+    # case |alpha - beta| = 0
     if isequal(ri)(d, c) or isequal(ri)(d, c ^ 2) then
         return [y, 2 * m + 3];
     fi;
-    # Case |alpha - beta| = 1
+    # case |alpha - beta| = 1
     dx := d ^ x;
     if not IsElmOfPrimeOrder(ri, dx * c, 5) then
         return [y, 2 * m + 3];
     fi;
-    # Case |alpha - beta| >= 2
-    # Case distinction on element e
+    # case |alpha - beta| >= 2
+    # case distinction on element e
     # w in v ^ <x>
     if not IsElmOfPrimeOrder(ri, d * c, 2) then
-        # Case 1, alpha > beta
+        # case 1, alpha > beta
         if docommute(ri)(dx, d ^ c) then
             e := dx ^ c;
-        # Case 2, alpha < beta
+        # case 2, alpha < beta
         else
             e := (dx ^ (c ^ 2)) ^ 2;
         fi;
     # w not in v ^ <x>
     else
-        # Case 3, alpha > beta
+        # case 3, alpha > beta
         if not docommute(ri)(dx, d ^ c) then
             e := dx ^ (c ^ 2);
-        # Case 4, alpha < beta
+        # case 4, alpha < beta
         else
             e := (dx ^ c) ^ 2;
         fi;
@@ -551,13 +548,13 @@ end);
 # eps : real number, the error bound
 # N : integer, upper bound for the degree of G
 #
-# Returns fail or a list consisting of:
+# Returns fail or a list [g, k] consisting of:
 # - g: element of G,
 #      should be a k-cycle matching c
 # - k: integer,
 #      should be length of cycle g.
 #
-# Note that the order of the returned list is reversed wrt the paper to be
+# Note that the order of the returned list is reversed with respect to the paper to be
 # consistent with the return values of the other functions.
 #
 # We return fail if one of the following holds:
