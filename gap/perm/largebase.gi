@@ -12,9 +12,14 @@
 ##  SPDX-License-Identifier: GPL-3.0-or-later
 ##
 ##
-##  This file provides code for recognising whether a permutation group
-##  on N points is isomorphic to G wr S_r where G is S_n acting on
-##  k-sets and N = Binomial(n,k)^r and kr > 1. It implements [LNPS06].
+##  This file provides code for recognising a subfamily of large base primitive
+##  permutation groups.  To be in that subfamily, a primitive permutation group
+##  G on N points must be permutation isomorphic to a subgroup of the product
+##  action wreath product G wr S_r, where G is S_n acting on k-sets, and hence
+##  N = Binomial(n,k)^r.
+##  For a precise description of which groups are recognised by this file
+##  confer to the documentation of the function LargeBasePrimitive.
+##  This file is based on the article [LNPS06].
 ##
 #############################################################################
 
