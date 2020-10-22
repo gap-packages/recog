@@ -169,7 +169,7 @@ RECOG.FirstJellyfish := function( alpha, svalpha, gammaalpha, deltaalpha,
     beta := Random( gammaalpha );
     g := RECOG.NkrTraceSchreierTree( beta, svalpha );
     if g = fail then
-        Info(InfoRecog,2,"Schreier tracing failed");
+        Info(InfoJellyfish,2,"Schreier tracing failed");
         return fail;
     else g := g^-1;
     fi;
@@ -198,7 +198,7 @@ RECOG.FirstJellyfish := function( alpha, svalpha, gammaalpha, deltaalpha,
         gamma := Random( gams );
         g := RECOG.NkrTraceSchreierTree( gamma, svalpha );
         if g = fail then
-            Info(InfoRecog,2,"Schreier tracing failed - 2");
+            Info(InfoJellyfish,2,"Schreier tracing failed - 2");
             return fail;
         else g := g^-1;
         fi;
@@ -208,10 +208,10 @@ RECOG.FirstJellyfish := function( alpha, svalpha, gammaalpha, deltaalpha,
     od;
 
     if I = 0 and Size(jellyfish)>Binomial(n-1,k-1)*Binomial(n,k)^(r-1)
-        then Info(InfoRecog,2,"gammas ran out for ",[n,k,r]);
+        then Info(InfoJellyfish,2,"gammas ran out for ",[n,k,r]);
         return fail;
     elif Size(jellyfish) < Binomial(n-1,k-1)*Binomial(n,k)^(r-1)
-        then Info(InfoRecog,2,"too small set remained");
+        then Info(InfoJellyfish,2,"too small set remained");
         return fail;
     fi;
 
@@ -391,7 +391,7 @@ RECOG.AllJellyfish := function( G )
     l := Maximum( sizes );
     if Length(Filtered(sizes,i->i=s)) > 1 or
        Length(Filtered(sizes,i->i=l)) > 1 then
-        Info(InfoRecog,2,"no unique max or min sized G_alpha orbit");
+        Info(InfoJellyfish,2,"no unique max or min sized G_alpha orbit");
         return fail;
     fi;
     s := alphaorbs[ Position(sizes,s) ]; # shortest <G>_<alpha>-orbit
@@ -405,7 +405,7 @@ RECOG.AllJellyfish := function( G )
            Size(l) = Binomial(n-k,k)^r then
             jellyfishone := RECOG.FirstJellyfish(alpha,svalpha,s,l,G,n,k,r);
             if jellyfishone <> fail then
-                Info(InfoRecog,2,"found jellyfish for ",p);
+                Info(InfoJellyfish,2,"found jellyfish for ",p);
                 alljellyfish := RECOG.GetAllJellyfish( jellyfishone[1],
                                  jellyfishone[2], G,n,k,r );
                 if alljellyfish <> fail then
@@ -413,12 +413,12 @@ RECOG.AllJellyfish := function( G )
                 fi;
             fi;
         else
-            Info(InfoRecog,2,
+            Info(InfoJellyfish,2,
         "couldn't find orbits of correct size for n=",n," k=",k," r=",r);
         fi;
     od;
 
-    Info(InfoRecog,3,"getting jellyfish failed");
+    Info(InfoJellyfish,3,"getting jellyfish failed");
     return fail;
 
 end;
