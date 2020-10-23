@@ -377,6 +377,11 @@ RECOG.AllJellyfish := function( G )
           s, l, params, p, n, k, r, jellyfishone, alljellyfish;
 
     N := LargestMovedPoint(G);
+    params := RECOG.NkrGetParameters( N );
+    if IsEmpty(params) then
+        return false;
+    fi;
+
     D := [ 1 .. N ];
 
     gens := ShallowCopy( GeneratorsOfGroup(G) );
@@ -401,8 +406,6 @@ RECOG.AllJellyfish := function( G )
     fi;
     s := alphaorbs[ Position(sizes,s) ]; # shortest <G>_<alpha>-orbit
     l := alphaorbs[ Position(sizes,l) ]; # longest <G>_<alpha>-orbit
-
-    params := RECOG.NkrGetParameters( N );
 
     for p in params do
         n := p[1]; k := p[2]; r := p[3];
@@ -490,14 +493,17 @@ end;
 #! is a subgroup of the product action wreath product <M>S_n \wr S_r</M>,
 #! and an overgroup of <M>(A_n) ^ r</M> where <M>S_n</M> and <M>A_n</M> act on
 #! the <M>k</M>-subsets of <M>\{1, ..., n\}</M>.
-#! This algorithm recognises large primitive groups with <M>r \cdot k > 1</M>
+#! This algorithm recognises fixed-point-free large primitive groups with
+#! <M>r \cdot k > 1</M>
 #! and <M>2 \cdot r \cdot k^2 \le n</M>.
 #!
 #! If <A>G</A> is imprimitive then the output is
 #! <K>NeverApplicable</K>. If <A>G</A> is primitive then
 #! the output is either a homomorphism into the
 #! natural imprimitive action of <A>G</A> on <M>nr</M> points with
-#! <M>r</M> blocks of size <M>n</M>, or <K>TemporaryFailure</K>.
+#! <M>r</M> blocks of size <M>n</M>,  or <K>TemporaryFailure</K>, or
+#! <K>NeverApplicable</K> if no parameters <M>n</M>, <M>k</M>, and <M>r</M> as
+#! above exist.
 #! @EndChunk
 FindHomMethodsPerm.LargeBasePrimitive :=
   function(ri,grp)
@@ -512,6 +518,8 @@ FindHomMethodsPerm.LargeBasePrimitive :=
     res := RECOG.AllJellyfish(grp);
     if res = fail then
         return TemporaryFailure;
+    elif res = false then
+        return NeverApplicable;
     fi;
     ri!.jellyfishinfo := res;
     T := res[1];
@@ -522,6 +530,8 @@ FindHomMethodsPerm.LargeBasePrimitive :=
     hom := GroupHomByFuncWithData(grp,Group(imgens),RECOG.JellyHomFunc,
                                   rec(T := T,seen := seen));
     SetHomom(ri,hom);
+
+    findgensNmeth(ri).method := FindKernelDoNothing;
 
     return Success;
   end;
