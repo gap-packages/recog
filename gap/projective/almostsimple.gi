@@ -1314,7 +1314,7 @@ RECOG.RuleOutSmallProjOrder := function(m)
 end;
 
 #! @BeginChunk SporadicsByOrders
-#! This method prints a list of sporadic simple groups that <A>G</A>
+#! This method returns a list of sporadic simple groups that <A>G</A>
 #! possibly could be. Therefore it checks whether
 #! <A>G</A> has elements of orders that do not appear in sporadic
 #! groups and otherwise checks whether the most common ("killer") orders
@@ -1432,4 +1432,128 @@ FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
       Info(InfoRecog,2,"This did not work.");
   od;
   return false; # FIXME: false = NeverApplicable here really correct?
+end;
+
+#! @BeginChunk NameSporadic
+#! This method returns a list of sporadic simple groups that <A>ri</A>
+#! could be. It does not recognise the monster and the baby monster group. It
+#! is based on the magma v2.24.10 function <C>RecognizeSporadic</C>.
+FindHomMethodsProjective.NameSporadic := function(ri)
+    local orders, setOfOrders, maximalOrders, isMaximal, namesOfPossibleSporadics, i, j;
+    orders := [];
+    #do we need SetPseudoRandomStamp?
+    for i in [1 .. 500] do
+        Add(orders, RandomElmOrd(ri, "NameSporadic", false).order);
+    od;
+    # Compute maximal orders. Maximal in the sense that it does not divide the
+    # order of another group element.
+    setOfOrders := Immutable(Set(orders));
+    maximalOrders := [];
+    for i in [1..Length(setOfOrders)] do
+        isMaximal := true;
+        for j in [i+1..Length(setOfOrders)] do
+            if setOfOrders[j] mod setOfOrders[i] = 0 then
+                isMaximal := false;
+                break;
+            fi;
+        od;
+        if isMaximal then
+            Add(maximalOrders, setOfOrders[i]);
+        fi;
+    od;
+    namesOfPossibleSporadics := [];
+    if maximalOrders = [5, 6, 8, 11] then
+       Add(namesOfPossibleSporadics, "M11");
+    fi;
+    if maximalOrders = [6, 8, 10, 11] then
+       Add(namesOfPossibleSporadics, "M12");
+    fi;
+    if maximalOrders = [5, 6, 7, 8, 11] then
+       Add(namesOfPossibleSporadics, "M22");
+    fi;
+    if IsSubset([6, 8, 11, 14, 15, 23], maximalOrders)
+           and IsSubset(maximalOrders, [11, 14, 15, 23]) then
+       Add(namesOfPossibleSporadics, "M23");
+    fi;
+    if IsSubset([8, 10, 11, 12, 14, 15, 21, 23], maximalOrders)
+           and IsSubset(maximalOrders, [11, 21, 23]) then
+       Add(namesOfPossibleSporadics, "M24");
+    fi;
+    if IsSubset([6, 7, 10, 11, 15, 19], maximalOrders)
+           and IsSubset(maximalOrders, [11, 15, 19]) then
+       Add(namesOfPossibleSporadics, "J1");
+    fi;
+    if IsSubset([7, 8, 10, 12, 15], maximalOrders)
+           and IsSubset(maximalOrders, [7, 12, 15]) then
+       Add(namesOfPossibleSporadics, "J2");
+    fi;
+    if IsSubset([8, 9, 10, 12, 15, 17, 19], maximalOrders)
+           and IsSubset(maximalOrders, [15, 17, 19]) then
+       Add(namesOfPossibleSporadics, "J3");
+    fi;
+    if IsSubset([7, 8, 10, 11, 12, 15, 20], maximalOrders)
+           and IsSubset(maximalOrders, [11, 20]) then
+       Add(namesOfPossibleSporadics, "HS");
+    fi;
+    if IsSubset([8, 9, 11, 12, 14, 30], maximalOrders)
+           and IsSubset(maximalOrders, [11, 14, 30]) then
+       Add(namesOfPossibleSporadics, "McL");
+    fi;
+    if IsSubset([11, 13, 14, 15, 18, 20, 21, 24], maximalOrders)
+           and IsSubset(maximalOrders, [11, 13]) then
+       Add(namesOfPossibleSporadics, "Suz");
+    fi;
+    if IsSubset([14, 15, 16, 20, 24, 26, 29], maximalOrders)
+           and IsSubset(maximalOrders, [26, 29]) then
+       Add(namesOfPossibleSporadics, "Ru");
+    fi;
+    if IsSubset([14, 18, 20, 21, 22, 23, 24, 30], maximalOrders)
+           and IsSubset(maximalOrders, [22, 23, 24, 30]) then
+       Add(namesOfPossibleSporadics, "Co3");
+    fi;
+    if IsSubset([11, 16, 18, 20, 23, 24, 28, 30], maximalOrders)
+           and IsSubset(maximalOrders, [16, 23, 28, 30]) then
+       Add(namesOfPossibleSporadics, "Co2");
+    fi;
+    if IsSubset([16, 22, 23, 24, 26, 28, 33, 35, 36, 39, 40, 42, 60], maximalOrders)
+           and IsSubset(maximalOrders, [33, 42]) then
+       Add(namesOfPossibleSporadics, "Co1");
+    fi;
+    if IsSubset([11, 12, 15, 16, 19, 20, 28, 31], maximalOrders)
+           and IsSubset(maximalOrders, [19, 28, 31]) then
+       Add(namesOfPossibleSporadics, "ON");
+    fi;
+    if IsSubset([13, 14, 16, 18, 20, 21, 22, 24, 30], maximalOrders)
+           and IsSubset(maximalOrders, [13, 24, 30]) then
+       Add(namesOfPossibleSporadics, "Fi22");
+    fi;
+    if IsSubset([8, 10, 12, 15, 17, 21, 28], maximalOrders)
+           and IsSubset(maximalOrders, [17, 28]) then
+       Add(namesOfPossibleSporadics, "He");
+    fi;
+    if IsSubset([18, 22, 24, 25, 28, 30, 31, 33, 37, 40, 42, 67], maximalOrders)
+           and IsSubset(maximalOrders, [31, 67]) then
+       Add(namesOfPossibleSporadics, "Ly");
+    fi;
+    if IsSubset([16, 23, 24, 28, 29, 30, 31, 33, 35, 37, 40, 42, 43, 44, 66], maximalOrders)
+           and IsSubset(maximalOrders, [37, 43]) then
+       Add(namesOfPossibleSporadics, "J4");
+    fi;
+    if IsSubset([9, 12, 14, 19, 21, 22, 25, 30, 35, 40], maximalOrders)
+           and (IsSubset(maximalOrders, [19]) or IsSubset(maximalOrders, [22])) then
+       Add(namesOfPossibleSporadics, "HN");
+    fi;
+    if IsSubset([13, 14, 16, 17, 22, 23, 24, 26, 27, 28, 35, 36, 39, 42, 60], maximalOrders)
+           and IsSubset(maximalOrders, [17, 23]) then
+       Add(namesOfPossibleSporadics, "Fi23");
+    fi;
+    if IsSubset([16, 17, 22, 23, 24, 26, 27, 28, 29, 33, 35, 36, 39, 42, 45, 60], maximalOrders)
+           and IsSubset(maximalOrders, [17, 29]) then
+       Add(namesOfPossibleSporadics, "Fi24'");
+    fi;
+    if IsSubset([19, 20, 21, 24, 27, 28, 30, 31, 36, 39], maximalOrders)
+            and IsSubset(maximalOrders, [19, 31, 39]) then
+       Add(namesOfPossibleSporadics, "Th");
+    fi;
+    return namesOfPossibleSporadics;
 end;

@@ -6,7 +6,7 @@ gap> TestSporadic := function(name)
 >     g := AtlasGenerators(name,1).generators;
 >     g := Group(g);
 >     ri := EmptyRecognitionInfoRecord(rec(),g,IsMatrixGroup(g));
->     return FindHomMethodsProjective.SporadicsByOrders(ri,g:DEBUGRECOGSPORADICS);
+>     return FindHomMethodsProjective.NameSporadic(ri);
 > end;;
 
 #
@@ -44,19 +44,13 @@ gap> TestSporadic("Suz");
 [ "Suz" ]
 gap> TestSporadic("Fi23");
 [ "Fi23" ]
-gap> TestSporadic("M12.2");
-[ "M12.2" ]
-gap> TestSporadic("M22.2");
-[ "M22.2" ]
-gap> TestSporadic("J2.2");
-[ "J2.2" ]
-gap> TestSporadic("McL.2");
-[ "McL.2" ]
-gap> TestSporadic("Suz.2");
-[ "Suz.2" ]
-gap> TestSporadic("Fi22.2");
-[ "Fi22.2" ]
-gap> TestSporadic("J3.2");
-[ "J3.2" ]
-gap> TestSporadic("2F4(2)'");
-[ "2F4(2)'" ]
+gap> TestSporadic("M12");
+[ "M12" ]
+gap> TestSporadic("Fi22");
+[ "Fi22" ]
+gap> TestSporadic("Co1");
+[ "Co1" ]
+gap> TestSporadic("He");
+[ "He" ]
+gap> TestSporadic("Fi24'");
+[ "Fi24'" ]
