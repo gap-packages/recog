@@ -173,13 +173,26 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     ri!.pr := ProductReplacer(GeneratorsOfGroup(H));
     ri!.gensHmem := GeneratorsWithMemory(GeneratorsOfGroup(H));
     ri!.prodrep := ProductReplacer(ri!.gensHmem, rec( maxdepth := 400 ));
+    # The purpose of the following components is to use the components randr
+    # and rando as the central places where random elements and their orders
+    # can be stored.
+    #
+    # randr stores the random elements computed by RandomElm and RandomElmOrd
     ri!.randr := EmptyPlist(100);
+    # If the order of a random element is computed by RandomElmOrd or if the
+    # order of an entry of randr is computed by GetElmOrd, then the order is
+    # saved into rando.
     ri!.rando := EmptyPlist(100);
-    ri!.randp := EmptyPlist(100);
+    # randrpt stores for each stamp how often it was used to generate a random
+    # element.
     ri!.randrpt := rec();
+    # randopt stores for each stamp how often it was used to generate a random
+    # order.
     ri!.randopt := rec();
-    ri!.randppt := rec();
     ri!.randstore := true;  # TODO: try what happens if we change this to false in terms of performance
+    # randp and randppt were used to store ppd elements. Currently unused.
+    #ri!.randp := EmptyPlist(100);
+    #ri!.randppt := rec();
     H!.pseudorandomfunc := [rec(func := function(ri,name,bool)
                                           return RandomElm(ri,name,bool).el;
                                         end,
@@ -187,24 +200,40 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     return ri;
   end );
 
+# Sets the stamp used by RandomElm, RandomElmOrd, and related functions.
 RECOG.SetPseudoRandomStamp := function(g,st)
   if IsBound(g!.pseudorandomfunc) then
       g!.pseudorandomfunc[Length(g!.pseudorandomfunc)].args[2] := st;
   fi;
 end;
 
+# RandomElm and RandomElmOrd take a recog record, a string, and a
+# bool as inputs.
+# The string is used as a stamp to request a random element or order for a
+# specific computation. RandomElm and RandomElmOrd will first try to reuse
+# random elements and orders generated with different stamps.
+# For example, if a computation which used stamp := "A" has already computed
+# random elements or orders, then RandomElm and RandomElmOrd will reuse these
+# if called with stamp := "B".
+#
+# The components of the recog record involved are explained in
+# EmptyRecognitionInfoRecord.
+#
+# HACK: For recog records created by EmptyRecognitionInfoRecord the method
+# RandomElm is by default stored in the component ri!.Grp!.pseudorandomfunc.
+# A method for PseudoRandom is installed such that it calls
+# RandomElm(ri, "PseudoRandom", false).
 InstallMethod( RandomElm, "for a recognition info record, a string and a bool",
   [ IsRecognitionInfo, IsString, IsBool ],
-  function(ri, s, mem)
+  function(ri, stamp, mem)
     local pos,el;
     if ri!.randstore then
-        if not IsBound(ri!.randrpt.(s)) then
-            ri!.randrpt.(s) := 1;
-            pos := 1;
+        if IsBound(ri!.randrpt.(stamp)) then
+            ri!.randrpt.(stamp) := ri!.randrpt.(stamp) + 1;
         else
-            ri!.randrpt.(s) := ri!.randrpt.(s) + 1;
-            pos := ri!.randrpt.(s);
+            ri!.randrpt.(stamp) := 1;
         fi;
+        pos := ri!.randrpt.(stamp);
         if not IsBound(ri!.randr[pos]) then
             ri!.randr[pos] := Next(ri!.prodrep);
         fi;
@@ -219,19 +248,19 @@ InstallMethod( RandomElm, "for a recognition info record, a string and a bool",
     fi;
   end );
 
+# For an explanation see RandomElm.
 InstallMethod( RandomElmOrd,
   "for a recognition info record, a string and a bool",
   [ IsRecognitionInfo, IsString, IsBool ],
-  function(ri, s, mem)
+  function(ri, stamp, mem)
     local pos,res;
     if ri!.randstore then
-        if not IsBound(ri!.randopt.(s)) then
-            ri!.randopt.(s) := 1;
-            pos := 1;
+        if IsBound(ri!.randopt.(stamp)) then
+            ri!.randopt.(stamp) := ri!.randopt.(stamp) + 1;
         else
-            ri!.randopt.(s) := ri!.randopt.(s) + 1;
-            pos := ri!.randopt.(s);
+            ri!.randopt.(stamp) := 1;
         fi;
+        pos := ri!.randopt.(stamp);
         if not IsBound(ri!.rando[pos]) then
             if not IsBound(ri!.randr[pos]) then
                 ri!.randr[pos] := Next(ri!.prodrep);
@@ -252,23 +281,23 @@ InstallMethod( RandomElmOrd,
     return res;
   end );
 
+# GetElmOrd takes a recognition info record and a record r. The record r
+# typically is created by RandomElm and represents a random element of Grp(ri).
+# If ri!.randstore is true this function tries to look up or computes and
+# stores the order in ri.
 InstallMethod( GetElmOrd, "for a recognition info record and a record",
   [ IsRecognitionInfo, IsRecord ],
   function( ri, r )
     local x;
-    if ri!.randstore and r.nr > 0 then
-        if not IsBound(ri!.rando[r.nr]) then
-            ri!.rando[r.nr] := ri!.order(ri!.randr[r.nr]!.el);
+    if ri!.randstore then
+        if IsBound(ri!.rando[r.nr]) then
             r.order := ri!.rando[r.nr];
         else
+            ri!.rando[r.nr] := ri!.order(ri!.randr[r.nr]!.el);
             r.order := ri!.rando[r.nr];
         fi;
     else
-        if IsObjWithMemory(r.el) then
-            x := r.el!.el;
-        else
-            x := r.el;
-        fi;
+        x := StripMemory(r.el);
         r.order := ri!.order(x);
     fi;
   end );
