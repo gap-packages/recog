@@ -1436,8 +1436,8 @@ end;
 
 #! @BeginChunk NameSporadic
 #! This method returns a list of sporadic simple groups that <A>ri</A>
-#! could be. It does not recognise the monster and the baby monster group. It
-#! is based on the magma v2.24.10 function <C>RecognizeSporadic</C>.
+#! could be. It does not recognise the Monster and the Baby Monster group. It
+#! is based on the Magma v2.24.10 function <C>RecognizeSporadic</C>.
 FindHomMethodsProjective.NameSporadic := function(ri)
     local orders, setOfOrders, maximalOrders, isMaximal, namesOfPossibleSporadics, i, j;
     orders := [];
@@ -1447,7 +1447,7 @@ FindHomMethodsProjective.NameSporadic := function(ri)
     od;
     # Compute maximal orders. Maximal in the sense that it does not divide the
     # order of another group element.
-    setOfOrders := Immutable(Set(orders));
+    setOfOrders := AsSet(orders);
     maximalOrders := [];
     for i in [1..Length(setOfOrders)] do
         isMaximal := true;
