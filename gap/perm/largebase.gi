@@ -379,7 +379,7 @@ RECOG.AllJellyfish := function( G )
     N := LargestMovedPoint(G);
     params := RECOG.NkrGetParameters( N );
     if IsEmpty(params) then
-        return false;
+        return NeverApplicable;
     fi;
 
     D := [ 1 .. N ];
@@ -402,7 +402,7 @@ RECOG.AllJellyfish := function( G )
     if Length(Filtered(sizes,i->i=s)) > 1 or
        Length(Filtered(sizes,i->i=l)) > 1 then
         Info(InfoJellyfish,2,"no unique max or min sized G_alpha orbit");
-        return fail;
+        return TemporaryFailure;
     fi;
     s := alphaorbs[ Position(sizes,s) ]; # shortest <G>_<alpha>-orbit
     l := alphaorbs[ Position(sizes,l) ]; # longest <G>_<alpha>-orbit
@@ -427,7 +427,7 @@ RECOG.AllJellyfish := function( G )
     od;
 
     Info(InfoJellyfish,3,"getting jellyfish failed");
-    return fail;
+    return TemporaryFailure;
 
 end;
 
@@ -516,10 +516,8 @@ FindHomMethodsPerm.LargeBasePrimitive :=
     fi;
     RECOG.SetPseudoRandomStamp(grp,"Jellyfish");
     res := RECOG.AllJellyfish(grp);
-    if res = fail then
-        return TemporaryFailure;
-    elif res = false then
-        return NeverApplicable;
+    if res = NeverApplicable or res = TemporaryFailure then
+        return res;
     fi;
     ri!.jellyfishinfo := res;
     T := res[1];
