@@ -3,6 +3,7 @@
 # this code can be regenerated, at least in principle (and thus verified).
 # If not (or if the script has been lost), let's write one. It should
 # be possible to do so using the AtlasRep package.
+# Possibly that was ProduceTrivialStabChainHint.
 
 # Hints for M11:
 InstallAlmostSimpleHint( "M11", "StabChainHint",
