@@ -1,5 +1,5 @@
 # Classical natural:
-# Usage: ReadPackage("recog","tst/TestClassicalNatural.g");
+# Usage: ReadPackage("recog","tst/testclassicalnatural.g");
 LoadPackage("recog");
 for q in [2,3,4,5,7,8,9,11,13,16,17,25,81,256] do
   for d in Set([2,3,4,5,6,7,8,9,10,17,18,19,20,29,30,q-1,q,q+1]) do
