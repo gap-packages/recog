@@ -1434,12 +1434,91 @@ FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
   return false; # FIXME: false = NeverApplicable here really correct?
 end;
 
+# Data for the function NameSporadic
+RECOG.NameSporadicData := MakeImmutable([
+    rec(name := "M11",
+        maximalOrdersOverset := [5, 6, 8, 11],
+        maximalOrdersSubset := [],
+        length := 4),
+    rec(name := "M12",
+        maximalOrdersOverset := [6, 8, 10, 11],
+        maximalOrdersSubset := [],
+        length := 4),
+    rec(name := "M22",
+        maximalOrdersOverset := [5, 6, 7, 8, 11],
+        maximalOrdersSubset := [],
+        length := 5),
+    rec(name := "M23",
+        maximalOrdersOverset := [6, 8, 11, 14, 15, 23],
+        maximalOrdersSubset := [11, 14, 15, 23]),
+    rec(name := "M24",
+        maximalOrdersOverset := [8, 10, 11, 12, 14, 15, 21, 23],
+        maximalOrdersSubset := [11, 21, 23]),
+    rec(name := "J1",
+        maximalOrdersOverset := [6, 7, 10, 11, 15, 19],
+        maximalOrdersSubset := [11, 15, 19]),
+    rec(name := "J2",
+        maximalOrdersOverset := [7, 8, 10, 12, 15],
+        maximalOrdersSubset := [7, 12, 15]),
+    rec(name := "J3",
+        maximalOrdersOverset := [8, 9, 10, 12, 15, 17, 19],
+        maximalOrdersSubset := [15, 17, 19]),
+    rec(name := "HS",
+        maximalOrdersOverset := [7, 8, 10, 11, 12, 15, 20],
+        maximalOrdersSubset := [11, 20]),
+    rec(name := "McL",
+        maximalOrdersOverset := [8, 9, 11, 12, 14, 30],
+        maximalOrdersSubset := [11, 14, 30]),
+    rec(name := "Suz",
+        maximalOrdersOverset := [11, 13, 14, 15, 18, 20, 21, 24],
+        maximalOrdersSubset := [11, 13]),
+    rec(name := "Ru",
+        maximalOrdersOverset := [14, 15, 16, 20, 24, 26, 29],
+        maximalOrdersSubset := [26, 29]),
+    rec(name := "Co3",
+        maximalOrdersOverset := [14, 18, 20, 21, 22, 23, 24, 30],
+        maximalOrdersSubset := [22, 23, 24, 30]),
+    rec(name := "Co2",
+        maximalOrdersOverset := [11, 16, 18, 20, 23, 24, 28, 30],
+        maximalOrdersSubset := [16, 23, 28, 30]),
+    rec(name := "Co1",
+        maximalOrdersOverset := [16, 22, 23, 24, 26, 28, 33, 35, 36, 39, 40, 42, 60],
+        maximalOrdersSubset := [33, 42]),
+    rec(name := "ON",
+        maximalOrdersOverset := [11, 12, 15, 16, 19, 20, 28, 31],
+        maximalOrdersSubset := [19, 28, 31]),
+    rec(name := "Fi22",
+        maximalOrdersOverset := [13, 14, 16, 18, 20, 21, 22, 24, 30],
+        maximalOrdersSubset := [13, 24, 30]),
+    rec(name := "He",
+        maximalOrdersOverset := [8, 10, 12, 15, 17, 21, 28],
+        maximalOrdersSubset := [17, 28]),
+    rec(name := "Ly",
+        maximalOrdersOverset := [18, 22, 24, 25, 28, 30, 31, 33, 37, 40, 42, 67],
+        maximalOrdersSubset := [31, 67]),
+    rec(name := "J4",
+        maximalOrdersOverset := [16, 23, 24, 28, 29, 30, 31, 33, 35, 37, 40, 42, 43, 44, 66],
+        maximalOrdersSubset := [37, 43]),
+    rec(name := "Fi23",
+        maximalOrdersOverset := [13, 14, 16, 17, 22, 23, 24, 26, 27, 28, 35, 36, 39, 42, 60],
+        maximalOrdersSubset := [17, 23]),
+    rec(name := "Fi24'",
+        maximalOrdersOverset := [16, 17, 22, 23, 24, 26, 27, 28, 29, 33, 35, 36, 39, 42, 45, 60],
+        maximalOrdersSubset := [17, 29]),
+    rec(name := "Th'",
+        maximalOrdersOverset := [19, 20, 21, 24, 27, 28, 30, 31, 36, 39],
+        maximalOrdersSubset := [19, 31, 39]),
+]);
 #! @BeginChunk NameSporadic
 #! This method returns a list of sporadic simple groups that <A>ri</A>
 #! could be. It does not recognise the Monster and the Baby Monster group. It
 #! is based on the Magma v2.24.10 function <C>RecognizeSporadic</C>.
-FindHomMethodsProjective.NameSporadic := function(ri)
-    local orders, setOfOrders, maximalOrders, isMaximal, namesOfPossibleSporadics, i, j;
+#!
+#! According to communication with Eamonn O'Brien
+# TODO G is unused
+FindHomMethodsProjective.NameSporadic := function(ri, G)
+    local orders, setOfOrders, maximalOrders, isMaximal,
+        namesOfPossibleSporadics, res, i, j, data, name;
     orders := [];
     #do we need SetPseudoRandomStamp?
     for i in [1 .. 500] do
@@ -1462,98 +1541,27 @@ FindHomMethodsProjective.NameSporadic := function(ri)
         fi;
     od;
     namesOfPossibleSporadics := [];
-    if maximalOrders = [5, 6, 8, 11] then
-       Add(namesOfPossibleSporadics, "M11");
-    fi;
-    if maximalOrders = [6, 8, 10, 11] then
-       Add(namesOfPossibleSporadics, "M12");
-    fi;
-    if maximalOrders = [5, 6, 7, 8, 11] then
-       Add(namesOfPossibleSporadics, "M22");
-    fi;
-    if IsSubset([6, 8, 11, 14, 15, 23], maximalOrders)
-           and IsSubset(maximalOrders, [11, 14, 15, 23]) then
-       Add(namesOfPossibleSporadics, "M23");
-    fi;
-    if IsSubset([8, 10, 11, 12, 14, 15, 21, 23], maximalOrders)
-           and IsSubset(maximalOrders, [11, 21, 23]) then
-       Add(namesOfPossibleSporadics, "M24");
-    fi;
-    if IsSubset([6, 7, 10, 11, 15, 19], maximalOrders)
-           and IsSubset(maximalOrders, [11, 15, 19]) then
-       Add(namesOfPossibleSporadics, "J1");
-    fi;
-    if IsSubset([7, 8, 10, 12, 15], maximalOrders)
-           and IsSubset(maximalOrders, [7, 12, 15]) then
-       Add(namesOfPossibleSporadics, "J2");
-    fi;
-    if IsSubset([8, 9, 10, 12, 15, 17, 19], maximalOrders)
-           and IsSubset(maximalOrders, [15, 17, 19]) then
-       Add(namesOfPossibleSporadics, "J3");
-    fi;
-    if IsSubset([7, 8, 10, 11, 12, 15, 20], maximalOrders)
-           and IsSubset(maximalOrders, [11, 20]) then
-       Add(namesOfPossibleSporadics, "HS");
-    fi;
-    if IsSubset([8, 9, 11, 12, 14, 30], maximalOrders)
-           and IsSubset(maximalOrders, [11, 14, 30]) then
-       Add(namesOfPossibleSporadics, "McL");
-    fi;
-    if IsSubset([11, 13, 14, 15, 18, 20, 21, 24], maximalOrders)
-           and IsSubset(maximalOrders, [11, 13]) then
-       Add(namesOfPossibleSporadics, "Suz");
-    fi;
-    if IsSubset([14, 15, 16, 20, 24, 26, 29], maximalOrders)
-           and IsSubset(maximalOrders, [26, 29]) then
-       Add(namesOfPossibleSporadics, "Ru");
-    fi;
-    if IsSubset([14, 18, 20, 21, 22, 23, 24, 30], maximalOrders)
-           and IsSubset(maximalOrders, [22, 23, 24, 30]) then
-       Add(namesOfPossibleSporadics, "Co3");
-    fi;
-    if IsSubset([11, 16, 18, 20, 23, 24, 28, 30], maximalOrders)
-           and IsSubset(maximalOrders, [16, 23, 28, 30]) then
-       Add(namesOfPossibleSporadics, "Co2");
-    fi;
-    if IsSubset([16, 22, 23, 24, 26, 28, 33, 35, 36, 39, 40, 42, 60], maximalOrders)
-           and IsSubset(maximalOrders, [33, 42]) then
-       Add(namesOfPossibleSporadics, "Co1");
-    fi;
-    if IsSubset([11, 12, 15, 16, 19, 20, 28, 31], maximalOrders)
-           and IsSubset(maximalOrders, [19, 28, 31]) then
-       Add(namesOfPossibleSporadics, "ON");
-    fi;
-    if IsSubset([13, 14, 16, 18, 20, 21, 22, 24, 30], maximalOrders)
-           and IsSubset(maximalOrders, [13, 24, 30]) then
-       Add(namesOfPossibleSporadics, "Fi22");
-    fi;
-    if IsSubset([8, 10, 12, 15, 17, 21, 28], maximalOrders)
-           and IsSubset(maximalOrders, [17, 28]) then
-       Add(namesOfPossibleSporadics, "He");
-    fi;
-    if IsSubset([18, 22, 24, 25, 28, 30, 31, 33, 37, 40, 42, 67], maximalOrders)
-           and IsSubset(maximalOrders, [31, 67]) then
-       Add(namesOfPossibleSporadics, "Ly");
-    fi;
-    if IsSubset([16, 23, 24, 28, 29, 30, 31, 33, 35, 37, 40, 42, 43, 44, 66], maximalOrders)
-           and IsSubset(maximalOrders, [37, 43]) then
-       Add(namesOfPossibleSporadics, "J4");
-    fi;
+    for data in RECOG.NameSporadicData do
+        if IsSubset(maximalOrders, data.maximalOrdersSubset)
+                and IsSubset(data.maximalOrdersOverset, maximalOrders) then
+            Add(namesOfPossibleSporadics, data.name);
+        fi;
+    od;
+    # HN works a bit differently
     if IsSubset([9, 12, 14, 19, 21, 22, 25, 30, 35, 40], maximalOrders)
-           and (IsSubset(maximalOrders, [19]) or IsSubset(maximalOrders, [22])) then
-       Add(namesOfPossibleSporadics, "HN");
+        and (IsSubset(maximalOrders, [19]) or IsSubset(maximalOrders, [21]))
+    then
+        Add(namesOfPossibleSporadics, "HN");
     fi;
-    if IsSubset([13, 14, 16, 17, 22, 23, 24, 26, 27, 28, 35, 36, 39, 42, 60], maximalOrders)
-           and IsSubset(maximalOrders, [17, 23]) then
-       Add(namesOfPossibleSporadics, "Fi23");
+    if ValueOption("DEBUGRECOGSPORADICS") <> fail then
+        return namesOfPossibleSporadics;
     fi;
-    if IsSubset([16, 17, 22, 23, 24, 26, 27, 28, 29, 33, 35, 36, 39, 42, 45, 60], maximalOrders)
-           and IsSubset(maximalOrders, [17, 29]) then
-       Add(namesOfPossibleSporadics, "Fi24'");
-    fi;
-    if IsSubset([19, 20, 21, 24, 27, 28, 30, 31, 36, 39], maximalOrders)
-            and IsSubset(maximalOrders, [19, 31, 39]) then
-       Add(namesOfPossibleSporadics, "Th");
-    fi;
-    return namesOfPossibleSporadics;
+    for name in namesOfPossibleSporadics do
+        Info(InfoRecog, 2, "Trying hint for ", name,
+             "...");
+        res := LookupHintForSimple(ri, Grp(ri), name);
+        if res = true then return Success; fi;
+        Info(InfoRecog, 2, "This did not work.");
+    od;
+    return false; # FIXME: false = NeverApplicable here really correct?
 end;

@@ -398,10 +398,10 @@ AddMethod(
 AddMethod(
     FindHomDbProjective,
     rec(
-        method := FindHomMethodsProjective.SporadicsByOrders,
+        method := FindHomMethodsProjective.NameSporadic,
         rank := 820,
-        stamp := "SporadicsByOrders",
-        comment := "generate a few random elements and compute the proj. orders",
+        stamp := "NameSporadic",
+        comment := "generate maximal orders",
     )
 );
 
