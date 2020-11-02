@@ -182,7 +182,7 @@ function(ri, c, eps, N)
             then
                 Add(result, c ^ 2 * r);
             else
-                Add(result, cr);
+                Add(result, c * r);
             fi;
         fi;
         if Length(result) > R then break; fi;
