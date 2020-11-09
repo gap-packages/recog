@@ -1,3 +1,22 @@
+#############################################################################
+##
+##  This file is part of recog, a package for the GAP computer algebra system
+##  which provides a collection of methods for the constructive recognition
+##  of groups.
+##
+##  This files's authors include Friedrich Rober and Sergio Siccha.
+##
+##  Copyright of recog belongs to its developers whose names are too numerous
+##  to list here. Please refer to the COPYRIGHT file for details.
+##
+##  SPDX-License-Identifier: GPL-3.0-or-later
+##
+##
+##  This file provides code for recognising whether a permutation group
+##  is isomorphic to an alternating or symmetric group. It implements [JLNP13].
+##
+#############################################################################
+#
 # FIXME: Move me into GAP
 # Helper function to compute all primes up to a given integer via a prime sieve
 BindGlobal("AllPrimesUpTo",
@@ -633,55 +652,75 @@ function(ri, g, c, k, eps, N)
     fi;
 end);
 
-# TODO: Use FindImageAn or FindImageSn to compute SLPs in nice gens.
-# This function is taken from the function RecogniseSnAn in gap/SnAnBB.gi
-# FIXME: describe return values etc
+# This function is an excerpt of the function RecogniseSnAn in gap/SnAnBB.gi
+# ri : recog info record with group G,
+# n : degree
+# stdGensAn : standard generators of An < G
+#
+# Returns either fail or a list [s, stdGens, xis], where:
+# - s is the isomorphism type, that is either the string "Sn" or "An".
+# - stdGens are the standard generators of G. Identical to stdGensAn if G is
+#   isomorphic to An
+# - xis implicitly defines the isomorphism. It is used by FindImageSn and
+#   FindImageAn to compute the isomorphism.
 BindGlobal("ConstructSnAnIsomorphism",
-function(ri, n, gens)
-    local grp, xis, gl, slp, eval, h, b, g;
+function(ri, n, stdGensAn)
+    local grp, xis, gImage, gensWithoutMemory, bWithoutMemory, hWithoutMemory, slp, eval, h, b, g;
     grp := GroupWithMemory(Grp(ri));
-    # TODO: strip here?
-    xis := ConstructXiAn(n, gens[1], gens[2]);
+    gensWithoutMemory := StripMemory(stdGensAn);
+    xis := ConstructXiAn(n, gensWithoutMemory[1], gensWithoutMemory[2]);
     for g in GeneratorsOfGroup(grp) do
-        # TODO: can we take g, gens, xis to be without memory? Like this?
-        # gens := StripMemory(gens); xis := StripMemory(xis);
-        gl := FindImageAn(ri, n, g, gens[1], gens[2], xis[1], xis[2]);
-        if gl = fail then return fail; fi;
-        if SignPerm(gl) = -1 then
+        gImage := FindImageAn(ri, n, StripMemory(g), gensWithoutMemory[1],
+                          gensWithoutMemory[2], xis[1], xis[2]);
+        if gImage = fail then return fail; fi;
+        if SignPerm(gImage) = -1 then
             # we found an odd permutation,
             # so the group cannot be An
-            slp := RECOG.SLPforAn(n, (1,2) * gl);
-            eval:=ResultOfStraightLineProgram(slp, [gens[2], gens[1]]);
-            h :=  eval * g ^ -1;
+            slp := RECOG.SLPforAn(n, (1,2) * gImage);
+            eval:=ResultOfStraightLineProgram(slp, [stdGensAn[2], stdGensAn[1]]);
+            h := eval * g ^ -1;
             if n mod 2 <> 0 then
-                b := gens[1] * gens[2];
+                b := stdGensAn[1] * stdGensAn[2];
             else
-                b := h * gens[1] * gens[2];
+                b := h * stdGensAn[1] * stdGensAn[2];
             fi;
             if SatisfiesSnPresentation(ri, n, b, h) then
-                xis := ConstructXiSn(n, b, h);
+                bWithoutMemory := StripMemory(b);
+                hWithoutMemory := StripMemory(h);
+                xis := ConstructXiSn(n, bWithoutMemory, hWithoutMemory);
+                # TODO: Move this loop, introduce a new variable foundOddPermutation,
+                # because we already computed this for the previous generators
                 for g in GeneratorsOfGroup(grp) do
-                    gl := FindImageSn(ri, n, g, b, h, xis[1], xis[2]);
-                    if gl = fail then return fail; fi;
-                    slp := RECOG.SLPforSn(n, gl);
+                    gImage := FindImageSn(ri, n, StripMemory(g), bWithoutMemory, hWithoutMemory, xis[1], xis[2]);
+                    if gImage = fail then return fail; fi;
+                    slp := RECOG.SLPforSn(n, gImage);
                     eval := ResultOfStraightLineProgram(slp, [h, b]);
-                    if not isequal(ri)(eval, g) then return fail; fi;
+                    if not isequal(ri)(eval, StripMemory(g)) then return fail; fi;
                 od;
                 return ["Sn", [b, h], xis];
             else
                 return fail;
             fi;
         else
-            slp := RECOG.SLPforAn(n, gl);
-            eval:=ResultOfStraightLineProgram(slp, [gens[2], gens[1]]);
-            if not isequal(ri)(eval, g) then return fail; fi;
+            slp := RECOG.SLPforAn(n, gImage);
+            eval:=ResultOfStraightLineProgram(slp, [gensWithoutMemory[2], gensWithoutMemory[1]]);
+            if not isequal(ri)(eval, StripMemory(g)) then return fail; fi;
         fi;
     od;
 
-    return ["An", [gens[1], gens[2]], xis];
+    return ["An", [stdGensAn[1], stdGensAn[2]], xis];
 end);
 
-# FIXME: describe function
+# This method is an implementation of <Cite Key="JLNP13"/>. It is the main
+# function of SnAnUnknownDegree.
+#
+# From <Cite Key="JLNP13"/>, Theorem 1.1:
+# RecogniseSnAn is a one-sided Monte-Carlo algorithm with the following
+# properties. It takes as input a black-box group <A>G</A>, a natural number
+# <A>N</A> and a real number <A>eps</A> with 0 < <A>eps</A> < 1. If <A>G</A> is
+# isomorphic to An or Sn for some 9 <= <A>n</A> <= <A>N</A>, it returns with
+# probability at least 1 - <A>eps</A> the degree <A>n</A> and an
+# isomorphism from <A>G</A> to An or Sn.
 BindGlobal("RecogniseSnAn",
 function(ri, eps, N)
     local T, foundPreImagesOfStdGens, iterator, c, tmp, isoData, i;
@@ -715,3 +754,72 @@ function(ri, eps, N)
     od;
     return TemporaryFailure;
 end);
+
+#! @BeginChunk SnAnUnknownDegree
+#! This method tries to determine whether the input group given by <A>ri</A> is
+#! isomorphic to a symmetric group Sn or alternating group An with
+#! 9 <= <A>n</A>.
+#! It is an implementation of <Cite Key="JLNP13"/>.
+#! @EndChunk
+FindHomMethodsGeneric.SnAnUnknownDegree := function(ri)
+    local G, N, isoData, degree;
+    G := Grp(ri);
+    # TODO find value for N and eps
+    # Check magma
+    # TODO: Can we assume that recognition of natural Sn and An came first? Can
+    # we explicitly check that by checking ri!.fhmethsel?
+    if IsPermGroup(G) then
+        N := NrMovedPoints(G);
+    else
+        N := ErrorNoReturn("TODO");
+    fi;
+    # Try to find an isomorphism
+    isoData := RecogniseSnAn(ri, 1 / 10 ^ 6, N);
+    # NeverApplicable or TemporaryFailure
+    if not IsList(isoData) then
+        return isoData;
+    fi;
+    SetFilterObj(ri, IsLeaf);
+    degree := isoData[4];
+    if isoData[1] = "Sn" then
+        SetSize(ri, Factorial(degree));
+        SetIsRecogInfoForAlmostSimpleGroup(ri, true);
+    else
+        SetSize(ri, Factorial(degree) / 2);
+        SetIsRecogInfoForSimpleGroup(ri, true);
+    fi;
+    # Note that when putting the generators into the record, we reverse
+    # their order, such that it fits to the SLPforSn/SLPforAn function!
+    Setslptonice(ri, SLPOfElms(Reversed(isoData[2])));
+    isoData[2] := StripMemory(isoData[2]);
+    SetNiceGens(ri, Reversed(isoData[2]));
+    # TODO do we need to StripMemory somewhere here?
+    # TODO better place to save these?
+    ri!.SnAnUnknownDegreeIsoData := isoData;
+    if isoData[1] = "Sn" then
+        Setslpforelement(ri, SLPforElementFuncsGeneric.SnUnknownDegree);
+    else
+        Setslpforelement(ri, SLPforElementFuncsGeneric.AnUnknownDegree);
+    fi;
+    return Success;
+end;
+
+# The SLP function if G is isomorphic to Sn.
+SLPforElementFuncsGeneric.SnUnknownDegree := function(ri, g)
+    local isoData, degree, image;
+    isoData := ri!.SnAnUnknownDegreeIsoData;
+    degree := isoData[4];
+    image := FindImageSn(ri, degree, g, isoData[2][1], isoData[2][2],
+                       isoData[3][1], isoData[3][2]);
+    return RECOG.SLPforSn(degree, image);
+end;
+
+# The SLP function if G is isomorphic to An.
+SLPforElementFuncsGeneric.AnUnknownDegree := function(ri, g)
+    local isoData, degree, image;
+    isoData := ri!.SnAnUnknownDegreeIsoData;
+    degree := isoData[4];
+    image := FindImageAn(ri, degree, g, isoData[2][1], isoData[2][2],
+                       isoData[3][1], isoData[3][2]);
+    return RECOG.SLPforAn(degree, image);
+end;

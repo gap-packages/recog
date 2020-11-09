@@ -1,7 +1,7 @@
 #@local testFunction, IsBolsteringElement, degrees
 #@local altGroups, symGroups, permMatGroup, altMatGroups, nonAltOrSymGroups
-#@local ri, g, c, r, i, x
-#@local sets, S11On2Sets, res, isoData, gensWithMem, g1, img1, g2, img2
+#@local ri, g, c, r, i, x, slp
+#@local sets, S11On2Sets, res, isoData, gens, g1, img1, g2, img2
 #
 # testing matrix:
 # - isomorphic: yes, no
@@ -218,15 +218,36 @@ gap> BuildCycle(ri, c, x, 10);
 gap> sets := Combinations([1 .. 11], 2);;
 gap> S11On2Sets := Action(SymmetricGroup(11), sets, OnSets);;
 gap> ri := EmptyRecognitionInfoRecord(rec(), S11On2Sets, false);;
-gap> isoData := RecogniseSnAn(ri, 1/10, 20);;
-gap> gensWithMem := GeneratorsWithMemory(GeneratorsOfGroup(S11On2Sets));;
-gap> g1 := gensWithMem[1];;
+gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri);;
+gap> isoData := ri!.SnAnUnknownDegreeIsoData;;
+gap> gens := GeneratorsOfGroup(S11On2Sets);;
+gap> g1 := gens[1];;
 gap> img1 := FindImageSn(ri, 11, g1, isoData[2][1], isoData[2][2],
 >                        isoData[3][1], isoData[3][2]);;
 gap> CycleStructurePerm(img1);
 [ ,,,,,,,,, 1 ]
-gap> g2 := gensWithMem[2];;
+gap> g2 := gens[2];;
 gap> img2 := FindImageSn(ri, 11, g2, isoData[2][1], isoData[2][2],
 >                        isoData[3][1], isoData[3][2]);;
 gap> CycleStructurePerm(img2);
 [ 1 ]
+
+# FindHomMethodsGeneric.SnAnUnknownDegree
+gap> sets := Combinations([1 .. 11], 2);;
+gap> S11On2Sets := Action(SymmetricGroup(11), sets, OnSets);;
+gap> ri := EmptyRecognitionInfoRecord(rec(), S11On2Sets, false);;
+gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri);
+true
+gap> Size(ri);
+39916800
+gap> Size(SymmetricGroup(11));
+39916800
+
+# Check Slp function
+gap> ri := EmptyRecognitionInfoRecord(rec(), SymmetricGroup(11), false);;
+gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri);
+true
+gap> x := PseudoRandom(Grp(ri));;
+gap> slp := SLPforElement(ri, x);;
+gap> x = ResultOfStraightLineProgram(slp, NiceGens(ri));
+true
