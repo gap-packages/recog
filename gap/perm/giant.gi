@@ -730,7 +730,7 @@ FindHomMethodsPerm.Giant :=
     if res = fail then
         return TemporaryFailure;
     fi;
-    res.slpnice := SLPOfElms(res.gens);
+    Setslptonice(ri, SLPOfElms(res.gens));
     # Note that when putting the generators into the record, we reverse
     # their order, such that it fits to the SLPforSn/SLPforAn function!
     Setslpforelement(ri,SLPforElementFuncsPerm.Giant);
@@ -744,7 +744,6 @@ FindHomMethodsPerm.Giant :=
         SetIsRecogInfoForAlmostSimpleGroup(ri,true);
     fi;
     SetNiceGens(ri,StripMemory(res.gens));
-    Setslptonice(ri,res.slpnice);
     return Success;
   end;
 

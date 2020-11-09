@@ -2433,7 +2433,6 @@ SLCR.FindHom := function(ri,G,d,q)
   until data <> fail;
   Info(InfoRecog,2,"Constructive recognition: success!");
   genlist := List(data.gens,x->x[1]);
-  data.slpnice := SLPOfElms(genlist);
   # Now clean out the memory everywhere in data:
   for i in [1..Length(data.gens)] do
       data.gens[i][1] := StripMemory(data.gens[i][1]);
@@ -2455,7 +2454,7 @@ SLCR.FindHom := function(ri,G,d,q)
   Setslpforelement(ri,SLPforElementFuncsMatrix.SLConstructive);
   SetFilterObj(ri,IsLeaf);
   SetNiceGens(ri,StripMemory(genlist));
-  Setslptonice(ri,data.slpnice);
+  Setslptonice(ri,SLPOfElms(genlist));
   return Success;
 end;
 
@@ -2491,7 +2490,6 @@ FindHomMethodsMatrix.NaturalSL := function(ri,G)
       data:=SLCR.SLDataStructure(grpmem,p,e,n);
   until data <> fail;
   genlist:=List(data.gens,x->x[1]);
-  data.slpnice:=SLPOfElms(genlist);
 
   # Now clean out the memory everywhere in data:
   for i in [1..Length(data.gens)] do
@@ -2514,7 +2512,7 @@ FindHomMethodsMatrix.NaturalSL := function(ri,G)
   Setslpforelement(ri,SLPforElementFuncsMatrix.SLConstructive);
   SetFilterObj(ri,IsLeaf);
   SetNiceGens(ri,StripMemory(genlist));
-  Setslptonice(ri,data.slpnice);
+  Setslptonice(ri,SLPOfElms(genlist));
   return Success;
 end;
 
