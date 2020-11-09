@@ -1,4 +1,4 @@
-#@local testFunction, degrees
+#@local testFunction, IsBolsteringElement, degrees
 #@local altGroups, symGroups, permMatGroup, altMatGroups, nonAltOrSymGroups
 #@local ri, g, c, r, i, x
 #@local sets, S11On2Sets, res, isoData, gensWithMem, g1, img1, g2, img2
@@ -29,6 +29,44 @@ gap> testFunction := function(G, eps, N)
 >         od;
 >     od;
 > end;;
+
+#
+# x : permutation
+# c : permutation,
+#     should be a 3-cycle
+#
+# Returns true, if x is a bolstering element with respect to the 3-cycle c.
+#
+# Let c = (u, v, w). We call x a bolstering element with respect to c, if
+# x = (v, a_1, ..., a_alpha)(w, b_1, ..., b_beta)(...) or
+# x = (v, a_1, ..., a_alpha, w, b_1, ..., b_beta)(...)
+# with u in fix(x) and alpha, beta >= 2.
+gap> IsBolsteringElement :=
+> function(x, c)
+>     local suppC, dist, i, k, p, pos1;
+>     # suppC = [u, v, w]
+>     suppC := MovedPoints(c);
+>     if Size(suppC) <> 3 then return false; fi;
+>     # dist = [k_u, k_v, k_w],
+>     # where for each p in suppC, k_p is the minimal integer such that p^(x^k) in suppC
+>     dist := [0, 0, 0];
+>     for i in [1..3] do
+>         k := 1;
+>         p := suppC[i]^x;
+>         while not p in suppC do
+>             k := k + 1;
+>             p := p ^ x;
+>         od;
+>         dist[i] := k;
+>     od;
+>     # One point of suppC is fixed by x
+>     pos1 := PositionProperty(dist, k -> k = 1);
+>     if pos1 = fail then return false; fi;
+>     Remove(dist, pos1);
+>     # The other two points of cuppC have distance at least 2
+>     if ForAny(dist, k -> k < 2) then return false; fi;
+>     return true;
+> end;;
 gap> degrees := Concatenation(
 >     [10, 12, 20, 21, 30, 35, 40, 42, 50, 51],
 >     Primes{[5 .. 15]}
@@ -58,6 +96,7 @@ gap> nonAltOrSymGroups := [
 >     #Omega(0, 5, 5),
 > ];;
 
+# FIXME: This is super slow.
 # ThreeCycleCandidates
 gap> for i in [1 .. Length(degrees)] do
 >     testFunction(altGroups[i], 1/100, degrees[i]);
@@ -179,8 +218,7 @@ gap> BuildCycle(ri, c, x, 10);
 gap> sets := Combinations([1 .. 11], 2);;
 gap> S11On2Sets := Action(SymmetricGroup(11), sets, OnSets);;
 gap> ri := EmptyRecognitionInfoRecord(rec(), S11On2Sets, false);;
-gap> res := RecogniseSnAn(ri, 1/10, 20);;
-gap> isoData := ConstructSnAnIsomorphism(ri, res[3], [res[1], res[2]]);;
+gap> isoData := RecogniseSnAn(ri, 1/10, 20);;
 gap> gensWithMem := GeneratorsWithMemory(GeneratorsOfGroup(S11On2Sets));;
 gap> g1 := gensWithMem[1];;
 gap> img1 := FindImageSn(ri, 11, g1, isoData[2][1], isoData[2][2],
