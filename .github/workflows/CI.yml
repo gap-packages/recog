@@ -1,0 +1,74 @@
+name: CI
+
+# Trigger the workflow on push or pull request
+on:
+  - push
+  - pull_request
+
+jobs:
+  test:
+    name: ${{ matrix.gap-branch }} - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        gap-branch:
+          - master
+          - stable-4.11
+          - stable-4.10
+
+    env:
+      GAP_PKGS_TO_CLONE: "AutoDoc"
+      SOURCE_DATE_EPOCH: 0
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Download CI scripts"
+        run:  git clone https://github.com/gap-system/pkg-ci-scripts.git scripts
+      - name: "Compile GAP and download packages"
+        env:
+          GAPBRANCH: ${{ matrix.gap-branch }}
+        run:  bash scripts/build_gap.sh
+      - name: "Prepare this package"
+        run:  bash scripts/build_pkg.sh
+      - name: "Compile documentation"
+        run:  $HOME/gap/bin/gap.sh -l "$PWD/gaproot;" --quitonbreak makedoc.g -c "QUIT;"
+      - name: "Run tests"
+        run:  bash scripts/run_tests.sh
+      - name: "Gather coverage"
+        run:  bash scripts/gather-coverage.sh
+      - name: "Upload coverage data to codecov"
+        run:  bash <(curl -s https://codecov.io/bash)
+
+  manual:
+    name: Build manuals
+    runs-on: ubuntu-latest
+
+    env:
+      GAP_PKGS_TO_CLONE: "AutoDoc"
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Download CI scripts"
+        run:  git clone https://github.com/gap-system/pkg-ci-scripts.git scripts
+      - name: "Install latex"
+        run: |
+          packages=(
+            texlive-latex-base
+            texlive-latex-recommended
+            texlive-latex-extra
+            texlive-extra-utils
+            texlive-fonts-recommended texlive-fonts-extra
+          )
+          sudo apt-get install "${packages[@]}"
+      - name: "Compile GAP and download packages"
+        run:  bash scripts/build_gap.sh
+      - name: "Prepare this package"
+        run:  bash scripts/build_pkg.sh
+      - name: "Compile documentation"
+        run:  $HOME/gap/bin/gap.sh -l "$PWD/gaproot;" --quitonbreak makedoc.g -c "QUIT;"
+      - name: "Upload documentation"
+        uses: actions/upload-artifact@v1
+        with:
+          name: manual
+          path: ./doc/manual.pdf
