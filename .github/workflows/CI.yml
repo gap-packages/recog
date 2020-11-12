@@ -20,7 +20,6 @@ jobs:
 
     env:
       GAP_PKGS_TO_CLONE: "AutoDoc"
-      SOURCE_DATE_EPOCH: 0
     steps:
       - uses: actions/checkout@v2
 
@@ -47,6 +46,7 @@ jobs:
 
     env:
       GAP_PKGS_TO_CLONE: "AutoDoc"
+      SOURCE_DATE_EPOCH: 0
     steps:
       - uses: actions/checkout@v2
       - name: "Download CI scripts"
