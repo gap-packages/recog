@@ -18,55 +18,27 @@ jobs:
           - stable-4.11
           - stable-4.10
 
-    env:
-      GAP_PKGS_TO_CLONE: "AutoDoc"
     steps:
       - uses: actions/checkout@v2
-
-      - name: "Download CI scripts"
-        run:  git clone https://github.com/gap-system/pkg-ci-scripts.git scripts
-      - name: "Compile GAP and download packages"
-        env:
+      - uses: gap-actions/setup-gap-for-packages@v1
+        with:
+          GAP_PKGS_TO_CLONE: "AutoDoc"
           GAPBRANCH: ${{ matrix.gap-branch }}
-        run:  bash scripts/build_gap.sh
-      - name: "Prepare this package"
-        run:  bash scripts/build_pkg.sh
-      - name: "Compile documentation"
-        run:  $HOME/gap/bin/gap.sh -l "$PWD/gaproot;" --quitonbreak makedoc.g -c "QUIT;"
-      - name: "Run tests"
-        run:  bash scripts/run_tests.sh
-      - name: "Gather coverage"
-        run:  bash scripts/gather-coverage.sh
-      - name: "Upload coverage data to codecov"
-        run:  bash <(curl -s https://codecov.io/bash)
+      - uses: gap-actions/compile-documentation-for-packages@v1
+      - uses: gap-actions/run-test-for-packages@v1
 
   manual:
     name: Build manuals
     runs-on: ubuntu-latest
 
-    env:
-      GAP_PKGS_TO_CLONE: "AutoDoc"
-      SOURCE_DATE_EPOCH: 0
     steps:
       - uses: actions/checkout@v2
-      - name: "Download CI scripts"
-        run:  git clone https://github.com/gap-system/pkg-ci-scripts.git scripts
-      - name: "Install latex"
-        run: |
-          packages=(
-            texlive-latex-base
-            texlive-latex-recommended
-            texlive-latex-extra
-            texlive-extra-utils
-            texlive-fonts-recommended texlive-fonts-extra
-          )
-          sudo apt-get install "${packages[@]}"
-      - name: "Compile GAP and download packages"
-        run:  bash scripts/build_gap.sh
-      - name: "Prepare this package"
-        run:  bash scripts/build_pkg.sh
-      - name: "Compile documentation"
-        run:  $HOME/gap/bin/gap.sh -l "$PWD/gaproot;" --quitonbreak makedoc.g -c "QUIT;"
+      - uses: gap-actions/setup-gap-for-packages@v1
+        with:
+          GAP_PKGS_TO_CLONE: "AutoDoc"
+      - uses: gap-actions/compile-documentation-for-packages@v1
+        with:
+          use-latex: 'true'
       - name: "Upload documentation"
         uses: actions/upload-artifact@v1
         with:
