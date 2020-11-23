@@ -14,7 +14,7 @@
 ##
 ##  This file provides code for recognising whether a permutation group
 ##  on N points is isomorphic to G wr S_r where G is S_n acting on
-##  k-sets and N = Binomial(n,k)^r and kr > 1.
+##  k-sets and N = Binomial(n,k)^r and kr > 1. It implements [LNPS06].
 ##
 #############################################################################
 
