@@ -2347,7 +2347,7 @@ function( arg )
                    d := DimensionOfMatrixGroup(grp),
                    p := Characteristic(f),
                    a := DegreeOverPrimeField(f),
-                   q := Characteristic(f)^DegreeOverPrimeField(f),
+                   q := q,
                    E := [], LE := [], BE := [], LB := [],
                    LS := [], E2 := [], LE2 := [], BE2 := [],
                    g := fail,
