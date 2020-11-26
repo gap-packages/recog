@@ -65,21 +65,15 @@ end);
 #   result        : either fail or true
 #
 
-InstallGlobalFunction( "CallMethods", function(arg)
+InstallGlobalFunction( "CallMethods", function(db, tolerancelimit, methargs...)
     # First argument is a method database, i.e. list of records
     #   describing recognition methods.
     # Second argument is a number, the tolerance limit.
     # All other arguments are handed through to the methods.
 
-    local i, methargs, ms, result, tolerance, tolerancelimit, db;
+    local i, ms, result, tolerance;
 
-    if Length(arg) < 2 then
-        ErrorNoReturn("CallMethods needs at least two arguments");
-    fi;
-    db := arg[1];
     ms := rec(failedMethods := rec(), inapplicableMethods := rec());
-    tolerancelimit := arg[2];
-    methargs := arg{[3..Length(arg)]};
 
     # Initialize record:
     tolerance := 0;    # reuse methods that failed that many times
