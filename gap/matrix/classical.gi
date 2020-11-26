@@ -16,7 +16,8 @@
 ##
 ##
 ##  This file contains  an implementation  of the recognition  algorithms for
-##  classical groups by Niemeyer and Praeger.
+##  classical groups in irreducible natural representation by Niemeyer and
+##  Praeger.
 ##
 ##  A description of them can be found in [NP97], [NP98], and [NP99].
 ##
