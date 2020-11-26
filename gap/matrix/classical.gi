@@ -677,7 +677,7 @@ RECOG.TestRandomElement := function (recognise, grp)
               s := Gcd(s, ppd[3]);
               h := g^s;
               ## now order(h) is the product of all ppds dividing |g|, see
-              ##  Section 6.1 page 250 of [3]
+              ##  Section 6.1 page 250 of [NP99]
               if IsOne(h) then return false; fi;
               gmod := GModuleByMats([h], recognise.field);
               cf := MTX.CollectedFactors(gmod);
@@ -1251,7 +1251,7 @@ end;
 
 ############################################################################/
 ##
-##  The following functions deal with the Non-generic cases. See [3].
+##  The following functions deal with the Non-generic cases. See [NP99].
 ##
 
 ############################################################################/
@@ -1715,7 +1715,7 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
         fi;
     elif d = 8 and  q =  5 then
         #ACN Feb 07: added fix - need also elements of order a mult of 3
-        #            these are missing in the paper [3]
+        #            these are missing in the paper [NP99]
         if not HasElementsMultipleOf( recognise.orders, [7,13,3])  then
             return fail;
         fi;
