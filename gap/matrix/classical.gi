@@ -675,7 +675,7 @@ RECOG.TestRandomElement := function (recognise, grp)
               h := g^s;
               ## now order(h) is the product of all ppds dividing |g|, see
               ##  Section 6.1 page 250 of [NP99]
-              if IsOne(h) then return false; fi;
+              if IsOne(h) then return TemporaryFailure; fi;
               gmod := GModuleByMats([h], recognise.field);
               cf := MTX.CollectedFactors(gmod);
               if Length(cf) = 2 and cf[1][2] = cf[2][2] then
@@ -759,26 +759,26 @@ RECOG.TestRandomElement := function (recognise, grp)
             Info(InfoClassical,2,o1, " ", o2);
             ### ACN March 2007 needed Projective order
             if  q mod 2 = 0 and (o1 <= 2 or o2 <= 2) then
-                return fail;
+                return TemporaryFailure;
             elif q mod 2 <> 0 and (o1 <= 4 or o2 <= 4) then
-                return fail;
+                return TemporaryFailure;
             fi;
             if ( (q+1) mod o1 = 0 and (q+1) mod o2 = 0) then
                 if not IsPowerOfPrime(q+1,2) and q <> 8 then
                     if  not ForAny( PrimeDivisors(o1), r ->
                       IsPrimitivePrimeDivisor(p,2*recognise.a,r)) then
-                        return false;
+                        return TemporaryFailure;
                     fi;
                     if not ForAny( PrimeDivisors(o2), r ->
                       IsPrimitivePrimeDivisor(p,2*recognise.a,r)) then
-                        return false;
+                        return TemporaryFailure;
                     fi;
                 elif q = 8 then
                     if not o1 mod 9 = 0 or not o2 mod 9 = 0 then
-                        return false;
+                        return TemporaryFailure;
                     fi;
                 else
-                    if o1 < (q+1)/2 or o2 < (q+1)/2 then return false; fi;
+                    if o1 < (q+1)/2 or o2 < (q+1)/2 then return TemporaryFailure; fi;
                 fi;
                 AddSet( recognise.plusminus, [1,1] );
             fi;
