@@ -41,16 +41,13 @@ SigmaL
 
 
 
-
+g := SO(1,4,8);
+ri := RecogniseClassical(g);
+ri.isSOContained;
 
 # A run with SU(3, 5)
-gap> g := SU(3,5);;
-gap> SetInfoLevel(InfoClassical, 2);
-gap> res := RecogniseClassical(g);;
-#I  G is not an alternating group
-#I  G' is not a Mathieu group;
-#I  involution in cyclic subgroup  of order 8 is not central
-#I  group contains SU(3, 25);
+g := SU(3,5);;
+res := RecogniseClassical(g);;
 gap> DisplayRecog(res);
 Reducible : false
 Forms: unitary
