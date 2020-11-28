@@ -2409,7 +2409,7 @@ end);
 
 # The following function pretty prints the output of RecogniseClassical.
 # This can be helpful when debugging it.
-DisplayRecog := function( r )
+DisplayRecogniseClassical := function( r )
 
     local q0;
 
