@@ -17,7 +17,7 @@
 gap> testFunction := function(G, eps, N)
 >     local ri, iterator, candidate, i, j;
 >     ri := EmptyRecognitionInfoRecord(rec(), G, false);
->     iterator := ThreeCycleCandidatesIterator(ri, eps, N);
+>     iterator := ThreeCycleCandidatesIterator(ri, ThreeCycleCandidatesConstants(eps, N));
 >     for i in [1 .. 10] do
 >         candidate := iterator();
 >         for j in [1 .. 10] do
