@@ -773,7 +773,7 @@ end);
 #! @BeginChunk SnAnUnknownDegree
 #! This method tries to determine whether the input group given by <A>ri</A> is
 #! isomorphic to a symmetric group Sn or alternating group An with
-#! 9 <= <A>n</A>.
+#! <M>9 \leq n</M>.
 #! It is an implementation of <Cite Key="JLNP13"/>.
 #! @EndChunk
 FindHomMethodsGeneric.SnAnUnknownDegree := function(ri)
