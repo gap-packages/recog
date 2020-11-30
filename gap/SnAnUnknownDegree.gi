@@ -737,7 +737,7 @@ end);
 BindGlobal("RecogniseSnAn",
 function(ri, eps, N)
     local T, foundPreImagesOfStdGens, constants, iterator, c, tmp, isoData, i;
-    T := Int(Ceil(Log(1 / Float(eps))));
+    T := Log2Int(1 / Float(eps));
     foundPreImagesOfStdGens := false;
     constants := ThreeCycleCandidatesConstants(1. / 4., N);
     for i in [1 .. T] do
