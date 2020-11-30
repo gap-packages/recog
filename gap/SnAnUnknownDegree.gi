@@ -136,7 +136,7 @@ BindGlobal("ThreeCycleCandidatesIterator",
             # 2 ^ logInt2N. Thus, if we find an r such that
             # (r ^ M) ^ (2 & logInt2N) is non-trivial, then we can return
             # NeverApplicable.
-            for a in [1 .. logInt2N]
+            for a in [1 .. logInt2N] do
                 tPowerOld := tPower;
                 tPower := tPower ^ 2;
                 if isone(ri)(tPower) then break; fi;
