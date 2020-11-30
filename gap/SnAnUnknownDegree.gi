@@ -62,7 +62,7 @@ BindGlobal("ThreeCycleCandidatesConstants",
         M := M,
         B := Int(Ceil(13 * Log2(Float(N)) * Log2(3 / Float(eps)))),
         T := Int(Ceil(3 * Log2(3 / Float(eps)))),
-        C := Int(Ceil(Float(3 * N * ~[3] / 5))),
+        C := Int(Ceil(Float(3 * N * ~.T / 5))),
         logInt2N := LogInt(N, 2)
     );
 end);
