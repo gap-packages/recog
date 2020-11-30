@@ -47,8 +47,7 @@ end);
 # eps : real number, the error bound
 # N : integer, upper bound for the degree of G
 #
-# Returns constants used in ThreeCyclesCanditatesIterator
-# as [M, B, T, C, logInt2N]
+# Returns a record of constants used in ThreeCyclesCanditatesIterator.
 BindGlobal("ThreeCycleCandidatesConstants",
     function(eps, N)
     local M, allPrimes, i, p;
@@ -59,17 +58,17 @@ BindGlobal("ThreeCycleCandidatesConstants",
         p := allPrimes[i];
         M := M * p ^ LogInt(N, p);
     od;
-    # FIXME: Probably B can be chosen smaller
-    return [M,
-            Int(Ceil(13 * Log2(Float(N)) * Log2(3 / Float(eps)))),
-            Int(Ceil(3 * Log2(3 / Float(eps)))),
-            Int(Ceil(Float(3 * N * ~[3] / 5))),
-            LogInt(N, 2)
-            ];
+    return record(
+        M := M,
+        B := Int(Ceil(13 * Log2(Float(N)) * Log2(3 / Float(eps)))),
+        T := Int(Ceil(3 * Log2(3 / Float(eps)))),
+        C := Int(Ceil(Float(3 * N * ~[3] / 5))),
+        logInt2N := LogInt(N, 2)
+    );
 end);
 
 # ri : recog info record with group G
-# constants : list of integers [M, B, T, C, logInt2N]
+# constants : a record with components M, B, T, C, and logInt2N
 #
 # The following algorithm constructs a set of possible 3-cycles. It is based
 # on the simple observation that the product of two involutions t1, t2, which
@@ -132,10 +131,16 @@ BindGlobal("ThreeCycleCandidatesIterator",
             r := RandomElm(ri, "simplesocle", true)!.el;
             tPower := r ^ M;
             # Invariant: tPower = (r ^ M) ^ (2 ^ a)
-            for a in [1 .. logInt2N + 1]
+            # We make a small improvement to the version described in the
+            # algorithm. The order of r ^ M is a 2-power. It can be at most
+            # 2 ^ logInt2N. Thus, if we find an r such that
+            # (r ^ M) ^ (2 & logInt2N) is non-trivial, then we can return
+            # NeverApplicable.
+            for a in [1 .. logInt2N]
                 tPowerOld := tPower;
                 tPower := tPower ^ 2;
                 if isone(ri)(tPower) then break; fi;
+            od;
             if not isone(ri)(tPower) then
                 return NeverApplicable;
             fi;
@@ -733,7 +738,7 @@ end);
 BindGlobal("RecogniseSnAn",
 function(ri, eps, N)
     local T, foundPreImagesOfStdGens, constants, iterator, c, tmp, isoData, i;
-    T := Log2Int(1 / Float(eps));
+    T := Int(Ceil(Log2(1 / Float(eps))));
     foundPreImagesOfStdGens := false;
     constants := ThreeCycleCandidatesConstants(1. / 4., N);
     for i in [1 .. T] do
