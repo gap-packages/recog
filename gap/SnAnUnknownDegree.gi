@@ -58,7 +58,7 @@ BindGlobal("ThreeCycleCandidatesConstants",
         p := allPrimes[i];
         M := M * p ^ LogInt(N, p);
     od;
-    return record(
+    return rec(
         M := M,
         B := Int(Ceil(13 * Log2(Float(N)) * Log2(3 / Float(eps)))),
         T := Int(Ceil(3 * Log2(3 / Float(eps)))),
@@ -94,11 +94,11 @@ BindGlobal("ThreeCycleCandidatesIterator",
     # The current involution t_i
     t := fail;
 
-    M := constants[1];
-    B := constants[2];
-    T := constants[3];
-    C := constants[4];
-    logInt2N := constants[5];
+    M := constants.M;
+    B := constants.B;
+    T := constants.T;
+    C := constants.C;
+    logInt2N := constants.logInt2N;
 
     # Counters
     # Counts the constructed involutions t_i in steps 2 & 3.
