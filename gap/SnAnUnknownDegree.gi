@@ -794,6 +794,7 @@ FindHomMethodsGeneric.SnAnUnknownDegree := function(ri)
     if not IsList(isoData) then
         return isoData;
     fi;
+    ri!.SnAnUnknownDegreeIsoData := isoData;
     SetFilterObj(ri, IsLeaf);
     degree := isoData[4];
     if isoData[1] = "Sn" then
@@ -808,9 +809,6 @@ FindHomMethodsGeneric.SnAnUnknownDegree := function(ri)
     Setslptonice(ri, SLPOfElms(Reversed(isoData[2])));
     isoData[2] := StripMemory(isoData[2]);
     SetNiceGens(ri, Reversed(isoData[2]));
-    # TODO do we need to StripMemory somewhere here?
-    # TODO better place to save these?
-    ri!.SnAnUnknownDegreeIsoData := isoData;
     if isoData[1] = "Sn" then
         Setslpforelement(ri, SLPforElementFuncsGeneric.SnUnknownDegree);
     else
