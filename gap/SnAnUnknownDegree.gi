@@ -728,7 +728,7 @@ end);
 # This method is an implementation of <Cite Key="JLNP13"/>. It is the main
 # function of SnAnUnknownDegree.
 #
-# From <Cite Key="JLNP13"/>, Theorem 1.1:
+# From <Cite Key="JLNP13" Where="Theorem 1.1"/>:
 # RecogniseSnAn is a one-sided Monte-Carlo algorithm with the following
 # properties. It takes as input a black-box group <A>G</A>, a natural number
 # <A>N</A> and a real number <A>eps</A> with 0 < <A>eps</A> < 1. If <A>G</A> is
