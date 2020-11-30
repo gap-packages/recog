@@ -44,10 +44,33 @@ function(n)
     return ListBlist([1..n], sieve);
 end);
 
-
-# ri : recog info record with group G
 # eps : real number, the error bound
 # N : integer, upper bound for the degree of G
+#
+# Returns constants used in ThreeCyclesCanditatesIterator
+# as [M, B, T, C, logInt2N]
+BindGlobal("ThreeCycleCandidatesConstants",
+    function(eps, N)
+    local M, allPrimes, i, p;
+    # Constants
+    # TODO: better iteration over primes
+    M := 1;
+    allPrimes := AllPrimesUpTo(N);
+    for i in [2 .. Length(allPrimes)] do
+        p := allPrimes[i];
+        M := M * p ^ LogInt(N, p);
+    od;
+    # FIXME: Probably B can be chosen smaller
+    return [M,
+            Int(Ceil(13 * Log2(Float(N)) * Log2(3 / Float(eps)))),
+            Int(Ceil(3 * Log2(3 / Float(eps)))),
+            Int(Ceil(Float(3 * N * ~[3] / 5))),
+            LogInt(N, 2)
+            ];
+end);
+
+# ri : recog info record with group G
+# constants : list of integers [M, B, T, C, logInt2N]
 #
 # The following algorithm constructs a set of possible 3-cycles. It is based
 # on the simple observation that the product of two involutions t1, t2, which
@@ -60,14 +83,12 @@ end);
 # - TemporaryFailure, if we exhausted all attempts
 # - NeverApplicable, if we found out that G can't be an Sn or An
 BindGlobal("ThreeCycleCandidatesIterator",
-    function(ri, eps, N)
+    function(ri, constants)
     local
         # involution
         t,
         # integers, controlling the number of iterations
         M, B, T, C, logInt2N,
-        # iteration over all primes up to N
-        allPrimes, i, p,
         # counters
         nrInvolutions, nrTriedConjugates, nrThreeCycleCandidates,
         # helper functions
@@ -76,19 +97,11 @@ BindGlobal("ThreeCycleCandidatesIterator",
     # The current involution t_i
     t := fail;
 
-    # Constants
-    # TODO: better iteration over primes
-    M := 1;
-    allPrimes := AllPrimesUpTo(N);
-    for i in [2 .. Length(allPrimes)] do
-        p := allPrimes[i];
-        M := M * p ^ LogInt(N, p);
-    od;
-    # FIXME: Probably B can be chosen smaller
-    B := Int(Ceil(13 * Log2(Float(N)) * Log2(3 / Float(eps))));
-    T := Int(Ceil(3 * Log2(3 / Float(eps))));
-    C := Int(Ceil(Float(3 * N * T / 5)));
-    logInt2N := LogInt(N, 2);
+    M := constants[1];
+    B := constants[2];
+    T := constants[3];
+    C := constants[4];
+    logInt2N := constants[5];
 
     # Counters
     # Counts the constructed involutions t_i in steps 2 & 3.
@@ -723,11 +736,12 @@ end);
 # isomorphism from <A>G</A> to An or Sn.
 BindGlobal("RecogniseSnAn",
 function(ri, eps, N)
-    local T, foundPreImagesOfStdGens, iterator, c, tmp, isoData, i;
+    local T, foundPreImagesOfStdGens, constants, iterator, c, tmp, isoData, i;
     T := Int(Ceil(Log(1 / Float(eps))));
     foundPreImagesOfStdGens := false;
+    constants := ThreeCycleCandidatesConstants(1. / 4., N);
     for i in [1 .. T] do
-        iterator := ThreeCycleCandidatesIterator(ri, 1. / 4., N);
+        iterator := ThreeCycleCandidatesIterator(ri, constants);
         c := iterator();
         while c <> fail do
             if c = NeverApplicable then return NeverApplicable; fi;
