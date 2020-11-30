@@ -128,7 +128,7 @@ BindGlobal("ThreeCycleCandidatesIterator",
         # three cycle candidates for the current involution t.
         # If this is the case, we need to construct the next involution
         if nrTriedConjugates >= C or nrThreeCycleCandidates >= T then
-            r := RandomElm(ri, "simplesocle", true)!.el;
+            r := RandomElm(ri, "SnAnUnknownDegree", true)!.el;
             tPower := r ^ M;
             # Invariant: tPower = (r ^ M) ^ (2 ^ a)
             # We make a small improvement to the version described in the
@@ -153,7 +153,7 @@ BindGlobal("ThreeCycleCandidatesIterator",
         # Try to construct a three cycle candidate via a conjugate of t. See
         # the comment above this function.
         nrTriedConjugates := nrTriedConjugates + 1;
-        c := t ^ RandomElm(ri, "simplesocle", true)!.el;
+        c := t ^ RandomElm(ri, "SnAnUnknownDegree", true)!.el;
         if not isequal(ri)(t * c, c * t) then
             nrThreeCycleCandidates := nrThreeCycleCandidates + 1;
             return (t * c) ^ 2;
@@ -201,7 +201,7 @@ function(ri, c, eps, N)
     S := 7 * N * R;
     # find pre-bolstering elements
     for i in [0 .. S] do
-        r := RandomElm(ri, "simplesocle", true)!.el;
+        r := RandomElm(ri, "SnAnUnknownDegree", true)!.el;
         # test whether r is pre-bolstering
         cr := c ^ r;
         cr2 := cr ^ r;
@@ -642,7 +642,7 @@ function(ri, g, c, k, eps, N)
     gTilde := g;
     for i in [1 .. Int(Ceil(Log(10. / 3.) ^ (-1)
             * (Log(Float(N)) + Log(1 / Float(eps)))))] do
-        x := r ^ RandomElm(ri, "simplesocle", true)!.el;
+        x := r ^ RandomElm(ri, "SnAnUnknownDegree", true)!.el;
         m := AdjustCycle(ri, gTilde, c, x, kTilde);
         if m = fail then return fail; fi;
         tmp := AppendPoints(ri, gTilde, c, m, s, kTilde, k0);
