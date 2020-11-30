@@ -53,7 +53,6 @@ BindGlobal("ThreeCycleCandidatesConstants",
     function(eps, N)
     local M, allPrimes, i, p;
     # Constants
-    # TODO: better iteration over primes
     M := 1;
     allPrimes := AllPrimesUpTo(N);
     for i in [2 .. Length(allPrimes)] do
@@ -76,7 +75,6 @@ end);
 # on the simple observation that the product of two involutions t1, t2, which
 # only move one common point, squares to a 3-cycle.
 #
-# TODO: take care of duplicate candidates?
 # Creates and returns a function, here called oneThreeCycleCandidate. The
 # function oneThreeCycleCandidate returns one of the following:
 # - a three cycle candidate, i.e. an element of G
