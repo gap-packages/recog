@@ -132,15 +132,13 @@ BindGlobal("ThreeCycleCandidatesIterator",
         # If this is the case, we need to construct the next involution
         if nrTriedConjugates >= C or nrThreeCycleCandidates >= T then
             r := RandomElm(ri, "simplesocle", true)!.el;
-            a := 0;
             tPower := r ^ M;
             # Invariant: tPower = (r ^ M) ^ (2 ^ a)
-            repeat
-                a := a + 1;
+            for a in [1 .. logInt2N + 1]
                 tPowerOld := tPower;
                 tPower := tPower ^ 2;
-            until a = logInt2N or isone(ri)(tPower);
-            if a = logInt2N then
+                if isone(ri)(tPower) then break; fi;
+            if not isone(ri)(tPower) then
                 return NeverApplicable;
             fi;
             t := tPowerOld;
