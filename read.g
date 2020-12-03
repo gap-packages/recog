@@ -49,7 +49,7 @@ ReadPackage("recog","gap/matrix/classical.gi");
 ReadPackage("recog","gap/matrix/slconstr.gi");
 ReadPackage("recog","gap/projective/c3c5.gi");
 ReadPackage("recog","gap/projective/d247.gi");
-ReadPackage("recog","gap/projective/almostsimple/twoelorders.gi");
+ReadPackage("recog","gap/projective/almostsimple/threeelorders.gi");
 ReadPackage("recog","gap/projective/almostsimple.gi");
 ReadPackage("recog","gap/projective/almostsimple/lietype.gi");
 ReadPackage("recog","gap/projective/almostsimple/hints.gi");

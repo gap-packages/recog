@@ -1,8 +1,15 @@
-# RECOG.grouplist is used by RECOG.findchar and contains entries
-# of the form
+# RECOG.grouplist is used by RECOG.findchar, which uses the three largest
+# element orders to find the characteristic of its input lie type group.
+# RECOG.grouplist contains entries of the form
 #    [m1, m2, grp],
 # where m1 and m2 are the largest element orders found by sampling
-# a suitable number of random elements; and grp indicates a group:
+# a suitable number of random elements, and grp indicates a group as below.
+#
+# Note that RECOG.findchar first uses the three largest element orders to
+# handle some (or even all?) cases which are not already uniquely determined by
+# the largest two. Thus we only store the two largest element orders in
+# RECOG.grouplist.
+# grp is of the form:
 #    ["l",n,q] <-> L_n(q)
 #    ["G2",q]  <-> G_2(q)
 #    ["2G2",q] <-> G_2(q)
