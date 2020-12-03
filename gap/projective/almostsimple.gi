@@ -740,6 +740,9 @@ end;
 #! different from <M>p</M>, the method also provides
 #! a short list of the possible isomorphism types of <A>G</A>.
 #!
+#! This method assumes that its input is neither alternating nor sporadic and
+#! that <Ref Func="ComputeSimpleSocle"/> has already been called.
+#!
 #! This recognition method is based on the paper <Cite Key="KS09"/>.
 #! @EndChunk
 FindHomMethodsProjective.ThreeLargeElOrders := function(ri,G)
