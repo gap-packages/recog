@@ -461,7 +461,7 @@ AddMethod(
         method := FindHomMethodsProjective.ThreeLargeElOrders,
         rank := 500,
         stamp := "ThreeLargeElOrders",
-        comment := "look at three large element orders",
+        comment := "recognise Lie type groups and get its characteristic",
     )
 );
 
