@@ -735,9 +735,9 @@ end;
 #! simple but not alternating, this method takes the three
 #! largest element orders from a sample of pseudorandom elements of
 #! <A>G</A>. From these element orders, it tries to determine whether <A>G</A>
-#! is of Lie type or sporadic, and the characteristic of <A>G</A> if it is of
+#! is of Lie type and the characteristic of <A>G</A> if it is of
 #! Lie type. In the case when <A>G</A> is of Lie type of characteristic
-#! different from <M>p</M> or <A>G</A> is sporadic, the method also provides
+#! different from <M>p</M>, the method also provides
 #! a short list of the possible isomorphism types of <A>G</A>.
 #!
 #! This recognition method is based on the paper <Cite Key="KS09"/>.
