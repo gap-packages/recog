@@ -11,12 +11,9 @@
 ##
 ##  SPDX-License-Identifier: GPL-3.0-or-later
 ##
-##
-##  The classical groups recognition.
-##
-##
-##  This file contains  an implementation  of the recognition  algorithms for
-##  classical groups by Niemeyer and Praeger.
+##  This file contains an implementation of the non-constructive recognition
+##  algorithms for classical groups in their natural representation by
+##  Niemeyer and Praeger.
 ##
 ##  A description of them can be found in [NP97], [NP98], and [NP99].
 ##
@@ -24,7 +21,7 @@
 ##  [CLG97a], [CLG97b], and [CLGM+95].
 ##
 ##  - In this implementation we use the irreducibility test of the algorithm
-##    described in [CLG97b], which can often avoid an application  of the
+##    described in [CLG97b], which can often avoid an application of the
 ##    Meataxe algorithm.
 ##
 ##  For an overview, see also [Pra99].
