@@ -1440,8 +1440,6 @@ RECOG.NonGenericUnitary := function(recognise, grp)
         fi;
          Info(InfoClassical,2,"group contains SU(",
               recognise.d, ", ", recognise.q, ");");
-        recognise.isSpContained := true;
-
         recognise.isSUContained := true;
         return true;
     end;
