@@ -26,15 +26,6 @@ TestNaming := function(grpname, param...)
         expected.isSpContained := true;
     elif grpname = "SU" then
         expected.isSUContained := true;
-        # FIXME/TODO: apparently for unitary groups, isSpContained is also set
-        # to true. Now, in U(n,q) <= SL(n,q^2) we can indeed find Sp(n,q) as a
-        # subgroup, but not Sp(n,q^2). So arguably isSpContained should not be
-        # set to true. But for now, we just accept it as it is.
-        #
-        # NOTE: the exception are precisely the non-generic cases
-        if param[1] in [3,4,6] or param = [5,2] then
-            expected.isSpContained := true;
-        fi;
     else
         Error("unsupported group type ", grpname);
     fi;

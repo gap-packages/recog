@@ -56,8 +56,6 @@ gap> d:=8;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("Sp", d, q); od
 #
 # unitary groups
 #
-# TODO: the non-generic codes are also recognized as symplectic? see code dealing
-# with that inside 'TestNaming'
 # FIXME/TODO: sometimes get SU(6,2) has bad value for isSUContained; expected true, got unknown
 gap> d:=3;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SU", d, q); od;
 gap> d:=4;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SU", d, q); od;
