@@ -31,8 +31,8 @@
 BindGlobal( "ClassicalMethDb", [] );
 #
 ###
-# Test whether <n> (assumed integer) is a power of <p> (assumed positive prime)
-IsPowerOfPrime := {n, p} -> n > 1 and p ^ PVALUATION_INT(n, p) = n;
+# Test whether <n> (assumed integer) is a power of 2
+IsPowerOfTwo := n -> n > 1 and 2 ^ Log2Int(n) = n;
 
 
 # Check if m > 5 and the order of a basic lppd(d,q;e) element
@@ -150,7 +150,7 @@ RECOG.IsGenericParameters := function( recognise, grp )
 
     elif hint = "linear" and d = 3 then
         #q = 2^s-1
-        if IsPowerOfPrime( q+1, 2 ) then
+        if IsPowerOfTwo( q+1 ) then
             recognise.isGeneric := false;
         fi;
         return false;
@@ -514,7 +514,7 @@ RECOG.IsNotPSL := function (recognise, grp)
    if d = 3 then
        # q = 3*2^s-1 and q^2-1 has no large ppd.
        # TODO recheck this
-       if (q = 2 or ((q+1) mod 3 = 0 and IsPowerOfPrime((q+1)/3,2))) then
+       if (q = 2 or ((q+1) mod 3 = 0 and IsPowerOfTwo((q+1)/3))) then
             ord := Order(recognise.g);
             if (ord mod 8 <> 0 or (p^(2*a)-1) mod ord = 0) then
                 Info( InfoClassical, 2, "G' not PSL(2,7);");
@@ -764,7 +764,7 @@ RECOG.TestRandomElement := function (recognise, grp)
                 return fail;
             fi;
             if ( (q+1) mod o1 = 0 and (q+1) mod o2 = 0) then
-                if not IsPowerOfPrime(q+1,2) and q <> 8 then
+                if not IsPowerOfTwo(q+1) and q <> 8 then
                     if  not ForAny( PrimeDivisors(o1), r ->
                       IsPrimitivePrimeDivisor(p,2*recognise.a,r)) then
                         return false;
@@ -1281,7 +1281,7 @@ RECOG.NonGenericLinear := function( recognise, grp )
     end;
 
     if recognise.d > 3 then return false; fi;
-    if recognise.d = 3 and not IsPowerOfPrime(recognise.q+1, 2) then
+    if recognise.d = 3 and not IsPowerOfTwo(recognise.q+1) then
         return false;
     fi;
     # grp is non-generic if either d = 2 or (d,q) = (3, 2^s-1)
@@ -1392,19 +1392,19 @@ RECOG.NonGenericSymplectic := function(recognise, grp)
         if not HasElementsMultipleOf(recognise.orders, [13,15]) then
             return fail;
         fi;
-    elif d = 4 and not IsPowerOfPrime(q+1,2) and not ((q+1) mod 3 = 0 and
-                   IsPowerOfPrime((q+1)/3, 2)) and q<>2 then
+    elif d = 4 and not IsPowerOfTwo(q+1) and not ((q+1) mod 3 = 0 and
+                   IsPowerOfTwo((q+1)/3)) and q<>2 then
         if not 4 in recognise.LB then
             return fail;
         fi;
         if not 2 in  recognise.LS then return fail; fi;
-    elif d = 4  and q >= 7 and IsPowerOfPrime(q+1,2) then
+    elif d = 4  and q >= 7 and IsPowerOfTwo(q+1) then
         if not 4 in recognise.LB then return fail; fi;
         if not HasElementsMultipleOf(recognise.orders, [4]) then
             return fail;
         fi;
 
-    elif d = 4 and q >= 11 and IsPowerOfPrime((q+1)/3, 2) then
+    elif d = 4 and q >= 11 and IsPowerOfTwo((q+1)/3) then
         if not HasElementsMultipleOf(recognise.orders, [3,4]) then
             return fail;
         fi;
@@ -2037,7 +2037,7 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
         if not HasElementsMultipleOf( recognise.orders, [5,9,19])  then
             return fail;
         fi;
-    elif d = 3 and q >=31 and IsPowerOfPrime(q+1,2) then
+    elif d = 3 and q >=31 and IsPowerOfTwo(q+1) then
         s := Log2Int(q+1);
         if PositionProperty(recognise.orders,
             i->(i > 2 and (q-1) mod i = 0))=fail then
@@ -2048,7 +2048,7 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
             return fail;
         fi;
     elif d = 3 and q>11 and ((q+1) mod 3=0 and
-        IsPowerOfPrime((q+1)/3,2)) then
+        IsPowerOfTwo((q+1)/3)) then
         s := Log2Int((q+1)/3);
         if PositionProperty(recognise.orders,
             i-> (i mod (3*2^(s-1)) = 0)) = fail then
@@ -2058,8 +2058,8 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
             i->(i > 2 and (q-1) mod i = 0))=fail then
             return fail;
         fi;
-    elif d = 3 and ((q+1) mod 3 <> 0 or not IsPowerOfPrime((q+1)/3,2)) and
-                   not IsPowerOfPrime(q+1,2) then
+    elif d = 3 and ((q+1) mod 3 <> 0 or not IsPowerOfTwo((q+1)/3)) and
+                   not IsPowerOfTwo(q+1) then
         if not 2 in recognise.LB then return fail; fi;
         if PositionProperty(recognise.orders,
             i->(i > 2 and (q-1) mod i = 0))=fail then
