@@ -48,7 +48,7 @@ HasLBGgt5 := function( m, p, a, e )
     # Find the basic ppds of p^(ae)-1
     pm := PrimitivePrimeDivisors(a*e, p);
     # find the ppds in m
-    ppds := Gcd(pm.ppds, m);
+    ppds := GcdInt(pm.ppds, m);
 
     # There are no ppds
     if ppds = 1 then return false; fi;
@@ -70,28 +70,31 @@ HasLBGgt5 := function( m, p, a, e )
 end;
 
 
-KroneckerFactors := function(g)
-
-    local a, b, c, d, A, B, C, D, I;
+# "Inverse" to KroneckerProduct on 2x2 matrices -- does not handle inputs with
+# a zero block in the top left (but the code calling this deals with this by
+# simply looking at another random element)
+BindGlobal("KroneckerFactors", function(g)
+    local a, b, c, d, A, Ainv, B, C, D, I;
 
     A := g{[1,2]}{[1,2]};
-    B := g{[1,2]}{[3,4]};
-    C := g{[3,4]}{[1,2]};
-    D := g{[3,4]}{[3,4]};
     if IsZero(Determinant(A)) then
         return false;
     fi;
-    b := (B * A^-1); b := b[1,1];
-    c := (C * A^-1); c := c[1,1];
-    d := (D * A^-1); d := d[1,1];
-    I := A^0;
+    Ainv := A^-1;
+    B := g{[1,2]}{[3,4]};
+    C := g{[3,4]}{[1,2]};
+    D := g{[3,4]}{[3,4]};
+    B := B * Ainv; b := B[1,1];
+    C := C * Ainv; c := C[1,1];
+    D := D * Ainv; d := D[1,1];
 
-    if B*A^-1 <> I*b or C*A^-1 <> I*c or D*A^-1 <> I*d then
+    I := A^0;
+    if B <> I*b or C <> I*c or D <> I*d then
         return false;
     fi;
 
-    return [ [[I[1,1] , b],[ c, d]], A];
-end;
+    return [ [[I[1,1], b], [c, d]], A ];
+end);
 
 
 ######################################################################
@@ -109,7 +112,7 @@ FindBase := function( field, phi )
           [[ 0,0,0,-1],[ 0,0,1,0],[0,1,0,0],[-1,0,0,0]]*One(field), field);
      mat1 := BaseChangeToCanonical(phi);
      mat2 := BaseChangeToCanonical(form);
-     mat := mat2^-1 * mat1;
+     mat := LeftQuotient(mat2, mat1);
      return mat;
 
 end;
@@ -122,7 +125,7 @@ FindBaseC2 := function( field, qf )
              [[0,0,0,-1],[0,0,1,0],[0,0,0,0],[0,0,0,0]]*One(field), field);
      mat := BaseChangeToCanonical(qf);
      mat2 := BaseChangeToCanonical(form2);
-     mat := mat2 * mat^-1;
+     mat := mat2 / mat;
      return mat;
 
 end;
@@ -629,7 +632,7 @@ RECOG.TestRandomElement := function (recognise, grp)
         recognise.isppd := false;
     else
         AddSet(recognise.E,ppd[1]);
-        recognise.currentgcd := Gcd( recognise.currentgcd, ppd[1] );
+        recognise.currentgcd := GcdInt( recognise.currentgcd, ppd[1] );
         if ppd[2] = true then
             AddSet(recognise.LE,ppd[1]);
         fi;
@@ -671,7 +674,7 @@ RECOG.TestRandomElement := function (recognise, grp)
               ## Bug fix 29.10.09
               ## Now we compute the r-part h of g
               s := Order(g);
-              s := Gcd(s, ppd[3]);
+              s := GcdInt(s, ppd[3]);
               h := g^s;
               ## now order(h) is the product of all ppds dividing |g|, see
               ##  Section 6.1 page 250 of [NP99]
