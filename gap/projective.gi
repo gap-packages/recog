@@ -393,17 +393,17 @@ AddMethod(
     )
 );
 
-# We can do the following early on since it will quickly fail for
-# non-sporadic groups:
-AddMethod(
-    FindHomDbProjective,
-    rec(
-        method := FindHomMethodsProjective.NameSporadic,
-        rank := 820,
-        stamp := "NameSporadic",
-        comment := "generate maximal orders",
-    )
-);
+# # We can do the following early on since it will quickly fail for
+# # non-sporadic groups:
+# AddMethod(
+#     FindHomDbProjective,
+#     rec(
+#         method := FindHomMethodsProjective.NameSporadic,
+#         rank := 820,
+#         stamp := "SporadicsByOrders",
+#         comment := "generate a few random elements and compute the proj. orders",
+#     )
+# );
 
 AddMethod(
     FindHomDbProjective,
@@ -442,6 +442,16 @@ AddMethod(
         rank := 600,
         stamp := "LowIndex",
         comment := "find an (imprimitive) action on subspaces",
+    )
+);
+
+AddMethod(
+    FindHomDbProjective,
+    rec(
+        method := FindHomMethodsProjective.NameSporadic,
+        rank := 580,
+        stamp := "NameSporadic",
+        comment := "generate maximal orders",
     )
 );
 

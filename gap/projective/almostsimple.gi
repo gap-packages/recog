@@ -1505,16 +1505,15 @@ RECOG.NameSporadicData := MakeImmutable([
     rec(name := "Fi24'",
         maximalOrdersOverset := [16, 17, 22, 23, 24, 26, 27, 28, 29, 33, 35, 36, 39, 42, 45, 60],
         maximalOrdersSubset := [17, 29]),
-    rec(name := "Th'",
+    rec(name := "Th",
         maximalOrdersOverset := [19, 20, 21, 24, 27, 28, 30, 31, 36, 39],
         maximalOrdersSubset := [19, 31, 39]),
 ]);
 #! @BeginChunk NameSporadic
 #! This method returns a list of sporadic simple groups that <A>ri</A>
-#! could be. It does not recognise the Monster and the Baby Monster group. It
-#! is based on the Magma v2.24.10 function <C>RecognizeSporadic</C>.
-#!
-#! According to communication with Eamonn O'Brien
+#! could be. It does not recognise extensions of sporadic simple groups nor the
+#! Monster and the Baby Monster group. It is based on the Magma v2.24.10
+#! function <C>RecognizeSporadic</C>.
 # TODO G is unused
 FindHomMethodsProjective.NameSporadic := function(ri, G)
     local orders, setOfOrders, maximalOrders, isMaximal,
@@ -1542,6 +1541,9 @@ FindHomMethodsProjective.NameSporadic := function(ri, G)
     od;
     namesOfPossibleSporadics := [];
     for data in RECOG.NameSporadicData do
+        if IsBound(data.length) and not Length(maximalOrders) = data.length then
+            continue;
+        fi;
         if IsSubset(maximalOrders, data.maximalOrdersSubset)
                 and IsSubset(data.maximalOrdersOverset, maximalOrders) then
             Add(namesOfPossibleSporadics, data.name);
@@ -1549,7 +1551,7 @@ FindHomMethodsProjective.NameSporadic := function(ri, G)
     od;
     # HN works a bit differently
     if IsSubset([9, 12, 14, 19, 21, 22, 25, 30, 35, 40], maximalOrders)
-        and (IsSubset(maximalOrders, [19]) or IsSubset(maximalOrders, [21]))
+            and (IsSubset(maximalOrders, [19]) or IsSubset(maximalOrders, [21]))
     then
         Add(namesOfPossibleSporadics, "HN");
     fi;
@@ -1563,5 +1565,5 @@ FindHomMethodsProjective.NameSporadic := function(ri, G)
         if res = true then return Success; fi;
         Info(InfoRecog, 2, "This did not work.");
     od;
-    return false; # FIXME: false = NeverApplicable here really correct?
+    return NeverApplicable;
 end;
