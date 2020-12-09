@@ -1561,23 +1561,25 @@ function(recognise, grp)
             return fail;
         fi;
     elif d = 4 and q > 9 then
+
         if not 3 in recognise.LB then
             return fail;
         fi;
         if not 2 in recognise.E2  then
             return fail;
         fi;
-        f1 := Collected(Factors( q^3-1 ));
-        f2 := Collected(Factors( q^2-1 ));
-        # check if we have a prime at least 11
-        if PositionProperty( f1, i-> (i[1] >= 11)) <> fail then
+        # ACN 27 Nov 2019 reworked this section.
+        # Let r be the ppd of q^3-1 and s that of q^2-1
+        # either max{r,s} >= 11 and G contains omega
+        # or {r,s} = {5,7} and then we have to rule out 2.A7.
+
+        # check of o is divisible by a prime >= 11
+        f1 := o -> PositionProperty(Factors(o), i-> i >= 11) <> fail;
+        if PositionProperty(recognise.orders, f1) <> fail then
             return CheckFlag();
         fi;
-        if PositionProperty( f2, i-> (i[1] >= 11)) <> fail then
-            return CheckFlag();
-        fi;
-        # Now we know that q^3-1 and q^2-1 only contain primes
-        # at most 7
+
+        # Now we know that element orders only contain primes at most 7
         if not q^3 mod 7 = 1 or q^2 mod 7 = 1 or q mod 7 = 1 then
             # 7 is not ppd of q^3-1
             return CheckFlag();
@@ -1593,9 +1595,9 @@ function(recognise, grp)
          q^3 mod i = 1 and   # order divides q^3-1
         (7*(q-1)) mod i <> 0 # order does not divide 7*(q-1)
          )) then
-            # 5 is not ppd of q^2-1
             return CheckFlag();
         fi;
+        return fail;
     elif d = 3 and q = 4 then
         if Order(grp) mod 216 = 0 then
             return CheckFlag();
@@ -1782,10 +1784,24 @@ function(recognise,grp)
              return false;
         fi;
     elif d = 8 and  q =  5 then
-        #ACN Feb 07: added fix - need also elements of order a mult of 3
-        #            these are missing in the paper [NP99]
-        if not HasElementsMultipleOf( recognise.orders, [7,13,3])  then
+        ## 2.July.2019: There is a mistake in the paper here
+        ## There are maximal subgroups of Omega+(8,5) that contain
+        ## elements of order 7,13,3
+        if not HasElementsMultipleOf( recognise.orders, [7,13,3,312])  then
             return fail;
+        fi;
+
+        pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
+        orbs := Orbits( pgrp, MovedPointsPerms( GeneratorsOfGroup(pgrp)));
+        if Set(orbs, Length) <> [ 19656, 39000 ] then
+             recognise.isSOContained := false;
+             return false;
+        fi;
+        if Size(pgrp) mod 8911539000000000000 = 0 then # compare to Size(POmega(+1,8,5))
+             return CheckFlag();
+        else
+             recognise.isSOContained := false;
+             return false;
         fi;
     elif d = 8 and (q = 4 or q > 5) then
         if not 6 in recognise.LB then
@@ -1856,6 +1872,9 @@ function(recognise,grp)
                 return CheckFlag();
         fi;
     elif d = 4 and q =  4 then
+        if not Length( Orbit( grp, Basis(GF(q)^d)[1]) ) in [75,60] then
+            return false;
+        fi;
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
         orbs := Orbits( pgrp, MovedPointsPerms(
            GeneratorsOfGroup(pgrp)));
@@ -1876,16 +1895,26 @@ function(recognise,grp)
                 return CheckFlag();
         fi;
     elif d = 4 and q = 5 then
+        ## Added fast test 4.7.2019 ACN
+        if not Length( Orbit( grp, Basis(GF(q)^d)[1]) ) in [144,120] then
+            return false;
+        fi;
+        ## The projective Group has half order of Omega
+        ## Fix 4.7.2019
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
-        if Size(pgrp) mod 7200 <> 0 then
+        if Size(pgrp) mod 3600 <> 0 then
             recognise.isSOContained := false;
             return false;
         else
             return CheckFlag();
         fi;
     elif d = 4 and q = 7 then
+        ## Added fast test 4.7.2019 ACN
+        if not Length( Orbit( grp, Basis(GF(q)^d)[1]) ) in [384,336] then
+            return false;
+        fi;
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
-        if Size(pgrp) mod 56448  <> 0 then
+        if Size(pgrp) mod 28224  <> 0 then
             recognise.isSOContained := false;
             return false;
         fi;
@@ -1902,8 +1931,12 @@ function(recognise,grp)
                 return CheckFlag();
         fi;
     elif d = 4 and q = 9 then
+        ## Added fast test 4.7.2019 ACN
+        if not Length( Orbit( grp, Basis(GF(q)^d)[1]) ) in [800,720] then
+            return false;
+        fi;
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
-        if Size(pgrp) mod 259200 <> 0 then
+        if Size(pgrp) mod 129600 <> 0 then
             recognise.isSOContained := false;
             return false;
         else
