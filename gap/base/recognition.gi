@@ -485,12 +485,12 @@ InstallGlobalFunction( RecogniseGeneric,
             Info(InfoRecog,2,"Going to the factor (depth=",depth,", try=",
               counter,").");
         fi;
-        Add(depthString,'F');
         if ForAny(GeneratorsOfGroup(H), x->not ValidateHomomInput(ri, x)) then
             # Our group fails to contain some of the generators of H!
             return fail;
         fi;
 
+        Add(depthString,'F');
         rifac := RecogniseGeneric(
                   Group(List(GeneratorsOfGroup(H), x->ImageElm(Homom(ri),x))),
                   methodsforfactor(ri), depthString, forfactor(ri) ); # TODO: change forfactor to hintsForFactor??)
