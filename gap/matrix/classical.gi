@@ -1872,7 +1872,7 @@ function(recognise,grp)
                 return CheckFlag();
         fi;
     elif d = 4 and q =  4 then
-        if not Length( Orbit( grp, Basis(GF(q)^d)[1]) ) in [75,60] then
+        if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) in [75,60] then
             return false;
         fi;
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
@@ -1896,7 +1896,7 @@ function(recognise,grp)
         fi;
     elif d = 4 and q = 5 then
         ## Added fast test 4.7.2019 ACN
-        if not Length( Orbit( grp, Basis(GF(q)^d)[1]) ) in [144,120] then
+        if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) in [144,120] then
             return false;
         fi;
         ## The projective Group has half order of Omega
@@ -1910,7 +1910,7 @@ function(recognise,grp)
         fi;
     elif d = 4 and q = 7 then
         ## Added fast test 4.7.2019 ACN
-        if not Length( Orbit( grp, Basis(GF(q)^d)[1]) ) in [384,336] then
+        if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) in [384,336] then
             return false;
         fi;
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
@@ -1932,7 +1932,7 @@ function(recognise,grp)
         fi;
     elif d = 4 and q = 9 then
         ## Added fast test 4.7.2019 ACN
-        if not Length( Orbit( grp, Basis(GF(q)^d)[1]) ) in [800,720] then
+        if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) in [800,720] then
             return false;
         fi;
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
