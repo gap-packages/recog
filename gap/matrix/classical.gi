@@ -279,11 +279,9 @@ RECOG.RuledOutExtField := function (recognise, grp)
 
     elif hint = "symplectic" then
         if d mod 4 = 2 and q mod 2 = 1 then
-             recognise.isNotExt :=
-            (PositionProperty(E, x -> (x mod 4 = 0)) <> fail);
+             recognise.isNotExt := ForAny(E, x -> x mod 4 = 0);
         elif  d mod 4 = 0 and q mod 2 = 0 then
-             recognise.isNotExt :=
-             (PositionProperty( E, x -> (x mod 4 = 2)) <> fail);
+             recognise.isNotExt := ForAny(E, x -> x mod 4 = 2);
         elif d mod 4 = 0 and q mod 2 = 1 then
              recognise.isNotExt := differmodfour(E);
         elif d mod 4 = 2 and q mod 2 = 0 then
@@ -297,8 +295,7 @@ RECOG.RuledOutExtField := function (recognise, grp)
 
     elif hint = "orthogonalplus" then
         if d mod 4 = 2  then
-            recognise.isNotExt  :=
-           (PositionProperty (E, x -> (x mod 4 = 0 )) <> fail);
+            recognise.isNotExt  := ForAny(E, x -> x mod 4 = 0);
         elif d mod 4 = 0  then
             recognise.isNotExt  := differmodfour(E);
         else
@@ -311,8 +308,7 @@ RECOG.RuledOutExtField := function (recognise, grp)
 
     elif hint = "orthogonalminus" then
         if d mod 4 = 0  then
-            recognise.isNotExt  :=
-            (PositionProperty ( E, x -> (x mod 4 = 2)) <> fail);
+            recognise.isNotExt  := ForAny(E, x -> x mod 4 = 2);
         elif d mod 4 = 2  then
             recognise.isNotExt  := differmodfour(E);
         else
@@ -434,7 +430,7 @@ RECOG.IsNotMathieu := function( recognise, grp )
           return false;
        fi;
    else
-       if ForAny([6,7,8,9],m-> m in E) then
+       if ForAny([6,7,8,9], m -> m in E) then
           Info( InfoClassical, 2, "G' is not a Mathieu group;");
            recognise.isNotMathieu := true;
            return false;
@@ -693,11 +689,11 @@ RECOG.TestRandomElement := function (recognise, grp)
     fi;
 
 
-    if PositionProperty(recognise.E, x->(x mod 2 <> 0)) <> fail then
+    if ForAny(recognise.E, x -> x mod 2 <> 0) then
         recognise.isSpContained := false;
         recognise.isSOContained := false;
     fi;
-    if PositionProperty(recognise.E, x ->(x mod 2 = 0)) <> fail then
+    if ForAny(recognise.E, x -> x mod 2 = 0) then
         recognise.isSUContained := false;
     fi;
 
@@ -768,7 +764,7 @@ RECOG.TestRandomElement := function (recognise, grp)
             fi;
             if ( (q+1) mod o1 = 0 and (q+1) mod o2 = 0) then
                 if not IsPowerOfTwo(q+1) and q <> 8 then
-                    if  not ForAny( PrimeDivisors(o1), r ->
+                    if not ForAny( PrimeDivisors(o1), r ->
                       IsPrimitivePrimeDivisor(p,2*recognise.a,r)) then
                         return TemporaryFailure;
                     fi;
@@ -1233,20 +1229,13 @@ RECOG.IsSOContained := function( recognise, grp )
 end;
 
 
-
-
-HasElementsMultipleOf := function(orders, ord )
-
-    local o;
-
-    for o in ord do
-       if PositionProperty(orders, i->(i mod o = 0 )) = fail then
-           return false;
-       fi;
-    od;
-
-    return true;
-
+# orders: list of observed element orders
+# ord: list of required element orders
+#
+# For all elements n of ord, we must have observed at least one
+# element whose order is a multiple of n
+HasElementsMultipleOf := function(orders, ord)
+    return ForAll(ord, n -> ForAny(orders, i -> i mod n = 0));
 end;
 
 ############################################################################/
@@ -1525,12 +1514,12 @@ RECOG.NonGenericUnitary := function(recognise, grp)
             # 5 is not ppd of q^2-1
             return CheckFlag();
         fi;
-        if PositionProperty( recognise.orders, i ->
+        if ForAny( recognise.orders, i ->
         (i mod 7 = 0 and     # order divisible by 7
          i <> 7 and          # but not equal to 7
          q^3 mod i = 1 and   # order divides q^3-1
         (7*(q-1)) mod i <> 0 # order does not divide 7*(q-1)
-         )) <> fail then
+         )) then
             # 5 is not ppd of q^2-1
             return CheckFlag();
         fi;
@@ -1547,8 +1536,8 @@ RECOG.NonGenericUnitary := function(recognise, grp)
         fi;
         if recognise.hasSpecialEle = false then
             if not Order( recognise.g ) mod 6 = 0 then return fail; fi;
-            if PositionProperty( GeneratorsOfGroup(grp),
-                h-> (Comm(h,recognise.g^3) <> One(grp))) <> fail then
+            if ForAny( GeneratorsOfGroup(grp),
+                h -> not IsOne(Comm(h,recognise.g^3))) then
                 Info( InfoClassical,2,
                       "Cube of element of order div by 6 is not central" );
                       recognise.hasSpecialEle := true;
@@ -1562,8 +1551,7 @@ RECOG.NonGenericUnitary := function(recognise, grp)
         fi;
         if recognise.hasSpecialEle = false then
             if not Order(recognise.g) mod 5  = 0 then return fail; fi;
-            if PositionProperty( GeneratorsOfGroup(grp),
-            h-> (Comm(h,recognise.g) <> One(grp))) <> fail then
+            if ForAny(GeneratorsOfGroup(grp), h -> not IsOne(Comm(h,recognise.g))) then
                 Info( InfoClassical,2,
                       "The element of order 5 is not central" );
                 recognise.hasSpecialEle := true;
@@ -1578,8 +1566,7 @@ RECOG.NonGenericUnitary := function(recognise, grp)
         if recognise.hasSpecialEle = false then
             if Order(recognise.g) mod 8 <> 0 then return fail; fi;
             g := recognise.g^(Order(recognise.g)/2);
-            if PositionProperty( GeneratorsOfGroup(grp),
-                                 h-> (Comm(h,g) <> One(grp))) <> fail then
+            if ForAny(GeneratorsOfGroup(grp), h -> not IsOne(Comm(h,g))) then
                 Info( InfoClassical,2,
                   "involution in cyclic subgroup  of order 8 is not central" );
                 recognise.hasSpecialEle := true;
@@ -1600,8 +1587,7 @@ RECOG.NonGenericUnitary := function(recognise, grp)
              str := Concatenation( str,  " and dividing ");
              str := Concatenation( str,  String(q-1) );
              Info(InfoClassical,2, str );
-             if PositionProperty(recognise.porders,
-                i->(i[1]>3 and q mod i[1]=1))=fail then
+             if not ForAny(recognise.porders, i -> i[1] > 3 and q mod i[1] = 1) then
                  return fail;
              fi;
              recognise.hasSpeccialEle := true;
@@ -2020,8 +2006,7 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
         if recognise.hasSpecialEle = false then
             if not Order(recognise.g) in [4,8] then return fail; fi;
             g := recognise.g^2;
-            if PositionProperty(GeneratorsOfGroup(grp),
-               h->(Comm(h,g)<>One(grp))) <> fail then
+            if ForAny(GeneratorsOfGroup(grp), h -> not IsOne(Comm(h,g))) then
                recognise.hasSpecialEle := true;
                return CheckFlag();
             fi;
@@ -2040,36 +2025,31 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
         fi;
     elif d = 3 and q >=31 and IsPowerOfTwo(q+1) then
         s := Log2Int(q+1);
-        if PositionProperty(recognise.orders,
-            i->(i > 2 and (q-1) mod i = 0))=fail then
+        if not ForAny(recognise.orders, i -> i > 2 and (q-1) mod i = 0) then
             return fail;
         fi;
-        if PositionProperty(recognise.orders,
-            i-> i mod 2^(s-1) = 0 ) = fail then
+        if not ForAny(recognise.orders, i -> i mod 2^(s-1) = 0) then
             return fail;
         fi;
     elif d = 3 and q>11 and ((q+1) mod 3=0 and
         IsPowerOfTwo((q+1)/3)) then
         s := Log2Int((q+1)/3);
-        if PositionProperty(recognise.orders,
-            i-> (i mod (3*2^(s-1)) = 0)) = fail then
+        if not ForAny(recognise.orders, i -> i mod (3*2^(s-1)) = 0) then
             return fail;
         fi;
-        if PositionProperty(recognise.orders,
-            i->(i > 2 and (q-1) mod i = 0))=fail then
+        if not ForAny(recognise.orders, i -> i > 2 and (q-1) mod i = 0) then
             return fail;
         fi;
     elif d = 3 and ((q+1) mod 3 <> 0 or not IsPowerOfTwo((q+1)/3)) and
                    not IsPowerOfTwo(q+1) then
         if not 2 in recognise.LB then return fail; fi;
-        if PositionProperty(recognise.orders,
-            i->(i > 2 and (q-1) mod i = 0))=fail then
+        if not ForAny(recognise.orders, i -> i > 2 and (q-1) mod i = 0) then
             return fail;
         fi;
         ## need to check that the basic lppd( 3,q;2) elements have order
         ## greater than 5.
-        if PositionProperty(recognise.orders, i->
-          HasLBGgt5(i,recognise.p,LogInt(q,recognise.p),2))=fail then
+        s := LogInt(q, recognise.p);
+        if not ForAny(recognise.orders, i -> HasLBGgt5(i, recognise.p, s, 2)) then
             return fail;
         fi;
     else
