@@ -1565,9 +1565,11 @@ function(recognise, grp)
         if not 3 in recognise.LB then
             return fail;
         fi;
-        if not 2 in recognise.E2  then
+
+        if not 2 in recognise.E2 then
             return fail;
         fi;
+
         # ACN 27 Nov 2019 reworked this section.
         # Let r be the ppd of q^3-1 and s that of q^2-1
         # either max{r,s} >= 11 and G contains omega
@@ -1756,11 +1758,11 @@ function(recognise,grp)
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
         orbs := Orbits( pgrp, MovedPointsPerms( GeneratorsOfGroup(pgrp)));
 
-        if Set(List(orbs,Length)) <> [ 120, 135 ] then
+        if Set(orbs,Length) <> [ 120, 135 ] then
            recognise.isSOContained := false;
            return false;
         fi;
-        if Size(pgrp) mod  174182400 = 0 then
+        if Size(pgrp) mod 174182400 = 0 then # compare to Size(POmega(+1,8,2))
            return CheckFlag();
            recognise.isSOContained := true;
         else
@@ -1773,11 +1775,11 @@ function(recognise,grp)
         fi;
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
         orbs := Orbits( pgrp, MovedPointsPerms( GeneratorsOfGroup(pgrp)));
-        if Set(List(orbs, Length)) <> [ 1080, 1120] then
+        if Set(orbs, Length) <> [ 1080, 1120 ] then
              recognise.isSOContained := false;
              return false;
         fi;
-        if Size(pgrp) mod 4952179814400 = 0 then
+        if Size(pgrp) mod 4952179814400 = 0 then # compare to Size(POmega(+1,8,3))
              return CheckFlag();
         else
              recognise.isSOContained := false;
