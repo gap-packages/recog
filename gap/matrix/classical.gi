@@ -51,7 +51,9 @@ HasLBGgt5 := function( m, p, a, e )
     ppds := GcdInt(pm.ppds, m);
 
     # There are no ppds
-    if ppds = 1 then return false; fi;
+    if ppds = 1 then
+        return false;
+    fi;
 
     ## if e+1 does not divide ppds then
     ## we know that all primes dividing ppds are large
@@ -63,7 +65,9 @@ HasLBGgt5 := function( m, p, a, e )
              return false;
          fi;
          # if (e+1)^2 does not divide m, then not large
-         if not (m mod (e+1)^2) = 0 then return false; fi;
+         if not (m mod (e+1)^2) = 0 then
+             return false;
+         fi;
      fi;
 
      return true;
@@ -263,7 +267,9 @@ RECOG.RuledOutExtField := function (recognise, grp)
         recognise.isNotExt := true;
         return false;
     fi;
-    if b > bx then return fail; fi;
+    if b > bx then
+        return fail;
+    fi;
 
     if hint = "linear" then
         if not IsPrime(d)
@@ -581,11 +587,19 @@ IsPrimitivePrimeDivisor := function( b, a, p )
 
     local i;
 
-    if not IsPrimeInt(p) then return false; fi;
-    if not IsInt(b) or b <= 1 then return false; fi;
-    if not IsInt(a) or a <= 1 then return false; fi;
+    if not IsPrimeInt(p) then
+        return false;
+    fi;
+    if not IsInt(b) or b <= 1 then
+        return false;
+    fi;
+    if not IsInt(a) or a <= 1 then
+        return false;
+    fi;
 
-    if (b^a-1) mod p <> 0 then return false; fi;
+    if (b^a-1) mod p <> 0 then
+        return false;
+    fi;
     for i in [ 1 .. a-1 ] do
         if b^i-1 mod p = 0 then
             return false;
@@ -674,7 +688,9 @@ RECOG.TestRandomElement := function (recognise, grp)
               h := g^s;
               ## now order(h) is the product of all ppds dividing |g|, see
               ##  Section 6.1 page 250 of [NP99]
-              if IsOne(h) then return TemporaryFailure; fi;
+              if IsOne(h) then
+                  return TemporaryFailure;
+              fi;
               gmod := GModuleByMats([h], recognise.field);
               cf := MTX.CollectedFactors(gmod);
               if Length(cf) = 2 and cf[1][2] = cf[2][2] then
@@ -777,7 +793,9 @@ RECOG.TestRandomElement := function (recognise, grp)
                         return TemporaryFailure;
                     fi;
                 else
-                    if o1 < (q+1)/2 or o2 < (q+1)/2 then return TemporaryFailure; fi;
+                    if o1 < (q+1)/2 or o2 < (q+1)/2 then
+                        return TemporaryFailure;
+                    fi;
                 fi;
                 AddSet( recognise.plusminus, [1,1] );
             fi;
@@ -1189,8 +1207,12 @@ RECOG.IsSOContained := function( recognise, grp )
         IsQuadraticForm( recognise.QuadraticForm) and
         recognise.QuadraticFormType = "orthogonalcircle" then
         #orthogonal circle
-        if recognise.d mod 2 = 0 then return false; fi;
-        if recognise.currentgcd <> 1 then return fail; fi;
+        if recognise.d mod 2 = 0 then
+            return false;
+        fi;
+        if recognise.currentgcd <> 1 then
+            return fail;
+        fi;
         recognise.isNotExt := true;
         recognise.isSOContained := true;
         Info(InfoClassical,2,"The group contains SO^o(", recognise.d, ", ",
@@ -1201,8 +1223,12 @@ RECOG.IsSOContained := function( recognise, grp )
         IsQuadraticForm( recognise.QuadraticForm) and
         recognise.QuadraticFormType = "orthogonalplus" then
         #orthogonal plus
-        if recognise.d mod 2 <> 0 then return false; fi;
-        if recognise.currentgcd <> 2 then return fail; fi;
+        if recognise.d mod 2 <> 0 then
+            return false;
+        fi;
+        if recognise.currentgcd <> 2 then
+            return fail;
+        fi;
         recognise.isNotExt := true;
         recognise.isSOContained := true;
         Info(InfoClassical,2,"The group contains SO+(", recognise.d, ", ",
@@ -1213,8 +1239,12 @@ RECOG.IsSOContained := function( recognise, grp )
         IsQuadraticForm( recognise.QuadraticForm) and
         recognise.QuadraticFormType = "orthogonalminus" then
         # orthogonal minus
-        if recognise.d mod 2 <> 0 then return false; fi;
-        if recognise.currentgcd <> 2 then return fail; fi;
+        if recognise.d mod 2 <> 0 then
+            return false;
+        fi;
+        if recognise.currentgcd <> 2 then
+            return fail;
+        fi;
         recognise.isNotExt := true;
         recognise.isSOContained := true;
         Info(InfoClassical,2,"The group contains SO-(", recognise.d, ", ",
@@ -1272,7 +1302,9 @@ RECOG.NonGenericLinear := function( recognise, grp )
         return true;
     end;
 
-    if recognise.d > 3 then return false; fi;
+    if recognise.d > 3 then
+        return false;
+    fi;
     if recognise.d = 3 and not IsPowerOfTwo(recognise.q+1) then
         return false;
     fi;
@@ -1331,7 +1363,9 @@ RECOG.NonGenericSymplectic := function(recognise, grp)
     d := recognise.d;
     q := recognise.q;
 
-    if not IsEvenInt(recognise.d) then return false; fi;
+    if not IsEvenInt(recognise.d) then
+        return false;
+    fi;
 
     if recognise.isReducible = true then
        return false;
@@ -1343,7 +1377,9 @@ RECOG.NonGenericSymplectic := function(recognise, grp)
        return false;
     fi;
 
-    if d > 8 then  return false; fi;
+    if d > 8 then 
+        return false;
+    fi;
 
     if recognise.n <= 5 then
         return NotEnoughInformation;
@@ -1389,9 +1425,13 @@ RECOG.NonGenericSymplectic := function(recognise, grp)
         if not 4 in recognise.LB then
             return fail;
         fi;
-        if not 2 in  recognise.LS then return fail; fi;
+        if not 2 in  recognise.LS then
+            return fail;
+        fi;
     elif d = 4  and q >= 7 and IsPowerOfTwo(q+1) then
-        if not 4 in recognise.LB then return fail; fi;
+        if not 4 in recognise.LB then
+            return fail;
+        fi;
         if not HasElementsMultipleOf(recognise.orders, [4]) then
             return fail;
         fi;
@@ -1400,7 +1440,9 @@ RECOG.NonGenericSymplectic := function(recognise, grp)
         if not HasElementsMultipleOf(recognise.orders, [3,4]) then
             return fail;
         fi;
-        if not 4 in recognise.LB then return fail; fi;
+        if not 4 in recognise.LB then
+            return fail;
+        fi;
     else
         Info(InfoClassical,2,
              "NonGenericSymplectic: d and q must have been generic");
@@ -1439,7 +1481,9 @@ RECOG.NonGenericUnitary := function(recognise, grp)
     d := recognise.d;
     q := recognise.q;
 
-    if d > 6 then  return false; fi;
+    if d > 6 then 
+        return false;
+    fi;
 
     if recognise.isReducible = true then
        return false;
@@ -1450,7 +1494,9 @@ RECOG.NonGenericUnitary := function(recognise, grp)
        return false;
     fi;
 
-    if recognise.maybeFrobenius = false then return false; fi;
+    if recognise.maybeFrobenius = false then
+        return false;
+    fi;
 
     if recognise.n <= 5 then
         return NotEnoughInformation;
@@ -1474,8 +1520,12 @@ RECOG.NonGenericUnitary := function(recognise, grp)
             return fail;
         fi;
     elif d = 6 and q >= 9 then
-        if not 3 in recognise.E2 then return fail; fi;
-        if not 5 in recognise.LB then return fail; fi;
+        if not 3 in recognise.E2 then
+            return fail;
+        fi;
+        if not 5 in recognise.LB then
+            return fail;
+        fi;
     elif d = 5 and q = 4 then
         if not HasElementsMultipleOf(recognise.orders, [11,12]) then
             return fail;
@@ -1493,7 +1543,9 @@ RECOG.NonGenericUnitary := function(recognise, grp)
         if not 3 in recognise.LB then
             return fail;
         fi;
-        if not 2 in recognise.E2  then return fail; fi;
+        if not 2 in recognise.E2  then
+            return fail;
+        fi;
         f1 := Collected(Factors( q^3-1 ));
         f2 := Collected(Factors( q^2-1 ));
         # check if we have a prime at least 11
@@ -1535,7 +1587,9 @@ RECOG.NonGenericUnitary := function(recognise, grp)
             return fail;
         fi;
         if recognise.hasSpecialEle = false then
-            if not Order( recognise.g ) mod 6 = 0 then return fail; fi;
+            if not Order( recognise.g ) mod 6 = 0 then
+                return fail;
+            fi;
             if ForAny( GeneratorsOfGroup(grp),
                 h -> not IsOne(Comm(h,recognise.g^3))) then
                 Info( InfoClassical,2,
@@ -1550,7 +1604,9 @@ RECOG.NonGenericUnitary := function(recognise, grp)
             return fail;
         fi;
         if recognise.hasSpecialEle = false then
-            if not Order(recognise.g) mod 5  = 0 then return fail; fi;
+            if not Order(recognise.g) mod 5  = 0 then
+                return fail;
+            fi;
             if ForAny(GeneratorsOfGroup(grp), h -> not IsOne(Comm(h,recognise.g))) then
                 Info( InfoClassical,2,
                       "The element of order 5 is not central" );
@@ -1564,7 +1620,9 @@ RECOG.NonGenericUnitary := function(recognise, grp)
             return fail;
         fi;
         if recognise.hasSpecialEle = false then
-            if Order(recognise.g) mod 8 <> 0 then return fail; fi;
+            if Order(recognise.g) mod 8 <> 0 then
+                return fail;
+            fi;
             g := recognise.g^(Order(recognise.g)/2);
             if ForAny(GeneratorsOfGroup(grp), h -> not IsOne(Comm(h,g))) then
                 Info( InfoClassical,2,
@@ -1631,8 +1689,12 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
     d := recognise.d;
     q := recognise.q;
 
-    if not d in [4,6,8,10] then return false; fi;
-    if d = 10 and q <> 2 then return false; fi;
+    if not d in [4,6,8,10] then
+        return false;
+    fi;
+    if d = 10 and q <> 2 then
+        return false;
+    fi;
 
     if recognise.isReducible = true then
        return false;
@@ -1704,8 +1766,12 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
             return fail;
         fi;
     elif d = 8 and (q = 4 or q > 5) then
-        if not 6 in recognise.LB then return fail; fi;
-        if not 4 in recognise.LS then return fail; fi;
+        if not 6 in recognise.LB then
+            return fail;
+        fi;
+        if not 4 in recognise.LS then
+            return fail;
+        fi;
     elif d = 6 and q = 2 then
         if not HasElementsMultipleOf( recognise.orders, [7]) and
            not HasElementsMultipleOf( recognise.orders, [15]) then
@@ -1715,10 +1781,16 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
         if not HasElementsMultipleOf( recognise.orders, [5])  then
             return fail;
         fi;
-        if not 13 in recognise.orders then return fail; fi;
+        if not 13 in recognise.orders then
+            return fail;
+        fi;
     elif d = 6 and q >= 4 then
-        if not 4 in recognise.LB then return fail; fi;
-        if not 3 in recognise.E2 then return fail; fi;
+        if not 4 in recognise.LB then
+            return fail;
+        fi;
+        if not 3 in recognise.E2 then
+            return fail;
+        fi;
     elif d = 4 and (q = 8 or q >= 11) then
         if recognise.needPlusMinus = false then
             recognise.needPlusMinus := true;
@@ -1850,9 +1922,15 @@ RECOG.NonGenericOrthogonalMinus := function(recognise, grp)
     d := recognise.d;
     q := recognise.q;
 
-    if not d in [4,6,8] then return false; fi;
-    if d = 8 and q <> 2 then return false; fi;
-    if d = 6 and q > 3 then return false; fi;
+    if not d in [4,6,8] then
+        return false;
+    fi;
+    if d = 8 and q <> 2 then
+        return false;
+    fi;
+    if d = 6 and q > 3 then
+        return false;
+    fi;
 
     if recognise.isReducible = true then
        return false;
@@ -1901,7 +1979,9 @@ RECOG.NonGenericOrthogonalMinus := function(recognise, grp)
          fi;
     elif d = 4 and q >=  4 then
         ppd := IsPpdElement( recognise.field, recognise.cpol, d, q, 1 );
-        if ppd = false or ppd[1] <> 4  or ppd[2] <> true then return fail; fi;
+        if ppd = false or ppd[1] <> 4  or ppd[2] <> true then
+            return fail;
+        fi;
         # found a ppd( 4, q; 4)-element
         g := recognise.g;
         for h in GeneratorsOfGroup(grp) do
@@ -1932,8 +2012,12 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
 
     isParForm := f -> IsSesquilinearForm(f) and IsParabolicForm(f);
 
-    if not IsOddInt(recognise.d) then return false; fi;
-    if not IsOddInt(recognise.q) then return false; fi;
+    if not IsOddInt(recognise.d) then
+        return false;
+    fi;
+    if not IsOddInt(recognise.q) then
+        return false;
+    fi;
 
     CheckFlag := function( )
         if recognise.isReducible = "unknown" then
@@ -1986,7 +2070,9 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
             return fail;
         fi;
     elif d = 5 and q >= 5 then
-        if not 4 in recognise.LE then return fail; fi;
+        if not 4 in recognise.LE then
+            return fail;
+        fi;
     elif d = 3 and q = 3 then
         if not HasElementsMultipleOf( recognise.orders, [3])  then
             return fail;
@@ -2004,7 +2090,9 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
             return fail;
         fi;
         if recognise.hasSpecialEle = false then
-            if not Order(recognise.g) in [4,8] then return fail; fi;
+            if not Order(recognise.g) in [4,8] then
+                return fail;
+            fi;
             g := recognise.g^2;
             if ForAny(GeneratorsOfGroup(grp), h -> not IsOne(Comm(h,g))) then
                recognise.hasSpecialEle := true;
@@ -2042,7 +2130,9 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
         fi;
     elif d = 3 and ((q+1) mod 3 <> 0 or not IsPowerOfTwo((q+1)/3)) and
                    not IsPowerOfTwo(q+1) then
-        if not 2 in recognise.LB then return fail; fi;
+        if not 2 in recognise.LB then
+            return fail;
+        fi;
         if not ForAny(recognise.orders, i -> i > 2 and (q-1) mod i = 0) then
             return fail;
         fi;

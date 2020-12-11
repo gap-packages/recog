@@ -116,7 +116,9 @@ end;
 SLPforElementFuncsMatrix.DiscreteLog := function(ri,x)
   local log;
   log := LogFFE(x[1,1],ri!.generator);
-  if log = fail then return fail; fi;
+  if log = fail then
+      return fail;
+  fi;
   return StraightLineProgramNC([[1,log]],1);
 end;
 

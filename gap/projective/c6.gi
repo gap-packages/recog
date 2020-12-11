@@ -688,7 +688,9 @@ RECOG.New2RecogniseC6 := function(grp)
 
     ## first find a non-central element of the <r>-core of <grp>
     b := RECOG.BlindDescent(r,n,grp,100);
-    if b = fail then return TemporaryFailure; fi;
+    if b = fail then
+        return TemporaryFailure;
+    fi;
     Info(InfoRecog,3,"Finished blind descent");
 
     u := b[1];

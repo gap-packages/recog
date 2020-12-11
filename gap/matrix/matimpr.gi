@@ -81,7 +81,9 @@ RECOG.IndexMaxSub := function( hm, grp, d )
         Enumerate(orb,4*d);
         if not IsClosed(orb) then
             Info(InfoRecog,2,"Did not find nice orbit.");
-            if lastsub = fail then return fail; fi;
+            if lastsub = fail then
+                return fail;
+            fi;
             return rec( orb := lastorb,
                         hom := OrbActionHomomorphism(grp,lastorb) );
         fi;
@@ -137,11 +139,17 @@ RECOG.SmallHomomorphicImageProjectiveGroup := function ( grp )
           hm := GModuleByMats(gens,fld);
           if not MTX.IsIrreducible(hm) then
               res := RECOG.IndexMaxSub( hm, grp, d );
-              if res <> fail then return [res, gens]; fi;
+              if res <> fail then
+                  return [res, gens];
+              fi;
               if i < LogInt(d,2) then
                   res := findred(gens);
-                  if res = false then return false; fi;
-                  if res <> fail then return res; fi;
+                  if res = false then
+                      return false;
+                  fi;
+                  if res <> fail then
+                      return res;
+                  fi;
               fi;
           fi;
       od;

@@ -30,7 +30,9 @@ PrimitivePrimeDivisors := function(d, q)
 
     local ddivs, c, a, ppds, noppds;
 
-    if d < 1 or q < 2 then return fail; fi;
+    if d < 1 or q < 2 then
+        return fail;
+    fi;
     if d = 1 then
         return rec( ppds := q-1, noppds := 1 );
     fi;

@@ -1036,7 +1036,9 @@ RECOG.TestGroup := function(g,proj,size, optionlist...)
           Print("seedMT := ", seedMT, ";\n");
           Print("seedRS := ", seedRS, ";\n");
           Error("Alarm: Size not correct!\n");
-          if count = -1 then return fail; fi;
+          if count = -1 then
+              return fail;
+          fi;
       else
           #Print("Test was OK!\n");
           count := 3;   # worked!
@@ -1068,7 +1070,9 @@ RECOG.TestGroup := function(g,proj,size, optionlist...)
           fi;
           Error("Alarm: SLPforElement did not work!\n");
           
-          if count = -1 then return fail; fi;
+          if count = -1 then
+              return fail;
+          fi;
       fi;
   until count >= options.inTests;
 
@@ -1099,7 +1103,9 @@ RECOG.TestGroup := function(g,proj,size, optionlist...)
             fi;
 
             Error("Alarm: SLPforElement did not work on (possibly) non-group element!\n");
-            if count = -1 then return fail; fi;
+            if count = -1 then
+                return fail;
+            fi;
         fi;
     until count >= options.inTests;
   fi;
@@ -1180,10 +1186,14 @@ RECOG.TestRecognitionNode := function(ri,stop,recurse)
           return rec(err := err, badnode := ri);
       fi;
       ef := RECOG.TestRecognitionNode(RIFac(ri),stop,recurse);
-      if IsRecord(ef) then return ef; fi;
+      if IsRecord(ef) then
+          return ef;
+      fi;
       if RIKer(ri) <> fail then
           ek := RECOG.TestRecognitionNode(RIKer(ri),stop,recurse);
-          if IsRecord(ek) then return ek; fi;
+          if IsRecord(ek) then
+              return ek;
+          fi;
       fi;
       return rec( err := err, badnode := ri, factorkernelok := true );
   fi;
