@@ -645,7 +645,9 @@ RECOG.MakePSL2Hint := function( name, G )
   p := Characteristic(f);
   d := DimensionOfMatrixGroup(G);
   defchar := Factors(name[3])[1];
-  if p = defchar then return fail; fi;
+  if p = defchar then
+      return fail;
+  fi;
   Info(InfoRecog,2,"Making hint for group ",name,"...");
   # we are in cross characteristic.
   # to be made better...
@@ -1422,12 +1424,16 @@ FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
   for i in [1..Length(l)] do
       Info(InfoRecog,2,"Trying hint for ",RECOG.SporadicsNames[l[i]],"...");
       res := LookupHintForSimple(ri,G,RECOG.SporadicsNames[l[i]]);
-      if res = true then return Success; fi;
+      if res = true then
+          return Success;
+      fi;
       if IsBound(RECOG.SporadicsWorkers[l[i]]) then
           Info(InfoRecog,2,"Calling its installed worker...");
           res := RECOG.SporadicsWorkers[l[1]](RECOG.SporadicsNames[l[i]],
                                         RECOG.SporadicsSizes[l[i]],ri,G);
-          if res = true then return Success; fi;
+          if res = true then
+              return Success;
+          fi;
       fi;
       Info(InfoRecog,2,"This did not work.");
   od;

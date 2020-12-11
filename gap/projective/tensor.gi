@@ -389,7 +389,9 @@ end;
 RECOG.HomTensorFactor := function(data,m)
   local k;
   k := RECOG.IsKroneckerProduct(m,data.blocksize);
-  if k[1] <> true then return fail; fi;
+  if k[1] <> true then
+      return fail;
+  fi;
   return k[3];
 end;
 

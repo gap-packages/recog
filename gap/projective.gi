@@ -149,7 +149,9 @@ end;
 RECOG.HomProjDet := function(data,m)
   local x;
   x := LogFFE(DeterminantMat(m),data.z);
-  if x = fail then return fail; fi;
+  if x = fail then
+      return fail;
+  fi;
   return data.c ^ (x mod data.gcd);
 end;
 
@@ -166,10 +168,14 @@ FindHomMethodsProjective.ProjDeterminant := function(ri,G)
   d := ri!.dimension;
   q := Size(f);
   gcd := GcdInt(q-1,d);
-  if gcd = 1 then return NeverApplicable; fi;
+  if gcd = 1 then
+      return NeverApplicable;
+  fi;
   z := Z(q);
   detsadd := List(GeneratorsOfGroup(G),x->LogFFE(DeterminantMat(x),z) mod gcd);
-  if IsZero(detsadd) then return NeverApplicable; fi;
+  if IsZero(detsadd) then
+      return NeverApplicable;
+  fi;
   Info(InfoRecog,2,"ProjDeterminant: found non-trivial homomorphism.");
   c := PermList(Concatenation([2..gcd],[1]));
   newgens := List(detsadd,x->c^x);

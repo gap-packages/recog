@@ -1592,6 +1592,8 @@ RECOG.RecogniseFDPM := function(group, field, eps)
   cob := uvs[2];
   ConvertToMatrixRep(cob);
   cobi := cob^-1;
-  if cobi = fail then return fail; fi;
+  if cobi = fail then
+    return fail;
+  fi;
   return rec( cob := cob, cobi := cobi, fdpm := fdpm );
 end;

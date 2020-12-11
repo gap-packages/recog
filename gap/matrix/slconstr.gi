@@ -1252,7 +1252,9 @@ return fail;
         smat[1,1] := Z(q)^(-2* exp);
         mat := mat * smat;
      fi;
-     if not (Determinant(mat) = Z(q)^0) then return fail; fi;
+     if not IsOne(Determinant(mat)) then
+         return fail;
+     fi;
      if d > 2 then
         #****error here
         slp := SLCR.SLSLP(data, mat^(-1), d-1);

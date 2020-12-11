@@ -104,7 +104,9 @@ RECOG.NkrTraceSchreierTree := function( beta, sv )
 
     local o, h;
 
-    if sv[beta] = false then return fail; fi;
+    if sv[beta] = false then
+        return fail;
+    fi;
 
     o := One(sv[beta]);
     h := One(sv[beta]);
@@ -254,7 +256,9 @@ RECOG.GetAllJellyfish := function( jellyfish, idjf, G, n, k, r )
     HaveSeen := function( jellyfish )
         local s;
         for s in seen do
-            if IsSubset(jellyfish,s) then return true;fi;
+            if IsSubset(jellyfish,s) then
+                return true;
+            fi;
         od;
         return false;
     end;
@@ -293,7 +297,9 @@ RECOG.GetAllJellyfish := function( jellyfish, idjf, G, n, k, r )
         top := top - 1;
     od;
 
-    if Length( seen ) <> n*r then return fail; fi;
+    if Length( seen ) <> n*r then
+        return fail;
+    fi;
 
     return [ T, seen ];
 
@@ -315,7 +321,9 @@ RECOG.OtherGetAllJellyfish:=function ( jellyfish, idjf, G, n, k, r )
     HaveSeen := function( jellyfish )
         local s;
         for s in seen do
-            if IsSubset(jellyfish,s) then return true;fi;
+            if IsSubset(jellyfish,s) then
+                return true;
+            fi;
         od;
         return false;
     end;
@@ -348,7 +356,9 @@ RECOG.OtherGetAllJellyfish:=function ( jellyfish, idjf, G, n, k, r )
         od;
     od;
 
-    if Length( seen ) <> n*r then return fail; fi;
+    if Length( seen ) <> n*r then
+        return fail;
+    fi;
 
     return [ T, seen ];
 

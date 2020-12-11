@@ -447,9 +447,13 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
 
     # Some helper function:
     AddList := function(l,el)
-      if opt.IsOne(el) then return false; fi;
+      if opt.IsOne(el) then
+          return false;
+      fi;
       for i in [1..Length(l)] do
-          if opt.Eq(l[i],el) then return false; fi;
+          if opt.Eq(l[i],el) then
+              return false;
+          fi;
       od;
       Add(l,el);
       return true;
@@ -599,7 +603,9 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
                   for y in iter do
                       if not opt.IsOne(y) then
                           UseElement(y);
-                          if blindr.isknownproper then return blindr; fi;
+                          if blindr.isknownproper then
+                              return blindr;
+                          fi;
                       fi;
                   od;
                   blindr.msg :=
@@ -615,7 +621,9 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
                       fi;
                       if not opt.IsOne(y) then
                           UseElement(y);
-                          if blindr.isknownproper then return blindr; fi;
+                          if blindr.isknownproper then
+                              return blindr;
+                          fi;
                       fi;
                   od;
                   blindr.msg :=
@@ -766,7 +774,9 @@ FindHomMethodsProjective.FindElmOfEvenNormal := function(ri,G)
               fi;
               res := RECOG.SortOutReducibleSecondNormalSubgroup(
                                       ri,G,rr.Ngens,mm);
-              if res = true then return Success; fi;
+              if res = true then
+                  return Success;
+              fi;
               r := rr;
           until count >= 2;
       fi;

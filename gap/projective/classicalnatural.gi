@@ -460,7 +460,9 @@ RECOG.FindStdGensUsingBSGS := function(g,stdgens,projective,large)
   l := List(stdgens,x->SiftGroupElementSLP(S,x));
   gens := EmptyPlist(Length(stdgens));
   for i in [1..Length(stdgens)] do
-      if not l[i].isone then return fail; fi;
+      if not l[i].isone then
+          return fail;
+      fi;
       Add(gens,ResultOfStraightLineProgram(l[i].slp,strong));
   od;
   return SLPOfElms(gens);
@@ -1192,7 +1194,9 @@ RECOG.RecogniseSL2NaturalOddCharUsingBSGS := function(g,f)
   q := Size(f);
   std := RECOG.MakeSL_StdGens(p,ext,2,2);
   slp := RECOG.FindStdGensUsingBSGS(g,std.all,false,true);
-  if slp = fail then return fail; fi;
+  if slp = fail then
+      return fail;
+  fi;
   res := rec( g := g, one := One(f), One := One(g), f := f, q := q,
               p := p, ext := ext, d := 2, bas := IdentityMat(2,f),
               basi := IdentityMat(2,f) );
@@ -1437,7 +1441,9 @@ RECOG.GuessProjSL2ElmOrder := function(x,f)
   fi;
   if p > 2 then
       y := x^p;
-      if IsOneProjective(y) then return p; fi;
+      if IsOneProjective(y) then
+          return p;
+      fi;
   fi;
   if IsOneProjective(x^(q-1)) then
       facts := Collected(FactInt(q-1:cheap)[1]);
@@ -1474,24 +1480,34 @@ RECOG.IsThisSL2Natural := function(gens,f)
   CheckElm := function(x)
       local o;
       o := RECOG.GuessProjSL2ElmOrder(x,f);
-      if o in [1,2] then return false; fi;
+      if o in [1,2] then
+          return false;
+      fi;
       if o > 5 then
           if notA5 = false then Info(InfoRecog,4,"SL2: Group is not A5"); fi;
           notA5 := true;
-          if seenqp1 and seenqm1 then return true; fi;
+          if seenqp1 and seenqm1 then
+              return true;
+          fi;
       fi;
-      if o = p or o <= 5 then return false; fi;
+      if o = p or o <= 5 then
+          return false;
+      fi;
       if (q+1) mod o = 0 then
           if not seenqp1 then
               Info(InfoRecog,4,"SL2: Found element of order dividing q+1.");
               seenqp1 := true;
-              if seenqm1 and notA5 then return true; fi;
+              if seenqm1 and notA5 then
+                  return true;
+              fi;
           fi;
       else
           if not seenqm1 then
               Info(InfoRecog,4,"SL2: Found element of order dividing q-1.");
               seenqm1 := true;
-              if seenqp1 and notA5 then return true; fi;
+              if seenqp1 and notA5 then
+                  return true;
+              fi;
           fi;
       fi;
       return false;
@@ -1520,7 +1536,9 @@ RECOG.IsThisSL2Natural := function(gens,f)
   notA5 := false;
 
   for i in [1..Length(gens)] do
-      if CheckElm(gens[i]) then return true; fi;
+      if CheckElm(gens[i]) then
+          return true;
+      fi;
   od;
   CheckElm(gens[1]*gens[2]);
   if Length(gens) >= 3 then
@@ -1536,7 +1554,9 @@ RECOG.IsThisSL2Natural := function(gens,f)
       for i in [1..l-1] do
           for j in [i+1..l] do
               x := Comm(gens[i],gens[j]);
-              if CheckElm(x) then return true; fi;
+              if CheckElm(x) then
+                  return true;
+              fi;
               Add(coms,x);
           od;
       od;
@@ -1546,7 +1566,9 @@ RECOG.IsThisSL2Natural := function(gens,f)
           a := RECOG.RandomSubproduct(gens,rec());
           b := RECOG.RandomSubproduct(gens,rec());
           x := Comm(a,b);
-          if CheckElm(x) then return true; fi;
+          if CheckElm(x) then
+              return true;
+          fi;
           Add(coms,x);
       od;
   fi;
@@ -1557,7 +1579,9 @@ RECOG.IsThisSL2Natural := function(gens,f)
   Info(InfoRecog,4,"SL2: Computing normal closure...");
   clos := FastNormalClosure(gens,coms,5);
   for i in [Length(coms)+1..Length(clos)] do
-      if CheckElm(clos[i]) then return true; fi;
+      if CheckElm(clos[i]) then
+          return true;
+      fi;
   od;
   if ForAll(clos{[Length(coms)+1..Length(clos)]}, RECOG.IsScalarMat) then
       Info(InfoRecog,4,"SL2: Group is soluble, derived subgroup central");

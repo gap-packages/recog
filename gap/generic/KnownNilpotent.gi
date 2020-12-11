@@ -88,7 +88,9 @@ FindHomMethodsGeneric.KnownNilpotent := function(ri,G)
       primes := Union(List(ords,o->Set(Factors(o))));
       RemoveSet(primes,1);    # in case there were identities!
   fi;
-  if Length(primes) < 2 then return NeverApplicable; fi;   # not our beer
+  if Length(primes) < 2 then
+      return NeverApplicable;   # not our beer
+  fi;
   cut := QuoInt(Length(primes),2);
   data := rec( primesfactor := primes{[1..cut]},
                primeskernel := primes{[cut+1..Length(primes)]},

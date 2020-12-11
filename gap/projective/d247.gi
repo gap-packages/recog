@@ -152,7 +152,9 @@ RECOG.DirectFactorsFinder := function(gens,facgens,k,eq)
   fi;
 
   pgens := List(pgens,PermList);
-  if fail in pgens then return fail; fi;
+  if fail in pgens then
+    return fail;
+  fi;
   return [o,pgens];
 end;
 
@@ -401,7 +403,9 @@ FindHomMethodsProjective.D247 := function(ri,G)
   for i in [1..9] do
       if InfoLevel(InfoRecog) >= 2 then Print(".\c"); fi;
       res := CheckNormalClosure(x);
-      if res in [true,false] then return res; fi;
+      if res in [true,false] then
+          return res;
+      fi;
       x := RECOG.InvolutionJumper(ri!.pr,RECOG.ProjectiveOrder,x,100,true);
       if x = fail then
           if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;
@@ -410,7 +414,9 @@ FindHomMethodsProjective.D247 := function(ri,G)
       fi;
   od;
   res := CheckNormalClosure(x);
-  if res in [true,false] then return res; fi;
+  if res in [true,false] then
+      return res;
+  fi;
   if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;
   Info(InfoRecog,2,"D247: Did not find normal subgroup, giving up.");
   return TemporaryFailure;
