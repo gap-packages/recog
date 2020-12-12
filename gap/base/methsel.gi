@@ -88,7 +88,8 @@ InstallGlobalFunction( "CallMethods", function(db, tolerancelimit, methargs...)
                 continue;
             fi;
 
-            # skip methods which signalled a temporary failure at a higher tolerance level
+            # skip methods which signalled a temporary failure at least
+            # (tolerance + 1) times.
             if IsBound(ms.failedMethods.(db[i].stamp)) and
                 ms.failedMethods.(db[i].stamp) > tolerance then
                 Info(InfoMethSel, 4, "Skipping rank ", db[i].rank,
