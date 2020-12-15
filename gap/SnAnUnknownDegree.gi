@@ -702,8 +702,6 @@ function(ri, n, stdGensAn)
                 bWithoutMemory := StripMemory(b);
                 hWithoutMemory := StripMemory(h);
                 xis := ConstructXiSn(n, bWithoutMemory, hWithoutMemory);
-                # TODO: Move this loop, introduce a new variable foundOddPermutation,
-                # because we already computed this for the previous generators
                 for g in GeneratorsOfGroup(grp) do
                     gImage := FindImageSn(ri, n, StripMemory(g), bWithoutMemory, hWithoutMemory, xis[1], xis[2]);
                     if gImage = fail then return fail; fi;
