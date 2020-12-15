@@ -773,9 +773,13 @@ end);
 #! isomorphic to a symmetric group Sn or alternating group An with
 #! <M>9 \leq n</M>.
 #! It is an implementation of <Cite Key="JLNP13"/>.
+#!
+#! TODO: document the bound N. Refer to Kleidman Liebeck [KL90].
+#!
+#! TODO: in the matrix case assumes that the group acts irreducibly.
 #! @EndChunk
 FindHomMethodsGeneric.SnAnUnknownDegree := function(ri)
-    local G, N, isoData, degree;
+    local G, N, isoData, degree, p, d;
     G := Grp(ri);
     # TODO find value for N and eps
     # Check magma
@@ -783,6 +787,31 @@ FindHomMethodsGeneric.SnAnUnknownDegree := function(ri)
     # we explicitly check that by checking ri!.fhmethsel?
     if IsPermGroup(G) then
         N := NrMovedPoints(G);
+    elif IsMatrixGroup(G) then
+        p := Characteristic(DefaultFieldOfMatrixGroup(G));
+        d := DimensionOfMatrixGroup(G);
+        # Let N be the largest integer such that A_N has a representation of
+        # dimension d.
+        if ri!.projective then
+            # If n >= 9, then the smallest irreducible projective An-module has
+            # dimension n-2, see [KL90], Proposition 5.3.7.
+            # Assume N >= 9 and use the comment above to compute N. If we arrive at a
+            # value < 9 for N, then we must have been in the case N < 9.
+            # TODO: do we want to use the table for the other cases?
+            N := Maximum(8, d + 2);
+        else
+            # If n >= 10, then the smallest irreducible An-module is the
+            # fully deleted permutation module, see [KL90], Proposition 5.3.5.
+            # It has dimension n-2 if p|n and dimension n-1 otherwise.
+            # Assume N >= 10 and use the comment above to compute N. If we arrive at a
+            # value < 10 for N, then we must have been in the case N < 10.
+            if (d + 2) mod p = 0 then
+                N := d + 2;
+            else
+                N := d + 1;
+            fi;
+            N := Maximum(9, N);
+        fi;
     else
         N := ErrorNoReturn("TODO");
     fi;
