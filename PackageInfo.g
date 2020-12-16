@@ -123,7 +123,7 @@ rec(
     IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "sal@cs.st-andrews.ac.uk",
-    WWWHome       := "http://www-groups.dcs.st-and.ac.uk/~sal/",
+    WWWHome       := "http://www-groups.mcs.st-and.ac.uk/~sal",
     Place         := "St Andrews",
     Institution   := "University of St Andrews"
   ),
@@ -163,7 +163,7 @@ rec(
     IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "colva@mcs.st-and.ac.uk",
-    WWWHome       := "http://www-groups.dcs.st-and.ac.uk/~colva",
+    WWWHome       := "http://www-groups.mcs.st-and.ac.uk/~colva",
     Place         := "St Andrews",
     Institution   := "University of St Andrews"
   ),
@@ -193,7 +193,7 @@ rec(
     IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "gap@wilf-wilson.net",
-    WWWHome       := "http://wilf.me"
+    WWWHome       := "https://wilf.me"
   ),
 rec(
     LastName      := "Whybrow",
