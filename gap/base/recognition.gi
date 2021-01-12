@@ -854,6 +854,9 @@ InstallGlobalFunction( "SLPforNiceGens", function(ri)
   return s;
 end );
 
+# For user debugging purposes. Takes a string consisting of lower- or
+# upper-case "f" and "k". Returns the node one arrives at by descending through
+# the tree, going to the factor for each "f" and to the kernel for each "k".
 InstallGlobalFunction( "GetCompositionTreeNode",
   function( ri, what )
     local r,c;
