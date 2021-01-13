@@ -1760,21 +1760,24 @@ function(recognise,grp)
             return fail;
         fi;
     elif d = 8 and q = 2 then
-        if not HasElementsMultipleOf( recognise.orders, [7,9,15]) and
-           not HasElementsMultipleOf( recognise.orders, [7,10,15]) then
+        if not HasElementsMultipleOf( recognise.orders, [7,9,10]) and
+           not HasElementsMultipleOf( recognise.orders, [7,9,15]) then
             return fail;
         fi;
 
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
         orbs := Orbits( pgrp, MovedPointsPerms( GeneratorsOfGroup(pgrp)));
 
+        # Both the conformal orthogonal and the omega for d = 8 and q = 2 have
+        # orbits of these lenghts. The maximal subgroups of the conformal
+        # orthogonal don't have these orbit lenghts.
         if Set(orbs,Length) <> [ 120, 135 ] then
            recognise.isSOContained := false;
            return false;
         fi;
+        StabChain(pgrp, rec(random := 200, limit := 174182400));
         if Size(pgrp) mod 174182400 = 0 then # compare to Size(POmega(+1,8,2))
            return CheckFlag();
-           recognise.isSOContained := true;
         else
            recognise.isSOContained := false;
            return false;
@@ -1784,11 +1787,7 @@ function(recognise,grp)
             return fail;
         fi;
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
-        orbs := Orbits( pgrp, MovedPointsPerms( GeneratorsOfGroup(pgrp)));
-        if Set(orbs, Length) <> [ 1080, 1120 ] then
-             recognise.isSOContained := false;
-             return false;
-        fi;
+        StabChain(pgrp, rec(random := 200, limit := 4952179814400));
         if Size(pgrp) mod 4952179814400 = 0 then # compare to Size(POmega(+1,8,3))
              return CheckFlag();
         else
@@ -1799,21 +1798,37 @@ function(recognise,grp)
         ## 2.July.2019: There is a mistake in the paper here
         ## There are maximal subgroups of Omega+(8,5) that contain
         ## elements of order 7,13,3
-        if not HasElementsMultipleOf( recognise.orders, [7,13,3,312])  then
+        ## 13.Jan.2021: Added 31
+        # TODO: This means, in Table 4 of [NP99] the second column of the line "d =
+        # 8, q = 5" should be "3, 7, 13, 31 + perm.rep"
+        # We generated 10000 random elements for all groups between
+        # Omega+(8,5) and Delta+(8, 5). The percentage of elements with orders
+        # divisible by 3, 7, 13, 31, and 312 respectively were at least:
+        # 56, 14, 31, 16, 5.71
+        # Since elements of order divisible by 312 are relatively rare, we
+        # don't use these anymore.
+        if not HasElementsMultipleOf( recognise.orders, [3,7,13,31])  then
             return fail;
         fi;
-
+        ## Such elements also exist in maximal subgroups of
+        ## Omega+(8,5) with composition factors being C_2 and Omega(0,7,5).
+        ## Thus we compute the projective action of grp on the one-dimensional
+        ## subspaces and then compare the size of pgrp to the size of
+        ## POmega(+1,8,5).
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
-        orbs := Orbits( pgrp, MovedPointsPerms( GeneratorsOfGroup(pgrp)));
-        if Set(orbs, Length) <> [ 19656, 39000 ] then
-             recognise.isSOContained := false;
-             return false;
-        fi;
-        if Size(pgrp) mod 8911539000000000000 = 0 then # compare to Size(POmega(+1,8,5))
+        # We take a value for random of only 200 promille, but in practice this
+        # seems to be good enough.
+        # The orders of the remaining maximal subgroups are not divisible
+        # by e.g. 13^2. Also, passing to the projective action reduces the
+        # involved group sizes by a factor of at most 4. So, if we know that
+        # the order of pgrp is divisible by Size(POmega(+1,8,5)), then this
+        # excludes the remaining maximal subgroups.
+        # TODO: IsSOContained -> IsOmegaContained
+        StabChain(pgrp, rec(random := 200, limit := 8911539000000000000));
+        if Size(pgrp) mod 8911539000000000000 = 0 then
              return CheckFlag();
         else
-             recognise.isSOContained := false;
-             return false;
+             return fail;
         fi;
     elif d = 8 and (q = 4 or q > 5) then
         if not 6 in recognise.LB then
@@ -1822,16 +1837,15 @@ function(recognise,grp)
         if not 4 in recognise.LS then
             return fail;
         fi;
+    # For each q we have that OmegaPlus(6,q) is isomorphic to PSL(4,q).
     elif d = 6 and q = 2 then
+        # Additionally, OmegaPlus(6,2) is isomorphic to AlternatingGroup(8).
         if not HasElementsMultipleOf( recognise.orders, [7]) and
            not HasElementsMultipleOf( recognise.orders, [15]) then
             return fail;
         fi;
     elif d = 6 and q = 3 then
-        if not HasElementsMultipleOf( recognise.orders, [5])  then
-            return fail;
-        fi;
-        if not 13 in recognise.orders then
+        if not HasElementsMultipleOf( recognise.orders, [5, 13])  then
             return fail;
         fi;
     elif d = 6 and q >= 4 then
@@ -1885,6 +1899,9 @@ function(recognise,grp)
                 return CheckFlag();
         fi;
     elif d = 4 and q =  4 then
+        # TODO: check all occurences of Orbit and Orbits for the "conformals
+        # can merge orbits"-bug.
+
         if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) in [75,60] then
             return false;
         fi;
