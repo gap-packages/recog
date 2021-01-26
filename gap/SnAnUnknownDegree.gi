@@ -774,18 +774,16 @@ end);
 #! <M>9 \leq n</M>.
 #! It is an implementation of <Cite Key="JLNP13"/>.
 #!
-#! TODO: document the bound N. Refer to Kleidman Liebeck [KL90].
-#!
-#! TODO: in the matrix case assumes that the group acts irreducibly.
 #! @EndChunk
 FindHomMethodsGeneric.SnAnUnknownDegree := function(ri)
     local G, N, isoData, degree, p, d;
     G := Grp(ri);
-    # TODO find value for N and eps
+    # TODO find value for eps
+    eps := 1 / 10^2;
     # Check magma
-    # TODO: Can we assume that recognition of natural Sn and An came first? Can
-    # we explicitly check that by checking ri!.fhmethsel?
     if IsPermGroup(G) then
+        # TODO: Can we assume that recognition of natural Sn and An came first? Can
+        # we explicitly check that by checking ri!.fhmethsel?
         N := NrMovedPoints(G);
     elif IsMatrixGroup(G) then
         p := Characteristic(DefaultFieldOfMatrixGroup(G));
@@ -813,11 +811,13 @@ FindHomMethodsGeneric.SnAnUnknownDegree := function(ri)
             N := Maximum(9, N);
         fi;
     else
-        N := ErrorNoReturn("TODO");
+        N := ErrorNoReturn("SnAnUnknownDegree: no method to compute bound",
+                           " <N>, Grp(<ri>) must be an IsPermGroup or an",
+                           " IsMatrixGroup");
     fi;
     # Try to find an isomorphism
-    isoData := RecogniseSnAn(ri, 1 / 10 ^ 6, N);
-    # NeverApplicable or TemporaryFailure
+    isoData := RecogniseSnAn(ri, eps, N);
+    # RecogniseSnAn returned NeverApplicable or TemporaryFailure
     if not IsList(isoData) then
         return isoData;
     fi;
