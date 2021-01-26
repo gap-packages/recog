@@ -244,7 +244,7 @@ gap> Size(SymmetricGroup(11));
 39916800
 
 # Check Slp function
-gap> ri := EmptyRecognitionInfoRecord(rec(), SymmetricGroup(11), false);;
+gap> ri := EmptyRecognitionInfoRecord(rec(), S11On2Sets, false);;
 gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri);
 true
 gap> x := PseudoRandom(Grp(ri));;
