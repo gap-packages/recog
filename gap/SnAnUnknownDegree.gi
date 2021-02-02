@@ -660,12 +660,13 @@ end;
 # n : degree
 # stdGensAn : standard generators of An < G
 #
-# Returns either fail or a list [s, stdGens, xis], where:
+# Returns either fail or a list [s, stdGens, xis, n], where:
 # - s is the isomorphism type, that is either the string "Sn" or "An".
 # - stdGens are the standard generators of G. Identical to stdGensAn if G is
 #   isomorphic to An
 # - xis implicitly defines the isomorphism. It is used by RECOG.FindImageSn and
 #   RECOG.FindImageAn to compute the isomorphism.
+# - n is the degree of the group
 RECOG.ConstructSnAnIsomorphism := function(ri, n, stdGensAn)
     local grp, xis, gImage, gensWithoutMemory, bWithoutMemory, hWithoutMemory,
         slp, eval, h, b, g;
@@ -700,7 +701,7 @@ RECOG.ConstructSnAnIsomorphism := function(ri, n, stdGensAn)
                     eval := ResultOfStraightLineProgram(slp, [h, b]);
                     if not isequal(ri)(eval, StripMemory(g)) then return fail; fi;
                 od;
-                return ["Sn", [b, h], xis];
+                return ["Sn", [b, h], xis, n];
             else
                 return fail;
             fi;
@@ -712,7 +713,7 @@ RECOG.ConstructSnAnIsomorphism := function(ri, n, stdGensAn)
         fi;
     od;
 
-    return ["An", [stdGensAn[1], stdGensAn[2]], xis];
+    return ["An", [stdGensAn[1], stdGensAn[2]], xis, n];
 end;
 
 # This method is an implementation of <Cite Key="JLNP13"/>. It is the main
@@ -752,7 +753,6 @@ RECOG.RecogniseSnAn := function(ri, eps, N)
             #   g, c correspond to standard generators of An
             isoData := RECOG.ConstructSnAnIsomorphism(ri, tmp[3], tmp{[1,2]});
             if isoData = fail then continue; fi;
-            Add(isoData, tmp[3]);
             return isoData;
         od;
     od;
