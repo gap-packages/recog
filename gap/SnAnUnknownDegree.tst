@@ -13,17 +13,17 @@
 #
 # TODO: Use RECOG.TestGroup?
 # TODO: better name for testFunction
-# tests ThreeCycleCandidatesIterator and BolsteringElements
+# tests RECOG.ThreeCycleCandidatesIterator and RECOG.BolsteringElements
 gap> testFunction := function(G, eps, N)
 >     local ri, iterator, candidate, i, j;
 >     ri := EmptyRecognitionInfoRecord(rec(), G, false);
->     iterator := ThreeCycleCandidatesIterator(ri, ThreeCycleCandidatesConstants(eps, N));
+>     iterator := RECOG.ThreeCycleCandidatesIterator(ri, RECOG.ThreeCycleCandidatesConstants(eps, N));
 >     for i in [1 .. 10] do
 >         candidate := iterator();
 >         for j in [1 .. 10] do
 >             if candidate <> NeverApplicable
 >                     and candidate <> TemporaryFailure then
->                 BolsteringElements(ri, candidate, eps,
+>                 RECOG.BolsteringElements(ri, candidate, eps,
 >                                    N);
 >             fi;
 >         od;
@@ -109,53 +109,53 @@ gap> for i in [1 .. Length(nonAltOrSymGroups)] do
 >     testFunction(nonAltOrSymGroups[i], 1/100, 15);
 > od;
 
-# IsFixedPoint
+# RECOG.IsFixedPoint
 gap> ri := EmptyRecognitionInfoRecord(rec(), SymmetricGroup(10), false);;
 gap> g := (1,2,3,4,5,6,7,8);;
 gap> c := (1,2,3);;
 gap> r := (1,2)(4,5,6);;
-gap> IsFixedPoint(ri, g,c,r);
+gap> RECOG.IsFixedPoint(ri, g,c,r);
 true
 gap> r := (2,3,4);;
-gap> IsFixedPoint(ri, g,c,r);
+gap> RECOG.IsFixedPoint(ri, g,c,r);
 false
 
-# AdjustCycle
+# RECOG.AdjustCycle
 gap> ri := EmptyRecognitionInfoRecord(rec(), SymmetricGroup(10), false);;
 gap> g := (1,2,3,4,5,6,7,8);;
 gap> c := (1,2,3);;
 gap> r := (4,5);;
-gap> AdjustCycle(ri, g, c, r, 8);
+gap> RECOG.AdjustCycle(ri, g, c, r, 8);
 (3,5)
 gap> r := (3,4,5);;
-gap> AdjustCycle(ri, g, c, r, 8);
+gap> RECOG.AdjustCycle(ri, g, c, r, 8);
 (3,4,5)
 gap> r := (2,5);;
-gap> AdjustCycle(ri, g, c, r, 8);
+gap> RECOG.AdjustCycle(ri, g, c, r, 8);
 (3,5)
 gap> r := (2,4,5);;
-gap> AdjustCycle(ri, g, c, r, 8);
+gap> RECOG.AdjustCycle(ri, g, c, r, 8);
 (3,5,4)
 gap> r := (2,3,5);;
-gap> AdjustCycle(ri, g, c, r, 8);
+gap> RECOG.AdjustCycle(ri, g, c, r, 8);
 (3,4,5)
 gap> r := (1,5);;
-gap> AdjustCycle(ri, g, c, r, 8);
+gap> RECOG.AdjustCycle(ri, g, c, r, 8);
 (3,5)
 gap> r := (1,4,5);;
-gap> AdjustCycle(ri, g, c, r, 8);
+gap> RECOG.AdjustCycle(ri, g, c, r, 8);
 (3,5,4)
 gap> r := (1,3,4,5);;
-gap> AdjustCycle(ri, g, c, r, 8);
+gap> RECOG.AdjustCycle(ri, g, c, r, 8);
 (3,6,4,5)
 gap> r := (1,2,5);;
-gap> AdjustCycle(ri, g, c, r, 8);
+gap> RECOG.AdjustCycle(ri, g, c, r, 8);
 (3,5,4)
 gap> r := (1,2,3,5);;
-gap> AdjustCycle(ri, g, c, r, 8);
+gap> RECOG.AdjustCycle(ri, g, c, r, 8);
 (3,5,4,6)
 
-# BuildCycle
+# RECOG.BuildCycle
 gap> ri := EmptyRecognitionInfoRecord(rec(), SymmetricGroup(10), false);;
 
 # c = (u,v,w)
@@ -164,53 +164,53 @@ gap> c := (1,2,3);;
 # Form 1: x = (v,a_1,...,a_alpha) * (w,b_1,....,b_beta) * (...)
 # alpha - beta = 0
 gap> x := (2,4,5,6)* (3,7,8,9);;
-gap> BuildCycle(ri, c, x, 10);
+gap> RECOG.BuildCycle(ri, c, x, 10);
 [ (1,2,3,4,7,5,8,6,9), 9 ]
 
 # alpha - beta = -1
 gap> x := (2,4,5,6)* (3,7,8,9,10);;
-gap> BuildCycle(ri, c, x, 10);
+gap> RECOG.BuildCycle(ri, c, x, 10);
 [ (1,2,3,4,7,5,8,6,9), 9 ]
 
 # alpha - beta = 1
 gap> x := (2,4,5,6,10)* (3,7,8,9);;
-gap> BuildCycle(ri, c, x, 10);
+gap> RECOG.BuildCycle(ri, c, x, 10);
 [ (1,2,3,4,7,5,8,6,9), 9 ]
 
 # alpha - beta = -2
 gap> x := (2,4,5) * (3,7,8,9,10);;
-gap> BuildCycle(ri, c, x, 10);
+gap> RECOG.BuildCycle(ri, c, x, 10);
 [ (1,2,3,4,7,5,8,10,9), 9 ]
 
 # alpha - beta = 2
 gap> x := (2,4,5,6,10) * (3,7,8);;
-gap> BuildCycle(ri, c, x, 10);
+gap> RECOG.BuildCycle(ri, c, x, 10);
 [ (1,2,3,4,7,5,8,6,10), 9 ]
 
 # Form 2: x = (v,a_1,...,a_alpha,w,b_1,....,b_beta) * (...)
 # alpha - beta = 0
 gap> x := (2,4,5,6,3,7,8,9);;
-gap> BuildCycle(ri, c, x, 10);
+gap> RECOG.BuildCycle(ri, c, x, 10);
 [ (1,2,3,4,7,5,8,6,9), 9 ]
 
 # alpha - beta = -1
 gap> x := (2,4,5,6,3,7,8,9,10);;
-gap> BuildCycle(ri, c, x, 10);
+gap> RECOG.BuildCycle(ri, c, x, 10);
 [ (1,2,3,4,7,5,8,6,9), 9 ]
 
 # alpha - beta = 1
 gap> x := (2,4,5,6,10,3,7,8,9);;
-gap> BuildCycle(ri, c, x, 10);
+gap> RECOG.BuildCycle(ri, c, x, 10);
 [ (1,2,3,4,7,5,8,6,9), 9 ]
 
 # alpha - beta = -2
 gap> x := (2,4,5,3,7,8,9,10);;
-gap> BuildCycle(ri, c, x, 10);
+gap> RECOG.BuildCycle(ri, c, x, 10);
 [ (1,2,3,4,7,5,8,10,9), 9 ]
 
 # alpha - beta = 2
 gap> x := (2,4,5,6,10,3,7,8);;
-gap> BuildCycle(ri, c, x, 10);
+gap> RECOG.BuildCycle(ri, c, x, 10);
 [ (1,2,3,4,7,5,8,6,10), 9 ]
 
 # Construct isomorphism between S_11 on 2-sets and S_11 in natural
@@ -222,12 +222,12 @@ gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri);;
 gap> isoData := ri!.SnAnUnknownDegreeIsoData;;
 gap> gens := GeneratorsOfGroup(S11On2Sets);;
 gap> g1 := gens[1];;
-gap> img1 := FindImageSn(ri, 11, g1, isoData[2][1], isoData[2][2],
+gap> img1 := RECOG.FindImageSn(ri, 11, g1, isoData[2][1], isoData[2][2],
 >                        isoData[3][1], isoData[3][2]);;
 gap> CycleStructurePerm(img1);
 [ ,,,,,,,,, 1 ]
 gap> g2 := gens[2];;
-gap> img2 := FindImageSn(ri, 11, g2, isoData[2][1], isoData[2][2],
+gap> img2 := RECOG.FindImageSn(ri, 11, g2, isoData[2][1], isoData[2][2],
 >                        isoData[3][1], isoData[3][2]);;
 gap> CycleStructurePerm(img2);
 [ 1 ]

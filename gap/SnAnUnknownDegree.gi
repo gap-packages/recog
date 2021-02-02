@@ -19,8 +19,7 @@
 #
 # FIXME: Move me into GAP
 # Helper function to compute all primes up to a given integer via a prime sieve
-BindGlobal("AllPrimesUpTo",
-function(n)
+RECOG.AllPrimesUpTo := function(n)
     local i, j, sieve, result;
     if n <= 1000 then
       return Primes{[1..PositionSorted(Primes, n+1)-1]};
@@ -42,18 +41,17 @@ function(n)
         i := i + 2;
     od;
     return ListBlist([1..n], sieve);
-end);
+end;
 
 # eps : real number, the error bound
 # N : integer, upper bound for the degree of G
 #
 # Returns a record of constants used in ThreeCyclesCanditatesIterator.
-BindGlobal("ThreeCycleCandidatesConstants",
-    function(eps, N)
+RECOG.ThreeCycleCandidatesConstants := function(eps, N)
     local M, allPrimes, i, p;
     # Constants
     M := 1;
-    allPrimes := AllPrimesUpTo(N);
+    allPrimes := RECOG.AllPrimesUpTo(N);
     for i in [2 .. Length(allPrimes)] do
         p := allPrimes[i];
         M := M * p ^ LogInt(N, p);
@@ -65,7 +63,7 @@ BindGlobal("ThreeCycleCandidatesConstants",
         C := Int(Ceil(Float(3 * N * ~.T / 5))),
         logInt2N := LogInt(N, 2)
     );
-end);
+end;
 
 # ri : recog info record with group G
 # constants : a record with components M, B, T, C, and logInt2N
@@ -79,8 +77,7 @@ end);
 # - a three cycle candidate, i.e. an element of G
 # - TemporaryFailure, if we exhausted all attempts
 # - NeverApplicable, if we found out that G can't be an Sn or An
-BindGlobal("ThreeCycleCandidatesIterator",
-    function(ri, constants)
+RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
     local
         # involution
         t,
@@ -181,7 +178,7 @@ BindGlobal("ThreeCycleCandidatesIterator",
         return candidate;
     end;
     return oneThreeCycleCandidate;
-end);
+end;
 
 # ri : recog info record with group G
 # c : element of G,
@@ -193,8 +190,7 @@ end);
 #
 # If the input is as assumed, then this function returns a list of bolstering
 # elements with respect to c.
-BindGlobal("BolsteringElements",
-function(ri, c, eps, N)
+RECOG.BolsteringElements := function(ri, c, eps, N)
     local result, R, S, nrPrebolsteringElms, i, r, cr, cr2;
     result := [];
     R := Int(Ceil(7 / 4 * Log2(Float(eps ^ -1))));
@@ -221,7 +217,7 @@ function(ri, c, eps, N)
         if Length(result) > R then break; fi;
     od;
     return result;
-end);
+end;
 
 # ri : recog info record with group G
 # g : element of G,
@@ -235,8 +231,7 @@ end);
 # If the input is as assumed, that is in particular the supports of c and
 # c^(g^2) have exactly one point, say alpha, in common, then this function
 # returns whether alpha is a fixed point of r.
-BindGlobal("IsFixedPoint",
-function(ri, g, c, r)
+RECOG.IsFixedPoint := function(ri, g, c, r)
     local
         # respectively c ^ (g ^ i)
         cg, cg2, cg3, cg4,
@@ -280,7 +275,7 @@ function(ri, g, c, r)
     if not commutesWithAtMostOne(ri, x2, H2) then return false; fi;
     if not commutesWithAtMostOne(ri, x3, H2) then return false; fi;
     return true;
-end);
+end;
 
 # ri : recog info record with group G
 # g : element of G,
@@ -298,8 +293,7 @@ end);
 # W.l.o.g. let g = (1, ..., k) and c = (1, 2, 3).
 # If the input is as assumed, then the algorithm returns a conjugate r ^ x such
 # that r ^ x fixes the points 1, 2 but not the point 3.
-BindGlobal("AdjustCycle",
-function(ri, g, c, r, k)
+RECOG.AdjustCycle := function(ri, g, c, r, k)
     local
         # list of 4 booleans, is point j fixed point
         F4,
@@ -318,7 +312,7 @@ function(ri, g, c, r, k)
         # conjugating element
         x;
     # According to the paper we have:
-    # F := { 1 \leq j \leq k | IsFixedPoint(g, c ^ (g ^ (j - 3)), r) = true }
+    # F := { 1 <= j <= k | RECOG.IsFixedPoint(g, c ^ (g ^ (j - 3)), r) = true }
     # f1 := smallest number in F
     # f2 := second smallest number in F
     # m := smallest number *not* in F
@@ -332,7 +326,7 @@ function(ri, g, c, r, k)
     for j in [1 .. k] do
         # invariant: t = c ^ (g ^ (j - 3))
         t := t ^ g;
-        if IsFixedPoint(ri, g, t, r) then
+        if RECOG.IsFixedPoint(ri, g, t, r) then
             if j <= 4 then
                 F4[j] := true;
             fi;
@@ -405,7 +399,7 @@ function(ri, g, c, r, k)
         fi;
     fi;
     return r^x;
-end);
+end;
 
 # ri : recog info record with group G
 # g : element of G,
@@ -413,7 +407,7 @@ end);
 # c : element of G,
 #     should be a 3-cycle
 # r : element of G,
-#     should be a cycle as in the return value of AdjustCycle. If e.g.
+#     should be a cycle as in the return value of RECOG.AdjustCycle. If e.g.
 #     g = (1, 2, ..., k), then r would be a cycle fixing 1 and 2 and moving 3.
 # s : element of group G,
 #     should be a storage cycle
@@ -426,7 +420,7 @@ end);
 # - gTilde: element of G,
 #           should be a cycle matching g
 # - sTilde: element of G,
-#           should be current storage cycle, since we may call AppendPoints
+#           should be current storage cycle, since we may call RECOG.AppendPoints
 #           several times and may not have used the last sTilde.
 # - kTilde: integer,
 #           should be the length of gTilde
@@ -436,8 +430,7 @@ end);
 # the point j in {1, ..., k} with the 3-cycle c ^ (g ^ (j - 3)). We store new
 # points in the storage cycle sTilde until we have found two different points.
 # Then we append these to g.
-BindGlobal("AppendPoints",
-function(ri, g, c, r, s, k, k0)
+RECOG.AppendPoints := function(ri, g, c, r, s, k, k0)
     local gTilde, sTilde, kTilde, gc2, x, j;
     gTilde := g;
     sTilde := s;
@@ -460,20 +453,19 @@ function(ri, g, c, r, s, k, k0)
         fi;
     od;
     return [gTilde, sTilde, kTilde];
-end);
+end;
 
 # ri : recog info record with group G
 # g : element of G
 # p : prime
 # Returns whether g is an element of order p.
-BindGlobal("IsElmOfPrimeOrder",
-function(ri, g, p)
+RECOG.IsElmOfPrimeOrder := function(ri, g, p)
     if not isone(ri)(g) and isone(ri)(g ^ p) then
         return true;
     else
         return false;
     fi;
-end);
+end;
 
 # ri : recog info record with group G
 # c : a 3-cycle of a group G
@@ -487,8 +479,7 @@ end);
 # We return fail if one of the following holds:
 # - N is not an upper bound for the degree of G
 # - c is not a 3-cycle
-BindGlobal("BuildCycle",
-function(ri, c, x, N)
+RECOG.BuildCycle := function(ri, c, x, N)
     local
         # integers
         m, mDash,
@@ -509,7 +500,7 @@ function(ri, c, x, N)
     while true do
         if m >= N / 2 then
             return fail;
-        elif IsElmOfPrimeOrder(ri, d * c, 5) then
+        elif RECOG.IsElmOfPrimeOrder(ri, d * c, 5) then
             m := m + 1;
         else
             break;
@@ -526,13 +517,13 @@ function(ri, c, x, N)
     fi;
     # case |alpha - beta| = 1
     dx := d ^ x;
-    if not IsElmOfPrimeOrder(ri, dx * c, 5) then
+    if not RECOG.IsElmOfPrimeOrder(ri, dx * c, 5) then
         return [y, 2 * m + 3];
     fi;
     # case |alpha - beta| >= 2
     # case distinction on element e
     # w in v ^ <x>
-    if not IsElmOfPrimeOrder(ri, d * c, 2) then
+    if not RECOG.IsElmOfPrimeOrder(ri, d * c, 2) then
         # case 1, alpha > beta
         if docommute(ri)(dx, d ^ c) then
             e := dx ^ c;
@@ -564,7 +555,7 @@ function(ri, c, x, N)
     while true do
         if mDash >= N / 2 then
             return fail;
-        elif IsElmOfPrimeOrder(ri, f * c, 5) then
+        elif RECOG.IsElmOfPrimeOrder(ri, f * c, 5) then
             mDash := mDash + 1;
         else
             break;
@@ -573,7 +564,7 @@ function(ri, c, x, N)
         f := f ^ x2;
     od;
     return [g, 2 * mDash + 2 * m + 3];
-end);
+end;
 
 # ri : recog info record with group G
 # c : element of G,
@@ -587,23 +578,22 @@ end);
 # - k: integer,
 #      should be length of cycle g.
 #
-# Note that the order of the returned list is reversed with respect to the paper to be
-# consistent with the return values of the other functions.
+# Note that the order of the returned list is reversed with respect to the
+# paper to be consistent with the return values of the other functions.
 #
 # We return fail if one of the following holds:
 # - the list of bolstering elements is too small
 # - N is not an upper bound for the degree of G
 # - c is not a 3-cycle
-BindGlobal("ConstructLongCycle",
-function(ri, c, eps, N)
+RECOG.ConstructLongCycle := function(ri, c, eps, N)
     local g, k, tmp, B, x;
-    B := BolsteringElements(ri, c, Float(eps) / 2., N);
+    B := RECOG.BolsteringElements(ri, c, Float(eps) / 2., N);
     if Length(B) < Int(Ceil(7. / 4. * Log(2. / Float(eps)))) then
         return fail;
     fi;
     k := 0;
     for x in B do
-        tmp := BuildCycle(ri, c, x, N);
+        tmp := RECOG.BuildCycle(ri, c, x, N);
         if tmp = fail then
             return fail;
         elif tmp[2] > k then
@@ -612,7 +602,7 @@ function(ri, c, eps, N)
         fi;
     od;
     return [g, k];
-end);
+end;
 
 # ri : recog info record with group G
 # g : element of G,
@@ -631,8 +621,7 @@ end);
 #            3-cycle, a standard generator of An < G
 # - kTilde : integer,
 #            degree of group An < G, that is generated by gTilde and cTilde
-BindGlobal("StandardGenerators",
-function(ri, g, c, k, eps, N)
+RECOG.StandardGenerators := function(ri, g, c, k, eps, N)
     local s, k0, c2, r, kTilde, gTilde, i, x, m, tmp, cTilde;
     s := One(g);
     k0 := k - 2;
@@ -643,9 +632,9 @@ function(ri, g, c, k, eps, N)
     for i in [1 .. Int(Ceil(Log(10. / 3.) ^ (-1)
             * (Log(Float(N)) + Log(1 / Float(eps)))))] do
         x := r ^ RandomElm(ri, "SnAnUnknownDegree", true)!.el;
-        m := AdjustCycle(ri, gTilde, c, x, kTilde);
+        m := RECOG.AdjustCycle(ri, gTilde, c, x, kTilde);
         if m = fail then return fail; fi;
-        tmp := AppendPoints(ri, gTilde, c, m, s, kTilde, k0);
+        tmp := RECOG.AppendPoints(ri, gTilde, c, m, s, kTilde, k0);
         gTilde := tmp[1];
         s := tmp[2];
         kTilde := tmp[3];
@@ -659,14 +648,14 @@ function(ri, g, c, k, eps, N)
         gTilde := gTilde * s;
         cTilde := s;
     fi;
-    if SatisfiesAnPresentation(ri, gTilde, cTilde, kTilde) then
+    if RECOG.SatisfiesAnPresentation(ri, gTilde, cTilde, kTilde) then
         return [gTilde, cTilde, kTilde];
     else
         return fail;
     fi;
-end);
+end;
 
-# This function is an excerpt of the function RecogniseSnAn in gap/SnAnBB.gi
+# This function is an excerpt of the function RECOG.RecogniseSnAn in gap/SnAnBB.gi
 # ri : recog info record with group G,
 # n : degree
 # stdGensAn : standard generators of An < G
@@ -675,16 +664,16 @@ end);
 # - s is the isomorphism type, that is either the string "Sn" or "An".
 # - stdGens are the standard generators of G. Identical to stdGensAn if G is
 #   isomorphic to An
-# - xis implicitly defines the isomorphism. It is used by FindImageSn and
-#   FindImageAn to compute the isomorphism.
-BindGlobal("ConstructSnAnIsomorphism",
-function(ri, n, stdGensAn)
-    local grp, xis, gImage, gensWithoutMemory, bWithoutMemory, hWithoutMemory, slp, eval, h, b, g;
+# - xis implicitly defines the isomorphism. It is used by RECOG.FindImageSn and
+#   RECOG.FindImageAn to compute the isomorphism.
+RECOG.ConstructSnAnIsomorphism := function(ri, n, stdGensAn)
+    local grp, xis, gImage, gensWithoutMemory, bWithoutMemory, hWithoutMemory,
+        slp, eval, h, b, g;
     grp := GroupWithMemory(Grp(ri));
     gensWithoutMemory := StripMemory(stdGensAn);
-    xis := ConstructXiAn(n, gensWithoutMemory[1], gensWithoutMemory[2]);
+    xis := RECOG.ConstructXiAn(n, gensWithoutMemory[1], gensWithoutMemory[2]);
     for g in GeneratorsOfGroup(grp) do
-        gImage := FindImageAn(ri, n, StripMemory(g), gensWithoutMemory[1],
+        gImage := RECOG.FindImageAn(ri, n, StripMemory(g), gensWithoutMemory[1],
                           gensWithoutMemory[2], xis[1], xis[2]);
         if gImage = fail then return fail; fi;
         if SignPerm(gImage) = -1 then
@@ -698,12 +687,14 @@ function(ri, n, stdGensAn)
             else
                 b := h * stdGensAn[1] * stdGensAn[2];
             fi;
-            if SatisfiesSnPresentation(ri, n, b, h) then
+            if RECOG.SatisfiesSnPresentation(ri, n, b, h) then
                 bWithoutMemory := StripMemory(b);
                 hWithoutMemory := StripMemory(h);
-                xis := ConstructXiSn(n, bWithoutMemory, hWithoutMemory);
+                xis := RECOG.ConstructXiSn(n, bWithoutMemory, hWithoutMemory);
                 for g in GeneratorsOfGroup(grp) do
-                    gImage := FindImageSn(ri, n, StripMemory(g), bWithoutMemory, hWithoutMemory, xis[1], xis[2]);
+                    gImage := RECOG.FindImageSn(ri, n, StripMemory(g),
+                                                bWithoutMemory, hWithoutMemory,
+                                                xis[1], xis[2]);
                     if gImage = fail then return fail; fi;
                     slp := RECOG.SLPforSn(n, gImage);
                     eval := ResultOfStraightLineProgram(slp, [h, b]);
@@ -715,36 +706,36 @@ function(ri, n, stdGensAn)
             fi;
         else
             slp := RECOG.SLPforAn(n, gImage);
-            eval:=ResultOfStraightLineProgram(slp, [gensWithoutMemory[2], gensWithoutMemory[1]]);
+            eval := ResultOfStraightLineProgram(slp, [gensWithoutMemory[2],
+                                                gensWithoutMemory[1]]);
             if not isequal(ri)(eval, StripMemory(g)) then return fail; fi;
         fi;
     od;
 
     return ["An", [stdGensAn[1], stdGensAn[2]], xis];
-end);
+end;
 
 # This method is an implementation of <Cite Key="JLNP13"/>. It is the main
 # function of SnAnUnknownDegree.
 #
 # From <Cite Key="JLNP13" Where="Theorem 1.1"/>:
-# RecogniseSnAn is a one-sided Monte-Carlo algorithm with the following
+# RECOG.RecogniseSnAn is a one-sided Monte-Carlo algorithm with the following
 # properties. It takes as input a black-box group <A>G</A>, a natural number
 # <A>N</A> and a real number <A>eps</A> with 0 < <A>eps</A> < 1. If <A>G</A> is
 # isomorphic to An or Sn for some 9 <= <A>n</A> <= <A>N</A>, it returns with
 # probability at least 1 - <A>eps</A> the degree <A>n</A> and an
 # isomorphism from <A>G</A> to An or Sn.
-BindGlobal("RecogniseSnAn",
-function(ri, eps, N)
+RECOG.RecogniseSnAn := function(ri, eps, N)
     local T, foundPreImagesOfStdGens, constants, iterator, c, tmp, isoData, i;
     T := Int(Ceil(Log2(1 / Float(eps))));
     foundPreImagesOfStdGens := false;
-    constants := ThreeCycleCandidatesConstants(1. / 4., N);
+    constants := RECOG.ThreeCycleCandidatesConstants(1. / 4., N);
     for i in [1 .. T] do
-        iterator := ThreeCycleCandidatesIterator(ri, constants);
+        iterator := RECOG.ThreeCycleCandidatesIterator(ri, constants);
         c := iterator();
         while c <> fail do
             if c = NeverApplicable then return NeverApplicable; fi;
-            tmp := ConstructLongCycle(ri, c, 1. / 8., N);
+            tmp := RECOG.ConstructLongCycle(ri, c, 1. / 8., N);
             if tmp = fail then
                 c := iterator();
                 continue;
@@ -752,21 +743,21 @@ function(ri, eps, N)
             # Now tmp contains [g, k] where
             #   g corresponds to a long cycle
             #   k is its length
-            tmp := StandardGenerators(ri, tmp[1], c, tmp[2], 1. / 8., N);
+            tmp := RECOG.StandardGenerators(ri, tmp[1], c, tmp[2], 1. / 8., N);
             if tmp = fail then
                 c := iterator();
                 continue;
             fi;
             # Now tmp contains [g, c, n] where
             #   g, c correspond to standard generators of An
-            isoData := ConstructSnAnIsomorphism(ri, tmp[3], tmp{[1,2]});
+            isoData := RECOG.ConstructSnAnIsomorphism(ri, tmp[3], tmp{[1,2]});
             if isoData = fail then continue; fi;
             Add(isoData, tmp[3]);
             return isoData;
         od;
     od;
     return TemporaryFailure;
-end);
+end;
 
 #! @BeginChunk SnAnUnknownDegree
 #! This method tries to determine whether the input group given by <A>ri</A> is
@@ -800,16 +791,18 @@ FindHomMethodsGeneric.SnAnUnknownDegree := function(ri)
         if ri!.projective then
             # If n >= 9, then the smallest irreducible projective An-module has
             # dimension n-2, see [KL90], Proposition 5.3.7.
-            # Assume N >= 9 and use the comment above to compute N. If we arrive at a
-            # value < 9 for N, then we must have been in the case N < 9.
+            # Assume N >= 9 and use the comment above to compute N. If we
+            # arrive at a value < 9 for N, then we must have been in the case N
+            # < 9.
             # TODO: do we want to use the table for the other cases?
             N := Maximum(8, d + 2);
         else
             # If n >= 10, then the smallest irreducible An-module is the
             # fully deleted permutation module, see [KL90], Proposition 5.3.5.
             # It has dimension n-2 if p|n and dimension n-1 otherwise.
-            # Assume N >= 10 and use the comment above to compute N. If we arrive at a
-            # value < 10 for N, then we must have been in the case N < 10.
+            # Assume N >= 10 and use the comment above to compute N. If we
+            # arrive at a value < 10 for N, then we must have been in the case
+            # N < 10.
             if (d + 2) mod p = 0 then
                 N := d + 2;
             else
@@ -823,8 +816,8 @@ FindHomMethodsGeneric.SnAnUnknownDegree := function(ri)
                            " IsMatrixGroup");
     fi;
     # Try to find an isomorphism
-    isoData := RecogniseSnAn(ri, eps, N);
-    # RecogniseSnAn returned NeverApplicable or TemporaryFailure
+    isoData := RECOG.RecogniseSnAn(ri, eps, N);
+    # RECOG.RecogniseSnAn returned NeverApplicable or TemporaryFailure
     if not IsList(isoData) then
         return isoData;
     fi;
@@ -856,7 +849,7 @@ SLPforElementFuncsGeneric.SnUnknownDegree := function(ri, g)
     local isoData, degree, image;
     isoData := ri!.SnAnUnknownDegreeIsoData;
     degree := isoData[4];
-    image := FindImageSn(ri, degree, g, isoData[2][1], isoData[2][2],
+    image := RECOG.FindImageSn(ri, degree, g, isoData[2][1], isoData[2][2],
                        isoData[3][1], isoData[3][2]);
     return RECOG.SLPforSn(degree, image);
 end;
@@ -866,7 +859,7 @@ SLPforElementFuncsGeneric.AnUnknownDegree := function(ri, g)
     local isoData, degree, image;
     isoData := ri!.SnAnUnknownDegreeIsoData;
     degree := isoData[4];
-    image := FindImageAn(ri, degree, g, isoData[2][1], isoData[2][2],
+    image := RECOG.FindImageAn(ri, degree, g, isoData[2][1], isoData[2][2],
                        isoData[3][1], isoData[3][2]);
     return RECOG.SLPforAn(degree, image);
 end;
