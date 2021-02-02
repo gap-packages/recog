@@ -648,7 +648,10 @@ RECOG.StandardGenerators := function(ri, g, c, k, eps, N)
         gTilde := gTilde * s;
         cTilde := s;
     fi;
-    if RECOG.SatisfiesAnPresentation(ri, gTilde, cTilde, kTilde) then
+    if RECOG.SatisfiesAnPresentation(ri,
+                                     StripMemory(gTilde),
+                                     StripMemory(cTilde),
+                                     kTilde) then
         return [gTilde, cTilde, kTilde];
     else
         return fail;
