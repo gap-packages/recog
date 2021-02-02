@@ -18,9 +18,9 @@ gap> testFunction := function(G, eps, N)
 >     local ri, iterator, candidate, i, j;
 >     ri := EmptyRecognitionInfoRecord(rec(), G, false);
 >     iterator := RECOG.ThreeCycleCandidatesIterator(ri, RECOG.ThreeCycleCandidatesConstants(eps, N));
->     for i in [1 .. 10] do
+>     for i in [1 .. 4] do
 >         candidate := iterator();
->         for j in [1 .. 10] do
+>         for j in [1 .. 4] do
 >             if candidate <> NeverApplicable
 >                     and candidate <> TemporaryFailure then
 >                 RECOG.BolsteringElements(ri, candidate, eps,
