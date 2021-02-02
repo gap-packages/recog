@@ -222,13 +222,13 @@ gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri);;
 gap> isoData := ri!.SnAnUnknownDegreeIsoData;;
 gap> gens := GeneratorsOfGroup(S11On2Sets);;
 gap> g1 := gens[1];;
-gap> img1 := RECOG.FindImageSn(ri, 11, g1, isoData[2][1], isoData[2][2],
->                        isoData[3][1], isoData[3][2]);;
+gap> img1 := RECOG.FindImageSn(ri, 11, g1, isoData[1][1], isoData[1][2],
+>                        isoData[2][1], isoData[2][2]);;
 gap> CycleStructurePerm(img1);
 [ ,,,,,,,,, 1 ]
 gap> g2 := gens[2];;
-gap> img2 := RECOG.FindImageSn(ri, 11, g2, isoData[2][1], isoData[2][2],
->                        isoData[3][1], isoData[3][2]);;
+gap> img2 := RECOG.FindImageSn(ri, 11, g2, isoData[1][1], isoData[1][2],
+>                        isoData[2][1], isoData[2][2]);;
 gap> CycleStructurePerm(img2);
 [ 1 ]
 
