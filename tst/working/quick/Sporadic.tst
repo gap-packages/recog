@@ -10,41 +10,36 @@ gap> TestSporadic := function(name)
 > end;;
 
 #
-gap> TestSporadic("J1");
-[ "J1" ]
-gap> TestSporadic("M11");
-[ "M11" ]
-gap> TestSporadic("J3");
-[ "J3" ]
-gap> TestSporadic("M23");
-[ "M23" ]
-gap> TestSporadic("M22");
-[ "M22" ]
-gap> TestSporadic("J2");
-[ "J2" ]
-gap> TestSporadic("Ru");
-[ "Ru" ]
-gap> TestSporadic("HS");
-[ "HS" ]
-gap> TestSporadic("M24");
-[ "M24" ]
-gap> TestSporadic("ON");
-[ "ON" ]
-gap> TestSporadic("McL");
-[ "McL" ]
-gap> TestSporadic("Co3");
-[ "Co3" ]
-gap> TestSporadic("Co2");
-[ "Co2" ]
-gap> TestSporadic("Suz");
-[ "Suz" ]
-gap> TestSporadic("Fi23");
-[ "Fi23" ]
-gap> TestSporadic("M12");
-[ "M12" ]
-gap> TestSporadic("Fi22");
-[ "Fi22" ]
-gap> TestSporadic("Co1");
-[ "Co1" ]
-gap> TestSporadic("He");
-[ "He" ]
+gap> data := ShallowCopy(RECOG.NameSporadicData);;
+
+# We test everything from RECOG.NameSporadicData except for "HN" and "Ly"
+# because they take very long.
+# "HN" is not in RECOG.NameSporadicData. We remove "Ly".
+gap> Remove(data, PositionProperty(data, x -> x.name = "Ly"));;
+gap> for d in data do
+> name := d.name;
+> Print(name, "\n");
+> TestSporadic(name);
+> od;
+M11
+M12
+M22
+M23
+M24
+J1
+J2
+J3
+HS
+McL
+Suz
+Ru
+Co3
+Co2
+Co1
+ON
+Fi22
+He
+J4
+Fi23
+Fi24'
+Th
