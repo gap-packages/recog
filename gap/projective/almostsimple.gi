@@ -1510,10 +1510,10 @@ RECOG.NameSporadicData := MakeImmutable([
         maximalOrdersSubset := [19, 31, 39]),
 ]);
 #! @BeginChunk NameSporadic
-#! This method returns a list of sporadic simple groups that <A>ri</A>
-#! could be. It does not recognise extensions of sporadic simple groups nor the
-#! Monster and the Baby Monster group. It is based on the Magma v2.24.10
-#! function <C>RecognizeSporadic</C>.
+#! This method returns a list of sporadic simple groups that the group
+#! underlying <A>ri</A> could be. It does not recognise extensions of sporadic
+#! simple groups nor the Monster and the Baby Monster group. It is based on the
+#! Magma v2.24.10 function <C>RecognizeSporadic</C>.
 # TODO G is unused
 FindHomMethodsProjective.NameSporadic := function(ri, G)
     local orders, setOfOrders, maximalOrders, isMaximal,
@@ -1526,6 +1526,10 @@ FindHomMethodsProjective.NameSporadic := function(ri, G)
     # Compute maximal orders. Maximal in the sense that it does not divide the
     # order of another group element.
     setOfOrders := AsSet(orders);
+    # All orders we look for are <= 66.
+    if setOfOrders[Length(setOfOrders)] > 67 then
+        return NeverApplicable;
+    fi;
     maximalOrders := [];
     for i in [1..Length(setOfOrders)] do
         isMaximal := true;
