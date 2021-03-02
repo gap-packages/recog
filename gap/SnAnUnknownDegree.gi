@@ -190,14 +190,16 @@ end;
 #
 # If the input is as assumed, then this function returns a list of bolstering
 # elements with respect to c.
-RECOG.BolsteringElements := function(ri, c, eps, N)
-    local result, R, S, nrPrebolsteringElms, i, r, cr, cr2;
+RECOG.BolsteringElements := function(ri, cWithMem, eps, N)
+    local result, R, S, nrPrebolsteringElms, i, c, rWithMem, r, cr, cr2;
     result := [];
+    c := StripMemory(cWithMem);
     R := Int(Ceil(7 / 4 * Log2(Float(eps ^ -1))));
     S := 7 * N * R;
     # find pre-bolstering elements
     for i in [0 .. S] do
-        r := RandomElm(ri, "SnAnUnknownDegree", true)!.el;
+        rWithMem := RandomElm(ri, "SnAnUnknownDegree", true)!.el;
+        r := StripMemory(rWithMem);
         # test whether r is pre-bolstering
         cr := c ^ r;
         cr2 := cr ^ r;
@@ -209,9 +211,9 @@ RECOG.BolsteringElements := function(ri, c, eps, N)
             if isone(ri)((cr ^ (c * r)
                       * cr ^ (cr2 * c)) ^ 3)
             then
-                Add(result, c ^ 2 * r);
+                Add(result, cWithMem ^ 2 * rWithMem);
             else
-                Add(result, c * r);
+                Add(result, cWithMem * rWithMem);
             fi;
         fi;
         if Length(result) > R then break; fi;
