@@ -162,16 +162,8 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     fi;
     Setarecommuting(ri, function(x,y)
       local a,b;
-      if IsObjWithMemory(x) then
-        a := StripMemory(x);
-      else
-        a := x;
-      fi;
-      if IsObjWithMemory(y) then
-        b := StripMemory(y);
-      else
-        b := y;
-      fi;
+      a := StripMemory(x);
+      b := StripMemory(y);
       return isequal(ri)(a*b, b*a);
     end);
     ri!.projective := projective;
