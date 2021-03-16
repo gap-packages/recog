@@ -58,8 +58,8 @@ RECOG.ThreeCycleCandidatesConstants := function(eps, N)
     od;
     return rec(
         M := M,
-        B := Int(Ceil(13 * Log2(Float(N)) * Log2(3 / Float(eps)))),
-        T := Int(Ceil(3 * Log2(3 / Float(eps)))),
+        B := Int(Ceil(13 * Log(Float(N)) * Log(3 / Float(eps)))),
+        T := Int(Ceil(3 * Log(3 / Float(eps)))),
         C := Int(Ceil(Float(3 * N * ~.T / 5))),
         logInt2N := LogInt(N, 2)
     );
@@ -77,6 +77,8 @@ end;
 # - a three cycle candidate, i.e. an element of G
 # - TemporaryFailure, if we exhausted all attempts
 # - NeverApplicable, if we found out that G can't be an Sn or An
+#
+# Lower Bounds need n >= 9.
 RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
     local
         # involution
@@ -190,11 +192,14 @@ end;
 #
 # If the input is as assumed, then this function returns a list of bolstering
 # elements with respect to c.
+#
+# Lower Bounds need n >= 9.
+# Bolstering Elements are only defined for n >= 7.
 RECOG.BolsteringElements := function(ri, cWithMem, eps, N)
     local result, R, S, nrPrebolsteringElms, i, c, rWithMem, r, cr, cr2;
     result := [];
     c := StripMemory(cWithMem);
-    R := Int(Ceil(7 / 4 * Log2(Float(eps ^ -1))));
+    R := Int(Ceil(7 / 4 * Log(Float(eps ^ -1))));
     S := 7 * N * R;
     # find pre-bolstering elements
     for i in [0 .. S] do
@@ -674,6 +679,8 @@ end;
 #     and RECOG.FindImageAn to compute the isomorphism.
 #   - n is the degree of the group.
 # - slpToStdGens: an SLP to stdGens.
+#
+# TODO: Image Computation requires n >= 11.
 RECOG.ConstructSnAnIsomorphism := function(ri, n, stdGensAnWithMemory)
     local grp, stdGensAn, xis, gImage, foundOddPermutation, slp, eval,
         hWithMemory, bWithMemory, stdGensSnWithMemory, b, h, g;
@@ -778,7 +785,7 @@ end;
 #! @BeginChunk SnAnUnknownDegree
 #! This method tries to determine whether the input group given by <A>ri</A> is
 #! isomorphic to a symmetric group Sn or alternating group An with
-#! <M>9 \leq n</M>.
+#! <M>11 \leq n</M>.
 #! It is an implementation of <Cite Key="JLNP13"/>.
 #!
 #! If <A>Grp(ri)</A> is a permutation group, we assume that it is primitive and
