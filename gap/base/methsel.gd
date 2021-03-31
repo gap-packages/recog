@@ -92,4 +92,4 @@ BindGlobal("TemporaryFailure", fail);    # HACK: use old value for now, to ease 
 # The method needs more information (e.g. things like whether group is
 # solvable; transitive; etc.) -> try again later if new information becomes
 # available (used to be 'NotApplicable').
-BindGlobal("NotEnoughInformation", "NotEnoughInformation");
+BindGlobal("NotEnoughInformation", MakeImmutable("NotEnoughInformation"));
