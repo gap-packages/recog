@@ -58,7 +58,7 @@ end;
 
 ## Functions for efficient matrix operations
 
-RECOG.Commute := function(g, h);
+RECOG.AreCommutingNonProjectiveMatrices := function(g, h);
 # Commute(g,h) returns true if and only if
 # gh = hg
   ConvertToMatrixRep(g);
@@ -510,7 +510,7 @@ RECOG.DoubleAndShrink := function(g, group, n)
 
   i := 1;
   # find elements that do not commute
-  while RECOG.Commute(gi, rs[i][3]) do
+  while RECOG.AreCommutingNonProjectiveMatrices(gi, rs[i][3]) do
     if i >= maxItr then
       return fail;
     fi;
@@ -532,12 +532,12 @@ RECOG.DoubleAndShrink := function(g, group, n)
     # calc gs[j-1]^s
     gconjs := RECOG.Conj(gs[j-1], s);
     # determine new s
-    if RECOG.Commute(gs[j-1], gconjs) then
+    if RECOG.AreCommutingNonProjectiveMatrices(gs[j-1], gconjs) then
       # calc gs[j-1]^(rs[j-1]*s)
       gconjrs := RECOG.Conj(rs[j-1][3], s);
-      if not RECOG.Commute(gs[j-1], gconjrs) then
+      if not RECOG.AreCommutingNonProjectiveMatrices(gs[j-1], gconjrs) then
         s := rs[j-1][1] * s;
-      elif not RECOG.Commute(rs[j-1][3], gconjs) then
+      elif not RECOG.AreCommutingNonProjectiveMatrices(rs[j-1][3], gconjs) then
         s := s * rs[j-1][2];
       else
         # s := s^(rs[j-1][1]^-1)
