@@ -41,23 +41,31 @@ end;
 #! largest moved point. If <A>G</A> is transitive then the method returns
 #! <K>NeverApplicable</K>.
 #! @EndChunk
-FindHomMethodsPerm.NonTransitive :=
-  function( ri, G )
+#! @BeginCode FindHomMethodsPerm.NonTransitive
+FindHomMethodsPerm.NonTransitive := function( ri, G )
     local hom,la,o;
 
-    # Then test whether we can do something:
+    # test whether we can do something:
     if IsTransitive(G) then
         return NeverApplicable;
     fi;
 
+    # compute orbit of the largest moved point
     la := LargestMovedPoint(G);
     o := Orb(G,la,OnPoints);
     Enumerate(o);
+    # compute homomorphism into Sym(o), i.e, restrict
+    # the permutation action of G to the orbit o
     hom := OrbActionHomomorphism(G,o);
+    # TODO: explanation
     Setvalidatehomominput(ri, {ri,p} -> ForAll(o, x -> (x^p in o)));
+    # store the homomorphism into the recognition info record
     SetHomom(ri,hom);
+
+    # indicate success
     return Success;
   end;
+#! @EndCode
 
 #! @BeginChunk Imprimitive
 #! If the input group is not known to be transitive then this method
@@ -411,7 +419,7 @@ FindHomMethodsPerm.Pcgs :=
 
 
 # The following commands install the above methods into the database:
-
+#! @BeginCode AddMethod_Perm_FindHomMethodsGeneric.TrivialGroup
 AddMethod(
     FindHomDbPerm,
     rec(
@@ -421,6 +429,8 @@ AddMethod(
         comment := "just go through generators and compare to the identity",
     )
 );
+#! @EndCode
+
 AddMethod(
     FindHomDbPerm,
     rec(
@@ -465,6 +475,7 @@ AddMethod(
     )
 );
 
+#! @BeginCode AddMethod_Perm_FindHomMethodsPerm.NonTransitive
 AddMethod(
     FindHomDbPerm,
     rec(
@@ -475,6 +486,7 @@ AddMethod(
         validatesOrAlwaysValidInput := true,
     )
 );
+#! @EndCode
 
 AddMethod(
     FindHomDbPerm,

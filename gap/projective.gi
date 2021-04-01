@@ -293,6 +293,7 @@ end;
 
 # The method installations:
 
+#! @BeginCode AddMethod_Projective_FindHomMethodsGeneric.TrivialGroup
 AddMethod(
     FindHomDbProjective,
     rec(
@@ -302,6 +303,7 @@ AddMethod(
         comment := "check if all generators are scalar multiples of the identity matrix",
     )
 );
+#! @EndCode
 
 AddMethod(
     FindHomDbProjective,

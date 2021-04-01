@@ -933,6 +933,7 @@ end;
 #  return true;
 #end;
 
+#! @BeginCode AddMethod_Matrix_FindHomMethodsGeneric.TrivialGroup
 AddMethod(
     FindHomDbMatrix,
     rec(
@@ -942,6 +943,7 @@ AddMethod(
         comment := "check whether all generators are equal to the identity matrix",
     )
 );
+#! @EndCode
 
 AddMethod(
     FindHomDbMatrix,

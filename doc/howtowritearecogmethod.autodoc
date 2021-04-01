@@ -1,0 +1,183 @@
+@Chapter How to write a recognition method
+
+This chapter explains how to integrate a newly developed group recognition
+method into the framework provided by the recog package.
+
+TODO:
+Refer to Chapter <Ref Chap="methsel"/> for an explanation of methods.
+There are leaf methods and split methods.
+The next two sections describe how to implement leaf and split methods
+respectively, and include example code.
+
+@Section Leaf methods
+
+A leaf method must at the very least do the following, examples will be
+provided below (TODO: add a reference):
+
+- Provide the order of the recognized group via `SetSize(ri, NNN)`.
+- Provide a set of SLPs which map the original generators $X$ to the nice generators $Y$, as entry for the attribute `slptonice`.
+- Provide a function which maps any element $g\in G$ to a corresponding SLP in terms of the nice generators $Y$, as entry for the attribute `slpforelement`.
+- Call `SetFilterObj(ri, IsLeaf);` to mark the node as a leaf node.
+
+There are further values that can be provided, in particular to speed up
+computations; we'll come back to that later. Let's first look at an example:
+The following method is used by <Package>recog</Package> to recognize trivial
+groups, as a base case for the recursive group recognition algorithm. It works
+for arbitrary groups.
+
+TODO: AutoDoc inserts extra paragraph commands here:
+@InsertCode FindHomMethodsGeneric.TrivialGroup
+
+The input is in the format described above (TODO), and the return value is "Success".
+
+Two more comments:
+- When we check whether all generators are the identity, we call `ri!.isone`,
+  instead of `IsOne`. The reason for this is the need to support __projective
+  groups__. For permutation groups and matrix groups, `ri!.isone` is simply
+  defined to be `IsOne`. For projective groups, it is set to `IsOneProjective`,
+  which can be read as  "is one modulo scalars".
+- The function `SLPforElementFuncs.TrivialGroup` takes `ri` as well as an
+  element `g` as input.  If $g \in G$, then it is supposed to return an SLP for
+  $g$ in terms of the nice gens $Y$. Otherwise it returns `fail`. Here is the
+  concrete implementation:
+
+@InsertCode SLPforElementFuncsGeneric.TrivialGroup
+
+Finally, we need to let <Package>recog</Package> know about this new
+recognition method. This is done via the `AddMethod` function. Another example!
+
+@InsertCode AddMethod_Perm_FindHomMethodsGeneric.TrivialGroup
+
+TODO: refer to the `AddMethod` documentation instead. Also this is outdated now.
+The function `AddMethod` takes four mandatory arguments `db`, `meth`, `rank`, `stamp`, and an optional fifth argument `comment`. Their meaning is as follows:
+
+- `db` is the "method database", and determines to which type of groups the methods should be applied. Allowed values are:
+    - `FindHomDbPerm`
+    - `FindHomDbMatrix`
+    - `FindHomDbProj`
+
+- `meth` is the recognition method we have defined. In our example this is `FindHomMethodsGeneric.TrivialGroup`.
+
+- `rank` is the relative rank of the recognition method, given as an integer. The idea is that methods with a high rank get called before methods with a low rank, so [recog] tries recognition methods starting from the highest rank. What the "right" rank for a given method is depends on which other methods exist and what their ranks are. As a rule of thumb, methods which are either very fast or very likely to be applicable should be tried before slower methods, or methods which are less likely to be relevant.
+- `stamp` holds a string value that uniquely describes the method. This is used for bookkeeping. It is also used in the manual, for printing the recognition tree, and for debugging purposes.
+- `comment` is a string valued comment which in the example above has been used to explain what the method does. This argument is optional and can be left out.
+
+
+Note that above, we only installed our method into `FindHomDbPerm`. But in
+recog, it is actually also installed for matrix and projective groups. We
+reproduce the corresponding `AddMethod` calls here. Note that the ranks differ,
+so the same method can be called with varying priority depending on the type of
+group.
+
+@InsertCode AddMethod_Matrix_FindHomMethodsGeneric.TrivialGroup
+@InsertCode AddMethod_Projective_FindHomMethodsGeneric.TrivialGroup
+
+- TODO: more advanced example?
+- TODO: also explain how verification works
+- TODO: we need something that demonstrates the other two return values (Oh yes, good point.)
+
+
+@Section Splitting methods
+
+Recall that splitting recognition methods produce an epimorphism $\phi:G\to H$
+and then delegate the work to the image $H$ and the kernel $N:=\ker(\phi)$.
+This means that now $N$ and $H$ have to be constructively recognized. Such a
+splitting recognition method only needs to provide a homomorphism, by calling
+`SetHomom(ri, hom);`. However, in practice one will want to provide additional
+data.
+
+We start with an example, similar to a method used in <Package>recog</Package>.
+This refers to permutation groups only!
+
+@InsertCode FindHomMethodsPerm.NonTransitive
+
+TODO Alternatively use this:
+@BeginExampleSession
+FindHomMethodsPerm.NonTransitive := function(ri, G)
+  local hom, la, o;
+
+  # test whether we can do something:
+  if IsTransitive(G) then
+    # the action is transitive, so we can't do
+    # anything, and there is no point in calling us again.
+    return NeverApplicable;
+  fi;
+
+  # compute orbit of the largest moved point
+  la := LargestMovedPoint(G);
+  o := Orbit(G, la, OnPoints);
+
+  # compute homomorphism into Sym(o), i.e, restrict
+  # the permutation action of G to the orbit o
+  hom := ActionHomomorphism(G, o);
+
+  # store the homomorphism into the recognition info record
+  SetHomom(ri, hom);
+
+  # indicate success
+  return Success;
+end;
+@EndExampleSession
+
+@InsertCode AddMethod_Perm_FindHomMethodsPerm.NonTransitive
+
+TODO: More complex example:
+
+@BeginExampleSession
+FindHomMethodsMatrix.BlockLowerTriangular := function(ri, G)
+  # This is only used coming from a hint, we know what to do:
+  # A base change was done to get block lower triangular shape.
+  # We first do the diagonal blocks, then the lower p-part:
+  local H, data, hom, newgens;
+
+  # we need to construct a homomorphism, but to defined it,
+  # we need the image, but of course the image is defined in
+  # terms of the homomorphism... to break this cycle, we do
+  # the following: we first map the input generators using
+  # the helper function RECOG.HomOntoBlockDiagonal; this
+  # function is later also used as the underlying mapping
+  # of the homomorphism.
+  data := rec( blocks := ri!.blocks );
+  newgens := List(GeneratorsOfGroup(G),
+                  x -> RECOG.HomOntoBlockDiagonal(data, x));
+  Assert(0, not fail in newgens);
+
+  # now that we have the images of the generators, we can
+  # defined the image group
+  H := Group(newgens);
+
+  # finally, we define the homomorphism
+  hom := GroupHomByFuncWithData(G, H, RECOG.HomOntoBlockDiagonal, data);
+
+  # ... and store it in the recognition info record
+  SetHomom(ri, hom);
+
+  # since we know exactly what kind of group we are looking
+  # at, we don't want to run generic recognition on the
+  # factor group and the kernel. So we provide "hints" to
+  # ensure more appropriate recognition methods are applied
+  # first.
+
+  # Give hint to factor
+  forfactor(ri).blocks := ri!.blocks;
+  Add(forfactor(ri).hints,
+      rec( method := FindHomMethodsMatrix.BlockDiagonal,
+           rank := 2000,
+           stamp := "BlockDiagonal" ) );
+
+  # Tell recog that we have a better method for finding kernel
+  findgensNmeth(ri).method := FindKernelLowerLeftPGroup;
+  findgensNmeth(ri).args := [];
+
+  # Give hint to kernel N
+  Add(forkernel(ri).hints,
+      rec( method := FindHomMethodsMatrix.LowerLeftPGroup,
+           rank := 2000,
+           stamp := “LowerLeftPGroup" ));
+  forkernel(ri).blocks := ri!.blocks;
+
+  # This function always succeeds, because it is only
+  # called for inputs for which it is known to apply.
+  return Success;
+end;
+@EndExampleSession
