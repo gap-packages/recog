@@ -160,7 +160,7 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
         Setisequal(ri,\=);
         ri!.order := Order;
     fi;
-    Setarecommuting(ri, function(x,y)
+    Setdocommute(ri, function(x,y)
       local a,b;
       a := StripMemory(x);
       b := StripMemory(y);

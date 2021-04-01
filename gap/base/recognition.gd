@@ -312,7 +312,7 @@ DeclareAttribute( "isequal", IsRecognitionInfo, "mutable" );
 # Used to compute order of group elements after recognition:
 DeclareAttribute( "order", IsRecognitionInfo, "mutable" );
 # Used to check whether two group elements commute:
-DeclareAttribute( "arecommuting", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "docommute", IsRecognitionInfo, "mutable" );
 
 
 #############################################################################
