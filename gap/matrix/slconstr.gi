@@ -14,6 +14,9 @@
 ##
 ##  Peter Brooksbank's code for constructive SL and PSL recognition.
 ##
+##  The function SLCR.FindHom can be used to find a constructive isomorphism
+##  from a group G to an SL(d,q), provided one knows d and q.
+##
 #############################################################################
 
 SLCR := rec();
@@ -2422,7 +2425,12 @@ end;
 ##end;
 
 # Here comes the code linking all this to the recog package:
-
+#! @BeginChunk SLCR.FindHom
+#! Given two integers d and g and a group G which must be isomorphic to SL(d,q),
+#! this function recognises G constructively and stores the result in ri.
+#!
+#! TODO: find a better name.
+#! @EndChunk
 SLCR.FindHom := function(ri,G,d,q)
   local GM,data,e,genlist,i,j,p;
   p := Factors(q);
