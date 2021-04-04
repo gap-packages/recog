@@ -6,29 +6,37 @@ gap> TestSporadic := function(name)
 >     g := AtlasGenerators(name,1).generators;
 >     g := Group(g);
 >     ri := EmptyRecognitionInfoRecord(rec(),g,IsMatrixGroup(g));
->     return FindHomMethodsProjective.SporadicsByOrders(ri,g:DEBUGRECOGSPORADICS);
+>     return FindHomMethodsProjective.NameSporadic(ri);
 > end;;
-gap> TestSporadic("M12"); # FIXME: sometimes ambiguous results McL.2
-[ "M12" ]
-gap> TestSporadic("Fi22"); # FIXME: sometimes ambiguous results, second match Fi22.2
-[ "Fi22" ]
-gap> TestSporadic("Co1"); # FIXME: sometimes "recognized" as Fi24'.2
-[ "Co1" ]
-gap> TestSporadic("He"); # FIXME: sometimes gives He.2
-[ "He"]
-gap> TestSporadic("He.2"); # FIXME: sometimes "recognized" as Fi23
+
+# NameSporadic can't recognize these groups
+gap> TestSporadic("M12.2");
+[ "M12.2" ]
+gap> TestSporadic("M22.2");
+[ "M22.2" ]
+gap> TestSporadic("J2.2");
+[ "J2.2" ]
+gap> TestSporadic("McL.2");
+[ "McL.2" ]
+gap> TestSporadic("Suz.2");
+[ "Suz.2" ]
+gap> TestSporadic("Fi22.2");
+[ "Fi22.2" ]
+gap> TestSporadic("J3.2");
+[ "J3.2" ]
+gap> TestSporadic("2F4(2)'");
+[ "2F4(2)'" ]
+gap> TestSporadic("He.2");
 [ "He.2" ]
-gap> TestSporadic("Fi24'"); # slow; FIXME: sometimes ambiguous results, second match Fi24'.2
-[ "Fi24'" ]
-gap> TestSporadic("Fi24'.2"); # FIXME: sometimes "recognized" as M
+gap> TestSporadic("Fi24'.2");
 [ "Fi24'.2" ]
-gap> TestSporadic("2F4(2)'.2"); # FIXME: sometimes ambiguous results
+gap> TestSporadic("2F4(2)'.2");
 [ "2F4(2)'.2" ]
-gap> TestSporadic("HN.2"); # FIXME: sometimes gives "B"
+gap> TestSporadic("HN.2");
 [ "HN.2" ]
-gap> TestSporadic("HS.2"); # FIXME: sometimes "recognized" as McL.2
+gap> TestSporadic("HS.2");
 [ "HS.2"]
-gap> TestSporadic("ON.2"); # FIXME: sometimes gives "B"
+gap> TestSporadic("ON.2");
 [ "ON.2" ]
 
 gap> #TestSporadic("HN"); # FIXME: very slow

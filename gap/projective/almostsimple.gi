@@ -1316,7 +1316,7 @@ RECOG.RuleOutSmallProjOrder := function(m)
 end;
 
 #! @BeginChunk SporadicsByOrders
-#! This method prints a list of sporadic simple groups that <A>G</A>
+#! This method returns a list of sporadic simple groups that <A>G</A>
 #! possibly could be. Therefore it checks whether
 #! <A>G</A> has elements of orders that do not appear in sporadic
 #! groups and otherwise checks whether the most common ("killer") orders
@@ -1438,4 +1438,142 @@ FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
       Info(InfoRecog,2,"This did not work.");
   od;
   return false; # FIXME: false = NeverApplicable here really correct?
+end;
+
+# Data for the function NameSporadic
+RECOG.NameSporadicData := MakeImmutable([
+    rec(name := "M11",
+        maximalOrdersOverset := [5, 6, 8, 11],
+        maximalOrdersSubset := [],
+        length := 4),
+    rec(name := "M12",
+        maximalOrdersOverset := [6, 8, 10, 11],
+        maximalOrdersSubset := [],
+        length := 4),
+    rec(name := "M22",
+        maximalOrdersOverset := [5, 6, 7, 8, 11],
+        maximalOrdersSubset := [],
+        length := 5),
+    rec(name := "M23",
+        maximalOrdersOverset := [6, 8, 11, 14, 15, 23],
+        maximalOrdersSubset := [11, 14, 15, 23]),
+    rec(name := "M24",
+        maximalOrdersOverset := [8, 10, 11, 12, 14, 15, 21, 23],
+        maximalOrdersSubset := [11, 21, 23]),
+    rec(name := "J1",
+        maximalOrdersOverset := [6, 7, 10, 11, 15, 19],
+        maximalOrdersSubset := [11, 15, 19]),
+    rec(name := "J2",
+        maximalOrdersOverset := [7, 8, 10, 12, 15],
+        maximalOrdersSubset := [7, 12, 15]),
+    rec(name := "J3",
+        maximalOrdersOverset := [8, 9, 10, 12, 15, 17, 19],
+        maximalOrdersSubset := [15, 17, 19]),
+    rec(name := "HS",
+        maximalOrdersOverset := [7, 8, 10, 11, 12, 15, 20],
+        maximalOrdersSubset := [11, 20]),
+    rec(name := "McL",
+        maximalOrdersOverset := [8, 9, 11, 12, 14, 30],
+        maximalOrdersSubset := [11, 14, 30]),
+    rec(name := "Suz",
+        maximalOrdersOverset := [11, 13, 14, 15, 18, 20, 21, 24],
+        maximalOrdersSubset := [11, 13]),
+    rec(name := "Ru",
+        maximalOrdersOverset := [14, 15, 16, 20, 24, 26, 29],
+        maximalOrdersSubset := [26, 29]),
+    rec(name := "Co3",
+        maximalOrdersOverset := [14, 18, 20, 21, 22, 23, 24, 30],
+        maximalOrdersSubset := [22, 23, 24, 30]),
+    rec(name := "Co2",
+        maximalOrdersOverset := [11, 16, 18, 20, 23, 24, 28, 30],
+        maximalOrdersSubset := [16, 23, 28, 30]),
+    rec(name := "Co1",
+        maximalOrdersOverset := [16, 22, 23, 24, 26, 28, 33, 35, 36, 39, 40, 42, 60],
+        maximalOrdersSubset := [33, 42]),
+    rec(name := "ON",
+        maximalOrdersOverset := [11, 12, 15, 16, 19, 20, 28, 31],
+        maximalOrdersSubset := [19, 28, 31]),
+    rec(name := "Fi22",
+        maximalOrdersOverset := [13, 14, 16, 18, 20, 21, 22, 24, 30],
+        maximalOrdersSubset := [13, 24, 30]),
+    rec(name := "He",
+        maximalOrdersOverset := [8, 10, 12, 15, 17, 21, 28],
+        maximalOrdersSubset := [17, 28]),
+    rec(name := "Ly",
+        maximalOrdersOverset := [18, 22, 24, 25, 28, 30, 31, 33, 37, 40, 42, 67],
+        maximalOrdersSubset := [31, 67]),
+    rec(name := "J4",
+        maximalOrdersOverset := [16, 23, 24, 28, 29, 30, 31, 33, 35, 37, 40, 42, 43, 44, 66],
+        maximalOrdersSubset := [37, 43]),
+    rec(name := "Fi23",
+        maximalOrdersOverset := [13, 14, 16, 17, 22, 23, 24, 26, 27, 28, 35, 36, 39, 42, 60],
+        maximalOrdersSubset := [17, 23]),
+    rec(name := "Fi24'",
+        maximalOrdersOverset := [16, 17, 22, 23, 24, 26, 27, 28, 29, 33, 35, 36, 39, 42, 45, 60],
+        maximalOrdersSubset := [17, 29]),
+    rec(name := "Th",
+        maximalOrdersOverset := [19, 20, 21, 24, 27, 28, 30, 31, 36, 39],
+        maximalOrdersSubset := [19, 31, 39]),
+]);
+#! @BeginChunk NameSporadic
+#! This method returns a list of sporadic simple groups that the group
+#! underlying <A>ri</A> could be. It does not recognise extensions of sporadic
+#! simple groups nor the Monster and the Baby Monster group. It is based on the
+#! Magma v2.24.10 function <C>RecognizeSporadic</C>.
+# TODO G is unused
+FindHomMethodsProjective.NameSporadic := function(ri, G)
+    local orders, setOfOrders, maximalOrders, isMaximal,
+        namesOfPossibleSporadics, res, i, j, data, name;
+    orders := [];
+    #do we need SetPseudoRandomStamp?
+    for i in [1 .. 500] do
+        Add(orders, RandomElmOrd(ri, "NameSporadic", false).order);
+    od;
+    # Compute maximal orders. Maximal in the sense that it does not divide the
+    # order of another group element.
+    setOfOrders := AsSet(orders);
+    # All orders we look for are <= 66.
+    if setOfOrders[Length(setOfOrders)] > 67 then
+        return NeverApplicable;
+    fi;
+    maximalOrders := [];
+    for i in [1..Length(setOfOrders)] do
+        isMaximal := true;
+        for j in [i+1..Length(setOfOrders)] do
+            if setOfOrders[j] mod setOfOrders[i] = 0 then
+                isMaximal := false;
+                break;
+            fi;
+        od;
+        if isMaximal then
+            Add(maximalOrders, setOfOrders[i]);
+        fi;
+    od;
+    namesOfPossibleSporadics := [];
+    for data in RECOG.NameSporadicData do
+        if IsBound(data.length) and not Length(maximalOrders) = data.length then
+            continue;
+        fi;
+        if IsSubset(maximalOrders, data.maximalOrdersSubset)
+                and IsSubset(data.maximalOrdersOverset, maximalOrders) then
+            Add(namesOfPossibleSporadics, data.name);
+        fi;
+    od;
+    # HN works a bit differently
+    if IsSubset([9, 12, 14, 19, 21, 22, 25, 30, 35, 40], maximalOrders)
+            and (IsSubset(maximalOrders, [19]) or IsSubset(maximalOrders, [21]))
+    then
+        Add(namesOfPossibleSporadics, "HN");
+    fi;
+    if ValueOption("DEBUGRECOGSPORADICS") <> fail then
+        return namesOfPossibleSporadics;
+    fi;
+    for name in namesOfPossibleSporadics do
+        Info(InfoRecog, 2, "Trying hint for ", name,
+             "...");
+        res := LookupHintForSimple(ri, Grp(ri), name);
+        if res = true then return Success; fi;
+        Info(InfoRecog, 2, "This did not work.");
+    od;
+    return NeverApplicable;
 end;
