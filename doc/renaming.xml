@@ -8,8 +8,8 @@ to be unintuitive or inconsistent with other names.
 For these reasons the names were changed to be more descriptive
 and to follow the internal consistency of &GAP;.
 In this chapter a dictionary from old to new names is included.
-The meanings of the old names for components of a recognition info record are described in
-Section 2.6 "Components of the recognition info record" of the article <Cite Key="NS06"/>.
+The meanings of the old names for components of a recognition node are described in
+Section 2.6 "Components of the recognition node" of the article <Cite Key="NS06"/>.
 
 <#Include SYSTEM "renaming_table.xml">
 

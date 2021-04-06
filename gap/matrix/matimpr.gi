@@ -235,7 +235,7 @@ function(ri,G)
   SetHomom(ri,iso);
   findgensNmeth(ri).method := FindKernelDoNothing;
 
-  # Inform authorities that the factor can be recognised easily:
+  # Inform authorities that the image can be recognised easily:
   forfactor(ri).blocksize := ri!.blocksize;
   AddMethod(forfactor(ri).hints, FindHomMethodsProjective.Blocks, 2000);
 
@@ -258,7 +258,7 @@ function(ri,G)
   for i in [1..d/ri!.blocksize] do
       Add(blocks,[(i-1)*ri!.blocksize+1..i*ri!.blocksize]);
   od;
-  # For the factor:
+  # For the image:
   forfactor(ri).blocks := blocks;
   AddMethod(forfactor(ri).hints, FindHomMethodsProjective.BlocksModScalars, 2000);
   # For the kernel:
@@ -289,7 +289,7 @@ function(ri,G)
   hom := GroupHomomorphismByFunction(G,H,RECOG.HomBackToMats);
   SetHomom(ri,hom);
 
-  # hints for the factor:
+  # hints for the image:
   Setmethodsforfactor(ri,FindHomDbMatrix);
   forfactor(ri).blocks := ri!.blocks{[1..Length(ri!.blocks)-1]};
   AddMethod(forfactor(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000 );
@@ -310,7 +310,7 @@ end);
 #  cut := QuoInt(nrblocks,2);  # this is now at least 1
 #  subdim := cut * ri!.blocksize;
 #
-#  # Project onto factor:
+#  # Project onto image:
 #  newgens := List(GeneratorsOfGroup(G),
 #                  x->ExtractSubMatrix(x,[subdim+1..dim],[subdim+1..dim]));
 #  for gen in newgens do
@@ -324,7 +324,7 @@ end);
 #  # Create some more kernel generators:
 #  findgensNmeth(ri).args[1] := 20 + nrblocks;
 #
-#  # Pass the block information on to the factor:
+#  # Pass the block information on to the image:
 #  forfactor(ri).blocksize := ri!.blocksize;
 #  AddMethod(forfactor(ri).hints, FindHomMethodsProjective.BalTreeForBlocks, 2000);
 #

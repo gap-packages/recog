@@ -65,7 +65,7 @@ function(ri, G)
     hom := OrbActionHomomorphism(G,o);
     # TODO: explanation
     Setvalidatehomominput(ri, {ri,p} -> ForAll(o, x -> (x^p in o)));
-    # store the homomorphism into the recognition info record
+    # store the homomorphism into the recognition node
     SetHomom(ri,hom);
 
     # indicate success

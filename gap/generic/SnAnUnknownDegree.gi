@@ -41,7 +41,7 @@ RECOG.ThreeCycleCandidatesConstants := function(eps, N)
     );
 end;
 
-# ri : recog info record with group G
+# ri : recognition node with group G
 # constants : a record with components M, B, T, C, and logInt2N
 #
 # The following algorithm constructs a set of possible 3-cycles. It is based
@@ -158,7 +158,7 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
     return oneThreeCycleCandidate;
 end;
 
-# ri : recog info record with group G
+# ri : recognition node with group G
 # c : element of G,
 #     should be a 3-cycle
 # eps : real number, the error bound
@@ -202,7 +202,7 @@ RECOG.BolsteringElements := function(ri, cWithMem, eps, N)
     return result;
 end;
 
-# ri : recog info record with group G
+# ri : recognition node with group G
 # g : element of G,
 #     should be a cycle matching c
 # c : element of G,
@@ -260,7 +260,7 @@ RECOG.IsFixedPoint := function(ri, g, c, r)
     return true;
 end;
 
-# ri : recog info record with group G
+# ri : recognition node with group G
 # g : element of G,
 #     should be a k-cycle matching c
 # c : element of G,
@@ -384,7 +384,7 @@ RECOG.AdjustCycle := function(ri, g, c, r, k)
     return r^x;
 end;
 
-# ri : recog info record with group G
+# ri : recognition node with group G
 # g : element of G,
 #     should be a k-cycle matching c
 # c : element of G,
@@ -438,7 +438,7 @@ RECOG.AppendPoints := function(ri, g, c, r, s, k, k0)
     return [gTilde, sTilde, kTilde];
 end;
 
-# ri : recog info record with group G
+# ri : recognition node with group G
 # g : element of G
 # p : prime
 # Returns whether g is an element of order p.
@@ -450,7 +450,7 @@ RECOG.IsElmOfPrimeOrder := function(ri, g, p)
     fi;
 end;
 
-# ri : recog info record with group G
+# ri : recognition node with group G
 # c : a 3-cycle of a group G
 # x : bolstering element with respect to c
 # N : integer, upper bound for the degree of G
@@ -549,7 +549,7 @@ RECOG.BuildCycle := function(ri, c, x, N)
     return [g, 2 * mDash + 2 * m + 3];
 end;
 
-# ri : recog info record with group G
+# ri : recognition node with group G
 # c : element of G,
 #     should be a 3-cycle
 # eps : real number, the error bound
@@ -587,7 +587,7 @@ RECOG.ConstructLongCycle := function(ri, c, eps, N)
     return [g, k];
 end;
 
-# ri : recog info record with group G
+# ri : recognition node with group G
 # g : element of G,
 #     should be a k-cycle matching c
 # c : element of G,
@@ -642,7 +642,7 @@ RECOG.StandardGenerators := function(ri, g, c, k, eps, N)
 end;
 
 # This function is an excerpt of the function RECOG.RecogniseSnAn in gap/SnAnBB.gi
-# ri : recog info record with group G,
+# ri : recognition node with group G,
 # n : degree
 # stdGensAnWithMemory : standard generators of An < G
 #

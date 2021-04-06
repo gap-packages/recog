@@ -102,51 +102,51 @@ PastNonAb := function(ri)
 
 
  x := pregensfac(ri)[1];
- if IsDirectProduct(Grp(RIFac(RIKer(ri)))) and not IsTrivial(PermAction(GroupWithGenerators([x]),Grp(RIKer(ri)),Homom(RIKer(ri)),Grp(RIFac(RIKer(ri))))) then return false;
+ if IsDirectProduct(Grp(ImageRecogNode(KernelRecogNode(ri)))) and not IsTrivial(PermAction(GroupWithGenerators([x]),Grp(KernelRecogNode(ri)),Homom(KernelRecogNode(ri)),Grp(ImageRecogNode(KernelRecogNode(ri))))) then return false;
  fi;
 
- riker := RIKer(ri);
-# Consider the automorphism of RIFac(riker) induced by x
- aut := GroupHomomorphismByFunction(Grp(RIFac(riker)),Grp(RIFac(riker)),
+ riker := KernelRecogNode(ri);
+# Consider the automorphism of ImageRecogNode(riker) induced by x
+ aut := GroupHomomorphismByFunction(Grp(ImageRecogNode(riker)),Grp(ImageRecogNode(riker)),
 function(g)
  local w,preim;
- w := slpforelement(RIFac(riker))(RIFac(riker),g);
+ w := slpforelement(ImageRecogNode(riker))(ImageRecogNode(riker),g);
  preim := ResultOfStraightLineProgram(w,pregensfac(riker));
  return ImageElm(Homom(riker),preim^x);
 end);
 # Is aut inner? - tell it that it's an automorphism.
  SetIsBijective(aut, true);
- t := MyIsInnerAutomorphism(Grp(RIFac(riker)),Name(RIFac(riker)),aut,g->slpforelement(RIFac(riker))(RIFac(riker),g));
+ t := MyIsInnerAutomorphism(Grp(ImageRecogNode(riker)),Name(ImageRecogNode(riker)),aut,g->slpforelement(ImageRecogNode(riker))(ImageRecogNode(riker),g));
  if t=false then return false; fi;
 
 # Check that all automorphisms induced by prefacgens induce inner auto's
  inns := [t];
  for i in [2..Length(pregensfac(ri))] do
    x := pregensfac(ri)[i];
-   aut := GroupHomomorphismByFunction(Grp(RIFac(riker)),Grp(RIFac(riker)),
+   aut := GroupHomomorphismByFunction(Grp(ImageRecogNode(riker)),Grp(ImageRecogNode(riker)),
 function(g)
  local w,preim;
- w := slpforelement(RIFac(riker))(RIFac(riker),g);
+ w := slpforelement(ImageRecogNode(riker))(ImageRecogNode(riker),g);
  preim := ResultOfStraightLineProgram(w,pregensfac(riker));
  return ImageElm(Homom(riker),preim^x);
 end);
-   conj_elt:= MyIsInnerAutomorphism(Grp(RIFac(riker)),Name(RIFac(riker)),aut,g->slpforelement(RIFac(riker))(RIFac(riker),g));
+   conj_elt:= MyIsInnerAutomorphism(Grp(ImageRecogNode(riker)),Name(ImageRecogNode(riker)),aut,g->slpforelement(ImageRecogNode(riker))(ImageRecogNode(riker),g));
    if conj_elt = false then return false; fi;
    Add(inns, conj_elt);
  od;
 
 
- innspreims := List(inns, t->ResultOfStraightLineProgram(slpforelement(RIFac(riker))(RIFac(riker),t),pregensfac(riker)));
+ innspreims := List(inns, t->ResultOfStraightLineProgram(slpforelement(ImageRecogNode(riker))(ImageRecogNode(riker),t),pregensfac(riker)));
 
 # Construct a lifting into the centraliser
  y := List([1..Length(innspreims)],i->pregensfac(ri)[i]*innspreims[i]^-1);
 # Define a lifting -
- l := x->ResultOfStraightLineProgram(slpforelement(RIFac(ri))(RIFac(ri),x),y);
+ l := x->ResultOfStraightLineProgram(slpforelement(ImageRecogNode(ri))(ImageRecogNode(ri),x),y);
 
 
  rihom := StructuralCopy(Homom(ri));
  kerhom := StructuralCopy(Homom(riker));
- zeta := GroupHomomorphismByFunction(Grp(ri),Grp(RIFac(riker)),function(g)
+ zeta := GroupHomomorphismByFunction(Grp(ri),Grp(ImageRecogNode(riker)),function(g)
  local g1;
  g1 := l(ImageElm(rihom,g));
  return ImageElm(kerhom,g*g1^-1);
@@ -155,29 +155,29 @@ end);
  return zeta;
 end;
 
-#returns a function from Grp(ri) to Grp(RIFac(RIKer(ri))) if can do so,
+#returns a function from Grp(ri) to Grp(ImageRecogNode(KernelRecogNode(ri))) if can do so,
 #otherwise returns false.
 AbPastAb := function(ri)
 ## Tries to push an abelian layer past another abelian layer where the layers are over different primes
  local x,riker,i,im,q,l,zeta;
 
  x := pregensfac(ri)[1];
- riker := RIKer(ri);;
-# Does x act trivially on RIFac(riker)
- for i in [1..Length(NiceGens(RIFac(riker)))] do
+ riker := KernelRecogNode(ri);;
+# Does x act trivially on ImageRecogNode(riker)
+ for i in [1..Length(NiceGens(ImageRecogNode(riker)))] do
    im := ImageElm(Homom(riker),pregensfac(riker)[i]^x);
-   if im <> NiceGens(RIFac(riker))[i] then
+   if im <> NiceGens(ImageRecogNode(riker))[i] then
      return false;
    fi;
  od;
 
-# Now we know x acts trivially on RIFac(riker)
+# Now we know x acts trivially on ImageRecogNode(riker)
 # Construct the new lifting
- q := Grp(RIFac(riker))!.Pcgs!.RelativeOrders[1];
- l := GroupHomomorphismByImagesNC(Grp(RIFac(ri)),Grp(ri),List(NiceGens(RIFac(ri)),x->x^q),List(pregensfac(ri),x->x^q));
+ q := Grp(ImageRecogNode(riker))!.Pcgs!.RelativeOrders[1];
+ l := GroupHomomorphismByImagesNC(Grp(ImageRecogNode(ri)),Grp(ri),List(NiceGens(ImageRecogNode(ri)),x->x^q),List(pregensfac(ri),x->x^q));
 
 # Construct the new map
- zeta := GroupHomomorphismByFunction(Grp(ri),Grp(RIFac(riker)),g->ImageElm(Homom(riker),g*ImageElm(Homom(ri)*l,g)^-1));
+ zeta := GroupHomomorphismByFunction(Grp(ri),Grp(ImageRecogNode(riker)),g->ImageElm(Homom(riker),g*ImageElm(Homom(ri)*l,g)^-1));
  return zeta;
 end;
 
@@ -188,29 +188,29 @@ AbPastAbSamePrime := function(ri)
        g,M,CS,maps,zeta,k,AcGens,L,intorikerfac;
 
  x := pregensfac(ri)[1];
- riker := RIKer(ri);;
+ riker := KernelRecogNode(ri);;
  if not SanityCheck(ri) then
    Error(179);
  fi;
-# Does x act trivially on RIFac(riker)
- for i in [1..Length(NiceGens(RIFac(riker)))] do
+# Does x act trivially on ImageRecogNode(riker)
+ for i in [1..Length(NiceGens(ImageRecogNode(riker)))] do
    im := ImageElm(Homom(riker),pregensfac(riker)[i]^x);
-   if im <> NiceGens(RIFac(riker))[i] then
+   if im <> NiceGens(ImageRecogNode(riker))[i] then
      return [false];
    fi;
  od;
 
 # Construct a map down onto the direct product of the two factor groups
- p := Grp(RIFac(riker))!.Pcgs!.RelativeOrders[1];
- l := GroupHomomorphismByImagesNC(Grp(RIFac(ri)),Grp(ri),NiceGens(RIFac(ri)),pregensfac(ri));
- psi := GroupHomomorphismByFunction(Grp(ri),Grp(RIFac(riker)),g->ImageElm(Homom(riker),g*ImageElm(l,ImageElm(Homom(ri),g))^-1));
+ p := Grp(ImageRecogNode(riker))!.Pcgs!.RelativeOrders[1];
+ l := GroupHomomorphismByImagesNC(Grp(ImageRecogNode(ri)),Grp(ri),NiceGens(ImageRecogNode(ri)),pregensfac(ri));
+ psi := GroupHomomorphismByFunction(Grp(ri),Grp(ImageRecogNode(riker)),g->ImageElm(Homom(riker),g*ImageElm(l,ImageElm(Homom(ri),g))^-1));
 # check generators and relations of facto(ri) map to 1 under psi
  checkelts1 := List(pregensfac(ri),x->x^p);
  if not ForAll(checkelts1,x->IsOne(ImageElm(psi,x))) then return [false]; fi;
  checkelts2 := Concatenation(List([1..Length(pregensfac(ri))],i->List([(i+1)..Length(pregensfac(ri))],j->Comm(pregensfac(ri)[i],pregensfac(ri)[j]))));
  if not ForAll(checkelts2,x->IsOne(ImageElm(psi,x))) then return [false]; fi;
 
- D := DirectProduct(Grp(RIFac(ri)),Grp(RIFac(riker)));
+ D := DirectProduct(Grp(ImageRecogNode(ri)),Grp(ImageRecogNode(riker)));
  phi := GroupHomomorphismByFunction(Grp(ri),D,g->ImageElm(Homom(ri)*Embedding(D,1),g)*ImageElm(psi*Embedding(D,2),g));
  pregens := Concatenation(pregensfac(ri),pregensfac(riker));
 # Construct the action of G on D
@@ -233,10 +233,10 @@ SubgroupNC(D,List(x,v->VectortoPc(v,D))));
 
 
  maps := List(L,x->NaturalHomomorphismByNormalSubgroupNC(D,x));
- intorikerfac := List(maps,x->IsomorphismGroups(Range(x),Grp(RIFac(riker))));
+ intorikerfac := List(maps,x->IsomorphismGroups(Range(x),Grp(ImageRecogNode(riker))));
 
 
- zeta := List([1..Length(L)],i->GroupHomomorphismByFunction(Grp(ri),Grp(RIFac(riker)),g->ImageElm(intorikerfac[i],ImageElm(maps[i],ImageElm(phi,g)))));
+ zeta := List([1..Length(L)],i->GroupHomomorphismByFunction(Grp(ri),Grp(ImageRecogNode(riker)),g->ImageElm(intorikerfac[i],ImageElm(maps[i],ImageElm(phi,g)))));
  return zeta;
 end;
 
@@ -246,26 +246,26 @@ NonAbPastAb := function(ri)
  local x,riker,i,target_size,s,im,gens,g,p,words,invims,invims1,gens2,
     zeta,h,lift,g1;
 
- if not IsPermGroup(Grp(RIFac(ri))) then return false; fi;
+ if not IsPermGroup(Grp(ImageRecogNode(ri))) then return false; fi;
  x := pregensfac(ri)[1];
- riker := RIKer(ri);;
-# Does x act trivially on RIFac(riker)
- for i in [1..Length(NiceGens(RIFac(riker)))] do
+ riker := KernelRecogNode(ri);;
+# Does x act trivially on ImageRecogNode(riker)
+ for i in [1..Length(NiceGens(ImageRecogNode(riker)))] do
    im := ImageElm(Homom(riker),pregensfac(riker)[i]^x);
-   if im <> NiceGens(RIFac(riker))[i] then
+   if im <> NiceGens(ImageRecogNode(riker))[i] then
      return false;
    fi;
  od;
 
 # construct a new generating set of elts coprime to p
 
-  p := Grp(RIFac(riker))!.Pcgs!.RelativeOrders[1];
-  target_size:= Size(RIFac(ri));
+  p := Grp(ImageRecogNode(riker))!.Pcgs!.RelativeOrders[1];
+  target_size:= Size(ImageRecogNode(ri));
   gens := [];
   #first see if just 4 generators will suffice
   for i in [1..4] do
     repeat
-      g := PseudoRandom(Grp(RIFac(ri)));
+      g := PseudoRandom(Grp(ImageRecogNode(ri)));
       g := g^(p^Valuation(Order(g),p));
     until not IsOne(g);
     Add(gens,g);
@@ -277,7 +277,7 @@ NonAbPastAb := function(ri)
   #one-by-one and check each time.
   while SizeStabChain(s) < target_size do
     repeat
-      g := PseudoRandom(Grp(RIFac(ri)));
+      g := PseudoRandom(Grp(ImageRecogNode(ri)));
       g := g^(p^Valuation(Order(g),p));
     until not IsOne(g);
     Add(gens, g);
@@ -286,26 +286,26 @@ NonAbPastAb := function(ri)
   od;
 
  #all of these were PseudoRandom(Grp(ri)) but since that's a matrix
- #group i presume should be conjugating in RIFac(ri) - Colva.
- #Add(gens,g^PseudoRandom(Grp(RIFac(ri))));
- #Add(gens,g^PseudoRandom(Grp(RIFac(ri))));
- #Add(gens,g^PseudoRandom(Grp(RIFac(ri))));
+ #group i presume should be conjugating in ImageRecogNode(ri) - Colva.
+ #Add(gens,g^PseudoRandom(Grp(ImageRecogNode(ri))));
+ #Add(gens,g^PseudoRandom(Grp(ImageRecogNode(ri))));
+ #Add(gens,g^PseudoRandom(Grp(ImageRecogNode(ri))));
  #repeat
- #  g := PseudoRandom(Grp(RIFac(ri)));
+ #  g := PseudoRandom(Grp(ImageRecogNode(ri)));
  #  g := g^(p^Valuation(Order(g),p));
  #until not IsOne(g);
  #Add(gens,g);
- #Add(gens,g^PseudoRandom(Grp(RIFac(ri))));
- #Add(gens,g^PseudoRandom(Grp(RIFac(ri))));
- #Add(gens,g^PseudoRandom(Grp(RIFac(ri))));
+ #Add(gens,g^PseudoRandom(Grp(ImageRecogNode(ri))));
+ #Add(gens,g^PseudoRandom(Grp(ImageRecogNode(ri))));
+ #Add(gens,g^PseudoRandom(Grp(ImageRecogNode(ri))));
 
- words := List(gens,x->SLPforElement(RIFac(ri),x));
+ words := List(gens,x->SLPforElement(ImageRecogNode(ri),x));
  invims1 := List(words,w->ResultOfStraightLineProgram(w,pregensfac(ri)));
  invims := List(invims1,x->x^(p^Valuation(Order(x),p)));
  #should this be invims1 or invims in next line???
  gens2 := List(invims, x->ImageElm(Homom(ri),x));
- lift := GroupHomomorphismByImagesNC(Grp(RIFac(ri)),Grp(ri),gens2,invims);
- zeta := GroupHomomorphismByFunction(Grp(ri),Grp(RIFac(riker)),g->ImageElm(Homom(riker),g*ImageElm(lift, ImageElm(Homom(ri),g))^-1));
+ lift := GroupHomomorphismByImagesNC(Grp(ImageRecogNode(ri)),Grp(ri),gens2,invims);
+ zeta := GroupHomomorphismByFunction(Grp(ri),Grp(ImageRecogNode(riker)),g->ImageElm(Homom(riker),g*ImageElm(lift, ImageElm(Homom(ri),g))^-1));
 
 
 # Do some random testing of elts to check that zeta is a hom
@@ -326,9 +326,9 @@ PushIntoSocle := function(ri,zeta)
  local riker,D,phi,im1,im2,nri,nrifac,list,g,overgp;
 
 
- riker := RIKer(ri);;
+ riker := KernelRecogNode(ri);;
 # Form the direct product of the socle
- D := DirectProduct(Grp(RIFac(ri)),Grp(RIFac(riker)));
+ D := DirectProduct(Grp(ImageRecogNode(ri)),Grp(ImageRecogNode(riker)));
 # and the new map phi from Grp(ri) -> D
  phi := GroupHomomorphismByFunction(Grp(ri),D,function(g)
 local im1,im2;
@@ -340,7 +340,7 @@ end);
 
  overgp := ShallowCopy(overgroup(ri));
 
-# setup the new record for the factor - this is the product of RIFac(ri) and RIFac(riker)
+# setup the new record for the factor - this is the product of ImageRecogNode(ri) and ImageRecogNode(riker)
  nrifac := rec();
  Objectify( RecognitionInfoType, nrifac );;
 
@@ -348,39 +348,39 @@ end);
  SetGrp(nrifac,D);
 
 #map the NiceGens for each factor into the direct product, and take both sets of NiceGens.
- SetNiceGens(nrifac,Concatenation(List(NiceGens(RIFac(ri)),x->ImageElm(MyEmbedding(D,1),x)),List(NiceGens(RIFac(riker)),x->ImageElm(MyEmbedding(D,2),x))));
+ SetNiceGens(nrifac,Concatenation(List(NiceGens(ImageRecogNode(ri)),x->ImageElm(MyEmbedding(D,1),x)),List(NiceGens(ImageRecogNode(riker)),x->ImageElm(MyEmbedding(D,2),x))));
 
  SetFilterObj(nrifac,IsLeaf);
  Setfhmethsel(nrifac,"socle");
  Setslpforelement(nrifac, function(nrifac,g)
 
    local list;
-   list := [SLPforElement(RIFac(ri),ImageElm(MyProjection(D,1),g)),SLPforElement(RIFac(riker),ImageElm(MyProjection(D,2),g))];
+   list := [SLPforElement(ImageRecogNode(ri),ImageElm(MyProjection(D,1),g)),SLPforElement(ImageRecogNode(riker),ImageElm(MyProjection(D,2),g))];
    if fail in list then return fail; fi;
    return MyDirectProductOfSLPsList(list);
  end
  );
- SetSize(nrifac,Size(RIFac(ri))*Size(RIFac(riker)));
+ SetSize(nrifac,Size(ImageRecogNode(ri))*Size(ImageRecogNode(riker)));
  SetFilterObj(nrifac,IsReady);
 
 # setup the new record for the subgroup - nri will take the place of the old ri, but iwth
 #ker(riker) as its kernel and nrifac, the new socle, as its factor.
  nri := rec();
  Objectify( RecognitionInfoType, nri );;
- SetRIFac(nri,nrifac);
+ SetImageRecogNode(nri,nrifac);
  SetGrp(nri,Grp(ri));
  if HasRIParent(ri) then
    SetRIParent(nri,RIParent(ri));
-   SetRIKer(RIParent(nri),nri);
+   SetKernelRecogNode(RIParent(nri),nri);
    if not SanityCheck(RIParent(nri)) then
      Error(1);
    fi;
  fi;
- if HasRIKer(riker) and RIKer(riker) = fail then
-   SetRIKer(nri, fail);
- elif HasRIKer(riker) then
-   SetRIKer(nri,RIKer(riker));
-   SetRIParent(RIKer(nri),nri);
+ if HasKernelRecogNode(riker) and KernelRecogNode(riker) = fail then
+   SetKernelRecogNode(nri, fail);
+ elif HasKernelRecogNode(riker) then
+   SetKernelRecogNode(nri,KernelRecogNode(riker));
+   SetRIParent(KernelRecogNode(nri),nri);
    if not SanityCheck(nri) then
      Error(2);
    fi;
@@ -389,17 +389,17 @@ end);
 ## Construct the preimages
  Setpregensfac(nri,Concatenation(
 List(pregensfac(ri),g->
-g*ResultOfStraightLineProgram(SLPforElement(RIFac(riker),ImageElm(phi*MyProjection(D,2),g)),pregensfac(riker))^-1),
+g*ResultOfStraightLineProgram(SLPforElement(ImageRecogNode(riker),ImageElm(phi*MyProjection(D,2),g)),pregensfac(riker))^-1),
 pregensfac(riker)));
  #this was causing problems with the kernel was fail.
- if HasRIKer(nri) and RIKer(nri) <> fail then
-   SetNiceGens(nri,Concatenation(pregensfac(nri),NiceGens(RIKer(nri))));
- elif HasRIKer(nri) then
+ if HasKernelRecogNode(nri) and KernelRecogNode(nri) <> fail then
+   SetNiceGens(nri,Concatenation(pregensfac(nri),NiceGens(KernelRecogNode(nri))));
+ elif HasKernelRecogNode(nri) then
  #so the kernel is the trivial group, just need preimages of the socle generators.
    SetNiceGens(nri, pregensfac(nri));
  fi;
  Setcalcnicegens(nri,CalcNiceGensHomNode);
- SetName(nrifac,Concatenation(Name(RIFac(ri)),",",Name(RIFac(riker))));
+ SetName(nrifac,Concatenation(Name(ImageRecogNode(ri)),",",Name(ImageRecogNode(riker))));
  Setslpforelement(nri,SLPforElementGeneric);
  Setovergroup(nri,overgp);
  SetFilterObj(nri,IsReady);
@@ -414,14 +414,14 @@ end;
 #into the socle.
 SwapFactors := function(ri,zeta)
 # Swaps the layers of the tree at ri using the map
-# zeta : Grp(ri) -> Grp(RIFac(RIKer(ri)))
+# zeta : Grp(ri) -> Grp(ImageRecogNode(KernelRecogNode(ri)))
 
 
  local riker,rifac,rikerfac,nri,nriker,overgp;
 
- riker := RIKer(ri);;
- rifac := RIFac(ri);;
- rikerfac := RIFac(riker);;
+ riker := KernelRecogNode(ri);;
+ rifac := ImageRecogNode(ri);;
+ rikerfac := ImageRecogNode(riker);;
 
 # setup the new record for the factor
  nri := rec();
@@ -433,35 +433,35 @@ SwapFactors := function(ri,zeta)
  SetHomom(nri,zeta);
  Setpregensfac(nri,StructuralCopy(pregensfac(riker)));
  Setpregensfac(nriker,List(pregensfac(ri),x->x*ResultOfStraightLineProgram(SLPforElement(rikerfac,ImageElm(zeta,x)),pregensfac(riker))^-1));
- SetRIKer(nriker,StructuralCopy(RIKer(riker)));
- SetRIParent(RIKer(nriker),nriker);
+ SetKernelRecogNode(nriker,StructuralCopy(KernelRecogNode(riker)));
+ SetRIParent(KernelRecogNode(nriker),nriker);
  SetRIParent(nriker,nri);
- SetRIKer(nri, nriker);
+ SetKernelRecogNode(nri, nriker);
  if not SanityCheck(nri) then
    Error(3);
  fi;
- SetRIFac(nriker,StructuralCopy(RIFac(ri)));
+ SetImageRecogNode(nriker,StructuralCopy(ImageRecogNode(ri)));
  #next two lines had capital p for parent before.
  #if IsBound(ri!.RIParent) then not sure whether should be checking HasRIParent, try that instead.
  if HasRIParent(ri) then
    SetRIParent(nri,StructuralCopy(RIParent(ri)));
-   SetRIKer(RIParent(nri),nri);
+   SetKernelRecogNode(RIParent(nri),nri);
    if not SanityCheck(RIParent(nri)) then
      Error(4);
    fi;
  fi;
- if HasRIKer(riker) then
-   SetRIKer(nriker,RIKer(riker));
-   SetRIParent(RIKer(riker),nriker);
+ if HasKernelRecogNode(riker) then
+   SetKernelRecogNode(nriker,KernelRecogNode(riker));
+   SetRIParent(KernelRecogNode(riker),nriker);
    if not SanityCheck(nri) then
      Error(5);
    fi;
  fi;
- SetRIFac(nri,StructuralCopy(RIFac(riker)));
+ SetImageRecogNode(nri,StructuralCopy(ImageRecogNode(riker)));
  #value of NiceGens is either the ones of the image on their own if kernel
  #is trivial, or gens for image plus gens for kernel.
- if HasRIKer(nriker) and not (RIKer(nriker) = fail) then
-   SetNiceGens(nriker,Concatenation(pregensfac(nriker),NiceGens(RIKer(nriker))));
+ if HasKernelRecogNode(nriker) and not (KernelRecogNode(nriker) = fail) then
+   SetNiceGens(nriker,Concatenation(pregensfac(nriker),NiceGens(KernelRecogNode(nriker))));
  else
    SetNiceGens(nriker, pregensfac(nriker));
  fi;
@@ -470,9 +470,9 @@ SwapFactors := function(ri,zeta)
  Setcalcnicegens(nriker,CalcNiceGensHomNode);
  SetGrp(nri,StructuralCopy(Grp(ri)));
  #the group of nriker is the generators of the group of its kernel(if nontrivial) plus the preimages of the factor.
- if HasRIKer(nriker) and not RIKer(nriker) = fail then
-   SetGrp(nriker,GroupWithGenerators(Concatenation(GeneratorsOfGroup(Grp(RIKer(nriker))),pregensfac(nriker))));
- elif HasRIKer(nriker) then
+ if HasKernelRecogNode(nriker) and not KernelRecogNode(nriker) = fail then
+   SetGrp(nriker,GroupWithGenerators(Concatenation(GeneratorsOfGroup(Grp(KernelRecogNode(nriker))),pregensfac(nriker))));
+ elif HasKernelRecogNode(nriker) then
    SetGrp(nriker,GroupWithGenerators(pregensfac(nriker)));
  fi;
  Setslpforelement(nri,SLPforElementGeneric);
@@ -492,8 +492,8 @@ end;
 #this checks that every factor group in the chief tree is polycyclic, if
 #so then group is soluble.
 IsSolubleTree := function(ri)
- if not IsBound(Grp(RIFac(ri))!.Pcgs) then return false; fi;
- if ri!.RIKer <> fail then return IsSolubleTree(RIKer(ri));
+ if not IsBound(Grp(ImageRecogNode(ri))!.Pcgs) then return false; fi;
+ if ri!.KernelRecogNode <> fail then return IsSolubleTree(KernelRecogNode(ri));
  else
    return true;
  fi;
@@ -507,9 +507,9 @@ end;
 PushDown := function(pri)
  local priker,prifac,prikerfac,zeta,i,npri,nnpri,knpri;
 
- priker := RIKer(pri);
- prifac := RIFac(pri);
- prikerfac := RIFac(priker);
+ priker := KernelRecogNode(pri);
+ prifac := ImageRecogNode(pri);
+ prikerfac := ImageRecogNode(priker);
 
 # Compute the push down maps - they depend on which groups are abelian.
 
@@ -540,14 +540,14 @@ PushDown := function(pri)
    return false;
  fi;
 
-# Is RIFac(priker)) the socle, i.e. are we pushing down into or
+# Is ImageRecogNode(priker)) the socle, i.e. are we pushing down into or
 #past the socle?
  if IsBound(prikerfac!.TFordered) and prikerfac!.TFordered="Socle" then
    zeta := zeta[1];
  #if both groups are insoluble then they should both be in the socle together.
    if not IsBound(Grp(prifac)!.Pcgs) then
      npri := PushIntoSocle(pri,zeta);;
-     SetTFordered(RIFac(npri),"Socle");
+     SetTFordered(ImageRecogNode(npri),"Socle");
    else
  #otherwise we should put prifac below prikerfac.
      npri := SwapFactors(pri,zeta);;
@@ -559,7 +559,7 @@ PushDown := function(pri)
    return npri;
  fi;
 
-#this is the case where RIFac(priker) is not the socle, we try
+#this is the case where ImageRecogNode(priker) is not the socle, we try
 #each of our maps in turn and
 #look to see whether we can push pri down a level, then recurse to
 #try to push it down further.
@@ -569,11 +569,11 @@ PushDown := function(pri)
  for i in [1..Length(zeta)] do
    Print("trying zeta, i is", i, "\n");
    npri := SwapFactors(StructuralCopy(pri),zeta[i]);;
-   knpri := PushDown(StructuralCopy(RIKer(npri)));;
+   knpri := PushDown(StructuralCopy(KernelRecogNode(npri)));;
 #having a problem with something believing it's got a parent when it doesn't.
    if knpri <> false and npri <> false then
 #found a map that works.
-     SetRIKer(npri,knpri);
+     SetKernelRecogNode(npri,knpri);
      SetRIParent(knpri,npri);
      if not SanityCheck(npri) then
        Error(6);
@@ -600,16 +600,16 @@ OrderTree := function(ri)
 # Is the tree soluble? in that case all is O_{\infty}(G) already.
  if IsSolubleTree(ri) then return ri; fi;
 # Is G simple?
- if ((not HasRIKer(ri)) or (RIKer(ri) = fail)) then return ri; fi;
+ if ((not HasKernelRecogNode(ri)) or (KernelRecogNode(ri) = fail)) then return ri; fi;
 
 # Find the last non-abelian chief factor.
  lastnonabri := StructuralCopy(ri);
- while RIKer(lastnonabri) <> fail and not IsSolubleTree(RIKer(lastnonabri)) do
-   lastnonabri := RIKer(lastnonabri);
+ while KernelRecogNode(lastnonabri) <> fail and not IsSolubleTree(KernelRecogNode(lastnonabri)) do
+   lastnonabri := KernelRecogNode(lastnonabri);
  od;
 
 # Tell that chief factor that it will be where the socle collects.
- SetTFordered(RIFac(lastnonabri),"Socle");
+ SetTFordered(ImageRecogNode(lastnonabri),"Socle");
 
 
 # Go to socle layer.
@@ -618,7 +618,7 @@ OrderTree := function(ri)
 # Push the soluble layers down
  while HasRIParent(pri) do
    pri := StructuralCopy(RIParent(pri));
-   SetNiceGens(pri,Concatenation(pregensfac(pri),NiceGens(RIKer(pri))));
+   SetNiceGens(pri,Concatenation(pregensfac(pri),NiceGens(KernelRecogNode(pri))));
    npri := PushDown(StructuralCopy(pri));;
    if npri <> false then
      pri := StructuralCopy(npri);
@@ -630,10 +630,10 @@ OrderTree := function(ri)
 
  #this is kind of messy, but i haven't managed to track down where all the
  #parent kernel factor not matching up errors are occurring
- while HasRIKer(pri) and not RIKer(pri) = fail do
-   SetRIParent(RIKer(pri), pri);
-   SetRIParent(RIFac(pri), pri);
-   pri:= RIKer(pri);
+ while HasKernelRecogNode(pri) and not KernelRecogNode(pri) = fail do
+   SetRIParent(KernelRecogNode(pri), pri);
+   SetRIParent(ImageRecogNode(pri), pri);
+   pri:= KernelRecogNode(pri);
  od;
  while HasRIParent(pri) do
    pri:= RIParent(pri);

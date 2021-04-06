@@ -13,10 +13,10 @@ for q in [2,3,4,5,7,8,9,11,13,16,17,25,81,256] do
     Print("Testing GL(",d,",",q,") in its natural representation...\n");
     ri := RECOG.TestGroup(g,false,Size(h));
     r := ri;
-    if not IsLeaf(ri) then r := RIFac(ri); fi;
+    if not IsLeaf(ri) then r := ImageRecogNode(ri); fi;
     stamp := r!.fhmethsel.successMethod;
     if stamp="ProjDeterminant" then
-        r := RIKer(r);
+        r := KernelRecogNode(r);
         stamp := r!.fhmethsel.successMethod;
     fi;
     Print("Stamp: ",stamp,"\n\n");
