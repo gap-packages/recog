@@ -1,4 +1,4 @@
-InstallMethod(\=, [IsRecognitionInfo,IsRecognitionInfo], IsIdenticalObj);
+InstallMethod(\=, [IsRecogNode,IsRecogNode], IsIdenticalObj);
 
 
 #utility function to check that parents and kernels are working.
@@ -7,20 +7,20 @@ local nri, i, bool;
 nri:= StructuralCopy(ri);
 i:= 0;
 bool:= true;
-while HasRIKer(nri) and not RIKer(nri) = fail do
-  if not RIParent(RIFac(nri)) = nri then
-    Print("factor error at level", i, "\n");
+while HasKernelRecogNode(nri) and not KernelRecogNode(nri) = fail do
+  if not RIParent(ImageRecogNode(nri)) = nri then
+    Print("image error at level", i, "\n");
     bool:= false;
   fi;
-  if not RIParent(RIKer(nri)) = nri then
+  if not RIParent(KernelRecogNode(nri)) = nri then
     Print("error: at level", i, "\n");
     bool:= false;
   fi;
-  nri:= RIKer(nri);
+  nri:= KernelRecogNode(nri);
   i:= i+1;
 od;
-if not RIParent(RIFac(nri)) = nri then
-  Print("factor error at level", i, "\n");
+if not RIParent(ImageRecogNode(nri)) = nri then
+  Print("image error at level", i, "\n");
 fi;
 return bool;
 end;

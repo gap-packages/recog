@@ -71,7 +71,7 @@ function(ri, G)
   SetHomom(ri,hom);
   findgensNmeth(ri).method := FindKernelDoNothing;
 
-  # Hint to the factor:
+  # Hint to the image:
   AddMethod(forfactor(ri).hints, FindHomMethodsMatrix.Scalar, 4000);
 
   return Success;
@@ -225,7 +225,7 @@ function(ri, G)
   # the dimension, because some blocks at the end might already be trivial.
   local H,data,hom,middle,newgens,nrblocks,topblock;
   nrblocks := Length(ri!.blocks);  # this is always >= 1
-  if nrblocks <= 2 then   # the factor is only one block
+  if nrblocks <= 2 then   # the image is only one block
       # go directly to scalars in that case:
       data := rec(poss := ri!.blocks[nrblocks]);
       newgens := List(GeneratorsOfGroup(G),x->RECOG.HomToDiagonalBlock(data,x));
@@ -259,7 +259,7 @@ function(ri, G)
   hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
   SetHomom(ri,hom);
 
-  # the factor are the last few blocks:
+  # the image are the last few blocks:
   forfactor(ri).blocks := List(ri!.blocks{[middle..nrblocks]},
                                x->x - (ri!.blocks[middle][1]-1));
   AddMethod(forfactor(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
@@ -417,7 +417,7 @@ function(ri,G)
   SetHomom(ri,hom);
   findgensNmeth(ri).method := FindKernelDoNothing;
 
-  # Inform authorities that the factor can be recognised easily:
+  # Inform authorities that the image can be recognised easily:
   forfactor(ri).blocks := bc.blocks;
   AddMethod(forfactor(ri).hints, FindHomMethodsMatrix.BlockLowerTriangular, 4000);
 
@@ -511,7 +511,7 @@ end);
 #! 
 #! The method immediately delegates to projective methods handling
 #! all the diagonal blocks projectively. This is done by giving a hint
-#! to the factor to use the method
+#! to the image to use the method
 #! <Ref Subsect="BlocksModScalars" Style="Text"/> is
 #! given. The method for the kernel then has to deal with only scalar blocks,
 #! either projectively or with scalars, which is again done by giving a hint
@@ -571,7 +571,7 @@ end);
 #      return NotEnoughInformation;
 #  fi;
 #
-#  # Project onto factor:
+#  # Project onto image:
 #  gens := GeneratorsOfGroup(G);
 #  dim := ri!.dimension;
 #  data := rec(subdim := ri!.subdim);
@@ -651,7 +651,7 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
 
     nothingnew := 0;   # we count until we produced 10 new generators
                        # giving no new dimension
-    rifac := RIFac(ri);
+    rifac := ImageRecogNode(ri);
     while nothingnew < 10 do
         x := RandomElm(ri,"KERNEL",true).el;
         Assert(2, ValidateHomomInput(ri, x));
@@ -817,7 +817,7 @@ function(ri,G)
   # Now give hints downward:
   Setmethodsforfactor(ri,FindHomDbProjective);
   # note that RecogniseGeneric detects the use of FindHomDbProjective and
-  # sets ri!.projective := true for the factor
+  # sets ri!.projective := true for the image
   # the kernel:
   q := Size(ri!.field);
   findgensNmeth(ri).method := FindKernelRandom;
@@ -827,7 +827,7 @@ end);
 
 #! @BeginChunk KnownStabilizerChain
 #! If a stabilizer chain is already known, then the kernel node is given
-#! knowledge about this known stabilizer chain, and the factor node is told to
+#! knowledge about this known stabilizer chain, and the image node is told to
 #! use homomorphism methods from the database for permutation groups.
 #! If a stabilizer chain of a parent node is already known this is used for
 #! the computation of a stabilizer chain of this node. This stabilizer chain

@@ -94,7 +94,7 @@ we first summarise it in steps:
     calls itself with the image of the homomorphism. Note that this
     might use another database of recognition methods because the
     homomorphism might change the representation of the group.</Item>
-<Item>After successful recognition of the factor group the procedure has
+<Item>After successful recognition of the image group the procedure has
     to recognise the kernel of the homomorphism. The first step for this
     is to find generators. If they are not already known from the
     <C>FindHomomorphism</C> method, they are created by producing random
@@ -119,8 +119,8 @@ group as a straight line program in the generators as follows:
 
 <Enum>
 <Item>Map the element through the homomorphism.</Item>
-<Item>Write the element in the factor group as a product of the nice
-    generators in the factor group.</Item>
+<Item>Write the element in the image group as a product of the nice
+    generators in the image group.</Item>
 <Item>Apply the resulting straight line program to the preimages of those
     nice generators and calculate the quotient, which will now lie in
     the kernel.</Item>
@@ -164,7 +164,7 @@ whether or not the method works in projective mode. For permutation groups,
 set this to <K>false</K>. The result is either <K>fail</K> or
 <K>false</K> if the method fails or a recognition info record <C>ri</C>.
 If the method created a leaf then <C>ri</C> will be a leaf, otherwise
-it will have the attribute <Ref Attr="Homom"/> set, but no factor or
+it will have the attribute <Ref Attr="Homom"/> set, but no image or
 kernel have been created or recognised yet. You can use for example
 the methods in <Ref Var="FindHomMethodsPerm"/> or
 <Ref Var="FindHomMethodsMatrix"/> or <Ref Var="FindHomMethodsProjective"/>
@@ -190,19 +190,19 @@ A recognition info record is a &GAP; component object. It is a member
 of the family
 
 <ManSection>
-<Fam Name="RecognitionInfoFamily"/>
+<Fam Name="RecogNodeFamily"/>
 </ManSection>
 
 and is in the category
 
 <ManSection>
-    <Filt Name="IsRecognitionInfo" Type="Category"/>
+    <Filt Name="IsRecogNode" Type="Category"/>
 </ManSection>
 
 and is <Ref Filt="IsAttributeStoringRep" BookName="Ref"/>, such that we can
 define attributes for it, the values of which are stored once they are
 known. A recognition info record always represents a whole binary tree of such
-records, see the attributes <Ref Attr="RIFac"/> and <Ref Attr="RIKer"/>
+records, see the attributes <Ref Attr="ImageRecogNode"/> and <Ref Attr="KernelRecogNode"/>
 below. <P/>
 
 The following filters are defined for recognition info records:
@@ -216,8 +216,8 @@ The following attributes are defined for recognition info records:
 <#Include Label="Homom">
 <#Include Label="NiceGens">
 <#Include Label="pregensfac">
-<#Include Label="RIFac">
-<#Include Label="RIKer">
+<#Include Label="ImageRecogNode">
+<#Include Label="KernelRecogNode">
 <#Include Label="RIParent">
 <#Include Label="fhmethsel">
 <#Include Label="slpforelement">
@@ -398,7 +398,7 @@ find kernel methods.
 
 The following attributes are used to give a successful find homomorphism
 method further possibilities to transport knowledge about the group
-recognised by the current recognition info record to the factor or
+recognised by the current recognition info record to the image or
 kernel of the found homomorphism:
 
 <ManSection>
@@ -433,15 +433,15 @@ kernel of the found homomorphism:
     example an invariant subspace of a matrix group) into this record.
     When a homomorphism is found and recognition goes on in its
     image, the value of this attribute is taken as initialisation data
-    for the newly created recognition info record for the factor. Thus,
+    for the newly created recognition info record for the image. Thus,
     information is transported down to the recognition process for the
-    factor. The component <C>hints</C> is special insofar as it has to
+    image. The component <C>hints</C> is special insofar as it has to
     contain records describing find homomorphism methods which might be
     particularly successful. They are prepended to the find homomorphism
     method database such that they are called before any other methods.
     This is a means to give hints to the recognition procedure in the
-    factor, because often during the finding of a homomorphism knowledge
-    is acquired which might help the recognition of the factor.
+    image, because often during the finding of a homomorphism knowledge
+    is acquired which might help the recognition of the image.
 </Description>
 </ManSection>
 
@@ -466,7 +466,7 @@ This attribute returns a function that compares two elements of the
 group being recognised.  Usually this is
 just the operation <Ref Oper="EQ" BookName="Ref"/> but for projective
 groups it is a special function checking for equality up to a scalar
-factor. In
+image. In
 generic code, one should always use the result of this attribute to
 compare two elements such that the code works also for
 projective groups. Find homomorphism methods usually do not have to
@@ -655,17 +655,17 @@ A successful find homomorphism method has the following duties:
     <Ref Attr="forkernel"/> and <Ref Attr="forfactor"/>, which both are
     records. Components in these
     record that are bound during the recognition will be copied into
-    the recognition info record of the kernel and factor respectively
+    the recognition info record of the kernel and image respectively
     of a found homomorphism
     upon creation and thus are available to all find homomorphism
-    methods called for the kernel and factor. This feature might be
+    methods called for the kernel and image. This feature might be
     interesting to transport information that is relevant for the
-    recognition of the kernel or factor and was acquired during the recognition
+    recognition of the kernel or image and was acquired during the recognition
     of <A>G</A> itself.<P/> A special role is played by the component
     <C>hints</C> in both of the above records,
     which can hold a list of records describing find
     homomorphism methods that shall be tried first when recognising the
-    kernel or factor. <P/>
+    kernel or image. <P/>
     In addition, a find homomorphism method might set the attribute
     <Ref Attr="immediateverification"/> to <K>true</K>, if it considers the
     problem of finding kernel generators particularly difficult.

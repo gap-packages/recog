@@ -3,7 +3,7 @@
 
 MySocleAction:= function(soc, g)
 local grp;
-grp:= PermAction(GroupWithGenerators([g]), Grp(soc), Homom(soc), Grp(RIFac(soc)));
+grp:= PermAction(GroupWithGenerators([g]), Grp(soc), Homom(soc), Grp(ImageRecogNode(soc)));
 if not Size(GeneratorsOfGroup(grp)) = 1 then
   return fail;
 fi;
@@ -20,12 +20,12 @@ local soc_found, soc, nri, d, R, phi, I, i, Pgens, Pinv_ims, P, perms,
 
 nri:= StructuralCopy(ri);
 soc_found:= false;
-while HasRIKer(nri) and not soc_found do
-  if HasTFordered(RIFac(nri)) and TFordered(RIFac(nri)) = "Socle" then
+while HasKernelRecogNode(nri) and not soc_found do
+  if HasTFordered(ImageRecogNode(nri)) and TFordered(ImageRecogNode(nri)) = "Socle" then
       soc_found:= true;
   fi;
   if not soc_found then
-    nri:= RIKer(nri);
+    nri:= KernelRecogNode(nri);
   fi;
 od;
 
@@ -37,17 +37,17 @@ fi;
 #was hoping to use this a short-cut, but it seems that
 #groups in the socle are not necessarily represented as explicit direct
 #products.
-if not IsDirectProduct(Grp(RIFac(nri))) then
+if not IsDirectProduct(Grp(ImageRecogNode(nri))) then
   SetTFordered(ri, "Pker");
   return ri;
 fi;
 
 soc:= nri;
-R:= RefineMap(Grp(soc), Homom(soc), Grp(RIFac(soc)));
+R:= RefineMap(Grp(soc), Homom(soc), Grp(ImageRecogNode(soc)));
 phi:= R[1];
 I:= R[2];
 SetHomom(soc, phi);
-SetGrp(RIFac(soc), I);
+SetGrp(ImageRecogNode(soc), I);
 
 #now we find the degree of the permutation action.
 Pgens:= [Identity(SymmetricGroup(2))];
@@ -60,33 +60,33 @@ while (HasRIParent(nri)) do
   nri:= RIParent(nri);
 
   #now need to find the permutation action of the preimages of the
-  #generators of  the factor on the factors of the socle.
+  #generators of  the image on the factors of the socle.
   perms:= List(pregensfac(nri), x ->MySocleAction(soc,x));
 
   #first do the case where this is not a new action - must belong to a lower
-  #factor group or be trivial.
+  #image group or be trivial.
   if IsSubgroup(P, GroupWithGenerators(perms)) then
-    if HasTFordered(RIFac(RIKer(nri))) and (RIFac(RIKer(nri))!.TFordered = "Socle") then
+    if HasTFordered(ImageRecogNode(KernelRecogNode(nri))) and (ImageRecogNode(KernelRecogNode(nri))!.TFordered = "Socle") then
       #don't reorder, just label this as the beginning of Pker
       SetTFordered(nri, "Pker");
-    elif HasTFordered(RIKer(nri)) and RIKer(nri)!.TFordered = "Pker" then
+    elif HasTFordered(KernelRecogNode(nri)) and KernelRecogNode(nri)!.TFordered = "Pker" then
       #move the label for Pker one level higher
-      Unbind(RIKer(nri)!.TFordered);
-      ResetFilterObj(RIKer(nri), HasTFordered);
+      Unbind(KernelRecogNode(nri)!.TFordered);
+      ResetFilterObj(KernelRecogNode(nri), HasTFordered);
       SetTFordered(nri, "Pker");
     else
       ki:= GroupHomomorphismByImagesNC(P, overgroup(soc), Pgens, Pinv_ims);
       #have to move down below all bits that act nontrivially on socle.
-      while not (HasTFordered(RIFac(RIKer(nri))) and
-                RIFac(RIKer(nri))!.TFordered = "Socle") do
-          if IsBound(Grp(RIFac(RIKer(nri)))!.Pcgs) then
+      while not (HasTFordered(ImageRecogNode(KernelRecogNode(nri))) and
+                ImageRecogNode(KernelRecogNode(nri))!.TFordered = "Socle") do
+          if IsBound(Grp(ImageRecogNode(KernelRecogNode(nri)))!.Pcgs) then
             #move past a (soluble) PC group
-            pgs:= pregensfac(RIKer(nri));
+            pgs:= pregensfac(KernelRecogNode(nri));
             pgs_ims:= List(pgs, x->x*Image(ki,MySocleAction(soc, x))^-1);
-            alpha:= GroupHomomorphismByImagesNC(Grp(RIFac(RIKer(nri))), overgroup(nri), pgs, pgs_ims);
+            alpha:= GroupHomomorphismByImagesNC(Grp(ImageRecogNode(KernelRecogNode(nri))), overgroup(nri), pgs, pgs_ims);
             zeta:= function(g)
-               return Image(Homom(RIKer(nri)),(g*Image(alpha,
-                    Image(Homom(RIKer(nri)), g))^-1));
+               return Image(Homom(KernelRecogNode(nri)),(g*Image(alpha,
+                    Image(Homom(KernelRecogNode(nri)), g))^-1));
             end;
           else
             #should have a nonabelian group to move past here,

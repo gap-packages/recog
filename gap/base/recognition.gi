@@ -57,17 +57,17 @@ RECOG_ViewObj := function( level, ri )
     fi;
     if not IsLeaf(ri) then
         Print("\n",String("",level)," F:");
-        if HasRIFac(ri) then
-            RECOG_ViewObj(level+3, RIFac(ri));
+        if HasImageRecogNode(ri) then
+            RECOG_ViewObj(level+3, ImageRecogNode(ri));
         else
-            Print("has no factor");
+            Print("has no image");
         fi;
         Print("\n",String("",level), " K:");
-        if HasRIKer(ri) then
-            if RIKer(ri) = fail then
+        if HasKernelRecogNode(ri) then
+            if KernelRecogNode(ri) = fail then
                 Print("<trivial kernel");
             else
-                RECOG_ViewObj(level+3, RIKer(ri));
+                RECOG_ViewObj(level+3, KernelRecogNode(ri));
             fi;
         else
             Print("has no kernel");
@@ -76,7 +76,7 @@ RECOG_ViewObj := function( level, ri )
     Print(">");
   end;
 
-InstallMethod( ViewObj, "for recognition infos", [IsRecognitionInfo],
+InstallMethod( ViewObj, "for recognition infos", [IsRecogNode],
   function(ri)
     RECOG_ViewObj(0, ri);
   end);
@@ -150,7 +150,7 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     Setforkernel(ri,rec(hints := []));
           # this is eventually handed down to the kernel
     Setforfactor(ri,rec(hints := []));
-          # this is eventually handed down to the factor
+          # this is eventually handed down to the image
     if projective then
         Setisone(ri,IsOneProjective);
         Setisequal(ri,IsEqualProjective);
@@ -230,7 +230,7 @@ end;
 # A method for PseudoRandom is installed such that it calls
 # RandomElm(ri, "PseudoRandom", false).
 InstallMethod( RandomElm, "for a recognition info record, a string and a bool",
-  [ IsRecognitionInfo, IsString, IsBool ],
+  [ IsRecogNode, IsString, IsBool ],
   function(ri, stamp, mem)
     local pos,el;
     if ri!.randstore then
@@ -257,7 +257,7 @@ InstallMethod( RandomElm, "for a recognition info record, a string and a bool",
 # For an explanation see RandomElm.
 InstallMethod( RandomElmOrd,
   "for a recognition info record, a string and a bool",
-  [ IsRecognitionInfo, IsString, IsBool ],
+  [ IsRecogNode, IsString, IsBool ],
   function(ri, stamp, mem)
     local pos,res;
     if ri!.randstore then
@@ -292,7 +292,7 @@ InstallMethod( RandomElmOrd,
 # If ri!.randstore is true this function tries to look up or computes and
 # stores the order in ri.
 InstallMethod( GetElmOrd, "for a recognition info record and a record",
-  [ IsRecognitionInfo, IsRecord ],
+  [ IsRecogNode, IsRecord ],
   function( ri, r )
     local x;
     if ri!.randstore then
@@ -311,7 +311,7 @@ InstallMethod( GetElmOrd, "for a recognition info record and a record",
 # FIXME: unused?
 # InstallMethod( RandomElmPpd,
 #   "for a recognition info record, a string and a bool",
-#   [ IsRecognitionInfo, IsString, IsBool ],
+#   [ IsRecogNode, IsString, IsBool ],
 #   function(ri, s, mem)
 #     local pos,res;
 #     if ri!.randstore then
@@ -357,7 +357,7 @@ InstallMethod( GetElmOrd, "for a recognition info record and a record",
 
 # FIXME: unused?
 # InstallMethod( GetElmPpd, "for a recognition info record and a record",
-#   [ IsRecognitionInfo, IsRecord ],
+#   [ IsRecogNode, IsRecord ],
 #   function( ri, r )
 #     local x;
 #     if IsObjWithMemory(r.el) then
@@ -389,14 +389,14 @@ InstallMethod( GetElmOrd, "for a recognition info record and a record",
 #   end );
 
 InstallMethod( RandomOrdersSeen, "for a recognition info record",
-  [ IsRecognitionInfo ],
+  [ IsRecogNode ],
   function(ri)
     return Compacted(ri!.rando);
   end );
 
 # FIXME: unused?
 # InstallMethod( StopStoringRandEls, "for a recognition info record",
-#   [ IsRecognitionInfo ],
+#   [ IsRecogNode ],
 #   function(ri)
 #     ri!.randstore := false;
 #     Unbind(ri!.randr);
@@ -507,7 +507,7 @@ InstallGlobalFunction( RecogniseGeneric,
     # The non-leaf case:
     # In that case we know that ri now knows: homom plus additional data.
 
-    # Try to recognise the factor a few times, then give up:
+    # Try to recognise the image a few times, then give up:
     counter := 0;
     repeat
         counter := counter + 1;
@@ -518,11 +518,11 @@ InstallGlobalFunction( RecogniseGeneric,
         fi;
 
         if IsMatrixGroup(Image(Homom(ri))) then
-            Info(InfoRecog,2,"Going to the factor (depth=",depth,", try=",
+            Info(InfoRecog,2,"Going to the image (depth=",depth,", try=",
               counter,", dim=",DimensionOfMatrixGroup(Image(Homom(ri))),
               ", field=",Size(FieldOfMatrixGroup(Image(Homom(ri)))),").");
         else
-            Info(InfoRecog,2,"Going to the factor (depth=",depth,", try=",
+            Info(InfoRecog,2,"Going to the image (depth=",depth,", try=",
               counter,").");
         fi;
         if ForAny(GeneratorsOfGroup(H), x->not ValidateHomomInput(ri, x)) then
@@ -536,24 +536,24 @@ InstallGlobalFunction( RecogniseGeneric,
                   methodsforfactor(ri), depthString, forfactor(ri) ); # TODO: change forfactor to hintsForFactor??)
         Remove(depthString);
         PrintTreePos("F",depthString,H);
-        SetRIFac(ri,rifac);
+        SetImageRecogNode(ri,rifac);
         SetRIParent(rifac,ri);
 
         if IsMatrixGroup(H) then
-            Info(InfoRecog,2,"Back from factor (depth=",depth,
+            Info(InfoRecog,2,"Back from image (depth=",depth,
                  ", dim=",ri!.dimension,", field=",
                  Size(ri!.field),").");
         else
-            Info(InfoRecog,2,"Back from factor (depth=",depth,").");
+            Info(InfoRecog,2,"Back from image (depth=",depth,").");
         fi;
 
         if not IsReady(rifac) then
-            # the recognition of the factor failed, also give up here:
+            # the recognition of the image failed, also give up here:
             if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
             return ri;
         fi;
 
-        # Now we want to have preimages of the new generators in the factor:
+        # Now we want to have preimages of the new generators in the image:
         Info(InfoRecog,2,"Calculating preimages of nice generators.");
         ri!.pregensfacwithmem := CalcNiceGens(rifac, ri!.gensHmem);
         Setpregensfac(ri, StripMemory(ri!.pregensfacwithmem));
@@ -588,8 +588,8 @@ InstallGlobalFunction( RecogniseGeneric,
         # We found out that N is the trivial group!
         # In this case we do nothing, kernel is fail indicating this.
         Info(InfoRecog,2,"Found trivial kernel (depth=",depth,").");
-        SetRIKer(ri,fail);
-        # We have to learn from the factor, what our nice generators are:
+        SetKernelRecogNode(ri,fail);
+        # We have to learn from the image, what our nice generators are:
         SetNiceGens(ri,pregensfac(ri));
         SetFilterObj(ri,IsReady);
         if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
@@ -610,7 +610,7 @@ InstallGlobalFunction( RecogniseGeneric,
         riker := RecogniseGeneric( N, methoddb, depthString, forkernel(ri) );
         Remove(depthString);
         PrintTreePos("K",depthString,H);
-        SetRIKer(ri,riker);
+        SetKernelRecogNode(ri,riker);
         SetRIParent(riker,ri);
         Info(InfoRecog,2,"Back from kernel (depth=",depth,").");
 
@@ -625,7 +625,7 @@ InstallGlobalFunction( RecogniseGeneric,
                 Assert(2, ValidateHomomInput(ri, x));
                 s := SLPforElement(rifac,ImageElm( Homom(ri), x!.el ));
                 if s = fail then
-                    ErrorNoReturn("Very bad: factor was wrongly recognised and we ",
+                    ErrorNoReturn("Very bad: image was wrongly recognised and we ",
                                   "found out too late");
                 fi;
                 y := ResultOfStraightLineProgram(s, ri!.pregensfacwithmem);
@@ -647,7 +647,7 @@ InstallGlobalFunction( RecogniseGeneric,
                 Info(InfoRecog,2,"Have now ",Length(gensN(ri)),
                      " generators for kernel, recognising...");
                 if succ = false then
-                    ErrorNoReturn("Very bad: factor was wrongly recognised and we ",
+                    ErrorNoReturn("Very bad: image was wrongly recognised and we ",
                                   "found out too late");
                 fi;
             fi;
@@ -697,15 +697,15 @@ InstallGlobalFunction( CalcNiceGensHomNode,
   # function for the situation on a homomorphism node (non-Leaf):
   function(ri, origgens)
     local nicegens, kernelgens;
-    # compute preimages of the nicegens of the factor group
-    nicegens := CalcNiceGens(RIFac(ri), origgens);
+    # compute preimages of the nicegens of the image group
+    nicegens := CalcNiceGens(ImageRecogNode(ri), origgens);
     # Is there a non-trivial kernel? then add its nicegens
-    if HasRIKer(ri) and RIKer(ri) <> fail then
-        # we cannot just use gensN(RIKer(ri)) here, as those values are defined
+    if HasKernelRecogNode(ri) and KernelRecogNode(ri) <> fail then
+        # we cannot just use gensN(KernelRecogNode(ri)) here, as those values are defined
         # relative to the original generators we used during recognition; but
         # the origgens passed to this function might differ
         kernelgens := ResultOfStraightLineProgram(gensNslp(ri), origgens);
-        Append(nicegens, CalcNiceGens(RIKer(ri), kernelgens));
+        Append(nicegens, CalcNiceGens(KernelRecogNode(ri), kernelgens));
     fi;
     return nicegens;
   end );
@@ -724,8 +724,8 @@ InstallGlobalFunction( SLPforElementGeneric,
   # generic method for a non-leaf node
   function(ri,g)
     local gg,n,rifac,riker,s,s1,s2,y,nr1,nr2;
-    rifac := RIFac(ri);
-    riker := RIKer(ri);   # note: might be fail
+    rifac := ImageRecogNode(ri);
+    riker := KernelRecogNode(ri);   # note: might be fail
 
     if not ValidateHomomInput(ri, g) then
         return fail;
@@ -765,7 +765,7 @@ InstallGlobalFunction( SLPforElementGeneric,
 # Some helper functions for generic code:
 
 InstallOtherMethod( Size, "for a recognition info record",
-  [IsRecognitionInfo and IsReady],
+  [IsRecogNode and IsReady],
   function(ri)
     local size;
     if IsLeaf(ri) then
@@ -773,9 +773,9 @@ InstallOtherMethod( Size, "for a recognition info record",
         #       of the recognition info record!
         return Size(Grp(ri));
     else
-        size := Size(RIFac(ri));
-        if RIKer(ri) <> fail then
-            return Size(RIKer(ri)) * size;
+        size := Size(ImageRecogNode(ri));
+        if KernelRecogNode(ri) <> fail then
+            return Size(KernelRecogNode(ri)) * size;
         else
             return size;   # trivial kernel
         fi;
@@ -783,13 +783,13 @@ InstallOtherMethod( Size, "for a recognition info record",
   end);
 
 InstallOtherMethod( Size, "for a failed recognition info record",
-  [IsRecognitionInfo],
+  [IsRecogNode],
   function(ri)
     ErrorNoReturn("the recognition described by this info record has failed!");
   end);
 
 InstallOtherMethod( \in, "for a group element and a recognition info record",
-  [IsObject, IsRecognitionInfo and IsReady],
+  [IsObject, IsRecogNode and IsReady],
   function( el, ri )
     local gens,slp;
     slp := SLPforElement(ri,el);
@@ -805,7 +805,7 @@ InstallOtherMethod( \in, "for a group element and a recognition info record",
   end);
 
 InstallOtherMethod( \in, "for a group element and a recognition info record",
-  [IsObject, IsRecognitionInfo],
+  [IsObject, IsRecogNode],
   function( el, ri )
     ErrorNoReturn("the recognition described by this info record has failed!");
   end);
@@ -841,12 +841,12 @@ InstallGlobalFunction( "DisplayCompositionFactors", function(arg)
           Print(IsomorphismTypeInfoFiniteSimpleGroup( f ).name, "\n" );
       od;
   else
-      if HasRIKer(ri) and RIKer(ri) <> fail then
-          DisplayCompositionFactors(RIFac(ri),depth+1,homs+1,
-                                    ksize*Size(RIKer(ri)));
-          DisplayCompositionFactors(RIKer(ri),depth+1,homs,ksize);
+      if HasKernelRecogNode(ri) and KernelRecogNode(ri) <> fail then
+          DisplayCompositionFactors(ImageRecogNode(ri),depth+1,homs+1,
+                                    ksize*Size(KernelRecogNode(ri)));
+          DisplayCompositionFactors(KernelRecogNode(ri),depth+1,homs,ksize);
       else
-          DisplayCompositionFactors(RIFac(ri),depth+1,homs+1,ksize);
+          DisplayCompositionFactors(ImageRecogNode(ri),depth+1,homs+1,ksize);
       fi;
   fi;
   if depth = 0 then
@@ -871,8 +871,8 @@ InstallGlobalFunction( "GetCompositionTreeNode",
     local r,c;
     r := ri;
     for c in what do
-      if c in "fF" then r := RIFac(r);
-      elif c in "kK" then r := RIKer(r); fi;
+      if c in "fF" then r := ImageRecogNode(r);
+      elif c in "kK" then r := KernelRecogNode(r); fi;
     od;
     return r;
   end );
@@ -1088,12 +1088,12 @@ RECOG.TestRecognitionNode := function(ri,stop,recurse)
       if IsLeaf(ri) then
           return rec(err := err, badnode := ri);
       fi;
-      ef := RECOG.TestRecognitionNode(RIFac(ri),stop,recurse);
+      ef := RECOG.TestRecognitionNode(ImageRecogNode(ri),stop,recurse);
       if IsRecord(ef) then
           return ef;
       fi;
-      if RIKer(ri) <> fail then
-          ek := RECOG.TestRecognitionNode(RIKer(ri),stop,recurse);
+      if KernelRecogNode(ri) <> fail then
+          ek := RECOG.TestRecognitionNode(KernelRecogNode(ri),stop,recurse);
           if IsRecord(ek) then
               return ek;
           fi;

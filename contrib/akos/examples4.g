@@ -485,7 +485,7 @@ if d>18 and d mod 16 = 2 and q mod 4 = 3 then
       od;
       list := reverse(Set(list));
       return list;
-  fi;  # largest prime factor of d-2
+  fi;  # largest prime image of d-2
 fi;
 
 end;

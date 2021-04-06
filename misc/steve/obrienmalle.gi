@@ -1,7 +1,7 @@
 # GAP translation attempt Jan 2004 SL
 
 #**************************************************************/
-#   Identify the non-abelian simple composition factor        */
+#   Identify the non-abelian simple composition image        */
 #   of a nearly simple matrix group.                          */
 #   Uses:  element orders, involution centralizers            */
 #                                                             */

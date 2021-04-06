@@ -125,7 +125,7 @@ function(ri,I,name)
  Objectify(RecognitionInfoType,rifac);;
  SetFilterObj(rifac,IsLeaf);
  SetRIParent(rifac,ri);
- SetRIFac(ri,rifac);
+ SetImageRecogNode(ri,rifac);
  SetGrp(rifac,I);
  if IsPcGroup(I) then
    bool := SolveLeafPc(ri,rifac);

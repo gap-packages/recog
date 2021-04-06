@@ -17,13 +17,13 @@
 #############################################################################
 
 # The category:
-DeclareCategory( "IsRecognitionInfo", IsObject );
+DeclareCategory( "IsRecogNode", IsObject );
 # The family:
-BindGlobal( "RecognitionInfoFamily",
-  NewFamily("RecognitionInfoFamily", IsRecognitionInfo));
+BindGlobal( "RecogNodeFamily",
+  NewFamily("RecogNodeFamily", IsRecogNode));
 # The type:
 BindGlobal( "RecognitionInfoType",
-  NewType(RecognitionInfoFamily, IsRecognitionInfo and IsAttributeStoringRep));
+  NewType(RecogNodeFamily, IsRecogNode and IsAttributeStoringRep));
 
 
 # The info class:
@@ -45,7 +45,7 @@ BindGlobal( "RECOG", rec() );
 ## <Description>
 ## This flag indicates, whether or not a recognition info record represents a leaf
 ## in the recognition tree. If it is not set, one finds at least one of
-## the attributes <Ref Attr="RIFac"/> and <Ref Attr="RIKer"/> set for
+## the attributes <Ref Attr="ImageRecogNode"/> and <Ref Attr="KernelRecogNode"/> set for
 ## the corresponding node. This flag is normally reset and has to be set
 ## by a find homomorphism method to indicate a leaf.
 ## </Description>
@@ -80,7 +80,7 @@ DeclareFilter( "IsReady" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "Grp", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "Grp", IsRecogNode, "mutable" );
 
 ## <#GAPDoc Label="Homom">
 ## <ManSection>
@@ -94,7 +94,7 @@ DeclareAttribute( "Grp", IsRecognitionInfo, "mutable" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "Homom", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "Homom", IsRecogNode, "mutable" );
 
 ## <#GAPDoc Label="NiceGens">
 ## <ManSection>
@@ -107,23 +107,23 @@ DeclareAttribute( "Homom", IsRecognitionInfo, "mutable" );
 ##     to set the value of <Ref Attr="NiceGens"/>. By default, the original
 ##     generators of the group at this node are taken. For a homomorphism
 ##     (or isomorphism), the <Ref Attr="NiceGens"/> will be the concatenation
-##     of preimages of the <Ref Attr="NiceGens"/> of the factor group
+##     of preimages of the <Ref Attr="NiceGens"/> of the image group
 ##     (see <Ref Attr="pregensfac"/>) and
 ##     the <Ref Attr="NiceGens"/> of the kernel. A find homomorphism method
 ##     does not have to set <Ref Attr="NiceGens"/> if it finds a homomorphism.
 ##     Note however, that such a find homomorphism method has to ensure somehow,
-##     that preimages of the <Ref Attr="NiceGens"/> of the factor group
+##     that preimages of the <Ref Attr="NiceGens"/> of the image group
 ##     can be acquired. See <Ref Attr="calcnicegens"/>, <Ref Func="CalcNiceGens"/>
 ##     and <Ref Attr="slptonice"/>
 ##     for instructions.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "NiceGens", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "NiceGens", IsRecogNode, "mutable" );
 
-## <#GAPDoc Label="RIFac">
+## <#GAPDoc Label="ImageRecogNode">
 ## <ManSection>
-## <Attr Name="RIFac" Arg="ri"/>
+## <Attr Name="ImageRecogNode" Arg="ri"/>
 ## <Description>
 ##     The value of this attribute is the recognition info record of the
 ##     image of the homomorphism that was found from the group described by
@@ -131,15 +131,15 @@ DeclareAttribute( "NiceGens", IsRecognitionInfo, "mutable" );
 ##     recursive procedure after a find homomorphism method has succeeded
 ##     to find a homomorphism (or isomorphism). It does not have to be set
 ##     in leaf nodes of the recognition tree. This attribute value provides
-##     the link to the <Q>factor</Q> subtree of the recognition tree.
+##     the link to the <Q>image</Q> subtree of the recognition tree.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "RIFac", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "ImageRecogNode", IsRecogNode, "mutable" );
 
-## <#GAPDoc Label="RIKer">
+## <#GAPDoc Label="KernelRecogNode">
 ## <ManSection>
-## <Attr Name="RIKer" Arg="ri"/>
+## <Attr Name="KernelRecogNode" Arg="ri"/>
 ## <Description>
 ##     The value of this attribute is the recognition info record of the
 ##     kernel of the homomorphism that was found from the group described by
@@ -153,7 +153,7 @@ DeclareAttribute( "RIFac", IsRecognitionInfo, "mutable" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "RIKer", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "KernelRecogNode", IsRecogNode, "mutable" );
 
 ## <#GAPDoc Label="RIParent">
 ## <ManSection>
@@ -165,7 +165,7 @@ DeclareAttribute( "RIKer", IsRecognitionInfo, "mutable" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "RIParent", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "RIParent", IsRecogNode, "mutable" );
 
 ## <#GAPDoc Label="StdPresentation">
 ## <ManSection>
@@ -176,10 +176,10 @@ DeclareAttribute( "RIParent", IsRecognitionInfo, "mutable" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "StdPresentation", IsRecognitionInfo, "mutable" );    # TODO: implement
+DeclareAttribute( "StdPresentation", IsRecogNode, "mutable" );    # TODO: implement
 
-DeclareProperty( "IsRecogInfoForSimpleGroup", IsRecognitionInfo );
-DeclareProperty( "IsRecogInfoForAlmostSimpleGroup", IsRecognitionInfo );
+DeclareProperty( "IsRecogInfoForSimpleGroup", IsRecogNode );
+DeclareProperty( "IsRecogInfoForAlmostSimpleGroup", IsRecogNode );
 InstallTrueMethod( IsRecogInfoForAlmostSimpleGroup, IsRecogInfoForSimpleGroup );
 
 ## <#GAPDoc Label="pregensfac">
@@ -187,7 +187,7 @@ InstallTrueMethod( IsRecogInfoForAlmostSimpleGroup, IsRecogInfoForSimpleGroup );
 ## <Attr Name="pregensfac" Arg="ri"/>
 ## <Description>
 ##     The value of this attribute is only set for homomorphism nodes. In that
-##     case it contains preimages of the nice generators in the factor group.
+##     case it contains preimages of the nice generators in the image group.
 ##     This attribute is set automatically by the generic recursive recognition
 ##     function using the mechanism described with the attribute
 ##     <Ref Attr="calcnicegens"/> below. A find homomorphism does not have
@@ -195,15 +195,15 @@ InstallTrueMethod( IsRecogInfoForAlmostSimpleGroup, IsRecogInfoForSimpleGroup );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "pregensfac", IsRecognitionInfo, "mutable" );
-DeclareAttribute( "validatehomominput", IsRecognitionInfo);
+DeclareAttribute( "pregensfac", IsRecogNode, "mutable" );
+DeclareAttribute( "validatehomominput", IsRecogNode);
 
 ## <#GAPDoc Label="calcnicegens">
 ## <ManSection>
 ## <Attr Name="calcnicegens" Arg="ri"/>
 ## <Description>
 ##     To make the recursion work, we have to acquire preimages of the
-##     nice generators in factor groups under the homomorphism found.
+##     nice generators in image groups under the homomorphism found.
 ##     But we want to keep the information, how the nice generators
 ##     were found, locally at the node where they were found. This
 ##     attribute solves this problem of acquiring preimages in the following
@@ -220,7 +220,7 @@ DeclareAttribute( "validatehomominput", IsRecognitionInfo);
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "calcnicegens", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "calcnicegens", IsRecogNode, "mutable" );
 
 ## <#GAPDoc Label="slptonice">
 ## <ManSection>
@@ -234,7 +234,7 @@ DeclareAttribute( "calcnicegens", IsRecognitionInfo, "mutable" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "slptonice", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "slptonice", IsRecogNode, "mutable" );
 
 ## <#GAPDoc Label="fhmethsel">
 ## <ManSection>
@@ -248,7 +248,7 @@ DeclareAttribute( "slptonice", IsRecognitionInfo, "mutable" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "fhmethsel", IsRecognitionInfo, "mutable" );      # TODO: rename?
+DeclareAttribute( "fhmethsel", IsRecogNode, "mutable" );      # TODO: rename?
 
 ## <#GAPDoc Label="methodsforfactor">
 ## <ManSection>
@@ -268,7 +268,7 @@ DeclareAttribute( "fhmethsel", IsRecognitionInfo, "mutable" );      # TODO: rena
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "methodsforfactor", IsRecognitionInfo, "mutable" ); # rename to MethodsDBForFactor
+DeclareAttribute( "methodsforfactor", IsRecogNode, "mutable" ); # rename to MethodsDBForFactor
 
 ## <#GAPDoc Label="slpforelement">
 ## <ManSection>
@@ -291,28 +291,28 @@ DeclareAttribute( "methodsforfactor", IsRecognitionInfo, "mutable" ); # rename t
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "slpforelement", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "slpforelement", IsRecogNode, "mutable" );
 # Here we collect generators of the kernel:
-DeclareAttribute( "gensN", IsRecognitionInfo, "mutable" );      # TODO: rename?
+DeclareAttribute( "gensN", IsRecogNode, "mutable" );      # TODO: rename?
 # The following holds a method, described by a record, to find generators
 # of the kernel:
-DeclareAttribute( "findgensNmeth", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "findgensNmeth", IsRecogNode, "mutable" );
 # Here is one slp to make all the gensN:
-DeclareAttribute( "gensNslp", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "gensNslp", IsRecogNode, "mutable" );
 # Do we have to do an immediate verification of the kernel?
-DeclareAttribute( "immediateverification", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "immediateverification", IsRecogNode, "mutable" );
 # Used to transport information about the group down to the kernel:
-DeclareAttribute( "forkernel", IsRecognitionInfo, "mutable" );
-# Used to transport information about the group down to the factor:
-DeclareAttribute( "forfactor", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "forkernel", IsRecogNode, "mutable" );
+# Used to transport information about the group down to the image:
+DeclareAttribute( "forfactor", IsRecogNode, "mutable" );
 # Used to check whether group elements are equal to one after recognition:
-DeclareAttribute( "isone", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "isone", IsRecogNode, "mutable" );
 # Used to compare group elements after recognition:
-DeclareAttribute( "isequal", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "isequal", IsRecogNode, "mutable" );
 # Used to compute order of group elements after recognition:
-DeclareAttribute( "order", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "order", IsRecogNode, "mutable" );
 # Used to check whether two group elements commute:
-DeclareAttribute( "docommute", IsRecognitionInfo, "mutable" );
+DeclareAttribute( "docommute", IsRecogNode, "mutable" );
 
 
 #############################################################################
@@ -520,7 +520,7 @@ DeclareSynonym("RecognizeGroup", RecogniseGroup);
 ##     <Ref Sect="findhomo"/>. <A>depthString</A> is a string whose length
 ##     measures the depth in the recognition tree. It will be increased by one
 ##     character for each step we go into the tree, namely by <C>F</C> for
-##     a factor node, and <C>K</C> for a kernel. The top level begins with an
+##     a image node, and <C>K</C> for a kernel. The top level begins with an
 ##     empty string. <A>knowledge</A> is an optional record the
 ##     components of which are copied into the new recognition info record
 ##     which is created for the group <A>H</A>. Especially the component
@@ -588,9 +588,9 @@ DeclareGlobalFunction( "CalcNiceGensGeneric" );
 ## <Returns>a list of preimages of the nice generators</Returns>
 ## <Description>
 ##     This is the default function for homomorphism node for the attribute
-##     <Ref Attr="calcnicegens"/>. It just delegates to factor and kernel of
+##     <Ref Attr="calcnicegens"/>. It just delegates to image and kernel of
 ##     the homomorphism, as the nice generators of a homomorphism (or isomorphism)
-##     node are just the concatenation of the nice generators of the factor
+##     node are just the concatenation of the nice generators of the image
 ##     and the kernel. A find homomorphism method finding a homomorphism
 ##     or isomorphism does not have to do anything with respect to nice
 ##     generators.
@@ -613,13 +613,13 @@ DeclareGlobalFunction( "SLPforElementGeneric" );
 ## </ManSection>
 ## <#/GAPDoc>
 DeclareGlobalFunction( "SLPforElement" );
-DeclareOperation( "RandomElm", [ IsRecognitionInfo, IsString, IsBool ] );
-DeclareOperation( "RandomElmOrd", [ IsRecognitionInfo, IsString, IsBool ] );
-DeclareOperation( "RandomElmPpd", [ IsRecognitionInfo, IsString, IsBool ] );
-DeclareOperation( "RandomOrdersSeen", [ IsRecognitionInfo ] );
-DeclareOperation( "StopStoringRandEls", [ IsRecognitionInfo ] );
-DeclareOperation( "GetElmOrd", [ IsRecognitionInfo, IsRecord ] );
-DeclareOperation( "GetElmPpd", [ IsRecognitionInfo, IsRecord ] );
+DeclareOperation( "RandomElm", [ IsRecogNode, IsString, IsBool ] );
+DeclareOperation( "RandomElmOrd", [ IsRecogNode, IsString, IsBool ] );
+DeclareOperation( "RandomElmPpd", [ IsRecogNode, IsString, IsBool ] );
+DeclareOperation( "RandomOrdersSeen", [ IsRecogNode ] );
+DeclareOperation( "StopStoringRandEls", [ IsRecogNode ] );
+DeclareOperation( "GetElmOrd", [ IsRecogNode, IsRecord ] );
+DeclareOperation( "GetElmPpd", [ IsRecogNode, IsRecord ] );
 
 
 # Finally the generic verification procedure:

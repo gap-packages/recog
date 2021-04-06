@@ -26,9 +26,9 @@ Here is an example of a successful recognition tree:
 Group([ (1,2,3,4,5,6,7,8,9,10,11,12), (1,2), (13,14,15,16,17), (13,14) ])
 gap> ri := RecogniseGroup(g);
 #I  Finished rank 90 method "NonTransitive": success.
-#I  Going to the factor (depth=0, try=1).
+#I  Going to the image (depth=0, try=1).
 #I  Finished rank 95 method "MovesOnlySmallPoints": success.
-#I  Back from factor (depth=0).
+#I  Back from image (depth=0).
 #I  Calculating preimages of nice generators.
 #I  Creating 20 random generators for kernel.
 ....................
@@ -89,7 +89,7 @@ generators, you can use the following function:
 <Returns>the size of the recognised group</Returns>
 <Description>
     This method calculates the size of the recognised group
-    by multiplying the size of the factor and the kernel recursively.
+    by multiplying the size of the image and the kernel recursively.
     It is assumed that leaf nodes know already or can calculate the
     size of their group.
 </Description>

@@ -158,11 +158,11 @@ FindHomMethodsMatrix.BlockLowerTriangular := function(ri, G)
 
   # since we know exactly what kind of group we are looking
   # at, we don't want to run generic recognition on the
-  # factor group and the kernel. So we provide "hints" to
+  # image group and the kernel. So we provide "hints" to
   # ensure more appropriate recognition methods are applied
   # first.
 
-  # Give hint to factor
+  # Give hint to image
   forfactor(ri).blocks := ri!.blocks;
   Add(forfactor(ri).hints,
       rec( method := FindHomMethodsMatrix.BlockDiagonal,
