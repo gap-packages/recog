@@ -1,1 +1,5 @@
 OLD_NAME,NEW NAME,TYPE
+RecognitionInfoFamily,RecogNodeFamily,Fam
+IsRecognitionInfo,IsRecogNode,Filt
+RIFac,ImageRecogNode,Attr
+RIKer,KernelRecogNode,Attr
