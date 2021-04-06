@@ -62,7 +62,7 @@ function(ri, G)
   fi;
 
   if nrblocks = 1 then   # in this case the block is everything!
-      # no hints for the factor, will run into diagonal and notice scalar
+      # no hints for the image, will run into diagonal and notice scalar
       data := rec(poss := ri!.blocks[1]);
       newgens := List(GeneratorsOfGroup(G),x->RECOG.HomToDiagonalBlock(data,x));
       H := GroupWithGenerators(newgens);
@@ -83,16 +83,16 @@ function(ri, G)
   hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
   SetHomom(ri,hom);
 
-  # the factor are the last few blocks:
+  # the image are the last few blocks:
   # The following is already be set, but make it explicit here:
   Setmethodsforfactor(ri,FindHomDbProjective);
-  if middle < nrblocks then   # more than one block in factor:
+  if middle < nrblocks then   # more than one block in image:
       forfactor(ri).blocks := List(ri!.blocks{[middle..nrblocks]},
                                    x->x - (ri!.blocks[middle][1]-1));
       AddMethod(forfactor(ri).hints,
                 FindHomMethodsProjective.BlocksModScalars,
                 2000);
-  fi; # Otherwise the factor is to be recognised projectively as usual
+  fi; # Otherwise the image is to be recognised projectively as usual
 
   # the kernel is the first few blocks:
   findgensNmeth(ri).args[1] := 10 + nrblocks;

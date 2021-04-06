@@ -1,9 +1,29 @@
 <Table Align="|l|l|">
-<Caption> renaming of functions</Caption>
+<Caption> Renaming</Caption>
 <HorLine/>
 <Row>
 	<Item> <E>Old Name</E> </Item>
 	<Item> <E>New Name</E> </Item>
+</Row>
+<HorLine/>
+<Row>
+	<Item> <C>RecognitionInfoFamily</C> </Item>
+	<Item> <Ref Fam="RecogNodeFamily"/> </Item>
+</Row>
+<HorLine/>
+<Row>
+	<Item> <C>IsRecognitionInfo</C> </Item>
+	<Item> <Ref Filt="IsRecogNode"/> </Item>
+</Row>
+<HorLine/>
+<Row>
+	<Item> <C>RIFac</C> </Item>
+	<Item> <Ref Attr="ImageRecogNode"/> </Item>
+</Row>
+<HorLine/>
+<Row>
+	<Item> <C>RIKer</C> </Item>
+	<Item> <Ref Attr="KernelRecogNode"/> </Item>
 </Row>
 <HorLine/>
 </Table>

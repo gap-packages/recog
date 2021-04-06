@@ -287,9 +287,9 @@ ConvertToMatrixRep(homcomp,Size(f));
     # gap> gens:=List(GeneratorsOfGroup(G),g->PermutationMat(g,n)) * Z(5);;
     # gap> gens[1][1][2] := -gens[1][1][2];; gens[2][7][5] := -gens[2][7][5];;
     # gap> H2:=Group(gens);; ri:=RecognizeGroup( H2 );
-    # gap> Grp(RIFac(ri));
+    # gap> Grp(ImageRecogNode(ri));
     # <matrix group with 2 generators>
-    # gap> Grp(RIFac(RIFac(ri)));
+    # gap> Grp(ImageRecogNode(ImageRecogNode(ri)));
     # Group([ (1,2,3,4,5,6,7), (1,2,3) ])
 
     a := OrbActionHomomorphism(G,o);

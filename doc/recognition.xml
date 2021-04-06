@@ -52,7 +52,7 @@ with a technical description of the recursive procedure
 behind our main function <Ref Func="RecogniseGroup"/>.
 In Section <Ref Sect="rirecord"/>
 we describe the return type of <Ref Func="RecogniseGroup"/>
-which we call <Q>recognition info records</Q>.
+which we call <Q>recognition nodes</Q>.
 The methods to find homomorphisms are described
 in Section <Ref Sect="findhomo"/>.
 Finally,
@@ -65,7 +65,7 @@ recognition of different types of groups.<P/>
 At the heart of the recognition
 procedure is a function called <Ref Func="RecogniseGeneric"/> which gets
 a &GAP; group object and returns a
-so-called <Q>recognition info record</Q> (see Subsection
+so-called <Q>recognition node</Q> (see Subsection
 <Ref Subsect="rirecord"/> for details). Success or failure will be indicated
 by this record being in the filter <Ref Filt="IsReady"/> or not.<P/>
 To know how to find homomorphisms
@@ -80,7 +80,7 @@ To describe the algorithm executed by <Ref Func="RecogniseGeneric"/>
 we first summarise it in steps:
 
 <Enum>
-<Item>Create a new, empty recognition info record.</Item>
+<Item>Create a new, empty recognition node.</Item>
 <Item>Use the database of <C>FindHomomorphism</C> methods and the method
     selection procedure described in Chapter <Ref Chap="methsel"/> to
     try to find a homomorphism onto a smaller group or an isomorphism
@@ -89,12 +89,12 @@ we first summarise it in steps:
 <Item>If an isomorphism is found or a method somehow else recognises
     the group in question, such that we can write elements as straight
     line programs in the generators from now on, then make the recognition
-    info record a leaf of the recognition tree and return success.</Item>
+    node a leaf of the recognition tree and return success.</Item>
 <Item>Otherwise the function sets up all the data for the homomorphism and
     calls itself with the image of the homomorphism. Note that this
     might use another database of recognition methods because the
     homomorphism might change the representation of the group.</Item>
-<Item>After successful recognition of the factor group the procedure has
+<Item>After successful recognition of the image group the procedure has
     to recognise the kernel of the homomorphism. The first step for this
     is to find generators. If they are not already known from the
     <C>FindHomomorphism</C> method, they are created by producing random
@@ -119,8 +119,8 @@ group as a straight line program in the generators as follows:
 
 <Enum>
 <Item>Map the element through the homomorphism.</Item>
-<Item>Write the element in the factor group as a product of the nice
-    generators in the factor group.</Item>
+<Item>Write the element in the image group as a product of the nice
+    generators in the image group.</Item>
 <Item>Apply the resulting straight line program to the preimages of those
     nice generators and calculate the quotient, which will now lie in
     the kernel.</Item>
@@ -138,7 +138,7 @@ verification phase.<P/>
 The latter procedure to write elements as straight line programs in the
 generators is implemented in the function <Ref Func="SLPforElementGeneric"/>
 which will be called automatically if one calls the <Ref Func="SLPforElement"/>
-function of the resulting recognition info record (see
+function of the resulting recognition node (see
 <Ref Attr="slpforelement"/>).<P/>
 
 It is now high time to give you the calling details of the main recursive
@@ -156,15 +156,15 @@ following convenience functions:
 
 <ManSection>
 <Func Name="TryFindHomMethod" Arg="H, method, projective"/>
-<Returns><K>fail</K> or <K>false</K> or a recognition info record.</Returns>
+<Returns><K>fail</K> or <K>false</K> or a recognition node.</Returns>
 <Description>
 Use this function to try to run a given find homomorphism method
 <A>method</A> on a group <A>H</A>. Indicate by the boolean <A>projective</A>
 whether or not the method works in projective mode. For permutation groups,
 set this to <K>false</K>. The result is either <K>fail</K> or
-<K>false</K> if the method fails or a recognition info record <C>ri</C>.
+<K>false</K> if the method fails or a recognition node <C>ri</C>.
 If the method created a leaf then <C>ri</C> will be a leaf, otherwise
-it will have the attribute <Ref Attr="Homom"/> set, but no factor or
+it will have the attribute <Ref Attr="Homom"/> set, but no image or
 kernel have been created or recognised yet. You can use for example
 the methods in <Ref Var="FindHomMethodsPerm"/> or
 <Ref Var="FindHomMethodsMatrix"/> or <Ref Var="FindHomMethodsProjective"/>
@@ -184,40 +184,40 @@ passed to <Ref Attr="Homom"/>.
 </Section>
 
 <Section Label="rirecord">
-    <Heading>Recognition info records</Heading>
+    <Heading>Recognition nodes</Heading>
 
-A recognition info record is a &GAP; component object. It is a member
+A recognition node is a &GAP; component object. It is a member
 of the family
 
 <ManSection>
-<Fam Name="RecognitionInfoFamily"/>
+<Fam Name="RecogNodeFamily"/>
 </ManSection>
 
 and is in the category
 
 <ManSection>
-    <Filt Name="IsRecognitionInfo" Type="Category"/>
+    <Filt Name="IsRecogNode" Type="Category"/>
 </ManSection>
 
 and is <Ref Filt="IsAttributeStoringRep" BookName="Ref"/>, such that we can
 define attributes for it, the values of which are stored once they are
-known. A recognition info record always represents a whole binary tree of such
-records, see the attributes <Ref Attr="RIFac"/> and <Ref Attr="RIKer"/>
+known. A recognition node always represents a whole binary tree of such
+records, see the attributes <Ref Attr="ImageRecogNode"/> and <Ref Attr="KernelRecogNode"/>
 below. <P/>
 
-The following filters are defined for recognition info records:
+The following filters are defined for recognition nodes:
 
 <#Include Label="IsLeaf">
 <#Include Label="IsReady">
 
-The following attributes are defined for recognition info records:
+The following attributes are defined for recognition nodes:
 
 <#Include Label="Grp">
 <#Include Label="Homom">
 <#Include Label="NiceGens">
 <#Include Label="pregensfac">
-<#Include Label="RIFac">
-<#Include Label="RIKer">
+<#Include Label="ImageRecogNode">
+<#Include Label="KernelRecogNode">
 <#Include Label="RIParent">
 <#Include Label="fhmethsel">
 <#Include Label="slpforelement">
@@ -309,14 +309,14 @@ about the kernel:
     taking at least one argument <A>ri</A> and possibly more, and does
     not return anything. The second is <C>args</C> which holds a list
     of arguments for the above mentioned function. The real list of
-    arguments is derived by prepending the recognition info record
+    arguments is derived by prepending the recognition node
     to the list of arguments in <C>args</C>. That is, the following
     code is used to call the method:
 <Listing>
     gensNmeth := findgensNmeth(ri);
     CallFuncList(gensNmeth.method,Concatenation([ri],gensNmeth.args));
 </Listing>
-The record is initialised upon creation of the recognition info record
+The record is initialised upon creation of the recognition node
 to calling <Ref Func="FindKernelRandom"/> with one argument of 20
 (FIXME: is 20 correct?) (in addition
 to the first argument <A>ri</A>). See below for a choice of possible
@@ -398,7 +398,7 @@ find kernel methods.
 
 The following attributes are used to give a successful find homomorphism
 method further possibilities to transport knowledge about the group
-recognised by the current recognition info record to the factor or
+recognised by the current recognition node to the image or
 kernel of the found homomorphism:
 
 <ManSection>
@@ -411,7 +411,7 @@ kernel of the found homomorphism:
     example an invariant subspace of a matrix group) into this record.
     When a homomorphism is found and recognition goes on in its
     kernel, the value of this attribute is taken as initialisation data
-    for the newly created recognition info record for the kernel. Thus,
+    for the newly created recognition node for the kernel. Thus,
     information is transported down to the recognition process for the
     kernel. The component <C>hints</C> is special insofar as it has to
     contain records describing find homomorphism methods which might be
@@ -433,15 +433,15 @@ kernel of the found homomorphism:
     example an invariant subspace of a matrix group) into this record.
     When a homomorphism is found and recognition goes on in its
     image, the value of this attribute is taken as initialisation data
-    for the newly created recognition info record for the factor. Thus,
+    for the newly created recognition node for the image. Thus,
     information is transported down to the recognition process for the
-    factor. The component <C>hints</C> is special insofar as it has to
+    image. The component <C>hints</C> is special insofar as it has to
     contain records describing find homomorphism methods which might be
     particularly successful. They are prepended to the find homomorphism
     method database such that they are called before any other methods.
     This is a means to give hints to the recognition procedure in the
-    factor, because often during the finding of a homomorphism knowledge
-    is acquired which might help the recognition of the factor.
+    image, because often during the finding of a homomorphism knowledge
+    is acquired which might help the recognition of the image.
 </Description>
 </ManSection>
 
@@ -488,14 +488,14 @@ not have to set this attribute.
 </ManSection>
 
 <Subsection Label="componentsri">
-<Heading>Other components of recognition info records</Heading>
+<Heading>Other components of recognition nodes</Heading>
 
     In this subsection we describe a few more components of
-    recognition info records that can be queried or set by find
+    recognition nodes that can be queried or set by find
     homomorphism methods. Not all of these components are bound in all
     cases. See the individual descriptions about the conventions.
     Remember to use the <C>!.</C> notation to access these components
-    of a recognition info record.
+    of a recognition node.
 
 <List>
 
@@ -557,21 +557,21 @@ the calling convention by means of a hypothetical function:
         <K>TemporaryFailure</K>, or <K>NotEnoughInformation</K>.</Returns>
     <Description>
         Find homomorphism methods take two arguments <A>ri</A> and <A>G</A>,
-        of which <A>ri</A> is a recognition info record and <A>G</A> is
+        of which <A>ri</A> is a recognition node and <A>G</A> is
         a &GAP; group object. The return value is one of the four possible
         values in the framework for method selection described in Chapter
         <Ref Chap="methsel"/> indicating success, failure, or (temporary)
         non-applicability. The above mentioned additional information
-        in case of success are all returned by changing the recognition
-        info record <A>ri</A>. For the conventions about what a find
+        in case of success are all returned by changing the
+        recognition node <A>ri</A>. For the conventions about what a find
         homomorphism method has to do and return see below.
     </Description>
 </ManSection>
 
 A failed or not applicable find homomorphism method does not have to report
-or do anything in the recognition info record <A>ri</A>. However, it can
+or do anything in the recognition node <A>ri</A>. However, it can
 collect information and store it either in the group object or in the
-recognition info record. Note that for example it might be that
+recognition node. Note that for example it might be that
 a failed find homomorphism method acquires additional information that
 allows another find homomorphism method to become applicable. <P/>
 
@@ -601,8 +601,8 @@ A successful find homomorphism method has the following duties:
     then it has to set the attribute <Ref Attr="slpforelement"/> to a function
     like <Ref Func="SLPforElementGeneric"/> that can write an arbitrary
     element in <A>G</A> as a straight line program in the nice generators of
-    <A>G</A>. The method may store additional data into the recognition info
-    record for this to work. It does not have to set any other value in
+    <A>G</A>. The method may store additional data into the recognition node
+    for this to work. It does not have to set any other value in
     <A>ri</A>.
 </Item>
 <Mark>for leaves: information about nice generators</Mark>
@@ -655,17 +655,17 @@ A successful find homomorphism method has the following duties:
     <Ref Attr="forkernel"/> and <Ref Attr="forfactor"/>, which both are
     records. Components in these
     record that are bound during the recognition will be copied into
-    the recognition info record of the kernel and factor respectively
+    the recognition node of the kernel and image respectively
     of a found homomorphism
     upon creation and thus are available to all find homomorphism
-    methods called for the kernel and factor. This feature might be
+    methods called for the kernel and image. This feature might be
     interesting to transport information that is relevant for the
-    recognition of the kernel or factor and was acquired during the recognition
+    recognition of the kernel or image and was acquired during the recognition
     of <A>G</A> itself.<P/> A special role is played by the component
     <C>hints</C> in both of the above records,
     which can hold a list of records describing find
     homomorphism methods that shall be tried first when recognising the
-    kernel or factor. <P/>
+    kernel or image. <P/>
     In addition, a find homomorphism method might set the attribute
     <Ref Attr="immediateverification"/> to <K>true</K>, if it considers the
     problem of finding kernel generators particularly difficult.
@@ -681,7 +681,7 @@ case of a <Q>homomorphism node</Q>:
 <Func Name="SLPforElementGeneric" Arg="ri, x"/>
 <Returns>A &GAP; straight line program.</Returns>
 <Description>
-This function takes as arguments a recognition info record <A>ri</A>
+This function takes as arguments a recognition node <A>ri</A>
 and a group element <A>x</A>. It returns a &GAP; straight line program
 that expresses the element <A>x</A> in terms of the nice generators of the
 group <M>G</M> recognised by <A>ri</A>.<P/>

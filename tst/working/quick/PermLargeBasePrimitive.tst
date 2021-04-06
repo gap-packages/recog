@@ -27,5 +27,5 @@ gap> riWithFixed := RECOG.TestGroup(jellyGroupWithFixedPoints,
 >   rec(tryNonGroupElements := true));;
 gap> riWithFixed!.fhmethsel.successMethod;
 "ThrowAwayFixedPoints"
-gap> RIFac(riWithFixed)!.fhmethsel.successMethod;
+gap> ImageRecogNode(riWithFixed)!.fhmethsel.successMethod;
 "LargeBasePrimitive"

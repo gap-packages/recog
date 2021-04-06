@@ -200,7 +200,7 @@ InstallGlobalFunction( NormalTree,
     Setforkernel(ri,rec(hints := []));
           # this is eventually handed down to the kernel
     Setforfactor(ri,rec(hints := []));
-          # this is eventually handed down to the factor
+          # this is eventually handed down to the image
 
 
     # Use the homomorphism defined by nsm!.Maps[depth+1];
@@ -223,23 +223,23 @@ InstallGlobalFunction( NormalTree,
     # We know we are in the non-leaf case:
     # In that case we know that ri now homom and image of homom is a leaf
 
-    Info(InfoRecognition,1,"Going to the factor (depth=",depth,")");
+    Info(InfoRecognition,1,"Going to the image (depth=",depth,")");
 
     I := SubgroupNC(OverI,List(GeneratorsOfGroup(H), x->ImageElm(Homom(ri),x)));
 
     rifac := RecogniseLeaf(ri,I,name);;
 
-     SetRIFac(ri,rifac);
+     SetImageRecogNode(ri,rifac);
      SetRIParent(rifac,ri);
 
-     Info(InfoRecognition,1,"Back from factor (depth=",depth,").");
+     Info(InfoRecognition,1,"Back from image (depth=",depth,").");
 
      if not IsReady(rifac) then
-          # the recognition of the factor failed, also give up here:
+          # the recognition of the image failed, also give up here:
           return ri;
      fi;
 
-        # Now we want to have preimages of the new generators in the factor:
+        # Now we want to have preimages of the new generators in the image:
       if not IsBound(ri!.pregensfac) then
         Info(InfoRecognition,1,"Calculating preimages of nice generators.");
         Setpregensfac( ri, CalcNiceGens(rifac,GeneratorsOfGroup(H)));
@@ -279,8 +279,8 @@ InstallGlobalFunction( NormalTree,
         # We found out that N is the trivial group!
         # In this case we do nothing, kernel is fail indicating this.
         Info(InfoRecognition,1,"Found trivial kernel (depth=",depth,").");
-        SetRIKer(ri,fail);
-        # We have to learn from the factor, what our nice generators are:
+        SetKernelRecogNode(ri,fail);
+        # We have to learn from the image, what our nice generators are:
         SetNiceGens(ri,pregensfac(ri));
         SetFilterObj(ri,IsReady);
         return ri;
@@ -294,7 +294,7 @@ InstallGlobalFunction( NormalTree,
         N := Group(StripMemory(gensN(ri)));
 
         riker := NormalTree( N, nsm, depth+1 );;
-        SetRIKer(ri,riker);
+        SetKernelRecogNode(ri,riker);
         SetRIParent(riker,ri);
         Info(InfoRecognition,1,"Back from kernel (depth=",depth,").");
 

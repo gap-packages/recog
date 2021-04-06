@@ -115,7 +115,7 @@ FindHomMethodsPerm.NonTransitive := function(ri, G)
   # the permutation action of G to the orbit o
   hom := ActionHomomorphism(G, o);
 
-  # store the homomorphism into the recognition info record
+  # store the homomorphism into the recognition node
   SetHomom(ri, hom);
 
   # indicate success
@@ -153,16 +153,16 @@ FindHomMethodsMatrix.BlockLowerTriangular := function(ri, G)
   # finally, we define the homomorphism
   hom := GroupHomByFuncWithData(G, H, RECOG.HomOntoBlockDiagonal, data);
 
-  # ... and store it in the recognition info record
+  # ... and store it in the recognition node
   SetHomom(ri, hom);
 
   # since we know exactly what kind of group we are looking
   # at, we don't want to run generic recognition on the
-  # factor group and the kernel. So we provide "hints" to
+  # image group and the kernel. So we provide "hints" to
   # ensure more appropriate recognition methods are applied
   # first.
 
-  # Give hint to factor
+  # Give hint to image
   forfactor(ri).blocks := ri!.blocks;
   Add(forfactor(ri).hints,
       rec( method := FindHomMethodsMatrix.BlockDiagonal,

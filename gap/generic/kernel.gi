@@ -21,7 +21,7 @@ InstallGlobalFunction( FindKernelRandom,
     local i,l,rifac,s,x,y;
     Info(InfoRecog,2,"Creating ",n," random generators for kernel.");
     l := gensN(ri);
-    rifac := RIFac(ri);
+    rifac := ImageRecogNode(ri);
     for i in [1..n] do
         x := RandomElm(ri,"KERNELANDVERIFY",true).el;
         Assert(2, ValidateHomomInput(ri, x));

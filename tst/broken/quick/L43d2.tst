@@ -1,4 +1,4 @@
-# Hits the error message "Error, the recognition described by this info record has failed!"
+# Hits the error message "Error, the recognition described by this recognition node has failed!"
 # See issue #122
 # Move me to ./tst/working when you have fixed me please
 #
