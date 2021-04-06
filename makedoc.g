@@ -47,6 +47,7 @@ AutoDoc(rec(
             "afterrecog.xml",
             "methods.xml",
             "examples.xml",
+            "renaming.xml",
             ],
         ),
 ));
