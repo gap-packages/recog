@@ -357,7 +357,7 @@ end;
 #! <A>G</A> to the action on the moved points of <A>G</A> if
 #! <A>G</A> has any fixed points, and is either known to be primitive or the
 #! ratio of fixed points to moved points exceeds a certain threshold. If <A>G</A>
-#! has fixed points but does not meet either of these criteria, then it returns
+#! has fixed points but is not primitive, then it returns
 #! <K>NotEnoughInformation</K> so that it may be called again at a later time.
 #! In all other cases, it returns <K>NeverApplicable</K>.
 #! <P/>
@@ -374,6 +374,23 @@ end;
 #! the efficient handling of large-base primitive groups by
 #! <Ref Func="LargeBasePrimitive"/>.
 #! @EndChunk
+#
+#  A technical explanation of why we use a threshold for the ratio of fixed
+#  points to moved points, this is technical so it does not go into the manual:
+#  The reason we do not just always discard fixed points is that it also incurs
+#  a cost, so we only try to do it when it seems worthwhile to do so.
+#
+#  Suppose the group G is not known to be primitive. Then we still
+#  apply this method if one of the following two criterion is met:
+#  - the largest moved point of G is three or more times larger than the number
+#    n of actually moved points
+#  - there is a generator of G whose internal storage reserves space for a
+#    number of moved points which is two or more times larger than n. Note that
+#    even for a simple transposition (1,2), for technical reasons it can happen
+#    that GAP internally stores it with the same size as a permutation moving a
+#    million points; this is wasteful, and the second criterion tries to deal
+#    with this.
+
 FindHomMethodsPerm.ThrowAwayFixedPoints := function( ri, G )
       # Check, whether we can throw away fixed points
       local gens,nrStoredPoints,n,largest,isApplicable,o,hom;
