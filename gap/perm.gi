@@ -355,17 +355,17 @@ end;
 #! @BeginChunk ThrowAwayFixedPoints
 #! This method defines a homomorphism of a permutation group
 #! <A>G</A> to the action on the moved points of <A>G</A> if
-#! either <A>G</A> has a lot of fixed points, or if <A>G</A> knows that it is
-#! primitive and has fixed points. If <A>G</A> has fixed points but does not
-#! know whether it is primitive, then it returns <K>NotEnoughInformation</K>
-#! so that it may be called again at a later time.
+#! <A>G</A> has any fixed points, and is either known to be primitive or the
+#! ratio of fixed points to moved points exceeds a certain threshold. If <A>G</A>
+#! has fixed points but does not meet either of these criteria, then it returns
+#! <K>NotEnoughInformation</K> so that it may be called again at a later time.
 #! In all other cases, it returns <K>NeverApplicable</K>.
 #! <P/>
 #!
 #! In the current setup, the
 #! homomorphism is defined if the number <M>n</M> of moved
 #! points is at most <M>1/3</M> of the largest moved point of <A>G</A>,
-#! or  <M>n</M> is at most half of the number of points on which
+#! or <M>n</M> is at most half of the number of points on which
 #! <A>G</A> is stored internally by &GAP;.
 #! <P/>
 #!
