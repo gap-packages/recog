@@ -62,6 +62,15 @@ in fact are installed as methods for projective groups.
 
 </Section>
 
+<Section Label="unusedmethods">
+<Heading>Unused methods</Heading>
+
+The following table gives an overview over the methods which are currently unused.
+
+<#Include SYSTEM "_methods_unused_table.xml">
+
+</Section>
+
 <!-- ############################################################ -->
 
 </Chapter>
