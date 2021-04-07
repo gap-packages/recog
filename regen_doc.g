@@ -36,6 +36,41 @@ else
     fi;
 fi;
 
+ListOfUnusedMethods := function()
+    local unusedMethods, methodRecords, methodRecordsNames, collection,
+        collectionName, i, methodName;
+    unusedMethods := [];
+    methodRecords := [FindHomMethodsGeneric, FindHomMethodsPerm,
+                      FindHomMethodsMatrix, FindHomMethodsProjective];
+    methodRecordsNames := ["FindHomMethodsGeneric", "FindHomMethodsPerm",
+                           "FindHomMethodsMatrix", "FindHomMethodsProjective"];
+    for i in [1..4] do
+        collection := methodRecords[i];
+        collectionName := methodRecordsNames[i];
+        for methodName in RecNames(collection) do
+            if IsEmpty(DbsWhichUseMethod(collection, methodName)) then
+                Add(unusedMethods, [methodName, collectionName]);
+            fi;
+        od;
+    od;
+    return unusedMethods;
+end;
+
+DbsWhichUseMethod := function(methodsRecord, methodName)
+    local result, method, methodDbs, types, db, i;
+    result := [];
+    method := methodsRecord.(methodName);
+    methodDbs := [FindHomDbPerm, FindHomDbMatrix, FindHomDbProjective];
+    types := ["permutation", "matrix", "projective"];
+    for i in [1..3] do
+        db := methodDbs[i];
+        if ForAny(db, x -> x.method = method) then
+            Add(result, types[i]);
+        fi;
+    od;
+    return result;
+end;
+
 GenerateMethodsTableXML := function(shortname, desc, db)
 local xmlfile, meth;
 
@@ -64,8 +99,34 @@ local xmlfile, meth;
 
 end;
 
-GenerateMethodsListXML := function(shortname, desc, db)
-local xmlfile, meth;
+GenerateUnusedMethodsTableXML := function()
+    local xmlfile, meth;
+
+    xmlfile := "doc/_methods_unused_table.xml";
+    xmlfile := OutputTextFile(xmlfile, false);
+    SetPrintFormattingStatus(xmlfile, false);
+
+    PrintTo(xmlfile, "<Table Align=\"|l|l|l|\">\n");
+    AppendTo(xmlfile, "<Caption>Unused group find homomorphism methods</Caption>\n");
+    AppendTo(xmlfile, "<HorLine/>\n");
+
+    for meth in ListOfUnusedMethods() do
+        AppendTo(xmlfile, "<Row>\n");
+        AppendTo(xmlfile, "<Item><C>", meth[1], "</C></Item>\n");
+        AppendTo(xmlfile, "<Item><C>", meth[2], "</C></Item>\n");
+        AppendTo(xmlfile, "<Item><Ref Subsect=\"", meth[1], "\"/></Item>\n");
+        AppendTo(xmlfile, "</Row>\n");
+        AppendTo(xmlfile, "<HorLine/>\n");
+    od;
+
+    AppendTo(xmlfile, "</Table>\n");
+
+    CloseStream(xmlfile);
+
+end;
+
+GenerateMethodsListXML := function(shortname, db)
+    local xmlfile, dbsWhichUseMethod, meth, recognizin;
 
     xmlfile := Concatenation("doc/_methods_", shortname, "_list.xml");
     xmlfile := OutputTextFile(xmlfile, false);
@@ -74,6 +135,17 @@ local xmlfile, meth;
     for meth in Set(RecNames(db)) do
         AppendTo(xmlfile, "<Subsection Label=\"", meth, "\">\n");
         AppendTo(xmlfile, "<Heading><C>", meth, "</C></Heading>\n");
+        # Where is this method used?
+        AppendTo(xmlfile, "This method is ");
+        dbsWhichUseMethod := DbsWhichUseMethod(db, meth);
+        if IsEmpty(dbsWhichUseMethod) then
+            AppendTo(xmlfile, "unused!");
+        else
+            AppendTo(xmlfile, "used for recognizing ",
+                     JoinStringsWithSeparator(dbsWhichUseMethod, ", "),
+                     " groups.");
+        fi;
+        AppendTo(xmlfile, "<P/>\n");
         AppendTo(xmlfile, "<#Include Label=\"", meth, "\">\n");
         AppendTo(xmlfile, "</Subsection>\n");
    od;
@@ -86,7 +158,9 @@ GenerateMethodsTableXML("matrix", "Matrix", FindHomDbMatrix);
 GenerateMethodsTableXML("perm", "Permutation", FindHomDbPerm);
 GenerateMethodsTableXML("proj", "Projective", FindHomDbProjective);
 
-GenerateMethodsListXML("generic", "Generic", FindHomMethodsGeneric);
-GenerateMethodsListXML("matrix", "Matrix", FindHomMethodsMatrix);
-GenerateMethodsListXML("perm", "Permutation", FindHomMethodsPerm);
-GenerateMethodsListXML("proj", "Projective", FindHomMethodsProjective);
+GenerateUnusedMethodsTableXML();
+
+GenerateMethodsListXML("generic", FindHomMethodsGeneric);
+GenerateMethodsListXML("matrix", FindHomMethodsMatrix);
+GenerateMethodsListXML("perm", FindHomMethodsPerm);
+GenerateMethodsListXML("proj", FindHomMethodsProjective);
