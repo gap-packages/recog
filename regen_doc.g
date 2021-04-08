@@ -123,7 +123,7 @@ GenerateUnusedMethodsTableXML := function()
 end;
 
 GenerateMethodsListXML := function(shortname, db)
-    local xmlfile, dbsWhichUseMethod, meth, recognizin;
+    local xmlfile, dbsWhichUseMethod, nrDbsWhichUseMethod, s, meth;
 
     xmlfile := Concatenation("doc/_methods_", shortname, "_list.xml");
     xmlfile := OutputTextFile(xmlfile, false);
@@ -135,12 +135,21 @@ GenerateMethodsListXML := function(shortname, db)
         # Where is this method used?
         AppendTo(xmlfile, "This method is ");
         dbsWhichUseMethod := DbsWhichUseMethod(db, meth);
-        if IsEmpty(dbsWhichUseMethod) then
+        nrDbsWhichUseMethod := Length(dbsWhichUseMethod);
+        if nrDbsWhichUseMethod = 0 then
             AppendTo(xmlfile, "unused!");
         else
-            AppendTo(xmlfile, "used for recognizing ",
-                     JoinStringsWithSeparator(dbsWhichUseMethod, " and "),
-                     " groups.");
+            s := "used for recognizing ";
+            Append(s, JoinStringsWithSeparator(dbsWhichUseMethod{[1 .. nrDbsWhichUseMethod - 1]},
+                                               ", "));
+            if nrDbsWhichUseMethod = 2 then
+                Append(s, " and ");
+            elif nrDbsWhichUseMethod = 3 then
+                Append(s, ", and ");
+            fi;
+            Append(s, dbsWhichUseMethod[nrDbsWhichUseMethod]);
+            Append(s, " groups.");
+            AppendTo(xmlfile, s);
         fi;
         AppendTo(xmlfile, "<P/>\n");
         AppendTo(xmlfile, "<#Include Label=\"", meth, "\">\n");
