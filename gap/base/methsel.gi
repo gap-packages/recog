@@ -21,7 +21,7 @@
 # database with "CallMethods".
 #
 InstallGlobalFunction("AddMethod", function(methodDb, method)
-    local l, pos;
+    local rank, l, pos;
     if not IsSubsetSet(NamesOfComponents(method),
                        ["method", "rank", "stamp"]) then
         ErrorNoReturn("<method> must have components",
@@ -30,6 +30,8 @@ InstallGlobalFunction("AddMethod", function(methodDb, method)
     if not IsBound(method.comment) then
         method.comment := "";
     fi;
+    rank := method.rank;
+    Unbind(method.rank);
     # method.validatesOrAlwaysValidInput for now only stores meta-information.
     # It may be used in the future, see github issue #184.
     if not IsBound(method.validatesOrAlwaysValidInput) then
@@ -37,20 +39,21 @@ InstallGlobalFunction("AddMethod", function(methodDb, method)
              ": validatesOrAlwaysValidInput not bound");
     fi;
     l := Length(methodDb);
-    pos := First([1 .. l], i -> methodDb[i].rank <= method.rank);
+    pos := First([1 .. l], i -> methodDb[i].rank <= rank);
     if pos = fail then
         pos := l + 1;
     fi;
-    Add(methodDb, method, pos);
+    Add(methodDb, rec(method := method, rank := rank), pos);
 end);
 
 
 #
 # A method is described by a record with the following components:
-#  method     : the function itself
 #  rank       : an integer rank
-#  stamp      : a string describing the method uniquely
-#  comment    : an optional comment to describe the method for humans
+#  method     : a record with entries:
+#               method: the function itself
+#               stamp : a string describing the method uniquely
+#               comment: an optional comment to describe the method for humans
 #
 # A database of methods is just a list of such records.
 #
@@ -81,33 +84,33 @@ InstallGlobalFunction( "CallMethods", function(db, tolerancelimit, methargs...)
         i := 1;
         while i <= Length(db) do
             # skip methods which are known to be inapplicableMethods
-            if IsBound(ms.inapplicableMethods.(db[i].stamp)) then
+            if IsBound(ms.inapplicableMethods.(db[i].method.stamp)) then
                 Info(InfoMethSel, 4, "Skipping inapplicableMethods rank ", db[i].rank,
-                     " method \"", db[i].stamp, "\".");
+                     " method \"", db[i].method.stamp, "\".");
                 i := i + 1;
                 continue;
             fi;
 
             # skip methods which signalled a temporary failure at least
             # (tolerance + 1) times.
-            if IsBound(ms.failedMethods.(db[i].stamp)) and
-                ms.failedMethods.(db[i].stamp) > tolerance then
+            if IsBound(ms.failedMethods.(db[i].method.stamp)) and
+                ms.failedMethods.(db[i].method.stamp) > tolerance then
                 Info(InfoMethSel, 4, "Skipping rank ", db[i].rank,
-                     " method \"", db[i].stamp, "\".");
+                     " method \"", db[i].method.stamp, "\".");
                 i := i + 1;
                 continue;
             fi;
 
             # apply the method
             Info(InfoMethSel, 3, "Calling rank ", db[i].rank,
-                     " method \"", db[i].stamp, "\"...");
-            result := CallFuncList(db[i].method,methargs);
+                     " method \"", db[i].method.stamp, "\"...");
+            result := CallFuncList(db[i].method.method,methargs);
 
             # evaluate the result
             if result = NeverApplicable then
                 Info(InfoMethSel, 3, "Finished rank ", db[i].rank,
-                     " method \"", db[i].stamp, "\": NeverApplicable.");
-                ms.inapplicableMethods.(db[i].stamp) := 1;
+                     " method \"", db[i].method.stamp, "\": NeverApplicable.");
+                ms.inapplicableMethods.(db[i].method.stamp) := 1;
                 # method turned out to be inapplicable, but it may have computed
                 # and stored new information -> start all over again
                 # TODO: instead of guessing, add a way for methods to signal
@@ -116,12 +119,12 @@ InstallGlobalFunction( "CallMethods", function(db, tolerancelimit, methargs...)
 
             elif result = TemporaryFailure then
                 Info(InfoMethSel, 2, "Finished rank ", db[i].rank,
-                     " method \"", db[i].stamp, "\": TemporaryFailure.");
-                if IsBound(ms.failedMethods.(db[i].stamp)) then
-                    ms.failedMethods.(db[i].stamp) :=
-                        ms.failedMethods.(db[i].stamp) + 1;
+                     " method \"", db[i].method.stamp, "\": TemporaryFailure.");
+                if IsBound(ms.failedMethods.(db[i].method.stamp)) then
+                    ms.failedMethods.(db[i].method.stamp) :=
+                        ms.failedMethods.(db[i].method.stamp) + 1;
                 else
-                    ms.failedMethods.(db[i].stamp) := 1;
+                    ms.failedMethods.(db[i].method.stamp) := 1;
                 fi;
                 # method failed (for now), but it may have computed
                 # and stored new information -> start all over again
@@ -129,13 +132,13 @@ InstallGlobalFunction( "CallMethods", function(db, tolerancelimit, methargs...)
 
             elif result = NotEnoughInformation then
                 Info(InfoMethSel, 3, "Finished rank ", db[i].rank,
-                     " method \"", db[i].stamp, "\": not currently applicable.");
+                     " method \"", db[i].method.stamp, "\": not currently applicable.");
                 i := i + 1;   # just try the next one
 
             elif result = Success then    # we have a result
                 Info(InfoMethSel, 2, "Finished rank ", db[i].rank,
-                     " method \"", db[i].stamp, "\": success.");
-                ms.successMethod := db[i].stamp;
+                     " method \"", db[i].method.stamp, "\": success.");
+                ms.successMethod := db[i].method.stamp;
                 ms.result := result;
                 ms.tolerance := tolerance;
                 return ms;

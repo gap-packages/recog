@@ -83,9 +83,9 @@ local xmlfile, meth;
     for meth in db do
         AppendTo(xmlfile, "<Row>\n");
         AppendTo(xmlfile, "<Item>", meth.rank, "</Item>\n");
-        AppendTo(xmlfile, "<Item><C>", meth.stamp, "</C></Item>\n");
-        AppendTo(xmlfile, "<Item>", meth.comment, "</Item>\n");
-        AppendTo(xmlfile, "<Item><Ref Subsect=\"", meth.stamp, "\"/></Item>\n");
+        AppendTo(xmlfile, "<Item><C>", meth.method.stamp, "</C></Item>\n");
+        AppendTo(xmlfile, "<Item>", meth.method.comment, "</Item>\n");
+        AppendTo(xmlfile, "<Item><Ref Subsect=\"", meth.method.stamp, "\"/></Item>\n");
         AppendTo(xmlfile, "</Row>\n");
         AppendTo(xmlfile, "<HorLine/>\n");
     od;
