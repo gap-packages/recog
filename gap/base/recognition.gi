@@ -428,6 +428,7 @@ InstallGlobalFunction( RecogniseGeneric,
   function(H, methoddb, depthString, knowledge)
     # Assume all the generators have no memory!
     local N,depth,done,i,l,ll,allmethods,
+          hint,
           proj1,proj2,ri,rifac,riker,s,x,y,z,succ,counter;
 
     depth := Length(depthString);
@@ -451,9 +452,26 @@ InstallGlobalFunction( RecogniseGeneric,
     # Find a possible homomorphism (or recognise this group as leaf)
     allmethods := methoddb;
     if IsBound(knowledge.hints) and Length(knowledge.hints) > 0 then
-        allmethods := Concatenation(knowledge.hints,allmethods);
+        allmethods := ShallowCopy(allmethods);
+        # HACK
+        for hint in knowledge.hints do
+            #Assert(0, IsRecogMethod(hint.method));
+            if IsRecogMethod(hint.method) then
+                Add(allmethods, rec(rank := hint.rank, method := hint.method));
+            else
+                Add(allmethods,
+                    rec(rank := hint.rank,
+                        method := rec(method := hint.method, stamp := hint.stamp)));
+            fi;
+        od;
+        # end HACK
+        #allmethods := Concatenation(knowledge.hints,allmethods);
         SortBy(allmethods, a -> -a.rank);
     fi;
+
+    # verify no rank occurs more than once
+    Assert(0, Length(Set(allmethods, m->m.rank)) = Length(allmethods));
+
     Setfhmethsel(ri, CallMethods( allmethods, 10, ri, H ));
     # TODO: extract the value 10 into a named constant, and / or make it
     #       an option parameter to the func
