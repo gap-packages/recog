@@ -15,6 +15,7 @@
 #############################################################################
 
 ReadPackage("recog","gap/base/hack.g");
+ReadPackage("recog","gap/base/methods.gd");
 ReadPackage("recog","gap/base/methsel.gd");
 ReadPackage("recog","gap/base/recognition.gd");
 

@@ -20,33 +20,40 @@
 # Add a method to a database with "AddMethod" and call a method from a
 # database with "CallMethods".
 #
-InstallGlobalFunction("AddMethod", function(methodDb, method)
-    local l, pos;
-    if not IsSubsetSet(NamesOfComponents(method),
-                       ["method", "rank", "stamp"]) then
-        ErrorNoReturn("<method> must have components",
-                      " method, rank, and stamp");
+InstallGlobalFunction("AddMethod", function(methodDb, args...)
+    local method, rank, comment, l, pos;
+    # HACK to be compatible with "old methods" during switch to RecogMethod
+    # objects.
+    method := args[1];
+    if Length(args) = 1 then
+        rank := method.rank;
+        if not IsBound(method.comment) then
+            comment := "";
+        else
+            comment := method.comment;
+        fi;
+        method := RecogMethod(method.stamp, comment, method.method);
+    elif Length(args) = 2 then
+        rank := args[2];
+    else
+        ErrorNoReturn("wrong nr arguments");
     fi;
-    if not IsBound(method.comment) then
-        method.comment := "";
+    # end of HACK
+    if not IsRecogMethod(method) then
+        ErrorNoReturn("<method> must be a RecogMethod");
     fi;
     l := Length(methodDb);
-    pos := First([1 .. l], i -> methodDb[i].rank <= method.rank);
+    pos := First([1 .. l], i -> methodDb[i].rank <= rank);
     if pos = fail then
         pos := l + 1;
     fi;
-    Add(methodDb, method, pos);
+    Add(methodDb, rec(method := method, rank := rank), pos);
 end);
 
 
-#
-# A method is described by a record with the following components:
-#  method     : the function itself
-#  rank       : an integer rank
-#  stamp      : a string describing the method uniquely
-#  comment    : an optional comment to describe the method for humans
-#
-# A database of methods is just a list of such records.
+# A database of methods a list of records with components:
+#  method     : a RecogMethod object
+#  rank       : the rank of the method in this particular database
 #
 # Data for the method selection process is collected in another record
 # with the following components:
@@ -75,33 +82,33 @@ InstallGlobalFunction( "CallMethods", function(db, tolerancelimit, methargs...)
         i := 1;
         while i <= Length(db) do
             # skip methods which are known to be inapplicableMethods
-            if IsBound(ms.inapplicableMethods.(db[i].stamp)) then
+            if IsBound(ms.inapplicableMethods.(Stamp(db[i].method))) then
                 Info(InfoMethSel, 4, "Skipping inapplicableMethods rank ", db[i].rank,
-                     " method \"", db[i].stamp, "\".");
+                     " method \"", Stamp(db[i].method), "\".");
                 i := i + 1;
                 continue;
             fi;
 
             # skip methods which signalled a temporary failure at least
             # (tolerance + 1) times.
-            if IsBound(ms.failedMethods.(db[i].stamp)) and
-                ms.failedMethods.(db[i].stamp) > tolerance then
+            if IsBound(ms.failedMethods.(Stamp(db[i].method))) and
+                ms.failedMethods.(Stamp(db[i].method)) > tolerance then
                 Info(InfoMethSel, 4, "Skipping rank ", db[i].rank,
-                     " method \"", db[i].stamp, "\".");
+                     " method \"", Stamp(db[i].method), "\".");
                 i := i + 1;
                 continue;
             fi;
 
             # apply the method
             Info(InfoMethSel, 3, "Calling rank ", db[i].rank,
-                     " method \"", db[i].stamp, "\"...");
-            result := CallFuncList(db[i].method,methargs);
+                     " method \"", Stamp(db[i].method), "\"...");
+            result := CallRecogMethod(db[i].method, methargs);
 
             # evaluate the result
             if result = NeverApplicable then
                 Info(InfoMethSel, 3, "Finished rank ", db[i].rank,
-                     " method \"", db[i].stamp, "\": NeverApplicable.");
-                ms.inapplicableMethods.(db[i].stamp) := 1;
+                     " method \"", Stamp(db[i].method), "\": NeverApplicable.");
+                ms.inapplicableMethods.(Stamp(db[i].method)) := 1;
                 # method turned out to be inapplicable, but it may have computed
                 # and stored new information -> start all over again
                 # TODO: instead of guessing, add a way for methods to signal
@@ -110,12 +117,12 @@ InstallGlobalFunction( "CallMethods", function(db, tolerancelimit, methargs...)
 
             elif result = TemporaryFailure then
                 Info(InfoMethSel, 2, "Finished rank ", db[i].rank,
-                     " method \"", db[i].stamp, "\": TemporaryFailure.");
-                if IsBound(ms.failedMethods.(db[i].stamp)) then
-                    ms.failedMethods.(db[i].stamp) :=
-                        ms.failedMethods.(db[i].stamp) + 1;
+                     " method \"", Stamp(db[i].method), "\": TemporaryFailure.");
+                if IsBound(ms.failedMethods.(Stamp(db[i].method))) then
+                    ms.failedMethods.(Stamp(db[i].method)) :=
+                        ms.failedMethods.(Stamp(db[i].method)) + 1;
                 else
-                    ms.failedMethods.(db[i].stamp) := 1;
+                    ms.failedMethods.(Stamp(db[i].method)) := 1;
                 fi;
                 # method failed (for now), but it may have computed
                 # and stored new information -> start all over again
@@ -123,13 +130,13 @@ InstallGlobalFunction( "CallMethods", function(db, tolerancelimit, methargs...)
 
             elif result = NotEnoughInformation then
                 Info(InfoMethSel, 3, "Finished rank ", db[i].rank,
-                     " method \"", db[i].stamp, "\": not currently applicable.");
+                     " method \"", Stamp(db[i].method), "\": not currently applicable.");
                 i := i + 1;   # just try the next one
 
             elif result = Success then    # we have a result
                 Info(InfoMethSel, 2, "Finished rank ", db[i].rank,
-                     " method \"", db[i].stamp, "\": success.");
-                ms.successMethod := db[i].stamp;
+                     " method \"", Stamp(db[i].method), "\": success.");
+                ms.successMethod := Stamp(db[i].method);
                 ms.result := result;
                 ms.tolerance := tolerance;
                 return ms;
