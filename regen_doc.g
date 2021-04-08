@@ -36,17 +36,29 @@ else
     fi;
 fi;
 
+DbsWhichUseMethod := function(methodsRecord, methodName)
+    local result, method, methodDbs, types, db, i;
+    result := [];
+    method := methodsRecord.(methodName);
+    methodDbs := [FindHomDbPerm, FindHomDbMatrix, FindHomDbProjective];
+    types := ["permutation", "matrix", "projective"];
+    for i in [1..Length(methodDbs)] do
+        db := methodDbs[i];
+        if ForAny(db, x -> x.method = method) then
+            Add(result, types[i]);
+        fi;
+    od;
+    return result;
+end;
+
 ListOfUnusedMethods := function()
     local unusedMethods, methodRecords, methodRecordsNames, collection,
         collectionName, i, methodName;
     unusedMethods := [];
-    methodRecords := [FindHomMethodsGeneric, FindHomMethodsPerm,
-                      FindHomMethodsMatrix, FindHomMethodsProjective];
     methodRecordsNames := ["FindHomMethodsGeneric", "FindHomMethodsPerm",
                            "FindHomMethodsMatrix", "FindHomMethodsProjective"];
-    for i in [1..4] do
-        collection := methodRecords[i];
-        collectionName := methodRecordsNames[i];
+    for collectionName in methodRecordsNames do
+        collection := ValueGlobal(collectionName);
         for methodName in RecNames(collection) do
             if IsEmpty(DbsWhichUseMethod(collection, methodName)) then
                 Add(unusedMethods, [methodName, collectionName]);
@@ -54,21 +66,6 @@ ListOfUnusedMethods := function()
         od;
     od;
     return unusedMethods;
-end;
-
-DbsWhichUseMethod := function(methodsRecord, methodName)
-    local result, method, methodDbs, types, db, i;
-    result := [];
-    method := methodsRecord.(methodName);
-    methodDbs := [FindHomDbPerm, FindHomDbMatrix, FindHomDbProjective];
-    types := ["permutation", "matrix", "projective"];
-    for i in [1..3] do
-        db := methodDbs[i];
-        if ForAny(db, x -> x.method = method) then
-            Add(result, types[i]);
-        fi;
-    od;
-    return result;
 end;
 
 GenerateMethodsTableXML := function(shortname, desc, db)
@@ -142,7 +139,7 @@ GenerateMethodsListXML := function(shortname, db)
             AppendTo(xmlfile, "unused!");
         else
             AppendTo(xmlfile, "used for recognizing ",
-                     JoinStringsWithSeparator(dbsWhichUseMethod, ", "),
+                     JoinStringsWithSeparator(dbsWhichUseMethod, " and "),
                      " groups.");
         fi;
         AppendTo(xmlfile, "<P/>\n");
