@@ -294,15 +294,7 @@ end;
 # The method installations:
 
 #! @BeginCode AddMethod_Projective_FindHomMethodsGeneric.TrivialGroup
-AddMethod(
-    FindHomDbProjective,
-    rec(
-        method := FindHomMethodsGeneric.TrivialGroup,
-        rank := 3000,
-        stamp := "TrivialGroup",
-        comment := "check if all generators are scalar multiples of the identity matrix",
-    )
-);
+AddMethod(FindHomDbProjective, FindHomMethodsGeneric.TrivialGroup, 3000);
 #! @EndCode
 
 AddMethod(

@@ -457,15 +457,7 @@ FindHomMethodsPerm.Pcgs :=
 
 # The following commands install the above methods into the database:
 #! @BeginCode AddMethod_Perm_FindHomMethodsGeneric.TrivialGroup
-AddMethod(
-    FindHomDbPerm,
-    rec(
-        method := FindHomMethodsGeneric.TrivialGroup,
-        rank := 300,
-        stamp := "TrivialGroup",
-        comment := "just go through generators and compare to the identity",
-    )
-);
+AddMethod(FindHomDbPerm, FindHomMethodsGeneric.TrivialGroup, 300);
 #! @EndCode
 
 AddMethod(

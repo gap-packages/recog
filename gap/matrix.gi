@@ -904,15 +904,7 @@ end;
 #end;
 
 #! @BeginCode AddMethod_Matrix_FindHomMethodsGeneric.TrivialGroup
-AddMethod(
-    FindHomDbMatrix,
-    rec(
-        method := FindHomMethodsGeneric.TrivialGroup,
-        rank := 3100,
-        stamp := "TrivialGroup",
-        comment := "check whether all generators are equal to the identity matrix",
-    )
-);
+AddMethod(FindHomDbMatrix, FindHomMethodsGeneric.TrivialGroup, 3100);
 #! @EndCode
 
 AddMethod(

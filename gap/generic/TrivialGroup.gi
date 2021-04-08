@@ -30,7 +30,9 @@ end;
 #! take this case into account in the other methods.
 #! @EndChunk
 #! @BeginCode FindHomMethodsGeneric.TrivialGroup
-FindHomMethodsGeneric.TrivialGroup := function(ri, G)
+FindHomMethodsGeneric.TrivialGroup := RecogMethod("TrivialGroup",
+"go through generators and compare to the identity",
+function(ri, G)
   local gens;
   # get the generators of the group
   gens := GeneratorsOfGroup(G);
@@ -58,5 +60,5 @@ FindHomMethodsGeneric.TrivialGroup := function(ri, G)
   # We have reached a leaf node.
   SetFilterObj(ri, IsLeaf);
   return Success;
-end;
+end);
 #! @EndCode
