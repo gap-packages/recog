@@ -688,6 +688,7 @@ RECOG.ConstructSnAnIsomorphism := function(ri, n, stdGensAnWithMemory)
     grp := GroupWithMemory(Grp(ri));
     stdGensAn := StripMemory(stdGensAnWithMemory);
     xis := RECOG.ConstructXiAn(n, stdGensAn[1], stdGensAn[2]);
+    foundOddPermutation := false;
     for g in GeneratorsOfGroup(grp) do
         gImage := RECOG.FindImageAn(ri, n, StripMemory(g),
                                     stdGensAn[1], stdGensAn[2],
