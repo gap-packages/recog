@@ -96,7 +96,6 @@ gap> nonAltOrSymGroups := [
 >     #Omega(0, 5, 5),
 > ];;
 
-# FIXME: This is super slow.
 # ThreeCycleCandidates
 gap> for i in [1 .. Length(degrees)] do
 >     testFunction(altGroups[i], 1/100, degrees[i]);
