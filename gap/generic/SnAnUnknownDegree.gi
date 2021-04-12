@@ -742,6 +742,9 @@ end;
 
 # This method is an implementation of <Cite Key="JLNP13"/>. It is the main
 # function of SnAnUnknownDegree.
+# Note that it currently only works for 11 <= <A>n</A>. To make it work with
+# smaller <A>n</A>, we need to include fixes from Jonathan Conder's B.Sc.
+# Thesis "Algorithms for Permutation Groups".
 #
 # From <Cite Key="JLNP13" Where="Theorem 1.1"/>:
 # RECOG.RecogniseSnAn is a one-sided Monte-Carlo algorithm with the following
