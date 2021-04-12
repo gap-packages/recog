@@ -13,7 +13,8 @@
 ##
 ##
 ##  This file provides code for recognising whether a permutation group
-##  is isomorphic to an alternating or symmetric group. It implements [JLNP13].
+##  is isomorphic to an alternating or symmetric group. It implements
+##  <Cite Key="JLNP13"/>.
 ##
 #############################################################################
 #
@@ -130,9 +131,9 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
             r := RandomElm(ri, "SnAnUnknownDegree", true)!.el;
             tPower := r ^ M;
             # Invariant: tPower = (r ^ M) ^ (2 ^ a)
-            # We make a small improvement to the version described in the
-            # algorithm. The order of r ^ M is a 2-power. It can be at most
-            # 2 ^ logInt2N. Thus, if we find an r such that
+            # We make a small improvement to the version described in
+            # <Cite Key="JLNP13"/>. The order of r ^ M is a 2-power.
+            # It can be at most 2 ^ logInt2N. Thus, if we find an r such that
             # (r ^ M) ^ (2 & logInt2N) is non-trivial, then we can return
             # NeverApplicable.
             for a in [1 .. logInt2N] do
