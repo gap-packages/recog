@@ -1,7 +1,7 @@
 #@local testFunction, IsBolsteringElement, degrees
 #@local altGroups, symGroups, permMatGroup, altMatGroups, nonAltOrSymGroups
 #@local ri, g, c, r, i, x, slp
-#@local sets, S11On2Sets, res, isoData, gens, g1, img1, g2, img2
+#@local S11On2Sets, d, sets, SdOn2Sets, success, res, isoData, gens, g1, img1, g2, img2
 #
 # testing matrix:
 # - isomorphic: yes, no
@@ -232,15 +232,27 @@ gap> CycleStructurePerm(img2);
 [ 1 ]
 
 # FindHomMethodsGeneric.SnAnUnknownDegree
-gap> sets := Combinations([1 .. 11], 2);;
-gap> S11On2Sets := Action(SymmetricGroup(11), sets, OnSets);;
-gap> ri := EmptyRecognitionInfoRecord(rec(), S11On2Sets, false);;
-gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri);
-true
-gap> Size(ri);
-39916800
-gap> Size(SymmetricGroup(11));
-39916800
+# Sn
+gap> for d in [11 .. 15] do
+> sets := Combinations([1 .. d], 2);;
+> SdOn2Sets := Action(SymmetricGroup(d), sets, OnSets);;
+> ri := EmptyRecognitionInfoRecord(rec(), SdOn2Sets, false);;
+> success := FindHomMethodsGeneric.SnAnUnknownDegree(ri);
+> if not success or not Size(ri) = Factorial(d) then
+>   Print("wrong result! degree ", d, "\n");
+> fi;
+> od;
+
+# An
+gap> for d in [11 .. 15] do
+> sets := Combinations([1 .. d], 2);;
+> SdOn2Sets := Action(AlternatingGroup(d), sets, OnSets);;
+> ri := EmptyRecognitionInfoRecord(rec(), SdOn2Sets, false);;
+> success := FindHomMethodsGeneric.SnAnUnknownDegree(ri);
+> if not success or not Size(ri) = Factorial(d)/2 then
+>   Print("wrong result! degree ", d, "\n");
+> fi;
+> od;
 
 # Check Slp function
 gap> ri := EmptyRecognitionInfoRecord(rec(), S11On2Sets, false);;
