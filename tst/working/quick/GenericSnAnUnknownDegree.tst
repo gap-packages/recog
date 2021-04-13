@@ -2,6 +2,18 @@
 #@local altGroups, symGroups, permMatGroup, altMatGroups, nonAltOrSymGroups
 #@local ri, g, c, r, i, x, slp
 #@local S11On2Sets, d, sets, SdOn2Sets, success, res, isoData, gens, g1, img1, g2, img2
+#@local SymOn2Sets, AltOn2Sets
+#
+# Hack to insert the method
+gap> AddMethod(FindHomDbPerm,
+>     rec(
+>         method := FindHomMethodsGeneric.SnAnUnknownDegree,
+>         rank := 58,
+>         stamp := "SnAnUnknownDegreeHack",
+>         comment := "HACK",
+>     )
+> );;
+
 #
 # testing matrix:
 # - isomorphic: yes, no
@@ -67,16 +79,29 @@ gap> IsBolsteringElement :=
 >     if ForAny(dist, k -> k < 2) then return false; fi;
 >     return true;
 > end;;
-gap> degrees := Concatenation(
->     [10, 12, 20, 21, 30, 35, 40, 42, 50, 51],
->     Primes{[5 .. 15]}
-> );;
-gap> degrees := degrees{[1, 2, 11, 12]};;
+gap> degrees := [11, 12, 13, 20, 21, 30, 35, 40, 42, 50, 51];;
 
 # TODO: more non-isomorphic examples
 # TODO: add projective groups
-gap> altGroups := List(degrees, AlternatingGroup);;
-gap> symGroups := List(degrees, SymmetricGroup);;
+#
+# SymmetricGroup action on 2-sets
+gap> SymOn2Sets := function(d)
+>     local sets;
+>     sets := Combinations([1 .. d], 2);;
+>     return Action(SymmetricGroup(d), sets, OnSets);;
+> end;;
+
+#
+# AlternatingGroup action on 2-sets
+gap> AltOn2Sets := function(d)
+>     local sets;
+>     sets := Combinations([1 .. d], 2);;
+>     return Action(AlternatingGroup(d), sets, OnSets);;
+> end;;
+
+#
+gap> altGroups := List(degrees, AltOn2Sets);;
+gap> symGroups := List(degrees, SymOn2Sets);;
 gap> permMatGroup := G -> Group(List(
 >     GeneratorsOfGroup(G),
 >     x -> ImmutableMatrix(7, PermutationMat(x, NrMovedPoints(G), GF(7)))
@@ -96,16 +121,16 @@ gap> nonAltOrSymGroups := [
 >     #Omega(0, 5, 5),
 > ];;
 
-# ThreeCycleCandidates
+# Test
 gap> for i in [1 .. Length(degrees)] do
->     testFunction(altGroups[i], 1/100, degrees[i]);
->     testFunction(symGroups[i], 1/100, degrees[i]);
+>     RECOG.TestGroup(altGroups[i], false, Factorial(degrees[i])/2);
+>     RECOG.TestGroup(symGroups[i], false, Factorial(degrees[i]));
 > od;
 gap> for i in [1 .. Length(altMatGroups)] do
->     testFunction(altMatGroups[i], 1/100, 13);
+>     RECOG.TestGroup(altMatGroups[i], false, Size(altMatGroups[i]));
 > od;
 gap> for i in [1 .. Length(nonAltOrSymGroups)] do
->     testFunction(nonAltOrSymGroups[i], 1/100, 15);
+>     RECOG.TestGroup(nonAltOrSymGroups[i], false, Size(nonAltOrSymGroups[i]));
 > od;
 
 # RECOG.IsFixedPoint
@@ -217,7 +242,7 @@ gap> RECOG.BuildCycle(ri, c, x, 10);
 gap> sets := Combinations([1 .. 11], 2);;
 gap> S11On2Sets := Action(SymmetricGroup(11), sets, OnSets);;
 gap> ri := EmptyRecognitionInfoRecord(rec(), S11On2Sets, false);;
-gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri);;
+gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri, S11On2Sets);;
 gap> isoData := ri!.SnAnUnknownDegreeIsoData;;
 gap> gens := GeneratorsOfGroup(S11On2Sets);;
 gap> g1 := gens[1];;
@@ -237,7 +262,7 @@ gap> for d in [11 .. 15] do
 > sets := Combinations([1 .. d], 2);;
 > SdOn2Sets := Action(SymmetricGroup(d), sets, OnSets);;
 > ri := EmptyRecognitionInfoRecord(rec(), SdOn2Sets, false);;
-> success := FindHomMethodsGeneric.SnAnUnknownDegree(ri);
+> success := FindHomMethodsGeneric.SnAnUnknownDegree(ri, SdOn2Sets);
 > if not success or not Size(ri) = Factorial(d) then
 >   Print("wrong result! degree ", d, "\n");
 > fi;
@@ -248,7 +273,7 @@ gap> for d in [11 .. 15] do
 > sets := Combinations([1 .. d], 2);;
 > SdOn2Sets := Action(AlternatingGroup(d), sets, OnSets);;
 > ri := EmptyRecognitionInfoRecord(rec(), SdOn2Sets, false);;
-> success := FindHomMethodsGeneric.SnAnUnknownDegree(ri);
+> success := FindHomMethodsGeneric.SnAnUnknownDegree(ri, SdOn2Sets);
 > if not success or not Size(ri) = Factorial(d)/2 then
 >   Print("wrong result! degree ", d, "\n");
 > fi;
@@ -256,9 +281,14 @@ gap> for d in [11 .. 15] do
 
 # Check Slp function
 gap> ri := EmptyRecognitionInfoRecord(rec(), S11On2Sets, false);;
-gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri);
+gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri, S11On2Sets);
 true
 gap> x := PseudoRandom(Grp(ri));;
 gap> slp := SLPforElement(ri, x);;
 gap> x = ResultOfStraightLineProgram(slp, NiceGens(ri));
 true
+
+#
+# Remove Hacky injection of our method
+gap> Remove(FindHomDbPerm,
+>       PositionProperty(FindHomDbPerm, x -> x.stamp = "SnAnUnknownDegreeHack"));;

@@ -755,7 +755,7 @@ end;
 # probability at least 1 - <A>eps</A> the degree <A>n</A> and an
 # isomorphism from <A>G</A> to An or Sn.
 RECOG.RecogniseSnAn := function(ri, eps, N)
-    local T, foundPreImagesOfStdGens, constants, iterator, c, tmp, isoData, i;
+    local T, foundPreImagesOfStdGens, constants, iterator, c, tmp, recogData, i;
     T := Int(Ceil(Log2(1 / Float(eps))));
     foundPreImagesOfStdGens := false;
     constants := RECOG.ThreeCycleCandidatesConstants(1. / 4., N);
@@ -779,9 +779,9 @@ RECOG.RecogniseSnAn := function(ri, eps, N)
             fi;
             # Now tmp contains [g, c, n] where
             #   g, c correspond to standard generators of An
-            isoData := RECOG.ConstructSnAnIsomorphism(ri, tmp[3], tmp{[1,2]});
-            if isoData = fail then continue; fi;
-            return isoData;
+            recogData := RECOG.ConstructSnAnIsomorphism(ri, tmp[3], tmp{[1,2]});
+            if recogData = fail then continue; fi;
+            return recogData;
         od;
     od;
     return TemporaryFailure;
@@ -797,9 +797,9 @@ end;
 #! not a giant (a giant is Sn or An in natural action).
 #!
 #! @EndChunk
-FindHomMethodsGeneric.SnAnUnknownDegree := function(ri)
-    local G, eps, N, p, d, recogData, isoData, degree, swapSLP;
-    G := Grp(ri);
+FindHomMethodsGeneric.SnAnUnknownDegree := function(ri, G)
+    local eps, N, p, d, recogData, isoData, degree, swapSLP;
+    #G := Grp(ri);
     # TODO find value for eps
     eps := 1 / 10^2;
     # Check magma
@@ -865,8 +865,8 @@ FindHomMethodsGeneric.SnAnUnknownDegree := function(ri)
     SetNiceGens(ri, Reversed(isoData[1]));
     swapSLP := StraightLineProgram([[[2, 1], [1, 1]]], 2);
     Setslptonice(ri,
-                 CompositionOfStraightLinePrograms(recogData.slpToStdGens,
-                                                   swapSLP));
+                 CompositionOfStraightLinePrograms(swapSLP,
+                                                   recogData.slpToStdGens));
     if recogData.type = "Sn" then
         Setslpforelement(ri, SLPforElementFuncsGeneric.SnUnknownDegree);
     else
