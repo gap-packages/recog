@@ -76,6 +76,10 @@ group.
 - TODO: also explain how verification works
 - TODO: we need something that demonstrates the other two return values (Oh yes, good point.)
 
+@Section Elements with memory
+
+When using the memory of group elements, one currently has to always access ri!.gensHmem instead of doing `GroupWithMemory(Grp(ri))`.
+Namely, many functions for objects with memory assume that, if the elements live in the same group, then their `!.slp` components are identical.
 
 @Section Splitting methods
 
