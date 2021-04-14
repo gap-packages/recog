@@ -683,13 +683,12 @@ end;
 #
 # TODO: Image Computation requires n >= 11.
 RECOG.ConstructSnAnIsomorphism := function(ri, n, stdGensAnWithMemory)
-    local grp, stdGensAn, xis, gImage, foundOddPermutation, slp, eval,
+    local stdGensAn, xis, gImage, foundOddPermutation, slp, eval,
         hWithMemory, bWithMemory, stdGensSnWithMemory, b, h, g;
-    grp := GroupWithMemory(Grp(ri));
     stdGensAn := StripMemory(stdGensAnWithMemory);
     xis := RECOG.ConstructXiAn(n, stdGensAn[1], stdGensAn[2]);
     foundOddPermutation := false;
-    for g in GeneratorsOfGroup(grp) do
+    for g in ri!.gensHmem do
         gImage := RECOG.FindImageAn(ri, n, StripMemory(g),
                                     stdGensAn[1], stdGensAn[2],
                                     xis[1], xis[2]);
@@ -727,7 +726,7 @@ RECOG.ConstructSnAnIsomorphism := function(ri, n, stdGensAnWithMemory)
         return fail;
     fi;
     xis := RECOG.ConstructXiSn(n, b, h);
-    for g in GeneratorsOfGroup(grp) do
+    for g in ri!.gensHmem do
         gImage := RECOG.FindImageSn(ri, n, StripMemory(g),
                                     b, h,
                                     xis[1], xis[2]);
