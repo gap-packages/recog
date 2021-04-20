@@ -103,3 +103,30 @@ RECOG.CheckFingerPrint := function(fp,orders)
     count := Number(orders,o->o in fp.freqorders);
     return RECOG.BinomialTab[Length(orders)][count+1]/2^(Length(orders));
 end;
+
+# Helper function to compute all primes up to a given integer via a prime sieve
+RECOG.PrimesCache := ShallowCopy(Primes); # all primes < 1000
+RECOG.PrimesCacheUpperBound := 1000;
+RECOG.CachePrimesUpTo := function(n)
+    local i, j, sieve;
+    if RECOG.PrimesCacheUpperBound >= n then return; fi;
+    sieve := BlistList([1..n], [1..n]);
+    sieve[1] := false;
+    for i in [2..Int(n/2)] do
+        sieve[i*2] := false;
+    od;
+    i := 3;
+    while i * i <= n do
+        if sieve[i] then
+            j := 3*i;
+            while j <= n do
+                sieve[j] := false;
+                j := j + 2*i;
+            od;
+        fi;
+        i := i + 2;
+    od;
+    RECOG.PrimesCache := ListBlist([1..n], sieve);
+    RECOG.PrimesCacheUpperBound := n;
+end;
+
