@@ -18,43 +18,18 @@
 ##
 #############################################################################
 #
-# FIXME: Move me into GAP
-# Helper function to compute all primes up to a given integer via a prime sieve
-RECOG.AllPrimesUpTo := function(n)
-    local i, j, sieve, result;
-    if n <= 1000 then
-      return Primes{[1..PositionSorted(Primes, n+1)-1]};
-    fi;
-    sieve := BlistList([1..n], [1..n]);
-    sieve[1] := false;
-    for i in [2..Int(n/2)] do
-        sieve[i*2] := false;
-    od;
-    i := 3;
-    while i * i <= n do
-        if sieve[i] then
-            j := 3*i;
-            while j <= n do
-                sieve[j] := false;
-                j := j + 2*i;
-            od;
-        fi;
-        i := i + 2;
-    od;
-    return ListBlist([1..n], sieve);
-end;
-
 # eps : real number, the error bound
 # N : integer, upper bound for the degree of G
 #
 # Returns a record of constants used in ThreeCyclesCanditatesIterator.
 RECOG.ThreeCycleCandidatesConstants := function(eps, N)
-    local M, allPrimes, i, p;
+    local M, p;
     # Constants
     M := 1;
-    allPrimes := RECOG.AllPrimesUpTo(N);
-    for i in [2 .. Length(allPrimes)] do
-        p := allPrimes[i];
+    RECOG.CachePrimesUpTo(N);
+    for p in RECOG.PrimesCache do
+        if p = 2 then continue; fi;
+        if p > N then break; fi;
         M := M * p ^ LogInt(N, p);
     od;
     return rec(
