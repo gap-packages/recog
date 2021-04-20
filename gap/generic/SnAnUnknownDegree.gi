@@ -134,7 +134,7 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
             # We make a small improvement to the version described in
             # <Cite Key="JLNP13"/>. The order of r ^ M is a 2-power.
             # It can be at most 2 ^ logInt2N. Thus, if we find an r such that
-            # (r ^ M) ^ (2 & logInt2N) is non-trivial, then we can return
+            # (r ^ M) ^ (2 ^ logInt2N) is non-trivial, then we can return
             # NeverApplicable.
             for a in [1 .. logInt2N] do
                 tPowerOld := tPower;
@@ -742,9 +742,9 @@ end;
 
 # This method is an implementation of <Cite Key="JLNP13"/>. It is the main
 # function of SnAnUnknownDegree.
-# Note that it currently only works for 11 <= <A>n</A>. To make it work with
-# smaller <A>n</A>, we need to include fixes from Jonathan Conder's B.Sc.
-# Thesis "Algorithms for Permutation Groups".
+# Note that it currently only works for 11 <= <A>n</A>. TODO: make it work with
+# smaller <A>n</A>, that is include fixes from Jonathan Conder's B.Sc.
+# Thesis "Algorithms for Permutation Groups", see PR #265.
 #
 # From <Cite Key="JLNP13" Where="Theorem 1.1"/>:
 # RECOG.RecogniseSnAn is a one-sided Monte-Carlo algorithm with the following
@@ -821,7 +821,8 @@ FindHomMethodsGeneric.SnAnUnknownDegree := function(ri, G)
             # Assume N >= 9 and use the comment above to compute N. If we
             # arrive at a value < 9 for N, then we must have been in the case N
             # < 9.
-            # TODO: do we want to use the table for the other cases?
+            # TODO: The table in [KL90], Proposition 5.3.7. has more detailed
+            # values for 5 <= n < 9. Do we want to use that?
             N := Maximum(8, d + 2);
         else
             # If n >= 10, then the smallest irreducible An-module is the
