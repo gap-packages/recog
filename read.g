@@ -25,7 +25,7 @@ ReadPackage("recog","gap/base/projective.gi");
 
 
 # Some tools:
-ReadPackage("recog","gap/tools.gi");
+ReadPackage("recog","gap/utils.gi");
 
 # generic
 ReadPackage("recog","gap/generic/kernel.gi");
