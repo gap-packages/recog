@@ -112,270 +112,6 @@ SatisfiesAnPresentation := function( n, s, t )
 end;
 
 
-# NiceGeneratorsSnAn := function ( n, grp, N )
-#
-#     local AddStack, g1, g2, g3, g4, g, h, a, b, c, t, i, k, l,
-#           delta, elfound, m, x, y;
-#
-#     # we put the elements that we look for on stacks
-#     AddStack := function( stk, e )
-#         if Length(stk) = 0 then
-#             stk[1] := e;
-#         elif Length(stk) = 1 then
-#             stk[2] := e;
-#         else
-#             stk[1] := stk[2];
-#             stk[2] := e;
-#         fi;
-#     end;
-#
-#     elfound := [false, false, false, false];
-#
-#     delta := 1 - (n mod 2);
-#
-#     l := One(grp);
-#
-#     m := n mod 6;
-#     if m = 0 then k := 5;
-#     elif m = 1 then k := 6;
-#     elif m = 2 or m = 4 then k := 3;
-#     elif m = 3 or m = 5 then k := 4;
-#     fi;
-#
-#     g1 := [];   # $n$-cycles
-#     g2 := [];   # transpositions
-#     g3 := [];   # $n$ or $n-1$-cycles
-#     g4 := [];   # 3-cycles
-#
-#     while N > 0 do
-#         N := N - 1;
-#         t := PseudoRandom(grp);
-#
-#         # use this random element to check the transpositions
-#         for a in g2 do
-#             x := a * a^t;
-#             if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and
-#                not(RecSnAnIsOne(x^3)) then
-#                 # a is not a transposition
-#                 Info( InfoRecSnAn, 2, "a is not a transposition");
-#                 RemoveElmList(g2,Position(g2,a));
-#                 if Length(g2) = 0 then elfound[2] := false; fi;
-#             fi;
-#         od;
-#
-#         # use this random element to check the 3-cycle
-#         for a in g4 do
-#             x := a * a^t;
-#             if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and
-#                not(RecSnAnIsOne(x^3)) and not(RecSnAnIsOne(x^5)) then
-#                 # a is not a 3-cycle
-#                 Info( InfoRecSnAn, 2, "a is not a 3-cycle");
-#                 RemoveElmList(g4,Position(g4,a));
-#                 if Length(g4) =  0 then elfound[4] := false; fi;
-#             fi;
-#         od;
-#
-#         if not(RecSnAnIsOne(t)) and RecSnAnIsOne(t^n) then
-#             # we hope we found an n-cycle
-#             AddStack(g1,t);
-#             elfound[1] := true;
-#             Info( InfoRecSnAn, 2, "found n-cycle");
-#             if delta = 0 then
-#                 elfound[3] := true;
-#                 AddStack(g3,t);
-#             fi;
-#         fi;
-#
-#         b := t^(n-2-delta);
-#         if not(RecSnAnIsOne(b)) and RecSnAnIsOne(b^2) then
-#             # we hope we found a 2(n-2)-cycle
-#             AddStack(g2,b);
-#             elfound[2] := true;
-#             Info( InfoRecSnAn, 2, "found transposition");
-#         fi;
-#
-#         if delta = 1 and not(RecSnAnIsOne(t))  and RecSnAnIsOne(t^(n-1)) then
-#             # we hope we found an n or (n-1)-cycle
-#             AddStack(g3,t);
-#             elfound[3] := true;
-#             Info( InfoRecSnAn, 2, "found (n-1)-cycle");
-#         fi;
-#
-#         b := t^(n-k);
-#         if not(RecSnAnIsOne(b)) and RecSnAnIsOne(b^3) then
-#             # we hope we found a 3(n-k)-element
-#             AddStack(g4,b);
-#             elfound[4] := true;
-#             Info( InfoRecSnAn, 2, "found 3-cycle");
-#         fi;
-#
-#         # if we have an n-cycle and a transposition, test for Sn
-#         if elfound[1] and elfound[2] then
-#             # hopefully $g2\lambda$ is a transposition
-#             for a in g2 do  # choose a transposition
-#                 i := n-1;
-#                 while N>0 and i>0 do # take up to n-1 conjugates,
-#                                      # check if they match some n-cycle
-#                     i := i-1;
-#                     h := a^PseudoRandom(grp);
-#                     # use this opportunity again to check that
-#                     # a really is a transposition
-#                     x := a*h;
-#                     if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and
-#                        not(RecSnAnIsOne(x^3)) then
-#                         # a is not a transposition
-#                         Info(InfoRecSnAn,2,"a is not a transposition");
-#                         RemoveElmList(g2,Position(g2,a));
-#                         if Length(g2) = 0 then elfound[2] := false; fi;
-#                         i := 0;
-#                     else
-#                         for b in g1 do
-#                           y := Comm(h, h^b);
-#                           if not(RecSnAnIsOne(y)) and
-#                              not(RecSnAnIsOne(y^2)) and RecSnAnIsOne(y^3) then
-#                             Info(InfoRecSnAn,1,"found good transposition");
-#                             if SatisfiesSnPresentation( n, b, h ) then
-#                               Info( InfoRecSnAn, 1,
-#                                 "Group satisfies presentation for Sn ",N);
-#                               return [ b, h, "Sn" ];
-#                             else
-#                               RemoveElmList(g1,Position(g1,b));
-#                               if Length(g1)=0 then elfound[1]:=false;fi;
-#                             fi;
-#                           fi;
-#                         od;  #for
-#                     fi;
-#                 od;  # while
-#             od;  # for a in g2
-#         fi;
-#
-#         # if we have an n- or (n-1)-cycle and a 3-cycle, test for An
-#         if elfound[3] and elfound[4] and n mod 2 <> 0 then
-#             for a in g4 do  # choose a 3-cycle
-#                 i := 1 + Int(n/3);
-#                 while N > 0 and i > 0 do
-#                     i := i-1;
-#                     c := a^PseudoRandom(grp);
-#                     # use this opportunity again to check that
-#                     # a really is a 3-cycle
-#                     x := a * c;
-#                     if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and
-#                        not(RecSnAnIsOne(x^3)) and not(RecSnAnIsOne(x^5)) then
-#                         # a is not a 3-cycle
-#                         Info( InfoRecSnAn, 2, "a is not a 3-cycle");
-#                         RemoveElmList(g4,Position(g4,a));
-#                         if Length(g4)=0 then elfound[4]:=false;fi;
-#                         i := 0;
-#                     else
-#                         for b in g3 do  # choose an n- or (n-1)-cycle
-#                           if not(RecSnAnIsOne(Comm(c,c^b)))  then
-#                             # hope: supp (c) = {1,2,k}
-#                             t := c*c^b;
-#                             if RecSnAnEq(t^2,t) then
-#                                 # k = 3
-#                                 x := c^(b^2);
-#                                 y := c^x;
-#                                 if RecSnAnIsOne(Comm(y, y^(b^2))) then
-#                                     # y\lambda = (1,5,2)
-#                                     h := c^2;
-#                                 else
-#                                     # y\lambda = (1,2,4)
-#                                     h := c;
-#                                 fi;
-#                             elif RecSnAnIsOne(Comm(c, c^(b^2))) then
-#                                 # 5 <= k <= n -2
-#                                 x := c^b;
-#                                 y := c^x;
-#                                 if RecSnAnIsOne(Comm(y,y^b)) then
-#                                     # y = (1,3,k) hence c = (1,2,k)
-#                                     h := Comm(c^2, x);
-#                                 else
-#                                     h := Comm(c,x^2);
-#                                 fi;
-#                             else
-#                                 # k= 4, n-1
-#                                 x := c^b;
-#                                 y := c^x;
-#                                 if RecSnAnIsOne(Comm(y,y^b)) then
-#                                     # y = (n-1, 1, 3), c = (1,2,n-1)
-#                                     h := Comm(c^2,x);
-#                                 elif RecSnAnIsOne(Comm(y,y^(b^2))) then
-#                                     # y = (1,4,5) c = (1,4,2)
-#                                     h := Comm(c,x^2);
-#                                 elif RecSnAnIsOne((y*y^b)^2) then
-#                                     # y = (1, n-1, n)  c = (1, n-1, 2)
-#                                     h := Comm(c,x^2);
-#                                 else
-#                                     # y = (1,3,4)  c = ( 1,2,4)
-#                                     h := Comm(c^2,x);
-#                                 fi;
-#                             fi;
-#
-#                             g := b * h^2;
-#
-#                             if SatisfiesAnPresentation( n, g, h ) then
-#                               Info( InfoRecSnAn, 1,
-#                               "Group satisfies presentation for An ",N);
-#                               return [ g, h, "An" ];
-#                             else
-#                               RemoveElmList(g3,Position(g3,b));
-#                               if Length(g3)=0 then elfound[3]:=false;fi;
-#                             fi;
-#                           fi;
-#                         od;  # for b in g3
-#                     fi;
-#                 od;  # while
-#             od; # for a in g4
-#         fi;
-#
-#         # if we have an n- or (n-1)-cycle and a 3-cycle, test for An
-#         if elfound[3] and elfound[4] and n mod 2 = 0 then
-#             for a in g4 do
-#                 i := Int(2 * n/3);
-#                 while N > 0 and i > 0 do
-#                     i := i-1;
-#                     c := a^PseudoRandom(grp);
-#                     # use this opportunity again to check that
-#                     # a really is a 3-cycle
-#                     x := a * c;
-#                     if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and
-#                        not(RecSnAnIsOne(x^3)) and not(RecSnAnIsOne(x^5)) then
-#                         # a is not a 3-cycle
-#                         Info( InfoRecSnAn, 2, "a is not a 3-cycle");
-#                         RemoveElmList(g4,Position(g4,a));
-#                         if Length(g4)=0 then elfound[4]:=false;fi;
-#                         i := 0;
-#                     else
-#                         for b in g3 do
-#                           if not(RecSnAnIsOne(Comm(c,c^b))) and
-#                              not(RecSnAnIsOne(Comm(c,c^(b^2)))) and
-#                              not(RecSnAnIsOne(Comm(c,c^(b^4)))) then
-#                             # hope: supp (c) = {1,i,j}
-#                             h := Comm(c^b,c);
-#                             # h = (1,i,i+1)
-#                             g := b * h;
-#                             if SatisfiesAnPresentation( n, g, h ) then
-#                               Info( InfoRecSnAn, 1,
-#                               "Group satisfies presentation for An ", N);
-#                               return [ g, h, "An" ];
-#                             else
-#                               RemoveElmList(g3,Position(g3,b));
-#                               if Length(g3)=0 then elfound[3]:=false;fi;
-#                             fi;
-#                           fi;
-#                         od;
-#                     fi;
-#                 od;  # while
-#             od;  # for a in g4
-#         fi;
-#
-#     od; # loop over random elements
-#
-#     return fail;
-#
-# end;
-
-
 Binary := function( i, m )
     local j, bin, le;
     bin := [];
@@ -1440,5 +1176,269 @@ end;
 #
 #         return ["An", [gens[1],gens[2]], xis];
 #     fi;
+#
+# end;
+#
+#
+# NiceGeneratorsSnAn := function ( n, grp, N )
+#
+#     local AddStack, g1, g2, g3, g4, g, h, a, b, c, t, i, k, l,
+#           delta, elfound, m, x, y;
+#
+#     # we put the elements that we look for on stacks
+#     AddStack := function( stk, e )
+#         if Length(stk) = 0 then
+#             stk[1] := e;
+#         elif Length(stk) = 1 then
+#             stk[2] := e;
+#         else
+#             stk[1] := stk[2];
+#             stk[2] := e;
+#         fi;
+#     end;
+#
+#     elfound := [false, false, false, false];
+#
+#     delta := 1 - (n mod 2);
+#
+#     l := One(grp);
+#
+#     m := n mod 6;
+#     if m = 0 then k := 5;
+#     elif m = 1 then k := 6;
+#     elif m = 2 or m = 4 then k := 3;
+#     elif m = 3 or m = 5 then k := 4;
+#     fi;
+#
+#     g1 := [];   # $n$-cycles
+#     g2 := [];   # transpositions
+#     g3 := [];   # $n$ or $n-1$-cycles
+#     g4 := [];   # 3-cycles
+#
+#     while N > 0 do
+#         N := N - 1;
+#         t := PseudoRandom(grp);
+#
+#         # use this random element to check the transpositions
+#         for a in g2 do
+#             x := a * a^t;
+#             if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and
+#                not(RecSnAnIsOne(x^3)) then
+#                 # a is not a transposition
+#                 Info( InfoRecSnAn, 2, "a is not a transposition");
+#                 RemoveElmList(g2,Position(g2,a));
+#                 if Length(g2) = 0 then elfound[2] := false; fi;
+#             fi;
+#         od;
+#
+#         # use this random element to check the 3-cycle
+#         for a in g4 do
+#             x := a * a^t;
+#             if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and
+#                not(RecSnAnIsOne(x^3)) and not(RecSnAnIsOne(x^5)) then
+#                 # a is not a 3-cycle
+#                 Info( InfoRecSnAn, 2, "a is not a 3-cycle");
+#                 RemoveElmList(g4,Position(g4,a));
+#                 if Length(g4) =  0 then elfound[4] := false; fi;
+#             fi;
+#         od;
+#
+#         if not(RecSnAnIsOne(t)) and RecSnAnIsOne(t^n) then
+#             # we hope we found an n-cycle
+#             AddStack(g1,t);
+#             elfound[1] := true;
+#             Info( InfoRecSnAn, 2, "found n-cycle");
+#             if delta = 0 then
+#                 elfound[3] := true;
+#                 AddStack(g3,t);
+#             fi;
+#         fi;
+#
+#         b := t^(n-2-delta);
+#         if not(RecSnAnIsOne(b)) and RecSnAnIsOne(b^2) then
+#             # we hope we found a 2(n-2)-cycle
+#             AddStack(g2,b);
+#             elfound[2] := true;
+#             Info( InfoRecSnAn, 2, "found transposition");
+#         fi;
+#
+#         if delta = 1 and not(RecSnAnIsOne(t))  and RecSnAnIsOne(t^(n-1)) then
+#             # we hope we found an n or (n-1)-cycle
+#             AddStack(g3,t);
+#             elfound[3] := true;
+#             Info( InfoRecSnAn, 2, "found (n-1)-cycle");
+#         fi;
+#
+#         b := t^(n-k);
+#         if not(RecSnAnIsOne(b)) and RecSnAnIsOne(b^3) then
+#             # we hope we found a 3(n-k)-element
+#             AddStack(g4,b);
+#             elfound[4] := true;
+#             Info( InfoRecSnAn, 2, "found 3-cycle");
+#         fi;
+#
+#         # if we have an n-cycle and a transposition, test for Sn
+#         if elfound[1] and elfound[2] then
+#             # hopefully $g2\lambda$ is a transposition
+#             for a in g2 do  # choose a transposition
+#                 i := n-1;
+#                 while N>0 and i>0 do # take up to n-1 conjugates,
+#                                      # check if they match some n-cycle
+#                     i := i-1;
+#                     h := a^PseudoRandom(grp);
+#                     # use this opportunity again to check that
+#                     # a really is a transposition
+#                     x := a*h;
+#                     if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and
+#                        not(RecSnAnIsOne(x^3)) then
+#                         # a is not a transposition
+#                         Info(InfoRecSnAn,2,"a is not a transposition");
+#                         RemoveElmList(g2,Position(g2,a));
+#                         if Length(g2) = 0 then elfound[2] := false; fi;
+#                         i := 0;
+#                     else
+#                         for b in g1 do
+#                           y := Comm(h, h^b);
+#                           if not(RecSnAnIsOne(y)) and
+#                              not(RecSnAnIsOne(y^2)) and RecSnAnIsOne(y^3) then
+#                             Info(InfoRecSnAn,1,"found good transposition");
+#                             if SatisfiesSnPresentation( n, b, h ) then
+#                               Info( InfoRecSnAn, 1,
+#                                 "Group satisfies presentation for Sn ",N);
+#                               return [ b, h, "Sn" ];
+#                             else
+#                               RemoveElmList(g1,Position(g1,b));
+#                               if Length(g1)=0 then elfound[1]:=false;fi;
+#                             fi;
+#                           fi;
+#                         od;  #for
+#                     fi;
+#                 od;  # while
+#             od;  # for a in g2
+#         fi;
+#
+#         # if we have an n- or (n-1)-cycle and a 3-cycle, test for An
+#         if elfound[3] and elfound[4] and n mod 2 <> 0 then
+#             for a in g4 do  # choose a 3-cycle
+#                 i := 1 + Int(n/3);
+#                 while N > 0 and i > 0 do
+#                     i := i-1;
+#                     c := a^PseudoRandom(grp);
+#                     # use this opportunity again to check that
+#                     # a really is a 3-cycle
+#                     x := a * c;
+#                     if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and
+#                        not(RecSnAnIsOne(x^3)) and not(RecSnAnIsOne(x^5)) then
+#                         # a is not a 3-cycle
+#                         Info( InfoRecSnAn, 2, "a is not a 3-cycle");
+#                         RemoveElmList(g4,Position(g4,a));
+#                         if Length(g4)=0 then elfound[4]:=false;fi;
+#                         i := 0;
+#                     else
+#                         for b in g3 do  # choose an n- or (n-1)-cycle
+#                           if not(RecSnAnIsOne(Comm(c,c^b)))  then
+#                             # hope: supp (c) = {1,2,k}
+#                             t := c*c^b;
+#                             if RecSnAnEq(t^2,t) then
+#                                 # k = 3
+#                                 x := c^(b^2);
+#                                 y := c^x;
+#                                 if RecSnAnIsOne(Comm(y, y^(b^2))) then
+#                                     # y\lambda = (1,5,2)
+#                                     h := c^2;
+#                                 else
+#                                     # y\lambda = (1,2,4)
+#                                     h := c;
+#                                 fi;
+#                             elif RecSnAnIsOne(Comm(c, c^(b^2))) then
+#                                 # 5 <= k <= n -2
+#                                 x := c^b;
+#                                 y := c^x;
+#                                 if RecSnAnIsOne(Comm(y,y^b)) then
+#                                     # y = (1,3,k) hence c = (1,2,k)
+#                                     h := Comm(c^2, x);
+#                                 else
+#                                     h := Comm(c,x^2);
+#                                 fi;
+#                             else
+#                                 # k= 4, n-1
+#                                 x := c^b;
+#                                 y := c^x;
+#                                 if RecSnAnIsOne(Comm(y,y^b)) then
+#                                     # y = (n-1, 1, 3), c = (1,2,n-1)
+#                                     h := Comm(c^2,x);
+#                                 elif RecSnAnIsOne(Comm(y,y^(b^2))) then
+#                                     # y = (1,4,5) c = (1,4,2)
+#                                     h := Comm(c,x^2);
+#                                 elif RecSnAnIsOne((y*y^b)^2) then
+#                                     # y = (1, n-1, n)  c = (1, n-1, 2)
+#                                     h := Comm(c,x^2);
+#                                 else
+#                                     # y = (1,3,4)  c = ( 1,2,4)
+#                                     h := Comm(c^2,x);
+#                                 fi;
+#                             fi;
+#
+#                             g := b * h^2;
+#
+#                             if SatisfiesAnPresentation( n, g, h ) then
+#                               Info( InfoRecSnAn, 1,
+#                               "Group satisfies presentation for An ",N);
+#                               return [ g, h, "An" ];
+#                             else
+#                               RemoveElmList(g3,Position(g3,b));
+#                               if Length(g3)=0 then elfound[3]:=false;fi;
+#                             fi;
+#                           fi;
+#                         od;  # for b in g3
+#                     fi;
+#                 od;  # while
+#             od; # for a in g4
+#         fi;
+#
+#         # if we have an n- or (n-1)-cycle and a 3-cycle, test for An
+#         if elfound[3] and elfound[4] and n mod 2 = 0 then
+#             for a in g4 do
+#                 i := Int(2 * n/3);
+#                 while N > 0 and i > 0 do
+#                     i := i-1;
+#                     c := a^PseudoRandom(grp);
+#                     # use this opportunity again to check that
+#                     # a really is a 3-cycle
+#                     x := a * c;
+#                     if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and
+#                        not(RecSnAnIsOne(x^3)) and not(RecSnAnIsOne(x^5)) then
+#                         # a is not a 3-cycle
+#                         Info( InfoRecSnAn, 2, "a is not a 3-cycle");
+#                         RemoveElmList(g4,Position(g4,a));
+#                         if Length(g4)=0 then elfound[4]:=false;fi;
+#                         i := 0;
+#                     else
+#                         for b in g3 do
+#                           if not(RecSnAnIsOne(Comm(c,c^b))) and
+#                              not(RecSnAnIsOne(Comm(c,c^(b^2)))) and
+#                              not(RecSnAnIsOne(Comm(c,c^(b^4)))) then
+#                             # hope: supp (c) = {1,i,j}
+#                             h := Comm(c^b,c);
+#                             # h = (1,i,i+1)
+#                             g := b * h;
+#                             if SatisfiesAnPresentation( n, g, h ) then
+#                               Info( InfoRecSnAn, 1,
+#                               "Group satisfies presentation for An ", N);
+#                               return [ g, h, "An" ];
+#                             else
+#                               RemoveElmList(g3,Position(g3,b));
+#                               if Length(g3)=0 then elfound[3]:=false;fi;
+#                             fi;
+#                           fi;
+#                         od;
+#                     fi;
+#                 od;  # while
+#             od;  # for a in g4
+#         fi;
+#
+#     od; # loop over random elements
+#
+#     return fail;
 #
 # end;
