@@ -493,7 +493,7 @@ end;
 
 #! @BeginChunk LargeBasePrimitive
 #! This method tries to determine whether the input group <A>G</A> is a
-#! large-base primitive group that neither is a symmetric nor an alternating
+#! fixed-point-free large-base primitive group that neither is a symmetric nor an alternating
 #! group in its natural action.
 #! This method is an implementation of <Cite Key="LNPS06"/>.
 #!
@@ -507,6 +507,19 @@ end;
 #! <M>r \cdot k > 1</M>
 #! and <M>2 \cdot r \cdot k^2 \le n</M>.
 #!
+#! A large primitive group <M>H</M> of the above type which does have fixed
+#! points is handled as follows: if the group <M>H</M> does not know yet that
+#! it is primitive, then <Ref Func="ThrowAwayFixedPoints"/> returns
+#! <K>NotEnoughInformation</K>. After the first call to
+#! <C>LargeBasePrimitive</C>, the group <M>H</M> knows that it is primitive,
+#! but since it has fixed points <C>LargeBasePrimitive</C> returns
+#! <K>NeverApplicable</K>. Since <Ref Func="ThrowAwayFixedPoints"/> previously
+#! returned <K>NotEnoughInformation</K>, it will be called again. Then it will
+#! use the new information about <M>H</M> being primitive, and is guaranteed to
+#! prune away the fixed points and set up a reduction homomorphism.
+#! <C>LargeBasePrimitive</C> is then applicable to the image of that
+#! homomorphism.
+#!
 #! If <A>G</A> is imprimitive then the output is
 #! <K>NeverApplicable</K>. If <A>G</A> is primitive then
 #! the output is either a homomorphism into the
@@ -515,8 +528,7 @@ end;
 #! <K>NeverApplicable</K> if no parameters <M>n</M>, <M>k</M>, and <M>r</M> as
 #! above exist.
 #! @EndChunk
-FindHomMethodsPerm.LargeBasePrimitive :=
-  function(ri,grp)
+FindHomMethodsPerm.LargeBasePrimitive := function(ri,grp)
     local res,T,seen,imgens,hom;
     if not IsPermGroup(grp) then
         return NeverApplicable;
@@ -526,6 +538,7 @@ FindHomMethodsPerm.LargeBasePrimitive :=
     fi;
     RECOG.SetPseudoRandomStamp(grp,"Jellyfish");
     res := RECOG.AllJellyfish(grp);
+    RECOG.SetPseudoRandomStamp(grp,"PseudoRandom");
     if res = NeverApplicable or res = TemporaryFailure then
         return res;
     fi;

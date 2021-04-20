@@ -355,24 +355,61 @@ end;
 #! @BeginChunk ThrowAwayFixedPoints
 #! This method defines a homomorphism of a permutation group
 #! <A>G</A> to the action on the moved points of <A>G</A> if
-#! <A>G</A> does not have too many moved points. In the current setup, the
-#! homomorphism is defined if the number <M>k</M> of moved
+#! <A>G</A> has any fixed points, and is either known to be primitive or the
+#! ratio of fixed points to moved points exceeds a certain threshold. If <A>G</A>
+#! has fixed points but is not primitive, then it returns
+#! <K>NotEnoughInformation</K> so that it may be called again at a later time.
+#! In all other cases, it returns <K>NeverApplicable</K>.
+#! <P/>
+#!
+#! In the current setup, the
+#! homomorphism is defined if the number <M>n</M> of moved
 #! points is at most <M>1/3</M> of the largest moved point of <A>G</A>,
-#! or  <M>k</M> is at most half of the number of points on which
-#! <A>G</A> is stored internally by &GAP;. The method returns
-#! <K>NeverApplicable</K> if it does not define a homomorphism indicating that it will
-#! never succeed.
+#! or <M>n</M> is at most half of the number of points on which
+#! <A>G</A> is stored internally by &GAP;.
+#! <P/>
+#!
+#! The fact that this method returns <K>NotEnoughInformation</K> if <A>G</A>
+#! has fixed points but does not know whether it is primitive, is important for
+#! the efficient handling of large-base primitive groups by
+#! <Ref Func="LargeBasePrimitive"/>.
 #! @EndChunk
-FindHomMethodsPerm.ThrowAwayFixedPoints :=
-  function( ri, G )
+#
+#  A technical explanation of why we use a threshold for the ratio of fixed
+#  points to moved points, this is technical so it does not go into the manual:
+#  The reason we do not just always discard fixed points is that it also incurs
+#  a cost, so we only try to do it when it seems worthwhile to do so.
+#
+#  Suppose the group G is not known to be primitive. Then we still
+#  apply this method if one of the following two criterion is met:
+#  - the largest moved point of G is three or more times larger than the number
+#    n of actually moved points
+#  - there is a generator of G whose internal storage reserves space for a
+#    number of moved points which is two or more times larger than n. Note that
+#    even for a simple transposition (1,2), for technical reasons it can happen
+#    that GAP internally stores it with the same size as a permutation moving a
+#    million points; this is wasteful, and the second criterion tries to deal
+#    with this.
+
+FindHomMethodsPerm.ThrowAwayFixedPoints := function( ri, G )
       # Check, whether we can throw away fixed points
-      local gens,hom,l,n,o;
+      local gens,nrStoredPoints,n,largest,isApplicable,o,hom;
 
       gens := GeneratorsOfGroup(G);
-      l := List(gens,StoredPointsPerm);
+      nrStoredPoints := Maximum(List(gens,StoredPointsPerm));
       n := NrMovedPoints(G);
-      if 2*n > Maximum(l) or 3*n > LargestMovedPoint(G) then  # we do nothing
-          return NeverApplicable;
+      largest := LargestMovedPoint(G);
+      # If isApplicable is true, we definitely are applicable.
+      isApplicable := 3*n <= largest or 2*n <= nrStoredPoints
+        or (HasIsPrimitive(G) and IsPrimitive(G) and n < largest);
+      # If isApplicable is false, we might become applicable if G figures out
+      # that it is primitive.
+      if not isApplicable then
+          if not HasIsPrimitive(G) and n < largest then
+              return NotEnoughInformation;
+          else
+              return NeverApplicable;
+          fi;
       fi;
       o := MovedPoints(G);
       hom := ActionHomomorphism(G,o);
