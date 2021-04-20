@@ -18,101 +18,64 @@
 ##  The code is based upon the algorithm presented in the paper [BLGN+03].
 ##
 ##
-DeclareInfoClass( "InfoRecSnAn" );
-SetInfoLevel( InfoRecSnAn, 0 );
-
-# The following are used for comparisons:
-
-# FIXME: Get rid of these globals.
-# However, it seems to me this whole file is dead code anyway..
-RecSnAnIsOne := IsOne;
-RecSnAnEq := EQ;
-
-## is <r,s> in S_n
-
-SatisfiesSnPresentation := function( n, r, s )
-
+RECOG.SatisfiesSnPresentation := function(ri, n, r, s)
     local j, t;
-
-    Info( InfoRecSnAn, 1, "calling Satisfies Sn Presentation");
-
-    if not(RecSnAnIsOne((r * s)^(n-1))) then
-        Info( InfoRecSnAn, 1, "does not satisfy presentation -1");
+    if not isone(ri)((r * s)^(n-1)) then
         return false;
     fi;
-
     j := 2;
     t := r;
     while j <= n/2 do
         t := t * r;
-        if not RecSnAnIsOne(Comm(s,t)^2) then
-            Info( InfoRecSnAn, 1, "does not satisfy presentation");
+        if not isone(ri)(Comm(s,t)^2) then
             return false;
         fi;
         j := j + 1;
     od;
-
-    Info( InfoRecSnAn, 1, "satisfies Sn presentation");
     return true;
-
 end;
 
+RECOG.SatisfiesAnPresentation := function(ri, s, t, n)
+    local j, r, ti, tr;
 
-##  is <s,t> in A_n
-
-SatisfiesAnPresentation := function( n, s, t )
-
-    local j, r, ti;
-
-    Info( InfoRecSnAn, 1, "calling Satisfies An Presentation");
-
-    if not(RecSnAnIsOne(s^(n-2))) or not(RecSnAnIsOne(t^3)) then
-        Info( InfoRecSnAn, 1, "does not satisfy presentation-1");
+    if not isone(ri)(s^(n-2)) or not isone(ri)(t^3) then
         return false;
     fi;
 
-    if n mod 2 <> 0 then
+    if IsOddInt(n) then
         # we already know s^(n-2) = t^3 = 1
-        if not(RecSnAnIsOne((s * t)^n)) then
-            Info( InfoRecSnAn, 1, "does not satisfy presentation");
+        if not isone(ri)((s * t)^n) then
             return false;
         fi;
-        j := 1;
-        r := s^0;
-        while j <= (n-3)/2  do
-            r := r * s;
-            if not(RecSnAnIsOne((t *(t^r))^2)) then
-                Info( InfoRecSnAn, 1, "does not satisfy presentation");
+        tr := t;
+        for j in [1..(n-3)/2] do
+            tr := tr ^ s; # equal to t^(s^j)
+            if not isone(ri)((t * tr)^2) then
                 return false;
             fi;
-            j := j + 1;
         od;
         return true;
     else
         # we already know s^(n-2) = t^3 = 1
-        if not(RecSnAnIsOne((s * t)^(n-1))) then
-            Info( InfoRecSnAn, 1, "does not satisfy presentation");
+        if not isone(ri)((s * t)^(n-1)) then
             return false;
         fi;
         j := 1;
         r := s^0;
+        ti := t^-1;
         while j <= (n-2)/2  do
             r := r * s;
-            ti := t^-1;
-            if (IsEvenInt(j) and not(RecSnAnIsOne((t *(t^r))^2))) or
-               (IsOddInt(j) and not(RecSnAnIsOne((ti *(t^r))^2))) then
-                Info( InfoRecSnAn, 1, "does not satisfy presentation");
+            if (IsEvenInt(j) and not isone(ri)((t *(t^r))^2)) or
+               (IsOddInt(j) and not isone(ri)((ti *(t^r))^2)) then
                 return false;
             fi;
             j := j + 1;
         od;
         return true;
     fi;
-
 end;
 
-
-Binary := function( i, m )
+RECOG.Binary := function( i, m )
     local j, bin, le;
     bin := [];
     for j in [ 1 .. m ] do
@@ -125,9 +88,7 @@ Binary := function( i, m )
     return bin;
 end;
 
-
-ConstructXiSn := function( n, g, h )
-
+RECOG.ConstructXiSn := function( n, g, h )
     local a, c, xis, xisl, k, m, b, i, j, q, q2, q4, g2, g4, conj, pow;
 
     k := QuoInt( n, 3 );
@@ -167,7 +128,7 @@ ConstructXiSn := function( n, g, h )
                 conj := conj * q4;
                 pow := pow * g4;
             fi;
-            b := Binary(i, m);
+            b := RECOG.Binary(i, m);
             for j in [1 .. m] do
                 if b[j] = 1 then
                     xis[j] := xis[j] * a;
@@ -200,7 +161,7 @@ ConstructXiSn := function( n, g, h )
                 conj := conj * q4;
                 pow := pow * g4;
             fi;
-            b := Binary(i, m);
+            b := RECOG.Binary(i, m);
             for j in [1 .. m] do
                 if b[j] = 1 then
                     xis[j] := xis[j] * a;
@@ -228,11 +189,8 @@ ConstructXiSn := function( n, g, h )
 
 end;
 
-
 ##  Test whether i^z = j
-
-IsImagePoint := function ( n, z, g,  h, j,  t1z, t2z )
-
+RECOG.IsImagePointSn := function(ri, n, z, g,  h, j,  t1z, t2z)
     local s, k, cnt, gj;
 
     gj := g^(j-3);
@@ -244,7 +202,7 @@ IsImagePoint := function ( n, z, g,  h, j,  t1z, t2z )
 
     cnt := 0;
     for k in [ 1 .. 4 ] do
-        if not RecSnAnEq(t1z*s[k],s[k]*t1z) then
+        if not isequal(ri)(t1z*s[k],s[k]*t1z) then
             cnt := cnt + 1;
         fi;
     od;
@@ -252,7 +210,7 @@ IsImagePoint := function ( n, z, g,  h, j,  t1z, t2z )
 
     cnt := 0;
     for k in [ 1 .. 4 ] do
-        if not RecSnAnEq(t2z*s[k],s[k]*t2z) then
+        if not isequal(ri)(t2z*s[k],s[k]*t2z) then
             cnt := cnt + 1;
         fi;
     od;
@@ -262,12 +220,8 @@ IsImagePoint := function ( n, z, g,  h, j,  t1z, t2z )
 
 end;
 
-
 ##  Determine the image of z under lambda
-
-# FIXME: dead code? (it's callers are all dead)
-FindImageSn := function( n, z, g, h, xis, xisl )
-
+RECOG.FindImageSn := function(ri, n, z, g, h, xis, xisl)
     local i, j, l, t, tz, k, sup, m, rest, lp1, mxj, mxjpm, zim, OrderSup;
 
     m := Length(xisl)/2;
@@ -287,10 +241,10 @@ FindImageSn := function( n, z, g, h, xis, xisl )
             mxjpm := xisl[j+m];
             while l <= 3 do  # limit support of i+l-1
                 lp1 := l mod 3 + 1;
-                if RecSnAnEq(tz[l]*xis[j],xis[j]*tz[l]) then
+                if isequal(ri)(tz[l]*xis[j],xis[j]*tz[l]) then
                     sup[l] := Difference( sup[l], mxj);
                     sup[lp1] := Difference( sup[lp1], mxj);
-                    if RecSnAnEq(tz[lp1]*xis[j],xis[j]*tz[lp1]) then
+                    if isequal(ri)(tz[lp1]*xis[j],xis[j]*tz[lp1]) then
                         sup[lp1 mod 3 + 1] :=
                             Difference( sup[lp1 mod 3 + 1], mxj);
                     else
@@ -298,10 +252,10 @@ FindImageSn := function( n, z, g, h, xis, xisl )
                             Difference( sup[lp1 mod 3 + 1], mxjpm);
                     fi;
                     l := 4;  # exit loop over l
-                elif RecSnAnEq(tz[l]*xis[j+m],xis[j+m]*tz[l]) then
+                elif isequal(ri)(tz[l]*xis[j+m],xis[j+m]*tz[l]) then
                     sup[l] := Difference( sup[l], mxjpm);
                     sup[lp1] := Difference( sup[lp1], mxjpm);
-                    if RecSnAnEq(tz[lp1]*xis[j+m],xis[j+m]*tz[lp1]) then
+                    if isequal(ri)(tz[lp1]*xis[j+m],xis[j+m]*tz[lp1]) then
                         sup[(lp1) mod 3 + 1] :=
                             Difference( sup[lp1 mod 3 + 1], mxjpm);
                     else
@@ -321,7 +275,7 @@ FindImageSn := function( n, z, g, h, xis, xisl )
                 if not IsBound(zim[i+l-1]) then
                     if Length(sup[l]) = 1 then
                         zim[i+l-1] := sup[l][1];
-                    elif IsImagePoint(n,z,g,h,j,t[l]^z,t[lp1 mod 3+1]^z)
+                    elif RECOG.IsImagePointSn(ri,n,z,g,h,j,t[l]^z,t[lp1 mod 3+1]^z)
                         then zim[i+l-1] := j;
                     fi;
                 fi;
@@ -341,7 +295,7 @@ FindImageSn := function( n, z, g, h, xis, xisl )
 
     if RemInt(n,3) = 2 then
         sup := Difference([1..n],zim);
-        if IsImagePoint(n,z,g,h,sup[1],(h^(g^(-1)))^z,
+        if RECOG.IsImagePointSn(ri, n,z,g,h,sup[1],(h^(g^(-1)))^z,
                                                  (h^(g^(-2)))^z ) then
             zim[n] := sup[1];
         else
@@ -353,12 +307,9 @@ FindImageSn := function( n, z, g, h, xis, xisl )
     if Length(Set(zim)) <> n then return fail; fi;
 
     return PermList(zim);
-
 end;
 
-
-ConstructXiAn := function( n, g, h )
-
+RECOG.ConstructXiAn := function( n, g, h )
     local a, c, xis, xisl, k, m, b, i, j, cyc5, cyc, cyc10,
           a1, b1, a2, b2, aux, a3, b3, anew;
 
@@ -436,7 +387,7 @@ ConstructXiAn := function( n, g, h )
                 xis[2*m+6] := xis[2*m+6] * b3;
                 Add(xisl[2*m+6], [5*i-4,5*i-3,5*i,5*i+1,5*i+5] );
               fi;
-              b := Binary(i, m);
+              b := RECOG.Binary(i, m);
               for j in [1 .. m] do
                 if b[j] = 1 then
                     xis[j]  := xis[j] * anew;
@@ -514,7 +465,7 @@ ConstructXiAn := function( n, g, h )
                 xis[2*m+7] := xis[2*m+7] * b3;
                 Add(xisl[2*m+7], [5*i-4,5*i-3,5*i,5*i+1,5*i+5] );
               fi;
-              b := Binary(i, m);
+              b := RECOG.Binary(i, m);
               for j in [1 .. m] do
                 if b[j] = 1 then
                     xis[j]  := xis[j] * anew;
@@ -607,7 +558,7 @@ ConstructXiAn := function( n, g, h )
                 a3 := a3^cyc10;
                 b3 := b3^cyc10;
               fi;
-              b := Binary(i, m);
+              b := RECOG.Binary(i, m);
               for j in [1 .. m] do
                 if b[j] = 1 then
                     xis[j] := xis[j] * anew;
@@ -690,7 +641,7 @@ ConstructXiAn := function( n, g, h )
                 a3 := a3^cyc10;
                 b3 := b3^cyc10;
               fi;
-              b := Binary(i, m);
+              b := RECOG.Binary(i, m);
               for j in [1 .. m] do
                 if b[j] = 1 then
                     xis[j] := xis[j] * anew;
@@ -716,14 +667,10 @@ ConstructXiAn := function( n, g, h )
     xisl := List(xisl, z->Union(z));
 
     return [xis,xisl];
-
 end;
 
-
 # Test whether i^z = j
-
-IsImagePointAn := function ( n, z, g, h, j, s, a, b, t1z, t2z )
-
+RECOG.IsImagePointAn := function(ri, n, z, g, h, j, s, a, b, t1z, t2z)
     local sc, k, cnt, bj;
 
     sc := ShallowCopy(s);
@@ -740,7 +687,7 @@ IsImagePointAn := function ( n, z, g, h, j, s, a, b, t1z, t2z )
 
     cnt := 0;
     for k in [ 1 .. 5 ] do
-        if not RecSnAnEq(t1z*sc[k],sc[k]*t1z) then
+        if not isequal(ri)(t1z*sc[k],sc[k]*t1z) then
             cnt := cnt + 1;
         fi;
     od;
@@ -748,21 +695,16 @@ IsImagePointAn := function ( n, z, g, h, j, s, a, b, t1z, t2z )
 
     cnt := 0;
     for k in [ 1 .. 5 ] do
-        if not RecSnAnEq(t2z*sc[k],sc[k]*t2z) then
+        if not isequal(ri)(t2z*sc[k],sc[k]*t2z) then
             cnt := cnt + 1;
         fi;
     od;
     if cnt < 4 then return false; fi;
-
     return true;
-
 end;
 
-
 ##  Determine the image of z under lambda
-
-FindImageAn := function( n, z, g, h, xis, xisl )
-
+RECOG.FindImageAn := function(ri, n, z, g, h, xis, xisl)
     local i, j, jj, d, dd, t, k, ind, indices, sup, m, rest, lp1,
           findp, mxj, mxjpm, zim, l, inds, a, b, c, tim, tc, tdz, s;
 
@@ -820,28 +762,28 @@ FindImageAn := function( n, z, g, h, xis, xisl )
             mxj := xisl[j];
             mxjpm := xisl[j+m];
             while d <= 10 do
-                if RecSnAnEq(tdz[d]*xis[j],xis[j]*tdz[d]) then
+                if isequal(ri)(tdz[d]*xis[j],xis[j]*tdz[d]) then
                     sup[tim[d][1]] := Difference( sup[tim[d][1]], mxj);
                     sup[tim[d][2]] := Difference( sup[tim[d][2]], mxj);
                     sup[tim[d][3]] := Difference( sup[tim[d][3]], mxj);
                     k := tc[d];
                     for jj in [ 1 .. 2 ] do
                         dd := Difference(tim[k[jj]], tim[d])[1];
-                        if RecSnAnEq(tdz[k[jj]]*xis[j],xis[j]*tdz[k[jj]]) then
+                        if isequal(ri)(tdz[k[jj]]*xis[j],xis[j]*tdz[k[jj]]) then
                             sup[dd] :=  Difference( sup[dd], mxj);
                         else
                             sup[dd] :=  Difference( sup[dd], mxjpm);
                         fi;
                     od;
                     d := 11;
-                elif RecSnAnEq(tdz[d]*xis[j+m],xis[j+m]*tdz[d]) then
+                elif isequal(ri)(tdz[d]*xis[j+m],xis[j+m]*tdz[d]) then
                     sup[tim[d][1]] := Difference(sup[tim[d][1]], mxjpm);
                     sup[tim[d][2]] := Difference(sup[tim[d][2]], mxjpm);
                     sup[tim[d][3]] := Difference(sup[tim[d][3]], mxjpm);
                     k := tc[d];
                     for jj in [ 1 .. 2 ] do
                         dd := Difference(tim[k[jj]], tim[d])[1];
-                        if RecSnAnEq(tdz[k[jj]]*xis[j+m],xis[j+m]*tdz[k[jj]]) then
+                        if isequal(ri)(tdz[k[jj]]*xis[j+m],xis[j+m]*tdz[k[jj]]) then
                             sup[dd] :=  Difference( sup[dd], mxjpm);
                         else
                             sup[dd] :=  Difference( sup[dd], mxj);
@@ -860,7 +802,7 @@ FindImageAn := function( n, z, g, h, xis, xisl )
             else
                 for j in [1..Length(sup[l])] do
                     if not IsBound(zim[i+l-1]) then
-                        if IsImagePointAn(n,z,g,h,sup[l][j],s,a,b,
+                        if RECOG.IsImagePointAn(ri,n,z,g,h,sup[l][j],s,a,b,
                               t[findp[l][1]]^z, t[findp[l][2]]^z ) then
                             zim[i+l-1] := sup[l][j];
                         fi;
@@ -886,7 +828,7 @@ FindImageAn := function( n, z, g, h, xis, xisl )
             sup := Difference([1..n],zim);
             for j in sup do
                 if not IsBound(zim[n+1-k]) then
-                    if IsImagePointAn(n,z,g,h,j,s,a,b,
+                    if RECOG.IsImagePointAn(ri,n,z,g,h,j,s,a,b,
                           t[findp[6-k][1]]^z, t[findp[6-k][2]]^z ) then
                         zim[n+1-k] := j;
                         sup := Difference(sup,[j]);
@@ -926,24 +868,24 @@ end;
 #     if gens = fail then return fail; fi;
 #
 #     if gens[3] = "Sn" then
-#         xis := ConstructXiSn( n, gens[1], gens[2] );
+#         xis := RECOG.ConstructXiSn( n, gens[1], gens[2] );
 #         for g in GeneratorsOfGroup(grp) do
-#             gl := FindImageSn( n, g, gens[1], gens[2], xis[1], xis[2] );
+#             gl := RECOG.FindImageSn( n, g, gens[1], gens[2], xis[1], xis[2] );
 #             if gl = fail then return fail; fi;
-#             slp := SLPforSn( n, gl );
+#             slp := RECOG.SLPforSn( n, gl );
 #             eval := ResultOfStraightLineProgram(slp, [gens[2],gens[1]]);
-#             if not RecSnAnEq(eval,g) then return fail; fi;
+#             if not isequal(ri)(eval,g) then return fail; fi;
 #         od;
 #         return [ "Sn", [gens[1],gens[2]], xis ];
 #     else
-#         xis := ConstructXiAn( n, gens[1], gens[2] );
+#         xis := RECOG.ConstructXiAn( n, gens[1], gens[2] );
 #         for g in GeneratorsOfGroup(grp) do
-#             gl := FindImageAn( n, g, gens[1], gens[2], xis[1], xis[2] );
+#             gl := RECOG.FindImageAn( n, g, gens[1], gens[2], xis[1], xis[2] );
 #             if gl = fail then return fail; fi;
 #             if SignPerm(gl) = -1 then
 #                 # we found an odd permutation,
 #                 # so the group cannot be An
-#                 slp := SLPforAn( n, (1,2)*gl );
+#                 slp := RECOG.SLPforAn( n, (1,2)*gl );
 #                 eval:=ResultOfStraightLineProgram(slp,[gens[2],gens[1]]);
 #                 h :=  eval * g^-1;
 #                 if n mod 2 <> 0 then
@@ -951,23 +893,23 @@ end;
 #                 else
 #                     b := h * gens[1] * gens[2];
 #                 fi;
-#                 if SatisfiesSnPresentation( n, b, h ) then
-#                     xis := ConstructXiSn( n, b, h );
+#                 if RECOG.SatisfiesSnPresentation( n, b, h ) then
+#                     xis := RECOG.ConstructXiSn( n, b, h );
 #                     for g in GeneratorsOfGroup(grp) do
-#                         gl := FindImageSn(n,g,b,h,xis[1],xis[2] );
+#                         gl := RECOG.FindImageSn(n,g,b,h,xis[1],xis[2] );
 #                         if gl = fail then return fail; fi;
-#                         slp := SLPforSn(n, gl);
+#                         slp := RECOG.SLPforSn(n, gl);
 #                         eval := ResultOfStraightLineProgram(slp,[h,b]);
-#                         if not RecSnAnEq(eval,g) then return fail; fi;
+#                         if not isequal(ri)(eval,g) then return fail; fi;
 #                     od;
 #                     return [ "Sn", [b,h] ,xis ];
 #                 else
 #                     return fail;
 #                 fi;
 #             else
-#                 slp := SLPforAn( n, gl );
+#                 slp := RECOG.SLPforAn( n, gl );
 #                 eval:=ResultOfStraightLineProgram(slp,[gens[2],gens[1]]);
-#                 if not RecSnAnEq(eval,g) then return fail; fi;
+#                 if not isequal(ri)(eval,g) then return fail; fi;
 #             fi;
 #         od;
 #
@@ -975,7 +917,6 @@ end;
 #     fi;
 #
 # end;
-#
 #
 # NiceGeneratorsSnAn := function ( n, grp, N )
 #
@@ -1019,8 +960,8 @@ end;
 #         # use this random element to check the transpositions
 #         for a in g2 do
 #             x := a * a^t;
-#             if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and
-#                not(RecSnAnIsOne(x^3)) then
+#             if not(isone(ri)(x)) and not(isone(ri)(x^2)) and
+#                not(isone(ri)(x^3)) then
 #                 # a is not a transposition
 #                 Info( InfoRecSnAn, 2, "a is not a transposition");
 #                 RemoveElmList(g2,Position(g2,a));
@@ -1031,8 +972,8 @@ end;
 #         # use this random element to check the 3-cycle
 #         for a in g4 do
 #             x := a * a^t;
-#             if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and
-#                not(RecSnAnIsOne(x^3)) and not(RecSnAnIsOne(x^5)) then
+#             if not(isone(ri)(x)) and not(isone(ri)(x^2)) and
+#                not(isone(ri)(x^3)) and not(isone(ri)(x^5)) then
 #                 # a is not a 3-cycle
 #                 Info( InfoRecSnAn, 2, "a is not a 3-cycle");
 #                 RemoveElmList(g4,Position(g4,a));
@@ -1040,7 +981,7 @@ end;
 #             fi;
 #         od;
 #
-#         if not(RecSnAnIsOne(t)) and RecSnAnIsOne(t^n) then
+#         if not(isone(ri)(t)) and isone(ri)(t^n) then
 #             # we hope we found an n-cycle
 #             AddStack(g1,t);
 #             elfound[1] := true;
@@ -1052,14 +993,14 @@ end;
 #         fi;
 #
 #         b := t^(n-2-delta);
-#         if not(RecSnAnIsOne(b)) and RecSnAnIsOne(b^2) then
+#         if not(isone(ri)(b)) and isone(ri)(b^2) then
 #             # we hope we found a 2(n-2)-cycle
 #             AddStack(g2,b);
 #             elfound[2] := true;
 #             Info( InfoRecSnAn, 2, "found transposition");
 #         fi;
 #
-#         if delta = 1 and not(RecSnAnIsOne(t))  and RecSnAnIsOne(t^(n-1)) then
+#         if delta = 1 and not(isone(ri)(t))  and isone(ri)(t^(n-1)) then
 #             # we hope we found an n or (n-1)-cycle
 #             AddStack(g3,t);
 #             elfound[3] := true;
@@ -1067,7 +1008,7 @@ end;
 #         fi;
 #
 #         b := t^(n-k);
-#         if not(RecSnAnIsOne(b)) and RecSnAnIsOne(b^3) then
+#         if not(isone(ri)(b)) and isone(ri)(b^3) then
 #             # we hope we found a 3(n-k)-element
 #             AddStack(g4,b);
 #             elfound[4] := true;
@@ -1086,8 +1027,8 @@ end;
 #                     # use this opportunity again to check that
 #                     # a really is a transposition
 #                     x := a*h;
-#                     if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and
-#                        not(RecSnAnIsOne(x^3)) then
+#                     if not(isone(ri)(x)) and not(isone(ri)(x^2)) and
+#                        not(isone(ri)(x^3)) then
 #                         # a is not a transposition
 #                         Info(InfoRecSnAn,2,"a is not a transposition");
 #                         RemoveElmList(g2,Position(g2,a));
@@ -1096,10 +1037,10 @@ end;
 #                     else
 #                         for b in g1 do
 #                           y := Comm(h, h^b);
-#                           if not(RecSnAnIsOne(y)) and
-#                              not(RecSnAnIsOne(y^2)) and RecSnAnIsOne(y^3) then
+#                           if not(isone(ri)(y)) and
+#                              not(isone(ri)(y^2)) and isone(ri)(y^3) then
 #                             Info(InfoRecSnAn,1,"found good transposition");
-#                             if SatisfiesSnPresentation( n, b, h ) then
+#                             if RECOG.SatisfiesSnPresentation( n, b, h ) then
 #                               Info( InfoRecSnAn, 1,
 #                                 "Group satisfies presentation for Sn ",N);
 #                               return [ b, h, "Sn" ];
@@ -1124,8 +1065,8 @@ end;
 #                     # use this opportunity again to check that
 #                     # a really is a 3-cycle
 #                     x := a * c;
-#                     if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and
-#                        not(RecSnAnIsOne(x^3)) and not(RecSnAnIsOne(x^5)) then
+#                     if not(isone(ri)(x)) and not(isone(ri)(x^2)) and
+#                        not(isone(ri)(x^3)) and not(isone(ri)(x^5)) then
 #                         # a is not a 3-cycle
 #                         Info( InfoRecSnAn, 2, "a is not a 3-cycle");
 #                         RemoveElmList(g4,Position(g4,a));
@@ -1133,25 +1074,25 @@ end;
 #                         i := 0;
 #                     else
 #                         for b in g3 do  # choose an n- or (n-1)-cycle
-#                           if not(RecSnAnIsOne(Comm(c,c^b)))  then
+#                           if not(isone(ri)(Comm(c,c^b)))  then
 #                             # hope: supp (c) = {1,2,k}
 #                             t := c*c^b;
-#                             if RecSnAnEq(t^2,t) then
+#                             if isequal(ri)(t^2,t) then
 #                                 # k = 3
 #                                 x := c^(b^2);
 #                                 y := c^x;
-#                                 if RecSnAnIsOne(Comm(y, y^(b^2))) then
+#                                 if isone(ri)(Comm(y, y^(b^2))) then
 #                                     # y\lambda = (1,5,2)
 #                                     h := c^2;
 #                                 else
 #                                     # y\lambda = (1,2,4)
 #                                     h := c;
 #                                 fi;
-#                             elif RecSnAnIsOne(Comm(c, c^(b^2))) then
+#                             elif isone(ri)(Comm(c, c^(b^2))) then
 #                                 # 5 <= k <= n -2
 #                                 x := c^b;
 #                                 y := c^x;
-#                                 if RecSnAnIsOne(Comm(y,y^b)) then
+#                                 if isone(ri)(Comm(y,y^b)) then
 #                                     # y = (1,3,k) hence c = (1,2,k)
 #                                     h := Comm(c^2, x);
 #                                 else
@@ -1161,13 +1102,13 @@ end;
 #                                 # k= 4, n-1
 #                                 x := c^b;
 #                                 y := c^x;
-#                                 if RecSnAnIsOne(Comm(y,y^b)) then
+#                                 if isone(ri)(Comm(y,y^b)) then
 #                                     # y = (n-1, 1, 3), c = (1,2,n-1)
 #                                     h := Comm(c^2,x);
-#                                 elif RecSnAnIsOne(Comm(y,y^(b^2))) then
+#                                 elif isone(ri)(Comm(y,y^(b^2))) then
 #                                     # y = (1,4,5) c = (1,4,2)
 #                                     h := Comm(c,x^2);
-#                                 elif RecSnAnIsOne((y*y^b)^2) then
+#                                 elif isone(ri)((y*y^b)^2) then
 #                                     # y = (1, n-1, n)  c = (1, n-1, 2)
 #                                     h := Comm(c,x^2);
 #                                 else
@@ -1178,7 +1119,7 @@ end;
 #
 #                             g := b * h^2;
 #
-#                             if SatisfiesAnPresentation( n, g, h ) then
+#                             if RECOG.SatisfiesAnPresentation( n, g, h ) then
 #                               Info( InfoRecSnAn, 1,
 #                               "Group satisfies presentation for An ",N);
 #                               return [ g, h, "An" ];
@@ -1203,8 +1144,8 @@ end;
 #                     # use this opportunity again to check that
 #                     # a really is a 3-cycle
 #                     x := a * c;
-#                     if not(RecSnAnIsOne(x)) and not(RecSnAnIsOne(x^2)) and
-#                        not(RecSnAnIsOne(x^3)) and not(RecSnAnIsOne(x^5)) then
+#                     if not(isone(ri)(x)) and not(isone(ri)(x^2)) and
+#                        not(isone(ri)(x^3)) and not(isone(ri)(x^5)) then
 #                         # a is not a 3-cycle
 #                         Info( InfoRecSnAn, 2, "a is not a 3-cycle");
 #                         RemoveElmList(g4,Position(g4,a));
@@ -1212,14 +1153,14 @@ end;
 #                         i := 0;
 #                     else
 #                         for b in g3 do
-#                           if not(RecSnAnIsOne(Comm(c,c^b))) and
-#                              not(RecSnAnIsOne(Comm(c,c^(b^2)))) and
-#                              not(RecSnAnIsOne(Comm(c,c^(b^4)))) then
+#                           if not(isone(ri)(Comm(c,c^b))) and
+#                              not(isone(ri)(Comm(c,c^(b^2)))) and
+#                              not(isone(ri)(Comm(c,c^(b^4)))) then
 #                             # hope: supp (c) = {1,i,j}
 #                             h := Comm(c^b,c);
 #                             # h = (1,i,i+1)
 #                             g := b * h;
-#                             if SatisfiesAnPresentation( n, g, h ) then
+#                             if RECOG.SatisfiesAnPresentation( n, g, h ) then
 #                               Info( InfoRecSnAn, 1,
 #                               "Group satisfies presentation for An ", N);
 #                               return [ g, h, "An" ];
