@@ -742,7 +742,7 @@ FindHomMethodsProjective.C6 := function(ri,G)
         forkernel(ri).blocksize := ri!.dimension / re.basis.blocks.ell;
         Add(forkernel(ri).hints,
             rec(method := FindHomMethodsProjective.DoBaseChangeForBlocks,
-                rank := 2000, stamp := "DoBaseChangeForBlocks"),1);
+                rank := 2000, stamp := "DoBaseChangeForBlocks") );
         Setimmediateverification(ri,true);
         findgensNmeth(ri).args[1] := re.basis.blocks.ell + 3;
         findgensNmeth(ri).args[2] := 5;

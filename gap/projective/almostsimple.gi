@@ -291,7 +291,7 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
                       forkernel(ri).blocksize := Length(s);
                       Add(forkernel(ri).hints,
                   rec(method:=FindHomMethodsProjective.DoBaseChangeForBlocks,
-                            rank := 2000, stamp := "DoBaseChangeForBlocks"),1);
+                            rank := 2000, stamp := "DoBaseChangeForBlocks"));
                       Setimmediateverification(ri,true);
                       findgensNmeth(ri).args[1] := Length(orb)+3;
                       findgensNmeth(ri).args[2] := 5;
