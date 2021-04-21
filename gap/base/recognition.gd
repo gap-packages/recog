@@ -652,11 +652,6 @@ DeclareGlobalFunction( "SLPforElementGeneric" );
 ## </ManSection>
 ## <#/GAPDoc>
 DeclareGlobalFunction( "SLPforElement" );
-DeclareGlobalFunction( "RandomSubproduct" );
-DeclareGlobalFunction( "FastNormalClosure" );
-DeclareGlobalFunction( "FindKernelFastNormalClosure" );
-DeclareGlobalFunction( "FindKernelRandom" );
-DeclareGlobalFunction( "FindKernelDoNothing" );
 DeclareOperation( "RandomElm", [ IsRecognitionInfo, IsString, IsBool ] );
 DeclareOperation( "RandomElmOrd", [ IsRecognitionInfo, IsString, IsBool ] );
 DeclareOperation( "RandomElmPpd", [ IsRecognitionInfo, IsString, IsBool ] );

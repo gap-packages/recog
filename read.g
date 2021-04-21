@@ -28,6 +28,7 @@ ReadPackage("recog","gap/base/projective.gi");
 ReadPackage("recog","gap/tools.gi");
 
 # generic
+ReadPackage("recog","gap/generic/kernel.gi");
 ReadPackage("recog","gap/generic/TrivialGroup.gi");
 ReadPackage("recog","gap/generic/FewGensAbelian.gi");
 ReadPackage("recog","gap/generic/KnownNilpotent.gi");
