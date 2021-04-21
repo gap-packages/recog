@@ -471,15 +471,7 @@ AddMethod(
     )
 );
 
-AddMethod(
-    FindHomDbPerm,
-    rec(
-        method := FindHomMethodsGeneric.FewGensAbelian,
-        rank := 99,
-        stamp := "FewGensAbelian",
-        comment := "if very few generators, check IsAbelian and if yes, do KnownNilpotent",
-    )
-);
+AddMethod(FindHomDbPerm, FindHomMethodsGeneric.FewGensAbelian, 99);
 
 AddMethod(
     FindHomDbPerm,
