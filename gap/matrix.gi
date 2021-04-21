@@ -24,7 +24,9 @@ end;
 #! This method is successful if and only if all generators of a matrix group
 #! <A>G</A> are diagonal matrices. Otherwise, it returns <K>NeverApplicable</K>.
 #! @EndChunk
-FindHomMethodsMatrix.DiagonalMatrices := function(ri, G)
+FindHomMethodsMatrix.DiagonalMatrices := RecogMethod("DiagonalMatrices",
+"check whether all generators are diagonal matrices",
+function(ri, G)
   local H,d,f,gens,hom,i,isscalars,j,newgens,upperleft;
 
   d := ri!.dimension;
@@ -71,10 +73,10 @@ FindHomMethodsMatrix.DiagonalMatrices := function(ri, G)
 
   # Hint to the factor:
   Add(forfactor(ri).hints,rec( method := FindHomMethodsMatrix.Scalar,
-                               rank := 4000, stamp := "Scalar" ));
+                               rank := 4000 ));
 
   return Success;
-end;
+end);
 
 #RECOG.DetWrapper := function(m)
 #  local n;
@@ -125,7 +127,9 @@ end;
 #! @BeginChunk Scalar
 #! TODO
 #! @EndChunk
-FindHomMethodsMatrix.Scalar := function(ri, G)
+FindHomMethodsMatrix.Scalar := RecogMethod("Scalar",
+"Hint TODO",
+function(ri, G)
   local f,gcd,generator,gens,i,l,o,pows,q,rep,slp,subset,z;
   if ri!.dimension > 1 then
       return NotEnoughInformation;
@@ -166,7 +170,7 @@ FindHomMethodsMatrix.Scalar := function(ri, G)
   ri!.generator := z^gcd;
   SetFilterObj(ri,IsLeaf);
   return Success;
-end;
+end);
 
 
 # Given a matrix `mat`, and a set of indices `poss`,
@@ -214,7 +218,9 @@ end;
 #! will only be scalar matrices. This method recursively builds a balanced tree
 #! and does scalar recognition in each leaf.
 #! @EndChunk
-FindHomMethodsMatrix.BlockScalar := function(ri, G)
+FindHomMethodsMatrix.BlockScalar := RecogMethod("BlockScalar",
+"Hint TODO",
+function(ri, G)
   # We assume that ri!.blocks is a list of ranges where the non-trivial
   # scalar blocks are. Note that their length does not have to sum up to
   # the dimension, because some blocks at the end might already be trivial.
@@ -228,8 +234,7 @@ FindHomMethodsMatrix.BlockScalar := function(ri, G)
       hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
       SetHomom(ri,hom);
       Add(forfactor(ri).hints,
-          rec( method := FindHomMethodsMatrix.Scalar, rank := 2000,
-               stamp := "Scalar" ));
+          rec( method := FindHomMethodsMatrix.Scalar, rank := 2000 ));
 
       if nrblocks = 1 then     # no kernel:
           findgensNmeth(ri).method := FindKernelDoNothing;
@@ -242,8 +247,7 @@ FindHomMethodsMatrix.BlockScalar := function(ri, G)
           # We have to go to BlockScalar with 1 block because the one block
           # is only a part of the whole matrix:
           Add(forkernel(ri).hints,
-              rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000,
-                   stamp := "BlockScalar" ));
+              rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000 ));
           Setimmediateverification(ri,true);
       fi;
       return Success;
@@ -262,8 +266,7 @@ FindHomMethodsMatrix.BlockScalar := function(ri, G)
   forfactor(ri).blocks := List(ri!.blocks{[middle..nrblocks]},
                                x->x - (ri!.blocks[middle][1]-1));
   Add(forfactor(ri).hints,
-      rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000,
-           stamp := "BlockScalar" ));
+      rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000 ));
 
   # the kernel is the first few blocks (can be only one!):
   # FIXME: why don't we just compute a precise set of generators of the kernel?
@@ -272,11 +275,10 @@ FindHomMethodsMatrix.BlockScalar := function(ri, G)
   findgensNmeth(ri).args[2] := 5;
   forkernel(ri).blocks := ri!.blocks{[1..middle-1]};
   Add(forkernel(ri).hints,
-      rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000,
-           stamp := "BlockScalar" ));
+      rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000 ));
   Setimmediateverification(ri,true);
   return Success;
-end;
+end);
 
 # A helper function for base changes:
 RECOG.HomDoBaseChange := function(data,el)
@@ -376,7 +378,11 @@ end;
 #! recognition info record has the <C>!.projective</C> component bound
 #! to <K>true</K> and this information is passed down to image and kernel.
 #! @EndChunk
-FindHomMethodsMatrix.ReducibleIso := function(ri,G)
+FindHomMethodsMatrix.ReducibleIso := RecogMethod("ReducibleIso",
+"use the MeatAxe to find invariant subspaces",
+# alternative comment:
+#"use MeatAxe to find a composition series, do base change",
+function(ri,G)
   # First we use the MeatAxe to find an invariant subspace:
   local H,bc,compseries,f,hom,isirred,m,newgens;
 
@@ -420,10 +426,10 @@ FindHomMethodsMatrix.ReducibleIso := function(ri,G)
   forfactor(ri).blocks := bc.blocks;
   Add(forfactor(ri).hints,
       rec(method := FindHomMethodsMatrix.BlockLowerTriangular,
-          rank := 4000,stamp := "BlockLowerTriangular"));
+          rank := 4000));
 
   return Success;
-end;
+end);
 
 # Given a matrix `mat` and a list of index sets `blocks`,
 # verify that the matrix has block lower triangular shape
@@ -479,7 +485,9 @@ end;
 #! recognition info record has the <C>!.projective</C> component bound
 #! to <K>true</K> and this information is passed down to image and kernel.
 #! @EndChunk
-FindHomMethodsMatrix.BlockLowerTriangular := function(ri,G)
+FindHomMethodsMatrix.BlockLowerTriangular := RecogMethod("BlockLowerTriangular",
+"Hint TODO",
+function(ri,G)
   # This is only used coming from a hint, we know what to do:
   # A base change was done to get block lower triangular shape.
   # We first do the diagonal blocks, then the lower p-part:
@@ -496,14 +504,14 @@ FindHomMethodsMatrix.BlockLowerTriangular := function(ri,G)
   forfactor(ri).blocks := ri!.blocks;
   Add(forfactor(ri).hints,
       rec( method := FindHomMethodsMatrix.BlockDiagonal,
-           rank := 2000, stamp := "BlockDiagonal" ) );
+           rank := 2000 ) );
   findgensNmeth(ri).method := FindKernelLowerLeftPGroup;
   findgensNmeth(ri).args := [];
   Add(forkernel(ri).hints,rec(method := FindHomMethodsMatrix.LowerLeftPGroup,
-                              rank := 2000,stamp := "LowerLeftPGroup"));
+                              rank := 2000));
   forkernel(ri).blocks := ri!.blocks;
   return Success;
-end;
+end);
 
 #! @BeginChunk BlockDiagonal
 #! This method is only called when a hint was passed down from the method
@@ -525,7 +533,9 @@ end;
 #! recognition info record has the <C>!.projective</C> component bound
 #! to <K>true</K> and this information is passed down to image and kernel.
 #! @EndChunk
-FindHomMethodsMatrix.BlockDiagonal := function(ri,G)
+FindHomMethodsMatrix.BlockDiagonal := RecogMethod("BlockDiagonal",
+"Hint TODO",
+function(ri,G)
   # This is only called by a hint, so we know what we have to do:
   # We do all the blocks projectively and thus are left with scalar blocks.
   # In the projective case we still do the same, the BlocksModScalars
@@ -535,8 +545,7 @@ FindHomMethodsMatrix.BlockDiagonal := function(ri,G)
   forfactor(ri).blocks := ri!.blocks;
   Add(forfactor(ri).hints,
       rec(method := FindHomMethodsProjective.BlocksModScalars,
-          rank   := 2000,
-          stamp  := "BlocksModScalars"));
+          rank   := 2000));
   # We go to projective, although it would not matter here, because we
   # gave a working hint anyway:
   Setmethodsforfactor(ri,FindHomDbProjective);
@@ -550,17 +559,15 @@ FindHomMethodsMatrix.BlockDiagonal := function(ri,G)
   if ri!.projective then
       Add(forkernel(ri).hints,
           rec(method := FindHomMethodsProjective.BlockScalarProj,
-              rank   := 2000,
-              stamp  := "BlockScalarProj"));
+              rank   := 2000));
   else
       Add(forkernel(ri).hints,
           rec(method := FindHomMethodsMatrix.BlockScalar,
-              rank   := 2000,
-              stamp  := "BlockScalar"));
+              rank   := 2000));
   fi;
   forkernel(ri).blocks := ri!.blocks;
   return Success;
-end;
+end);
 
 #RECOG.HomInducedOnFactor := function(data,el)
 #  local dim,m;
@@ -785,7 +792,9 @@ end;
 #! this fact and uses this special structure to find nice generators
 #! and a method to express group elements in terms of these.
 #! @EndChunk
-FindHomMethodsMatrix.LowerLeftPGroup := function(ri,G)
+FindHomMethodsMatrix.LowerLeftPGroup := RecogMethod("LowerLeftPGroup",
+"Hint TODO",
+function(ri,G)
   local f,p;
   # Do we really have our favorite situation?
   if not (IsBound(ri!.blocks) and
@@ -802,7 +811,7 @@ FindHomMethodsMatrix.LowerLeftPGroup := function(ri,G)
   Setslpforelement(ri,SLPforElementFuncsMatrix.LowerLeftPGroup);
   SetSize(ri,p^Length(ri!.gensNvectors));
   return Success;
-end;
+end);
 
 #! @BeginChunk GoProjective
 #! This method defines a homomorphism from a matrix group <A>G</A>
@@ -813,7 +822,9 @@ end;
 #! The bulk of the work in matrix recognition is done in the projective group
 #! setting.
 #! @EndChunk
-FindHomMethodsMatrix.GoProjective := function(ri,G)
+FindHomMethodsMatrix.GoProjective := RecogMethod("GoProjective",
+"divide out scalars and recognise projectively",
+function(ri,G)
   local hom,q;
   Info(InfoRecog,2,"Going projective...");
   hom := IdentityMapping(G);
@@ -827,7 +838,7 @@ FindHomMethodsMatrix.GoProjective := function(ri,G)
   findgensNmeth(ri).method := FindKernelRandom;
   findgensNmeth(ri).args := [Length(Factors(q-1))+5];
   return Success;
-end;
+end);
 
 #! @BeginChunk KnownStabilizerChain
 #! If a stabilizer chain is already known, then the kernel node is given
@@ -837,7 +848,9 @@ end;
 #! the computation of a stabilizer chain of this node. This stabilizer chain
 #! is then used in the same way as above.
 #! @EndChunk
-FindHomMethodsMatrix.KnownStabilizerChain := function(ri,G)
+FindHomMethodsMatrix.KnownStabilizerChain := RecogMethod("KnownStabilizerChain",
+"use an already known stabilizer chain for this group",
+function(ri,G)
   local S,hom;
   if HasStoredStabilizerChain(G) then
       Info(InfoRecog,2,"Already know stabilizer chain, using 1st orbit.");
@@ -858,7 +871,7 @@ FindHomMethodsMatrix.KnownStabilizerChain := function(ri,G)
       return Success;
   fi;
   return NeverApplicable;
-end;
+end);
 
 #FindHomMethodsMatrix.SmallVectorSpace := function(ri,G)
 #  local d,f,hom,l,method,o,q,r,v,w;
@@ -907,47 +920,17 @@ end;
 AddMethod(FindHomDbMatrix, FindHomMethodsGeneric.TrivialGroup, 3100);
 #! @EndCode
 
-AddMethod(
-    FindHomDbMatrix,
-    rec(
-        method := FindHomMethodsMatrix.DiagonalMatrices,
-        rank := 1100,
-        stamp := "DiagonalMatrices",
-        comment := "check whether all generators are diagonal matrices",
-    )
-);
+AddMethod(FindHomDbMatrix, FindHomMethodsMatrix.DiagonalMatrices, 1100);
 
-AddMethod(
-    FindHomDbMatrix,
-    rec(
-        method := FindHomMethodsMatrix.KnownStabilizerChain,
-        rank := 1175,
-        stamp := "KnownStabilizerChain",
-        comment := "use an already known stabilizer chain for this group",
-    )
-);
+AddMethod(FindHomDbMatrix, FindHomMethodsMatrix.KnownStabilizerChain, 1175);
 
 AddMethod(FindHomDbPerm, FindHomMethodsGeneric.FewGensAbelian, 1050);
 
-AddMethod(
-    FindHomDbMatrix,
-    rec(
-        method := FindHomMethodsMatrix.ReducibleIso,
-        rank := 1000,
-        stamp := "ReducibleIso",
-        comment := "use the MeatAxe to find invariant subspaces",
-    )
-);
+AddMethod(FindHomDbMatrix, FindHomMethodsMatrix.ReducibleIso, 1000);
 
-AddMethod(
-    FindHomDbMatrix,
-    rec(
-        method := FindHomMethodsMatrix.GoProjective,
-        rank := 900,
-        stamp := "GoProjective",
-        comment := "divide out scalars and recognise projectively",
-    )
-);
+AddMethod(FindHomDbMatrix, FindHomMethodsMatrix.GoProjective, 900);
+
+
 
 ###AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.SmallVectorSpace,
 ###           700, "SmallVectorSpace",
