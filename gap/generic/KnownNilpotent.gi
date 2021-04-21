@@ -76,7 +76,9 @@ end;
 #! p-group for some prime p. Make sure that the !.projective component is set
 #! correctly such that we can set the right Order method.
 #! @EndChunk
-FindHomMethodsGeneric.KnownNilpotent := function(ri,G)
+FindHomMethodsGeneric.KnownNilpotent := RecogMethod("KnownNilpotent",
+"TODO",
+function(ri,G)
   local H,cut,data,gens,decompositionData,gensfac,gensker,gensm,hom,ords,primes;
   gens := GeneratorsOfGroup(G);
   gensm := GeneratorsWithMemory(gens);
@@ -104,14 +106,12 @@ FindHomMethodsGeneric.KnownNilpotent := function(ri,G)
   forfactor(ri).primes := primes{[1..cut]};
   forkernel(ri).primes := primes{[cut+1..Length(primes)]};
   Add(forfactor(ri).hints,
-      rec( method := FindHomMethodsGeneric.KnownNilpotent, rank := 4000,
-           stamp := "KnownNilpotent" ));
+      rec( method := FindHomMethodsGeneric.KnownNilpotent, rank := 4000 ) );
   Add(forkernel(ri).hints,
-      rec( method := FindHomMethodsGeneric.KnownNilpotent, rank := 4000,
-           stamp := "KnownNilpotent" ));
+      rec( method := FindHomMethodsGeneric.KnownNilpotent, rank := 4000 ) );
   Append(gensN(ri),gensker);
   findgensNmeth(ri).method := FindKernelDoNothing;  # kernel already known
   ri!.leavegensNuntouched := true;
   Setcalcnicegens(ri,RECOG.CalcNiceGensKnownNilpotent);
   return Success;
-end;
+end);
