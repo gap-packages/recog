@@ -190,7 +190,7 @@ RECOG.IsDiagonalBlockOfMatrix := function(m, poss)
 end;
 
 
-# Homomorphism method used by these recognition methods:
+# Homomorphism used by these recognition methods:
 # - FindHomMethodsMatrix.BlockScalar
 # - FindHomMethodsProjective.BlocksModScalars
 RECOG.HomToDiagonalBlock := function(data,el)
