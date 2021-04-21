@@ -71,13 +71,12 @@ RECOG.CalcNiceGensKnownNilpotent := function(ri,origgens)
 end;
 
 #! @BeginChunk KnownNilpotent
-#! TODO
+#! Hint to this method if you know G to be nilpotent or call it directly
+#! if you find out so. Note that it will return NeverApplicable if G is a
+#! p-group for some prime p. Make sure that the !.projective component is set
+#! correctly such that we can set the right Order method.
 #! @EndChunk
 FindHomMethodsGeneric.KnownNilpotent := function(ri,G)
-  # Hint to this method if you know G to be nilpotent or call it directly
-  # if you find out so. Note that it will return NeverApplicable if G is a
-  # p-group for some prime p. Make sure that the !.projective component is set
-  # correctly such that we can set the right Order method.
   local H,cut,data,gens,decompositionData,gensfac,gensker,gensm,hom,ords,primes;
   gens := GeneratorsOfGroup(G);
   gensm := GeneratorsWithMemory(gens);
