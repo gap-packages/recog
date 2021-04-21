@@ -293,8 +293,7 @@ FindHomMethodsProjective.BlocksBackToMats := function(ri,G)
   Setmethodsforfactor(ri,FindHomDbMatrix);
   forfactor(ri).blocks := ri!.blocks{[1..Length(ri!.blocks)-1]};
   Add(forfactor(ri).hints,
-      rec(method := FindHomMethodsMatrix.BlockScalar, rank := 2000,
-          stamp := "BlockScalar"));
+      rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000 ));
 
   # This is an isomorphism:
   findgensNmeth(ri).method := FindKernelDoNothing;
@@ -379,7 +378,7 @@ end;
 #  # Inform authorities that the kernel can be recognised easily:
 #  forkernel(ri).subdim := ri!.subdim;
 #  Add(forkernel(ri).hints,rec(method := FindHomMethodsMatrix.LowerLeftPGroup,
-#                              rank := 2000,stamp := "LowerLeftPGroup"));
+#                              rank := 2000));
 #
 #  return Success;
 #end;

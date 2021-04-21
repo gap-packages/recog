@@ -251,8 +251,7 @@ FindHomMethodsProjective.BlockScalarProj := function(ri,G)
   # Switch to matrix mode:
   Setmethodsforfactor(ri,FindHomDbMatrix);
   Add(forfactor(ri).hints,
-      rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000,
-           stamp := "BlockScalar" ));
+      rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000 ));
   forfactor(ri).blocks := ri!.blocks{[1..Length(ri!.blocks)-1]};
   return Success;
 end;
@@ -311,15 +310,7 @@ AddMethod(FindHomDbPerm, FindHomMethodsGeneric.FewGensAbelian, 1250);
 
 # Note that we *can* in fact use the Matrix method here, because it
 # will do the right thing when used in projective mode:
-AddMethod(
-    FindHomDbProjective,
-    rec(
-        method := FindHomMethodsMatrix.ReducibleIso,
-        rank := 1200,
-        stamp := "ReducibleIso",
-        comment := "use MeatAxe to find a composition series, do base change",
-    )
-);
+AddMethod(FindHomDbProjective, FindHomMethodsMatrix.ReducibleIso, 1200);
 
 AddMethod(
     FindHomDbProjective,
