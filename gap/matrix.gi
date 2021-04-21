@@ -927,15 +927,7 @@ AddMethod(
     )
 );
 
-AddMethod(
-    FindHomDbMatrix,
-    rec(
-        method := FindHomMethodsGeneric.FewGensAbelian,
-        rank := 1050,
-        stamp := "FewGensAbelian",
-        comment := "if very few generators, check IsAbelian and if yes, do KnownNilpotent",
-    )
-);
+AddMethod(FindHomDbPerm, FindHomMethodsGeneric.FewGensAbelian, 1050);
 
 AddMethod(
     FindHomDbMatrix,

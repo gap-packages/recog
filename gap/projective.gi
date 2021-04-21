@@ -307,15 +307,7 @@ AddMethod(
     )
 );
 
-AddMethod(
-    FindHomDbProjective,
-    rec(
-        method := FindHomMethodsGeneric.FewGensAbelian,
-        rank := 1250,
-        stamp := "FewGensAbelian",
-        comment := "if very few generators, check IsAbelian and if yes, do KnownNilpotent",
-    )
-);
+AddMethod(FindHomDbPerm, FindHomMethodsGeneric.FewGensAbelian, 1250);
 
 # Note that we *can* in fact use the Matrix method here, because it
 # will do the right thing when used in projective mode:
