@@ -139,8 +139,9 @@ end;
 # Test to check whether the group contains both a large ppd element
 # and a basic ppd element
 # TODO: Better comments...
-RECOG.IsGenericParameters := function( recognise, grp )
-
+RECOG.IsGenericParameters := RecogMethod("IsGenericParameters",
+"tests whether group has generic parameters",
+function( recognise, grp )
     local fact, d, q, hint;
 
     hint := recognise.hint;
@@ -204,15 +205,16 @@ RECOG.IsGenericParameters := function( recognise, grp )
     fi;
 
     return false;
-end;
+end);
 
 
 # Generate elements until we find the required ppd type
 # elements...monte  yes
 # TODO: Better comments
 
-RECOG.IsGeneric := function (recognise, grp)
-
+RECOG.IsGeneric := RecogMethod("IsGeneric",
+"tests whether group is generic",
+function (recognise, grp)
     if recognise.isGeneric = false then
         return false;
     fi;
@@ -226,12 +228,13 @@ RECOG.IsGeneric := function (recognise, grp)
     recognise.isGeneric := true;
 
     return false;
-end;
+end);
 
 #enough info to rule out extension field groups...?
 #TODO: comments...
-RECOG.RuledOutExtField := function (recognise, grp)
-
+RECOG.RuledOutExtField := RecogMethod("RuledOutExtField",
+"tests whether extension field case is ruled out",
+function (recognise, grp)
     local differmodfour, d, q, E, b, bx, hint;
 
     hint := recognise.hint;
@@ -332,10 +335,11 @@ RECOG.RuledOutExtField := function (recognise, grp)
     if recognise.isNotExt = true then return false;
     else return fail;
     fi;
-end;
+end);
 
-RECOG.IsNotAlternating := function( recognise, grp )
-
+RECOG.IsNotAlternating := RecogMethod("IsNotAlternating",
+"tests whether alternating groups are ruled out",
+function( recognise, grp )
     local V, P, i, g ,q, o;
 
     q := recognise.q;
@@ -397,12 +401,13 @@ RECOG.IsNotAlternating := function( recognise, grp )
 
    return fail;
 
-end;
+end);
 
 
 
-RECOG.IsNotMathieu := function( recognise, grp )
-
+RECOG.IsNotMathieu := RecogMethod("IsNotMathieu",
+"tests whether Mathieu groups are ruled out",
+function( recognise, grp )
    local i, fn, g, d, q, E, ord;
 
    d := recognise.d;
@@ -468,11 +473,12 @@ RECOG.IsNotMathieu := function( recognise, grp )
 
    return fail;
 
-end;
+end);
 
 
-RECOG.IsNotPSL := function (recognise, grp)
-
+RECOG.IsNotPSL := RecogMethod("IsNotPSL",
+"tests whether PSL groups are ruled out",
+function (recognise, grp)
    local i, E, LE, d, p, a, q,  str, fn, ord;
 
     E := recognise.E;
@@ -574,7 +580,7 @@ RECOG.IsNotPSL := function (recognise, grp)
        return fail;
    fi;
    return fail;
-end;
+end);
 
 
 #############################################################################
@@ -610,8 +616,9 @@ IsPrimitivePrimeDivisor := function( b, a, p )
 end;
 
 # generate the next random element and its char polynomial
-RECOG.TestRandomElement := function (recognise, grp)
-
+RECOG.TestRandomElement := RecogMethod("TestRandomElement",
+"makes new random element and stores it and its char poly",
+function(recognise, grp)
     local g, ppd, bppd, d, q, cpol, f, deg, facs, r, s, h, gmod, str,
     ord, bc, phi, kf, o1, o2, cf, i, found, p;
 
@@ -829,14 +836,15 @@ RECOG.TestRandomElement := function (recognise, grp)
 
     return fail;
 
-end;
+end);
 
 
 
 # Compute the degrees of the irreducible factors of
 # the characteristic polynomial <cpol>
-RECOG.IsReducible := function( recognise, grp )
-
+RECOG.IsReducible := RecogMethod("IsReducible",
+"tests whether current random element rules out reducible",
+function( recognise, grp )
     local deg, dims, g;
 
     # compute the degrees of the irreducible factors
@@ -862,10 +870,11 @@ RECOG.IsReducible := function( recognise, grp )
     fi;
 
     return fail;
-end;
+end);
 
-RECOG.NoClassicalForms := function( recognise, grp )
-
+RECOG.NoClassicalForms := RecogMethod("NoClassicalForms",
+"tests whether we can rule out certain forms",
+function( recognise, grp )
     local d,field;
     PossibleClassicalForms( grp, recognise.g, recognise );
 
@@ -882,11 +891,13 @@ RECOG.NoClassicalForms := function( recognise, grp )
 
     return fail;
 
-end;
+end);
 
 
 
-RECOG.ClassicalForms := function( recognise, grp)
+RECOG.ClassicalForms := RecogMethod("ClassicalForms",
+"Find the invariant forms",
+function( recognise, grp)
     local   field,  z,  d,  i,  qq,  A,  c,  I,  t,  i0,
             a,  l,  g,  module,  forms,  dmodule,  fmodule,  form;
 
@@ -969,11 +980,12 @@ RECOG.ClassicalForms := function( recognise, grp)
 
     return fail;
 
-end;
+end);
 
 
-RECOG.MeatAxe := function( recognise, grp )
-
+RECOG.MeatAxe := RecogMethod("MeatAxe",
+"Test irreducibility",
+function( recognise, grp )
     if recognise.n > 15 then
         recognise.needMeataxe := true;
     fi;
@@ -996,12 +1008,12 @@ RECOG.MeatAxe := function( recognise, grp )
         recognise.isSOContained := false;
         return true;
     fi;
-end;
+end);
 
 ## Main function to test whether group contains SL
-RECOG.IsSLContained := function( recognise, grp )
-
-
+RECOG.IsSLContained := RecogMethod("IsSLContained",
+"tests whether group contains SL",
+function( recognise, grp )
     if recognise.isGeneric <> true or
        recognise.isNotExt <> true or
        recognise.isNotPSL <> true  or
@@ -1039,11 +1051,12 @@ RECOG.IsSLContained := function( recognise, grp )
         return false;
     fi;
 
-end;
+end);
 
 ## Main function to test whether group contains Sp
-RECOG.IsSpContained := function( recognise, grp )
-
+RECOG.IsSpContained := RecogMethod("IsSpContained",
+"tests whether group contains Sp",
+function( recognise, grp )
     local isSpForm;
 
     isSpForm := f -> IsSesquilinearForm(f) and IsSymplecticForm(f);
@@ -1095,12 +1108,13 @@ RECOG.IsSpContained := function( recognise, grp )
              recognise.d, ", ", recognise.q, ");");
         return false;
     fi;
-end;
+end);
 
 
 ## Main function to test whether group contains SU
-RECOG.IsSUContained := function( recognise, grp )
-
+RECOG.IsSUContained := RecogMethod("IsSUContained",
+"tests whether group contains SU",
+function( recognise, grp )
     local f, isHermForm, q0;
 
     isHermForm := f -> IsSesquilinearForm(f) and IsHermitianForm(f);
@@ -1158,12 +1172,13 @@ RECOG.IsSUContained := function( recognise, grp )
              recognise.d, ", ", q0, ");");
         return false;
     fi;
-end;
+end);
 
 
 ## Main function to test whether group contains SO
-RECOG.IsSOContained := function( recognise, grp )
-
+RECOG.IsSOContained := RecogMethod("IsSOContained",
+"tests whether group contains SO",
+function( recognise, grp )
     local f, isParForm, isEllForm, isHypForm;
 
     isParForm := f -> IsSesquilinearForm(f) and IsParabolicForm(f);
@@ -1256,7 +1271,7 @@ RECOG.IsSOContained := function( recognise, grp )
              recognise.d, ", ", recognise.q, ");");
         return false;
     fi;
-end;
+end);
 
 
 # orders: list of observed element orders
@@ -1282,8 +1297,9 @@ end;
 ##  find an element of order a multiple of 4 and a large and basic ppd(3,q;3)-
 ##  element
 ##
-RECOG.NonGenericLinear := function( recognise, grp )
-
+RECOG.NonGenericLinear := RecogMethod("NonGenericLinear",
+"tests whether group is non-generic Linear",
+function( recognise, grp )
     local CheckFlag;
 
     CheckFlag := function( )
@@ -1332,14 +1348,15 @@ RECOG.NonGenericLinear := function( recognise, grp )
     fi;
 
     return fail;
-end;
+end);
 
 ############################################################################/
 ##
 ##  Recognise non-generic symplectic matrix groups over finite fields
 ##
-RECOG.NonGenericSymplectic := function(recognise, grp)
-
+RECOG.NonGenericSymplectic := RecogMethod("NonGenericSymplectic",
+"tests whether group is non-generic Symplectic",
+function(recognise, grp)
     local d, q, CheckFlag, isSpForm;
 
     isSpForm := f -> IsSesquilinearForm(f) and IsSymplecticForm(f);
@@ -1451,14 +1468,15 @@ RECOG.NonGenericSymplectic := function(recognise, grp)
 
     return CheckFlag();
 
-end;
+end);
 
 ############################################################################/
 ##
 ##  Recognise non-generic unitary matrix groups over finite fields
 ##
-RECOG.NonGenericUnitary := function(recognise, grp)
-
+RECOG.NonGenericUnitary := RecogMethod("NonGenericUnitary",
+"tests whether group is non-generic Unitary",
+function(recognise, grp)
     local d, q,  g, f1, f2, o, CheckFlag, isHermForm, str;
 
     isHermForm := f -> IsSesquilinearForm(f) and IsHermitianForm(f);
@@ -1661,11 +1679,12 @@ RECOG.NonGenericUnitary := function(recognise, grp)
 
 
     return CheckFlag();
-end;
+end);
 
 
-RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
-
+RECOG.NonGenericOrthogonalPlus := RecogMethod("NonGenericOrthogonalPlus",
+"tests whether group is non-generic O+",
+function(recognise,grp)
     local d, q, gp1, gp2, CheckFlag, pgrp, orbs, isHypForm;
 
     isHypForm := f -> IsSesquilinearForm(f) and IsHyperbolicForm(f);
@@ -1895,10 +1914,11 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
 
      return CheckFlag();
 
-end;
+end);
 
-RECOG.NonGenericOrthogonalMinus := function(recognise, grp)
-
+RECOG.NonGenericOrthogonalMinus := RecogMethod("NonGenericOrthogonalMinus",
+"tests whether group is non-generic O-",
+function(recognise, grp)
     local d, q,  orbs, pgrp, h,  g, ppd,  CheckFlag, isEllForm;
 
 
@@ -2003,11 +2023,11 @@ RECOG.NonGenericOrthogonalMinus := function(recognise, grp)
 
      return CheckFlag();
 
-end;
+end);
 
-RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
-
-
+RECOG.NonGenericOrthogonalCircle := RecogMethod("NonGenericOrthogonalCircle",
+"tests whether group is non-generic Oo",
+function( recognise, grp )
     local d, q, g, s, CheckFlag, isParForm;
 
     isParForm := f -> IsSesquilinearForm(f) and IsParabolicForm(f);
@@ -2150,7 +2170,7 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
 
      return CheckFlag();
 
-end;
+end);
 
 ########
 
@@ -2162,218 +2182,47 @@ end;
 #
 # 1 - 10 Workers
 
-AddMethod(
-    ClassicalMethDb,
-    rec(
-        method := RECOG.TestRandomElement,
-        rank := 100,
-        stamp := "TestRandomElement",
-        comment := "makes new random element and stores it and its char poly",
-    )
-);
+AddMethod(ClassicalMethDb, RECOG.TestRandomElement, 100);
 
-AddMethod(
-    ClassicalMethDb,
-    rec(
-        method := RECOG.IsGenericParameters,
-        rank := 90,
-        stamp := "IsGenericParameters",
-        comment := "tests whether group has generic parameters",
-    )
-);
+AddMethod(ClassicalMethDb, RECOG.IsGenericParameters, 90);
 
-AddMethod(
-    ClassicalMethDb,
-    rec(
-        method := RECOG.IsGeneric,
-        rank := 89,
-        stamp := "IsGeneric",
-        comment := "tests whether group is generic",
-    )
-);
+AddMethod(ClassicalMethDb, RECOG.IsGeneric, 89);
 
-AddMethod(
-    ClassicalMethDb,
-    rec(
-        method := RECOG.IsReducible,
-        rank := 80,
-        stamp := "IsReducible",
-        comment := "tests whether current random element rules out reducible",
-    )
-);
+AddMethod(ClassicalMethDb, RECOG.IsReducible, 80);
 
-AddMethod(
-    ClassicalMethDb,
-    rec(
-        method := RECOG.RuledOutExtField,
-        rank := 81,
-        stamp := "RuledOutExtField",
-        comment := "tests whether extension field case is ruled out",
-    )
-);
+AddMethod(ClassicalMethDb, RECOG.RuledOutExtField, 81);
 
-AddMethod(
-    ClassicalMethDb,
-    rec(
-        method := RECOG.IsNotMathieu,
-        rank := 82,
-        stamp := "IsNotMathieu",
-        comment := "tests whether Mathieu groups are ruled out",
-    )
-);
+AddMethod(ClassicalMethDb, RECOG.IsNotMathieu, 82);
 
-AddMethod(
-    ClassicalMethDb,
-    rec(
-        method := RECOG.IsNotAlternating,
-        rank := 83,
-        stamp := "IsNotAlternating",
-        comment := "tests whether alternating groups are ruled out",
-    )
-);
+AddMethod(ClassicalMethDb, RECOG.IsNotAlternating, 83);
 
-AddMethod(
-    ClassicalMethDb,
-    rec(
-        method := RECOG.IsNotPSL,
-        rank := 84,
-        stamp := "IsNotPSL",
-        comment := "tests whether PSL groups are ruled out",
-    )
-);
+AddMethod(ClassicalMethDb, RECOG.IsNotPSL, 84);
 
+AddMethod(ClassicalMethDb, RECOG.NoClassicalForms, 85);
 
-AddMethod(
-    ClassicalMethDb,
-    rec(
-        method := RECOG.NoClassicalForms,
-        rank := 85,
-        stamp := "NoClassicalForms",
-        comment := "tests whether we can rule out certain forms",
-    )
-);
+AddMethod(ClassicalMethDb, RECOG.MeatAxe, 9);
 
-AddMethod(
-    ClassicalMethDb,
-    rec(
-        method := RECOG.MeatAxe,
-        rank := 9,
-        stamp := "MeatAxe",
-        comment := "Test irreducibility",
-    )
-);
+AddMethod(ClassicalMethDb, RECOG.ClassicalForms, 8);
 
-AddMethod(
-    ClassicalMethDb,
-    rec(
-        method := RECOG.ClassicalForms,
-        rank := 8,
-        stamp := "ClassicalForms",
-        comment := "Find the invariant forms",
-    )
-);
+AddMethod(ClassicalMethDb, RECOG.NonGenericLinear, 10);
 
-AddMethod(
-    ClassicalMethDb,
-    rec(
-        method := RECOG.NonGenericLinear,
-        rank := 10,
-        stamp := "NonGenericLinear",
-        comment := "tests whether group is non-generic Linear",
-    )
-);
+AddMethod(ClassicalMethDb, RECOG.NonGenericUnitary, 11);
 
-AddMethod(
-    ClassicalMethDb,
-    rec(
-        method := RECOG.NonGenericUnitary,
-        rank := 11,
-        stamp := "NonGenericUnitary",
-        comment := "tests whether group is non-generic Unitary",
-    )
-);
+AddMethod(ClassicalMethDb, RECOG.NonGenericSymplectic, 12);
 
-AddMethod(
-    ClassicalMethDb,
-    rec(
-        method := RECOG.NonGenericSymplectic,
-        rank := 12,
-        stamp := "NonGenericSymplectic",
-        comment := "tests whether group is non-generic Symplectic",
-    )
-);
+AddMethod(ClassicalMethDb, RECOG.NonGenericOrthogonalPlus, 13);
 
-AddMethod(
-    ClassicalMethDb,
-    rec(
-        method := RECOG.NonGenericOrthogonalPlus,
-        rank := 13,
-        stamp := "NonGenericOrthogonalPlus",
-        comment := "tests whether group is non-generic O+",
-    )
-);
+AddMethod(ClassicalMethDb, RECOG.NonGenericOrthogonalMinus, 14);
 
+AddMethod(ClassicalMethDb, RECOG.NonGenericOrthogonalCircle, 15);
 
-AddMethod(
-    ClassicalMethDb,
-    rec(
-        method := RECOG.NonGenericOrthogonalMinus,
-        rank := 14,
-        stamp := "NonGenericOrthogonalMinus",
-        comment := "tests whether group is non-generic O-",
-    )
-);
+AddMethod(ClassicalMethDb, RECOG.IsSLContained, 16);
 
+AddMethod(ClassicalMethDb, RECOG.IsSpContained, 17);
 
-AddMethod(
-    ClassicalMethDb,
-    rec(
-        method := RECOG.NonGenericOrthogonalCircle,
-        rank := 15,
-        stamp := "NonGenericOrthogonalCircle",
-        comment := "tests whether group is non-generic Oo",
-    )
-);
+AddMethod(ClassicalMethDb, RECOG.IsSUContained, 18);
 
-AddMethod(
-    ClassicalMethDb,
-    rec(
-        method := RECOG.IsSLContained,
-        rank := 16,
-        stamp := "IsSLContained",
-        comment := "tests whether group contains SL",
-    )
-);
-
-AddMethod(
-    ClassicalMethDb,
-    rec(
-        method := RECOG.IsSpContained,
-        rank := 17,
-        stamp := "IsSpContained",
-        comment := "tests whether group contains Sp",
-    )
-);
-
-AddMethod(
-    ClassicalMethDb,
-    rec(
-        method := RECOG.IsSUContained,
-        rank := 18,
-        stamp := "IsSUContained",
-        comment := "tests whether group contains SU",
-    )
-);
-
-AddMethod(
-    ClassicalMethDb,
-    rec(
-        method := RECOG.IsSOContained,
-        rank := 19,
-        stamp := "IsSOContained",
-        comment := "tests whether group contains SO",
-    )
-);
+AddMethod(ClassicalMethDb, RECOG.IsSOContained, 19);
 
 
 
