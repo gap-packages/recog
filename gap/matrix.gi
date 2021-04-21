@@ -71,7 +71,7 @@ FindHomMethodsMatrix.DiagonalMatrices := function(ri, G)
 
   # Hint to the factor:
   Add(forfactor(ri).hints,rec( method := FindHomMethodsMatrix.Scalar,
-                               rank := 4000, stamp := "Scalar" ),1);
+                               rank := 4000, stamp := "Scalar" ));
 
   return Success;
 end;
@@ -229,7 +229,7 @@ FindHomMethodsMatrix.BlockScalar := function(ri, G)
       SetHomom(ri,hom);
       Add(forfactor(ri).hints,
           rec( method := FindHomMethodsMatrix.Scalar, rank := 2000,
-               stamp := "Scalar" ),1);
+               stamp := "Scalar" ));
 
       if nrblocks = 1 then     # no kernel:
           findgensNmeth(ri).method := FindKernelDoNothing;
@@ -243,7 +243,7 @@ FindHomMethodsMatrix.BlockScalar := function(ri, G)
           # is only a part of the whole matrix:
           Add(forkernel(ri).hints,
               rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000,
-                   stamp := "BlockScalar" ),1);
+                   stamp := "BlockScalar" ));
           Setimmediateverification(ri,true);
       fi;
       return Success;
@@ -263,7 +263,7 @@ FindHomMethodsMatrix.BlockScalar := function(ri, G)
                                x->x - (ri!.blocks[middle][1]-1));
   Add(forfactor(ri).hints,
       rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000,
-           stamp := "BlockScalar" ),1);
+           stamp := "BlockScalar" ));
 
   # the kernel is the first few blocks (can be only one!):
   # FIXME: why don't we just compute a precise set of generators of the kernel?
@@ -273,7 +273,7 @@ FindHomMethodsMatrix.BlockScalar := function(ri, G)
   forkernel(ri).blocks := ri!.blocks{[1..middle-1]};
   Add(forkernel(ri).hints,
       rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000,
-           stamp := "BlockScalar" ),1);
+           stamp := "BlockScalar" ));
   Setimmediateverification(ri,true);
   return Success;
 end;

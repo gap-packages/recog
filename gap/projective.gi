@@ -99,7 +99,7 @@ FindHomMethodsProjective.BlocksModScalars := function(ri,G)
   forkernel(ri).blocks := ri!.blocks{[1..middle-1]};
   Add(forkernel(ri).hints,
       rec( method := FindHomMethodsProjective.BlocksModScalars, rank := 2000,
-           stamp := "BlocksModScalars" ),1);
+           stamp := "BlocksModScalars" ));
   Setimmediateverification(ri,true);
   return Success;
 end;
@@ -252,7 +252,7 @@ FindHomMethodsProjective.BlockScalarProj := function(ri,G)
   Setmethodsforfactor(ri,FindHomDbMatrix);
   Add(forfactor(ri).hints,
       rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000,
-           stamp := "BlockScalar" ), 1);
+           stamp := "BlockScalar" ));
   forfactor(ri).blocks := ri!.blocks{[1..Length(ri!.blocks)-1]};
   return Success;
 end;

@@ -202,7 +202,7 @@ FindHomMethodsProjective.LowIndex := function(ri,G)
           forkernel(ri).blocksize := Length(res.orb[1]);
           Add(forkernel(ri).hints,
               rec(method := FindHomMethodsProjective.DoBaseChangeForBlocks,
-                  rank := 2000, stamp := "DoBaseChangeForBlocks"),1);
+                  rank := 2000, stamp := "DoBaseChangeForBlocks"));
           Setimmediateverification(ri,true);
           findgensNmeth(ri).args[1] := Length(res.orb)+3;
           findgensNmeth(ri).args[2] := 5;

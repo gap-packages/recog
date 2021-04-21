@@ -411,7 +411,7 @@ FindHomMethodsProjective.KroneckerProduct := function(ri,G)
 
   Add( forkernel(ri).hints,
        rec( method := FindHomMethodsProjective.KroneckerKernel, rank := 2000,
-            stamp := "KroneckerKernel" ), 1);
+            stamp := "KroneckerKernel" ) );
   forkernel(ri).blocksize := ri!.blocksize;
   return Success;
 end;

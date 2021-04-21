@@ -189,13 +189,13 @@ FindHomMethodsPerm.BalTreeForBlocks := function(ri,G)
       forfactor(ri).blocks := List([1..n],i->[(i-1)*l+1..i*l]);
       Add(forfactor(ri).hints,rec(method := FindHomMethodsPerm.BalTreeForBlocks,
                                   rank := 200,
-                                  stamp := "BalTreeForBlocks"),1);
+                                  stamp := "BalTreeForBlocks"));
   fi;
   if cut > 1 then
       forkernel(ri).blocks := lowerhalf;
       Add(forkernel(ri).hints,rec(method := FindHomMethodsPerm.BalTreeForBlocks,
                                   rank := 200,
-                                  stamp := "BalTreeForBlocks"),1);
+                                  stamp := "BalTreeForBlocks"));
   fi;
   return Success;
 end;
