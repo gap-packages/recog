@@ -28,3 +28,4 @@ ReadPackage("recog","gap/matrix/classical.gd");
 ReadPackage("recog","gap/projective/almostsimple.gd");
 ReadPackage("recog","gap/projective/findnormal.gd");
 ReadPackage("recog","gap/projective/AnSnOnFDPM.gd");
+ReadPackage("recog","gap/generic/kernel.gd");
