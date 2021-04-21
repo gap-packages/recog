@@ -279,36 +279,6 @@ FindHomMethodsMatrix.BlockScalar := function(ri, G)
 end;
 
 # A helper function for base changes:
-
-ExtendToBasisOfFullRowspace := function(m,f)
-  # FIXME:
-  # This function has to be improved with respect to performance:
-  local i,o,v,z;
-  if not IsMutable(m) then
-      m := MutableCopyMat(m);
-  fi;
-  v := ZeroMutable(m[1]);
-  if RankMat(m) < Length(m) then
-      ErrorNoReturn("No basis!");
-  fi;
-  i := 1;
-  o := One(f);
-  z := Zero(f);
-  while Length(m) < Length(m[1]) do
-      v[i] := o;
-      Add(m,ShallowCopy(v));
-      v[i] := z;
-      if RankMat(m) < Length(m) then
-          Unbind(m[Length(m)]);
-      #else
-      #    Print("len=",Length(m),"    \r");
-      fi;
-      i := i + 1;
-  od;
-  #Print("\n");
-  return m;
-end;
-
 RECOG.HomDoBaseChange := function(data,el)
   return data.t*el*data.ti;
 end;
