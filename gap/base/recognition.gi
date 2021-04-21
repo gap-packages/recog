@@ -427,7 +427,7 @@ InstallGlobalFunction( PrintTreePos,
 InstallGlobalFunction( RecogniseGeneric,
   function(H, methoddb, depthString, knowledge)
     # Assume all the generators have no memory!
-    local N,depth,done,i,l,ll,gensNmeth,allmethods,
+    local N,depth,done,i,l,ll,allmethods,
           proj1,proj2,ri,rifac,riker,s,x,y,z,succ,counter;
 
     depth := Length(depthString);
@@ -554,9 +554,8 @@ InstallGlobalFunction( RecogniseGeneric,
         Setpregensfac(ri, StripMemory(ri!.pregensfacwithmem));
 
         # Now create the kernel generators with the stored method:
-        gensNmeth := findgensNmeth(ri);
-        succ := CallFuncList(gensNmeth.method,
-                             Concatenation([ri],gensNmeth.args));
+        succ := CallFuncList(findgensNmeth(ri).method,
+                             Concatenation([ri],findgensNmeth(ri).args));
     until succ;
 
     # If nobody has set how we produce preimages of the nicegens:
