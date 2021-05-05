@@ -3181,7 +3181,9 @@ end;
 #! @BeginChunk ClassicalNatural
 #! TODO
 #! @EndChunk
-FindHomMethodsProjective.ClassicalNatural := function(ri,g)
+FindHomMethodsProjective.ClassicalNatural := RecogMethod("ClassicalNatural",
+"check whether it is a classical group in its natural representation",
+function(ri, g)
   local changed,classical,d,det,ext,f,gcd,gens,gg,gm,i,p,pr,q,root,std,stdg,z;
   d := ri!.dimension;
   f := ri!.field;
@@ -3295,4 +3297,4 @@ FindHomMethodsProjective.ClassicalNatural := function(ri,g)
 
   return fail; # FIXME: fail = TemporaryFailure here really correct?
 
-end;
+end);

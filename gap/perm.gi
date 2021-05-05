@@ -142,7 +142,7 @@ end);
 #! called, and otherwise <K>NeverApplicable</K> is returned.
 #! @EndChunk
 FindHomMethodsPerm.PcgsForBlocks := RecogMethod("PcgsForBlocks",
-"COMMENT",
+"TODO",
 function(ri, G)
   local blocks,pcgs,subgens;
   blocks := ri!.blocks;   # we know them from above!
@@ -166,7 +166,7 @@ end);
 #! half of its blocks.
 #! @EndChunk
 FindHomMethodsPerm.BalTreeForBlocks := RecogMethod("BalTreeForBlocks",
-"COMMENT",
+"TODO",
 function(ri, G)
   local blocks,cut,hom,lowerhalf,nrblocks,o,upperhalf,l,n,seto;
 

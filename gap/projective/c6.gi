@@ -723,7 +723,9 @@ end;
 #! <A>G</A> into <M>Sp(2n,r)</M>, or a homomorphism into the C2 permutation
 #! action of <A>G</A> on a decomposition of <M>GF(q)^d</M>, or <K>fail</K>.
 #! @EndChunk
-FindHomMethodsProjective.C6 := function(ri,G)
+FindHomMethodsProjective.C6 := RecogMethod("C6",
+"find either an (imprimitive) action or a symplectic one",
+function(ri, G)
     local r,re,hom;
 
     RECOG.SetPseudoRandomStamp(G,"C6");
@@ -760,7 +762,7 @@ FindHomMethodsProjective.C6 := function(ri,G)
     SetHomom(ri,hom);
 
     return Success;
-end;
+end);
 
 # code prepared by Steve Linton
 # see comment for main function for its description

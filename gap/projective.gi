@@ -38,7 +38,9 @@ end;
 #! diagonal blocks and finally using projective recognition to recognise
 #! single diagonal block groups.
 #! @EndChunk
-FindHomMethodsProjective.BlocksModScalars := function(ri,G)
+FindHomMethodsProjective.BlocksModScalars := RecogMethod("BlocksModScalars",
+"TODO",
+function(ri, G)
   # We assume that ri!.blocks is a list of ranges where the diagonal
   # blocks are. Note that their length does not have to sum up to
   # the dimension, because some blocks at the end might already be trivial.
@@ -88,8 +90,7 @@ FindHomMethodsProjective.BlocksModScalars := function(ri,G)
       forfactor(ri).blocks := List(ri!.blocks{[middle..nrblocks]},
                                    x->x - (ri!.blocks[middle][1]-1));
       Add(forfactor(ri).hints,
-          rec( method := FindHomMethodsProjective.BlocksModScalars,rank := 2000,
-               stamp := "BlocksModScalars" ),1);
+          rec( method := FindHomMethodsProjective.BlocksModScalars, rank := 2000 ));
   fi; # Otherwise the factor is to be recognised projectively as usual
 
   # the kernel is the first few blocks:
@@ -98,11 +99,10 @@ FindHomMethodsProjective.BlocksModScalars := function(ri,G)
   # The following is already set, but make it explicit here:
   forkernel(ri).blocks := ri!.blocks{[1..middle-1]};
   Add(forkernel(ri).hints,
-      rec( method := FindHomMethodsProjective.BlocksModScalars, rank := 2000,
-           stamp := "BlocksModScalars" ));
+      rec( method := FindHomMethodsProjective.BlocksModScalars, rank := 2000 ));
   Setimmediateverification(ri,true);
   return Success;
-end;
+end);
 
 SLPforElementFuncsProjective.StabilizerChainProj := function(ri,x)
   local r;
@@ -119,7 +119,9 @@ end;
 #! the stabiliser chain.
 #! @EndChunk
 # TODO: merge FindHomMethodsPerm.StabilizerChainPerm and  FindHomMethodsProjective.StabilizerChainProj ?
-FindHomMethodsProjective.StabilizerChainProj := function(ri,G)
+FindHomMethodsProjective.StabilizerChainProj := RecogMethod("StabilizerChainProj",
+"last resort: compute a stabilizer chain (projectively)",
+function(ri, G)
   local Gm,S,SS,d,f,fu,opt,perms,q;
   d := ri!.dimension;
   f := ri!.field;
@@ -144,7 +146,7 @@ FindHomMethodsProjective.StabilizerChainProj := function(ri,G)
       Setmethodsforfactor(ri,FindHomDbPerm);
   fi;
   return Success;
-end;
+end);
 
 RECOG.HomProjDet := function(data,m)
   local x;
@@ -162,7 +164,9 @@ end;
 #! element <M>g \in <A>G</A></M> is the determinant of a matrix representative of
 #! <M>g</M>, modulo <M>D</M>.
 #! @EndChunk
-FindHomMethodsProjective.ProjDeterminant := function(ri,G)
+FindHomMethodsProjective.ProjDeterminant := RecogMethod("ProjDeterminant",
+"find homomorphism to non-zero scalars mod d-th powers",
+function(ri, G)
   local H,c,d,detsadd,f,gcd,hom,newgens,q,z;
   f := ri!.field;
   d := ri!.dimension;
@@ -188,7 +192,7 @@ FindHomMethodsProjective.ProjDeterminant := function(ri,G)
   findgensNmeth(ri).args[2] := 5;
   Setimmediateverification(ri,true);
   return Success;
-end;
+end);
 
 RECOG.IsBlockScalarMatrix := function(blocks, x)
   local b, s;
@@ -230,7 +234,9 @@ end;
 #! delegates to <C>BlockScalar</C> (see <Ref Subsect="BlockScalar"/>)
 #! and matrix group mode to do the recognition.
 #! @EndChunk
-FindHomMethodsProjective.BlockScalarProj := function(ri,G)
+FindHomMethodsProjective.BlockScalarProj := RecogMethod("BlockScalarProj",
+"TODO",
+function(ri, G)
   # We just norm the last block and go to matrix methods.
   local H,data,hom,newgens,g;
   data := rec( blocks := ri!.blocks );
@@ -254,7 +260,7 @@ FindHomMethodsProjective.BlockScalarProj := function(ri,G)
       rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000 ));
   forfactor(ri).blocks := ri!.blocks{[1..Length(ri!.blocks)-1]};
   return Success;
-end;
+end);
 
 RECOG.MakeAlternatingMatrixReps := function(deg,f,tens)
   local a,b,gens,gens2,i,m,ogens,r;
@@ -296,15 +302,7 @@ end;
 AddMethod(FindHomDbProjective, FindHomMethodsGeneric.TrivialGroup, 3000);
 #! @EndCode
 
-AddMethod(
-    FindHomDbProjective,
-    rec(
-        method := FindHomMethodsProjective.ProjDeterminant,
-        rank := 1300,
-        stamp := "ProjDeterminant",
-        comment := "find homomorphism to non-zero scalars mod d-th powers",
-    )
-);
+AddMethod(FindHomDbProjective, FindHomMethodsProjective.ProjDeterminant, 1300);
 
 AddMethod(FindHomDbPerm, FindHomMethodsGeneric.FewGensAbelian, 1250);
 
@@ -312,69 +310,22 @@ AddMethod(FindHomDbPerm, FindHomMethodsGeneric.FewGensAbelian, 1250);
 # will do the right thing when used in projective mode:
 AddMethod(FindHomDbProjective, FindHomMethodsMatrix.ReducibleIso, 1200);
 
-AddMethod(
-    FindHomDbProjective,
-    rec(
-        method := FindHomMethodsProjective.NotAbsolutelyIrred,
-        rank := 1100,
-        stamp := "NotAbsolutelyIrred",
-        comment := "write over a bigger field with smaller degree",
-    )
-);
+AddMethod(FindHomDbProjective, FindHomMethodsProjective.NotAbsolutelyIrred, 1100);
 
-AddMethod(
-    FindHomDbProjective,
-    rec(
-        method := FindHomMethodsProjective.ClassicalNatural,
-        rank := 1050,
-        stamp := "ClassicalNatural",
-        comment := "check whether it is a classical group in its natural representation",
-    )
-);
+AddMethod(FindHomDbProjective, FindHomMethodsProjective.ClassicalNatural, 1050);
 
-AddMethod(
-    FindHomDbProjective,
-    rec(
-        method := FindHomMethodsProjective.Subfield,
-        rank := 1000,
-        stamp := "Subfield",
-        comment := "write over a smaller field with same degree",
-    )
-);
+AddMethod(FindHomDbProjective, FindHomMethodsProjective.Subfield, 1000);
 
-AddMethod(
-    FindHomDbProjective,
-    rec(
-        method := FindHomMethodsProjective.C3C5,
-        rank := 900,
-        stamp := "C3C5",
-        comment := "compute a normal subgroup of derived and resolve C3 and C5",
-    )
-);
+AddMethod(FindHomDbProjective, FindHomMethodsProjective.C3C5, 900);
 
 #AddMethod( FindHomDbProjective, FindHomMethodsProjective.Derived,
 #   900, "Derived",
 #        "restrict to derived subgroup" );
 # Superseded by C3C5.
-AddMethod(
-    FindHomDbProjective,
-    rec(
-        method := FindHomMethodsProjective.C6,
-        rank := 850,
-        stamp := "C6",
-        comment := "find either an (imprimitive) action or a symplectic one",
-    )
-);
 
-AddMethod(
-    FindHomDbProjective,
-    rec(
-        method := FindHomMethodsProjective.D247,
-        rank := 840,
-        stamp := "D247",
-        comment := "play games to find a normal subgroup",
-    )
-);
+AddMethod(FindHomDbProjective, FindHomMethodsProjective.C6, 850);
+
+AddMethod(FindHomDbProjective, FindHomMethodsProjective.D247, 840);
 
 # # We can do the following early on since it will quickly fail for
 # # non-sporadic groups:
@@ -468,15 +419,7 @@ AddMethod(
     )
 );
 
-AddMethod(
-    FindHomDbProjective,
-    rec(
-        method := FindHomMethodsProjective.StabilizerChainProj,
-        rank := 100,
-        stamp := "StabilizerChainProj",
-        comment := "last resort: compute a stabilizer chain (projectively)",
-    )
-);
+AddMethod(FindHomDbProjective, FindHomMethodsProjective.StabilizerChainProj, 100);
 
 
 # Old methods which are no longer used:
