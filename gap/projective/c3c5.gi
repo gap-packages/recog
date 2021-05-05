@@ -132,7 +132,9 @@ end;
 #! elements can be elements in the centraliser of <A>G</A> in <M>PGL(d,q)</M>
 #! that come from scalar matrices in the extension field.
 #! @EndChunk
-FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
+FindHomMethodsProjective.NotAbsolutelyIrred := RecogMethod("NotAbsolutelyIrred",
+"write over a bigger field with smaller degree",
+function(ri, G)
   local H,f,hom,m,r;
 
   RECOG.SetPseudoRandomStamp(G,"NotAbsolutelyIrred");
@@ -179,15 +181,14 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
   findgensNmeth(ri).args := [5,0];
   Add(forkernel(ri).hints,
       rec(method := FindHomMethodsProjective.BiggerScalarsOnly,
-          rank   := 2000,
-          stamp  := "BiggerScalarsOnly"));
+          rank   := 2000));
   forkernel(ri).degsplittingfield := MTX.DegreeSplittingField(m)
                                    / DegreeOverPrimeField(f);
   forkernel(ri).biggerscalarsbas := r.inforec.bas;
   forkernel(ri).biggerscalarsbasi := r.inforec.basi;
 
   return Success;
-end;
+end);
 
 RECOG.HomBCToDiagonalBlock := function(data,x)
   local el;
@@ -198,7 +199,9 @@ end;
 #! @BeginChunk BiggerScalarsOnly
 #! TODO
 #! @EndChunk
-FindHomMethodsProjective.BiggerScalarsOnly := function(ri,G)
+FindHomMethodsProjective.BiggerScalarsOnly := RecogMethod("BiggerScalarsOnly",
+"TODO",
+function(ri, G)
   # We come here only hinted, we project to a little square block in the
   # upper left corner and know that there is no kernel:
   local H, data, hom;
@@ -217,7 +220,7 @@ FindHomMethodsProjective.BiggerScalarsOnly := function(ri,G)
   findgensNmeth(ri).method := FindKernelDoNothing;
 
   return Success;
-end;
+end);
 
 # The following are for subfield computations:
 
@@ -389,7 +392,9 @@ end;
 #! @BeginChunk Subfield
 #! TODO
 #! @EndChunk
-FindHomMethodsProjective.Subfield :=  function(ri,G)
+FindHomMethodsProjective.Subfield := RecogMethod("Subfield",
+"write over a smaller field with same degree",
+function(ri, G)
     # We assume G to be absolutely irreducible, although this is not
     # necessary:
     local Gprime,H,b,dim,f,hom,mo,newgens,pf,r;
@@ -423,7 +428,7 @@ FindHomMethodsProjective.Subfield :=  function(ri,G)
 
     # nothing more to do for us, C3C5 takes care of the rest!
     return NeverApplicable;
-  end;
+end);
 
 RECOG.HomActionFieldAuto := function(data,el)
   local pos,y;
@@ -447,7 +452,9 @@ end;
 #! @BeginChunk C3C5
 #! TODO
 #! @EndChunk
-FindHomMethodsProjective.C3C5 := function(ri,G)
+FindHomMethodsProjective.C3C5 := RecogMethod("C3C5",
+"compute a normal subgroup of derived and resolve C3 and C5",
+function(ri, G)
   # We assume that G acts absolutely irreducibly and that the matrix group
   # G cannot be realised over a smaller field. However, it might still be
   # C3 or C5. We see what we can do by computing a normal subgroup of
@@ -699,4 +706,4 @@ FindHomMethodsProjective.C3C5 := function(ri,G)
       return Success;
 
   fi;
-end;
+end);

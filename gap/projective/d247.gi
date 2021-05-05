@@ -349,7 +349,9 @@ RECOG.SortOutReducibleSecondNormalSubgroup :=
 #! @BeginChunk D247
 #! TODO
 #! @EndChunk
-FindHomMethodsProjective.D247 := function(ri,G)
+FindHomMethodsProjective.D247 := RecogMethod("D247",
+"play games to find a normal subgroup",
+function(ri, G)
   # We try to produce an element of a normal subgroup by playing
   # tricks.
   local CheckNormalClosure,f,i,res,x,ispower;
@@ -420,12 +422,14 @@ FindHomMethodsProjective.D247 := function(ri,G)
   if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;
   Info(InfoRecog,2,"D247: Did not find normal subgroup, giving up.");
   return TemporaryFailure;
-end;
+end);
 
 #! @BeginChunk PrototypeForC2C4
 #! TODO/FIXME: PrototypeForC2C4 is not used anywhere
 #! @EndChunk
-FindHomMethodsProjective.PrototypeForC2C4 := function(ri,G)
+FindHomMethodsProjective.PrototypeForC2C4 := RecogMethod("PrototypeForC2C4",
+"TODO",
+function(ri, G)
   # We try to produce an element of a normal subgroup by playing
   # tricks.
   local CheckNormalClosure,f,m,res,ngens,l;
@@ -459,4 +463,4 @@ FindHomMethodsProjective.PrototypeForC2C4 := function(ri,G)
 
   Info(InfoRecog,2,"Proto: Did not find normal subgroup, giving up.");
   return fail;
-end;
+end);
