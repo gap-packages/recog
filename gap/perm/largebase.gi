@@ -528,7 +528,10 @@ end;
 #! <K>NeverApplicable</K> if no parameters <M>n</M>, <M>k</M>, and <M>r</M> as
 #! above exist.
 #! @EndChunk
-FindHomMethodsPerm.LargeBasePrimitive := function(ri,grp)
+FindHomMethodsPerm.LargeBasePrimitive := RecogMethod("LargeBasePrimitive",
+"recognises large-base primitive permutation groups",
+rec(validatesOrAlwaysValidInput := true),
+function(ri, grp)
     local res,T,seen,imgens,hom;
     if not IsPermGroup(grp) then
         return NeverApplicable;
@@ -555,4 +558,4 @@ FindHomMethodsPerm.LargeBasePrimitive := function(ri,grp)
     findgensNmeth(ri).method := FindKernelDoNothing;
 
     return Success;
-  end;
+end);
