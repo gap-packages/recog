@@ -28,12 +28,15 @@
 #! If the input group moves a large point (currently, this means a point
 #! larger than 10), then this method returns <K>NeverApplicable</K>.
 #! @EndChunk
-FindHomMethodsPerm.MovesOnlySmallPoints := function(ri, G)
+FindHomMethodsPerm.MovesOnlySmallPoints := RecogMethod("MovesOnlySmallPoints",
+"calculate a stabilizer chain if only small points are moved",
+rec(validatesOrAlwaysValidInput := true),
+function(ri, G)
   if LargestMovedPoint(G) <= 10 then
       return FindHomMethodsPerm.StabChain(ri, G);
   fi;
   return NeverApplicable;
-end;
+end);
 
 #! @BeginChunk NonTransitive
 #! If a permutation group <A>G</A> acts nontransitively then this method
@@ -42,7 +45,10 @@ end;
 #! <K>NeverApplicable</K>.
 #! @EndChunk
 #! @BeginCode FindHomMethodsPerm.NonTransitive
-FindHomMethodsPerm.NonTransitive := function( ri, G )
+FindHomMethodsPerm.NonTransitive := RecogMethod("NonTransitive",
+"try to find non-transitivity and restrict to orbit",
+rec(validatesOrAlwaysValidInput := true),
+function(ri, G)
     local hom,la,o;
 
     # test whether we can do something:
@@ -64,7 +70,7 @@ FindHomMethodsPerm.NonTransitive := function( ri, G )
 
     # indicate success
     return Success;
-  end;
+end);
 #! @EndCode
 
 #! @BeginChunk Imprimitive
@@ -81,8 +87,10 @@ FindHomMethodsPerm.NonTransitive := function( ri, G )
 #! for the number of random generators in the kernel construction is increased
 #! by the number of blocks.
 #! @EndChunk
-FindHomMethodsPerm.Imprimitive :=
-  function( ri, G )
+FindHomMethodsPerm.Imprimitive := RecogMethod("Imprimitive",
+"for a imprimitive permutation group, restricts to block system",
+rec(validatesOrAlwaysValidInput := true),
+function(ri, G)
     local blocks,hom,pcgs,subgens;
 
     # Only look for primitivity once we know transitivity:
@@ -116,15 +124,13 @@ FindHomMethodsPerm.Imprimitive :=
     Setimmediateverification(ri,true);
     forkernel(ri).blocks := blocks;
     Add(forkernel(ri).hints,rec(method := FindHomMethodsPerm.PcgsForBlocks,
-                                rank := 400,
-                                stamp := "PcgsHinted"));
+                                rank := 400));
     Add(forkernel(ri).hints,rec(method := FindHomMethodsPerm.BalTreeForBlocks,
-                                rank := 200,
-                                stamp := "BalTreeForBlocks"));
+                                rank := 200));
     findgensNmeth(ri).args[1] := Length(blocks)+3;
     findgensNmeth(ri).args[2] := 5;
     return Success;
-  end;
+end);
 
 #! @BeginChunk PcgsForBlocks
 #! This method is called after a hint is set in
@@ -135,7 +141,9 @@ FindHomMethodsPerm.Imprimitive :=
 #! If so, then <C>FindHomMethodsPerm.</C><Ref Subsect="Pcgs" Style="Text"/> is
 #! called, and otherwise <K>NeverApplicable</K> is returned.
 #! @EndChunk
-FindHomMethodsPerm.PcgsForBlocks := function(ri,G)
+FindHomMethodsPerm.PcgsForBlocks := RecogMethod("PcgsForBlocks",
+"COMMENT",
+function(ri, G)
   local blocks,pcgs,subgens;
   blocks := ri!.blocks;   # we know them from above!
   subgens := List(GeneratorsOfGroup(G),g->RestrictedPerm(g,blocks[1]));
@@ -147,7 +155,7 @@ FindHomMethodsPerm.PcgsForBlocks := function(ri,G)
   fi;
   # We have failed, let others do the work...
   return NeverApplicable;
-end;
+end);
 
 #! @BeginChunk BalTreeForBlocks
 #! This method creates a balanced composition tree for the kernel of an
@@ -157,7 +165,9 @@ end;
 #! induced by the action of <A>G</A> on
 #! half of its blocks.
 #! @EndChunk
-FindHomMethodsPerm.BalTreeForBlocks := function(ri,G)
+FindHomMethodsPerm.BalTreeForBlocks := RecogMethod("BalTreeForBlocks",
+"COMMENT",
+function(ri, G)
   local blocks,cut,hom,lowerhalf,nrblocks,o,upperhalf,l,n,seto;
 
   blocks := ri!.blocks;
@@ -188,17 +198,15 @@ FindHomMethodsPerm.BalTreeForBlocks := function(ri,G)
       n := Length(upperhalf);
       forfactor(ri).blocks := List([1..n],i->[(i-1)*l+1..i*l]);
       Add(forfactor(ri).hints,rec(method := FindHomMethodsPerm.BalTreeForBlocks,
-                                  rank := 200,
-                                  stamp := "BalTreeForBlocks"));
+                                  rank := 200));
   fi;
   if cut > 1 then
       forkernel(ri).blocks := lowerhalf;
       Add(forkernel(ri).hints,rec(method := FindHomMethodsPerm.BalTreeForBlocks,
-                                  rank := 200,
-                                  stamp := "BalTreeForBlocks"));
+                                  rank := 200));
   fi;
   return Success;
-end;
+end);
 
 # Now to the small base groups using stabilizer chains:
 
@@ -220,8 +228,10 @@ end;
 #! chain. The method selection process ensures that this function is called
 #! only with small-base inputs, where the method works efficiently.
 #! @EndChunk
-FindHomMethodsPerm.StabChain :=
-   function( ri, G )
+FindHomMethodsPerm.StabChain := RecogMethod("StabChain",
+"for a permutation group using a stabilizer chain",
+rec(validatesOrAlwaysValidInput := true),
+function(ri, G)
      local Gmem,S,si;
 
      # We know transitivity and primitivity, because there are higher ranked
@@ -247,7 +257,7 @@ FindHomMethodsPerm.StabChain :=
      SetSize(ri,SizeStabChain(S));
      ri!.Gnomem := G;
      return Success;
-   end;
+end);
 
 SLPforElementFuncsPerm.StabilizerChainPerm := function(ri,x)
   local r;
@@ -259,7 +269,14 @@ end;
 #! TODO
 #! @EndChunk
 # TODO: merge FindHomMethodsPerm.StabilizerChainPerm and  FindHomMethodsProjective.StabilizerChainProj ?
-FindHomMethodsPerm.StabilizerChainPerm := function(ri,G)
+FindHomMethodsPerm.StabilizerChainPerm := RecogMethod("StabilizerChainPerm",
+Concatenation(
+    "for a permutation group using a stabilizer chain via the ",
+    "<URL Text=\"genss package\">",
+    "https://gap-packages.github.io/genss/",
+    "</URL>"),
+rec(validatesOrAlwaysValidInput := true),
+function(ri, G)
   local Gm,S;
   Gm := Group(ri!.gensHmem);
   Gm!.pseudorandomfunc := [rec(
@@ -274,7 +291,7 @@ FindHomMethodsPerm.StabilizerChainPerm := function(ri,G)
   Setslpforelement(ri,SLPforElementFuncsPerm.StabilizerChainPerm);
   SetFilterObj(ri,IsLeaf);
   return Success;
-end;
+end);
 
 # creates recursively a word for <g> using the Schreier tree labels
 # from the stabilizer chain <S>
@@ -391,7 +408,10 @@ end;
 #    million points; this is wasteful, and the second criterion tries to deal
 #    with this.
 
-FindHomMethodsPerm.ThrowAwayFixedPoints := function( ri, G )
+FindHomMethodsPerm.ThrowAwayFixedPoints := RecogMethod("ThrowAwayFixedPoints",
+"try to find a huge amount of (possible internal) fixed points",
+rec(validatesOrAlwaysValidInput := true),
+function(ri, G)
       # Check, whether we can throw away fixed points
       local gens,nrStoredPoints,n,largest,isApplicable,o,hom;
 
@@ -420,7 +440,7 @@ FindHomMethodsPerm.ThrowAwayFixedPoints := function( ri, G )
       findgensNmeth(ri).method := FindKernelDoNothing;
 
       return Success;
-  end;
+end);
 
 #! @BeginChunk Pcgs
 #! This is the &GAP; library function to compute a stabiliser chain for a
@@ -428,8 +448,10 @@ FindHomMethodsPerm.ThrowAwayFixedPoints := function( ri, G )
 #! node becomes a leaf node in the recursive scheme. If the input group is
 #! not solvable then the method returns <K>NeverApplicable</K>.
 #! @EndChunk
-FindHomMethodsPerm.Pcgs :=
-  function( ri, G )
+FindHomMethodsPerm.Pcgs := RecogMethod("Pcgs",
+"use a Pcgs to calculate a stabilizer chain",
+rec(validatesOrAlwaysValidInput := true),
+function(ri, G)
     local GM,S,pcgs;
     GM := Group(ri!.gensHmem);
     GM!.pseudorandomfunc := [rec(
@@ -452,7 +474,7 @@ FindHomMethodsPerm.Pcgs :=
     SetSize(ri,SizeStabChain(S));
     ri!.Gnomem := G;
     return Success;
-  end;
+end);
 
 
 # The following commands install the above methods into the database:
@@ -460,113 +482,27 @@ FindHomMethodsPerm.Pcgs :=
 AddMethod(FindHomDbPerm, FindHomMethodsGeneric.TrivialGroup, 300);
 #! @EndCode
 
-AddMethod(
-    FindHomDbPerm,
-    rec(
-        method := FindHomMethodsPerm.ThrowAwayFixedPoints,
-        rank := 100,
-        stamp := "ThrowAwayFixedPoints",
-        comment := "try to find a huge amount of (possible internal) fixed points",
-        validatesOrAlwaysValidInput := true,
-    )
-);
+AddMethod(FindHomDbPerm, FindHomMethodsPerm.ThrowAwayFixedPoints, 100);
 
 AddMethod(FindHomDbPerm, FindHomMethodsGeneric.FewGensAbelian, 99);
 
-AddMethod(
-    FindHomDbPerm,
-    rec(
-        method := FindHomMethodsPerm.Pcgs,
-        rank := 97,
-        stamp := "Pcgs",
-        comment := "use a Pcgs to calculate a stabilizer chain",
-        validatesOrAlwaysValidInput := true,
-    )
-);
+AddMethod(FindHomDbPerm, FindHomMethodsPerm.Pcgs, 97);
 
-AddMethod(
-    FindHomDbPerm,
-    rec(
-        method := FindHomMethodsPerm.MovesOnlySmallPoints,
-        rank := 95,
-        stamp := "MovesOnlySmallPoints",
-        comment := "calculate a stabilizer chain if only small points are moved",
-        # delegates to StabChain
-        validatesOrAlwaysValidInput := true,
-    )
-);
+AddMethod(FindHomDbPerm, FindHomMethodsPerm.MovesOnlySmallPoints, 95);
 
 #! @BeginCode AddMethod_Perm_FindHomMethodsPerm.NonTransitive
-AddMethod(
-    FindHomDbPerm,
-    rec(
-        method := FindHomMethodsPerm.NonTransitive,
-        rank := 90,
-        stamp := "NonTransitive",
-        comment := "try to find non-transitivity and restrict to orbit",
-        validatesOrAlwaysValidInput := true,
-    )
-);
+AddMethod(FindHomDbPerm, FindHomMethodsPerm.NonTransitive, 90);
 #! @EndCode
 
-AddMethod(
-    FindHomDbPerm,
-    rec(
-        method := FindHomMethodsPerm.Giant,
-        rank := 80,
-        stamp := "Giant",
-        comment := "tries to find Sn and An in their natural actions",
-        validatesOrAlwaysValidInput := true,
-    )
-);
+AddMethod(FindHomDbPerm, FindHomMethodsPerm.Giant, 80);
 
-AddMethod(
-    FindHomDbPerm,
-    rec(
-        method := FindHomMethodsPerm.Imprimitive,
-        rank := 70,
-        stamp := "Imprimitive",
-        comment := "for a imprimitive permutation group, restricts to block system",
-        validatesOrAlwaysValidInput := true,
-    )
-);
+AddMethod(FindHomDbPerm, FindHomMethodsPerm.Imprimitive, 70);
 
-AddMethod(
-    FindHomDbPerm,
-    rec(
-        method := FindHomMethodsPerm.LargeBasePrimitive,
-        rank := 60,
-        stamp := "LargeBasePrimitive",
-        comment := "recognises large-base primitive permutation groups",
-        validatesOrAlwaysValidInput := true,
-    )
-);
+AddMethod(FindHomDbPerm, FindHomMethodsPerm.LargeBasePrimitive, 60);
 
-AddMethod(
-    FindHomDbPerm,
-    rec(
-        method := FindHomMethodsPerm.StabilizerChainPerm,
-        rank := 55,
-        stamp := "StabilizerChainPerm",
-        comment := Concatenation(
-            "for a permutation group using a stabilizer chain via the ",
-            "<URL Text=\"genss package\">",
-            "https://gap-packages.github.io/genss/",
-            "</URL>"
-        ),
-        validatesOrAlwaysValidInput := true,
-    )
-);
-AddMethod(
-    FindHomDbPerm,
-    rec(
-        method := FindHomMethodsPerm.StabChain,
-        rank := 50,
-        stamp := "StabChain",
-        comment := "for a permutation group using a stabilizer chain",
-        validatesOrAlwaysValidInput := true,
-    )
-);
+AddMethod(FindHomDbPerm, FindHomMethodsPerm.StabilizerChainPerm, 55);
+
+AddMethod(FindHomDbPerm, FindHomMethodsPerm.StabChain, 50);
 
 
 # Note that the last one will always succeed!
