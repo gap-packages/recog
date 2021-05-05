@@ -65,9 +65,29 @@ function(m)
 end);
 
 InstallGlobalFunction(RecogMethod,
-function(stamp, comment, func)
-    local r;
+function(stamp, comment, arg...)
+    local func, opt, r;
+    # TODO: make <comment> optional, too?
+    if Length(arg) = 0 or Length(arg) > 2 then
+        Error("usage: RecogMethod(stamp, comment[, opt], func)");
+    fi;
+    func := Remove(arg);
+    if not IsFunction(func) then
+        Error("<func> must be a function");
+    fi;
+    if Length(arg) = 1 then
+        opt := arg[1];
+        if not IsRecord(opt) then
+            Error("<opt> must be a record");
+        fi;
+    else
+        opt := rec();
+    fi;
+
     r := rec(func := func);
+    if IsBound(opt.validatesOrAlwaysValidInput) then
+        r.validatesOrAlwaysValidInput := opt.validatesOrAlwaysValidInput;
+    fi;
     ObjectifyWithAttributes(r, RecogMethodType,
                             Stamp, stamp,
                             Comment, comment);
