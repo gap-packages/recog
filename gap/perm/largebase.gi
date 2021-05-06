@@ -528,7 +528,7 @@ end;
 #! <K>NeverApplicable</K> if no parameters <M>n</M>, <M>k</M>, and <M>r</M> as
 #! above exist.
 #! @EndChunk
-FindHomMethodsPerm.LargeBasePrimitive := RecogMethod("LargeBasePrimitive",
+BindRecogMethod(FindHomMethodsPerm, "LargeBasePrimitive",
 "recognises large-base primitive permutation groups",
 rec(validatesOrAlwaysValidInput := true),
 function(ri, grp)

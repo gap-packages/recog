@@ -139,7 +139,7 @@ end;
 # Test to check whether the group contains both a large ppd element
 # and a basic ppd element
 # TODO: Better comments...
-RECOG.IsGenericParameters := RecogMethod("IsGenericParameters",
+BindRecogMethod(RECOG, "IsGenericParameters",
 "tests whether group has generic parameters",
 function( recognise, grp )
     local fact, d, q, hint;
@@ -212,7 +212,7 @@ end);
 # elements...monte  yes
 # TODO: Better comments
 
-RECOG.IsGeneric := RecogMethod("IsGeneric",
+BindRecogMethod(RECOG, "IsGeneric",
 "tests whether group is generic",
 function (recognise, grp)
     if recognise.isGeneric = false then
@@ -232,7 +232,7 @@ end);
 
 #enough info to rule out extension field groups...?
 #TODO: comments...
-RECOG.RuledOutExtField := RecogMethod("RuledOutExtField",
+BindRecogMethod(RECOG, "RuledOutExtField",
 "tests whether extension field case is ruled out",
 function (recognise, grp)
     local differmodfour, d, q, E, b, bx, hint;
@@ -337,7 +337,7 @@ function (recognise, grp)
     fi;
 end);
 
-RECOG.IsNotAlternating := RecogMethod("IsNotAlternating",
+BindRecogMethod(RECOG, "IsNotAlternating",
 "tests whether alternating groups are ruled out",
 function( recognise, grp )
     local V, P, i, g ,q, o;
@@ -405,7 +405,7 @@ end);
 
 
 
-RECOG.IsNotMathieu := RecogMethod("IsNotMathieu",
+BindRecogMethod(RECOG, "IsNotMathieu",
 "tests whether Mathieu groups are ruled out",
 function( recognise, grp )
    local i, fn, g, d, q, E, ord;
@@ -476,7 +476,7 @@ function( recognise, grp )
 end);
 
 
-RECOG.IsNotPSL := RecogMethod("IsNotPSL",
+BindRecogMethod(RECOG, "IsNotPSL",
 "tests whether PSL groups are ruled out",
 function (recognise, grp)
    local i, E, LE, d, p, a, q,  str, fn, ord;
@@ -616,7 +616,7 @@ IsPrimitivePrimeDivisor := function( b, a, p )
 end;
 
 # generate the next random element and its char polynomial
-RECOG.TestRandomElement := RecogMethod("TestRandomElement",
+BindRecogMethod(RECOG, "TestRandomElement",
 "makes new random element and stores it and its char poly",
 function(recognise, grp)
     local g, ppd, bppd, d, q, cpol, f, deg, facs, r, s, h, gmod, str,
@@ -842,7 +842,7 @@ end);
 
 # Compute the degrees of the irreducible factors of
 # the characteristic polynomial <cpol>
-RECOG.IsReducible := RecogMethod("IsReducible",
+BindRecogMethod(RECOG, "IsReducible",
 "tests whether current random element rules out reducible",
 function( recognise, grp )
     local deg, dims, g;
@@ -872,7 +872,7 @@ function( recognise, grp )
     return fail;
 end);
 
-RECOG.NoClassicalForms := RecogMethod("NoClassicalForms",
+BindRecogMethod(RECOG, "NoClassicalForms",
 "tests whether we can rule out certain forms",
 function( recognise, grp )
     local d,field;
@@ -895,7 +895,7 @@ end);
 
 
 
-RECOG.ClassicalForms := RecogMethod("ClassicalForms",
+BindRecogMethod(RECOG, "ClassicalForms",
 "Find the invariant forms",
 function( recognise, grp)
     local   field,  z,  d,  i,  qq,  A,  c,  I,  t,  i0,
@@ -983,7 +983,7 @@ function( recognise, grp)
 end);
 
 
-RECOG.MeatAxe := RecogMethod("MeatAxe",
+BindRecogMethod(RECOG, "MeatAxe",
 "Test irreducibility",
 function( recognise, grp )
     if recognise.n > 15 then
@@ -1011,7 +1011,7 @@ function( recognise, grp )
 end);
 
 ## Main function to test whether group contains SL
-RECOG.IsSLContained := RecogMethod("IsSLContained",
+BindRecogMethod(RECOG, "IsSLContained",
 "tests whether group contains SL",
 function( recognise, grp )
     if recognise.isGeneric <> true or
@@ -1054,7 +1054,7 @@ function( recognise, grp )
 end);
 
 ## Main function to test whether group contains Sp
-RECOG.IsSpContained := RecogMethod("IsSpContained",
+BindRecogMethod(RECOG, "IsSpContained",
 "tests whether group contains Sp",
 function( recognise, grp )
     local isSpForm;
@@ -1112,7 +1112,7 @@ end);
 
 
 ## Main function to test whether group contains SU
-RECOG.IsSUContained := RecogMethod("IsSUContained",
+BindRecogMethod(RECOG, "IsSUContained",
 "tests whether group contains SU",
 function( recognise, grp )
     local f, isHermForm, q0;
@@ -1176,7 +1176,7 @@ end);
 
 
 ## Main function to test whether group contains SO
-RECOG.IsSOContained := RecogMethod("IsSOContained",
+BindRecogMethod(RECOG, "IsSOContained",
 "tests whether group contains SO",
 function( recognise, grp )
     local f, isParForm, isEllForm, isHypForm;
@@ -1297,7 +1297,7 @@ end;
 ##  find an element of order a multiple of 4 and a large and basic ppd(3,q;3)-
 ##  element
 ##
-RECOG.NonGenericLinear := RecogMethod("NonGenericLinear",
+BindRecogMethod(RECOG, "NonGenericLinear",
 "tests whether group is non-generic Linear",
 function( recognise, grp )
     local CheckFlag;
@@ -1354,7 +1354,7 @@ end);
 ##
 ##  Recognise non-generic symplectic matrix groups over finite fields
 ##
-RECOG.NonGenericSymplectic := RecogMethod("NonGenericSymplectic",
+BindRecogMethod(RECOG, "NonGenericSymplectic",
 "tests whether group is non-generic Symplectic",
 function(recognise, grp)
     local d, q, CheckFlag, isSpForm;
@@ -1474,7 +1474,7 @@ end);
 ##
 ##  Recognise non-generic unitary matrix groups over finite fields
 ##
-RECOG.NonGenericUnitary := RecogMethod("NonGenericUnitary",
+BindRecogMethod(RECOG, "NonGenericUnitary",
 "tests whether group is non-generic Unitary",
 function(recognise, grp)
     local d, q,  g, f1, f2, o, CheckFlag, isHermForm, str;
@@ -1682,7 +1682,7 @@ function(recognise, grp)
 end);
 
 
-RECOG.NonGenericOrthogonalPlus := RecogMethod("NonGenericOrthogonalPlus",
+BindRecogMethod(RECOG, "NonGenericOrthogonalPlus",
 "tests whether group is non-generic O+",
 function(recognise,grp)
     local d, q, gp1, gp2, CheckFlag, pgrp, orbs, isHypForm;
@@ -1916,7 +1916,7 @@ function(recognise,grp)
 
 end);
 
-RECOG.NonGenericOrthogonalMinus := RecogMethod("NonGenericOrthogonalMinus",
+BindRecogMethod(RECOG, "NonGenericOrthogonalMinus",
 "tests whether group is non-generic O-",
 function(recognise, grp)
     local d, q,  orbs, pgrp, h,  g, ppd,  CheckFlag, isEllForm;
@@ -2025,7 +2025,7 @@ function(recognise, grp)
 
 end);
 
-RECOG.NonGenericOrthogonalCircle := RecogMethod("NonGenericOrthogonalCircle",
+BindRecogMethod(RECOG, "NonGenericOrthogonalCircle",
 "tests whether group is non-generic Oo",
 function( recognise, grp )
     local d, q, g, s, CheckFlag, isParForm;

@@ -28,7 +28,7 @@
 #! If the input group moves a large point (currently, this means a point
 #! larger than 10), then this method returns <K>NeverApplicable</K>.
 #! @EndChunk
-FindHomMethodsPerm.MovesOnlySmallPoints := RecogMethod("MovesOnlySmallPoints",
+BindRecogMethod(FindHomMethodsPerm, "MovesOnlySmallPoints",
 "calculate a stabilizer chain if only small points are moved",
 rec(validatesOrAlwaysValidInput := true),
 function(ri, G)
@@ -45,7 +45,7 @@ end);
 #! <K>NeverApplicable</K>.
 #! @EndChunk
 #! @BeginCode FindHomMethodsPerm.NonTransitive
-FindHomMethodsPerm.NonTransitive := RecogMethod("NonTransitive",
+BindRecogMethod(FindHomMethodsPerm, "NonTransitive",
 "try to find non-transitivity and restrict to orbit",
 rec(validatesOrAlwaysValidInput := true),
 function(ri, G)
@@ -87,7 +87,7 @@ end);
 #! for the number of random generators in the kernel construction is increased
 #! by the number of blocks.
 #! @EndChunk
-FindHomMethodsPerm.Imprimitive := RecogMethod("Imprimitive",
+BindRecogMethod(FindHomMethodsPerm, "Imprimitive",
 "for a imprimitive permutation group, restricts to block system",
 rec(validatesOrAlwaysValidInput := true),
 function(ri, G)
@@ -141,7 +141,7 @@ end);
 #! If so, then <C>FindHomMethodsPerm.</C><Ref Subsect="Pcgs" Style="Text"/> is
 #! called, and otherwise <K>NeverApplicable</K> is returned.
 #! @EndChunk
-FindHomMethodsPerm.PcgsForBlocks := RecogMethod("PcgsForBlocks",
+BindRecogMethod(FindHomMethodsPerm, "PcgsForBlocks",
 "TODO",
 function(ri, G)
   local blocks,pcgs,subgens;
@@ -165,7 +165,7 @@ end);
 #! induced by the action of <A>G</A> on
 #! half of its blocks.
 #! @EndChunk
-FindHomMethodsPerm.BalTreeForBlocks := RecogMethod("BalTreeForBlocks",
+BindRecogMethod(FindHomMethodsPerm, "BalTreeForBlocks",
 "TODO",
 function(ri, G)
   local blocks,cut,hom,lowerhalf,nrblocks,o,upperhalf,l,n,seto;
@@ -228,7 +228,7 @@ end;
 #! chain. The method selection process ensures that this function is called
 #! only with small-base inputs, where the method works efficiently.
 #! @EndChunk
-FindHomMethodsPerm.StabChain := RecogMethod("StabChain",
+BindRecogMethod(FindHomMethodsPerm, "StabChain",
 "for a permutation group using a stabilizer chain",
 rec(validatesOrAlwaysValidInput := true),
 function(ri, G)
@@ -269,7 +269,7 @@ end;
 #! TODO
 #! @EndChunk
 # TODO: merge FindHomMethodsPerm.StabilizerChainPerm and  FindHomMethodsProjective.StabilizerChainProj ?
-FindHomMethodsPerm.StabilizerChainPerm := RecogMethod("StabilizerChainPerm",
+BindRecogMethod(FindHomMethodsPerm, "StabilizerChainPerm",
 Concatenation(
     "for a permutation group using a stabilizer chain via the ",
     "<URL Text=\"genss package\">",
@@ -408,7 +408,7 @@ end;
 #    million points; this is wasteful, and the second criterion tries to deal
 #    with this.
 
-FindHomMethodsPerm.ThrowAwayFixedPoints := RecogMethod("ThrowAwayFixedPoints",
+BindRecogMethod(FindHomMethodsPerm, "ThrowAwayFixedPoints",
 "try to find a huge amount of (possible internal) fixed points",
 rec(validatesOrAlwaysValidInput := true),
 function(ri, G)
@@ -448,7 +448,7 @@ end);
 #! node becomes a leaf node in the recursive scheme. If the input group is
 #! not solvable then the method returns <K>NeverApplicable</K>.
 #! @EndChunk
-FindHomMethodsPerm.Pcgs := RecogMethod("Pcgs",
+BindRecogMethod(FindHomMethodsPerm, "Pcgs",
 "use a Pcgs to calculate a stabilizer chain",
 rec(validatesOrAlwaysValidInput := true),
 function(ri, G)

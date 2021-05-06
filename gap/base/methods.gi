@@ -94,6 +94,11 @@ function(stamp, comment, arg...)
     return r;
 end);
 
+InstallGlobalFunction(BindRecogMethod,
+function(r, arg...)
+    r.(arg[1]) := CallFuncList(RecogMethod, arg);
+end);
+
 InstallGlobalFunction(CallRecogMethod,
 function(m, args)
     # HACK to be compatible with records

@@ -34,6 +34,7 @@ BindGlobal("RecogMethodType",
 #! stamp      : a string describing the method uniquely
 #! comment    : an optional comment to describe the method for humans
 DeclareGlobalFunction("RecogMethod");
+DeclareGlobalFunction("BindRecogMethod");
 DeclareGlobalFunction("CallRecogMethod");
 DeclareAttribute("Stamp", IsRecogMethod);
 DeclareAttribute("Comment", IsRecogMethod);
