@@ -695,7 +695,9 @@ end;
 #! computed the function does not need to be called again for this
 #! node and therefore returns <K>NeverApplicable</K>.
 #! @EndChunk
-FindHomMethodsProjective.ComputeSimpleSocle := function(ri,G)
+BindRecogMethod(FindHomMethodsProjective, "ComputeSimpleSocle",
+"compute simple socle of almost simple group",
+function(ri,G)
   local x;
   RECOG.SetPseudoRandomStamp(G,"ComputeSimpleSocle");
   ri!.simplesocle := Group(RECOG.simplesocle(ri,G));
@@ -710,7 +712,7 @@ FindHomMethodsProjective.ComputeSimpleSocle := function(ri,G)
   ri!.simplesocle!.pseudorandomfunc :=
        [rec( func := Next, args := [ri!.simplesoclepr] )];
   return NeverApplicable;
-end;
+end);
 
 # computes a random element in the non-abelian simple socle
 # and its projective order
@@ -747,7 +749,9 @@ end;
 #!
 #! This recognition method is based on the paper <Cite Key="KS09"/>.
 #! @EndChunk
-FindHomMethodsProjective.ThreeLargeElOrders := function(ri,G)
+BindRecogMethod(FindHomMethodsProjective, "ThreeLargeElOrders",
+"recognise Lie type groups and get its characteristic",
+function(ri,G)
   local hint,name,namecat,p,res;
   RECOG.SetPseudoRandomStamp(G,"ThreeLargeElOrders");
   ri!.simplesoclerandp := 0;
@@ -788,7 +792,7 @@ FindHomMethodsProjective.ThreeLargeElOrders := function(ri,G)
   od;
   Info(InfoRecog,2,"Did not succeed with hints, giving up...");
   return fail; # FIXME: fail = TemporaryFailure here really correct?
-end;
+end);
 
 # RECOG.DegreeAlternating := function (orders)
 #     local   degs,  prims,  m,  f,  n;
@@ -937,7 +941,9 @@ end;
 #! This algorithm is probably based on the paper <Cite Key="BLGN+05"/>.
 #! @EndChunk
 # subroutines are in AnSnOnFDPM.gi and also paper reference
-FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
+BindRecogMethod(FindHomMethodsProjective, "AltSymBBByDegree",
+"try BB recognition for dim+1 and/or dim+2 if sensible",
+function(ri,G)
   local GG,Gm,RecSnAnEq,RecSnAnIsOne,d,deg,f,fact,hom,newgens,o,orders,p,primes,
         r,totry;
   RECOG.SetPseudoRandomStamp(G,"AltSymBBByDegree");
@@ -1036,7 +1042,7 @@ FindHomMethodsProjective.AltSymBBByDegree := function(ri,G)
 #       fi;
 #   od;
 #   return TemporaryFailure;
-end;
+end);
 
 # Looking at element orders to determine which sporadic it could be:
 
@@ -1324,7 +1330,9 @@ end;
 #! Afterwards it creates hints that come out of a table for the sporadic
 #! simple groups.
 #! @EndChunk
-FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
+BindRecogMethod(FindHomMethodsProjective, "SporadicsByOrders",
+"generate a few random elements and compute the proj. orders",
+function(ri,G)
   local count,gens,i,j,jj,k,killers,l,limit,o,ordersseen,pp,r,raus,res,x;
 
   RECOG.SetPseudoRandomStamp(G,"SporadicsByOrders");
@@ -1438,7 +1446,7 @@ FindHomMethodsProjective.SporadicsByOrders := function(ri,G)
       Info(InfoRecog,2,"This did not work.");
   od;
   return false; # FIXME: false = NeverApplicable here really correct?
-end;
+end);
 
 # Data for the function NameSporadic
 RECOG.NameSporadicData := MakeImmutable([
@@ -1522,7 +1530,9 @@ RECOG.NameSporadicData := MakeImmutable([
 #! Magma v2.24.10 function <C>RecognizeSporadic</C>.
 #! @EndChunk
 # TODO G is unused
-FindHomMethodsProjective.NameSporadic := function(ri, G)
+BindRecogMethod(FindHomMethodsProjective, "NameSporadic",
+"generate maximal orders",
+function(ri, G)
     local orders, setOfOrders, maximalOrders, isMaximal,
         namesOfPossibleSporadics, res, i, j, data, name;
     orders := [];
@@ -1577,4 +1587,4 @@ FindHomMethodsProjective.NameSporadic := function(ri, G)
         Info(InfoRecog, 2, "This did not work.");
     od;
     return NeverApplicable;
-end;
+end);

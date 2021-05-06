@@ -182,7 +182,9 @@ end;
 #! orbit of subspaces or <K>fail</K>. In the current setup, <Q>short orbit</Q>
 #! is defined to have length at most <M>4d</M>.
 #! @EndChunk
-FindHomMethodsProjective.LowIndex := function(ri,G)
+BindRecogMethod(FindHomMethodsProjective, "LowIndex",
+"find an (imprimitive) action on subspaces",
+function(ri,G)
   local res;
   RECOG.SetPseudoRandomStamp(G,"LowIndex");
   res := RECOG.SmallHomomorphicImageProjectiveGroup(G);
@@ -214,7 +216,7 @@ FindHomMethodsProjective.LowIndex := function(ri,G)
 
       return Success;
   fi;
-end;
+end);
 
 #! @BeginChunk DoBaseChangeForBlocks
 #! TODO
