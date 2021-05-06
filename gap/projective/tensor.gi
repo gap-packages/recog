@@ -320,7 +320,9 @@ end;
 #! 
 #! This method and its description needs some improvement.
 #! @EndChunk
-FindHomMethodsProjective.TensorDecomposable := function(ri,G)
+BindRecogMethod(FindHomMethodsProjective, "TensorDecomposable",
+"find a tensor decomposition",
+function(ri,G)
   local H,N,conjgensG,d,f,hom,kro,r;
 
   RECOG.SetPseudoRandomStamp(G,"TensorDecomposable");
@@ -383,7 +385,7 @@ FindHomMethodsProjective.TensorDecomposable := function(ri,G)
   # This is an isomorphism:
   findgensNmeth(ri).method := FindKernelDoNothing;
   return Success;
-end;
+end);
 
 RECOG.HomTensorFactor := function(data,m)
   local k;

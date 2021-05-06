@@ -329,95 +329,23 @@ AddMethod(FindHomDbProjective, FindHomMethodsProjective.D247, 840);
 
 # # We can do the following early on since it will quickly fail for
 # # non-sporadic groups:
-# AddMethod(
-#     FindHomDbProjective,
-#     rec(
-#         method := FindHomMethodsProjective.SporadicsByOrders,
-#         rank := 820,
-#         stamp := "SporadicsByOrders",
-#         comment := "generate a few random elements and compute the proj. orders",
-#     )
-# );
+# AddMethod(FindHomDbProjective, FindHomMethodsProjective.SporadicsByOrders, 820);
 
-AddMethod(
-    FindHomDbProjective,
-    rec(
-        method := FindHomMethodsProjective.AltSymBBByDegree,
-        rank := 810,
-        stamp := "AltSymBBByDegree",
-        comment := "try BB recognition for dim+1 and/or dim+2 if sensible",
-    )
-);
+AddMethod(FindHomDbProjective, FindHomMethodsProjective.AltSymBBByDegree, 810);
 
-AddMethod(
-    FindHomDbProjective,
-    rec(
-        method := FindHomMethodsProjective.TensorDecomposable,
-        rank := 800,
-        stamp := "TensorDecomposable",
-        comment := "find a tensor decomposition",
-    )
-);
+AddMethod(FindHomDbProjective, FindHomMethodsProjective.TensorDecomposable, 800);
 
-AddMethod(
-    FindHomDbProjective,
-    rec(
-        method := FindHomMethodsProjective.FindElmOfEvenNormal,
-        rank := 700,
-        stamp := "FindElmOfEvenNormal",
-        comment := "find D2, D4 or D7 by finding an element of an even normal subgroup",
-    )
-);
+AddMethod(FindHomDbProjective, FindHomMethodsProjective.FindElmOfEvenNormal, 700);
 
-AddMethod(
-    FindHomDbProjective,
-    rec(
-        method := FindHomMethodsProjective.LowIndex,
-        rank := 600,
-        stamp := "LowIndex",
-        comment := "find an (imprimitive) action on subspaces",
-    )
-);
+AddMethod(FindHomDbProjective, FindHomMethodsProjective.LowIndex, 600);
 
-AddMethod(
-    FindHomDbProjective,
-    rec(
-        method := FindHomMethodsProjective.NameSporadic,
-        rank := 580,
-        stamp := "NameSporadic",
-        comment := "generate maximal orders",
-    )
-);
+AddMethod(FindHomDbProjective, FindHomMethodsProjective.NameSporadic, 580);
 
-AddMethod(
-    FindHomDbProjective,
-    rec(
-        method := FindHomMethodsProjective.ComputeSimpleSocle,
-        rank := 550,
-        stamp := "ComputeSimpleSocle",
-        comment := "compute simple socle of almost simple group",
-    )
-);
+AddMethod(FindHomDbProjective, FindHomMethodsProjective.ComputeSimpleSocle, 550);
 
-AddMethod(
-    FindHomDbProjective,
-    rec(
-        method := FindHomMethodsProjective.ThreeLargeElOrders,
-        rank := 500,
-        stamp := "ThreeLargeElOrders",
-        comment := "recognise Lie type groups and get its characteristic",
-    )
-);
+AddMethod(FindHomDbProjective, FindHomMethodsProjective.ThreeLargeElOrders, 500);
 
-AddMethod(
-    FindHomDbProjective,
-    rec(
-        method := FindHomMethodsProjective.LieTypeNonConstr,
-        rank := 400,
-        stamp := "LieTypeNonConstr",
-        comment := "do non-constructive recognition of Lie type groups",
-    )
-);
+AddMethod(FindHomDbProjective, FindHomMethodsProjective.LieTypeNonConstr, 400);
 
 AddMethod(FindHomDbProjective, FindHomMethodsProjective.StabilizerChainProj, 100);
 

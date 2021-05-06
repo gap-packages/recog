@@ -732,7 +732,9 @@ end );
 #! @BeginChunk FindElmOfEvenNormal
 #! TODO
 #! @EndChunk
-FindHomMethodsProjective.FindElmOfEvenNormal := function(ri,G)
+BindRecogMethod(FindHomMethodsProjective, "FindElmOfEvenNormal",
+"find D2, D4 or D7 by finding an element of an even normal subgroup",
+function(ri,G)
   local cf,count,f,m,mm,r,res,rr;
   RECOG.SetPseudoRandomStamp(G,"FindElmOfEvenNormal");
   r := FindElmOfEvenNormalSubgroup(G,
@@ -782,4 +784,4 @@ FindHomMethodsProjective.FindElmOfEvenNormal := function(ri,G)
       fi;
   fi;
   return fail; # FIXME: fail = TemporaryFailure here really correct?
-end;
+end);
