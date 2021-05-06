@@ -38,7 +38,7 @@ end;
 #! diagonal blocks and finally using projective recognition to recognise
 #! single diagonal block groups.
 #! @EndChunk
-FindHomMethodsProjective.BlocksModScalars := RecogMethod("BlocksModScalars",
+BindRecogMethod(FindHomMethodsProjective, "BlocksModScalars",
 "TODO",
 function(ri, G)
   # We assume that ri!.blocks is a list of ranges where the diagonal
@@ -119,7 +119,7 @@ end;
 #! the stabiliser chain.
 #! @EndChunk
 # TODO: merge FindHomMethodsPerm.StabilizerChainPerm and  FindHomMethodsProjective.StabilizerChainProj ?
-FindHomMethodsProjective.StabilizerChainProj := RecogMethod("StabilizerChainProj",
+BindRecogMethod(FindHomMethodsProjective, "StabilizerChainProj",
 "last resort: compute a stabilizer chain (projectively)",
 function(ri, G)
   local Gm,S,SS,d,f,fu,opt,perms,q;
@@ -164,7 +164,7 @@ end;
 #! element <M>g \in <A>G</A></M> is the determinant of a matrix representative of
 #! <M>g</M>, modulo <M>D</M>.
 #! @EndChunk
-FindHomMethodsProjective.ProjDeterminant := RecogMethod("ProjDeterminant",
+BindRecogMethod(FindHomMethodsProjective, "ProjDeterminant",
 "find homomorphism to non-zero scalars mod d-th powers",
 function(ri, G)
   local H,c,d,detsadd,f,gcd,hom,newgens,q,z;
@@ -234,7 +234,7 @@ end;
 #! delegates to <C>BlockScalar</C> (see <Ref Subsect="BlockScalar"/>)
 #! and matrix group mode to do the recognition.
 #! @EndChunk
-FindHomMethodsProjective.BlockScalarProj := RecogMethod("BlockScalarProj",
+BindRecogMethod(FindHomMethodsProjective, "BlockScalarProj",
 "TODO",
 function(ri, G)
   # We just norm the last block and go to matrix methods.

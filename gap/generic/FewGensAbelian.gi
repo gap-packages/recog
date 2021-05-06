@@ -19,7 +19,7 @@
 #! <Ref Subsect="KnownNilpotent" Style="Text"/>,
 #! otherwise return <K>NeverApplicable</K>.
 #! @EndChunk
-FindHomMethodsGeneric.FewGensAbelian := RecogMethod("FewGensAbelian",
+BindRecogMethod(FindHomMethodsGeneric, "FewGensAbelian",
 "if very few generators, check IsAbelian and if yes, do KnownNilpotent",
 function(ri, G)
   # If the number of generators is less than or equal to 200, then check

@@ -3181,7 +3181,7 @@ end;
 #! @BeginChunk ClassicalNatural
 #! TODO
 #! @EndChunk
-FindHomMethodsProjective.ClassicalNatural := RecogMethod("ClassicalNatural",
+BindRecogMethod(FindHomMethodsProjective, "ClassicalNatural",
 "check whether it is a classical group in its natural representation",
 function(ri, g)
   local changed,classical,d,det,ext,f,gcd,gens,gg,gm,i,p,pr,q,root,std,stdg,z;

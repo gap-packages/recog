@@ -706,7 +706,7 @@ RECOG.GiantEpsilon := 1/1024;
 #! the construction of <M>D</M> was unsuccessful.
 #! If the method constructs <M>D</M> then the calling node becomes a leaf.
 #! @EndChunk
-FindHomMethodsPerm.Giant := RecogMethod("Giant",
+BindRecogMethod(FindHomMethodsPerm, "Giant",
 "tries to find Sn and An in their natural actions",
 rec(validatesOrAlwaysValidInput := true),
 function(ri, grp)

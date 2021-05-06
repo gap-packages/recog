@@ -132,7 +132,7 @@ end;
 #! elements can be elements in the centraliser of <A>G</A> in <M>PGL(d,q)</M>
 #! that come from scalar matrices in the extension field.
 #! @EndChunk
-FindHomMethodsProjective.NotAbsolutelyIrred := RecogMethod("NotAbsolutelyIrred",
+BindRecogMethod(FindHomMethodsProjective, "NotAbsolutelyIrred",
 "write over a bigger field with smaller degree",
 function(ri, G)
   local H,f,hom,m,r;
@@ -199,7 +199,7 @@ end;
 #! @BeginChunk BiggerScalarsOnly
 #! TODO
 #! @EndChunk
-FindHomMethodsProjective.BiggerScalarsOnly := RecogMethod("BiggerScalarsOnly",
+BindRecogMethod(FindHomMethodsProjective, "BiggerScalarsOnly",
 "TODO",
 function(ri, G)
   # We come here only hinted, we project to a little square block in the
@@ -392,7 +392,7 @@ end;
 #! @BeginChunk Subfield
 #! TODO
 #! @EndChunk
-FindHomMethodsProjective.Subfield := RecogMethod("Subfield",
+BindRecogMethod(FindHomMethodsProjective, "Subfield",
 "write over a smaller field with same degree",
 function(ri, G)
     # We assume G to be absolutely irreducible, although this is not
@@ -452,7 +452,7 @@ end;
 #! @BeginChunk C3C5
 #! TODO
 #! @EndChunk
-FindHomMethodsProjective.C3C5 := RecogMethod("C3C5",
+BindRecogMethod(FindHomMethodsProjective, "C3C5",
 "compute a normal subgroup of derived and resolve C3 and C5",
 function(ri, G)
   # We assume that G acts absolutely irreducibly and that the matrix group

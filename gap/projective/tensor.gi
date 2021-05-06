@@ -397,7 +397,7 @@ end;
 #! @BeginChunk KroneckerProduct
 #! TODO
 #! @EndChunk
-FindHomMethodsProjective.KroneckerProduct := RecogMethod("KroneckerProduct",
+BindRecogMethod(FindHomMethodsProjective, "KroneckerProduct",
 "TODO",
 function(ri, G)
   # We got the hint that this is a Kronecker product, let's take it apart.
@@ -426,7 +426,7 @@ end;
 #! @BeginChunk KroneckerKernel
 #! TODO
 #! @EndChunk
-FindHomMethodsProjective.KroneckerKernel := RecogMethod("KroneckerKernel",
+BindRecogMethod(FindHomMethodsProjective, "KroneckerKernel",
 "TODO",
 function(ri, G)
   # One up in the tree we got the hint about a Kronecker product, this
