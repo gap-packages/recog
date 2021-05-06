@@ -1520,6 +1520,7 @@ RECOG.NameSporadicData := MakeImmutable([
 #! underlying <A>ri</A> could be. It does not recognise extensions of sporadic
 #! simple groups nor the Monster and the Baby Monster group. It is based on the
 #! Magma v2.24.10 function <C>RecognizeSporadic</C>.
+#! @EndChunk
 # TODO G is unused
 FindHomMethodsProjective.NameSporadic := function(ri, G)
     local orders, setOfOrders, maximalOrders, isMaximal,
