@@ -254,7 +254,7 @@ RECOG.SortOutReducibleNormalSubgroup :=
         forfactor(ri).generatorskronecker := kro;
         Add( forfactor(ri).hints,
              rec( method := FindHomMethodsProjective.KroneckerProduct,
-                  rank := 4000, stamp := "KroneckerProduct" ) );
+                  rank := 4000 ) );
         # This is an isomorphism:
         findgensNmeth(ri).method := FindKernelDoNothing;
         ri!.comment := "_D4TensorDec";

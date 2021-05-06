@@ -379,8 +379,7 @@ FindHomMethodsProjective.TensorDecomposable := function(ri,G)
   forfactor(ri).blocksize := r.blocksize;
   forfactor(ri).generatorskronecker := kro;
   Add( forfactor(ri).hints,
-       rec( method := FindHomMethodsProjective.KroneckerProduct, rank := 2000,
-            stamp := "KroneckerProduct" ), 1 );
+       rec( method := FindHomMethodsProjective.KroneckerProduct, rank := 2000 ) );
   # This is an isomorphism:
   findgensNmeth(ri).method := FindKernelDoNothing;
   return Success;
@@ -398,7 +397,9 @@ end;
 #! @BeginChunk KroneckerProduct
 #! TODO
 #! @EndChunk
-FindHomMethodsProjective.KroneckerProduct := function(ri,G)
+FindHomMethodsProjective.KroneckerProduct := RecogMethod("KroneckerProduct",
+"TODO",
+function(ri, G)
   # We got the hint that this is a Kronecker product, let's take it apart.
   # We first recognise projectively in one tensor factor and then in the
   # other, life is easy because of projectiveness!
@@ -410,11 +411,10 @@ FindHomMethodsProjective.KroneckerProduct := function(ri,G)
   SetHomom(ri,hom);
 
   Add( forkernel(ri).hints,
-       rec( method := FindHomMethodsProjective.KroneckerKernel, rank := 2000,
-            stamp := "KroneckerKernel" ) );
+       rec( method := FindHomMethodsProjective.KroneckerKernel, rank := 2000 ) );
   forkernel(ri).blocksize := ri!.blocksize;
   return Success;
-end;
+end);
 
 RECOG.HomTensorKernel := function(data,m)
   local mm;
@@ -426,7 +426,9 @@ end;
 #! @BeginChunk KroneckerKernel
 #! TODO
 #! @EndChunk
-FindHomMethodsProjective.KroneckerKernel := function(ri,G)
+FindHomMethodsProjective.KroneckerKernel := RecogMethod("KroneckerKernel",
+"TODO",
+function(ri, G)
   # One up in the tree we got the hint about a Kronecker product, this
   # method is called when we have gone to one factor and now are in the
   # kernel. So we know that we are a block diagonal matrix with identical
@@ -439,4 +441,4 @@ FindHomMethodsProjective.KroneckerKernel := function(ri,G)
   SetHomom(ri,hom);
   findgensNmeth(ri).method := FindKernelDoNothing;
   return Success;
-end;
+end);
