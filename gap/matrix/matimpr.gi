@@ -221,7 +221,9 @@ end);
 #! @BeginChunk DoBaseChangeForBlocks
 #! TODO
 #! @EndChunk
-FindHomMethodsProjective.DoBaseChangeForBlocks := function(ri,G)
+BindRecogMethod(FindHomMethodsProjective, "DoBaseChangeForBlocks",
+"Hint TODO",
+function(ri,G)
   # Do the base change:
   local H,iso,newgens,ti;
 
@@ -242,12 +244,14 @@ FindHomMethodsProjective.DoBaseChangeForBlocks := function(ri,G)
           stamp := "Blocks"));
 
   return Success;
-end;
+end);
 
 #! @BeginChunk Blocks
 #! TODO
 #! @EndChunk
-FindHomMethodsProjective.Blocks := function(ri,G)
+BindRecogMethod(FindHomMethodsProjective, "Blocks",
+"Hint TODO",
+function(ri,G)
   # Here we use BlocksModScalars and then get a kernel of scalar blocks
   # altogether mod scalars.
   local blocks,d,hom,i;
@@ -269,7 +273,7 @@ FindHomMethodsProjective.Blocks := function(ri,G)
       rec(method := FindHomMethodsProjective.BlocksBackToMats, rank := 2000,
           stamp := "BlocksBackToMats"));
   return Success;
-end;
+end);
 
 RECOG.HomBackToMats := function(el)
   # We assume that el is block diagonal with the last block being scalar.
@@ -282,7 +286,9 @@ end;
 #! @BeginChunk BlocksBackToMats
 #! TODO
 #! @EndChunk
-FindHomMethodsProjective.BlocksBackToMats := function(ri,G)
+BindRecogMethod(FindHomMethodsProjective, "BlocksBackToMats",
+"Hint TODO",
+function(ri,G)
   # This is only called as hint from Blocks, so we know that we in fact
   # have scalar blocks along the diagonal and nothing else.
   local H,hom,newgens;
@@ -301,7 +307,7 @@ FindHomMethodsProjective.BlocksBackToMats := function(ri,G)
   findgensNmeth(ri).method := FindKernelDoNothing;
 
   return Success;
-end;
+end);
 
 #FindHomMethodsProjective.BalTreeForBlocks := function(ri,G)
 #  local H,cut,dim,hom,newgens,nrblocks,subdim,gen;
