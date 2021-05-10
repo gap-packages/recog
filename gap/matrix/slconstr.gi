@@ -2475,7 +2475,9 @@ end;
 #! @BeginChunk NaturalSL
 #! TODO
 #! @EndChunk
-FindHomMethodsMatrix.NaturalSL := function(ri,G)
+BindRecogMethod(FindHomMethodsMatrix, "NaturalSL",
+"TODO",
+function(ri,G)
   local data,e,genlist,grpmem,i,j,n,p,q,r,il;
 
     if not IsMatrixGroup(G) then
@@ -2531,7 +2533,7 @@ FindHomMethodsMatrix.NaturalSL := function(ri,G)
   SetNiceGens(ri,StripMemory(genlist));
   Setslptonice(ri,SLPOfElms(genlist));
   return Success;
-end;
+end);
 
 #AddMethod( FindHomDbMatrix, FindHomMethodsMatrix.NaturalSL,
 #           980, "NaturalSL",
