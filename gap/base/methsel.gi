@@ -21,7 +21,7 @@
 # database with "CallMethods".
 #
 InstallGlobalFunction("AddMethod", function(methodDb, args...)
-    local method, rank, comment, l, pos;
+    local method, rank, comment, pos;
     # HACK to be compatible with "old methods" during switch to RecogMethod
     # objects.
     method := args[1];
@@ -42,11 +42,7 @@ InstallGlobalFunction("AddMethod", function(methodDb, args...)
     if not IsRecogMethod(method) then
         ErrorNoReturn("<method> must be a RecogMethod");
     fi;
-    l := Length(methodDb);
-    pos := First([1 .. l], i -> methodDb[i].rank <= rank);
-    if pos = fail then
-        pos := l + 1;
-    fi;
+    pos := PositionSortedBy(methodDb, -rank, m -> -m.rank);
     Add(methodDb, rec(method := method, rank := rank), pos);
 end);
 
