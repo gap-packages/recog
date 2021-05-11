@@ -1828,6 +1828,7 @@ function(recognise,grp)
         if not 4 in recognise.LB then
             return fail;
         fi;
+        # TODO: Note down somewhere what "E2" does. What does it do in Magma?
         if not 3 in recognise.E2 then
             return fail;
         fi;
@@ -2303,6 +2304,12 @@ function( arg )
                    p := Characteristic(f),
                    a := DegreeOverPrimeField(f),
                    q := Characteristic(f)^DegreeOverPrimeField(f),
+                   # TODO:
+                   # n -> recognise.nrRandomElms
+                   # LE = e's of large ppd elements
+                   # BE = e's of basic ppd elements
+                   # LB = e's of large basic ppd elements
+                   # E2 = ?
                    E := [], LE := [], BE := [], LB := [],
                    LS := [], E2 := [], LE2 := [], BE2 := [],
                    g := fail,
