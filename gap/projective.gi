@@ -89,8 +89,9 @@ function(ri, G)
   if middle < nrblocks then   # more than one block in factor:
       forfactor(ri).blocks := List(ri!.blocks{[middle..nrblocks]},
                                    x->x - (ri!.blocks[middle][1]-1));
-      Add(forfactor(ri).hints,
-          rec( method := FindHomMethodsProjective.BlocksModScalars, rank := 2000 ));
+      AddMethod(forfactor(ri).hints,
+                FindHomMethodsProjective.BlocksModScalars,
+                2000);
   fi; # Otherwise the factor is to be recognised projectively as usual
 
   # the kernel is the first few blocks:
@@ -98,8 +99,7 @@ function(ri, G)
   findgensNmeth(ri).args[2] := 5 + middle - 1;
   # The following is already set, but make it explicit here:
   forkernel(ri).blocks := ri!.blocks{[1..middle-1]};
-  Add(forkernel(ri).hints,
-      rec( method := FindHomMethodsProjective.BlocksModScalars, rank := 2000 ));
+  AddMethod(forkernel(ri).hints, FindHomMethodsProjective.BlocksModScalars, 2000);
   Setimmediateverification(ri,true);
   return Success;
 end);
@@ -256,8 +256,7 @@ function(ri, G)
 
   # Switch to matrix mode:
   Setmethodsforfactor(ri,FindHomDbMatrix);
-  Add(forfactor(ri).hints,
-      rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000 ));
+  AddMethod(forfactor(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
   forfactor(ri).blocks := ri!.blocks{[1..Length(ri!.blocks)-1]};
   return Success;
 end);

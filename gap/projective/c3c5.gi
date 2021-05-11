@@ -179,9 +179,9 @@ function(ri, G)
   # field, so go for it, however, fewer generators should suffice:
   # Also, doing normal closure will not help!
   findgensNmeth(ri).args := [5,0];
-  Add(forkernel(ri).hints,
-      rec(method := FindHomMethodsProjective.BiggerScalarsOnly,
-          rank   := 2000));
+  AddMethod(forkernel(ri).hints,
+            FindHomMethodsProjective.BiggerScalarsOnly,
+            2000);
   forkernel(ri).degsplittingfield := MTX.DegreeSplittingField(m)
                                    / DegreeOverPrimeField(f);
   forkernel(ri).biggerscalarsbas := r.inforec.bas;
@@ -212,10 +212,9 @@ function(ri, G)
   hom := GroupHomByFuncWithData(G, Group(H), RECOG.HomBCToDiagonalBlock, data);
   SetHomom(ri,hom);
 
-  Add(forfactor(ri).hints,
-      rec(method := FindHomMethodsProjective.StabilizerChainProj,
-          rank   := 4000,
-          stamp  := "StabilizerChainProj"));
+  AddMethod(forfactor(ri).hints,
+            FindHomMethodsProjective.StabilizerChainProj,
+            4000);
 
   findgensNmeth(ri).method := FindKernelDoNothing;
 
@@ -679,9 +678,9 @@ function(ri, G)
           # Hand down information:
           forfactor(ri).blocksize := r.blocksize;
           forfactor(ri).generatorskronecker := kro;
-          Add( forfactor(ri).hints,
-               rec(method := FindHomMethodsProjective.KroneckerProduct,
-                   rank   := 4000));
+          AddMethod(forfactor(ri).hints,
+                    FindHomMethodsProjective.KroneckerProduct,
+                    4000);
           # This is an isomorphism:
           findgensNmeth(ri).method := FindKernelDoNothing;
           return Success;

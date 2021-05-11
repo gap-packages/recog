@@ -380,8 +380,7 @@ function(ri,G)
   # Hand down information:
   forfactor(ri).blocksize := r.blocksize;
   forfactor(ri).generatorskronecker := kro;
-  Add( forfactor(ri).hints,
-       rec( method := FindHomMethodsProjective.KroneckerProduct, rank := 2000 ) );
+  AddMethod(forfactor(ri).hints, FindHomMethodsProjective.KroneckerProduct, 2000);
   # This is an isomorphism:
   findgensNmeth(ri).method := FindKernelDoNothing;
   return Success;
@@ -412,8 +411,7 @@ function(ri, G)
   hom := GroupHomByFuncWithData(G,H,RECOG.HomTensorFactor,data);
   SetHomom(ri,hom);
 
-  Add( forkernel(ri).hints,
-       rec( method := FindHomMethodsProjective.KroneckerKernel, rank := 2000 ) );
+  AddMethod(forkernel(ri).hints, FindHomMethodsProjective.KroneckerKernel, 2000);
   forkernel(ri).blocksize := ri!.blocksize;
   return Success;
 end);

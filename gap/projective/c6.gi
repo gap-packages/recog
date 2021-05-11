@@ -742,9 +742,9 @@ function(ri, G)
                  rec(r := re.r,n := re.n,q := re.q,blks := re.basis.blocks));
         forkernel(ri).t := re.basis.blocks.blocks;
         forkernel(ri).blocksize := ri!.dimension / re.basis.blocks.ell;
-        Add(forkernel(ri).hints,
-            rec(method := FindHomMethodsProjective.DoBaseChangeForBlocks,
-                rank := 2000, stamp := "DoBaseChangeForBlocks") );
+        AddMethod(forkernel(ri).hints,
+                  FindHomMethodsProjective.DoBaseChangeForBlocks,
+                  2000);
         Setimmediateverification(ri,true);
         findgensNmeth(ri).args[1] := re.basis.blocks.ell + 3;
         findgensNmeth(ri).args[2] := 5;

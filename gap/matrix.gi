@@ -72,8 +72,7 @@ function(ri, G)
   findgensNmeth(ri).method := FindKernelDoNothing;
 
   # Hint to the factor:
-  Add(forfactor(ri).hints,rec( method := FindHomMethodsMatrix.Scalar,
-                               rank := 4000 ));
+  AddMethod(forfactor(ri).hints, FindHomMethodsMatrix.Scalar, 4000);
 
   return Success;
 end);
@@ -233,8 +232,7 @@ function(ri, G)
       H := GroupWithGenerators(newgens);
       hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
       SetHomom(ri,hom);
-      Add(forfactor(ri).hints,
-          rec( method := FindHomMethodsMatrix.Scalar, rank := 2000 ));
+      AddMethod(forfactor(ri).hints, FindHomMethodsMatrix.Scalar, 2000);
 
       if nrblocks = 1 then     # no kernel:
           findgensNmeth(ri).method := FindKernelDoNothing;
@@ -246,8 +244,7 @@ function(ri, G)
           forkernel(ri).blocks := ri!.blocks{[1]};
           # We have to go to BlockScalar with 1 block because the one block
           # is only a part of the whole matrix:
-          Add(forkernel(ri).hints,
-              rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000 ));
+          AddMethod(forkernel(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
           Setimmediateverification(ri,true);
       fi;
       return Success;
@@ -265,8 +262,7 @@ function(ri, G)
   # the factor are the last few blocks:
   forfactor(ri).blocks := List(ri!.blocks{[middle..nrblocks]},
                                x->x - (ri!.blocks[middle][1]-1));
-  Add(forfactor(ri).hints,
-      rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000 ));
+  AddMethod(forfactor(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
 
   # the kernel is the first few blocks (can be only one!):
   # FIXME: why don't we just compute a precise set of generators of the kernel?
@@ -274,8 +270,7 @@ function(ri, G)
   findgensNmeth(ri).args[1] := 3 + nrblocks;
   findgensNmeth(ri).args[2] := 5;
   forkernel(ri).blocks := ri!.blocks{[1..middle-1]};
-  Add(forkernel(ri).hints,
-      rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000 ));
+  AddMethod(forkernel(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
   Setimmediateverification(ri,true);
   return Success;
 end);
@@ -424,9 +419,7 @@ function(ri,G)
 
   # Inform authorities that the factor can be recognised easily:
   forfactor(ri).blocks := bc.blocks;
-  Add(forfactor(ri).hints,
-      rec(method := FindHomMethodsMatrix.BlockLowerTriangular,
-          rank := 4000));
+  AddMethod(forfactor(ri).hints, FindHomMethodsMatrix.BlockLowerTriangular, 4000);
 
   return Success;
 end);
@@ -502,13 +495,10 @@ function(ri,G)
 
   # Now give hints downward:
   forfactor(ri).blocks := ri!.blocks;
-  Add(forfactor(ri).hints,
-      rec( method := FindHomMethodsMatrix.BlockDiagonal,
-           rank := 2000 ) );
+  AddMethod(forfactor(ri).hints, FindHomMethodsMatrix.BlockDiagonal, 2000);
   findgensNmeth(ri).method := FindKernelLowerLeftPGroup;
   findgensNmeth(ri).args := [];
-  Add(forkernel(ri).hints,rec(method := FindHomMethodsMatrix.LowerLeftPGroup,
-                              rank := 2000));
+  AddMethod(forkernel(ri).hints, FindHomMethodsMatrix.LowerLeftPGroup, 2000);
   forkernel(ri).blocks := ri!.blocks;
   return Success;
 end);
@@ -543,9 +533,7 @@ function(ri,G)
   SetHomom(ri, IdentityMapping(G));
   # Now give hints downward:
   forfactor(ri).blocks := ri!.blocks;
-  Add(forfactor(ri).hints,
-      rec(method := FindHomMethodsProjective.BlocksModScalars,
-          rank   := 2000));
+  AddMethod(forfactor(ri).hints, FindHomMethodsProjective.BlocksModScalars, 2000);
   # We go to projective, although it would not matter here, because we
   # gave a working hint anyway:
   Setmethodsforfactor(ri,FindHomDbProjective);
@@ -557,13 +545,11 @@ function(ri,G)
   # to a matrix group by multiplying things such that the last block
   # becomes an identity matrix:
   if ri!.projective then
-      Add(forkernel(ri).hints,
-          rec(method := FindHomMethodsProjective.BlockScalarProj,
-              rank   := 2000));
+      AddMethod(forkernel(ri).hints,
+                FindHomMethodsProjective.BlockScalarProj,
+                2000);
   else
-      Add(forkernel(ri).hints,
-          rec(method := FindHomMethodsMatrix.BlockScalar,
-              rank   := 2000));
+      AddMethod(forkernel(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
   fi;
   forkernel(ri).blocks := ri!.blocks;
   return Success;
@@ -598,8 +584,7 @@ end);
 #
 #  # Inform authorities that the kernel can be recognised easily:
 #  forkernel(ri).subdim := ri!.subdim;
-#  Add(forkernel(ri).hints,rec(method := FindHomMethodsMatrix.InducedOnSubspace,
-#                              rank := 2000,stamp := "InducedOnSubspace"),1);
+#  AddMethod(forkernel(ri).hints, FindHomMethodsMatrix.InducedOnSubspace, 2000);
 #
 #  return true;
 #end;
