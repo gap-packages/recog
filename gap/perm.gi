@@ -123,10 +123,8 @@ function(ri, G)
     # the kernel is solvable and that a hint is in order:
     Setimmediateverification(ri,true);
     forkernel(ri).blocks := blocks;
-    Add(forkernel(ri).hints,rec(method := FindHomMethodsPerm.PcgsForBlocks,
-                                rank := 400));
-    Add(forkernel(ri).hints,rec(method := FindHomMethodsPerm.BalTreeForBlocks,
-                                rank := 200));
+    AddMethod(forkernel(ri).hints, FindHomMethodsPerm.PcgsForBlocks, 400);
+    AddMethod(forkernel(ri).hints, FindHomMethodsPerm.BalTreeForBlocks, 200);
     findgensNmeth(ri).args[1] := Length(blocks)+3;
     findgensNmeth(ri).args[2] := 5;
     return Success;
@@ -197,13 +195,11 @@ function(ri, G)
       l := Length(upperhalf[1]);
       n := Length(upperhalf);
       forfactor(ri).blocks := List([1..n],i->[(i-1)*l+1..i*l]);
-      Add(forfactor(ri).hints,rec(method := FindHomMethodsPerm.BalTreeForBlocks,
-                                  rank := 200));
+      AddMethod(forfactor(ri).hints, FindHomMethodsPerm.BalTreeForBlocks, 200);
   fi;
   if cut > 1 then
       forkernel(ri).blocks := lowerhalf;
-      Add(forkernel(ri).hints,rec(method := FindHomMethodsPerm.BalTreeForBlocks,
-                                  rank := 200));
+      AddMethod(forkernel(ri).hints, FindHomMethodsPerm.BalTreeForBlocks, 200);
   fi;
   return Success;
 end);

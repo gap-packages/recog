@@ -202,9 +202,7 @@ function(ri,G)
           # A block system: We do a base change isomorphism:
           forkernel(ri).t := Concatenation(res.orb);
           forkernel(ri).blocksize := Length(res.orb[1]);
-          Add(forkernel(ri).hints,
-              rec(method := FindHomMethodsProjective.DoBaseChangeForBlocks,
-                  rank := 2000, stamp := "DoBaseChangeForBlocks"));
+          AddMethod(forkernel(ri).hints, FindHomMethodsProjective.DoBaseChangeForBlocks, 2000);
           Setimmediateverification(ri,true);
           findgensNmeth(ri).args[1] := Length(res.orb)+3;
           findgensNmeth(ri).args[2] := 5;
@@ -239,9 +237,7 @@ function(ri,G)
 
   # Inform authorities that the factor can be recognised easily:
   forfactor(ri).blocksize := ri!.blocksize;
-  Add(forfactor(ri).hints,
-      rec(method := FindHomMethodsProjective.Blocks,rank := 2000,
-          stamp := "Blocks"));
+  AddMethod(forfactor(ri).hints, FindHomMethodsProjective.Blocks, 2000);
 
   return Success;
 end);
@@ -264,14 +260,10 @@ function(ri,G)
   od;
   # For the factor:
   forfactor(ri).blocks := blocks;
-  Add(forfactor(ri).hints,
-      rec(method := FindHomMethodsProjective.BlocksModScalars, rank := 2000,
-          stamp := "BlocksModScalars"));
+  AddMethod(forfactor(ri).hints, FindHomMethodsProjective.BlocksModScalars, 2000);
   # For the kernel:
   forkernel(ri).blocks := blocks;
-  Add(forkernel(ri).hints,
-      rec(method := FindHomMethodsProjective.BlocksBackToMats, rank := 2000,
-          stamp := "BlocksBackToMats"));
+  AddMethod(forkernel(ri).hints, FindHomMethodsProjective.BlocksBackToMats, 2000);
   return Success;
 end);
 
@@ -300,8 +292,7 @@ function(ri,G)
   # hints for the factor:
   Setmethodsforfactor(ri,FindHomDbMatrix);
   forfactor(ri).blocks := ri!.blocks{[1..Length(ri!.blocks)-1]};
-  Add(forfactor(ri).hints,
-      rec( method := FindHomMethodsMatrix.BlockScalar, rank := 2000 ));
+  AddMethod(forfactor(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000 );
 
   # This is an isomorphism:
   findgensNmeth(ri).method := FindKernelDoNothing;
@@ -335,16 +326,12 @@ end);
 #
 #  # Pass the block information on to the factor:
 #  forfactor(ri).blocksize := ri!.blocksize;
-#  Add(forfactor(ri).hints,
-#      rec( method := FindHomMethodsProjective.BalTreeForBlocks,
-#           rank := 2000, stamp := "BalTreeForBlocks" ));
+#  AddMethod(forfactor(ri).hints, FindHomMethodsProjective.BalTreeForBlocks, 2000);
 #
 #  # Inform authorities that the kernel can be recognised easily:
 #  forkernel(ri).subdim := subdim;
 #  forkernel(ri).blocksize := ri!.blocksize;
-#  Add(forkernel(ri).hints,
-#      rec( method := FindHomMethodsProjective.BalTreeForBlocksProjKernel,
-#           rank := 2000, stamp := "BalTreeForBlocksProjKernel" ));
+#  AddMethod(forkernel(ri).hints, FindHomMethodsProjective.BalTreeForBlocksProjKernel, 2000);
 #
 #  # Verify the kernel immediately after its recognition:
 #  Setimmediateverification(ri,true);
@@ -385,8 +372,7 @@ end);
 #
 #  # Inform authorities that the kernel can be recognised easily:
 #  forkernel(ri).subdim := ri!.subdim;
-#  Add(forkernel(ri).hints,rec(method := FindHomMethodsMatrix.LowerLeftPGroup,
-#                              rank := 2000));
+#  AddMethod(forkernel(ri).hints, FindHomMethodsMatrix.LowerLeftPGroup, 2000);
 #
 #  return Success;
 #end;
@@ -406,9 +392,7 @@ end);
 #
 #  # But pass on the information on blocks:
 #  forfactor(ri).blocksize := ri!.blocksize;
-#  Add(forfactor(ri).hints,
-#      rec(method := FindHomMethodsProjective.BalTreeForBlocks,
-#                               rank := 2000, stamp := "BalTreeForBlocks"));
+#  AddMethod(forfactor(ri).hints, FindHomMethodsProjective.BalTreeForBlocks, 2000);
 #
 #  return Success;
 #end;
