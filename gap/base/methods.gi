@@ -16,26 +16,6 @@
 ##
 #############################################################################
 
-# HACK so that we can still treat RecogMethod objects as records
-RECOG.MethodComponentMap := rec(stamp := "Stamp",
-                                method := "func",
-                                comment := "Comment");
-InstallMethod(\., [IsRecogMethod, IsObject],
-function(x, nr)
-    local name, map;
-    name := NameRNam(nr);
-    if IsBound\.(RECOG.MethodComponentMap, nr) then
-        return x!.(RECOG.MethodComponentMap.(name));
-    fi;
-    return x!.(name);
-end);
-
-# HACK treat records as RecogMethod objects
-InstallOtherMethod(Stamp, [IsRecord],
-function(r)
-    return r.stamp;
-end);
-
 # HACK make RecogMethod objects callable as if they were functions
 InstallMethod(CallFuncList, [IsRecogMethod, IsList],
 {f, args} -> CallFuncList(f!.func, args));
@@ -46,11 +26,6 @@ function(m)
         ErrorNoReturn("<m> must be a RecogMethod, but is ", m);
     fi;
     return m!.func;
-end);
-
-InstallOtherMethod(Comment, [IsRecord],
-function(r)
-    return r.comment;
 end);
 
 InstallMethod(ViewString, [IsRecogMethod],
@@ -101,12 +76,8 @@ end);
 
 InstallGlobalFunction(CallRecogMethod,
 function(m, args)
-    # HACK to be compatible with records
-    if IsRecord(m) then
-        return CallFuncList(m.method, args);
-    elif IsRecogMethod(m) then
-        return CallFuncList(UnpackRecogMethod(m), args);
-    else
-        ErrorNoReturn("wrong type of <m>");
+    if not IsRecogMethod(m) then
+        ErrorNoReturn("<m> must be a RecogMethod, but is ", m);
     fi;
+    return CallFuncList(UnpackRecogMethod(m), args);
 end);

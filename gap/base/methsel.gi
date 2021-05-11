@@ -20,25 +20,8 @@
 # Add a method to a database with "AddMethod" and call a method from a
 # database with "CallMethods".
 #
-InstallGlobalFunction("AddMethod", function(methodDb, args...)
-    local method, rank, comment, pos;
-    # HACK to be compatible with "old methods" during switch to RecogMethod
-    # objects.
-    method := args[1];
-    if Length(args) = 1 then
-        rank := method.rank;
-        if not IsBound(method.comment) then
-            comment := "";
-        else
-            comment := method.comment;
-        fi;
-        method := RecogMethod(method.stamp, comment, method.method);
-    elif Length(args) = 2 then
-        rank := args[2];
-    else
-        ErrorNoReturn("wrong nr arguments");
-    fi;
-    # end of HACK
+InstallGlobalFunction("AddMethod", function(methodDb, method, rank)
+    local pos;
     if not IsRecogMethod(method) then
         ErrorNoReturn("<method> must be a RecogMethod");
     fi;
