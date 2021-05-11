@@ -1305,6 +1305,9 @@ BindRecogMethod(FindHomMethodsClassical, "NonGenericLinear",
 function( recognise, grp )
     local CheckFlag;
 
+    # We know that grp has non-generic parameters. Do we know whether the other
+    # prerequisites of Theorem 5.1, [NP99] are fulfilled? If one of them is
+    # unknown signal that they must be computed.
     CheckFlag := function( )
         if recognise.isReducible = "unknown" then
            recognise.needMeataxe := true;
@@ -1314,6 +1317,7 @@ function( recognise, grp )
             recognise.needForms :=  true;
             return fail;
         fi;
+        # TODO? 
         Info(InfoClassical,2,"The group is not generic");
         Info(InfoClassical,2,"and contains SL(", recognise.d, ", ",
              recognise.q, ");");
@@ -1321,13 +1325,13 @@ function( recognise, grp )
         return true;
     end;
 
+    # grp is non-generic if either d = 2 or (d,q) = (3, 2^s-1)
     if recognise.d > 3 then
         return false;
     fi;
     if recognise.d = 3 and not IsPowerOfTwo(recognise.q+1) then
         return false;
     fi;
-    # grp is non-generic if either d = 2 or (d,q) = (3, 2^s-1)
 
     if recognise.isReducible = true then
        return false;
@@ -1338,14 +1342,20 @@ function( recognise, grp )
        return false;
     fi;
 
+    if recognise.needLB  = false then
+        recognise.needLB := true;
+        return fail;
+    fi;
+
+    # Now we have confirmed all prerequisites of Theorem 5.1 except for that
+    # grp contains an element of order 4 and a basic lppd(3, q, 3) element.
     if recognise.n <= 5 then
         return fail;
     elif recognise.n = 6 then
         recognise.needOrders := true;
         return fail;
     fi;
-
-    if 3 in recognise.LE and 3 in recognise.BE
+    if 3 in recognise.LB
        and HasElementsMultipleOf(recognise.orders, [4]) then
            return CheckFlag();
     fi;
