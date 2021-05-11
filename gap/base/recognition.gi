@@ -451,21 +451,8 @@ InstallGlobalFunction( RecogniseGeneric,
 
     # Find a possible homomorphism (or recognise this group as leaf)
     allmethods := methoddb;
-    if IsBound(knowledge.hints) and Length(knowledge.hints) > 0 then
-        allmethods := ShallowCopy(allmethods);
-        # HACK
-        for hint in knowledge.hints do
-            #Assert(0, IsRecogMethod(hint.method));
-            if IsRecogMethod(hint.method) then
-                Add(allmethods, rec(rank := hint.rank, method := hint.method));
-            else
-                Add(allmethods,
-                    rec(rank := hint.rank,
-                        method := rec(method := hint.method, stamp := hint.stamp)));
-            fi;
-        od;
-        # end HACK
-        #allmethods := Concatenation(knowledge.hints,allmethods);
+    if IsBound(knowledge.hints) then
+        allmethods := Concatenation(allmethods, knowledge.hints);
         SortBy(allmethods, a -> -a.rank);
     fi;
 
