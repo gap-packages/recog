@@ -2376,7 +2376,9 @@ DisplayRecog := function( r )
 
            Print("Reducible : ", r.isReducible, "\n" );
            Print("Forms: " );
-           if Length(r.ClassicalForms)<> 1 then
+           if Length(r.ClassicalForms) = 0 then
+              Print("no form preserved\n"); # TODO is this correct?
+           elif Length(r.ClassicalForms)> 1 then
               Print("Several Forms preserved\n");
            elif IsTrivialForm( r.ClassicalForms[1] ) then
               Print("linear i.e. no forms\n");
