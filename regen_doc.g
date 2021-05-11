@@ -44,7 +44,7 @@ DbsWhichUseMethod := function(methodsRecord, methodName)
     types := ["permutation", "matrix", "projective"];
     for i in [1..Length(methodDbs)] do
         db := methodDbs[i];
-        if ForAny(db, x -> x.method = method) then
+        if ForAny(db, x -> Stamp(x.method) = Stamp(method)) then
             Add(result, types[i]);
         fi;
     od;
