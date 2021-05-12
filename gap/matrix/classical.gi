@@ -29,6 +29,9 @@
 #############################################################################
 
 BindGlobal( "ClassicalMethDb", [] );
+
+BindGlobal( "FindHomMethodsClassical", rec() );
+
 #
 ###
 # Test whether <n> (assumed integer) is a power of 2
@@ -139,7 +142,7 @@ end;
 # Test to check whether the group contains both a large ppd element
 # and a basic ppd element
 # TODO: Better comments...
-BindRecogMethod(RECOG, "IsGenericParameters",
+BindRecogMethod(FindHomMethodsClassical, "IsGenericParameters",
 "tests whether group has generic parameters",
 function( recognise, grp )
     local fact, d, q, hint;
@@ -212,7 +215,7 @@ end);
 # elements...monte  yes
 # TODO: Better comments
 
-BindRecogMethod(RECOG, "IsGeneric",
+BindRecogMethod(FindHomMethodsClassical, "IsGeneric",
 "tests whether group is generic",
 function (recognise, grp)
     if recognise.isGeneric = false then
@@ -232,7 +235,7 @@ end);
 
 #enough info to rule out extension field groups...?
 #TODO: comments...
-BindRecogMethod(RECOG, "RuledOutExtField",
+BindRecogMethod(FindHomMethodsClassical, "RuledOutExtField",
 "tests whether extension field case is ruled out",
 function (recognise, grp)
     local differmodfour, d, q, E, b, bx, hint;
@@ -337,7 +340,7 @@ function (recognise, grp)
     fi;
 end);
 
-BindRecogMethod(RECOG, "IsNotAlternating",
+BindRecogMethod(FindHomMethodsClassical, "IsNotAlternating",
 "tests whether alternating groups are ruled out",
 function( recognise, grp )
     local V, P, i, g ,q, o;
@@ -405,7 +408,7 @@ end);
 
 
 
-BindRecogMethod(RECOG, "IsNotMathieu",
+BindRecogMethod(FindHomMethodsClassical, "IsNotMathieu",
 "tests whether Mathieu groups are ruled out",
 function( recognise, grp )
    local i, fn, g, d, q, E, ord;
@@ -476,7 +479,7 @@ function( recognise, grp )
 end);
 
 
-BindRecogMethod(RECOG, "IsNotPSL",
+BindRecogMethod(FindHomMethodsClassical, "IsNotPSL",
 "tests whether PSL groups are ruled out",
 function (recognise, grp)
    local i, E, LE, d, p, a, q,  str, fn, ord;
@@ -616,7 +619,7 @@ IsPrimitivePrimeDivisor := function( b, a, p )
 end;
 
 # generate the next random element and its char polynomial
-BindRecogMethod(RECOG, "TestRandomElement",
+BindRecogMethod(FindHomMethodsClassical, "TestRandomElement",
 "makes new random element and stores it and its char poly",
 function(recognise, grp)
     local g, ppd, bppd, d, q, cpol, f, deg, facs, r, s, h, gmod, str,
@@ -842,7 +845,7 @@ end);
 
 # Compute the degrees of the irreducible factors of
 # the characteristic polynomial <cpol>
-BindRecogMethod(RECOG, "IsReducible",
+BindRecogMethod(FindHomMethodsClassical, "IsReducible",
 "tests whether current random element rules out reducible",
 function( recognise, grp )
     local deg, dims, g;
@@ -872,7 +875,7 @@ function( recognise, grp )
     return fail;
 end);
 
-BindRecogMethod(RECOG, "NoClassicalForms",
+BindRecogMethod(FindHomMethodsClassical, "NoClassicalForms",
 "tests whether we can rule out certain forms",
 function( recognise, grp )
     local d,field;
@@ -895,7 +898,7 @@ end);
 
 
 
-BindRecogMethod(RECOG, "ClassicalForms",
+BindRecogMethod(FindHomMethodsClassical, "ClassicalForms",
 "Find the invariant forms",
 function( recognise, grp)
     local   field,  z,  d,  i,  qq,  A,  c,  I,  t,  i0,
@@ -983,7 +986,7 @@ function( recognise, grp)
 end);
 
 
-BindRecogMethod(RECOG, "MeatAxe",
+BindRecogMethod(FindHomMethodsClassical, "MeatAxe",
 "Test irreducibility",
 function( recognise, grp )
     if recognise.n > 15 then
@@ -1011,7 +1014,7 @@ function( recognise, grp )
 end);
 
 ## Main function to test whether group contains SL
-BindRecogMethod(RECOG, "IsSLContained",
+BindRecogMethod(FindHomMethodsClassical, "IsSLContained",
 "tests whether group contains SL",
 function( recognise, grp )
     if recognise.isGeneric <> true or
@@ -1054,7 +1057,7 @@ function( recognise, grp )
 end);
 
 ## Main function to test whether group contains Sp
-BindRecogMethod(RECOG, "IsSpContained",
+BindRecogMethod(FindHomMethodsClassical, "IsSpContained",
 "tests whether group contains Sp",
 function( recognise, grp )
     local isSpForm;
@@ -1112,7 +1115,7 @@ end);
 
 
 ## Main function to test whether group contains SU
-BindRecogMethod(RECOG, "IsSUContained",
+BindRecogMethod(FindHomMethodsClassical, "IsSUContained",
 "tests whether group contains SU",
 function( recognise, grp )
     local f, isHermForm, q0;
@@ -1176,7 +1179,7 @@ end);
 
 
 ## Main function to test whether group contains SO
-BindRecogMethod(RECOG, "IsSOContained",
+BindRecogMethod(FindHomMethodsClassical, "IsSOContained",
 "tests whether group contains SO",
 function( recognise, grp )
     local f, isParForm, isEllForm, isHypForm;
@@ -1297,7 +1300,7 @@ end;
 ##  find an element of order a multiple of 4 and a large and basic ppd(3,q;3)-
 ##  element
 ##
-BindRecogMethod(RECOG, "NonGenericLinear",
+BindRecogMethod(FindHomMethodsClassical, "NonGenericLinear",
 "tests whether group is non-generic Linear",
 function( recognise, grp )
     local CheckFlag;
@@ -1354,7 +1357,7 @@ end);
 ##
 ##  Recognise non-generic symplectic matrix groups over finite fields
 ##
-BindRecogMethod(RECOG, "NonGenericSymplectic",
+BindRecogMethod(FindHomMethodsClassical, "NonGenericSymplectic",
 "tests whether group is non-generic Symplectic",
 function(recognise, grp)
     local d, q, CheckFlag, isSpForm;
@@ -1474,7 +1477,7 @@ end);
 ##
 ##  Recognise non-generic unitary matrix groups over finite fields
 ##
-BindRecogMethod(RECOG, "NonGenericUnitary",
+BindRecogMethod(FindHomMethodsClassical, "NonGenericUnitary",
 "tests whether group is non-generic Unitary",
 function(recognise, grp)
     local d, q,  g, f1, f2, o, CheckFlag, isHermForm, str;
@@ -1682,7 +1685,7 @@ function(recognise, grp)
 end);
 
 
-BindRecogMethod(RECOG, "NonGenericOrthogonalPlus",
+BindRecogMethod(FindHomMethodsClassical, "NonGenericOrthogonalPlus",
 "tests whether group is non-generic O+",
 function(recognise,grp)
     local d, q, gp1, gp2, CheckFlag, pgrp, orbs, isHypForm;
@@ -1916,7 +1919,7 @@ function(recognise,grp)
 
 end);
 
-BindRecogMethod(RECOG, "NonGenericOrthogonalMinus",
+BindRecogMethod(FindHomMethodsClassical, "NonGenericOrthogonalMinus",
 "tests whether group is non-generic O-",
 function(recognise, grp)
     local d, q,  orbs, pgrp, h,  g, ppd,  CheckFlag, isEllForm;
@@ -2025,7 +2028,7 @@ function(recognise, grp)
 
 end);
 
-BindRecogMethod(RECOG, "NonGenericOrthogonalCircle",
+BindRecogMethod(FindHomMethodsClassical, "NonGenericOrthogonalCircle",
 "tests whether group is non-generic Oo",
 function( recognise, grp )
     local d, q, g, s, CheckFlag, isParForm;
@@ -2182,47 +2185,47 @@ end);
 #
 # 1 - 10 Workers
 
-AddMethod(ClassicalMethDb, RECOG.TestRandomElement, 100);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.TestRandomElement, 100);
 
-AddMethod(ClassicalMethDb, RECOG.IsGenericParameters, 90);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsGenericParameters, 90);
 
-AddMethod(ClassicalMethDb, RECOG.IsGeneric, 89);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsGeneric, 89);
 
-AddMethod(ClassicalMethDb, RECOG.IsReducible, 80);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsReducible, 80);
 
-AddMethod(ClassicalMethDb, RECOG.RuledOutExtField, 81);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.RuledOutExtField, 81);
 
-AddMethod(ClassicalMethDb, RECOG.IsNotMathieu, 82);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsNotMathieu, 82);
 
-AddMethod(ClassicalMethDb, RECOG.IsNotAlternating, 83);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsNotAlternating, 83);
 
-AddMethod(ClassicalMethDb, RECOG.IsNotPSL, 84);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsNotPSL, 84);
 
-AddMethod(ClassicalMethDb, RECOG.NoClassicalForms, 85);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.NoClassicalForms, 85);
 
-AddMethod(ClassicalMethDb, RECOG.MeatAxe, 9);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.MeatAxe, 9);
 
-AddMethod(ClassicalMethDb, RECOG.ClassicalForms, 8);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.ClassicalForms, 8);
 
-AddMethod(ClassicalMethDb, RECOG.NonGenericLinear, 10);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.NonGenericLinear, 10);
 
-AddMethod(ClassicalMethDb, RECOG.NonGenericUnitary, 11);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.NonGenericUnitary, 11);
 
-AddMethod(ClassicalMethDb, RECOG.NonGenericSymplectic, 12);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.NonGenericSymplectic, 12);
 
-AddMethod(ClassicalMethDb, RECOG.NonGenericOrthogonalPlus, 13);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.NonGenericOrthogonalPlus, 13);
 
-AddMethod(ClassicalMethDb, RECOG.NonGenericOrthogonalMinus, 14);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.NonGenericOrthogonalMinus, 14);
 
-AddMethod(ClassicalMethDb, RECOG.NonGenericOrthogonalCircle, 15);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.NonGenericOrthogonalCircle, 15);
 
-AddMethod(ClassicalMethDb, RECOG.IsSLContained, 16);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsSLContained, 16);
 
-AddMethod(ClassicalMethDb, RECOG.IsSpContained, 17);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsSpContained, 17);
 
-AddMethod(ClassicalMethDb, RECOG.IsSUContained, 18);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsSUContained, 18);
 
-AddMethod(ClassicalMethDb, RECOG.IsSOContained, 19);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsSOContained, 19);
 
 
 
