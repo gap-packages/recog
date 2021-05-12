@@ -738,6 +738,12 @@ RECOG.RecogniseSnAn := function(ri, eps, N)
         c := iterator();
         while c <> fail do
             if c = NeverApplicable then return NeverApplicable; fi;
+            # This is a very cheap test to determine
+            # if our candidate c could be a three cycle.
+            if not isone(ri)(StripMemory(c) ^ 3) then
+                c := iterator();
+                continue;
+            fi;
             tmp := RECOG.ConstructLongCycle(ri, c, 1. / 8., N);
             if tmp = fail then
                 c := iterator();
