@@ -39,6 +39,14 @@ function(m)
     return s;
 end);
 
+InstallMethod(PrintObj, [IsRecogMethod],
+function(m)
+    Print("RecogMethod(\"", Stamp(m), "\",\n");
+    Print("\"", Comment(m), "\",\n");
+    Print(UnpackRecogMethod(m));
+    Print(");");
+end);
+
 InstallGlobalFunction(RecogMethod,
 function(stamp, comment, arg...)
     local func, opt, r;
