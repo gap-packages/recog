@@ -47,9 +47,16 @@ the verification phase will be much more expensive than the recognition phase.
 <P/>
 
 In the following sections, we describe the generic framework. We begin
-with a technical description of the recursive procedure and describe then
-the way methods to find homomorphism have to be implemented. Finally,
-we have four sections in which we collect conventions for the
+in Section <Ref Sect="techrecog"/>
+with a technical description of the recursive procedure
+behind our main function <Ref Func="RecogniseGroup"/>.
+In Section <Ref Sect="rirecord"/>
+we describe the return type of <Ref Func="RecogniseGroup"/>
+which we call <Q>recognition info records</Q>.
+The methods to find homomorphisms are described
+in Section <Ref Sect="findhomo"/>.
+Finally,
+we have three sections in which we collect conventions for the
 recognition of different types of groups.<P/>
 
 <Section Label="techrecog">
