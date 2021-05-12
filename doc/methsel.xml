@@ -35,30 +35,22 @@ the right thing.<P/>
 <Section Label="whataremethods">
     <Heading>What are methods?</Heading>
 
-A method is just a &GAP; function together with an agreement about
-what arguments it takes and what result it returns. The agreement
-about the arguments of course has to be made for every situation
-in which this generic method selection code is used, and the
-user is completely free there. A method can (and has to) return
-one of the following four values:<P/>
+Recognition methods lie in the filter <Ref Filt="IsRecogMethod"/> and can be
+created via the function <Ref Func="RecogMethod"/>.
 
-<List>
-<Mark><K>Success</K></Mark>
-<Item>means that the method was successful and no more methods have to be
-    tried.</Item>
-<Mark><K>NeverApplicable</K></Mark>
-<Item>means that the method was not successful and that there is no point
-    to call the method again in this situation whatsoever.</Item>
-<Mark><K>TemporaryFailure</K></Mark>
-<Item>means that the method temporarily failed, that it however could be
-    sensible to call it again in this situation at a later stage. This
-    value is typical for a Las Vegas algorithm using randomised methods,
-    which has failed, but which may succeed when called again.</Item>
-<Mark><K>NotEnoughInformation</K></Mark>
-<Item>means that the method for some reason refused to do its work. However,
-    it is possible that it will become applicable later such that it makes
-    sense to call it again, for example when more information is available.</Item>
-</List>
+<#Include Label="IsRecogMethod">
+
+<#Include Label="RecogMethod">
+
+<#Include Label="BindRecogMethod">
+
+<#Include Label="Stamp">
+<#Include Label="Comment">
+
+<#Include Label="CallRecogMethod">
+
+</Section>
+
 
 For administration in the method selection, a method is described by
 a record with the following components bound:

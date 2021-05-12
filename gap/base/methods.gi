@@ -50,7 +50,6 @@ end);
 InstallGlobalFunction(RecogMethod,
 function(stamp, comment, arg...)
     local func, opt, r;
-    # TODO: make <comment> optional, too?
     if Length(arg) = 0 or Length(arg) > 2 then
         Error("usage: RecogMethod(stamp, comment[, opt], func)");
     fi;
