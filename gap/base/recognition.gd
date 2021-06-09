@@ -323,10 +323,7 @@ DeclareAttribute( "docommute", IsRecognitionInfo, "mutable" );
 ## <ManSection>
 ## <Var Name="FindHomMethodsPerm"/>
 ## <Description>
-##     In this global record the functions that are methods for finding
-##     homomorphisms for permutation group recognition are stored. We
-##     collect them all in this record such that we do not use up too many
-##     global variable names.
+## Stores recog methods for permutation groups.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
@@ -336,10 +333,7 @@ BindGlobal( "FindHomMethodsPerm", rec() );
 ## <ManSection>
 ## <Var Name="SLPforElementFuncsPerm"/>
 ## <Description>
-##     This global record holds the functions that are methods for writing group
-##     elements as straight line programs (SLPs) in terms of the generators
-##     after successful permutation group recognition. We collect them all in this
-##     record such that we do not use up too many global variable names.
+## Stores the SLP functions for permutation groups.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
@@ -349,13 +343,7 @@ BindGlobal( "SLPforElementFuncsPerm", rec() );
 ## <ManSection>
 ## <Var Name="FindHomDbPerm"/>
 ## <Description>
-##     This list contains the methods for finding homomorphisms
-##     for permutation group recognition that are stored in the record
-##     <Ref Var="FindHomMethodsPerm"/>. As described in Section <Ref
-##     Sect="whataremethods"/> each method is described by a record. The list
-##     is always sorted with respect to decreasing ranks. The order in this
-##     list tells in which order the methods should be applied. Use <Ref
-##     Func="AddMethod"/> to add methods to this database.
+## The method database for permutation groups.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
@@ -365,10 +353,7 @@ BindGlobal( "FindHomDbPerm", [] );
 ## <ManSection>
 ## <Var Name="FindHomMethodsMatrix"/>
 ## <Description>
-##     In this global record the functions that are methods for finding
-##     homomorphisms for matrix group recognition are stored. We collect
-##     them all in this record such that we do not use up too many global
-##     variable names.
+## Stores recog methods for matrix groups.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
@@ -378,10 +363,7 @@ BindGlobal( "FindHomMethodsMatrix", rec() );
 ## <ManSection>
 ## <Var Name="SLPforElementFuncsMatrix"/>
 ## <Description>
-##     This global record holds the functions that are methods for writing group
-##     elements as straight line programs (SLPs) in terms of the generators
-##     after successful matrix group recognition. We collect them all in this
-##     record such that we do not use up too many global variable names.
+## Stores the SLP functions for matrix groups.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
@@ -391,13 +373,7 @@ BindGlobal( "SLPforElementFuncsMatrix", rec() );
 ## <ManSection>
 ## <Var Name="FindHomDbMatrix"/>
 ## <Description>
-##     This list contains the methods for finding homomorphisms
-##     for matrix group recognition that are stored in the record
-##     <Ref Var="FindHomMethodsMatrix"/>. As described in Section <Ref
-##     Sect="whataremethods"/> each method is described by a record. The list
-##     is always sorted with respect to decreasing ranks. The order in this
-##     list tells in which order the methods should be applied. Use <Ref
-##     Func="AddMethod"/> to add methods to this database.
+## The method database for matrix groups.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
@@ -407,10 +383,7 @@ BindGlobal( "FindHomDbMatrix", [] );
 ## <ManSection>
 ## <Var Name="FindHomMethodsProjective"/>
 ## <Description>
-##     In this global record the functions that are methods for finding
-##     homomorphisms for projective group recognition are stored. We collect
-##     them all in this record such that we do not use up too many global
-##     variable names.
+## Stores recog methods for projective groups.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
@@ -420,10 +393,7 @@ BindGlobal( "FindHomMethodsProjective", rec() );
 ## <ManSection>
 ## <Var Name="SLPforElementFuncsProjective"/>
 ## <Description>
-##     This global record holds the functions that are methods for writing group
-##     elements as straight line programs (SLPs) in terms of the generators
-##     after successful projective group recognition. We collect them all in this
-##     record such that we do not use up too many global variable names.
+## Stores the SLP functions for projective groups.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
@@ -433,13 +403,7 @@ BindGlobal( "SLPforElementFuncsProjective", rec() );
 ## <ManSection>
 ## <Var Name="FindHomDbProjective"/>
 ## <Description>
-##     This list contains the methods for finding homomorphisms
-##     for projective group recognition that are stored in the record
-##     <Ref Var="FindHomMethodsProjective"/>. As described in Section <Ref
-##     Sect="whataremethods"/> each method is described by a record. The list
-##     is always sorted with respect to decreasing ranks. The order in this
-##     list tells in which order the methods should be applied. Use <Ref
-##     Func="AddMethod"/> to add methods to this database.
+## The method database for projective matrix groups.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
@@ -462,10 +426,7 @@ BindGlobal( "FindHomMethodsGeneric", rec() );
 ## <ManSection>
 ## <Var Name="SLPforElementFuncsGeneric"/>
 ## <Description>
-##     This global record holds the functions that are methods for writing group
-##     elements as straight line programs (SLPs) in terms of the generators
-##     after successful generic group recognition. We collect them all in this
-##     record such that we do not use up too many global variable names.
+## Stores the SLP functions for generic groups.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>

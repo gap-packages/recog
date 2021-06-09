@@ -154,11 +154,6 @@ following convenience functions:
 <#Include Label="RecogniseProjectiveGroup">
 <#Include Label="RecogniseGroup">
 
-<#Include Label="SLPforElementFuncsPerm">
-<#Include Label="SLPforElementFuncsMatrix">
-<#Include Label="SLPforElementFuncsProjective">
-<#Include Label="SLPforElementFuncsGeneric">
-
 <ManSection>
 <Func Name="TryFindHomMethod" Arg="H, method, projective"/>
 <Returns><K>fail</K> or <K>false</K> or a recognition info record.</Returns>
