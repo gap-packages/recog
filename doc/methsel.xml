@@ -94,6 +94,32 @@ function:
 <#Include Label="CallMethods">
 </Section>
 
+<Section Label="howstored">
+<Heading>Global records storing functions</Heading>
+
+The following global records store the methods for finding
+homomorphisms for group recognition.
+We collect them in these records such that we do not use up too many
+global variable names.
+
+<#Include Label="FindHomMethodsPerm">
+<#Include Label="FindHomMethodsMatrix">
+<#Include Label="FindHomMethodsProjective">
+<#Include Label="FindHomMethodsGeneric">
+
+The following global records hold the functions for writing group elements as
+straight line programs (SLPs) in terms of the generators after successful group
+recognition.
+We collect them in these records such that we do not use up too many global
+variable names.
+
+<#Include Label="SLPforElementFuncsPerm">
+<#Include Label="SLPforElementFuncsMatrix">
+<#Include Label="SLPforElementFuncsProjective">
+<#Include Label="SLPforElementFuncsGeneric">
+
+</Section>
+
 <P/>
 
 <!-- ############################################################ -->
