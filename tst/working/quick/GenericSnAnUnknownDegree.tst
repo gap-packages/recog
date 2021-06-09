@@ -1,14 +1,30 @@
-#@local testFunction, IsBolsteringElement, degrees
+#@local testFunction, IsBolsteringElement, data
 #@local altGroups, symGroups, permMatGroup, altMatGroups, nonAltOrSymGroups
 #@local ri, g, c, r, i, x, slp
 #@local S11On2Sets, d, sets, SdOn2Sets, success, res, isoData, gens, g1, img1, g2, img2
-#@local SymOn2Sets, AltOn2Sets
+#@local SymOnKSets, AltOnKSets
 #
 # Hack to insert the method
 gap> AddMethod(FindHomDbPerm,
 >     rec(
 >         method := FindHomMethodsGeneric.SnAnUnknownDegree,
 >         rank := 58,
+>         stamp := "SnAnUnknownDegreeHack",
+>         comment := "HACK",
+>     )
+> );;
+gap> AddMethod(FindHomDbMatrix,
+>     rec(
+>         method := FindHomMethodsGeneric.SnAnUnknownDegree,
+>         rank := 1070,
+>         stamp := "SnAnUnknownDegreeHack",
+>         comment := "HACK",
+>     )
+> );;
+gap> AddMethod(FindHomDbProjective,
+>     rec(
+>         method := FindHomMethodsGeneric.SnAnUnknownDegree,
+>         rank := 1220,
 >         stamp := "SnAnUnknownDegreeHack",
 >         comment := "HACK",
 >     )
@@ -79,58 +95,71 @@ gap> IsBolsteringElement :=
 >     if ForAny(dist, k -> k < 2) then return false; fi;
 >     return true;
 > end;;
-gap> degrees := [11, 12, 13, 20, 21, 30, 35, 40, 42, 50, 51];;
+
+# For each entry (d, k) we construct Sym(d)/Alt(d) acting on k-sets.
+# For each entry (d, k), we must have 2 * k ^ 2 > d,
+# otherwise LargeBasePrimitive recognises the group instead of SnAnUnknownDegree.
+gap> data := [[11, 3], [12, 3], [13, 3]];;
 
 # TODO: more non-isomorphic examples
 # TODO: add projective groups
 #
-# SymmetricGroup action on 2-sets
-gap> SymOn2Sets := function(d)
+# SymmetricGroup action on k-sets
+gap> SymOnKSets := function(d, k)
 >     local sets;
->     sets := Combinations([1 .. d], 2);;
+>     sets := Combinations([1 .. d], k);;
 >     return Action(SymmetricGroup(d), sets, OnSets);;
 > end;;
 
 #
 # AlternatingGroup action on 2-sets
-gap> AltOn2Sets := function(d)
+gap> AltOnKSets := function(d, k)
 >     local sets;
->     sets := Combinations([1 .. d], 2);;
+>     sets := Combinations([1 .. d], k);;
 >     return Action(AlternatingGroup(d), sets, OnSets);;
 > end;;
 
 #
-gap> altGroups := List(degrees, AltOn2Sets);;
-gap> symGroups := List(degrees, SymOn2Sets);;
+gap> altGroups := List(data, entry -> AltOnKSets(entry[1], entry[2]));;
+gap> symGroups := List(data, entry -> SymOnKSets(entry[1], entry[2]));;
 gap> permMatGroup := G -> Group(List(
 >     GeneratorsOfGroup(G),
 >     x -> ImmutableMatrix(7, PermutationMat(x, NrMovedPoints(G), GF(7)))
 > ));;
-gap> altMatGroups := List([10],
+gap> altMatGroups := List([11],
 >                          n -> permMatGroup(AlternatingGroup(n)));;
 gap> nonAltOrSymGroups := [
 >     DihedralGroup(IsPermGroup, 10),
 >     #DihedralGroup(IsPcGroup, 10),
 >     #DihedralGroup(IsPermGroup, 2000),
 >     #DihedralGroup(IsPcGroup, 2000),
->     #PSL(3, 5),
+>     PSL(3, 5),
 >     SL(3, 5),
->     #permMatGroup(DihedralGroup(IsPermGroup, 10)),
->     #Omega(-1, 4, 5),
->     #Omega(+1, 4, 5),
->     #Omega(0, 5, 5),
+>     Omega(-1, 4, 5),
+>     Omega(-1, 4, 3),
+>     Omega(+1, 4, 5),
+>     Omega(+1, 4, 3),
+>     Omega(+1, 8, 5),
+>     Omega(+1, 8, 3),
+>     Omega(0, 5, 5),
+>     Omega(0, 5, 3),
 > ];;
 
 # Test
-gap> for i in [1 .. Length(degrees)] do
->     RECOG.TestGroup(altGroups[i], false, Factorial(degrees[i])/2);
->     RECOG.TestGroup(symGroups[i], false, Factorial(degrees[i]));
+gap> for i in [1 .. Length(data)] do
+>     RECOG.TestGroup(altGroups[i], false, Factorial(data[i, 1])/2);
+>     RECOG.TestGroup(symGroups[i], false, Factorial(data[i, 1]));
 > od;
 gap> for i in [1 .. Length(altMatGroups)] do
 >     RECOG.TestGroup(altMatGroups[i], false, Size(altMatGroups[i]));
 > od;
+gap> for i in [1 .. Length(altMatGroups)] do
+>     RECOG.TestGroup(altMatGroups[i], true, Size(altMatGroups[i]));
+> od;
 gap> for i in [1 .. Length(nonAltOrSymGroups)] do
->     RECOG.TestGroup(nonAltOrSymGroups[i], false, Size(nonAltOrSymGroups[i]));
+>     if FindHomMethodsGeneric.SnAnUnknownDegree(EmptyRecognitionInfoRecord(rec(), nonAltOrSymGroups[i], false), nonAltOrSymGroups[i]) = Success then
+>         Print("ERROR: Recognised group [", i, "] wrongly as Sn/An!\n");
+>     fi;
 > od;
 
 # RECOG.IsFixedPoint
@@ -292,3 +321,7 @@ true
 # Remove Hacky injection of our method
 gap> Remove(FindHomDbPerm,
 >       PositionProperty(FindHomDbPerm, x -> x.stamp = "SnAnUnknownDegreeHack"));;
+gap> Remove(FindHomDbMatrix,
+>       PositionProperty(FindHomDbMatrix, x -> x.stamp = "SnAnUnknownDegreeHack"));;
+gap> Remove(FindHomDbProjective,
+>       PositionProperty(FindHomDbProjective, x -> x.stamp = "SnAnUnknownDegreeHack"));;
