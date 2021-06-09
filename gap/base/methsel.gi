@@ -30,10 +30,6 @@ InstallGlobalFunction("AddMethod", function(methodDb, method, rank)
 end);
 
 
-# A database of methods a list of records with components:
-#  method     : a RecogMethod object
-#  rank       : the rank of the method in this particular database
-#
 # Data for the method selection process is collected in another record
 # with the following components:
 #   inapplicableMethods  : a record where each method that is never applicable

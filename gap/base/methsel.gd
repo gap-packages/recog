@@ -27,20 +27,15 @@ SetInfoLevel(InfoAddMethod, 0);
 
 ## <#GAPDoc Label="AddMethod">
 ## <ManSection>
-## <Func Name="AddMethod" Arg="methodDb, method"/>
-## <Returns>nothing</Returns>
+## <Func Name="AddMethod" Arg="methodDb, method, rank"/>
 ## <Description>
-#  <A>methodDb</A> must be a method database as in Section
-#  <Ref Sect="whataremethods"/>.
-#  <A>method</A> must be a record with the following components.
-#  <A>method</A> is the method function,
-#  <A>rank</A> the rank and <A>stamp</A> a string valued stamp, that is
-#  <A>stamp</A> uniquely identifies the method among all other methods.
-#  Optionally the component <A>comment</A> can be bound to a string.
-#  <P/>
-#  The method record <A>method</A> is inserted according to its rank, assuming
-#  that the method database <A>methodDb</A> is in rank-descending order.
-#  Nothing is returned.
+#  Add the recognition method <A>method</A> with rank <A>rank</A> to the
+#  method database <A>methodDb</A>. Return nothing.
+#  <A>method</A> is inserted into <A>methodDb</A> such that the ranks of its
+#  entries are in decreasing order.
+#  For information on recognition methods and method databases see
+#  <Ref Func="RecogMethod"/>
+#  and Section <Ref Sect="methoddatabases"/>, respectively.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
@@ -53,7 +48,7 @@ DeclareGlobalFunction( "AddMethod" );
 ## </Returns>
 ## <Description>
 ## The argument <A>db</A> must be a method database in the sense of
-## Section <Ref Sect="whataremethods"/>. <A>limit</A> must be a non-negative
+## Section <Ref Sect="methoddatabases"/>. <A>limit</A> must be a non-negative
 ## integer. <A>furtherargs</A> stands for an arbitrary number of additional
 ## arguments, which are handed down to the called methods. Of course they
 ## must fulfill the conventions defined for the methods in the database

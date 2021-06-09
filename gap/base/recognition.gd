@@ -554,7 +554,7 @@ DeclareSynonym("RecognizeGroup", RecogniseGroup);
 ## <Returns><K>fail</K> for failure or a recognition info record.</Returns>
 ## <Description>
 ##     <A>H</A> must be a &GAP; group object, <A>methoddb</A> must be a
-##     method database in the sense of Section <Ref Sect="whataremethods"/>
+##     method database in the sense of Section <Ref Sect="methoddatabases"/>
 ##     containing <C>FindHomomorphism</C> methods in the sense of Section
 ##     <Ref Sect="findhomo"/>. <A>depthString</A> is a string whose length
 ##     measures the depth in the recognition tree. It will be increased by one
@@ -564,7 +564,7 @@ DeclareSynonym("RecognizeGroup", RecogniseGroup);
 ##     components of which are copied into the new recognition info record
 ##     which is created for the group <A>H</A>. Especially the component
 ##     <C>hints</C> can contain a list of additional find homomorphism
-##     methods (described by records as in Section <Ref Sect="whataremethods"/>).
+##     methods (described by records as in Section <Ref Sect="methoddatabases"/>).
 #      The methods in <C>hints</C> and in <A>methoddb</A> are merged and sorted
 #      into rank-descending order. The result is passed to
 #      <Ref Func="CallMethods"/>.
