@@ -154,16 +154,9 @@ following convenience functions:
 <#Include Label="RecogniseProjectiveGroup">
 <#Include Label="RecogniseGroup">
 
-<#Include Label="FindHomDbPerm">
-<#Include Label="FindHomMethodsPerm">
 <#Include Label="SLPforElementFuncsPerm">
-<#Include Label="FindHomDbMatrix">
-<#Include Label="FindHomMethodsMatrix">
 <#Include Label="SLPforElementFuncsMatrix">
-<#Include Label="FindHomDbProjective">
-<#Include Label="FindHomMethodsProjective">
 <#Include Label="SLPforElementFuncsProjective">
-<#Include Label="FindHomMethodsGeneric">
 <#Include Label="SLPforElementFuncsGeneric">
 
 <ManSection>

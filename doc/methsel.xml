@@ -51,36 +51,38 @@ created via the function <Ref Func="RecogMethod"/>.
 
 </Section>
 
+<Section Label="methoddatabases">
+<Heading>Method Databases</Heading>
 
-For administration in the method selection, a method is described by
-a record with the following components bound:
-
+A <E>method database</E> is a list of records, where each record has the
+following components:
 <List>
 <Mark><C>method</C></Mark>
-<Item>holds the function itself.</Item>
+<Item>
+    A recognition method created with <Ref Func="RecogMethod"/>.
+</Item>
 <Mark><C>rank</C></Mark>
-<Item>holds an integer used to sort the various methods. Higher numbers
-    mean that the method is tried earlier. The numbering scheme is left
-    to the user.
-</Item>
-<Mark><C>stamp</C></Mark>
-<Item>holds a string value that uniquely describes the method. This is used
-    for bookkeeping and to keep track of what has to be tried how often.
-</Item>
-<Mark><C>comment</C></Mark>
-<Item>a string valued comment. This field is optional and can be left out.
+<Item>
+    An integer used to sort the various methods. Higher numbers mean that the
+    method is tried earlier.
+    See <Ref Func="CallMethods"/> for information on how the methods are called.
 </Item>
 </List>
 
-The different methods for a certain task are collected in so-called
-<Q>method databases</Q>. A <E>method database</E> is just a list of records,
-each describing a method in the format described above. During method selection,
-the methods are tried in the order in which they are stored in the database.
-Thus they should be stored in rank-descending order.<P/>
-
-There is one convenience function to put a new method into a method database:
+The databases are always sorted such that the ranks are decreasing.
+Use <Ref Func="AddMethod"/> to add a method to a database according to its rank.
 
 <#Include Label="AddMethod">
+<P/>
+
+The following databases contain the methods for finding
+homomorphisms for permutation, matrix, and projective groups.
+
+<#Include Label="FindHomDbPerm">
+<#Include Label="FindHomDbMatrix">
+<#Include Label="FindHomDbProjective">
+<P/>
+
 </Section>
 
 <Section Label="howcalled">
