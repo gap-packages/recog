@@ -709,29 +709,6 @@ of the nice generators of the current node.
 
 </Section>
 
-<Section Label="convperm">
-    <Heading>Conventions for the recognition of permutation groups</Heading>
-
-No conventions so far.
-</Section>
-
-<Section Label="convmat">
-    <Heading>Conventions for the recognition of matrix groups</Heading>
-
-We are considering only the case of matrix groups over finite fields.<P/>
-
-No conventions so far.
-</Section>
-
-<Section Label="convproj">
-    <Heading>Conventions for the recognition of projective groups</Heading>
-
-We are considering only the case of projective groups over finite fields.<P/>
-
-No conventions so far.
-</Section>
-
-
 <!-- ############################################################ -->
 
 </Chapter>
