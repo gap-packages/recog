@@ -498,7 +498,7 @@ DeclareSynonym("RecognizePermGroup", RecognisePermGroup);
 ## <Func Name="RecognizeMatrixGroup" Arg="H"/>
 ## <Returns><K>fail</K> for failure or a recognition info record.</Returns>
 ## <Description>
-## <A>H</A> must be a &GAP; matrix group object. This function calls
+## <A>H</A> must be a &GAP; matrix group object over a finite field. This function calls
 ## <Ref Func="RecogniseGeneric"/> with the method database used for
 ## matrix groups, which is stored in the global variable
 ## <Ref Var="FindHomDbMatrix"/>, and no prior knowledge.
@@ -514,7 +514,7 @@ DeclareSynonym("RecognizeMatrixGroup", RecogniseMatrixGroup);
 ## <Func Name="RecognizeProjectiveGroup" Arg="H"/>
 ## <Returns><K>fail</K> for failure or a recognition info record.</Returns>
 ## <Description>
-## <A>H</A> must be a &GAP; matrix group object. Since as of now no
+## <A>H</A> must be a &GAP; matrix group object over a finite field. Since as of now no
 ## actual projective groups are implemented in the &GAP; library we use
 ## matrix groups instead. The recognition will however view the group as
 ## the projective group, i.e. the matrix group modulo its scalar
