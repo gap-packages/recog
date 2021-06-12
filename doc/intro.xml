@@ -21,7 +21,7 @@ The setup is described in <Cite Key="NS06"/>. <P/>
 The framework allows to build composition trees and handles the builtup
 and usage of these trees in a generic way. It also contains a
 method selection (described in Chapter <Ref Chap="methsel"/>) that allows
-install recognition methods in a convenient way and that automatically
+to install recognition methods in a convenient way and that automatically
 tries to try the different available methods in a sensible order.
 </Section>
 
