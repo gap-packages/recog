@@ -1,4 +1,4 @@
-# FDPM = fully deleted permutation
+# FDPM = fully deleted permutation module
 
 # Alternating:
 gap> deg := Random(10,88);;
