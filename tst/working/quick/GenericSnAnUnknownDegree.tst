@@ -3,32 +3,12 @@
 #@local ri, g, c, r, i, x, slp
 #@local S11On2Sets, d, sets, SdOn2Sets, success, res, isoData, gens, g1, img1, g2, img2
 #@local SymOnKSets, AltOnKSets
+#@local db
 #
-# Hack to insert the method
-gap> AddMethod(FindHomDbPerm,
->     rec(
->         method := FindHomMethodsGeneric.SnAnUnknownDegree,
->         rank := 58,
->         stamp := "SnAnUnknownDegreeHack",
->         comment := "HACK",
->     )
-> );;
-gap> AddMethod(FindHomDbMatrix,
->     rec(
->         method := FindHomMethodsGeneric.SnAnUnknownDegree,
->         rank := 1070,
->         stamp := "SnAnUnknownDegreeHack",
->         comment := "HACK",
->     )
-> );;
-gap> AddMethod(FindHomDbProjective,
->     rec(
->         method := FindHomMethodsGeneric.SnAnUnknownDegree,
->         rank := 1220,
->         stamp := "SnAnUnknownDegreeHack",
->         comment := "HACK",
->     )
-> );;
+# HACK to insert the method
+gap> AddMethod(FindHomDbPerm, FindHomMethodsGeneric.SnAnUnknownDegree, 58);;
+gap> AddMethod(FindHomDbMatrix, FindHomMethodsGeneric.SnAnUnknownDegree, 1070);;
+gap> AddMethod(FindHomDbProjective, FindHomMethodsGeneric.SnAnUnknownDegree, 1220);;
 
 #
 # testing matrix:
@@ -287,7 +267,7 @@ gap> CycleStructurePerm(img2);
 
 # FindHomMethodsGeneric.SnAnUnknownDegree
 # Sn
-gap> for d in [11 .. 15] do
+gap> for d in [11 .. 14] do
 > sets := Combinations([1 .. d], 2);;
 > SdOn2Sets := Action(SymmetricGroup(d), sets, OnSets);;
 > ri := EmptyRecognitionInfoRecord(rec(), SdOn2Sets, false);;
@@ -298,7 +278,7 @@ gap> for d in [11 .. 15] do
 > od;
 
 # An
-gap> for d in [11 .. 15] do
+gap> for d in [11 .. 14] do
 > sets := Combinations([1 .. d], 2);;
 > SdOn2Sets := Action(AlternatingGroup(d), sets, OnSets);;
 > ri := EmptyRecognitionInfoRecord(rec(), SdOn2Sets, false);;
@@ -319,9 +299,7 @@ true
 
 #
 # Remove Hacky injection of our method
-gap> Remove(FindHomDbPerm,
->       PositionProperty(FindHomDbPerm, x -> x.stamp = "SnAnUnknownDegreeHack"));;
-gap> Remove(FindHomDbMatrix,
->       PositionProperty(FindHomDbMatrix, x -> x.stamp = "SnAnUnknownDegreeHack"));;
-gap> Remove(FindHomDbProjective,
->       PositionProperty(FindHomDbProjective, x -> x.stamp = "SnAnUnknownDegreeHack"));;
+gap> for db in [FindHomDbPerm, FindHomDbMatrix, FindHomDbProjective] do
+>       Remove(db,
+>              PositionProperty(db, x -> Stamp(x.method) = "SnAnUnknownDegree"));;
+> od;
