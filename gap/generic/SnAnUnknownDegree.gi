@@ -777,7 +777,9 @@ end;
 #! not a giant (a giant is Sn or An in natural action).
 #!
 #! @EndChunk
-FindHomMethodsGeneric.SnAnUnknownDegree := function(ri, G)
+FindHomMethodsGeneric.SnAnUnknownDegree := RecogMethod("SnAnUnknownDegree",
+"method groups isomorphic to Sn or An with n >= 11",
+function(ri, G)
     local eps, N, p, d, recogData, isoData, degree, swapSLP;
     #G := Grp(ri);
     # TODO find value for eps
@@ -854,7 +856,7 @@ FindHomMethodsGeneric.SnAnUnknownDegree := function(ri, G)
         Setslpforelement(ri, SLPforElementFuncsGeneric.AnUnknownDegree);
     fi;
     return Success;
-end;
+end);
 
 # The SLP function if G is isomorphic to Sn.
 SLPforElementFuncsGeneric.SnUnknownDegree := function(ri, g)
