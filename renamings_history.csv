@@ -3,3 +3,14 @@ RecognitionInfoFamily,RecogNodeFamily,Fam
 IsRecognitionInfo,IsRecogNode,Filt
 RIFac,ImageRecogNode,Attr
 RIKer,KernelRecogNode,Attr
+RIParent,ParentNodeOfRecogNode,Attr
+methodsforfactor,methodsforimage,Attr
+forfactor,InitDataForImageNode,Attr
+forkernel,InitDataForKernelNode,Attr
+NiceGens,NiceGenerators,Attr
+pregensfac,PreImagesOfNiceGeneratorsOfImageNode,Attr
+calcnicegens,RECOG_CalcNiceGeneratorsFunctionOfRecogNode,Attr
+CalcNiceGensGeneric,CalcNiceGeneratorsForLeafNode,Func
+CalcNiceGens,CalcNiceGenerators,Func
+CalcNiceGensHomNode,CalcNiceGeneratorsForSplitNode,Func
+ParentNodeOfRecogNode,ParentRecogNode,Attr
