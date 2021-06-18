@@ -745,7 +745,7 @@ function(ri, grp)
         SetSize(ri,Factorial(Length(mp)));
         SetIsRecogInfoForAlmostSimpleGroup(ri,true);
     fi;
-    SetNiceGens(ri,StripMemory(res.gens));
+    SetNiceGenerators(ri,StripMemory(res.gens));
     return Success;
 end);
 

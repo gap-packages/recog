@@ -320,12 +320,12 @@ SolveLeafDP := function(ri,rifac,name)
  blkdata := RecogniseLeaf(riH1,blk,name);;
 
 # Get the inverse images of the nice generators of blk in H1
- invims := CalcNiceGens(blkdata,GeneratorsOfGroup(H1));
+ invims := CalcNiceGenerators(blkdata,GeneratorsOfGroup(H1));
  Yhat := ShallowCopy(invims);
  blktoH1 := GroupHomomorphismByFunction(blk,Grp(ri),g->
 ResultOfStraightLineProgram( SLPforElement(blkdata,g),invims));
 
- Y := NiceGens(blkdata);
+ Y := NiceGenerators(blkdata);
  YY := List(Y,y->ImageElm(MyEmbedding(I,1),y));
  r := Length(Y);
 
@@ -360,8 +360,8 @@ g->ImageElm(projs[i],phi!.fun(econj[i]!.fun(blktoH1!.fun(g)))));
    od;
  od;
 
- Setpregensfac(ri,Yhat);
- SetNiceGens(rifac,YY);
+ SetPreImagesOfNiceGeneratorsOfImageNode(ri,Yhat);
+ SetNiceGenerators(rifac,YY);
  Setslpforelement(rifac, function(rifac,g)
 
    local list;

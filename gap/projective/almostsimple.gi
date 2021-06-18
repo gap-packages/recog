@@ -287,9 +287,9 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
                   hom := OrbActionHomomorphism(G,orb);
                   if Length(s) * Length(orb) = d then
                       # A block system!
-                      forkernel(ri).t := Concatenation(orb);
-                      forkernel(ri).blocksize := Length(s);
-                      AddMethod(forkernel(ri).hints,
+                      InitDataForKernelNode(ri).t := Concatenation(orb);
+                      InitDataForKernelNode(ri).blocksize := Length(s);
+                      AddMethod(InitDataForKernelNode(ri).hints,
                                 FindHomMethodsProjective.DoBaseChangeForBlocks,
                                 2000);
                       Setimmediateverification(ri,true);
@@ -302,7 +302,7 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
                            Length(orb)," - not a block system.");
                   fi;
                   SetHomom(ri,hom);
-                  Setmethodsforfactor(ri,FindHomDbPerm);
+                  Setmethodsforimage(ri,FindHomDbPerm);
                   return true;
               fi;
           else
@@ -974,7 +974,7 @@ function(ri,G)
               hom := GroupHomByFuncWithData(G,GG,RECOG.HomFDPM,r);
 
               SetHomom(ri,hom);
-              Setmethodsforfactor(ri,FindHomDbPerm);
+              Setmethodsforimage(ri,FindHomDbPerm);
 
               ri!.comment := "_FDPM";
               return Success;

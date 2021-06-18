@@ -147,9 +147,9 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     Setslpforelement(ri,SLPforElementGeneric);
     SetgensN(ri,[]);       # this will grow over time
     Setimmediateverification(ri,false);
-    Setforkernel(ri,rec(hints := []));
+    SetInitDataForKernelNode(ri,rec(hints := []));
           # this is eventually handed down to the kernel
-    Setforfactor(ri,rec(hints := []));
+    SetInitDataForImageNode(ri,rec(hints := []));
           # this is eventually handed down to the image
     if projective then
         Setisone(ri,IsOneProjective);
@@ -446,8 +446,8 @@ InstallGlobalFunction( RecogniseGeneric,
     else
         ri := EmptyRecognitionInfoRecord(knowledge,H,false);
     fi;
-    # was here earlier: Setcalcnicegens(ri,CalcNiceGensGeneric);
-    Setmethodsforfactor(ri,methoddb);
+    # was here earlier: SetRECOG_CalcNiceGeneratorsFunctionOfRecogNode(ri,CalcNiceGeneratorsForLeafNode);
+    Setmethodsforimage(ri,methoddb);
 
     # Find a possible homomorphism (or recognise this group as leaf)
     allmethods := methoddb;
@@ -476,21 +476,21 @@ InstallGlobalFunction( RecogniseGeneric,
     # Handle the leaf case:
     if IsLeaf(ri) then
         # If nobody has set how we produce preimages of the nicegens:
-        if not Hascalcnicegens(ri) then
-            Setcalcnicegens(ri,CalcNiceGensGeneric);
+        if not HasRECOG_CalcNiceGeneratorsFunctionOfRecogNode(ri) then
+            SetRECOG_CalcNiceGeneratorsFunctionOfRecogNode(ri,CalcNiceGeneratorsForLeafNode);
         fi;
         if Hasslptonice(ri) then
             SlotUsagePattern(slptonice(ri));
         fi;
         # Handle the case that nobody set nice generators:
-        if not HasNiceGens(ri) then
+        if not HasNiceGenerators(ri) then
             if Hasslptonice(ri) then
-                SetNiceGens(ri,ResultOfStraightLineProgram(slptonice(ri),
+                SetNiceGenerators(ri,ResultOfStraightLineProgram(slptonice(ri),
                                             GeneratorsOfGroup(H)));
             else
                 # FIXME: is this a good idea???
                 # maybe an error would be better for debugging
-                SetNiceGens(ri,GeneratorsOfGroup(H));
+                SetNiceGenerators(ri,GeneratorsOfGroup(H));
             fi;
         fi;
         # these two were set correctly by FindHomomorphism
@@ -533,11 +533,11 @@ InstallGlobalFunction( RecogniseGeneric,
         Add(depthString,'F');
         rifac := RecogniseGeneric(
                   Group(List(GeneratorsOfGroup(H), x->ImageElm(Homom(ri),x))),
-                  methodsforfactor(ri), depthString, forfactor(ri) ); # TODO: change forfactor to hintsForFactor??)
+                  methodsforimage(ri), depthString, InitDataForImageNode(ri) ); # TODO: change InitDataForImageNode to hintsForFactor??)
         Remove(depthString);
         PrintTreePos("F",depthString,H);
         SetImageRecogNode(ri,rifac);
-        SetRIParent(rifac,ri);
+        SetParentRecogNode(rifac,ri);
 
         if IsMatrixGroup(H) then
             Info(InfoRecog,2,"Back from image (depth=",depth,
@@ -555,8 +555,8 @@ InstallGlobalFunction( RecogniseGeneric,
 
         # Now we want to have preimages of the new generators in the image:
         Info(InfoRecog,2,"Calculating preimages of nice generators.");
-        ri!.pregensfacwithmem := CalcNiceGens(rifac, ri!.gensHmem);
-        Setpregensfac(ri, StripMemory(ri!.pregensfacwithmem));
+        ri!.pregensfacwithmem := CalcNiceGenerators(rifac, ri!.gensHmem);
+        SetPreImagesOfNiceGeneratorsOfImageNode(ri, StripMemory(ri!.pregensfacwithmem));
 
         # Now create the kernel generators with the stored method:
         succ := CallFuncList(findgensNmeth(ri).method,
@@ -564,8 +564,8 @@ InstallGlobalFunction( RecogniseGeneric,
     until succ;
 
     # If nobody has set how we produce preimages of the nicegens:
-    if not Hascalcnicegens(ri) then
-        Setcalcnicegens(ri,CalcNiceGensHomNode);
+    if not HasRECOG_CalcNiceGeneratorsFunctionOfRecogNode(ri) then
+        SetRECOG_CalcNiceGeneratorsFunctionOfRecogNode(ri,CalcNiceGeneratorsForSplitNode);
     fi;
 
     # Do a little bit of preparation for the generators of N:
@@ -590,7 +590,7 @@ InstallGlobalFunction( RecogniseGeneric,
         Info(InfoRecog,2,"Found trivial kernel (depth=",depth,").");
         SetKernelRecogNode(ri,fail);
         # We have to learn from the image, what our nice generators are:
-        SetNiceGens(ri,pregensfac(ri));
+        SetNiceGenerators(ri,PreImagesOfNiceGeneratorsOfImageNode(ri));
         SetFilterObj(ri,IsReady);
         if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
         # StopStoringRandEls(ri);
@@ -607,11 +607,11 @@ InstallGlobalFunction( RecogniseGeneric,
         N := Group(StripMemory(gensN(ri)));
 
         Add(depthString,'K');
-        riker := RecogniseGeneric( N, methoddb, depthString, forkernel(ri) );
+        riker := RecogniseGeneric( N, methoddb, depthString, InitDataForKernelNode(ri) );
         Remove(depthString);
         PrintTreePos("K",depthString,H);
         SetKernelRecogNode(ri,riker);
-        SetRIParent(riker,ri);
+        SetParentRecogNode(riker,ri);
         Info(InfoRecog,2,"Back from kernel (depth=",depth,").");
 
         done := true;
@@ -656,12 +656,12 @@ InstallGlobalFunction( RecogniseGeneric,
 
     if IsReady(riker) then    # we are only ready when the kernel is
         # Now make the two projection slps:
-        SetNiceGens(ri,Concatenation(pregensfac(ri), NiceGens(riker)));
-        #ll := List([1..Length(NiceGens(rifac))],i->[i,1]);
-        #ri!.proj1 := StraightLineProgramNC([ll],Length(NiceGens(ri)));
-        #ll := List([1..Length(NiceGens(riker))],
-        #           i->[i+Length(NiceGens(rifac)),1]);
-        #ri!.proj2 := StraightLineProgramNC([ll],Length(NiceGens(ri)));
+        SetNiceGenerators(ri,Concatenation(PreImagesOfNiceGeneratorsOfImageNode(ri), NiceGenerators(riker)));
+        #ll := List([1..Length(NiceGenerators(rifac))],i->[i,1]);
+        #ri!.proj1 := StraightLineProgramNC([ll],Length(NiceGenerators(ri)));
+        #ll := List([1..Length(NiceGenerators(riker))],
+        #           i->[i+Length(NiceGenerators(rifac)),1]);
+        #ri!.proj2 := StraightLineProgramNC([ll],Length(NiceGenerators(ri)));
         SetFilterObj(ri,IsReady);
     fi;
     if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
@@ -678,12 +678,12 @@ InstallGlobalFunction( ValidateHomomInput,
     fi;
   end );
 
-InstallGlobalFunction( CalcNiceGens,
+InstallGlobalFunction( CalcNiceGenerators,
   function(ri,origgens)
-    return calcnicegens(ri)(ri,origgens);
+    return RECOG_CalcNiceGeneratorsFunctionOfRecogNode(ri)(ri,origgens);
   end );
 
-InstallGlobalFunction( CalcNiceGensGeneric,
+InstallGlobalFunction( CalcNiceGeneratorsForLeafNode,
   # generic function using an slp:
   function(ri,origgens)
     if Hasslptonice(ri) then
@@ -693,19 +693,19 @@ InstallGlobalFunction( CalcNiceGensGeneric,
     fi;
   end );
 
-InstallGlobalFunction( CalcNiceGensHomNode,
+InstallGlobalFunction( CalcNiceGeneratorsForSplitNode,
   # function for the situation on a homomorphism node (non-Leaf):
   function(ri, origgens)
     local nicegens, kernelgens;
     # compute preimages of the nicegens of the image group
-    nicegens := CalcNiceGens(ImageRecogNode(ri), origgens);
+    nicegens := CalcNiceGenerators(ImageRecogNode(ri), origgens);
     # Is there a non-trivial kernel? then add its nicegens
     if HasKernelRecogNode(ri) and KernelRecogNode(ri) <> fail then
         # we cannot just use gensN(KernelRecogNode(ri)) here, as those values are defined
         # relative to the original generators we used during recognition; but
         # the origgens passed to this function might differ
         kernelgens := ResultOfStraightLineProgram(gensNslp(ri), origgens);
-        Append(nicegens, CalcNiceGens(KernelRecogNode(ri), kernelgens));
+        Append(nicegens, CalcNiceGenerators(KernelRecogNode(ri), kernelgens));
     fi;
     return nicegens;
   end );
@@ -745,7 +745,7 @@ InstallGlobalFunction( SLPforElementGeneric,
         return s1;
     fi;
     # Otherwise work in the kernel:
-    y := ResultOfStraightLineProgram(s1,pregensfac(ri));
+    y := ResultOfStraightLineProgram(s1,PreImagesOfNiceGeneratorsOfImageNode(ri));
     n := g*y^-1;
     s2 := SLPforElement(riker,n);
     if s2 = fail then
@@ -796,7 +796,7 @@ InstallOtherMethod( \in, "for a group element and a recognition info record",
     if slp = fail then
         return false;
     else
-        gens := NiceGens(ri);
+        gens := NiceGenerators(ri);
         if IsObjWithMemory(gens[1]) then
             gens := StripMemory(gens);
         fi;
@@ -858,7 +858,7 @@ InstallGlobalFunction( "SLPforNiceGens", function(ri)
   local l,ll,s;
   l := List( [1..Length(GeneratorsOfGroup(Grp(ri)))], x->() );
   l := GeneratorsWithMemory(l);
-  ll := CalcNiceGens(ri,l);
+  ll := CalcNiceGenerators(ri,l);
   s := SLPOfElms(ll);
   if s <> fail then
       SlotUsagePattern(s);
@@ -955,7 +955,7 @@ RECOG.TestGroup := function(g,proj,size, optionlist...)
   if IsEmpty(gens) then
     gens := [One(g)];
   fi;
-  l := CalcNiceGens(ri,gens);
+  l := CalcNiceGenerators(ri,gens);
   repeat
       count := count + 1;
       #Print(".\c");
@@ -1073,7 +1073,7 @@ RECOG.TestRecognitionNode := function(ri,stop,recurse)
       x := PseudoRandom(grp);
       slp := SLPforElement(ri,x);
       if slp <> fail then
-          y := ResultOfStraightLineProgram(slp,NiceGens(ri));
+          y := ResultOfStraightLineProgram(slp,NiceGenerators(ri));
       fi;
       if slp = fail or not ri!.isone(x/y) then
           if stop then ErrorNoReturn("ErrorNoReturn found, look at x, slp and y"); fi;

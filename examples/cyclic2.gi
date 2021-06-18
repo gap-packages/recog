@@ -20,7 +20,7 @@ FindHomMethodsPerm.Cyclic2 :=
              i := i + 1;
          od;
          ri!.firstnontrivialgen := i;
-         SetNiceGens(ri,[GeneratorsOfGroup(H)[i]]);
+         SetNiceGenerators(ri,[GeneratorsOfGroup(H)[i]]);
          Setslptonice(StraightLineProgramNC([[[i,1]]],Length(gens)));
          Setslpforelement(ri,SLPforElementFuncsPerm.Cyclic2);
          SetFilterObj(ri,IsLeaf);

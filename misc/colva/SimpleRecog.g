@@ -21,10 +21,10 @@ RecogniseTrivialGroup := function(H,phi,I)
 
  T := GroupWithGenerators([One(CyclicGroup(1))]);
  recdata := rec(Group := T);
- recdata!.NiceGens := GeneratorsOfGroup(T);
+ recdata!.NiceGenerators := GeneratorsOfGroup(T);
  recdata!.NiceGensSlps := [StraightLineProgramNC([[1,0]],1)];
  recdata!.GtoSlp := g->StraightLineProgramNC([[1,0]],1);
- recdata!.SlptoG := w->ResultOfStraightLineProgram(w,recdata!.NiceGens);
+ recdata!.SlptoG := w->ResultOfStraightLineProgram(w,recdata!.NiceGenerators);
 
 # Need to create a hom into T that returns fail if the element is not "trivial"
  if IsPermGroup(I) then
@@ -68,14 +68,14 @@ RecognisePcGroup := function(G)
 
  recdata := rec(Group := G,name := "Pc group");
  if IsTrivial(G) then
-   recdata!.NiceGens := [One(G)];
+   recdata!.NiceGenerators := [One(G)];
    recdata!.NiceGensSlps := [StraightLineProgramNC([[1,0]],1)];
    recdata!.GtoSlp := function(g)
   if IsOne(g) then return StraightLineProgramNC([[1,0]],1);
   else return fail;
   fi;
   end;
-   recdata!.SlptoG := w->ResultOfStraightLineProgram(w,recdata!.NiceGens);
+   recdata!.SlptoG := w->ResultOfStraightLineProgram(w,recdata!.NiceGenerators);
    return recdata;
  fi;
 
@@ -89,7 +89,7 @@ RecognisePcGroup := function(G)
 
 # Compute a Pcgs of G and use it!!
  P := Pcgs(G);
- recdata!.NiceGens := AsList(P);
+ recdata!.NiceGenerators := AsList(P);
  recdata!.NiceGensSlps := List(AsList(P),x->SLPOfElm(ImageElm(rho,x)));
 
 # Solving the rewriting problem
@@ -119,9 +119,9 @@ RecogniseQuasiSimple := function(G,name)
    Gm := GroupWithMemory(G);
    n := Int(SplitString(name,"_")[2]);
    re := RecogniseSnAn(n,Gm,1/100);
-   recdata!.NiceGens := [StripMemory(re[2][2]),StripMemory(re[2][1])];
+   recdata!.NiceGenerators := [StripMemory(re[2][2]),StripMemory(re[2][1])];
    recdata!.NiceGensSlps := [SLPOfElm(re[2][2]),SLPOfElm(re[2][1])];
-   ims := List(recdata!.NiceGens,g->FindImageAn( n, g, re[2][1], re[2][2], re[3][1], re[3][2] ));
+   ims := List(recdata!.NiceGenerators,g->FindImageAn( n, g, re[2][1], re[2][2], re[3][1], re[3][2] ));
    recdata!.Gold := GroupWithGenerators(ims);
    recdata!.GtoGold := GroupHomomorphismByFunction(G,recdata.Gold,g->FindImageAn( n, g, re[2][1], re[2][2], re[3][1], re[3][2] ));
 
@@ -129,10 +129,10 @@ RecogniseQuasiSimple := function(G,name)
      return SLPforAn( n, ImageElm(recdata.GtoGold,g) );
    end;
    recdata!.SlptoG := function(w)
-     return ResultOfStraightLineProgram(w,recdata.NiceGens);
+     return ResultOfStraightLineProgram(w,recdata.NiceGenerators);
    end;
    recdata!.GoldtoG := function(x)
-     return ResultOfStraightLineProgram(SLPforAn(n,x),recdata.NiceGens);
+     return ResultOfStraightLineProgram(SLPforAn(n,x),recdata.NiceGenerators);
    end;
 
 
@@ -145,7 +145,7 @@ RecogniseQuasiSimple := function(G,name)
 #   if re=fail then
 #     Error("Failure in recognition of SL");
 #   fi;
-#   recdata!.NiceGens := List(re.gens,x->StripMemory(x[1])![1]);
+#   recdata!.NiceGenerators := List(re.gens,x->StripMemory(x[1])![1]);
 #   recdata!.NiceGensSlps := List(re.gens,x->SLPOfElm(x[1]));
 
 
@@ -157,7 +157,7 @@ RecogniseQuasiSimple := function(G,name)
 #     return SLSLP( re, g, npe[1]);
 #   end;
 #   recdata!.SlptoG := function(w)
-#     return ResultOfStraightLineProgram(w,recdata.NiceGens);
+#     return ResultOfStraightLineProgram(w,recdata.NiceGenerators);
 #   end;
 
  elif IsPermGroup(G) then
@@ -165,7 +165,7 @@ RecogniseQuasiSimple := function(G,name)
    S := StabChainOp(Pmem,rec(random := 900));
    DoSafetyCheckStabChain(S);
    recdata!.NiceGensSlps := List(S.labels,x->SLPOfElm(x));
-   recdata!.NiceGens := List(recdata!.NiceGensSlps,x->ResultOfStraightLineProgram(x,GeneratorsOfGroup(G)));
+   recdata!.NiceGenerators := List(recdata!.NiceGensSlps,x->ResultOfStraightLineProgram(x,GeneratorsOfGroup(G)));
    StripStabChain(S);
    MakeImmutable(S);
    SetStabChainImmutable(G,S);
@@ -178,7 +178,7 @@ RecogniseQuasiSimple := function(G,name)
      return SLPinLabels(S,g);
    end;
    recdata!.SlptoG := function(w)
-     return ResultOfStraightLineProgram(w,recdata.NiceGens);
+     return ResultOfStraightLineProgram(w,recdata.NiceGenerators);
    end;
 
 
@@ -199,7 +199,7 @@ Print(String(Size(P)));
    S := StabChainOp(Pmem,rec(random := 900));
    DoSafetyCheckStabChain(S);
    recdata!.NiceGensSlps := List(S.labels,x->SLPOfElm(x));
-   recdata!.NiceGens := List(recdata!.NiceGensSlps,x->ResultOfStraightLineProgram(x,GeneratorsOfGroup(G)));
+   recdata!.NiceGenerators := List(recdata!.NiceGensSlps,x->ResultOfStraightLineProgram(x,GeneratorsOfGroup(G)));
    StripStabChain(S);
    MakeImmutable(S);
    SetStabChainImmutable(P,S);
@@ -223,7 +223,7 @@ Print("image in in P");
      return SLPinLabels(S,im);
    end;
    recdata!.SlptoG := function(w)
-     return ResultOfStraightLineProgram(w,recdata.NiceGens);
+     return ResultOfStraightLineProgram(w,recdata.NiceGenerators);
    end;
  fi;
 
@@ -527,7 +527,7 @@ ResultOfStraightLineProgram(blkdata!.GtoSlp(g),invims));
 
 
 
- Y := blkdata!.NiceGens;
+ Y := blkdata!.NiceGenerators;
  YY := List(Y,y->ImageElm(Embedding(I,1),y));
  r := Length(Y);
 
@@ -580,7 +580,7 @@ function(g)
  return Product(list);
  end);
 
- recdata!.NiceGens := List(YY,x->StripMemory(x));
+ recdata!.NiceGenerators := List(YY,x->StripMemory(x));
  recdata!.invims := Yhat;
 
 

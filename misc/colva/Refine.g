@@ -28,7 +28,7 @@ InsertSubTree := function(ri,rifac,maps)
 
  SetGrp(lri[1],Grp(ri));
 
- ripregensfac := ShallowCopy(pregensfac(ri));
+ ripregensfac := ShallowCopy(PreImagesOfNiceGeneratorsOfImageNode(ri));
  overgp := ShallowCopy(overgroup(ri));
  Setovergroup(lri[1],overgp);
 
@@ -37,20 +37,20 @@ InsertSubTree := function(ri,rifac,maps)
    Objectify(RecognitionInfoType,rri[i]);;
    SetGrp(rri[i],Q[i]);
    SetHomom(lri[i],GtoQ[i]);
-   SetNiceGens(rri[i],AsList(Pcgs(Q[i])));
+   SetNiceGenerators(rri[i],AsList(Pcgs(Q[i])));
    Setslpforelement(rri[i],SolvePcWord);
-   Setpregensfac(lri[i],List(NiceGens(rri[i]),x-> ResultOfStraightLineProgram(slpforelement(rifac)(rifac,PreImagesRepresentative(maps[i],x)),ripregensfac)));
-   Setcalcnicegens(lri[i],CalcNiceGensHomNode);
+   SetPreImagesOfNiceGeneratorsOfImageNode(lri[i],List(NiceGenerators(rri[i]),x-> ResultOfStraightLineProgram(slpforelement(rifac)(rifac,PreImagesRepresentative(maps[i],x)),ripregensfac)));
+   SetRECOG_CalcNiceGeneratorsFunctionOfRecogNode(lri[i],CalcNiceGeneratorsForSplitNode);
    lri[i]!.nrgensH := Length(GeneratorsOfGroup(Grp(lri[i])));
    Setovergroup(lri[i],overgp);
-   Setcalcnicegens(lri[i],CalcNiceGensGeneric);
+   SetRECOG_CalcNiceGeneratorsFunctionOfRecogNode(lri[i],CalcNiceGeneratorsForLeafNode);
    Setslpforelement(lri[i],SLPforElementGeneric);
    SetFilterObj(rri[i],IsLeaf);
    SetFilterObj(rri[i],IsReady);
    SetFilterObj(lri[i],IsReady);
 
    lri[i]!.genswithmem := GeneratorsWithMemory(
-            Concatenation(GeneratorsOfGroup(Grp(lri[i])),pregensfac(lri[i])));
+            Concatenation(GeneratorsOfGroup(Grp(lri[i])),PreImagesOfNiceGeneratorsOfImageNode(lri[i])));
    lri[i]!.groupmem := Group(lri[i]!.genswithmem{[1..lri[i]!.nrgensH]});
    # FIXME: This is broken due to the new random element infrastructure!
 
@@ -70,28 +70,28 @@ InsertSubTree := function(ri,rifac,maps)
    SetGrp(lri[i+1],GroupWithGenerators(kgens));
    SetKernelRecogNode(lri[i],lri[i+1]);
    SetImageRecogNode(lri[i],rri[i]);
-   SetRIParent(lri[i+1],lri[i]);
-   SetRIParent(rri[i],lri[i]);
+   SetParentRecogNode(lri[i+1],lri[i]);
+   SetParentRecogNode(rri[i],lri[i]);
  od;
 
 
- # tell lri[1] to join onto RIParent(ri)
- if HasRIParent(ri) then
-   SetRIParent(lri[1],StructuralCopy(RIParent(ri)));
+ # tell lri[1] to join onto ParentRecogNode(ri)
+ if HasParentRecogNode(ri) then
+   SetParentRecogNode(lri[1],StructuralCopy(ParentRecogNode(ri)));
  fi;
 
  # tell last lri to be kerfac
    SetKernelRecogNode(lri[Size(Q)],StructuralCopy(kerfac));
-   SetRIParent(KernelRecogNode(lri[Size(Q)]),lri[Size(Q)]);
+   SetParentRecogNode(KernelRecogNode(lri[Size(Q)]),lri[Size(Q)]);
 
  # Set up the nice generators
 
  i := Size(Q);
  while i>0 do
    if KernelRecogNode(lri[i]) <> fail then
-     SetNiceGens(lri[i],Concatenation(pregensfac(lri[i]),NiceGens(KernelRecogNode(lri[i]))));
+     SetNiceGenerators(lri[i],Concatenation(PreImagesOfNiceGeneratorsOfImageNode(lri[i]),NiceGenerators(KernelRecogNode(lri[i]))));
    else
-     SetNiceGens(lri[i],pregensfac(lri[i]));
+     SetNiceGenerators(lri[i],PreImagesOfNiceGeneratorsOfImageNode(lri[i]));
    fi;
    i := i - 1;
  od;
@@ -113,9 +113,9 @@ RefineSolubleLayers := function(ri)
    riker := KernelRecogNode(ri);
    SetKernelRecogNode(ri,RefineSolubleLayers(riker));
    if KernelRecogNode(ri)<>fail then
-     SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(KernelRecogNode(ri))));
+     SetNiceGenerators(ri,Concatenation(PreImagesOfNiceGeneratorsOfImageNode(ri),NiceGenerators(KernelRecogNode(ri))));
    else
-     SetNiceGens(ri,pregensfac(ri));
+     SetNiceGenerators(ri,PreImagesOfNiceGeneratorsOfImageNode(ri));
    fi;
    return ri;
  fi;
@@ -125,11 +125,11 @@ RefineSolubleLayers := function(ri)
   ri := InsertSubTree(ri, rifac, maps);;
   riker := KernelRecogNode(ri);
   SetKernelRecogNode(ri,RefineSolubleLayers(riker));
-  SetRIParent(KernelRecogNode(ri),ri);
+  SetParentRecogNode(KernelRecogNode(ri),ri);
   if KernelRecogNode(ri)<>fail then
-    SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(KernelRecogNode(ri))));
+    SetNiceGenerators(ri,Concatenation(PreImagesOfNiceGeneratorsOfImageNode(ri),NiceGenerators(KernelRecogNode(ri))));
   else
-    SetNiceGens(ri,pregensfac(ri));
+    SetNiceGenerators(ri,PreImagesOfNiceGeneratorsOfImageNode(ri));
   fi;
 
   return ri;
@@ -142,7 +142,7 @@ ConstructActionMatrices := function(ri)
 
  AcGens := [];
  for g in GeneratorsOfGroup(overgroup(ri)) do
-   Add(AcGens,List(pregensfac(ri),x->ExponentsOfPcElement(Pcgs(ImageRecogNode(ri)!.group),ImageElm(Homom(ri),x^g))));
+   Add(AcGens,List(PreImagesOfNiceGeneratorsOfImageNode(ri),x->ExponentsOfPcElement(Pcgs(ImageRecogNode(ri)!.group),ImageElm(Homom(ri),x^g))));
  od;
 
  return AcGens;
@@ -165,9 +165,9 @@ RefineElementaryAbelianLayers := function(ri)
    riker := KernelRecogNode(ri);
    SetKernelRecogNode(ri,RefineElementaryAbelianLayers(riker));
    if KernelRecogNode(ri)<>fail then
-     SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(KernelRecogNode(ri))));
+     SetNiceGenerators(ri,Concatenation(PreImagesOfNiceGeneratorsOfImageNode(ri),NiceGenerators(KernelRecogNode(ri))));
    else
-     SetNiceGens(ri,pregensfac(ri));
+     SetNiceGenerators(ri,PreImagesOfNiceGeneratorsOfImageNode(ri));
    fi;
    return ri;
  fi;
@@ -181,9 +181,9 @@ RefineElementaryAbelianLayers := function(ri)
    riker := KernelRecogNode(ri);
    SetKernelRecogNode(ri,RefineElementaryAbelianLayers(riker));
    if KernelRecogNode(ri)<>fail then
-     SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(KernelRecogNode(ri))));
+     SetNiceGenerators(ri,Concatenation(PreImagesOfNiceGeneratorsOfImageNode(ri),NiceGenerators(KernelRecogNode(ri))));
    else
-     SetNiceGens(ri,pregensfac(ri));
+     SetNiceGenerators(ri,PreImagesOfNiceGeneratorsOfImageNode(ri));
    fi;
 
    return ri;
@@ -201,11 +201,11 @@ SubgroupNC(Grp(ImageRecogNode(ri)),List(CS[i],v->VectortoPc(v,Grp(ImageRecogNode
   ri := InsertSubTree(ri, rifac, maps);;
   riker := KernelRecogNode(ri);
   SetKernelRecogNode(ri,RefineElementaryAbelianLayers(riker));
-  SetRIParent(KernelRecogNode(ri),ri);
+  SetParentRecogNode(KernelRecogNode(ri),ri);
   if KernelRecogNode(ri)<>fail then
-    SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(KernelRecogNode(ri))));
+    SetNiceGenerators(ri,Concatenation(PreImagesOfNiceGeneratorsOfImageNode(ri),NiceGenerators(KernelRecogNode(ri))));
   else
-    SetNiceGens(ri,pregensfac(ri));
+    SetNiceGenerators(ri,PreImagesOfNiceGeneratorsOfImageNode(ri));
   fi;
 
   return ri;
@@ -222,22 +222,22 @@ RemoveTrivialLayers := function(ri)
  I := Grp(rifac);
  if IsPcGroup(I) and IsTrivial(I) then
 # I is trivial!!
-   if HasRIParent(ri) then
-     parri := StructuralCopy(RIParent(ri));
+   if HasParentRecogNode(ri) then
+     parri := StructuralCopy(ParentRecogNode(ri));
    fi;
    ri := riker;;
    if IsBound(parri) then
-     SetRIParent(ri,parri);
+     SetParentRecogNode(ri,parri);
    else
-     Unbind(ri!.RIParent);
-     ResetFilterObj(ri, HasRIParent);
+     Unbind(ri!.ParentRecogNode);
+     ResetFilterObj(ri, HasParentRecogNode);
    fi;
    newriker := KernelRecogNode(ri);
    SetKernelRecogNode(ri,RemoveTrivialLayers(newriker));
    if KernelRecogNode(ri)<>fail then
-     SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(KernelRecogNode(ri))));
+     SetNiceGenerators(ri,Concatenation(PreImagesOfNiceGeneratorsOfImageNode(ri),NiceGenerators(KernelRecogNode(ri))));
    else
-     SetNiceGens(ri,pregensfac(ri));
+     SetNiceGenerators(ri,PreImagesOfNiceGeneratorsOfImageNode(ri));
    fi;
 
    return RemoveTrivialLayers(ri);
@@ -245,9 +245,9 @@ RemoveTrivialLayers := function(ri)
 
  SetKernelRecogNode(ri,RemoveTrivialLayers(riker));
  if KernelRecogNode(ri)<>fail then
-   SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(KernelRecogNode(ri))));
+   SetNiceGenerators(ri,Concatenation(PreImagesOfNiceGeneratorsOfImageNode(ri),NiceGenerators(KernelRecogNode(ri))));
  else
-   SetNiceGens(ri,pregensfac(ri));
+   SetNiceGenerators(ri,PreImagesOfNiceGeneratorsOfImageNode(ri));
  fi;
  return ri;
 end;

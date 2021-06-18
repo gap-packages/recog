@@ -66,8 +66,8 @@ RECOG.CalcNiceGensKnownNilpotent := function(ri,origgens)
   local kernelgens;
   kernelgens := List([1..Length(ri!.decompositionExponents)],
                      i -> origgens[i]^ri!.decompositionExponents[i]);
-  return Concatenation(CalcNiceGens(ImageRecogNode(ri), origgens),
-                       CalcNiceGens(KernelRecogNode(ri), kernelgens));
+  return Concatenation(CalcNiceGenerators(ImageRecogNode(ri), origgens),
+                       CalcNiceGenerators(KernelRecogNode(ri), kernelgens));
 end;
 
 #! @BeginChunk KnownNilpotent
@@ -103,13 +103,13 @@ function(ri,G)
   H := GroupWithGenerators(gensfac);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomForNilpotent,data);
   SetHomom(ri,hom);
-  forfactor(ri).primes := primes{[1..cut]};
-  forkernel(ri).primes := primes{[cut+1..Length(primes)]};
-  AddMethod(forfactor(ri).hints, FindHomMethodsGeneric.KnownNilpotent, 4000);
-  AddMethod(forkernel(ri).hints, FindHomMethodsGeneric.KnownNilpotent, 4000);
+  InitDataForImageNode(ri).primes := primes{[1..cut]};
+  InitDataForKernelNode(ri).primes := primes{[cut+1..Length(primes)]};
+  AddMethod(InitDataForImageNode(ri).hints, FindHomMethodsGeneric.KnownNilpotent, 4000);
+  AddMethod(InitDataForKernelNode(ri).hints, FindHomMethodsGeneric.KnownNilpotent, 4000);
   Append(gensN(ri),gensker);
   findgensNmeth(ri).method := FindKernelDoNothing;  # kernel already known
   ri!.leavegensNuntouched := true;
-  Setcalcnicegens(ri,RECOG.CalcNiceGensKnownNilpotent);
+  SetRECOG_CalcNiceGeneratorsFunctionOfRecogNode(ri,RECOG.CalcNiceGensKnownNilpotent);
   return Success;
 end);

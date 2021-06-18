@@ -96,30 +96,30 @@ DeclareAttribute( "Grp", IsRecogNode, "mutable" );
 ## <#/GAPDoc>
 DeclareAttribute( "Homom", IsRecogNode, "mutable" );
 
-## <#GAPDoc Label="NiceGens">
+## <#GAPDoc Label="NiceGenerators">
 ## <ManSection>
-## <Attr Name="NiceGens" Arg="ri"/>
+## <Attr Name="NiceGenerators" Arg="ri"/>
 ## <Description>
 ##     The value of this attribute must be set for all nodes and contains
 ##     the nice generators. The <Ref Func="SLPforElement"/> function of the
 ##     node will write its straight line program in terms of these nice
 ##     generators. For leaf nodes, the find homomorphism method is responsible
-##     to set the value of <Ref Attr="NiceGens"/>. By default, the original
+##     to set the value of <Ref Attr="NiceGenerators"/>. By default, the original
 ##     generators of the group at this node are taken. For a homomorphism
-##     (or isomorphism), the <Ref Attr="NiceGens"/> will be the concatenation
-##     of preimages of the <Ref Attr="NiceGens"/> of the image group
-##     (see <Ref Attr="pregensfac"/>) and
-##     the <Ref Attr="NiceGens"/> of the kernel. A find homomorphism method
-##     does not have to set <Ref Attr="NiceGens"/> if it finds a homomorphism.
+##     (or isomorphism), the <Ref Attr="NiceGenerators"/> will be the concatenation
+##     of preimages of the <Ref Attr="NiceGenerators"/> of the image group
+##     (see <Ref Attr="PreImagesOfNiceGeneratorsOfImageNode"/>) and
+##     the <Ref Attr="NiceGenerators"/> of the kernel. A find homomorphism method
+##     does not have to set <Ref Attr="NiceGenerators"/> if it finds a homomorphism.
 ##     Note however, that such a find homomorphism method has to ensure somehow,
-##     that preimages of the <Ref Attr="NiceGens"/> of the image group
-##     can be acquired. See <Ref Attr="calcnicegens"/>, <Ref Func="CalcNiceGens"/>
+##     that preimages of the <Ref Attr="NiceGenerators"/> of the image group
+##     can be acquired. See <Ref Attr="RECOG_CalcNiceGeneratorsFunctionOfRecogNode"/>, <Ref Func="CalcNiceGenerators"/>
 ##     and <Ref Attr="slptonice"/>
 ##     for instructions.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "NiceGens", IsRecogNode, "mutable" );
+DeclareAttribute( "NiceGenerators", IsRecogNode, "mutable" );
 
 ## <#GAPDoc Label="ImageRecogNode">
 ## <ManSection>
@@ -155,9 +155,9 @@ DeclareAttribute( "ImageRecogNode", IsRecogNode, "mutable" );
 ## <#/GAPDoc>
 DeclareAttribute( "KernelRecogNode", IsRecogNode, "mutable" );
 
-## <#GAPDoc Label="RIParent">
+## <#GAPDoc Label="ParentRecogNode">
 ## <ManSection>
-## <Attr Name="RIParent" Arg="ri"/>
+## <Attr Name="ParentRecogNode" Arg="ri"/>
 ## <Description>
 ##     The value of this attribute is the recognition info record of the
 ##     parent of this node in the recognition tree. The top node does not
@@ -165,7 +165,7 @@ DeclareAttribute( "KernelRecogNode", IsRecogNode, "mutable" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "RIParent", IsRecogNode, "mutable" );
+DeclareAttribute( "ParentRecogNode", IsRecogNode, "mutable" );
 
 ## <#GAPDoc Label="StdPresentation">
 ## <ManSection>
@@ -182,25 +182,25 @@ DeclareProperty( "IsRecogInfoForSimpleGroup", IsRecogNode );
 DeclareProperty( "IsRecogInfoForAlmostSimpleGroup", IsRecogNode );
 InstallTrueMethod( IsRecogInfoForAlmostSimpleGroup, IsRecogInfoForSimpleGroup );
 
-## <#GAPDoc Label="pregensfac">
+## <#GAPDoc Label="PreImagesOfNiceGeneratorsOfImageNode">
 ## <ManSection>
-## <Attr Name="pregensfac" Arg="ri"/>
+## <Attr Name="PreImagesOfNiceGeneratorsOfImageNode" Arg="ri"/>
 ## <Description>
 ##     The value of this attribute is only set for homomorphism nodes. In that
 ##     case it contains preimages of the nice generators in the image group.
 ##     This attribute is set automatically by the generic recursive recognition
 ##     function using the mechanism described with the attribute
-##     <Ref Attr="calcnicegens"/> below. A find homomorphism does not have
+##     <Ref Attr="RECOG_CalcNiceGeneratorsFunctionOfRecogNode"/> below. A find homomorphism does not have
 ##     to touch this attribute.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "pregensfac", IsRecogNode, "mutable" );
+DeclareAttribute( "PreImagesOfNiceGeneratorsOfImageNode", IsRecogNode, "mutable" );
 DeclareAttribute( "validatehomominput", IsRecogNode);
 
-## <#GAPDoc Label="calcnicegens">
+## <#GAPDoc Label="RECOG_CalcNiceGeneratorsFunctionOfRecogNode">
 ## <ManSection>
-## <Attr Name="calcnicegens" Arg="ri"/>
+## <Attr Name="RECOG_CalcNiceGeneratorsFunctionOfRecogNode" Arg="ri"/>
 ## <Description>
 ##     To make the recursion work, we have to acquire preimages of the
 ##     nice generators in image groups under the homomorphism found.
@@ -215,12 +215,12 @@ DeclareAttribute( "validatehomominput", IsRecogNode);
 ##     task can be done by storing a straight line program writing the
 ##     nice generators in terms of the original generators and executing
 ##     this with inputs <A>origgens</A>. Therefore the default value of
-##     this attribute is the function <Ref Func="CalcNiceGensGeneric"/>
+##     this attribute is the function <Ref Func="CalcNiceGeneratorsForLeafNode"/>
 ##     described below.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "calcnicegens", IsRecogNode, "mutable" );
+DeclareAttribute( "RECOG_CalcNiceGeneratorsFunctionOfRecogNode", IsRecogNode, "mutable" );
 
 ## <#GAPDoc Label="slptonice">
 ## <ManSection>
@@ -229,8 +229,8 @@ DeclareAttribute( "calcnicegens", IsRecogNode, "mutable" );
 ##     As described above, the value, if set, must be a straight line program
 ##     expressing the nice generators at this node in terms of the original
 ##     generators. This is for leaf nodes, that choose to use the default
-##     function <Ref Func="CalcNiceGensGeneric"/> installed in the
-##     <Ref Attr="calcnicegens"/> attribute.
+##     function <Ref Func="CalcNiceGeneratorsForLeafNode"/> installed in the
+##     <Ref Attr="RECOG_CalcNiceGeneratorsFunctionOfRecogNode"/> attribute.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
@@ -250,9 +250,9 @@ DeclareAttribute( "slptonice", IsRecogNode, "mutable" );
 ## <#/GAPDoc>
 DeclareAttribute( "fhmethsel", IsRecogNode, "mutable" );      # TODO: rename?
 
-## <#GAPDoc Label="methodsforfactor">
+## <#GAPDoc Label="methodsforimage">
 ## <ManSection>
-## <Attr Name="methodsforfactor" Arg="ri"/>
+## <Attr Name="methodsforimage" Arg="ri"/>
 ## <Description>
 ##     This attribute is initialised at the beginning of the recursive
 ##     recognition function with the database of find homomorphism methods
@@ -268,7 +268,7 @@ DeclareAttribute( "fhmethsel", IsRecogNode, "mutable" );      # TODO: rename?
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "methodsforfactor", IsRecogNode, "mutable" ); # rename to MethodsDBForFactor
+DeclareAttribute( "methodsforimage", IsRecogNode, "mutable" ); # rename to MethodsDBForFactor
 
 ## <#GAPDoc Label="slpforelement">
 ## <ManSection>
@@ -277,7 +277,7 @@ DeclareAttribute( "methodsforfactor", IsRecogNode, "mutable" ); # rename to Meth
 ##     After the recognition phase is completed for the node <A>ri</A>, we
 ##     are by definition able to write arbitrary elements in the group described
 ##     by this node as a straight line program (SLP) in terms of the nice
-##     generators stored in <Ref Attr="NiceGens"/>.
+##     generators stored in <Ref Attr="NiceGenerators"/>.
 ##     This attribute value is a function taking the node <A>ri</A> and a
 ##     group element as its arguments and returning the above mentioned
 ##     straight line program. For the case that a find homomorphism method
@@ -302,9 +302,9 @@ DeclareAttribute( "gensNslp", IsRecogNode, "mutable" );
 # Do we have to do an immediate verification of the kernel?
 DeclareAttribute( "immediateverification", IsRecogNode, "mutable" );
 # Used to transport information about the group down to the kernel:
-DeclareAttribute( "forkernel", IsRecogNode, "mutable" );
+DeclareAttribute( "InitDataForKernelNode", IsRecogNode, "mutable" );
 # Used to transport information about the group down to the image:
-DeclareAttribute( "forfactor", IsRecogNode, "mutable" );
+DeclareAttribute( "InitDataForImageNode", IsRecogNode, "mutable" );
 # Used to check whether group elements are equal to one after recognition:
 DeclareAttribute( "isone", IsRecogNode, "mutable" );
 # Used to compare group elements after recognition:
@@ -547,27 +547,27 @@ DeclareGlobalFunction( "TryFindHomMethod" );
 
 # Helper functions for the generic part:
 
-## <#GAPDoc Label="CalcNiceGens">
+## <#GAPDoc Label="CalcNiceGenerators">
 ## <ManSection>
-## <Func Name="CalcNiceGens" Arg="ri, origgens"/>
+## <Func Name="CalcNiceGenerators" Arg="ri, origgens"/>
 ## <Returns>a list of preimages of the nice generators</Returns>
 ## <Description>
 ##     This is a wrapper function which extracts the value of the attribute
-##     <Ref Attr="calcnicegens"/> and calls that function with the arguments
+##     <Ref Attr="RECOG_CalcNiceGeneratorsFunctionOfRecogNode"/> and calls that function with the arguments
 ##     <A>ri</A> and <A>origgens</A>.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareGlobalFunction( "CalcNiceGens" );
+DeclareGlobalFunction( "CalcNiceGenerators" );
 DeclareGlobalFunction( "ValidateHomomInput" );
 
-## <#GAPDoc Label="CalcNiceGensGeneric">
+## <#GAPDoc Label="CalcNiceGeneratorsForLeafNode">
 ## <ManSection>
-## <Func Name="CalcNiceGensGeneric" Arg="ri, origgens"/>
+## <Func Name="CalcNiceGeneratorsForLeafNode" Arg="ri, origgens"/>
 ## <Returns>a list of preimages of the nice generators</Returns>
 ## <Description>
 ##     This is the default function for leaf nodes for the attribute <Ref
-##     Attr="calcnicegens"/> described above. It does the following: If the
+##     Attr="RECOG_CalcNiceGeneratorsFunctionOfRecogNode"/> described above. It does the following: If the
 ##     value of the attribute <Ref Attr="slptonice"/> is set, then it must
 ##     be a straight line program expressing the nice generators in terms
 ##     of the original generators of this node. In that case, this straight
@@ -580,15 +580,15 @@ DeclareGlobalFunction( "ValidateHomomInput" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareGlobalFunction( "CalcNiceGensGeneric" );
+DeclareGlobalFunction( "CalcNiceGeneratorsForLeafNode" );
 
-## <#GAPDoc Label="CalcNiceGensHomNode">
+## <#GAPDoc Label="CalcNiceGeneratorsForSplitNode">
 ## <ManSection>
-## <Func Name="CalcNiceGensHomNode" Arg="ri, origgens"/>
+## <Func Name="CalcNiceGeneratorsForSplitNode" Arg="ri, origgens"/>
 ## <Returns>a list of preimages of the nice generators</Returns>
 ## <Description>
 ##     This is the default function for homomorphism node for the attribute
-##     <Ref Attr="calcnicegens"/>. It just delegates to image and kernel of
+##     <Ref Attr="RECOG_CalcNiceGeneratorsFunctionOfRecogNode"/>. It just delegates to image and kernel of
 ##     the homomorphism, as the nice generators of a homomorphism (or isomorphism)
 ##     node are just the concatenation of the nice generators of the image
 ##     and the kernel. A find homomorphism method finding a homomorphism
@@ -597,7 +597,7 @@ DeclareGlobalFunction( "CalcNiceGensGeneric" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareGlobalFunction( "CalcNiceGensHomNode" );
+DeclareGlobalFunction( "CalcNiceGeneratorsForSplitNode" );
 DeclareGlobalFunction( "SLPforElementGeneric" );
 
 ## <#GAPDoc Label="SLPforElement">

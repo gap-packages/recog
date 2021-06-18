@@ -845,7 +845,7 @@ function(ri, G)
     fi;
     # Note that when setting the nice generators we reverse their order, such
     # that it fits to the SLPforSn/SLPforAn function!
-    SetNiceGens(ri, Reversed(isoData[1]));
+    SetNiceGenerators(ri, Reversed(isoData[1]));
     swapSLP := StraightLineProgram([[[2, 1], [1, 1]]], 2);
     Setslptonice(ri,
                  CompositionOfStraightLinePrograms(swapSLP,

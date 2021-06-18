@@ -133,12 +133,12 @@ end;
 #     VPctoTriv := GroupHomomorphismByImages(VPc,Triv,AsList(P),GeneratorsOfGroup(Triv));
 #     mems := List(AsList(P),x->ImageElm(VPctoTriv,x));
 #     Setslptonice(rri[count],SLPOfElms(mems));
-#     Setcalcnicegens(rri[count], CalcNiceGensGeneric);
+#     SetRECOG_CalcNiceGeneratorsFunctionOfRecogNode(rri[count], CalcNiceGeneratorsForLeafNode);
 #     Setslpforelement(rri[count],
 #   function(rri[count],g)
 #     return SLPOfElm(ImageElm(VPctoTriv,g));
 #   end);
-#     Setpregensfac(lri[count],Bpreims);
+#     SetPreImagesOfNiceGeneratorsOfImageNode(lri[count],Bpreims);
 #     SetHomom(lri[count],GroupHomomorphismByFunction(Grp(lri[count]),VPc,function(g)
 #  local v;
 #  v := GtoVp(g);
@@ -192,14 +192,14 @@ InstallGlobalFunction( NormalTree,
     Setovergroup(ri,nsm!.Group);
 
     SetGrp(ri,H);
-    Setcalcnicegens(ri,CalcNiceGensGeneric);
+    SetRECOG_CalcNiceGeneratorsFunctionOfRecogNode(ri,CalcNiceGeneratorsForLeafNode);
     Setslpforelement(ri,SLPforElementGeneric);
     SetgensN(ri,[]);       # this will grow over time
     SetfindgensNmeth(ri,rec(method := FindKernelRandom, args := [20]));
     Setimmediateverification(ri,false);
-    Setforkernel(ri,rec(hints := []));
+    SetInitDataForKernelNode(ri,rec(hints := []));
           # this is eventually handed down to the kernel
-    Setforfactor(ri,rec(hints := []));
+    SetInitDataForImageNode(ri,rec(hints := []));
           # this is eventually handed down to the image
 
 
@@ -230,7 +230,7 @@ InstallGlobalFunction( NormalTree,
     rifac := RecogniseLeaf(ri,I,name);;
 
      SetImageRecogNode(ri,rifac);
-     SetRIParent(rifac,ri);
+     SetParentRecogNode(rifac,ri);
 
      Info(InfoRecognition,1,"Back from image (depth=",depth,").");
 
@@ -240,14 +240,14 @@ InstallGlobalFunction( NormalTree,
      fi;
 
         # Now we want to have preimages of the new generators in the image:
-      if not IsBound(ri!.pregensfac) then
+      if not IsBound(ri!.PreImagesOfNiceGeneratorsOfImageNode) then
         Info(InfoRecognition,1,"Calculating preimages of nice generators.");
-        Setpregensfac( ri, CalcNiceGens(rifac,GeneratorsOfGroup(H)));
+        SetPreImagesOfNiceGeneratorsOfImageNode( ri, CalcNiceGenerators(rifac,GeneratorsOfGroup(H)));
       fi;
-        Setcalcnicegens(ri,CalcNiceGensHomNode);
+        SetRECOG_CalcNiceGeneratorsFunctionOfRecogNode(ri,CalcNiceGeneratorsForSplitNode);
 
         ri!.genswithmem := GeneratorsWithMemory(
-            Concatenation(GeneratorsOfGroup(H),pregensfac(ri)));
+            Concatenation(GeneratorsOfGroup(H),PreImagesOfNiceGeneratorsOfImageNode(ri)));
         ri!.groupmem := Group(ri!.genswithmem{[1..ri!.nrgensH]});
         # FIXME: This is broken due to the new random element infrastructure!
 
@@ -281,7 +281,7 @@ InstallGlobalFunction( NormalTree,
         Info(InfoRecognition,1,"Found trivial kernel (depth=",depth,").");
         SetKernelRecogNode(ri,fail);
         # We have to learn from the image, what our nice generators are:
-        SetNiceGens(ri,pregensfac(ri));
+        SetNiceGenerators(ri,PreImagesOfNiceGeneratorsOfImageNode(ri));
         SetFilterObj(ri,IsReady);
         return ri;
     fi;
@@ -295,19 +295,19 @@ InstallGlobalFunction( NormalTree,
 
         riker := NormalTree( N, nsm, depth+1 );;
         SetKernelRecogNode(ri,riker);
-        SetRIParent(riker,ri);
+        SetParentRecogNode(riker,ri);
         Info(InfoRecognition,1,"Back from kernel (depth=",depth,").");
 
         done := true;
 
     if IsReady(riker) then    # we are only ready when the kernel is
         # Now make the two projection slps:
-        SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(riker)));
-        #ll := List([1..Length(NiceGens(rifac))],i->[i,1]);
-        #ri!.proj1 := StraightLineProgramNC([ll],Length(NiceGens(ri)));
-        #ll := List([1..Length(NiceGens(riker))],
-        #           i->[i+Length(NiceGens(rifac)),1]);
-        #ri!.proj2 := StraightLineProgramNC([ll],Length(NiceGens(ri)));
+        SetNiceGenerators(ri,Concatenation(PreImagesOfNiceGeneratorsOfImageNode(ri),NiceGenerators(riker)));
+        #ll := List([1..Length(NiceGenerators(rifac))],i->[i,1]);
+        #ri!.proj1 := StraightLineProgramNC([ll],Length(NiceGenerators(ri)));
+        #ll := List([1..Length(NiceGenerators(riker))],
+        #           i->[i+Length(NiceGenerators(rifac)),1]);
+        #ri!.proj2 := StraightLineProgramNC([ll],Length(NiceGenerators(ri)));
         SetFilterObj(ri,IsReady);
     fi;
     return ri;

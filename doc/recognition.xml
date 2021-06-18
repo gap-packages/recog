@@ -214,16 +214,16 @@ The following attributes are defined for recognition info records:
 
 <#Include Label="Grp">
 <#Include Label="Homom">
-<#Include Label="NiceGens">
-<#Include Label="pregensfac">
+<#Include Label="NiceGenerators">
+<#Include Label="PreImagesOfNiceGeneratorsOfImageNode">
 <#Include Label="ImageRecogNode">
 <#Include Label="KernelRecogNode">
-<#Include Label="RIParent">
+<#Include Label="ParentRecogNode">
 <#Include Label="fhmethsel">
 <#Include Label="slpforelement">
 <#Include Label="SLPforElement">
 <#Include Label="StdPresentation">
-<#Include Label="methodsforfactor">
+<#Include Label="methodsforimage">
 
 <ManSection>
 <Attr Name="validatehomominput" Arg="ri, x"/>
@@ -269,10 +269,10 @@ the original generators and the nice generators for a node.
 They are used to transport this information from a successful find
 homomorphism method up to the recursive recognition function:
 
-<#Include Label="calcnicegens">
-<#Include Label="CalcNiceGensGeneric">
-<#Include Label="CalcNiceGensHomNode">
-<#Include Label="CalcNiceGens">
+<#Include Label="RECOG_CalcNiceGeneratorsFunctionOfRecogNode">
+<#Include Label="CalcNiceGeneratorsForLeafNode">
+<#Include Label="CalcNiceGeneratorsForSplitNode">
+<#Include Label="CalcNiceGenerators">
 <#Include Label="slptonice">
 
 The following three attributes are concerned with the administration of the
@@ -402,7 +402,7 @@ recognised by the current recognition info record to the image or
 kernel of the found homomorphism:
 
 <ManSection>
-<Attr Name="forkernel" Arg="ri"/>
+<Attr Name="InitDataForKernelNode" Arg="ri"/>
 <Description>
     This attribute is initialised to a record with only the component
     <C>hints</C> bound to an empty list at the beginning of the
@@ -424,7 +424,7 @@ kernel of the found homomorphism:
 </ManSection>
 
 <ManSection>
-<Attr Name="forfactor" Arg="ri"/>
+<Attr Name="InitDataForImageNode" Arg="ri"/>
 <Description>
     This attribute is initialised to a record with only the component
     <C>hints</C> bound to an empty list at the beginning of the
@@ -615,10 +615,10 @@ A successful find homomorphism method has the following duties:
     nice generators in terms of the original generators into the attribute
     <Ref Attr="slptonice"/>. In that case, the generic frame work takes
     care of the rest. The third possibility is to store a function
-    into the value of the attribute <Ref Attr="calcnicegens"/> which
+    into the value of the attribute <Ref Attr="RECOG_CalcNiceGeneratorsFunctionOfRecogNode"/> which
     can calculate preimages of the nice generators in terms of preimages
     of the original generators. See the function
-    <Ref Func="CalcNiceGensGeneric"/> for an example of such a function.
+    <Ref Func="CalcNiceGeneratorsForLeafNode"/> for an example of such a function.
 </Item>
 <Mark>for non-leaves: the homomorphism itself</Mark>
 <Item>
@@ -627,7 +627,7 @@ A successful find homomorphism method has the following duties:
     group in the attribute <Ref Attr="Homom"/>. Note that if your homomorphism
     changes the representation (for example going from matrix groups to
     permutation groups), you will have to set the attribute
-    <Ref Attr="methodsforfactor"/> accordingly. Also,
+    <Ref Attr="methodsforimage"/> accordingly. Also,
     <Ref Attr="ValidateHomomInput"/> may be set to a function which returns
     <K>false</K> for values which may cause <Ref Attr="Homom"/> to
     produce the wrong answer, or error.
@@ -652,7 +652,7 @@ A successful find homomorphism method has the following duties:
 <Mark>additional information</Mark>
 <Item>
     A find homomorphism method may store any data into the attributes
-    <Ref Attr="forkernel"/> and <Ref Attr="forfactor"/>, which both are
+    <Ref Attr="InitDataForKernelNode"/> and <Ref Attr="InitDataForImageNode"/>, which both are
     records. Components in these
     record that are bound during the recognition will be copied into
     the recognition info record of the kernel and image respectively
@@ -691,7 +691,7 @@ group say <M>H</M> with kernel <M>N</M>. It first maps <A>x</A> via
 the homomorphism to <M>H</M> and uses the recognition information there
 to write it as a straight line program in terms of the nice generators of
 <M>H</M>. Then it applies this straight line program to the preimages
-of those nice generators (see <Ref Attr="pregensfac"/>)
+of those nice generators (see <Ref Attr="PreImagesOfNiceGeneratorsOfImageNode"/>)
 thereby finding an element <M>y</M> of <M>G</M> with <M>x \cdot y^{-1}</M>
 lying in the kernel <M>N</M>. <P/>
 Then the function writes this element

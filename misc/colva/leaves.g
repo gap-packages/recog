@@ -26,12 +26,12 @@ SolveLeafPc := function(ri,rifac)
    SetName(rifac,"Trivial Group");
    Setslptonice( rifac,
                 StraightLineProgramNC([[[1,0]]],Length(GeneratorsOfGroup(I))));
-   SetNiceGens(rifac, [One(I)]);
+   SetNiceGenerators(rifac, [One(I)]);
    Setslpforelement( rifac,
      function(rifac,g)
        return StraightLineProgramNC( [ [1,0] ], 1 );
      end);
-   Setcalcnicegens(rifac, CalcNiceGensGeneric);
+   SetRECOG_CalcNiceGeneratorsFunctionOfRecogNode(rifac, CalcNiceGeneratorsForLeafNode);
    return true;
  fi;
 
@@ -42,10 +42,10 @@ SolveLeafPc := function(ri,rifac)
  T := GroupWithGenerators(trivgens);
  rho := GroupHomomorphismByImages(I,T,gens,trivgens);
  P := Pcgs(I);
- SetNiceGens(rifac,AsList(P));
+ SetNiceGenerators(rifac,AsList(P));
  mems := List(AsList(P),x->ImageElm(rho,x));
  Setslptonice(rifac,SLPOfElms(mems));
- Setcalcnicegens(rifac, CalcNiceGensGeneric);
+ SetRECOG_CalcNiceGeneratorsFunctionOfRecogNode(rifac, CalcNiceGeneratorsForLeafNode);
 
 # Solving the rewriting problem
  T2 := GroupWithMemory(GroupWithGenerators(List(AsList(P),x->())));
@@ -124,7 +124,7 @@ function(ri,I,name)
  rifac := rec();
  Objectify(RecognitionInfoType,rifac);;
  SetFilterObj(rifac,IsLeaf);
- SetRIParent(rifac,ri);
+ SetParentRecogNode(rifac,ri);
  SetImageRecogNode(ri,rifac);
  SetGrp(rifac,I);
  if IsPcGroup(I) then
@@ -158,7 +158,7 @@ function(ri,I,name)
 
      bool := FindHomMethodsMatrix.NaturalSL(rifac,I);
      if bool=true then SetFilterObj(rifac,IsReady);
-       Setcalcnicegens(rifac, CalcNiceGensGeneric);
+       SetRECOG_CalcNiceGeneratorsFunctionOfRecogNode(rifac, CalcNiceGeneratorsForLeafNode);
        SetSize(I,SimpleGroupOrder(name[1]));
        SetSize(rifac,Size(I));
        SetName(rifac,name[1]);
@@ -180,7 +180,7 @@ function(ri,I,name)
    bool := FindHomMethodsPerm.StabChain(rifac,I);
    SetSize(I,SimpleGroupOrder(name[1]));
    if bool then SetFilterObj(rifac,IsReady);
-     Setcalcnicegens(rifac, CalcNiceGensGeneric);
+     SetRECOG_CalcNiceGeneratorsFunctionOfRecogNode(rifac, CalcNiceGeneratorsForLeafNode);
      return rifac;
    fi;
  fi;

@@ -149,17 +149,17 @@ FindHomMethodsProjective.NotAbsolutelyIrred := function(ri,G)
   SetHomom(ri,hom);
 
   # Hand down hint that no MeatAxe run can help:
-  forfactor(ri).isabsolutelyirred := true;
+  InitDataForImageNode(ri).isabsolutelyirred := true;
 
   # There might be a kernel, because we have more scalars over the bigger
   # field, so go for it, however, some more generators might be in order,
   # Normal closure however is unnecessary.
   findgensNmeth(ri).args[1] := 5;
   findgensNmeth(ri).args[2] := 0;
-  Add(forkernel(ri).hints,
+  Add(InitDataForKernelNode(ri).hints,
       rec( method := FindHomMethodsProjective.BiggerScalarsOnly, rank := 2000,
            stamp := "BiggerScalarsOnly" ));
-  forkernel(ri).degsplittingfield := MTX.DegreeSplittingField(m)
+  InitDataForKernelNode(ri).degsplittingfield := MTX.DegreeSplittingField(m)
                                    / DegreeOverPrimeField(f);
 
   return true;
@@ -175,7 +175,7 @@ FindHomMethodsProjective.BiggerScalarsOnly := function(ri,G)
   hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
   SetHomom(ri,hom);
 
-  Add(forfactor(ri).hints,
+  Add(InitDataForImageNode(ri).hints,
       rec( method := FindHomMethodsProjective.StabilizerChainProj, rank := 4000,
            stamp := "StabilizerChain" ));
 

@@ -352,7 +352,7 @@ function(ri,G)
       hom := ActionHomomorphism(G,r.orbit,OnSubspacesByCanonicalBasis,
                                 "surjective");
       SetHomom(ri,hom);
-      Setmethodsforfactor(ri,FindHomDbPerm);
+      Setmethodsforimage(ri,FindHomDbPerm);
       return Success;
   fi;
 
@@ -369,7 +369,7 @@ function(ri,G)
       hom := ActionHomomorphism(G,r.spaces,OnSubspacesByCanonicalBasis,
                                 "surjective");
       SetHomom(ri,hom);
-      Setmethodsforfactor(ri,FindHomDbPerm);
+      Setmethodsforimage(ri,FindHomDbPerm);
       return Success;
   fi;
 
@@ -378,9 +378,9 @@ function(ri,G)
   SetHomom(ri,hom);
 
   # Hand down information:
-  forfactor(ri).blocksize := r.blocksize;
-  forfactor(ri).generatorskronecker := kro;
-  AddMethod(forfactor(ri).hints, FindHomMethodsProjective.KroneckerProduct, 2000);
+  InitDataForImageNode(ri).blocksize := r.blocksize;
+  InitDataForImageNode(ri).generatorskronecker := kro;
+  AddMethod(InitDataForImageNode(ri).hints, FindHomMethodsProjective.KroneckerProduct, 2000);
   # This is an isomorphism:
   findgensNmeth(ri).method := FindKernelDoNothing;
   return Success;
@@ -411,8 +411,8 @@ function(ri, G)
   hom := GroupHomByFuncWithData(G,H,RECOG.HomTensorFactor,data);
   SetHomom(ri,hom);
 
-  AddMethod(forkernel(ri).hints, FindHomMethodsProjective.KroneckerKernel, 2000);
-  forkernel(ri).blocksize := ri!.blocksize;
+  AddMethod(InitDataForKernelNode(ri).hints, FindHomMethodsProjective.KroneckerKernel, 2000);
+  InitDataForKernelNode(ri).blocksize := ri!.blocksize;
   return Success;
 end);
 

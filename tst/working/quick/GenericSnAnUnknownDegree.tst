@@ -294,7 +294,7 @@ gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri, S11On2Sets);
 true
 gap> x := PseudoRandom(Grp(ri));;
 gap> slp := SLPforElement(ri, x);;
-gap> x = ResultOfStraightLineProgram(slp, NiceGens(ri));
+gap> x = ResultOfStraightLineProgram(slp, NiceGenerators(ri));
 true
 
 #

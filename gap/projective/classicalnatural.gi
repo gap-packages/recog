@@ -3254,7 +3254,7 @@ function(ri, g)
       Setslptonice(ri,SLPOfElms(std.all));
       ri!.nicebas := std.bas;
       ri!.nicebasi := std.basi;
-      SetNiceGens(ri,List(StripMemory(std.all),x->std.basi*x*std.bas));
+      SetNiceGenerators(ri,List(StripMemory(std.all),x->std.basi*x*std.bas));
       ri!.fakegens := RECOG.InitSLfake(f,2);
       ri!.fakegens.count := 0;
       ri!.gcd := gcd;
@@ -3281,7 +3281,7 @@ function(ri, g)
           ri!.nicebasi := std.basi;
           ext := DegreeOverPrimeField(f);
           stdg := RECOG.MakeSL_StdGens(p,ext,d,d);
-          SetNiceGens(ri,List(StripMemory(stdg.all),
+          SetNiceGenerators(ri,List(StripMemory(stdg.all),
                       x->std.basi*x*std.bas));
           ri!.fakegens := RECOG.InitSLfake(f,d);
           ri!.fakegens.count := 0;

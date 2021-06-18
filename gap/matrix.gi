@@ -72,7 +72,7 @@ function(ri, G)
   findgensNmeth(ri).method := FindKernelDoNothing;
 
   # Hint to the image:
-  AddMethod(forfactor(ri).hints, FindHomMethodsMatrix.Scalar, 4000);
+  AddMethod(InitDataForImageNode(ri).hints, FindHomMethodsMatrix.Scalar, 4000);
 
   return Success;
 end);
@@ -110,7 +110,7 @@ end);
 #  SetHomom(ri,hom);
 #
 #  # Hint to the kernel:
-#  forkernel(ri).containedinsl := true;
+#  InitDataForKernelNode(ri).containedinsl := true;
 #  return true;
 #end;
 
@@ -232,7 +232,7 @@ function(ri, G)
       H := GroupWithGenerators(newgens);
       hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
       SetHomom(ri,hom);
-      AddMethod(forfactor(ri).hints, FindHomMethodsMatrix.Scalar, 2000);
+      AddMethod(InitDataForImageNode(ri).hints, FindHomMethodsMatrix.Scalar, 2000);
 
       if nrblocks = 1 then     # no kernel:
           findgensNmeth(ri).method := FindKernelDoNothing;
@@ -241,10 +241,10 @@ function(ri, G)
           # That should be easily and efficiently possible at this point, no?
           findgensNmeth(ri).args[1] := 7;
           findgensNmeth(ri).args[2] := 5;
-          forkernel(ri).blocks := ri!.blocks{[1]};
+          InitDataForKernelNode(ri).blocks := ri!.blocks{[1]};
           # We have to go to BlockScalar with 1 block because the one block
           # is only a part of the whole matrix:
-          AddMethod(forkernel(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
+          AddMethod(InitDataForKernelNode(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
           Setimmediateverification(ri,true);
       fi;
       return Success;
@@ -260,17 +260,17 @@ function(ri, G)
   SetHomom(ri,hom);
 
   # the image are the last few blocks:
-  forfactor(ri).blocks := List(ri!.blocks{[middle..nrblocks]},
+  InitDataForImageNode(ri).blocks := List(ri!.blocks{[middle..nrblocks]},
                                x->x - (ri!.blocks[middle][1]-1));
-  AddMethod(forfactor(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
+  AddMethod(InitDataForImageNode(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
 
   # the kernel is the first few blocks (can be only one!):
   # FIXME: why don't we just compute a precise set of generators of the kernel?
   # That should be easily and efficiently possible at this point, no?
   findgensNmeth(ri).args[1] := 3 + nrblocks;
   findgensNmeth(ri).args[2] := 5;
-  forkernel(ri).blocks := ri!.blocks{[1..middle-1]};
-  AddMethod(forkernel(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
+  InitDataForKernelNode(ri).blocks := ri!.blocks{[1..middle-1]};
+  AddMethod(InitDataForKernelNode(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
   Setimmediateverification(ri,true);
   return Success;
 end);
@@ -418,8 +418,8 @@ function(ri,G)
   findgensNmeth(ri).method := FindKernelDoNothing;
 
   # Inform authorities that the image can be recognised easily:
-  forfactor(ri).blocks := bc.blocks;
-  AddMethod(forfactor(ri).hints, FindHomMethodsMatrix.BlockLowerTriangular, 4000);
+  InitDataForImageNode(ri).blocks := bc.blocks;
+  AddMethod(InitDataForImageNode(ri).hints, FindHomMethodsMatrix.BlockLowerTriangular, 4000);
 
   return Success;
 end);
@@ -494,12 +494,12 @@ function(ri,G)
   SetHomom(ri,hom);
 
   # Now give hints downward:
-  forfactor(ri).blocks := ri!.blocks;
-  AddMethod(forfactor(ri).hints, FindHomMethodsMatrix.BlockDiagonal, 2000);
+  InitDataForImageNode(ri).blocks := ri!.blocks;
+  AddMethod(InitDataForImageNode(ri).hints, FindHomMethodsMatrix.BlockDiagonal, 2000);
   findgensNmeth(ri).method := FindKernelLowerLeftPGroup;
   findgensNmeth(ri).args := [];
-  AddMethod(forkernel(ri).hints, FindHomMethodsMatrix.LowerLeftPGroup, 2000);
-  forkernel(ri).blocks := ri!.blocks;
+  AddMethod(InitDataForKernelNode(ri).hints, FindHomMethodsMatrix.LowerLeftPGroup, 2000);
+  InitDataForKernelNode(ri).blocks := ri!.blocks;
   return Success;
 end);
 
@@ -532,11 +532,11 @@ function(ri,G)
   # will automatically take care of the projectiveness!
   SetHomom(ri, IdentityMapping(G));
   # Now give hints downward:
-  forfactor(ri).blocks := ri!.blocks;
-  AddMethod(forfactor(ri).hints, FindHomMethodsProjective.BlocksModScalars, 2000);
+  InitDataForImageNode(ri).blocks := ri!.blocks;
+  AddMethod(InitDataForImageNode(ri).hints, FindHomMethodsProjective.BlocksModScalars, 2000);
   # We go to projective, although it would not matter here, because we
   # gave a working hint anyway:
-  Setmethodsforfactor(ri,FindHomDbProjective);
+  Setmethodsforimage(ri,FindHomDbProjective);
 
   # the kernel:
   findgensNmeth(ri).args[1] := Length(ri!.blocks)+10;
@@ -545,13 +545,13 @@ function(ri,G)
   # to a matrix group by multiplying things such that the last block
   # becomes an identity matrix:
   if ri!.projective then
-      AddMethod(forkernel(ri).hints,
+      AddMethod(InitDataForKernelNode(ri).hints,
                 FindHomMethodsProjective.BlockScalarProj,
                 2000);
   else
-      AddMethod(forkernel(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
+      AddMethod(InitDataForKernelNode(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
   fi;
-  forkernel(ri).blocks := ri!.blocks;
+  InitDataForKernelNode(ri).blocks := ri!.blocks;
   return Success;
 end);
 
@@ -583,8 +583,8 @@ end);
 #  SetHomom(ri,hom);
 #
 #  # Inform authorities that the kernel can be recognised easily:
-#  forkernel(ri).subdim := ri!.subdim;
-#  AddMethod(forkernel(ri).hints, FindHomMethodsMatrix.InducedOnSubspace, 2000);
+#  InitDataForKernelNode(ri).subdim := ri!.subdim;
+#  AddMethod(InitDataForKernelNode(ri).hints, FindHomMethodsMatrix.InducedOnSubspace, 2000);
 #
 #  return true;
 #end;
@@ -717,11 +717,11 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
         fi;
     od;
     # Now make sure those things get handed down to the kernel:
-    forkernel(ri).gensNvectors := lvec;
-    forkernel(ri).gensNpivots := pivots;
-    forkernel(ri).blocks := ri!.blocks;
-    forkernel(ri).lens := lens;
-    forkernel(ri).basisOfFieldExtension := basisOfFieldExtension;
+    InitDataForKernelNode(ri).gensNvectors := lvec;
+    InitDataForKernelNode(ri).gensNpivots := pivots;
+    InitDataForKernelNode(ri).blocks := ri!.blocks;
+    InitDataForKernelNode(ri).lens := lens;
+    InitDataForKernelNode(ri).basisOfFieldExtension := basisOfFieldExtension;
     # this is stored on the upper level:
     SetgensN(ri,l);
     ri!.leavegensNuntouched := true;
@@ -753,7 +753,7 @@ SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
           if not IsZero(done) then
               AddRowVector(h,ri!.gensNvectors[i],-done);
               pow := IntFFE(done);
-              g := NiceGens(ri)[i]^(-pow) * g;
+              g := NiceGenerators(ri)[i]^(-pow) * g;
               Add(l,i);
               Add(l,IntFFE(done));
           fi;
@@ -815,7 +815,7 @@ function(ri,G)
   hom := IdentityMapping(G);
   SetHomom(ri,hom);
   # Now give hints downward:
-  Setmethodsforfactor(ri,FindHomDbProjective);
+  Setmethodsforimage(ri,FindHomDbProjective);
   # note that RecogniseGeneric detects the use of FindHomDbProjective and
   # sets ri!.projective := true for the image
   # the kernel:
@@ -842,8 +842,8 @@ function(ri,G)
       S := StoredStabilizerChain(G);
       hom := OrbActionHomomorphism(G,S!.orb);
       SetHomom(ri,hom);
-      Setmethodsforfactor(ri,FindHomDbPerm);
-      forkernel(ri).StabilizerChainFromAbove := S;
+      Setmethodsforimage(ri,FindHomDbPerm);
+      InitDataForKernelNode(ri).StabilizerChainFromAbove := S;
       return Success;
   elif IsBound(ri!.StabilizerChainFromAbove) then
       Info(InfoRecog,2,"Know stabilizer chain for super group, using base.");
@@ -851,8 +851,8 @@ function(ri,G)
       Info(InfoRecog,2,"Computed stabilizer chain, size=",Size(S));
       hom := OrbActionHomomorphism(G,S!.orb);
       SetHomom(ri,hom);
-      Setmethodsforfactor(ri,FindHomDbPerm);
-      forkernel(ri).StabilizerChainFromAbove := S;
+      Setmethodsforimage(ri,FindHomDbPerm);
+      InitDataForKernelNode(ri).StabilizerChainFromAbove := S;
       return Success;
   fi;
   return NeverApplicable;
@@ -890,14 +890,14 @@ end);
 #  fi;
 #
 #  SetHomom(ri,hom);
-#  Setmethodsforfactor(ri,FindHomDbPerm);
+#  Setmethodsforimage(ri,FindHomDbPerm);
 #  return true;
 #end;
 #
 #FindHomMethodsMatrix.IsomorphismPermGroup := function(ri,G)
 #  SetHomom(ri,IsomorphismPermGroup(G));
 #  findgensNmeth(ri).method := FindKernelDoNothing;
-#  Setmethodsforfactor(ri,FindHomDbPerm);
+#  Setmethodsforimage(ri,FindHomDbPerm);
 #  return true;
 #end;
 
