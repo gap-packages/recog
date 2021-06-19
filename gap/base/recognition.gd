@@ -99,6 +99,7 @@ DeclareAttribute( "Homom", IsRecogNode, "mutable" );
 ## <#GAPDoc Label="NiceGenerators">
 ## <ManSection>
 ## <Attr Name="NiceGenerators" Arg="ri"/>
+## <Attr Name="NiceGens" Arg="ri"/>
 ## <Description>
 ##     The value of this attribute must be set for all nodes and contains
 ##     the nice generators. The <Ref Func="SLPforElement"/> function of the
@@ -116,10 +117,15 @@ DeclareAttribute( "Homom", IsRecogNode, "mutable" );
 ##     can be acquired. See <Ref Attr="RECOG_CalcNiceGeneratorsFunctionOfRecogNode"/>, <Ref Func="CalcNiceGenerators"/>
 ##     and <Ref Attr="slptonice"/>
 ##     for instructions.
+##     <P/>
+##     For backwards compatibility, the name <Ref Attr="NiceGens"/> is a
+##     synonym for <Ref Attr="NiceGenerators"/>. This will be deprecated in the
+##     near future.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
 DeclareAttribute( "NiceGenerators", IsRecogNode, "mutable" );
+DeclareSynonym( "NiceGens", NiceGenerators );
 
 ## <#GAPDoc Label="ImageRecogNode">
 ## <ManSection>
