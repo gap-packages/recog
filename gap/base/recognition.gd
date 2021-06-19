@@ -99,23 +99,24 @@ DeclareAttribute( "Homom", IsRecogNode, "mutable" );
 ## <#GAPDoc Label="NiceGens">
 ## <ManSection>
 ## <Attr Name="NiceGens" Arg="ri"/>
+## <Attr Name="NiceGens" Arg="ri, origgens"/>
 ## <Description>
-##     The value of this attribute must be set for all nodes and contains
-##     the nice generators. The <Ref Func="SLPforElement"/> function of the
+##     The value of this attribute contains the nice generators and must be set
+##     for all nodes. The <Ref Func="SLPforElement"/> function of the
 ##     node will write its straight line program in terms of these nice
-##     generators. For leaf nodes, the find homomorphism method is responsible
-##     to set the value of <Ref Attr="NiceGens"/>. By default, the original
-##     generators of the group at this node are taken. For a homomorphism
-##     (or isomorphism), the <Ref Attr="NiceGens"/> will be the concatenation
-##     of preimages of the <Ref Attr="NiceGens"/> of the image group
+##     generators.
+##     <P/>
+##     For a leaf node, <Ref Attr="NiceGens"/> can be any list of generators.
+##     <P/>
+##     For a splitting node, <Ref Attr="NiceGens"/> is the concatenation
+##     of preimages of the <Ref Attr="NiceGens"/> of the factor group
 ##     (see <Ref Attr="pregensfac"/>) and
-##     the <Ref Attr="NiceGens"/> of the kernel. A find homomorphism method
-##     does not have to set <Ref Attr="NiceGens"/> if it finds a homomorphism.
-##     Note however, that such a find homomorphism method has to ensure somehow,
-##     that preimages of the <Ref Attr="NiceGens"/> of the image group
-##     can be acquired. See <Ref Attr="calcnicegens"/>, <Ref Func="CalcNiceGens"/>
-##     and <Ref Attr="slptonice"/>
-##     for instructions.
+##     the <Ref Attr="NiceGens"/> of the kernel.
+##     <P/>
+##     To compute the nice generators, a method with two-arguments is installed
+##     for <Ref Attr="NiceGens"/> which takes the value of the attribute
+##     <Ref Attr="calcnicegens"/> and calls it with the arguments <A>ri</A> and
+##     <A>origgens</A>. For more information see <Ref Attr="calcnicegens"/>.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
@@ -547,18 +548,6 @@ DeclareGlobalFunction( "TryFindHomMethod" );
 
 # Helper functions for the generic part:
 
-## <#GAPDoc Label="CalcNiceGens">
-## <ManSection>
-## <Func Name="CalcNiceGens" Arg="ri, origgens"/>
-## <Returns>a list of preimages of the nice generators</Returns>
-## <Description>
-##     This is a wrapper function which extracts the value of the attribute
-##     <Ref Attr="calcnicegens"/> and calls that function with the arguments
-##     <A>ri</A> and <A>origgens</A>.
-## </Description>
-## </ManSection>
-## <#/GAPDoc>
-DeclareGlobalFunction( "CalcNiceGens" );
 DeclareGlobalFunction( "ValidateHomomInput" );
 
 ## <#GAPDoc Label="CalcNiceGensGeneric">

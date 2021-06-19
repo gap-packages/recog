@@ -264,7 +264,7 @@ returns <K>true</K>.
 </ManSection>
 
 
-The following two attributes are concerned with the relation between
+The following four attributes are concerned with the relation between
 the original generators and the nice generators for a node.
 They are used to transport this information from a successful find
 homomorphism method up to the recursive recognition function:
@@ -272,7 +272,6 @@ homomorphism method up to the recursive recognition function:
 <#Include Label="calcnicegens">
 <#Include Label="CalcNiceGensGeneric">
 <#Include Label="CalcNiceGensHomNode">
-<#Include Label="CalcNiceGens">
 <#Include Label="slptonice">
 
 The following three attributes are concerned with the administration of the

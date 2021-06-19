@@ -81,6 +81,12 @@ InstallMethod( ViewObj, "for recognition nodes", [IsRecogNode],
     RECOG_ViewObj(0, ri);
   end);
 
+InstallOtherMethod( NiceGens, "for a recognition node and a list",
+[IsRecogNode, IsList],
+  function(ri,origgens)
+    return calcnicegens(ri)(ri,origgens);
+  end );
+
 
 #############################################################################
 # The main recursive function:
@@ -535,13 +541,8 @@ InstallGlobalFunction( RecogniseGeneric,
                   Group(List(GeneratorsOfGroup(H), x->ImageElm(Homom(ri),x))),
                   methodsforfactor(ri), depthString, forfactor(ri) ); # TODO: change forfactor to hintsForFactor??)
         Remove(depthString);
-<<<<<<< HEAD
-        PrintTreePos("F",depthString,H);
-        SetImageRecogNode(ri,rifac);
-=======
         PrintTreePos("I",depthString,H);
-        SetRIFac(ri,rifac);
->>>>>>> 74ba82d... Some more factor -> image
+        SetImageRecogNode(ri,rifac);
         SetRIParent(rifac,ri);
 
         if IsMatrixGroup(H) then
@@ -560,7 +561,7 @@ InstallGlobalFunction( RecogniseGeneric,
 
         # Now we want to have preimages of the new generators in the image:
         Info(InfoRecog,2,"Calculating preimages of nice generators.");
-        ri!.pregensfacwithmem := CalcNiceGens(rifac, ri!.gensHmem);
+        ri!.pregensfacwithmem := NiceGens(rifac, ri!.gensHmem);
         Setpregensfac(ri, StripMemory(ri!.pregensfacwithmem));
 
         # Now create the kernel generators with the stored method:
@@ -683,11 +684,6 @@ InstallGlobalFunction( ValidateHomomInput,
     fi;
   end );
 
-InstallGlobalFunction( CalcNiceGens,
-  function(ri,origgens)
-    return calcnicegens(ri)(ri,origgens);
-  end );
-
 InstallGlobalFunction( CalcNiceGensGeneric,
   # generic function using an slp:
   function(ri,origgens)
@@ -703,14 +699,14 @@ InstallGlobalFunction( CalcNiceGensHomNode,
   function(ri, origgens)
     local nicegens, kernelgens;
     # compute preimages of the nicegens of the image group
-    nicegens := CalcNiceGens(ImageRecogNode(ri), origgens);
+    nicegens := NiceGens(ImageRecogNode(ri), origgens);
     # Is there a non-trivial kernel? then add its nicegens
     if HasKernelRecogNode(ri) and KernelRecogNode(ri) <> fail then
         # we cannot just use gensN(KernelRecogNode(ri)) here, as those values are defined
         # relative to the original generators we used during recognition; but
         # the origgens passed to this function might differ
         kernelgens := ResultOfStraightLineProgram(gensNslp(ri), origgens);
-        Append(nicegens, CalcNiceGens(KernelRecogNode(ri), kernelgens));
+        Append(nicegens, NiceGens(KernelRecogNode(ri), kernelgens));
     fi;
     return nicegens;
   end );
@@ -863,7 +859,7 @@ InstallGlobalFunction( "SLPforNiceGens", function(ri)
   local l,ll,s;
   l := List( [1..Length(GeneratorsOfGroup(Grp(ri)))], x->() );
   l := GeneratorsWithMemory(l);
-  ll := CalcNiceGens(ri,l);
+  ll := NiceGens(ri,l);
   s := SLPOfElms(ll);
   if s <> fail then
       SlotUsagePattern(s);
@@ -960,7 +956,7 @@ RECOG.TestGroup := function(g,proj,size, optionlist...)
   if IsEmpty(gens) then
     gens := [One(g)];
   fi;
-  l := CalcNiceGens(ri,gens);
+  l := NiceGens(ri,gens);
   repeat
       count := count + 1;
       #Print(".\c");

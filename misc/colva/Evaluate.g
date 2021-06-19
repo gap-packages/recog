@@ -242,7 +242,7 @@ InstallGlobalFunction( NormalTree,
         # Now we want to have preimages of the new generators in the image:
       if not IsBound(ri!.pregensfac) then
         Info(InfoRecognition,1,"Calculating preimages of nice generators.");
-        Setpregensfac( ri, CalcNiceGens(rifac,GeneratorsOfGroup(H)));
+        Setpregensfac( ri, NiceGens(rifac,GeneratorsOfGroup(H)));
       fi;
         Setcalcnicegens(ri,CalcNiceGensHomNode);
 
