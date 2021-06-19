@@ -203,21 +203,30 @@ DeclareAttribute( "validatehomominput", IsRecogNode);
 ## <ManSection>
 ## <Attr Name="calcnicegens" Arg="ri"/>
 ## <Description>
-##     To make the recursion work, we have to acquire preimages of the
-##     nice generators in image groups under the homomorphism found.
-##     But we want to keep the information, how the nice generators
-##     were found, locally at the node where they were found. This
-##     attribute solves this problem of acquiring preimages in the following
-##     way: Its value must be a function, taking the recognition
-##     node <A>ri</A> as first argument, and a list <A>origgens</A> of
-##     preimages of the
-##     original generators of the current node, and has to
-##     return corresponding preimages of the nice generators. Usually this
-##     task can be done by storing a straight line program writing the
-##     nice generators in terms of the original generators and executing
-##     this with inputs <A>origgens</A>. Therefore the default value of
-##     this attribute is the function <Ref Func="CalcNiceGensGeneric"/>
-##     described below.
+##     Stores a function <C>func(ri2, gens2)</C> which computes group elements
+##     of <C>ri2</C> by evaluating words in <C>gens2</C>.
+##     These words must be chosen such that, if <C>ri2</C> is equal to
+##     <A>ri</A> and <C>gens2</C> is equal to
+##     <C>GeneratorsOfGroup(Grp(ri))</C>, then <C>func</C> returns the nice
+##     generators of <A>ri</A>.
+##     Correspondingly, if <C>gens2</C> is another list of group elements, then
+##     the words which yield the nice generators of <A>ri</A> are evaluated in
+##     <C>gens2</C>.
+##     <P/>
+##     This us used by the recursive group recognition to compute preimages of
+##     nice generators as follows:
+##     if <C>imagenode</C> is the image node of a node <C>node</C> and
+##     <C>nodegens</C> are the generators of <C>Grp(node)</C>,
+##     then <C>func(imagenode, nodegens)</C> computes the preimages of the
+##     nice generators of <C>imagenode</C>.
+##     <P/>
+##     Usually <C>func</C> stores a straight line program writing the nice
+##     generators in terms of the generators of the group represented
+##     by <A>ri</A> and executes this with inputs <A>gens2</A>.
+##     <P/>
+##     The default values of this attribute are the functions
+##     <Ref Func="CalcNiceGensGeneric"/> and
+##     <Ref Func="CalcNiceGensHomNode"/>.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
