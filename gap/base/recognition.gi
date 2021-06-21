@@ -699,8 +699,15 @@ InstallGlobalFunction( CalcNiceGensHomNode,
         # we cannot just use gensN(KernelRecogNode(ri)) here, as those values are defined
         # relative to the original generators we used during recognition; but
         # the origgens passed to this function might differ
-        kernelgens := ResultOfStraightLineProgram(gensNslp(ri), origgens);
-        Append(nicegens, NiceGens(KernelRecogNode(ri), kernelgens));
+        if origgens = GeneratorsOfGroup(Grp(ri)) then
+            Print("HIT\n");
+            Error("break");
+            nicekernelgens := NiceGens(KernelRecogNode(ri));
+        else
+            kernelgens := ResultOfStraightLineProgram(gensNslp(ri), origgens);
+            nicekernelgens := NiceGens(KernelRecogNode(ri), kernelgens);
+        fi;
+        Append(nicegens, nicekernelgens);
     fi;
     return nicegens;
   end );
