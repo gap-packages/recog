@@ -56,7 +56,7 @@ RECOG_ViewObj := function( level, ri )
         Print(" Field=",Size(ri!.field));
     fi;
     if not IsLeaf(ri) then
-        Print("\n",String("",level)," F:");
+        Print("\n",String("",level)," I:");
         if HasImageRecogNode(ri) then
             RECOG_ViewObj(level+3, ImageRecogNode(ri));
         else
@@ -530,13 +530,18 @@ InstallGlobalFunction( RecogniseGeneric,
             return fail;
         fi;
 
-        Add(depthString,'F');
+        Add(depthString,'I');
         rifac := RecogniseGeneric(
                   Group(List(GeneratorsOfGroup(H), x->ImageElm(Homom(ri),x))),
                   methodsforfactor(ri), depthString, forfactor(ri) ); # TODO: change forfactor to hintsForFactor??)
         Remove(depthString);
+<<<<<<< HEAD
         PrintTreePos("F",depthString,H);
         SetImageRecogNode(ri,rifac);
+=======
+        PrintTreePos("I",depthString,H);
+        SetRIFac(ri,rifac);
+>>>>>>> 74ba82d... Some more factor -> image
         SetRIParent(rifac,ri);
 
         if IsMatrixGroup(H) then
