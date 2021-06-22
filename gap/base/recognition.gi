@@ -23,7 +23,7 @@ RECOG_ViewObj := function( level, ri )
     if IsReady(ri) then
         Print("<recognition node ");
     else
-        Print("<failed recognition node ");
+        Print("<unfinished recognition node ");
     fi;
     if IsBound(ri!.projective) and ri!.projective then
         Print("(projective) ");
