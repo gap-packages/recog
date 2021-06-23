@@ -81,6 +81,12 @@ InstallMethod( ViewObj, "for recognition nodes", [IsRecogNode],
     RECOG_ViewObj(0, ri);
   end);
 
+InstallMethod( NiceGens, "for a recognition node",
+[IsRecogNode],
+  function(ri)
+    return NiceGens(ri, GeneratorsOfGroup(Grp(ri)));
+  end );
+
 InstallOtherMethod( NiceGens, "for a recognition node and a list",
 [IsRecogNode, IsList],
   function(ri,origgens)
@@ -690,7 +696,7 @@ InstallGlobalFunction( CalcNiceGensGeneric,
 InstallGlobalFunction( CalcNiceGensHomNode,
   # function for the situation on a homomorphism node (non-Leaf):
   function(ri, origgens)
-    local nicegens, kernelgens;
+    local nicegens, nicekernelgens, x, kernelgens;
     # compute preimages of the nicegens of the image group
     nicegens := NiceGens(ImageRecogNode(ri), origgens);
     # Is there a non-trivial kernel? then add its nicegens
@@ -699,10 +705,19 @@ InstallGlobalFunction( CalcNiceGensHomNode,
         # relative to the original generators we used during recognition; but
         # the origgens passed to this function might differ
         if origgens = GeneratorsOfGroup(Grp(ri)) then
-            Print("HIT\n");
-            Error("break");
+            # Print("HIT\n");
+            #Error("break");
             nicekernelgens := NiceGens(KernelRecogNode(ri));
+            if IsObjWithMemory(origgens[1]) then
+                nicekernelgens := GeneratorsWithMemory(nicekernelgens);
+                # HACK!
+                for x in nicekernelgens do
+                    x!.slp := origgens[1]!.slp;
+                od;
+            fi;
         else
+            # when recognizing, origgens have memory. When recognition is finished,
+            # these are usually without memory?
             kernelgens := ResultOfStraightLineProgram(gensNslp(ri), origgens);
             nicekernelgens := NiceGens(KernelRecogNode(ri), kernelgens);
         fi;
