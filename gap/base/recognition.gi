@@ -972,6 +972,8 @@ RECOG.TestGroup := function(g,proj,size, optionlist...)
     gens := [One(g)];
   fi;
   l := NiceGens(ri,gens);
+  l := NiceGens(ri,gens);
+  # Test whether SLPForNiceGens gives the same slps
   repeat
       count := count + 1;
       #Print(".\c");
