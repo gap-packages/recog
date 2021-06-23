@@ -452,7 +452,6 @@ InstallGlobalFunction( RecogniseGeneric,
     else
         ri := EmptyRecognitionInfoRecord(knowledge,H,false);
     fi;
-    # was here earlier: Setcalcnicegens(ri,CalcNiceGensGeneric);
     Setmethodsforfactor(ri,methoddb);
 
     # Find a possible homomorphism (or recognise this group as leaf)
