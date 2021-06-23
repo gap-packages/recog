@@ -23,7 +23,7 @@ RECOG_ViewObj := function( level, ri )
     if IsReady(ri) then
         Print("<recognition node ");
     else
-        Print("<failed recognition node ");
+        Print("<unfinished recognition node ");
     fi;
     if IsBound(ri!.projective) and ri!.projective then
         Print("(projective) ");
@@ -56,7 +56,7 @@ RECOG_ViewObj := function( level, ri )
         Print(" Field=",Size(ri!.field));
     fi;
     if not IsLeaf(ri) then
-        Print("\n",String("",level)," F:");
+        Print("\n",String("",level)," I:");
         if HasImageRecogNode(ri) then
             RECOG_ViewObj(level+3, ImageRecogNode(ri));
         else
@@ -80,6 +80,18 @@ InstallMethod( ViewObj, "for recognition nodes", [IsRecogNode],
   function(ri)
     RECOG_ViewObj(0, ri);
   end);
+
+InstallMethod( NiceGens, "for a recognition node",
+[IsRecogNode],
+  function(ri)
+    return NiceGens(ri, GeneratorsOfGroup(Grp(ri)));
+  end );
+
+InstallOtherMethod( NiceGens, "for a recognition node and a list",
+[IsRecogNode, IsList],
+  function(ri,origgens)
+    return calcnicegens(ri)(ri,origgens);
+  end );
 
 
 #############################################################################
@@ -446,7 +458,6 @@ InstallGlobalFunction( RecogniseGeneric,
     else
         ri := EmptyRecognitionInfoRecord(knowledge,H,false);
     fi;
-    # was here earlier: Setcalcnicegens(ri,CalcNiceGensGeneric);
     Setmethodsforfactor(ri,methoddb);
 
     # Find a possible homomorphism (or recognise this group as leaf)
@@ -530,12 +541,12 @@ InstallGlobalFunction( RecogniseGeneric,
             return fail;
         fi;
 
-        Add(depthString,'F');
+        Add(depthString,'I');
         rifac := RecogniseGeneric(
                   Group(List(GeneratorsOfGroup(H), x->ImageElm(Homom(ri),x))),
-                  methodsforfactor(ri), depthString, forfactor(ri) ); # TODO: change forfactor to hintsForFactor??)
+                  methodsforfactor(ri), depthString, forfactor(ri) );
         Remove(depthString);
-        PrintTreePos("F",depthString,H);
+        PrintTreePos("I",depthString,H);
         SetImageRecogNode(ri,rifac);
         SetRIParent(rifac,ri);
 
@@ -555,7 +566,7 @@ InstallGlobalFunction( RecogniseGeneric,
 
         # Now we want to have preimages of the new generators in the image:
         Info(InfoRecog,2,"Calculating preimages of nice generators.");
-        ri!.pregensfacwithmem := CalcNiceGens(rifac, ri!.gensHmem);
+        ri!.pregensfacwithmem := NiceGens(rifac, ri!.gensHmem);
         Setpregensfac(ri, StripMemory(ri!.pregensfacwithmem));
 
         # Now create the kernel generators with the stored method:
@@ -654,14 +665,8 @@ InstallGlobalFunction( RecogniseGeneric,
         fi;
     until done;
 
-    if IsReady(riker) then    # we are only ready when the kernel is
-        # Now make the two projection slps:
-        SetNiceGens(ri,Concatenation(pregensfac(ri), NiceGens(riker)));
-        #ll := List([1..Length(NiceGens(rifac))],i->[i,1]);
-        #ri!.proj1 := StraightLineProgramNC([ll],Length(NiceGens(ri)));
-        #ll := List([1..Length(NiceGens(riker))],
-        #           i->[i+Length(NiceGens(rifac)),1]);
-        #ri!.proj2 := StraightLineProgramNC([ll],Length(NiceGens(ri)));
+    # we are only ready when the kernel is
+    if IsReady(riker) then
         SetFilterObj(ri,IsReady);
     fi;
     if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
@@ -678,11 +683,6 @@ InstallGlobalFunction( ValidateHomomInput,
     fi;
   end );
 
-InstallGlobalFunction( CalcNiceGens,
-  function(ri,origgens)
-    return calcnicegens(ri)(ri,origgens);
-  end );
-
 InstallGlobalFunction( CalcNiceGensGeneric,
   # generic function using an slp:
   function(ri,origgens)
@@ -696,16 +696,32 @@ InstallGlobalFunction( CalcNiceGensGeneric,
 InstallGlobalFunction( CalcNiceGensHomNode,
   # function for the situation on a homomorphism node (non-Leaf):
   function(ri, origgens)
-    local nicegens, kernelgens;
+    local nicegens, nicekernelgens, x, kernelgens;
     # compute preimages of the nicegens of the image group
-    nicegens := CalcNiceGens(ImageRecogNode(ri), origgens);
+    nicegens := NiceGens(ImageRecogNode(ri), origgens);
     # Is there a non-trivial kernel? then add its nicegens
     if HasKernelRecogNode(ri) and KernelRecogNode(ri) <> fail then
         # we cannot just use gensN(KernelRecogNode(ri)) here, as those values are defined
         # relative to the original generators we used during recognition; but
         # the origgens passed to this function might differ
-        kernelgens := ResultOfStraightLineProgram(gensNslp(ri), origgens);
-        Append(nicegens, CalcNiceGens(KernelRecogNode(ri), kernelgens));
+        if origgens = GeneratorsOfGroup(Grp(ri)) then
+            # Print("HIT\n");
+            #Error("break");
+            nicekernelgens := NiceGens(KernelRecogNode(ri));
+            if IsObjWithMemory(origgens[1]) then
+                nicekernelgens := GeneratorsWithMemory(nicekernelgens);
+                # HACK!
+                for x in nicekernelgens do
+                    x!.slp := origgens[1]!.slp;
+                od;
+            fi;
+        else
+            # when recognizing, origgens have memory. When recognition is finished,
+            # these are usually without memory?
+            kernelgens := ResultOfStraightLineProgram(gensNslp(ri), origgens);
+            nicekernelgens := NiceGens(KernelRecogNode(ri), kernelgens);
+        fi;
+        Append(nicegens, nicekernelgens);
     fi;
     return nicegens;
   end );
@@ -858,7 +874,7 @@ InstallGlobalFunction( "SLPforNiceGens", function(ri)
   local l,ll,s;
   l := List( [1..Length(GeneratorsOfGroup(Grp(ri)))], x->() );
   l := GeneratorsWithMemory(l);
-  ll := CalcNiceGens(ri,l);
+  ll := NiceGens(ri,l);
   s := SLPOfElms(ll);
   if s <> fail then
       SlotUsagePattern(s);
@@ -955,7 +971,9 @@ RECOG.TestGroup := function(g,proj,size, optionlist...)
   if IsEmpty(gens) then
     gens := [One(g)];
   fi;
-  l := CalcNiceGens(ri,gens);
+  l := NiceGens(ri,gens);
+  l := NiceGens(ri,gens);
+  # Test whether SLPForNiceGens gives the same slps
   repeat
       count := count + 1;
       #Print(".\c");

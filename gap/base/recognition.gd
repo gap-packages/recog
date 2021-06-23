@@ -99,23 +99,24 @@ DeclareAttribute( "Homom", IsRecogNode, "mutable" );
 ## <#GAPDoc Label="NiceGens">
 ## <ManSection>
 ## <Attr Name="NiceGens" Arg="ri"/>
+## <Attr Name="NiceGens" Arg="ri, origgens"/>
 ## <Description>
-##     The value of this attribute must be set for all nodes and contains
-##     the nice generators. The <Ref Func="SLPforElement"/> function of the
+##     The value of this attribute contains the nice generators and must be set
+##     for all nodes. The <Ref Func="SLPforElement"/> function of the
 ##     node will write its straight line program in terms of these nice
-##     generators. For leaf nodes, the find homomorphism method is responsible
-##     to set the value of <Ref Attr="NiceGens"/>. By default, the original
-##     generators of the group at this node are taken. For a homomorphism
-##     (or isomorphism), the <Ref Attr="NiceGens"/> will be the concatenation
-##     of preimages of the <Ref Attr="NiceGens"/> of the image group
+##     generators.
+##     <P/>
+##     For a leaf node, <Ref Attr="NiceGens"/> can be any list of generators.
+##     <P/>
+##     For a splitting node, <Ref Attr="NiceGens"/> is the concatenation
+##     of preimages of the <Ref Attr="NiceGens"/> of the factor group
 ##     (see <Ref Attr="pregensfac"/>) and
-##     the <Ref Attr="NiceGens"/> of the kernel. A find homomorphism method
-##     does not have to set <Ref Attr="NiceGens"/> if it finds a homomorphism.
-##     Note however, that such a find homomorphism method has to ensure somehow,
-##     that preimages of the <Ref Attr="NiceGens"/> of the image group
-##     can be acquired. See <Ref Attr="calcnicegens"/>, <Ref Func="CalcNiceGens"/>
-##     and <Ref Attr="slptonice"/>
-##     for instructions.
+##     the <Ref Attr="NiceGens"/> of the kernel.
+##     <P/>
+##     To compute the nice generators, a method with two-arguments is installed
+##     for <Ref Attr="NiceGens"/> which takes the value of the attribute
+##     <Ref Attr="calcnicegens"/> and calls it with the arguments <A>ri</A> and
+##     <A>origgens</A>. For more information see <Ref Attr="calcnicegens"/>.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
@@ -202,21 +203,30 @@ DeclareAttribute( "validatehomominput", IsRecogNode);
 ## <ManSection>
 ## <Attr Name="calcnicegens" Arg="ri"/>
 ## <Description>
-##     To make the recursion work, we have to acquire preimages of the
-##     nice generators in image groups under the homomorphism found.
-##     But we want to keep the information, how the nice generators
-##     were found, locally at the node where they were found. This
-##     attribute solves this problem of acquiring preimages in the following
-##     way: Its value must be a function, taking the recognition
-##     node <A>ri</A> as first argument, and a list <A>origgens</A> of
-##     preimages of the
-##     original generators of the current node, and has to
-##     return corresponding preimages of the nice generators. Usually this
-##     task can be done by storing a straight line program writing the
-##     nice generators in terms of the original generators and executing
-##     this with inputs <A>origgens</A>. Therefore the default value of
-##     this attribute is the function <Ref Func="CalcNiceGensGeneric"/>
-##     described below.
+##     Stores a function <C>func(ri2, gens2)</C> which computes group elements
+##     of <C>ri2</C> by evaluating words in <C>gens2</C>.
+##     These words must be chosen such that, if <C>ri2</C> is equal to
+##     <A>ri</A> and <C>gens2</C> is equal to
+##     <C>GeneratorsOfGroup(Grp(ri))</C>, then <C>func</C> returns the nice
+##     generators of <A>ri</A>.
+##     Correspondingly, if <C>gens2</C> is another list of group elements, then
+##     the words which yield the nice generators of <A>ri</A> are evaluated in
+##     <C>gens2</C>.
+##     <P/>
+##     This us used by the recursive group recognition to compute preimages of
+##     nice generators as follows:
+##     if <C>imagenode</C> is the image node of a node <C>node</C> and
+##     <C>nodegens</C> are the generators of <C>Grp(node)</C>,
+##     then <C>func(imagenode, nodegens)</C> computes the preimages of the
+##     nice generators of <C>imagenode</C>.
+##     <P/>
+##     Usually <C>func</C> stores a straight line program writing the nice
+##     generators in terms of the generators of the group represented
+##     by <A>ri</A> and executes this with inputs <A>gens2</A>.
+##     <P/>
+##     The default values of this attribute are the functions
+##     <Ref Func="CalcNiceGensGeneric"/> and
+##     <Ref Func="CalcNiceGensHomNode"/>.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
@@ -547,18 +557,6 @@ DeclareGlobalFunction( "TryFindHomMethod" );
 
 # Helper functions for the generic part:
 
-## <#GAPDoc Label="CalcNiceGens">
-## <ManSection>
-## <Func Name="CalcNiceGens" Arg="ri, origgens"/>
-## <Returns>a list of preimages of the nice generators</Returns>
-## <Description>
-##     This is a wrapper function which extracts the value of the attribute
-##     <Ref Attr="calcnicegens"/> and calls that function with the arguments
-##     <A>ri</A> and <A>origgens</A>.
-## </Description>
-## </ManSection>
-## <#/GAPDoc>
-DeclareGlobalFunction( "CalcNiceGens" );
 DeclareGlobalFunction( "ValidateHomomInput" );
 
 ## <#GAPDoc Label="CalcNiceGensGeneric">

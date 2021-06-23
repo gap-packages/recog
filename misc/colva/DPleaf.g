@@ -320,7 +320,7 @@ SolveLeafDP := function(ri,rifac,name)
  blkdata := RecogniseLeaf(riH1,blk,name);;
 
 # Get the inverse images of the nice generators of blk in H1
- invims := CalcNiceGens(blkdata,GeneratorsOfGroup(H1));
+ invims := NiceGens(blkdata,GeneratorsOfGroup(H1));
  Yhat := ShallowCopy(invims);
  blktoH1 := GroupHomomorphismByFunction(blk,Grp(ri),g->
 ResultOfStraightLineProgram( SLPforElement(blkdata,g),invims));

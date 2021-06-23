@@ -66,8 +66,8 @@ RECOG.CalcNiceGensKnownNilpotent := function(ri,origgens)
   local kernelgens;
   kernelgens := List([1..Length(ri!.decompositionExponents)],
                      i -> origgens[i]^ri!.decompositionExponents[i]);
-  return Concatenation(CalcNiceGens(ImageRecogNode(ri), origgens),
-                       CalcNiceGens(KernelRecogNode(ri), kernelgens));
+  return Concatenation(NiceGens(ImageRecogNode(ri), origgens),
+                       NiceGens(KernelRecogNode(ri), kernelgens));
 end;
 
 #! @BeginChunk KnownNilpotent
