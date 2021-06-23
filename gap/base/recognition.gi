@@ -538,7 +538,7 @@ InstallGlobalFunction( RecogniseGeneric,
         Add(depthString,'I');
         rifac := RecogniseGeneric(
                   Group(List(GeneratorsOfGroup(H), x->ImageElm(Homom(ri),x))),
-                  methodsforfactor(ri), depthString, forfactor(ri) ); # TODO: change forfactor to hintsForFactor??)
+                  methodsforfactor(ri), depthString, forfactor(ri) );
         Remove(depthString);
         PrintTreePos("I",depthString,H);
         SetImageRecogNode(ri,rifac);
