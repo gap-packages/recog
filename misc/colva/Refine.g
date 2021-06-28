@@ -70,19 +70,19 @@ InsertSubTree := function(ri,rifac,maps)
    SetGrp(lri[i+1],GroupWithGenerators(kgens));
    SetKernelRecogNode(lri[i],lri[i+1]);
    SetImageRecogNode(lri[i],rri[i]);
-   SetRIParent(lri[i+1],lri[i]);
-   SetRIParent(rri[i],lri[i]);
+   SetParentRecogNode(lri[i+1],lri[i]);
+   SetParentRecogNode(rri[i],lri[i]);
  od;
 
 
- # tell lri[1] to join onto RIParent(ri)
- if HasRIParent(ri) then
-   SetRIParent(lri[1],StructuralCopy(RIParent(ri)));
+ # tell lri[1] to join onto ParentRecogNode(ri)
+ if HasParentRecogNode(ri) then
+   SetParentRecogNode(lri[1],StructuralCopy(ParentRecogNode(ri)));
  fi;
 
  # tell last lri to be kerfac
    SetKernelRecogNode(lri[Size(Q)],StructuralCopy(kerfac));
-   SetRIParent(KernelRecogNode(lri[Size(Q)]),lri[Size(Q)]);
+   SetParentRecogNode(KernelRecogNode(lri[Size(Q)]),lri[Size(Q)]);
 
  # Set up the nice generators
 
@@ -125,7 +125,7 @@ RefineSolubleLayers := function(ri)
   ri := InsertSubTree(ri, rifac, maps);;
   riker := KernelRecogNode(ri);
   SetKernelRecogNode(ri,RefineSolubleLayers(riker));
-  SetRIParent(KernelRecogNode(ri),ri);
+  SetParentRecogNode(KernelRecogNode(ri),ri);
   if KernelRecogNode(ri)<>fail then
     SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(KernelRecogNode(ri))));
   else
@@ -201,7 +201,7 @@ SubgroupNC(Grp(ImageRecogNode(ri)),List(CS[i],v->VectortoPc(v,Grp(ImageRecogNode
   ri := InsertSubTree(ri, rifac, maps);;
   riker := KernelRecogNode(ri);
   SetKernelRecogNode(ri,RefineElementaryAbelianLayers(riker));
-  SetRIParent(KernelRecogNode(ri),ri);
+  SetParentRecogNode(KernelRecogNode(ri),ri);
   if KernelRecogNode(ri)<>fail then
     SetNiceGens(ri,Concatenation(pregensfac(ri),NiceGens(KernelRecogNode(ri))));
   else
@@ -222,15 +222,15 @@ RemoveTrivialLayers := function(ri)
  I := Grp(rifac);
  if IsPcGroup(I) and IsTrivial(I) then
 # I is trivial!!
-   if HasRIParent(ri) then
-     parri := StructuralCopy(RIParent(ri));
+   if HasParentRecogNode(ri) then
+     parri := StructuralCopy(ParentRecogNode(ri));
    fi;
    ri := riker;;
    if IsBound(parri) then
-     SetRIParent(ri,parri);
+     SetParentRecogNode(ri,parri);
    else
-     Unbind(ri!.RIParent);
-     ResetFilterObj(ri, HasRIParent);
+     Unbind(ri!.ParentRecogNode);
+     ResetFilterObj(ri, HasParentRecogNode);
    fi;
    newriker := KernelRecogNode(ri);
    SetKernelRecogNode(ri,RemoveTrivialLayers(newriker));

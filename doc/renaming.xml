@@ -1,8 +1,6 @@
 <Chapter Label="Renaming">
 <Heading>Renaming</Heading>
 
-<#Include SYSTEM "renaming_index.xml">
-
 Many of the names in the recog package were found
 to be unintuitive or inconsistent with other names.
 For these reasons the names were changed to be more descriptive

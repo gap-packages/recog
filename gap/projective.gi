@@ -69,7 +69,7 @@ function(ri, G)
       hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
       SetHomom(ri,hom);
       # The following is already be set, but make it explicit here:
-      Setmethodsforfactor(ri,FindHomDbProjective);
+      Setmethodsforimage(ri,FindHomDbProjective);
       # no kernel:
       findgensNmeth(ri).method := FindKernelDoNothing;
       return Success;
@@ -85,11 +85,11 @@ function(ri, G)
 
   # the image are the last few blocks:
   # The following is already be set, but make it explicit here:
-  Setmethodsforfactor(ri,FindHomDbProjective);
+  Setmethodsforimage(ri,FindHomDbProjective);
   if middle < nrblocks then   # more than one block in image:
-      forfactor(ri).blocks := List(ri!.blocks{[middle..nrblocks]},
+      InitialDataForImageRecogNode(ri).blocks := List(ri!.blocks{[middle..nrblocks]},
                                    x->x - (ri!.blocks[middle][1]-1));
-      AddMethod(forfactor(ri).hints,
+      AddMethod(InitialDataForImageRecogNode(ri).hints,
                 FindHomMethodsProjective.BlocksModScalars,
                 2000);
   fi; # Otherwise the image is to be recognised projectively as usual
@@ -98,8 +98,8 @@ function(ri, G)
   findgensNmeth(ri).args[1] := 10 + nrblocks;
   findgensNmeth(ri).args[2] := 5 + middle - 1;
   # The following is already set, but make it explicit here:
-  forkernel(ri).blocks := ri!.blocks{[1..middle-1]};
-  AddMethod(forkernel(ri).hints, FindHomMethodsProjective.BlocksModScalars, 2000);
+  InitialDataForKernelRecogNode(ri).blocks := ri!.blocks{[1..middle-1]};
+  AddMethod(InitialDataForKernelRecogNode(ri).hints, FindHomMethodsProjective.BlocksModScalars, 2000);
   Setimmediateverification(ri,true);
   return Success;
 end);
@@ -143,7 +143,7 @@ function(ri, G)
   else
       ForgetMemory(S);
       SetHomom(ri,OrbActionHomomorphism(G,S!.orb));
-      Setmethodsforfactor(ri,FindHomDbPerm);
+      Setmethodsforimage(ri,FindHomDbPerm);
   fi;
   return Success;
 end);
@@ -187,7 +187,7 @@ function(ri, G)
   hom := GroupHomByFuncWithData(G,H,RECOG.HomProjDet,
                                 rec(c := c, z := z, gcd := gcd));
   SetHomom(ri,hom);
-  Setmethodsforfactor(ri,FindHomDbPerm);
+  Setmethodsforimage(ri,FindHomDbPerm);
   findgensNmeth(ri).args[1] := 8;
   findgensNmeth(ri).args[2] := 5;
   Setimmediateverification(ri,true);
@@ -255,9 +255,9 @@ function(ri, G)
   findgensNmeth(ri).method := FindKernelDoNothing;  # This is an iso
 
   # Switch to matrix mode:
-  Setmethodsforfactor(ri,FindHomDbMatrix);
-  AddMethod(forfactor(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
-  forfactor(ri).blocks := ri!.blocks{[1..Length(ri!.blocks)-1]};
+  Setmethodsforimage(ri,FindHomDbMatrix);
+  AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
+  InitialDataForImageRecogNode(ri).blocks := ri!.blocks{[1..Length(ri!.blocks)-1]};
   return Success;
 end);
 

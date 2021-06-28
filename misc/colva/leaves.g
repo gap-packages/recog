@@ -124,7 +124,7 @@ function(ri,I,name)
  rifac := rec();
  Objectify(RecognitionInfoType,rifac);;
  SetFilterObj(rifac,IsLeaf);
- SetRIParent(rifac,ri);
+ SetParentRecogNode(rifac,ri);
  SetImageRecogNode(ri,rifac);
  SetGrp(rifac,I);
  if IsPcGroup(I) then

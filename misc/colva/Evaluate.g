@@ -197,9 +197,9 @@ InstallGlobalFunction( NormalTree,
     SetgensN(ri,[]);       # this will grow over time
     SetfindgensNmeth(ri,rec(method := FindKernelRandom, args := [20]));
     Setimmediateverification(ri,false);
-    Setforkernel(ri,rec(hints := []));
+    SetInitialDataForKernelRecogNode(ri,rec(hints := []));
           # this is eventually handed down to the kernel
-    Setforfactor(ri,rec(hints := []));
+    SetInitialDataForImageRecogNode(ri,rec(hints := []));
           # this is eventually handed down to the image
 
 
@@ -230,7 +230,7 @@ InstallGlobalFunction( NormalTree,
     rifac := RecogniseLeaf(ri,I,name);;
 
      SetImageRecogNode(ri,rifac);
-     SetRIParent(rifac,ri);
+     SetParentRecogNode(rifac,ri);
 
      Info(InfoRecognition,1,"Back from image (depth=",depth,").");
 
@@ -295,7 +295,7 @@ InstallGlobalFunction( NormalTree,
 
         riker := NormalTree( N, nsm, depth+1 );;
         SetKernelRecogNode(ri,riker);
-        SetRIParent(riker,ri);
+        SetParentRecogNode(riker,ri);
         Info(InfoRecognition,1,"Back from kernel (depth=",depth,").");
 
         done := true;

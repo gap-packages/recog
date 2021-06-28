@@ -155,9 +155,9 @@ DeclareAttribute( "ImageRecogNode", IsRecogNode, "mutable" );
 ## <#/GAPDoc>
 DeclareAttribute( "KernelRecogNode", IsRecogNode, "mutable" );
 
-## <#GAPDoc Label="RIParent">
+## <#GAPDoc Label="ParentRecogNode">
 ## <ManSection>
-## <Attr Name="RIParent" Arg="ri"/>
+## <Attr Name="ParentRecogNode" Arg="ri"/>
 ## <Description>
 ##     The value of this attribute is the recognition node of the
 ##     parent of this node in the recognition tree. The top node does not
@@ -165,7 +165,8 @@ DeclareAttribute( "KernelRecogNode", IsRecogNode, "mutable" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "RIParent", IsRecogNode, "mutable" );
+DeclareAttribute( "ParentRecogNode", IsRecogNode, "mutable" );
+DeclareObsoleteSynonymAttr( "RIParent", "ParentRecogNode", 1 );
 
 ## <#GAPDoc Label="StdPresentation">
 ## <ManSection>
@@ -250,9 +251,9 @@ DeclareAttribute( "slptonice", IsRecogNode, "mutable" );
 ## <#/GAPDoc>
 DeclareAttribute( "fhmethsel", IsRecogNode, "mutable" );      # TODO: rename?
 
-## <#GAPDoc Label="methodsforfactor">
+## <#GAPDoc Label="methodsforimage">
 ## <ManSection>
-## <Attr Name="methodsforfactor" Arg="ri"/>
+## <Attr Name="methodsforimage" Arg="ri"/>
 ## <Description>
 ##     This attribute is initialised at the beginning of the recursive
 ##     recognition function with the database of find homomorphism methods
@@ -268,7 +269,8 @@ DeclareAttribute( "fhmethsel", IsRecogNode, "mutable" );      # TODO: rename?
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "methodsforfactor", IsRecogNode, "mutable" ); # rename to MethodsDBForFactor
+DeclareAttribute( "methodsforimage", IsRecogNode, "mutable" ); # rename to MethodsDBForFactor
+DeclareObsoleteSynonymAttr( "methodsforfactor", "methodsforimage", 1 );
 
 ## <#GAPDoc Label="slpforelement">
 ## <ManSection>
@@ -302,9 +304,11 @@ DeclareAttribute( "gensNslp", IsRecogNode, "mutable" );
 # Do we have to do an immediate verification of the kernel?
 DeclareAttribute( "immediateverification", IsRecogNode, "mutable" );
 # Used to transport information about the group down to the kernel:
-DeclareAttribute( "forkernel", IsRecogNode, "mutable" );
+DeclareAttribute( "InitialDataForKernelRecogNode", IsRecogNode, "mutable" );
+DeclareObsoleteSynonymAttr( "forkernel", "InitialDataForKernelRecogNode", 1 );
 # Used to transport information about the group down to the image:
-DeclareAttribute( "forfactor", IsRecogNode, "mutable" );
+DeclareAttribute( "InitialDataForImageRecogNode", IsRecogNode, "mutable" );
+DeclareObsoleteSynonymAttr( "forfactor", "InitialDataForImageRecogNode", 1 );
 # Used to check whether group elements are equal to one after recognition:
 DeclareAttribute( "isone", IsRecogNode, "mutable" );
 # Used to compare group elements after recognition:

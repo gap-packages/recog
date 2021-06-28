@@ -163,8 +163,8 @@ FindHomMethodsMatrix.BlockLowerTriangular := function(ri, G)
   # first.
 
   # Give hint to image
-  forfactor(ri).blocks := ri!.blocks;
-  Add(forfactor(ri).hints,
+  InitialDataForImageRecogNode(ri).blocks := ri!.blocks;
+  Add(InitialDataForImageRecogNode(ri).hints,
       rec( method := FindHomMethodsMatrix.BlockDiagonal,
            rank := 2000,
            stamp := "BlockDiagonal" ) );
@@ -174,11 +174,11 @@ FindHomMethodsMatrix.BlockLowerTriangular := function(ri, G)
   findgensNmeth(ri).args := [];
 
   # Give hint to kernel N
-  Add(forkernel(ri).hints,
+  Add(InitialDataForKernelRecogNode(ri).hints,
       rec( method := FindHomMethodsMatrix.LowerLeftPGroup,
            rank := 2000,
            stamp := “LowerLeftPGroup" ));
-  forkernel(ri).blocks := ri!.blocks;
+  InitialDataForKernelRecogNode(ri).blocks := ri!.blocks;
 
   # This function always succeeds, because it is only
   # called for inputs for which it is known to apply.

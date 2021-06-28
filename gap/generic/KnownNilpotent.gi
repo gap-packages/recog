@@ -103,10 +103,10 @@ function(ri,G)
   H := GroupWithGenerators(gensfac);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomForNilpotent,data);
   SetHomom(ri,hom);
-  forfactor(ri).primes := primes{[1..cut]};
-  forkernel(ri).primes := primes{[cut+1..Length(primes)]};
-  AddMethod(forfactor(ri).hints, FindHomMethodsGeneric.KnownNilpotent, 4000);
-  AddMethod(forkernel(ri).hints, FindHomMethodsGeneric.KnownNilpotent, 4000);
+  InitialDataForImageRecogNode(ri).primes := primes{[1..cut]};
+  InitialDataForKernelRecogNode(ri).primes := primes{[cut+1..Length(primes)]};
+  AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsGeneric.KnownNilpotent, 4000);
+  AddMethod(InitialDataForKernelRecogNode(ri).hints, FindHomMethodsGeneric.KnownNilpotent, 4000);
   Append(gensN(ri),gensker);
   findgensNmeth(ri).method := FindKernelDoNothing;  # kernel already known
   ri!.leavegensNuntouched := true;

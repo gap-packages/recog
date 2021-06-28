@@ -341,7 +341,7 @@ FindHomMethodsMatrix.ShortOrbits := function(ri,g)
   Info(InfoRecog,3,"Finished building homomorphism.");
 
   SetHomom(ri,hom);
-  Setmethodsforfactor(ri,FindHomDbPerm);
+  Setmethodsforimage(ri,FindHomDbPerm);
 
   return true;
 end;
