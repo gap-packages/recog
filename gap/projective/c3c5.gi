@@ -173,19 +173,19 @@ function(ri, G)
   SetHomom(ri,hom);
 
   # Hand down hint that no MeatAxe run can help:
-  forfactor(ri).isabsolutelyirred := true;
+  InitialDataForImageRecogNode(ri).isabsolutelyirred := true;
 
   # There might be a kernel, because we have more scalars over the bigger
   # field, so go for it, however, fewer generators should suffice:
   # Also, doing normal closure will not help!
   findgensNmeth(ri).args := [5,0];
-  AddMethod(forkernel(ri).hints,
+  AddMethod(InitialDataForKernelRecogNode(ri).hints,
             FindHomMethodsProjective.BiggerScalarsOnly,
             2000);
-  forkernel(ri).degsplittingfield := MTX.DegreeSplittingField(m)
+  InitialDataForKernelRecogNode(ri).degsplittingfield := MTX.DegreeSplittingField(m)
                                    / DegreeOverPrimeField(f);
-  forkernel(ri).biggerscalarsbas := r.inforec.bas;
-  forkernel(ri).biggerscalarsbasi := r.inforec.basi;
+  InitialDataForKernelRecogNode(ri).biggerscalarsbas := r.inforec.bas;
+  InitialDataForKernelRecogNode(ri).biggerscalarsbasi := r.inforec.basi;
 
   return Success;
 end);
@@ -212,7 +212,7 @@ function(ri, G)
   hom := GroupHomByFuncWithData(G, Group(H), RECOG.HomBCToDiagonalBlock, data);
   SetHomom(ri,hom);
 
-  AddMethod(forfactor(ri).hints,
+  AddMethod(InitialDataForImageRecogNode(ri).hints,
             FindHomMethodsProjective.StabilizerChainProj,
             4000);
 
@@ -520,7 +520,7 @@ function(ri, G)
           H := GroupWithGenerators(gensim);
           hom := GroupHomByFuncWithData(G,H,RECOG.HomCommutator,r);
           SetHomom(ri,hom);
-          Setmethodsforfactor(ri,FindHomDbMatrix);
+          Setmethodsforimage(ri,FindHomDbMatrix);
           poss := Filtered([1..Length(gensim)],i->IsOne(gensim[i]));
           Append(gensN(ri),ri!.gensHmem{poss});
           findgensNmeth(ri).args[1] := 5;
@@ -627,7 +627,7 @@ function(ri, G)
       hom := GroupHomByFuncWithData(G,HH,RECOG.HomActionFieldAuto,
                   rec( c := c,cc := cc,cgen := cgen, cyc := cyc ) );
       SetHomom(ri,hom);
-      Setmethodsforfactor(ri,FindHomDbPerm);
+      Setmethodsforimage(ri,FindHomDbPerm);
       return Success;
 
       # The kernel will be semilinear directly, however, we have to
@@ -676,9 +676,9 @@ function(ri, G)
           SetHomom(ri,hom);
 
           # Hand down information:
-          forfactor(ri).blocksize := r.blocksize;
-          forfactor(ri).generatorskronecker := kro;
-          AddMethod(forfactor(ri).hints,
+          InitialDataForImageRecogNode(ri).blocksize := r.blocksize;
+          InitialDataForImageRecogNode(ri).generatorskronecker := kro;
+          AddMethod(InitialDataForImageRecogNode(ri).hints,
                     FindHomMethodsProjective.KroneckerProduct,
                     4000);
           # This is an isomorphism:
@@ -699,7 +699,7 @@ function(ri, G)
       Enumerate(o);
       a := OrbActionHomomorphism(G,o);
       SetHomom(ri,a);
-      Setmethodsforfactor(ri,FindHomDbPerm);
+      Setmethodsforimage(ri,FindHomDbPerm);
 
       return Success;
 

@@ -8,18 +8,18 @@ nri:= StructuralCopy(ri);
 i:= 0;
 bool:= true;
 while HasKernelRecogNode(nri) and not KernelRecogNode(nri) = fail do
-  if not RIParent(ImageRecogNode(nri)) = nri then
+  if not ParentRecogNode(ImageRecogNode(nri)) = nri then
     Print("image error at level", i, "\n");
     bool:= false;
   fi;
-  if not RIParent(KernelRecogNode(nri)) = nri then
+  if not ParentRecogNode(KernelRecogNode(nri)) = nri then
     Print("error: at level", i, "\n");
     bool:= false;
   fi;
   nri:= KernelRecogNode(nri);
   i:= i+1;
 od;
-if not RIParent(ImageRecogNode(nri)) = nri then
+if not ParentRecogNode(ImageRecogNode(nri)) = nri then
   Print("image error at level", i, "\n");
 fi;
 return bool;

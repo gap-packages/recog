@@ -740,15 +740,15 @@ function(ri, G)
         hom := GroupHomByFuncWithData(G,GroupWithGenerators(re.igens),
                  RECOG.HomFuncActionOnBlocks,
                  rec(r := re.r,n := re.n,q := re.q,blks := re.basis.blocks));
-        forkernel(ri).t := re.basis.blocks.blocks;
-        forkernel(ri).blocksize := ri!.dimension / re.basis.blocks.ell;
-        AddMethod(forkernel(ri).hints,
+        InitialDataForKernelRecogNode(ri).t := re.basis.blocks.blocks;
+        InitialDataForKernelRecogNode(ri).blocksize := ri!.dimension / re.basis.blocks.ell;
+        AddMethod(InitialDataForKernelRecogNode(ri).hints,
                   FindHomMethodsProjective.DoBaseChangeForBlocks,
                   2000);
         Setimmediateverification(ri,true);
         findgensNmeth(ri).args[1] := re.basis.blocks.ell + 3;
         findgensNmeth(ri).args[2] := 5;
-        Setmethodsforfactor(ri,FindHomDbPerm);
+        Setmethodsforimage(ri,FindHomDbPerm);
     else
         Info(InfoRecog,2,"C6: Found homomorphism.");
         hom := GroupHomByFuncWithData(G,GroupWithGenerators(re.igens),
@@ -757,7 +757,7 @@ function(ri, G)
         findgensNmeth(ri).args[1] := 3 + re.n;
         findgensNmeth(ri).args[2] := 5;
         Setimmediateverification(ri,true);
-        Setmethodsforfactor(ri,FindHomDbMatrix);
+        Setmethodsforimage(ri,FindHomDbMatrix);
     fi;
     SetHomom(ri,hom);
 

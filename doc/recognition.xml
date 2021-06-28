@@ -218,12 +218,12 @@ The following attributes are defined for recognition nodes:
 <#Include Label="pregensfac">
 <#Include Label="ImageRecogNode">
 <#Include Label="KernelRecogNode">
-<#Include Label="RIParent">
+<#Include Label="ParentRecogNode">
 <#Include Label="fhmethsel">
 <#Include Label="slpforelement">
 <#Include Label="SLPforElement">
 <#Include Label="StdPresentation">
-<#Include Label="methodsforfactor">
+<#Include Label="methodsforimage">
 
 <ManSection>
 <Attr Name="validatehomominput" Arg="ri, x"/>
@@ -402,7 +402,7 @@ recognised by the current recognition node to the image or
 kernel of the found homomorphism:
 
 <ManSection>
-<Attr Name="forkernel" Arg="ri"/>
+<Attr Name="InitialDataForKernelRecogNode" Arg="ri"/>
 <Description>
     This attribute is initialised to a record with only the component
     <C>hints</C> bound to an empty list at the beginning of the
@@ -424,7 +424,7 @@ kernel of the found homomorphism:
 </ManSection>
 
 <ManSection>
-<Attr Name="forfactor" Arg="ri"/>
+<Attr Name="InitialDataForImageRecogNode" Arg="ri"/>
 <Description>
     This attribute is initialised to a record with only the component
     <C>hints</C> bound to an empty list at the beginning of the
@@ -627,7 +627,7 @@ A successful find homomorphism method has the following duties:
     group in the attribute <Ref Attr="Homom"/>. Note that if your homomorphism
     changes the representation (for example going from matrix groups to
     permutation groups), you will have to set the attribute
-    <Ref Attr="methodsforfactor"/> accordingly. Also,
+    <Ref Attr="methodsforimage"/> accordingly. Also,
     <Ref Attr="ValidateHomomInput"/> may be set to a function which returns
     <K>false</K> for values which may cause <Ref Attr="Homom"/> to
     produce the wrong answer, or error.
@@ -652,7 +652,7 @@ A successful find homomorphism method has the following duties:
 <Mark>additional information</Mark>
 <Item>
     A find homomorphism method may store any data into the attributes
-    <Ref Attr="forkernel"/> and <Ref Attr="forfactor"/>, which both are
+    <Ref Attr="InitialDataForKernelRecogNode"/> and <Ref Attr="InitialDataForImageRecogNode"/>, which both are
     records. Components in these
     record that are bound during the recognition will be copied into
     the recognition node of the kernel and image respectively

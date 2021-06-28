@@ -200,9 +200,9 @@ function(ri,G)
           Info(InfoRecog,2,"Found block system with ",Length(res.orb),
                " blocks.");
           # A block system: We do a base change isomorphism:
-          forkernel(ri).t := Concatenation(res.orb);
-          forkernel(ri).blocksize := Length(res.orb[1]);
-          AddMethod(forkernel(ri).hints, FindHomMethodsProjective.DoBaseChangeForBlocks, 2000);
+          InitialDataForKernelRecogNode(ri).t := Concatenation(res.orb);
+          InitialDataForKernelRecogNode(ri).blocksize := Length(res.orb[1]);
+          AddMethod(InitialDataForKernelRecogNode(ri).hints, FindHomMethodsProjective.DoBaseChangeForBlocks, 2000);
           Setimmediateverification(ri,true);
           findgensNmeth(ri).args[1] := Length(res.orb)+3;
           findgensNmeth(ri).args[2] := 5;
@@ -210,7 +210,7 @@ function(ri,G)
 
       # we are done, report the hom:
       SetHomom(ri,res.hom);
-      Setmethodsforfactor(ri,FindHomDbPerm);
+      Setmethodsforimage(ri,FindHomDbPerm);
 
       return Success;
   fi;
@@ -236,8 +236,8 @@ function(ri,G)
   findgensNmeth(ri).method := FindKernelDoNothing;
 
   # Inform authorities that the image can be recognised easily:
-  forfactor(ri).blocksize := ri!.blocksize;
-  AddMethod(forfactor(ri).hints, FindHomMethodsProjective.Blocks, 2000);
+  InitialDataForImageRecogNode(ri).blocksize := ri!.blocksize;
+  AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsProjective.Blocks, 2000);
 
   return Success;
 end);
@@ -259,11 +259,11 @@ function(ri,G)
       Add(blocks,[(i-1)*ri!.blocksize+1..i*ri!.blocksize]);
   od;
   # For the image:
-  forfactor(ri).blocks := blocks;
-  AddMethod(forfactor(ri).hints, FindHomMethodsProjective.BlocksModScalars, 2000);
+  InitialDataForImageRecogNode(ri).blocks := blocks;
+  AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsProjective.BlocksModScalars, 2000);
   # For the kernel:
-  forkernel(ri).blocks := blocks;
-  AddMethod(forkernel(ri).hints, FindHomMethodsProjective.BlocksBackToMats, 2000);
+  InitialDataForKernelRecogNode(ri).blocks := blocks;
+  AddMethod(InitialDataForKernelRecogNode(ri).hints, FindHomMethodsProjective.BlocksBackToMats, 2000);
   return Success;
 end);
 
@@ -290,9 +290,9 @@ function(ri,G)
   SetHomom(ri,hom);
 
   # hints for the image:
-  Setmethodsforfactor(ri,FindHomDbMatrix);
-  forfactor(ri).blocks := ri!.blocks{[1..Length(ri!.blocks)-1]};
-  AddMethod(forfactor(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000 );
+  Setmethodsforimage(ri,FindHomDbMatrix);
+  InitialDataForImageRecogNode(ri).blocks := ri!.blocks{[1..Length(ri!.blocks)-1]};
+  AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000 );
 
   # This is an isomorphism:
   findgensNmeth(ri).method := FindKernelDoNothing;
@@ -325,13 +325,13 @@ end);
 #  findgensNmeth(ri).args[1] := 20 + nrblocks;
 #
 #  # Pass the block information on to the image:
-#  forfactor(ri).blocksize := ri!.blocksize;
-#  AddMethod(forfactor(ri).hints, FindHomMethodsProjective.BalTreeForBlocks, 2000);
+#  InitialDataForImageRecogNode(ri).blocksize := ri!.blocksize;
+#  AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsProjective.BalTreeForBlocks, 2000);
 #
 #  # Inform authorities that the kernel can be recognised easily:
-#  forkernel(ri).subdim := subdim;
-#  forkernel(ri).blocksize := ri!.blocksize;
-#  AddMethod(forkernel(ri).hints, FindHomMethodsProjective.BalTreeForBlocksProjKernel, 2000);
+#  InitialDataForKernelRecogNode(ri).subdim := subdim;
+#  InitialDataForKernelRecogNode(ri).blocksize := ri!.blocksize;
+#  AddMethod(InitialDataForKernelRecogNode(ri).hints, FindHomMethodsProjective.BalTreeForBlocksProjKernel, 2000);
 #
 #  # Verify the kernel immediately after its recognition:
 #  Setimmediateverification(ri,true);
@@ -371,8 +371,8 @@ end);
 #  findgensNmeth(ri).args := [];
 #
 #  # Inform authorities that the kernel can be recognised easily:
-#  forkernel(ri).subdim := ri!.subdim;
-#  AddMethod(forkernel(ri).hints, FindHomMethodsMatrix.LowerLeftPGroup, 2000);
+#  InitialDataForKernelRecogNode(ri).subdim := ri!.subdim;
+#  AddMethod(InitialDataForKernelRecogNode(ri).hints, FindHomMethodsMatrix.LowerLeftPGroup, 2000);
 #
 #  return Success;
 #end;
@@ -391,8 +391,8 @@ end);
 #  findgensNmeth(ri).method := FindKernelDoNothing;
 #
 #  # But pass on the information on blocks:
-#  forfactor(ri).blocksize := ri!.blocksize;
-#  AddMethod(forfactor(ri).hints, FindHomMethodsProjective.BalTreeForBlocks, 2000);
+#  InitialDataForImageRecogNode(ri).blocksize := ri!.blocksize;
+#  AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsProjective.BalTreeForBlocks, 2000);
 #
 #  return Success;
 #end;

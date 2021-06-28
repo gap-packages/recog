@@ -250,9 +250,9 @@ RECOG.SortOutReducibleNormalSubgroup :=
         SetHomom(ri,hom);
 
         # Hand down information:
-        forfactor(ri).blocksize := r.blocksize;
-        forfactor(ri).generatorskronecker := kro;
-        AddMethod(forfactor(ri).hints,
+        InitialDataForImageRecogNode(ri).blocksize := r.blocksize;
+        InitialDataForImageRecogNode(ri).generatorskronecker := kro;
+        AddMethod(InitialDataForImageRecogNode(ri).hints,
                   FindHomMethodsProjective.KroneckerProduct,
                   4000);
         # This is an isomorphism:
@@ -294,7 +294,7 @@ ConvertToMatrixRep(homcomp,Size(f));
 
     a := OrbActionHomomorphism(G,o);
     SetHomom(ri,a);
-    Setmethodsforfactor(ri,FindHomDbPerm);
+    Setmethodsforimage(ri,FindHomDbPerm);
     ri!.comment := "_D2Imprimitive";
     Setimmediateverification(ri,true);
     findgensNmeth(ri).args[1] := Length(o)+6;
@@ -329,7 +329,7 @@ RECOG.SortOutReducibleSecondNormalSubgroup :=
                            RECOG.DirectFactorsAction,
                            rec( o := orb[1], eq := ri!.isequal) );
                 SetHomom(ri,hom);
-                Setmethodsforfactor(ri,FindHomDbPerm);
+                Setmethodsforimage(ri,FindHomDbPerm);
                 Info(InfoRecog,2,"D247: Success, found D7 with action",
                      " on ",mult," direct factors.");
                 ri!.comment := "_D7TensorInduced";

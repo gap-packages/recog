@@ -92,9 +92,9 @@ FindHomMethodsProjective.Derived :=
         SetHomom(ri,hom);
 
         # Hand down information:
-        forfactor(ri).blocksize := r.blocksize;
-        forfactor(ri).generatorskronecker := kro;
-        Add( forfactor(ri).hints,
+        InitialDataForImageRecogNode(ri).blocksize := r.blocksize;
+        InitialDataForImageRecogNode(ri).generatorskronecker := kro;
+        Add( InitialDataForImageRecogNode(ri).hints,
              rec( method := FindHomMethodsProjective.KroneckerProduct,
                   rank := 4000, stamp := "KroneckerProduct" ) );
         # This is an isomorphism:
@@ -114,7 +114,7 @@ FindHomMethodsProjective.Derived :=
     Enumerate(o);
     a := OrbActionHomomorphism(G,o);
     SetHomom(ri,a);
-    Setmethodsforfactor(ri,FindHomDbPerm);
+    Setmethodsforimage(ri,FindHomDbPerm);
 
     return true;
   end;

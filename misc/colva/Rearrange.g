@@ -369,10 +369,10 @@ end);
  Objectify( RecognitionInfoType, nri );;
  SetImageRecogNode(nri,nrifac);
  SetGrp(nri,Grp(ri));
- if HasRIParent(ri) then
-   SetRIParent(nri,RIParent(ri));
-   SetKernelRecogNode(RIParent(nri),nri);
-   if not SanityCheck(RIParent(nri)) then
+ if HasParentRecogNode(ri) then
+   SetParentRecogNode(nri,ParentRecogNode(ri));
+   SetKernelRecogNode(ParentRecogNode(nri),nri);
+   if not SanityCheck(ParentRecogNode(nri)) then
      Error(1);
    fi;
  fi;
@@ -380,7 +380,7 @@ end);
    SetKernelRecogNode(nri, fail);
  elif HasKernelRecogNode(riker) then
    SetKernelRecogNode(nri,KernelRecogNode(riker));
-   SetRIParent(KernelRecogNode(nri),nri);
+   SetParentRecogNode(KernelRecogNode(nri),nri);
    if not SanityCheck(nri) then
      Error(2);
    fi;
@@ -434,25 +434,25 @@ SwapFactors := function(ri,zeta)
  Setpregensfac(nri,StructuralCopy(pregensfac(riker)));
  Setpregensfac(nriker,List(pregensfac(ri),x->x*ResultOfStraightLineProgram(SLPforElement(rikerfac,ImageElm(zeta,x)),pregensfac(riker))^-1));
  SetKernelRecogNode(nriker,StructuralCopy(KernelRecogNode(riker)));
- SetRIParent(KernelRecogNode(nriker),nriker);
- SetRIParent(nriker,nri);
+ SetParentRecogNode(KernelRecogNode(nriker),nriker);
+ SetParentRecogNode(nriker,nri);
  SetKernelRecogNode(nri, nriker);
  if not SanityCheck(nri) then
    Error(3);
  fi;
  SetImageRecogNode(nriker,StructuralCopy(ImageRecogNode(ri)));
  #next two lines had capital p for parent before.
- #if IsBound(ri!.RIParent) then not sure whether should be checking HasRIParent, try that instead.
- if HasRIParent(ri) then
-   SetRIParent(nri,StructuralCopy(RIParent(ri)));
-   SetKernelRecogNode(RIParent(nri),nri);
-   if not SanityCheck(RIParent(nri)) then
+ #if IsBound(ri!.ParentRecogNode) then not sure whether should be checking HasParentRecogNode, try that instead.
+ if HasParentRecogNode(ri) then
+   SetParentRecogNode(nri,StructuralCopy(ParentRecogNode(ri)));
+   SetKernelRecogNode(ParentRecogNode(nri),nri);
+   if not SanityCheck(ParentRecogNode(nri)) then
      Error(4);
    fi;
  fi;
  if HasKernelRecogNode(riker) then
    SetKernelRecogNode(nriker,KernelRecogNode(riker));
-   SetRIParent(KernelRecogNode(riker),nriker);
+   SetParentRecogNode(KernelRecogNode(riker),nriker);
    if not SanityCheck(nri) then
      Error(5);
    fi;
@@ -553,7 +553,7 @@ PushDown := function(pri)
      npri := SwapFactors(pri,zeta);;
    fi;
    View(npri);
-   if not SanityCheck(RIParent(npri)) then
+   if not SanityCheck(ParentRecogNode(npri)) then
      Error(101);
    fi;
    return npri;
@@ -574,7 +574,7 @@ PushDown := function(pri)
    if knpri <> false and npri <> false then
 #found a map that works.
      SetKernelRecogNode(npri,knpri);
-     SetRIParent(knpri,npri);
+     SetParentRecogNode(knpri,npri);
      if not SanityCheck(npri) then
        Error(6);
      fi;
@@ -616,8 +616,8 @@ OrderTree := function(ri)
  pri:= StructuralCopy(lastnonabri);
 
 # Push the soluble layers down
- while HasRIParent(pri) do
-   pri := StructuralCopy(RIParent(pri));
+ while HasParentRecogNode(pri) do
+   pri := StructuralCopy(ParentRecogNode(pri));
    SetNiceGens(pri,Concatenation(pregensfac(pri),NiceGens(KernelRecogNode(pri))));
    npri := PushDown(StructuralCopy(pri));;
    if npri <> false then
@@ -631,12 +631,12 @@ OrderTree := function(ri)
  #this is kind of messy, but i haven't managed to track down where all the
  #parent kernel factor not matching up errors are occurring
  while HasKernelRecogNode(pri) and not KernelRecogNode(pri) = fail do
-   SetRIParent(KernelRecogNode(pri), pri);
-   SetRIParent(ImageRecogNode(pri), pri);
+   SetParentRecogNode(KernelRecogNode(pri), pri);
+   SetParentRecogNode(ImageRecogNode(pri), pri);
    pri:= KernelRecogNode(pri);
  od;
- while HasRIParent(pri) do
-   pri:= RIParent(pri);
+ while HasParentRecogNode(pri) do
+   pri:= ParentRecogNode(pri);
  od;
  return pri;
 end;
