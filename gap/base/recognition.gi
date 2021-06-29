@@ -195,7 +195,7 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     # randopt stores for each stamp how often it was used to generate a random
     # order.
     ri!.randopt := rec();
-    ri!.randstore := true;  # TODO: try what happens if we change this to false in terms of performance
+    ri!.randstore := true;
     # randp and randppt were used to store ppd elements. Currently unused.
     #ri!.randp := EmptyPlist(100);
     #ri!.randppt := rec();
