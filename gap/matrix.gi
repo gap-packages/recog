@@ -512,8 +512,8 @@ end);
 #! The method immediately delegates to projective methods handling
 #! all the diagonal blocks projectively. This is done by giving a hint
 #! to the image to use the method
-#! <Ref Subsect="BlocksModScalars" Style="Text"/> is
-#! given. The method for the kernel then has to deal with only scalar blocks,
+#! <Ref Subsect="BlocksModScalars" Style="Text"/>.
+#! The method for the kernel then has to deal with only scalar blocks,
 #! either projectively or with scalars, which is again done by giving a hint
 #! to either use <Ref Subsect="BlockScalar" Style="Text"/> or
 #! <Ref Subsect="BlockScalarProj" Style="Text"/> respectively.
