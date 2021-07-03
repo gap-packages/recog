@@ -239,8 +239,9 @@ function(ri, G)
       else   # exactly two blocks:
           # FIXME: why don't we just compute a precise set of generators of the kernel?
           # That should be easily and efficiently possible at this point, no?
-          findgensNmeth(ri).args[1] := 7;
-          findgensNmeth(ri).args[2] := 5;
+          # The kernel is abelian, so we don't need to do normal closures.
+          findgensNmeth(ri).method := FindKernelRandom;
+          findgensNmeth(ri).args := [7];
           InitialDataForKernelRecogNode(ri).blocks := ri!.blocks{[1]};
           # We have to go to BlockScalar with 1 block because the one block
           # is only a part of the whole matrix:
@@ -539,8 +540,9 @@ function(ri,G)
   Setmethodsforimage(ri,FindHomDbProjective);
 
   # the kernel:
-  findgensNmeth(ri).args[1] := Length(ri!.blocks)+10;
-  findgensNmeth(ri).args[2] := 7;
+  # The kernel is abelian, so we don't need to do normal closures.
+  findgensNmeth(ri).method := FindKernelRandom;
+  findgensNmeth(ri).args := [Length(ri!.blocks)+10];
   # In the projective case we have to do a trick: We use an isomorphism
   # to a matrix group by multiplying things such that the last block
   # becomes an identity matrix:
