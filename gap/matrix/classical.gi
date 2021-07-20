@@ -1707,6 +1707,7 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
            recognise.isSOContained := false;
            return false;
         fi;
+        StabChain(pgrp, rec(random := 200, limit := 174182400));
         if Size(pgrp) mod 174182400 = 0 then # compare to Size(POmega(+1,8,2))
            return CheckFlag();
         else
@@ -1764,18 +1765,20 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
     elif d = 8 and (q = 4 or q > 5) then
         if not 6 in recognise.LB then return fail; fi;
         if not 4 in recognise.LS then return fail; fi;
+    # For each q we have that OmegaPlus(6,q) is isomorphic to PSL(4,q).
     elif d = 6 and q = 2 then
+        # Additionally, OmegaPlus(6,2) is isomorphic to AlternatingGroup(8).
         if not HasElementsMultipleOf( recognise.orders, [7]) and
            not HasElementsMultipleOf( recognise.orders, [15]) then
             return fail;
         fi;
     elif d = 6 and q = 3 then
-        if not HasElementsMultipleOf( recognise.orders, [5])  then
+        if not HasElementsMultipleOf( recognise.orders, [5, 13])  then
             return fail;
         fi;
-        if not 13 in recognise.orders then return fail; fi;
     elif d = 6 and q >= 4 then
         if not 4 in recognise.LB then return fail; fi;
+        # TODO: "E2" means basic
         if not 3 in recognise.E2 then return fail; fi;
     elif d = 4 and (q = 8 or q >= 11) then
         if recognise.needPlusMinus = false then
