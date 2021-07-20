@@ -1778,7 +1778,7 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
         fi;
     elif d = 6 and q >= 4 then
         if not 4 in recognise.LB then return fail; fi;
-        # TODO: "E2" means basic
+        # TODO: what does "E2" do exactly? What does it do in magma?
         if not 3 in recognise.E2 then return fail; fi;
     elif d = 4 and (q = 8 or q >= 11) then
         if recognise.needPlusMinus = false then
