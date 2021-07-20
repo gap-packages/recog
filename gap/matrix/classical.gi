@@ -1723,24 +1723,6 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
              return false;
         fi;
     elif d = 8 and  q =  5 then
-        # BEGIN
-        # Here is an idea for a more efficient check:
-        # We need the forms package to conjugate this into the "standard"
-        # Omega. Then e.g. taking Orbit(pgrp, 1) should always yield the same
-        # orbit. Take
-        # grp := Omega(+1, 8, 5); field := GF(5); d := 8;
-        # or
-        # grp := GO(+1, 8, 5); field := GF(5); d := 8;
-        # Then we can prove that 13^2 divides the group order as follows:
-        # pgrp := ProjectiveActionOnFullSpace( grp, field, d );
-        # orbs := Orbits(pgrp, MovedPoints(pgrp));
-        # List(orbs, Length); # one of them has length 19656
-        # S := Stabilizer(pgrp, 1); # choose a point in the orbit with length 19656
-        # orbsStab := Orbits(S, MovedPoints(S));
-        # List(orbsStab, x -> Length(x) mod 13);
-        # If we find an orbit of length divisible by 13 in the last line, then
-        # 13^2 divides our group order, and then we must contain Omega+(8,5).
-        # END
         ## 2.July.2019: There is a mistake in the paper here
         ## There are maximal subgroups of Omega+(8,5) that contain
         ## elements of order 7,13,3
@@ -1762,9 +1744,9 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
         ## subspaces and then compare the size of pgrp to the size of
         ## POmega(+1,8,5).
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
-        # We take a value for random of only 100 promille, but in practice this
+        # We take a value for random of only 200 promille, but in practice this
         # seems to be good enough.
-        # TODO: The orders of the remaining maximal subgroups are not divisible
+        # The orders of the remaining maximal subgroups are not divisible
         # by e.g. 13^2. Also, passing to the projective action reduces the
         # involved group sizes by a factor of at most 4. So, if we know that
         # the order of pgrp is divisible by Size(POmega(+1,8,5)), then this
