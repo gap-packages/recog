@@ -1692,21 +1692,23 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
             return fail;
         fi;
     elif d = 8 and q = 2 then
-        if not HasElementsMultipleOf( recognise.orders, [7,9,15]) and
-           not HasElementsMultipleOf( recognise.orders, [7,10,15]) then
+        if not HasElementsMultipleOf( recognise.orders, [7,9,10]) and
+           not HasElementsMultipleOf( recognise.orders, [7,9,15]) then
             return fail;
         fi;
 
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
         orbs := Orbits( pgrp, MovedPointsPerms( GeneratorsOfGroup(pgrp)));
 
+        # Both the conformal orthogonal and the omega for d = 8 and q = 2 have
+        # orbits of these lenghts. The maximal subgroups of the conformal
+        # orthogonal don't have these orbit lenghts.
         if Set(orbs,Length) <> [ 120, 135 ] then
            recognise.isSOContained := false;
            return false;
         fi;
         if Size(pgrp) mod 174182400 = 0 then # compare to Size(POmega(+1,8,2))
            return CheckFlag();
-           recognise.isSOContained := true;
         else
            recognise.isSOContained := false;
            return false;
@@ -1716,6 +1718,7 @@ RECOG.NonGenericOrthogonalPlus := function(recognise,grp)
             return fail;
         fi;
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
+        StabChain(pgrp, rec(random := 200, limit := 4952179814400));
         if Size(pgrp) mod 4952179814400 = 0 then # compare to Size(POmega(+1,8,3))
              return CheckFlag();
         else
