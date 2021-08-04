@@ -1490,7 +1490,7 @@ end);
 BindRecogMethod(FindHomMethodsClassical, "NonGenericUnitary",
 "tests whether group is non-generic Unitary",
 function(recognise, grp)
-    local d, q,  g, f1, f2, o, CheckFlag, isHermForm, str;
+    local d, q,  g, f1, f2, o, CheckFlag, isHermForm, order;
 
     isHermForm := f -> IsSesquilinearForm(f) and IsHermitianForm(f);
 
@@ -1611,7 +1611,8 @@ function(recognise, grp)
         fi;
         return fail;
     elif d = 3 and q = 4 then
-        if Order(grp) mod 216 = 0 then
+        # Take the natural action of grp, and compute its order
+        if Order(Action(grp, recognise.field ^ d, OnPoints)) mod 216 = 0 then
             return CheckFlag();
         else
             recognise.isSUContained := false;
@@ -1622,50 +1623,62 @@ function(recognise, grp)
             return fail;
         fi;
         if recognise.hasSpecialEle = false then
-            if not Order( recognise.g ) mod 6 = 0 then
+            order := Order( recognise.g );
+            if not order mod 6 = 0 then
                 return fail;
             fi;
-            if ForAny( GeneratorsOfGroup(grp),
-                h -> not IsOne(Comm(h,recognise.g^3))) then
+            if not IsCentral(grp, recognise.g ^ (order / 2)) then
                 Info( InfoClassical,2,
-                      "Cube of element of order div by 6 is not central" );
-                      recognise.hasSpecialEle := true;
+                      "Found an element of order divisible by 6 such",
+                      " that the corresponding involution is not central." );
+                recognise.hasSpecialEle := true;
                 return CheckFlag();
-             fi;
-        else return CheckFlag();
+            else
+                return fail;
+            fi;
+        else
+            return CheckFlag();
         fi;
     elif d = 3 and q = 16 then
         if not HasElementsMultipleOf(recognise.orders, [5,13]) then
             return fail;
         fi;
         if recognise.hasSpecialEle = false then
-            if not Order(recognise.g) mod 5  = 0 then
+            order := Order( recognise.g );
+            if not order mod 5  = 0 then
                 return fail;
             fi;
-            if ForAny(GeneratorsOfGroup(grp), h -> not IsOne(Comm(h,recognise.g))) then
+            if not IsCentral(grp, recognise.g ^ (order / 5)) then
                 Info( InfoClassical,2,
-                      "The element of order 5 is not central" );
+                      "The element of order equal 5 is not central" );
                 recognise.hasSpecialEle := true;
                 return CheckFlag();
+            else
+                return fail;
             fi;
-        else return CheckFlag();
+        else
+            return CheckFlag();
         fi;
     elif d = 3 and q = 25 then
         if not HasElementsMultipleOf(recognise.orders, [5,7,8]) then
             return fail;
         fi;
         if recognise.hasSpecialEle = false then
-            if Order(recognise.g) mod 8 <> 0 then
+            order := Order(recognise.g);
+            if order mod 8 <> 0 then
                 return fail;
             fi;
-            g := recognise.g^(Order(recognise.g)/2);
-            if ForAny(GeneratorsOfGroup(grp), h -> not IsOne(Comm(h,g))) then
+            if not IsCentral(grp, recognise.g ^ (order / 2)) then
                 Info( InfoClassical,2,
-                  "involution in cyclic subgroup  of order 8 is not central" );
+                      "Found an element of order divisible by 8 which powers",
+                      " to a non-central involution." );
                 recognise.hasSpecialEle := true;
                 return CheckFlag();
-             fi;
-        else return CheckFlag();
+            else
+                return fail;
+            fi;
+        else
+            return CheckFlag();
         fi;
     elif d = 3 and q >= 49  then
         if not 3 in recognise.LE or not 3 in recognise.BE then
@@ -1676,10 +1689,9 @@ function(recognise, grp)
             return fail;
         fi;
         if recognise.hasSpecialEle = false then
-             str := "Searching for elements of order > 3 mod scalars";
-             str := Concatenation( str,  " and dividing ");
-             str := Concatenation( str,  String(q-1) );
-             Info(InfoClassical,2, str );
+             Info(InfoClassical,2,
+                  "Searching for elements of order > 3 mod scalars",
+                  " and dividing ", String(q-1));
              if not ForAny(recognise.porders, i -> i[1] > 3 and q mod i[1] = 1) then
                  return fail;
              fi;
