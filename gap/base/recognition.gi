@@ -744,14 +744,22 @@ InstallGlobalFunction( SLPforElementGeneric,
     if s1 = fail then
         return fail;
     fi;
-    # if the kernel is trivial, we are done:
-    if riker = fail then
-        # was: return CompositionOfStraightLinePrograms(s1,gensQslp(ri));
-        return s1;
-    fi;
-    # Otherwise work in the kernel:
+    # The corresponding kernel element:
     y := ResultOfStraightLineProgram(s1,pregensfac(ri));
     n := g*y^-1;
+    # If the kernel is trivial, we check whether n is the identity in ri.
+    # This is necessary during immediate verification, since the kernel might
+    # have incorrectly been recognised as trivial.
+    if riker = fail then
+        if not ri!.isone(n)
+                # Big ugly hack. If the successMethod is BlocksModScalars, then
+                # we can't use ri!.isone, see the documentation of
+                # BlocksModScalars. 
+                and not ri!.fhmethsel.successMethod = "BlocksModScalars" then
+            return fail;
+        fi;
+        return s1;
+    fi;
     s2 := SLPforElement(riker,n);
     if s2 = fail then
         return fail;
@@ -761,9 +769,6 @@ InstallGlobalFunction( SLPforElementGeneric,
     s := NewProductOfStraightLinePrograms(s2,[nr1+1..nr1+nr2],
                                           s1,[1..nr1],
                                           nr1+nr2);
-    #s := ProductOfStraightLinePrograms(
-    #       CompositionOfStraightLinePrograms(s2,ri!.proj2),
-    #       CompositionOfStraightLinePrograms(s1,ri!.proj1));
     return s;
   end);
 
