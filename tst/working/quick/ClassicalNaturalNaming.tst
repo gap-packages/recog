@@ -29,12 +29,12 @@ gap> d:=7;; for q in [2, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SO", d, q); od;
 #
 # O^+(4,q) with q = 8 or q >= 11 are non-generic
 #
-# FIXME/TODO: sometimes get SO(1,4,11) has bad value for isSOContained; expected true, got unknown
-# FIXME/TODO: sometimes get SO(1,4,13) has bad value for isSOContained; expected true, got unknown
-# FIXME/TODO: sometimes get SO(1,8,4) has bad value for isSOContained; expected true, got unknown
+# FIXME/TODO: sometimes get "SO(1,d,q) has bad value for isSOContained;
+# expected true, got unknown" for
+# (d,q) in [ (4,11), (4,13), (8,4), (8,7), (8,8) ]
 gap> d:=4;; for q in [2, 3, 4, 5, 7, 8, 9] do TestNaming("SO", +1, d, q); od;
 gap> d:=6;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SO", +1, d, q); od;
-gap> d:=8;; for q in [2, 3, 5, 7, 8, 9, 11, 13] do TestNaming("SO", +1, d, q); od;
+gap> d:=8;; for q in [2, 3, 5, 9, 11, 13] do TestNaming("SO", +1, d, q); od;
 
 #
 # orthogonal groups, even dimension, minus form
