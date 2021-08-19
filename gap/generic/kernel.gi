@@ -85,6 +85,9 @@ end );
 InstallGlobalFunction( FastNormalClosure , function( grpgens, list, n )
   local list2, fewGenerators, repetitions, randlist, conjugators, i, c;
   list2 := ShallowCopy(list);
+  if Length(grpgens) = 1 then
+    return list2;
+  fi;
   fewGenerators := Length(grpgens) <= 3;
   if fewGenerators then
     repetitions := 3 * n;
