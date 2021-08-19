@@ -317,8 +317,8 @@ about the kernel:
     CallFuncList(gensNmeth.method,Concatenation([ri],gensNmeth.args));
 </Listing>
 The record is initialised upon creation of the recognition node
-to calling <Ref Func="FindKernelRandom"/> with one argument of 20
-(FIXME: is 20 correct?) (in addition
+to calling <Ref Func="FindKernelFastNormalClosure"/> with arguments
+<C>[6, 3]</C> (in addition
 to the first argument <A>ri</A>). See below for a choice of possible
 find kernel methods.
 </Description>
