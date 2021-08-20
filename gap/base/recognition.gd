@@ -18,9 +18,11 @@
 
 # The category:
 DeclareCategory( "IsRecogNode", IsObject );
+DeclareObsoleteSynonym( "IsRecognitionNode", "IsRecogNode" );
 # The family:
 BindGlobal( "RecogNodeFamily",
   NewFamily("RecogNodeFamily", IsRecogNode));
+DeclareObsoleteSynonym( "RecognitionInfoFamily", "RecogNodeFamily" );
 # The type:
 BindGlobal( "RecognitionInfoType",
   NewType(RecogNodeFamily, IsRecogNode and IsAttributeStoringRep));
@@ -136,6 +138,7 @@ DeclareAttribute( "NiceGens", IsRecogNode, "mutable" );
 ## </ManSection>
 ## <#/GAPDoc>
 DeclareAttribute( "ImageRecogNode", IsRecogNode, "mutable" );
+DeclareObsoleteSynonymAttr( "RIFac", "ImageRecogNode" );
 
 ## <#GAPDoc Label="KernelRecogNode">
 ## <ManSection>
@@ -154,6 +157,7 @@ DeclareAttribute( "ImageRecogNode", IsRecogNode, "mutable" );
 ## </ManSection>
 ## <#/GAPDoc>
 DeclareAttribute( "KernelRecogNode", IsRecogNode, "mutable" );
+DeclareObsoleteSynonymAttr( "RIKer", "KernelRecogNode" );
 
 ## <#GAPDoc Label="ParentRecogNode">
 ## <ManSection>
