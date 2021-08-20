@@ -10,12 +10,9 @@ gap> TestSporadic := function(name)
 > end;;
 
 #
-gap> data := [rec(name := "M23"), rec(name := "Suz"), rec(name := "Fi23")];;
-gap> for d in data do
-> name := d.name;
-> Print(name, "\n");
-> TestSporadic(name);
-> od;
-M23
-Suz
-Fi23
+gap> TestSporadic("J4"); # slow
+[ "J4" ]
+gap> TestSporadic("Th"); # slow
+[ "Th" ]
+gap> TestSporadic("Fi24'"); # slow
+[ "Fi24'" ]
