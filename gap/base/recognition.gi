@@ -16,6 +16,8 @@
 ##
 #############################################################################
 
+BindGlobal("RECOG_FindKernelFastNormalClosureStandardArgumentValues",
+           Immutable([6, 3]));
 
 # a nice view method:
 RECOG_ViewObj := function( level, ri )
@@ -170,8 +172,11 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     # FIXME: perhaps DON'T set a default for findgensNmeth, to ensure
     # people always set a value? Or at least find some way so that
     # methods must explicitly acknowledge that they want the default...
-    SetfindgensNmeth(ri,rec(method := FindKernelFastNormalClosure,
-                            args := [6,3]));
+    SetfindgensNmeth(
+        ri,
+        rec(method := FindKernelFastNormalClosure,
+            args := ShallowCopy(RECOG_FindKernelFastNormalClosureStandardArgumentValues))
+    );
     if IsMatrixGroup(H) then
         ri!.field := FieldOfMatrixGroup(H);
         ri!.dimension := DimensionOfMatrixGroup(H);
