@@ -18,6 +18,7 @@
 
 BindGlobal("RECOG_FindKernelFastNormalClosureStandardArgumentValues",
            Immutable([6, 3]));
+BindConstant("RECOG_NrElementsInImmediateVerification", 10);
 
 # a nice view method:
 RECOG_ViewObj := function( level, ri )
@@ -571,7 +572,7 @@ InstallGlobalFunction( RecogniseGeneric,
         # Now create the kernel generators with the stored method:
         succ := CallFuncList(findgensNmeth(ri).method,
                              Concatenation([ri],findgensNmeth(ri).args));
-    until succ;
+    until succ = true;
 
     # If nobody has set how we produce preimages of the nicegens:
     if not Hascalcnicegens(ri) then
@@ -594,7 +595,11 @@ InstallGlobalFunction( RecogniseGeneric,
         od;
         SetgensN(ri,ll);
     fi;
-    if Length(gensN(ri)) = 0 then
+    if IsEmpty(gensN(ri)) and immediateverification(ri) then
+        # Special case, for an explanation see the source of the called function.
+        RECOG_HandleSpecialCaseKernelTrivialAndMarkedForImmediateVerification(ri);
+    fi;
+    if IsEmpty(gensN(ri)) then
         # We found out that N is the trivial group!
         # In this case we do nothing, kernel is fail indicating this.
         Info(InfoRecog,2,"Found trivial kernel (depth=",depth,").");
@@ -626,41 +631,9 @@ InstallGlobalFunction( RecogniseGeneric,
 
         done := true;
         if IsReady(riker) and immediateverification(ri) then
-            # Do an immediate verification:
-            Info(InfoRecog,2,"Doing immediate verification.");
-            for i in [1..5] do
-                # We must use different random elements than the kernel
-                # finding routines!
-                x := RandomElm(ri,"KERNELANDVERIFY",true).el;
-                Assert(2, ValidateHomomInput(ri, x));
-                s := SLPforElement(rifac,ImageElm( Homom(ri), x!.el ));
-                if s = fail then
-                    ErrorNoReturn("Very bad: image was wrongly recognised and we ",
-                                  "found out too late");
-                fi;
-                y := ResultOfStraightLineProgram(s, ri!.pregensfacwithmem);
-                z := x*y^-1;
-                s := SLPforElement(riker,z!.el);
-                if InfoLevel(InfoRecog) >= 2 then Print(".\c"); fi;
-                if s = fail then
-                    # We missed something!
-                    done := false;
-                    Add(gensN(ri),z);
-                    Info(InfoRecog,2,
-                         "Alarm: Found unexpected kernel element! (depth=",
-                         depth,")");
-                fi;
-            od;
-            if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;
-            if not done then
-                succ := FindKernelFastNormalClosure(ri,5,5);
-                Info(InfoRecog,2,"Have now ",Length(gensN(ri)),
-                     " generators for kernel, recognising...");
-                if succ = false then
-                    ErrorNoReturn("Very bad: image was wrongly recognised and we ",
-                                  "found out too late");
-                fi;
-            fi;
+            Info(InfoRecog,2,"Doing immediate verification (depth=",
+                 depth,").");
+            done := ImmediateVerification(ri);
         fi;
     until done;
 

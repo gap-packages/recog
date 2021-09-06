@@ -554,6 +554,7 @@ function(ri,G)
       AddMethod(InitialDataForKernelRecogNode(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
   fi;
   InitialDataForKernelRecogNode(ri).blocks := ri!.blocks;
+  Setimmediateverification(ri, true);
   return Success;
 end);
 
@@ -818,6 +819,9 @@ function(ri,G)
   SetHomom(ri,hom);
   # Now give hints downward:
   Setmethodsforimage(ri,FindHomDbProjective);
+  # Make sure that immediate verification is performed to safeguard against the
+  # kernel being too small.
+  Setimmediateverification(ri, true);
   # note that RecogniseGeneric detects the use of FindHomDbProjective and
   # sets ri!.projective := true for the image
   # the kernel:
