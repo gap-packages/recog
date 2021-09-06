@@ -107,7 +107,8 @@ gap> TestRecogGL(7,5);;
 Stamp: ClassicalNatural
 gap> TestRecogGL(8,5);;
 Stamp: ClassicalNatural
-gap> #TestRecogGL(9,5);; # FIXME buggy, see issue #37
+gap> TestRecogGL(9,5);;
+Stamp: ClassicalNatural
 gap> TestRecogGL(10,5);;
 Stamp: ClassicalNatural
 gap> TestRecogGL(17,5);;
@@ -224,7 +225,8 @@ gap> TestRecogGL(6,27);;
 Stamp: ClassicalNatural
 gap> TestRecogGL(7,27);;
 Stamp: ClassicalNatural
-gap> #TestRecogGL(8,27);; # FIXME: see issue #12
+gap> TestRecogGL(8,27);;
+Stamp: ClassicalNatural
 gap> TestRecogGL(9,27);;
 Stamp: ClassicalNatural
 gap> TestRecogGL(10,27);;

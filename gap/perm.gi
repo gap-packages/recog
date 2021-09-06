@@ -68,6 +68,9 @@ function(ri, G)
     # store the homomorphism into the recognition node
     SetHomom(ri,hom);
 
+    # TODO: explanation
+    Setimmediateverification(ri, true);
+
     # indicate success
     return Success;
 end);
