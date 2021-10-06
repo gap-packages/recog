@@ -3,39 +3,10 @@ gap> START_TEST("bugfix.tst");
 gap> oldInfoLevel := InfoLevel(InfoRecog);;
 gap> SetInfoLevel(InfoRecog, 0);
 
-# See https://github.com/gap-packages/recog/issues/1
-gap> gens := [];; e:=Z(2)^0;;
-gap> mat:=IdentityMat(4,GF(2));; mat[1,2]:=e;; Add(gens, mat);
-gap> mat:=IdentityMat(4,GF(2));; mat[2,1]:=e;; Add(gens, mat);
-gap> mat:=IdentityMat(4,GF(2));; mat[3,2]:=e;; Add(gens, mat);
-gap> mat:=IdentityMat(4,GF(2));; mat[4,3]:=e;; Add(gens, mat);
-gap> G:=Group(gens);
-<matrix group with 4 generators>
-gap> ri:=RECOG.TestGroup(G, false, 192);;
-gap> outsider:=Reversed(IdentityMat(4,GF(2)));;
-gap> outsider in ri;
-false
-
 # Issue #11.
 gap> G1 := Group(Z(3)^0 * [ [[1,0,0],[0,1,0],[0,0,-1]], [[1,-1,-1],[0,0,1],[0,-1,0]] ]);;
 gap> for i in [1..50] do
 >     ri := RECOG.TestGroup(G1, false, 72);
-> od;
-
-# Issue #16
-gap> g := DirectProduct(SymmetricGroup(12),SymmetricGroup(5));;
-gap> for i in [1..30] do
->   h:=g^Random(SymmetricGroup(37));
->   r:=RecogniseGroup(h);
->   if Size(r) <> Size(g) then ErrorNoReturn("wrong size"); fi;
-> od;
-
-# Issue #37
-gap> for i in [1..50] do
->     ri := RECOG.TestGroup(GL(9,5), false, Size(GL(9,5)));
-> od;
-gap> for i in [1..50] do
->     ri := RECOG.TestGroup(GL(8,27), false, Size(GL(8,27)));
 > od;
 
 # The following test used to run into an error
@@ -47,35 +18,13 @@ gap> Reset(GlobalRandomSource, seedRS);;
 gap> G:=ClassicalMaximals("L",3,3)[4];;
 gap> ri:=RECOG.TestGroup(G, false, 24);;
 
-# verify issue #38 is resolved
-gap> RECOG.TestGroup(SymmetricGroup(11), false, Factorial(11));
-<recognition node Giant AlmostSimple Size=39916800>
-
-# See https://github.com/gap-packages/recog/issues/65
-gap> RecogniseGroup(SL(2,2));
-<recognition node GoProjective Dim=2 Field=2
- F:<recognition node (projective) ClassicalNatural_PSL2Even Size=6 Dim=
-2 Field=2>
- K:<trivial kernel>
-gap> RecogniseGroup(SL(2,3));
-<recognition node GoProjective Dim=2 Field=3
- F:<recognition node (projective) ClassicalNatural_PSL2Odd Size=12 Dim=
-2 Field=3>
- K:<recognition node DiagonalMatrices Dim=2 Field=3
-    F:<recognition node Scalar Dim=1 Field=3>
-    K:<trivial kernel>>
-gap> RecogniseGroup(SL(2,4));
-<recognition node GoProjective Dim=2 Field=4
- F:<recognition node (projective) ClassicalNatural_PSL2Even Simple Size=
-60 Dim=2 Field=4>
- K:<trivial kernel>
-gap> RecogniseGroup(SL(2,5));
-<recognition node GoProjective Dim=2 Field=5
- F:<recognition node (projective) ClassicalNatural_PSL2Odd Simple Size=60 Dim=
-2 Field=5>
- K:<recognition node DiagonalMatrices Dim=2 Field=5
-    F:<recognition node Scalar Dim=1 Field=5>
-    K:<trivial kernel>>
+# Issue #37
+gap> for i in [1..50] do
+>     ri := RECOG.TestGroup(GL(9,5), false, Size(GL(9,5)));
+> od;
+gap> for i in [1..50] do
+>     ri := RECOG.TestGroup(GL(8,27), false, Size(GL(8,27)));
+> od;
 
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
