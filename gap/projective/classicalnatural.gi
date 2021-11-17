@@ -1572,7 +1572,7 @@ RECOG.IsThisSL2Natural := function(gens,f)
           Add(coms,x);
       od;
   fi;
-  if ForAll(coms, RECOG.IsScalarMat) then
+  if ForAll(coms, IsDiagonalMat) then
       Info(InfoRecog,4,"SL2: Group is soluble, commutators are central");
       return false;
   fi;
@@ -1583,7 +1583,7 @@ RECOG.IsThisSL2Natural := function(gens,f)
           return true;
       fi;
   od;
-  if ForAll(clos{[Length(coms)+1..Length(clos)]}, RECOG.IsScalarMat) then
+  if ForAll(clos{[Length(coms)+1..Length(clos)]}, IsDiagonalMat) then
       Info(InfoRecog,4,"SL2: Group is soluble, derived subgroup central");
       return false;
   fi;

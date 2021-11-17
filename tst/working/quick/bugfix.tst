@@ -54,6 +54,13 @@ gap> RecogniseGroup(SL(2,5));
     F:<recognition node Scalar Dim=1 Field=5>
     K:<trivial kernel>>
 
+# We had a bug where RECOG.IsScalarMat was used incorrectly (return value was
+# assumed to be true or false, but could be an FFE). This example used to
+# trigger the error, which looked like this:
+#   Error, <expr> must be 'true' or 'false' (not an ffe)
+gap> RECOG.IsThisSL2Natural([ [ [ 0*Z(5), Z(5^2)^9 ], [ Z(5^2)^3, 0*Z(5) ] ], [ [ Z(5), 0*Z(5) ], [ 0*Z(5), Z(5)^3 ] ] ], GF(5^2));
+false
+
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
 gap> STOP_TEST("bugfix.tst");
