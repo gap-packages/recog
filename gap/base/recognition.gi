@@ -43,7 +43,7 @@ RECOG_ViewObj := function( level, ri )
             Print(ms);
         fi;
         if IsBound(ri!.comment) then
-            Print(ri!.comment);
+            Print(" Comment=", ri!.comment);
         fi;
     fi;
     if HasIsRecogInfoForSimpleGroup(ri) and IsRecogInfoForSimpleGroup(ri) then

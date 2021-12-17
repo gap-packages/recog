@@ -257,7 +257,7 @@ RECOG.SortOutReducibleNormalSubgroup :=
                   4000);
         # This is an isomorphism:
         findgensNmeth(ri).method := FindKernelDoNothing;
-        ri!.comment := "_D4TensorDec";
+        ri!.comment := "D4TensorDec";
         return Success;
     fi;
     Info(InfoRecog,2,"D247:Using action on the set of homogeneous components",
@@ -295,7 +295,7 @@ ConvertToMatrixRep(homcomp,Size(f));
     a := OrbActionHomomorphism(G,o);
     SetHomom(ri,a);
     Setmethodsforimage(ri,FindHomDbPerm);
-    ri!.comment := "_D2Imprimitive";
+    ri!.comment := "D2Imprimitive";
     Setimmediateverification(ri,true);
     findgensNmeth(ri).args[1] := Length(o)+6;
     findgensNmeth(ri).args[2] := 4;
@@ -332,7 +332,7 @@ RECOG.SortOutReducibleSecondNormalSubgroup :=
                 Setmethodsforimage(ri,FindHomDbPerm);
                 Info(InfoRecog,2,"D247: Success, found D7 with action",
                      " on ",mult," direct factors.");
-                ri!.comment := "_D7TensorInduced";
+                ri!.comment := "D7TensorInduced";
                 return Success;
             else
                 Info(InfoRecog,2,"D247: Did not find direct factors!");
