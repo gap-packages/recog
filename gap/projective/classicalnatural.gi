@@ -3246,10 +3246,10 @@ function(ri, g)
       Info(InfoRecog,2,"ClassicalNatural: this is PSL_2!");
       if IsEvenInt(q) then
           std := RECOG.RecogniseSL2NaturalEvenChar(gm,f,false);
-          ri!.comment := "_PSL2Even";
+          ri!.comment := "PSL2Even";
       else
           std := RECOG.RecogniseSL2NaturalOddCharUsingBSGS(gm,f);
-          ri!.comment := "_PSL2Odd";
+          ri!.comment := "PSL2Odd";
       fi;
       Setslptonice(ri,SLPOfElms(std.all));
       ri!.nicebas := std.bas;
@@ -3270,7 +3270,7 @@ function(ri, g)
               # FIXME: Note d=3 currently has a problem in the SL2-finder.
               Info(InfoRecog,2,"Classical natural: SL(",d,",",q,"): small ",
                    "case, handing over to Schreier-Sims.");
-              ri!.comment := Concatenation("_SL(",String(d),",",String(q),")",
+              ri!.comment := Concatenation("SL(",String(d),",",String(q),")",
                                            "_StabilizerChain");
               return FindHomMethodsProjective.StabilizerChainProj(ri,g);
           fi;
@@ -3285,7 +3285,7 @@ function(ri, g)
                       x->std.basi*x*std.bas));
           ri!.fakegens := RECOG.InitSLfake(f,d);
           ri!.fakegens.count := 0;
-          ri!.comment := "_PSLd";
+          ri!.comment := "PSLd";
           ri!.gcd := gcd;
           SetFilterObj(ri,IsLeaf);
           SetSize(ri,Product([0..d-1],i->(q^d-q^i))/((q-1)*gcd.gcd));

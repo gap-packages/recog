@@ -57,7 +57,7 @@ function(ri, G)
       Setslptonice( ri, StraightLineProgramNC([[[1,0]]],
                                               Length(GeneratorsOfGroup(G))));
       SetFilterObj(ri,IsLeaf);
-      ri!.comment := "_BlocksDim=1";
+      ri!.comment := "BlocksDim=1";
       return Success;
   fi;
 

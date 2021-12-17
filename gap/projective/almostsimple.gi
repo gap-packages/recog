@@ -194,7 +194,7 @@ InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
                 SetIsRecogInfoForSimpleGroup(ri,hint.issimple);
             fi;
             SetIsRecogInfoForAlmostSimpleGroup(ri,true);
-            ri!.comment := Concatenation("_",hint.name);
+            ri!.comment := hint.name;
             return true;
         od;
     fi;
@@ -976,7 +976,7 @@ function(ri,G)
               SetHomom(ri,hom);
               Setmethodsforimage(ri,FindHomDbPerm);
 
-              ri!.comment := "_FDPM";
+              ri!.comment := "FDPM";
               return Success;
           fi;
       fi;
@@ -1024,7 +1024,7 @@ function(ri,G)
 #           ForgetMemory(r[3][1]);
 #           SetFilterObj(ri,IsLeaf);
 #           SetIsRecogInfoForSimpleGroup(ri,true);
-#           ri!.comment := "_Alt";
+#           ri!.comment := "Alt";
 #           return Success;
 #       else   # r[1] = "Sn"
 #           Info(InfoRecog,2,"Found Sym(",deg,")!");
@@ -1037,7 +1037,7 @@ function(ri,G)
 #           ForgetMemory(r[3][1]);
 #           SetFilterObj(ri,IsLeaf);
 #           SetIsRecogInfoForAlmostSimpleGroup(ri,true);
-#           ri!.comment := "_Sym";
+#           ri!.comment := "Sym";
 #           return Success;
 #       fi;
 #   od;
