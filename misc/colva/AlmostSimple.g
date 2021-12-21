@@ -64,7 +64,7 @@ StableDerivative := function(G)
        r := PseudoRandomNormalClosureElement(G,H);
        Add(gens,Ggens[i]^-1*r^-1*Ggens[i]*r);
    od;
-   gens := FastNormalClosure(Ggens,gens,1);
+   gens := FastNormalClosure(G,gens,1);
    H := GroupWithGenerators(gens);
    G := ShallowCopy(H);
   until IsProbablyPerfect(G);

@@ -357,7 +357,7 @@ LowIndexMaps := function(G,ri)
  kgens := List([1..15],i->PseudoRandom(G));
  kims := List(kgens,x->ImageElm(rho,x));
  kgens := List([1..15],i->kgens[i]*ImageElm(rhoinv,kims[i])^-1);
- kgens := FastNormalClosure(GeneratorsOfGroup(G),kgens,3);
+ kgens := FastNormalClosure(Grp(ri),kgens,3);
 
 # Compute the stabilizer of 1 in P
  s1gens := List(GeneratorsOfGroup(Stabiliser(P,1)),x->ImageElm(rhoinv,x));
