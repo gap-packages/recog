@@ -683,7 +683,7 @@ RECOG.simplesocle := function(ri,g)
     comm3:=Comm(comm2,comm2^y);
   until not ri!.isone(comm3);
 
-  gensH:=FastNormalClosure(GeneratorsOfGroup(g),[comm3],20);
+  gensH:=FastNormalClosure(g,[comm3],20);
 
   return gensH;
 end;

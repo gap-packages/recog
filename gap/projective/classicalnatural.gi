@@ -1469,7 +1469,7 @@ RECOG.GuessProjSL2ElmOrder := function(x,f)
   return o;
 end;
 
-RECOG.IsThisSL2Natural := function(gens,f)
+RECOG.IsThisSL2Natural := function(ri,gens,f)
   # Checks quickly whether or not this is SL(2,f).
   # The answer is not guaranteed to be correct, this is Las Vegas.
   local CheckElm,a,b,clos,coms,i,isabelian,j,l,notA5,p,q,S,seenqm1,seenqp1,x;
@@ -3193,7 +3193,7 @@ function(ri, g)
 
   # First check whether we are applicable:
   if d = 2 then
-      if not RECOG.IsThisSL2Natural(GeneratorsOfGroup(g),f) then
+      if not RECOG.IsThisSL2Natural(ri,GeneratorsOfGroup(g),f) then
           Info(InfoRecog,2,"ClassicalNatural: Is not PSL_2.");
           return fail; # FIXME: fail = TemporaryFailure here really correct?
       fi;

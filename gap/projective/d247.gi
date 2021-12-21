@@ -362,7 +362,7 @@ function(ri, G)
     # This is called with an element that we hope lies in a normal subgroup.
     local H,a,basis,collf,conjgensG,count,dim,hom,homcomp,homs,homsimg,i,
           kro,m,mm,mult,ngens,nngens,o,orb,pr,r,subdim,y,z;
-    ngens := FastNormalClosure(GeneratorsOfGroup(G),[x],4);
+    ngens := FastNormalClosure(G,[x],4);
     m := GModuleByMats(ngens,f);
     if MTX.IsIrreducible(m) then
         if not ispower then
@@ -440,7 +440,7 @@ function(ri, G)
   CheckNormalClosure := function(x)
     # This is called with an element that we hope lies in a normal subgroup.
     local m,ngens;
-    ngens := FastNormalClosure(GeneratorsOfGroup(G),x,4);
+    ngens := FastNormalClosure(G,x,4);
     m := GModuleByMats(ngens,f);
     if not IsIrreducible(m) then
         Info(InfoRecog,2,"Proto: Seem to have found something!");
