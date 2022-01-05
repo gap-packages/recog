@@ -452,35 +452,38 @@ InstallGlobalFunction( RecogniseGeneric,
     fi;
 
     # Set up the record and the group object:
-    if IsIdenticalObj( methoddb, FindHomDbProjective ) then
-        ri := EmptyRecognitionInfoRecord(knowledge,H,true);
-    else
-        ri := EmptyRecognitionInfoRecord(knowledge,H,false);
-    fi;
+    ri := EmptyRecognitionInfoRecord(
+        knowledge,
+        H,
+        IsIdenticalObj( methoddb, FindHomDbProjective )
+    );
     # was here earlier: Setcalcnicegens(ri,CalcNiceGensGeneric);
     Setmethodsforimage(ri,methoddb);
 
-    # Find a possible homomorphism (or recognise this group as leaf)
+    # Combine database of find homomorphism methods with hints
     allmethods := methoddb;
     if IsBound(knowledge.hints) then
         allmethods := Concatenation(allmethods, knowledge.hints);
         SortBy(allmethods, a -> -a.rank);
     fi;
-
     # verify no rank occurs more than once
     Assert(0, Length(Set(allmethods, m->m.rank)) = Length(allmethods));
 
+    # Find a possible homomorphism (or recognise this group as leaf)
     Setfhmethsel(ri, CallMethods( allmethods, 10, ri, H ));
     # TODO: extract the value 10 into a named constant, and / or make it
     #       an option parameter to the func
 
     # Reset the pseudo random stamp:
     RECOG.SetPseudoRandomStamp(Grp(ri),"PseudoRandom");
+
+    # Handle the unfinished case:
     if fhmethsel(ri).result = TemporaryFailure then
-        # FIXME: shouldn't we print an error here? at least if the user called us...
-        # Perhaps yes: this is an ri which does NOT have IsReady set, and may be useful for debugging...
         SetFilterObj(ri,IsLeaf);
         if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
+        Info(InfoRecog, 1,
+             "RecogNode <ri> could not be recognised,",
+             " IsReady(<ri>) is not set, recognition aborts");
         return ri;
     fi;
 
@@ -504,10 +507,9 @@ InstallGlobalFunction( RecogniseGeneric,
                 SetNiceGens(ri,GeneratorsOfGroup(H));
             fi;
         fi;
-        # these two were set correctly by FindHomomorphism
-        if IsLeaf(ri) then SetFilterObj(ri,IsReady); fi;
         if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
         # StopStoringRandEls(ri);
+        SetFilterObj(ri,IsReady);
         return ri;
     fi;
 
@@ -519,8 +521,10 @@ InstallGlobalFunction( RecogniseGeneric,
     repeat
         counter := counter + 1;
         if counter > 10 then
-            Info(InfoRecog,1,"Giving up desperately...");
             if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
+            Info(InfoRecog, 1,
+                 "ImageRecogNode of RecogNode <ri> could not be recognised,",
+                 " IsReady(<ri>) is not set, recognition aborts");
             return ri;
         fi;
 
@@ -540,7 +544,7 @@ InstallGlobalFunction( RecogniseGeneric,
         Add(depthString,'F');
         rifac := RecogniseGeneric(
                   Group(List(GeneratorsOfGroup(H), x->ImageElm(Homom(ri),x))),
-                  methodsforimage(ri), depthString, InitialDataForImageRecogNode(ri) ); # TODO: change InitialDataForImageRecogNode to hintsForFactor??)
+                  methodsforimage(ri), depthString, InitialDataForImageRecogNode(ri) );
         Remove(depthString);
         PrintTreePos("F",depthString,H);
         SetImageRecogNode(ri,rifac);
@@ -555,7 +559,7 @@ InstallGlobalFunction( RecogniseGeneric,
         fi;
 
         if not IsReady(rifac) then
-            # the recognition of the image failed, also give up here:
+            # IsReady was not set, thus abort the whole computation.
             if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
             return ri;
         fi;
@@ -576,8 +580,8 @@ InstallGlobalFunction( RecogniseGeneric,
     fi;
 
     # Do a little bit of preparation for the generators of N:
-    l := gensN(ri);
     if not IsBound(ri!.leavegensNuntouched) then
+        l := gensN(ri);
         Sort(l,SortFunctionWithMemory);   # this favours "shorter" memories!
         # FIXME: For projective groups different matrices might stand
         #        for the same element, we might overlook this here!
@@ -602,9 +606,9 @@ InstallGlobalFunction( RecogniseGeneric,
         SetKernelRecogNode(ri,fail);
         # We have to learn from the image, what our nice generators are:
         SetNiceGens(ri,pregensfac(ri));
-        SetFilterObj(ri,IsReady);
         if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
         # StopStoringRandEls(ri);
+        SetFilterObj(ri,IsReady);
         return ri;
     fi;
 
@@ -625,20 +629,22 @@ InstallGlobalFunction( RecogniseGeneric,
         SetParentRecogNode(riker,ri);
         Info(InfoRecog,2,"Back from kernel (depth=",depth,").");
 
+        if not IsReady(riker) then
+            # IsReady is not set, thus the whole computation aborts.
+            return ri;
+        fi;
         done := true;
-        if IsReady(riker) and immediateverification(ri) then
+        if immediateverification(ri) then
             Info(InfoRecog,2,"Doing immediate verification (depth=",
                  depth,").");
             done := ImmediateVerification(ri);
         fi;
     until done;
 
-    if IsReady(riker) then    # we are only ready when the kernel is
-        SetNiceGens(ri,Concatenation(pregensfac(ri), NiceGens(riker)));
-        SetFilterObj(ri,IsReady);
-    fi;
+    SetNiceGens(ri,Concatenation(pregensfac(ri), NiceGens(riker)));
     if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
     # StopStoringRandEls(ri);
+    SetFilterObj(ri,IsReady);
     return ri;
   end);
 
