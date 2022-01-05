@@ -60,11 +60,17 @@ DeclareFilter( "IsLeaf" );
 ## <Filt Name="IsReady" Type="Flag"/>
 ## <Description>
 ## This flag indicates during the recognition procedure, whether a node in
-## the recognition tree is already completed or not. It is mainly set for
-## debugging purposes during the recognition. However, if the recognition
-## fails somewhere in a leaf, this flag is not set and all nodes above will
-## also not have this flag set. In this way one can see whether the recognition
-## failed and where the problem was.
+## the recognition tree was recognized completely. For leaves this means that
+## recognition terminated without throwing errors. For non-leaf nodes this
+## means that a homomorphism was computed and both image and kernel nodes are
+## ready or non-existent (if the kernel is trivial).
+## <P/>
+## This does not mean, that the result of the recognition procedure was
+## verified and proven to be mathematically correct!
+## <P/>
+## In particular, computing <Ref Oper="Size"/> and member ship test via <Ref
+## Oper="\\in"/> can only be done for <Ref Filt="IsRecogNode"/> objects which
+## have <Ref Filt="IsReady"/> set.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>

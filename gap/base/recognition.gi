@@ -506,10 +506,6 @@ InstallGlobalFunction( RecogniseGeneric,
         fi;
         # these two were set correctly by FindHomomorphism
         if IsLeaf(ri) then SetFilterObj(ri,IsReady); fi;
-        # FIXME: settle what IsReady means *exactly*;
-        # if it means that the leaf is "guaranteed" to be mathematically correct,
-        # then we need to verify that this is really always the case (for some
-        # methods, one might doubt this...)
         if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
         # StopStoringRandEls(ri);
         return ri;
