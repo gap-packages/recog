@@ -638,13 +638,7 @@ InstallGlobalFunction( RecogniseGeneric,
     until done;
 
     if IsReady(riker) then    # we are only ready when the kernel is
-        # Now make the two projection slps:
         SetNiceGens(ri,Concatenation(pregensfac(ri), NiceGens(riker)));
-        #ll := List([1..Length(NiceGens(rifac))],i->[i,1]);
-        #ri!.proj1 := StraightLineProgramNC([ll],Length(NiceGens(ri)));
-        #ll := List([1..Length(NiceGens(riker))],
-        #           i->[i+Length(NiceGens(rifac)),1]);
-        #ri!.proj2 := StraightLineProgramNC([ll],Length(NiceGens(ri)));
         SetFilterObj(ri,IsReady);
     fi;
     if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
