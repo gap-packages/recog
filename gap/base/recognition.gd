@@ -59,18 +59,19 @@ DeclareFilter( "IsLeaf" );
 ## <ManSection>
 ## <Filt Name="IsReady" Type="Flag"/>
 ## <Description>
-## This flag indicates during the recognition procedure, whether a node in
-## the recognition tree was recognized completely. For leaves this means that
-## recognition terminated without throwing errors. For non-leaf nodes this
-## means that a homomorphism was computed and both image and kernel nodes are
-## ready or non-existent (if the kernel is trivial).
+## This flag is set for a <Ref Filt="IsRecogNode"/> object <C>node</C> by <Ref
+## Func="RecogniseGeneric"/>, if recognition of the <E>subtree</E> rooted in
+## <C>node</C> finished successfully.
+## Recognition of a node is considered successful, if <Ref Func="CallMethods"/>
+## reports <K>Success</K>, that is if a method from the respective method
+## database (see Section <Ref Sect="methoddatabases"/>) was successful.
+## Thus, if the <Ref Filt="IsReady"/> flag is set, this does not necessarily
+## mean, that the result of the recognition procedure was verified and proven
+## to be mathematically correct!
 ## <P/>
-## This does not mean, that the result of the recognition procedure was
-## verified and proven to be mathematically correct!
-## <P/>
-## In particular, computing <Ref Oper="Size"/> and member ship test via <Ref
-## Oper="\\in"/> can only be done for <Ref Filt="IsRecogNode"/> objects which
-## have <Ref Filt="IsReady"/> set.
+## In particular, any computations using the datastructure set up by the
+## recognition procedure, like <Ref Oper="Size"/> and membership testing via
+## <Ref Oper="\\in"/>, will error if <Ref Filt="IsReady"/> is not set.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
