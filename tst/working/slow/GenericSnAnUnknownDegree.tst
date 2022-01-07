@@ -24,7 +24,7 @@ gap> AddMethod(FindHomDbProjective, FindHomMethodsGeneric.SnAnUnknownDegree, 122
 # tests RECOG.ThreeCycleCandidatesIterator and RECOG.BolsteringElements
 gap> testFunction := function(G, eps, N)
 >     local ri, iterator, candidate, i, j;
->     ri := EmptyRecognitionInfoRecord(rec(), G, false);
+>     ri := RecogNode(G);
 >     iterator := RECOG.ThreeCycleCandidatesIterator(ri, RECOG.ThreeCycleCandidatesConstants(eps, N));
 >     for i in [1 .. 4] do
 >         candidate := iterator();
@@ -137,13 +137,13 @@ gap> for i in [1 .. Length(altMatGroups)] do
 >     RECOG.TestGroup(altMatGroups[i], true, Size(altMatGroups[i]));
 > od;
 gap> for i in [1 .. Length(nonAltOrSymGroups)] do
->     if FindHomMethodsGeneric.SnAnUnknownDegree(EmptyRecognitionInfoRecord(rec(), nonAltOrSymGroups[i], false), nonAltOrSymGroups[i]) = Success then
+>     if FindHomMethodsGeneric.SnAnUnknownDegree(RecogNode(nonAltOrSymGroups[i]), nonAltOrSymGroups[i]) = Success then
 >         Print("ERROR: Recognised group [", i, "] wrongly as Sn/An!\n");
 >     fi;
 > od;
 
 # RECOG.IsFixedPoint
-gap> ri := EmptyRecognitionInfoRecord(rec(), SymmetricGroup(10), false);;
+gap> ri := RecogNode(SymmetricGroup(10));;
 gap> g := (1,2,3,4,5,6,7,8);;
 gap> c := (1,2,3);;
 gap> r := (1,2)(4,5,6);;
@@ -154,7 +154,7 @@ gap> RECOG.IsFixedPoint(ri, g,c,r);
 false
 
 # RECOG.AdjustCycle
-gap> ri := EmptyRecognitionInfoRecord(rec(), SymmetricGroup(10), false);;
+gap> ri := RecogNode(SymmetricGroup(10));;
 gap> g := (1,2,3,4,5,6,7,8);;
 gap> c := (1,2,3);;
 gap> r := (4,5);;
@@ -189,7 +189,7 @@ gap> RECOG.AdjustCycle(ri, g, c, r, 8);
 (3,5,4,6)
 
 # RECOG.BuildCycle
-gap> ri := EmptyRecognitionInfoRecord(rec(), SymmetricGroup(10), false);;
+gap> ri := RecogNode(SymmetricGroup(10));;
 
 # c = (u,v,w)
 gap> c := (1,2,3);;
@@ -250,7 +250,7 @@ gap> RECOG.BuildCycle(ri, c, x, 10);
 # representation.
 gap> sets := Combinations([1 .. 11], 2);;
 gap> S11On2Sets := Action(SymmetricGroup(11), sets, OnSets);;
-gap> ri := EmptyRecognitionInfoRecord(rec(), S11On2Sets, false);;
+gap> ri := RecogNode(S11On2Sets);;
 gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri, S11On2Sets);;
 gap> isoData := ri!.SnAnUnknownDegreeIsoData;;
 gap> gens := GeneratorsOfGroup(S11On2Sets);;
@@ -270,7 +270,7 @@ gap> CycleStructurePerm(img2);
 gap> for d in [11 .. 14] do
 > sets := Combinations([1 .. d], 2);;
 > SdOn2Sets := Action(SymmetricGroup(d), sets, OnSets);;
-> ri := EmptyRecognitionInfoRecord(rec(), SdOn2Sets, false);;
+> ri := RecogNode(SdOn2Sets);;
 > success := FindHomMethodsGeneric.SnAnUnknownDegree(ri, SdOn2Sets);
 > if not success or not Size(ri) = Factorial(d) then
 >   Print("wrong result! degree ", d, "\n");
@@ -281,7 +281,7 @@ gap> for d in [11 .. 14] do
 gap> for d in [11 .. 14] do
 > sets := Combinations([1 .. d], 2);;
 > SdOn2Sets := Action(AlternatingGroup(d), sets, OnSets);;
-> ri := EmptyRecognitionInfoRecord(rec(), SdOn2Sets, false);;
+> ri := RecogNode(SdOn2Sets);;
 > success := FindHomMethodsGeneric.SnAnUnknownDegree(ri, SdOn2Sets);
 > if not success or not Size(ri) = Factorial(d)/2 then
 >   Print("wrong result! degree ", d, "\n");
@@ -289,7 +289,7 @@ gap> for d in [11 .. 14] do
 > od;
 
 # Check Slp function
-gap> ri := EmptyRecognitionInfoRecord(rec(), S11On2Sets, false);;
+gap> ri := RecogNode(S11On2Sets);;
 gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri, S11On2Sets);
 true
 gap> x := PseudoRandom(Grp(ri));;

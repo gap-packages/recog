@@ -186,7 +186,7 @@ RecogniseQuasiSimple := function(G,name)
  else
 # Use Shortotbits and consider the group as a perm grp
    re := rec();
-   Objectify(RecognitionInfoType,re);;
+   Objectify(RecogNodeType,re);;
    FindHomMethodsMatrix.ShortOrbits(re,G);
 # Perm Image
    GtoP := Homom(re);

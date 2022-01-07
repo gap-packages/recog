@@ -342,7 +342,7 @@ end);
 
 # setup the new record for the factor - this is the product of ImageRecogNode(ri) and ImageRecogNode(riker)
  nrifac := rec();
- Objectify( RecognitionInfoType, nrifac );;
+ Objectify( RecogNodeType, nrifac );;
 
 #new factor group is direct product of old factor groups, both are now in the socle.
  SetGrp(nrifac,D);
@@ -366,7 +366,7 @@ end);
 # setup the new record for the subgroup - nri will take the place of the old ri, but iwth
 #ker(riker) as its kernel and nrifac, the new socle, as its factor.
  nri := rec();
- Objectify( RecognitionInfoType, nri );;
+ Objectify( RecogNodeType, nri );;
  SetImageRecogNode(nri,nrifac);
  SetGrp(nri,Grp(ri));
  if HasParentRecogNode(ri) then
@@ -425,9 +425,9 @@ SwapFactors := function(ri,zeta)
 
 # setup the new record for the factor
  nri := rec();
- Objectify( RecognitionInfoType, nri );;
+ Objectify( RecogNodeType, nri );;
  nriker := rec();
- Objectify( RecognitionInfoType, nriker );;
+ Objectify( RecogNodeType, nriker );;
 
  SetHomom(nriker,StructuralCopy(Homom(ri)));
  SetHomom(nri,zeta);

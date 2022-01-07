@@ -357,7 +357,7 @@ RECOG.ProduceTrivialStabChainHint := function(name,reps,maxes)
       for m in [1..Length(maxes)] do
           Print("Doing maximal subgroup #",m,"\n");
           hint := rec( name := name, size := size, usemax := [m] );
-          ri := EmptyRecognitionInfoRecord(rec(),g,true);
+          ri := RecogNode(rec(),g,true);
           t := Runtime();
           res := DoHintedStabChain(ri,g,hint);
           t := Runtime() - t;

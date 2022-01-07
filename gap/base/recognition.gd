@@ -24,9 +24,29 @@ BindGlobal( "RecogNodeFamily",
   NewFamily("RecogNodeFamily", IsRecogNode));
 DeclareObsoleteSynonym( "RecognitionInfoFamily", "RecogNodeFamily" );
 # The type:
-BindGlobal( "RecognitionInfoType",
+BindGlobal( "RecogNodeType",
   NewType(RecogNodeFamily, IsRecogNode and IsAttributeStoringRep));
 
+## <#GAPDoc Label="RecogNode">
+## <ManSection>
+## <Oper Name="RecogNode" Arg="H[, projective][, r]"/>
+## <Oper Name="RecogNode" Arg="r, H, projective"/>
+## <Returns>a recognition node.</Returns>
+## <Description>
+## Create an <Ref Filt="IsRecogNode"/> object <C>node</C> representing the
+## group <A>H</A>.
+## The optional boolean <A>projective</A> defaults to false and specifies,
+## in the case that <A>H</A> is a matrix group, whether <A>H</A> is to be
+## interpreted as a projective group.
+## The optional record <A>r</A> defaults to an empty record and is used to
+## initialize the returned <C>node</C>.
+## <P/>
+## For backwards-compatibility, also the order of arguments
+## <C>r, H, projective</C> is accepted.
+## </Description>
+## </ManSection>
+## <#/GAPDoc>
+DeclareOperation( "RecogNode", [ IsGroup, IsBool, IsRecord ]);
 
 # The info class:
 DeclareInfoClass( "InfoRecog" );
@@ -449,8 +469,6 @@ BindGlobal( "SLPforElementFuncsGeneric", rec() );
 
 
 # Our global functions for the main recursion:
-
-DeclareGlobalFunction( "EmptyRecognitionInfoRecord" );
 
 ## <#GAPDoc Label="RecognisePermGroup">
 ## <ManSection>

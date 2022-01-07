@@ -18,6 +18,7 @@
 ReadPackage("recog","gap/base/methods.gi");
 ReadPackage("recog","gap/base/methsel.gi");
 ReadPackage("recog","gap/base/recognition.gi");
+ReadPackage("recog","gap/obsolete.gi");
 
 # The following contain generic functionality for different types of groups:
 

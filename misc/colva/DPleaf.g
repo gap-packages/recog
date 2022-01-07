@@ -314,7 +314,7 @@ SolveLeafDP := function(ri,rifac,name)
  blk := GroupWithGenerators(List(GeneratorsOfGroup(H1),x->ImageElm(H1toblk,x)));
 
  riH1 := rec();
- Objectify(RecognitionInfoType,riH1);;
+ Objectify(RecogNodeType,riH1);;
 
  SetGrp(riH1,H1);
  blkdata := RecogniseLeaf(riH1,blk,name);;
