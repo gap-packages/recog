@@ -129,7 +129,7 @@ InstallGlobalFunction( RecogniseGroup,
 InstallGlobalFunction( TryFindHomMethod,
   function( g, method, projective )
     local result,ri;
-    ri := EmptyRecognitionInfoRecord(rec(),g,projective);
+    ri := RecogNode(g,projective);
     Unbind(g!.pseudorandomfunc);
     result := method(ri,g);
     if result in [TemporaryFailure, NeverApplicable] then
@@ -141,11 +141,13 @@ InstallGlobalFunction( TryFindHomMethod,
     fi;
   end );
 
-InstallGlobalFunction( EmptyRecognitionInfoRecord,
-  function(r,H,projective)
+InstallMethod( RecogNode,
+  "standard method",
+  [ IsGroup, IsBool, IsRecord ],
+  function(H,projective,r)
     local ri;
     ri := ShallowCopy(r);
-    Objectify( RecognitionInfoType, ri );
+    Objectify( RecogNodeType, ri );
     SetGrp(ri,H);
     Setslpforelement(ri,SLPforElementGeneric);
     SetgensN(ri,[]);       # this will grow over time
@@ -212,6 +214,20 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     return ri;
   end );
 
+InstallOtherMethod( RecogNode,
+  "for a group",
+  [ IsGroup ],
+  function(H)
+    return RecogNode(H, false, rec());
+  end );
+
+InstallOtherMethod( RecogNode,
+  "for a group and a boolean",
+  [ IsGroup, IsBool ],
+  function(H, projective)
+    return RecogNode(H, projective, rec());
+  end );
+
 # Sets the stamp used by RandomElm, RandomElmOrd, and related functions.
 RECOG.SetPseudoRandomStamp := function(g,st)
   if IsBound(g!.pseudorandomfunc) then
@@ -229,9 +245,9 @@ end;
 # if called with stamp := "B".
 #
 # The components of the recog record involved are explained in
-# EmptyRecognitionInfoRecord.
+# RecogNode.
 #
-# HACK: For recog records created by EmptyRecognitionInfoRecord the method
+# HACK: For recog records created by RecogNode the method
 # RandomElm is by default stored in the component ri!.Grp!.pseudorandomfunc.
 # A method for PseudoRandom is installed such that it calls
 # RandomElm(ri, "PseudoRandom", false).
@@ -452,10 +468,10 @@ InstallGlobalFunction( RecogniseGeneric,
     fi;
 
     # Set up the record and the group object:
-    ri := EmptyRecognitionInfoRecord(
-        knowledge,
+    ri := RecogNode(
         H,
-        IsIdenticalObj( methoddb, FindHomDbProjective )
+        IsIdenticalObj( methoddb, FindHomDbProjective ),
+        knowledge
     );
     # was here earlier: Setcalcnicegens(ri,CalcNiceGensGeneric);
     Setmethodsforimage(ri,methoddb);

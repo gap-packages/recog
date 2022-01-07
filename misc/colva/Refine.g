@@ -24,7 +24,7 @@ InsertSubTree := function(ri,rifac,maps)
 
  lri := []; rri := [];
  lri[1] := rec();
- Objectify(RecognitionInfoType,lri[1]);;
+ Objectify(RecogNodeType,lri[1]);;
 
  SetGrp(lri[1],Grp(ri));
 
@@ -34,7 +34,7 @@ InsertSubTree := function(ri,rifac,maps)
 
  for i in [1..Length(Q)] do
    rri[i] := rec();
-   Objectify(RecognitionInfoType,rri[i]);;
+   Objectify(RecogNodeType,rri[i]);;
    SetGrp(rri[i],Q[i]);
    SetHomom(lri[i],GtoQ[i]);
    SetNiceGens(rri[i],AsList(Pcgs(Q[i])));
@@ -66,7 +66,7 @@ InsertSubTree := function(ri,rifac,maps)
      kgens := [One(overgp)];
    fi;
    lri[i+1] := rec();
-   Objectify(RecognitionInfoType,lri[i+1]);;
+   Objectify(RecogNodeType,lri[i+1]);;
    SetGrp(lri[i+1],GroupWithGenerators(kgens));
    SetKernelRecogNode(lri[i],lri[i+1]);
    SetImageRecogNode(lri[i],rri[i]);

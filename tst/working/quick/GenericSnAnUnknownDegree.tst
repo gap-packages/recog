@@ -10,7 +10,7 @@ gap> AddMethod(FindHomDbProjective, FindHomMethodsGeneric.SnAnUnknownDegree, 122
 gap> for d in [11] do
 > sets := Combinations([1 .. d], 2);;
 > SdOn2Sets := Action(SymmetricGroup(d), sets, OnSets);;
-> ri := EmptyRecognitionInfoRecord(rec(), SdOn2Sets, false);;
+> ri := RecogNode(SdOn2Sets);;
 > success := FindHomMethodsGeneric.SnAnUnknownDegree(ri, SdOn2Sets);
 > if not success or not Size(ri) = Factorial(d) then
 >   Print("wrong result! degree ", d, "\n");
@@ -21,7 +21,7 @@ gap> for d in [11] do
 gap> for d in [11] do
 > sets := Combinations([1 .. d], 2);;
 > SdOn2Sets := Action(AlternatingGroup(d), sets, OnSets);;
-> ri := EmptyRecognitionInfoRecord(rec(), SdOn2Sets, false);;
+> ri := RecogNode(SdOn2Sets);;
 > success := FindHomMethodsGeneric.SnAnUnknownDegree(ri, SdOn2Sets);
 > if not success or not Size(ri) = Factorial(d)/2 then
 >   Print("wrong result! degree ", d, "\n");
@@ -29,7 +29,7 @@ gap> for d in [11] do
 > od;
 
 # Check Slp function
-gap> ri := EmptyRecognitionInfoRecord(rec(), SdOn2Sets, false);;
+gap> ri := RecogNode(SdOn2Sets);;
 gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri, SdOn2Sets);
 true
 gap> x := PseudoRandom(Grp(ri));;

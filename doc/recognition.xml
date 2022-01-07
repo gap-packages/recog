@@ -205,6 +205,10 @@ known. A recognition node always represents a whole binary tree of such
 records, see the attributes <Ref Attr="ImageRecogNode"/> and <Ref Attr="KernelRecogNode"/>
 below. <P/>
 
+Recognition nodes can be created via:
+
+<#Include Label="RecogNode">
+
 The following filters are defined for recognition nodes:
 
 <#Include Label="IsLeaf">
