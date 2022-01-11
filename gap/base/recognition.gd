@@ -82,9 +82,12 @@ DeclareFilter( "IsLeaf" );
 ## This flag is set for a <Ref Filt="IsRecogNode"/> object <C>node</C> by <Ref
 ## Func="RecogniseGeneric"/>, if recognition of the <E>subtree</E> rooted in
 ## <C>node</C> finished successfully.
-## Recognition of a node is considered successful, if <Ref Func="CallMethods"/>
-## reports <K>Success</K>, that is if a method from the respective method
-## database (see Section <Ref Sect="methoddatabases"/>) was successful.
+## Recognition of a node is considered successful, if two conditions hold.
+## First, the call of <Ref Func="CallMethods"/> for this node reports
+## <K>Success</K>, that is a method from the respective method database (see
+## Section <Ref Sect="methoddatabases"/>) was successful.
+## Secondly, the construction of the kernel generators was successful.
+## <P/>
 ## Thus, if the <Ref Filt="IsReady"/> flag is set, this does not necessarily
 ## mean, that the result of the recognition procedure was verified and proven
 ## to be mathematically correct!
