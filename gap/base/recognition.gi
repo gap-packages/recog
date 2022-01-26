@@ -542,6 +542,7 @@ InstallGlobalFunction( RecogniseGeneric,
         IsIdenticalObj( methoddb, FindHomDbProjective ),
         knowledge
     );
+    ri!.mandarins := mandarins;
     if isSafeForMandarins then
         SetFilterObj(ri, IsSafeForMandarins);
     fi;
@@ -596,19 +597,18 @@ InstallGlobalFunction( RecogniseGeneric,
             fi;
         fi;
 
-        # TODO: store the mandarin SLPs here. Make sure, to only write when succesful.
-        # check mandarins now
+        # Check mandarins now
+        mandarinSLPs := [];
         for x in mandarins do
             s := SLPforElement(ri, x);
             if s = fail then
-                # TODO: with the master branch rewriting the gens as slps never
-                # fails. at least we never enter a second iteration of the
-                # "recognise image" loop.
                 Info(InfoRecog, 2,
                      "Enter Mandarin crisis (leaf, depth=", depth, ").");
                 return MANDARIN_CRISIS;
             fi;
+            Add(mandarinSLPs, s);
         od;
+        ri!.mandarinSLPs := mandarinSLPs;
 
         if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
         # StopStoringRandEls(ri);
@@ -641,7 +641,7 @@ InstallGlobalFunction( RecogniseGeneric,
         Assert(2, y <> fail);
         Add(imageMandarins, y);
     od;
-    # TODO: sort the imageMandarins and remove duplicates and trivials
+    # TODO: sort the imageMandarins and handle duplicates and trivials
 
     counter_image := 1;
     repeat
@@ -740,15 +740,32 @@ InstallGlobalFunction( RecogniseGeneric,
 
     # Evaluate mandarins to get kernel mandarins
     kernelMandarins := [];
+    # The image node SLPs are in terms of the generators of the image. Rewrite
+    # these in terms of the generators of H.
+    # TODO, compose: slp to pregensfac -> imageMandarinSLPs[i]
+    # How can I access / store an slpToPregensfac? I don't want to have a
+    # single slp for every element of pregensfac but one slp which returns all.
+    # Btw. for kernels this is stored in gensNslp.
+    imageMandarinSLPs := List(rifac!.mandarinSLPs,
+                              x -> PrependRestrictionToImageNodeSLP(ri, x));
     for i in [1..Length(mandarins)] do
         x := mandarins[i];
+        sx := mandarinSLPs[i];
         y := imageMandarins[i];
-        s := SLPforElement(rifac, y);
-        # TODO: These SLPs should be stored when they are computed for the
-        # first time. In particular, they can't be fail.
-        z := ResultOfStraightLineProgram(s, pregensfac(ri));
+        sy := imageMandarinSLPs[i];
+        z := ResultOfStraightLineProgram(sy, pregensfac(ri));
         if not ri!.isequal(x, z) then
-            Add( kernelMandarins, x / z );
+            Add(kernelMandarins, x / z);
+            # TODO: Can we compute the SLPs here already? Yes, because we know
+            # how we got the kernels gens?
+            Add(kernelMandarinSLPs,
+                # TODO: Is this valid syntax?
+                mandarinSLPs[i] / imageMandarinSLPs[i]);
+        else
+            Add(kernelMandarins, One(Grp(ri)));
+            Add(kernelMandarinSLPs,
+                # TODO
+                trivialCase);
         fi;
     od;
     # TODO: sort the kernelMandarins and remove duplicates and trivials
