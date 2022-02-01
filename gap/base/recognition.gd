@@ -626,8 +626,9 @@ DeclareGlobalFunction( "CalcNiceGensGeneric" );
 ##     This is the default function for homomorphism node for the attribute
 ##     <Ref Attr="calcnicegens"/>. It just delegates to image and kernel of
 ##     the homomorphism, as the nice generators of a homomorphism (or isomorphism)
-##     node are just the concatenation of the nice generators of the image
-##     and the kernel. A find homomorphism method finding a homomorphism
+##     node are just the concatenation of the preimages of the nice generators
+##     of the image with the nice generators of the kernel.
+##     A find homomorphism method finding a homomorphism
 ##     or isomorphism does not have to do anything with respect to nice
 ##     generators.
 ## </Description>
