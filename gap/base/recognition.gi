@@ -478,11 +478,11 @@ function(ri)
     local gensNWasEmpty, targetNrGensN, kernelGenerationSuccess;
     gensNWasEmpty := IsEmpty(gensN(ri));
     if gensNWasEmpty then
-        # This gets reduced during each iteration to a minimal value of 1, to
-        # account for the case where the kernel only has two elements. The
-        # findgensNmeth might discard trivial or duplicate generators. In that
-        # case we can never find more than one generator, if the kernel has
-        # size two.
+        # The following value was chosen arbitrarily. It gets reduced during
+        # each iteration to a minimal value of 1, to account for the case where
+        # the kernel only has two elements. The findgensNmeth might discard
+        # trivial or duplicate generators. In that case we can never find more
+        # than one generator, if the kernel has size two.
         targetNrGensN := 5;
     else
         targetNrGensN := 2 * Length(gensN(ri));
@@ -513,7 +513,7 @@ InstallGlobalFunction( RecogniseGeneric,
       local depth, ri, allmethods, s, imageMandarins, y, counter_image, rifac,
             kernelGenerationSuccess, l, ll, kernelMandarins, x, z,
             mandarinSuccess, immediateVerificationSuccess, N, riker,
-            enlargeKernelSuccess, i;
+            enlargeKernelSuccess, i, mandarinSLPs, nrNiceGensOfImageNode;
 
     depth := Length(depthString);
 
@@ -534,7 +534,6 @@ InstallGlobalFunction( RecogniseGeneric,
         # TODO: enable passing NUM_MANDARINS as optional arg
         mandarins := List([1..NUM_MANDARINS_DEFAULT_VALUE], i -> PseudoRandom(H));
     fi;
-
 
     # Set up the record and the group object:
     ri := RecogNode(
@@ -597,7 +596,7 @@ InstallGlobalFunction( RecogniseGeneric,
             fi;
         fi;
 
-        # Check mandarins now
+        # Check mandarins and compute their SLPs in the nice generators of ri.
         mandarinSLPs := [];
         for x in mandarins do
             s := SLPforElement(ri, x);
@@ -641,8 +640,9 @@ InstallGlobalFunction( RecogniseGeneric,
         Assert(2, y <> fail);
         Add(imageMandarins, y);
     od;
-    # TODO: sort the imageMandarins and handle duplicates and trivials
+    # TODO: sort (?) the imageMandarins and handle duplicates and trivials
 
+    # Recognise the image and build the kernel.
     counter_image := 1;
     repeat
         if counter_image > 2 then
@@ -738,47 +738,24 @@ InstallGlobalFunction( RecogniseGeneric,
         SetgensN(ri,ll);
     fi;
 
-    # Evaluate mandarins to get kernel mandarins
-    kernelMandarins := [];
-    # The image node SLPs are in terms of the generators of the image. Rewrite
-    # these in terms of the generators of H.
-    # TODO, compose: slp to pregensfac -> imageMandarinSLPs[i]
-    # How can I access / store an slpToPregensfac? I don't want to have a
-    # single slp for every element of pregensfac but one slp which returns all.
-    # Btw. for kernels this is stored in gensNslp.
-    imageMandarinSLPs := List(rifac!.mandarinSLPs,
-                              x -> PrependRestrictionToImageNodeSLP(ri, x));
-    for i in [1..Length(mandarins)] do
-        x := mandarins[i];
-        sx := mandarinSLPs[i];
-        y := imageMandarins[i];
-        sy := imageMandarinSLPs[i];
-        z := ResultOfStraightLineProgram(sy, pregensfac(ri));
-        if not ri!.isequal(x, z) then
-            Add(kernelMandarins, x / z);
-            # TODO: Can we compute the SLPs here already? Yes, because we know
-            # how we got the kernels gens?
-            Add(kernelMandarinSLPs,
-                # TODO: Is this valid syntax?
-                mandarinSLPs[i] / imageMandarinSLPs[i]);
-        else
-            Add(kernelMandarins, One(Grp(ri)));
-            Add(kernelMandarinSLPs,
-                # TODO
-                trivialCase);
-        fi;
-    od;
-    # TODO: sort the kernelMandarins and remove duplicates and trivials
+    # Build kernel mandarins
+    kernelMandarins := List(
+        [1..Length(mandarins)],
+        i -> mandarins[i]
+            # Divide by a preimage of its image under Homom(ri).
+            / ResultOfStraightLineProgram(rifac!.mandarinSLPs[i], pregensfac(ri))
+    );
+    # TODO: sort(?) the kernelMandarins and handle duplicates and trivials
 
     if IsEmpty(gensN(ri)) and immediateverification(ri) then
         # Special case, for an explanation see the source of the called function.
         RECOG_HandleSpecialCaseKernelTrivialAndMarkedForImmediateVerification(ri);
     fi;
-    if IsEmpty(gensN(ri)) and not IsEmpty(kernelMandarins)
+    if IsEmpty(gensN(ri))
             # HACK: something is suuper iffy about the method BlocksModScalars,
-            # see the comment at handling the "Enter mandarin crisis" non-leaf
-            # case.
-            and fhmethsel(ri).successMethod <> "BlocksModScalars" then
+            # see the comment at the "check mandarins" part of the non-leaf case.
+            and not fhmethsel(ri).successMethod in ["BlocksModScalars", "BlockScalar"]
+            and ForAny(kernelMandarins, x -> not ri!.isone(x)) then
         Info(InfoRecog, 2,
              "Enter Mandarin crisis (depth=", depth, "), ",
              "kernel can't be trivial.");
@@ -802,6 +779,21 @@ InstallGlobalFunction( RecogniseGeneric,
         SetKernelRecogNode(ri,fail);
         # We have to learn from the image, what our nice generators are:
         SetNiceGens(ri,pregensfac(ri));
+        # Since the kernel is trivial, evaluating the image's mandarinSLPs in
+        # pregensfac(ri) must yield the mandarins of the current node.
+        # Since the mandarins agree that the kernel is trivial, the current
+        # node can't be IsSafeForMandarins and we can ignore that case.
+        ri!.mandarinSLPs := ShallowCopy(rifac!.mandarinSLPs);
+        for i in [1..Length(mandarins)] do
+            x := mandarins[i];
+            s := ri!.mandarinSLPs[i];
+            if not isequal(ri)(x, ResultOfStraightLineProgram(s, NiceGens(ri)))
+                    # HACK: something is suuper iffy about the method BlocksModScalars,
+                    # see the comment at the "check mandarins" part of the non-leaf case.
+                    and fhmethsel(ri).successMethod <> "BlocksModScalars" then
+                return MANDARIN_CRISIS;
+            fi;
+        od;
         if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
         # StopStoringRandEls(ri);
         SetFilterObj(ri,IsReady);
@@ -874,19 +866,30 @@ InstallGlobalFunction( RecogniseGeneric,
 
     SetNiceGens(ri,Concatenation(pregensfac(ri), NiceGens(riker)));
 
-    # Check mandarins now
-    for x in mandarins do
-        # TODO: something is suuper iffy about the method BlocksModScalars, which
-        # is called by BlockDiagonal.
-        # Apparently its input is neither to be understood as a projective nor as a
-        # matrix group, but rather as a "all block-scalars being trivial" group.
-        # That ofc completely wrecks the mandarins, since they assume the group to
-        # be projective. Currently we don't check here whether the SLP for a
-        # mandarin evaluates to the mandarin.
-        # This also has to be considered when doing immediate verification.
-        # To solve that situation we hacked SLPforElementGeneric.
-        s := SLPforElement(ri, x);
-        if s = fail then
+    # Check mandarins
+    mandarinSLPs := [];
+    for i in [1..Length(mandarins)] do
+        x := mandarins[i];
+        # Build an SLP for the mandarin x and check that it evaluates to x.
+        # We get that SLP by multiplying the results of the corresponding
+        # kernel and image node SLPs. We also need to adjust for the fact that
+        # the nice generators of our node are the concatenation of the image
+        # and kernel node nice generators.
+        # Note that the case with trivial kernel was handled above.
+        nrNiceGensOfImageNode := Length(NiceGens(rifac));
+        s := NewProductOfStraightLinePrograms(riker!.mandarinSLPs[i], [nrNiceGensOfImageNode + 1 .. Length(NiceGens(ri))],
+                                              rifac!.mandarinSLPs[i], [1..nrNiceGensOfImageNode],
+                                              Length(NiceGens(ri)));
+        if not isequal(ri)(x, ResultOfStraightLineProgram(s, NiceGens(ri)))
+                # HACK: something is suuper iffy about the method BlocksModScalars, which
+                # is called by BlockDiagonal. Groups recognized by BlocksModScalars
+                # are to be understood as a projective nor as a matrix group, but
+                # rather as a "all block-scalars being trivial" group. To be able
+                # to check the mandarins we would thus need special functions
+                # handling isone and isequal, but these do not exist.
+                # Note that this also has to be considered when doing immediate verification.
+                # To solve that situation we hacked SLPforElementGeneric.
+                and fhmethsel(ri).successMethod <> "BlocksModScalars" then
             # TODO: with the master branch rewriting the gens as slps never
             # fails. at least we never enter a second iteration of the
             # "recognise image" loop.
@@ -894,7 +897,24 @@ InstallGlobalFunction( RecogniseGeneric,
                  "Enter Mandarin crisis (non-leaf, depth=", depth, ").");
             return MANDARIN_CRISIS;
         fi;
+        Add(mandarinSLPs, s);
+        # WHERE TO PUT THIS?
+        # How can I access / store an slpToPregensfac? I don't want to have a
+        # single slp for every element of pregensfac but one slp which returns all.
+        # Btw. for kernels this is stored in gensNslp.
+        # TODO: I bet I can just call these with NiceGens{[1..Length(NiceGens(rifac))]};
+        # projection SLP, do I need this?
+        #imageMandarinSLPs := List(
+        #    rifac!.mandarinSLPs,
+        #    x -> CompositionOfStraightLinePrograms(
+        #        x,
+        #        projection SLP
+        #    )
+        #);
+        #   StraightLineProgramNC([List([1..Length(NiceGens(rifac))], i -> [i, 1])],
+        #                        Length(NiceGens(ri)))
     od;
+    ri!.mandarinSLPs := mandarinSLPs;
 
     if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
     # StopStoringRandEls(ri);
