@@ -18,7 +18,8 @@
 
 BindGlobal("RECOG_FindKernelFastNormalClosureStandardArgumentValues",
            Immutable([6, 3]));
-BindConstant("RECOG_NrElementsInImmediateVerification", 10);
+#BindConstant("RECOG_NrElementsInImmediateVerification", 10);
+RECOG_NrElementsInImmediateVerification := 10;
 
 # a nice view method:
 RECOG_ViewObj := function( level, ri )
@@ -476,6 +477,7 @@ InstallGlobalFunction( PrintTreePos,
 BindGlobal("TryToEnlargeKernelGeneratingSetAndUpdateSLPsDuringMandarinCrisis",
 function(ri)
     local gensNWasEmpty, targetNrGensN, kernelGenerationSuccess;
+    Print("Handling Mandarin Crisis!\n");
     gensNWasEmpty := IsEmpty(gensN(ri));
     if gensNWasEmpty then
         # The following value was chosen arbitrarily. It gets reduced during
