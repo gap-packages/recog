@@ -478,6 +478,7 @@ BindGlobal("TryToEnlargeKernelGeneratingSetAndUpdateSLPsDuringMandarinCrisis",
 function(ri)
     local gensNWasEmpty, targetNrGensN, kernelGenerationSuccess;
     Print("Handling Mandarin Crisis!\n");
+    MC_CNT := MC_CNT + 1;
     gensNWasEmpty := IsEmpty(gensN(ri));
     if gensNWasEmpty then
         # The following value was chosen arbitrarily. It gets reduced during
