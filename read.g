@@ -18,6 +18,7 @@
 ReadPackage("recog","gap/base/methods.gi");
 ReadPackage("recog","gap/base/methsel.gi");
 ReadPackage("recog","gap/base/recognition.gi");
+ReadPackage("recog","gap/base/kernel.gi");
 ReadPackage("recog","gap/obsolete.gi");
 
 # The following contain generic functionality for different types of groups:
@@ -30,7 +31,6 @@ ReadPackage("recog","gap/base/projective.gi");
 ReadPackage("recog","gap/utils.gi");
 
 # generic
-ReadPackage("recog","gap/generic/kernel.gi");
 ReadPackage("recog","gap/generic/TrivialGroup.gi");
 ReadPackage("recog","gap/generic/FewGensAbelian.gi");
 ReadPackage("recog","gap/generic/KnownNilpotent.gi");
