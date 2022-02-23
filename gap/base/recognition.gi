@@ -614,8 +614,8 @@ InstallGlobalFunction( RecogniseGeneric,
         for x in mandarins do
             s := SLPforElement(ri, x);
             if s = fail then
-                Info(InfoRecog, 2,
-                     "Enter Mandarin crisis (leaf, depth=", depth, ").");
+                Info(InfoRecog, 1,
+                     "Enter mandarin crisis (leaf, depth=", depth, ").");
                 return MANDARIN_CRISIS;
             fi;
             Add(mandarinSLPs, s);
@@ -641,8 +641,8 @@ InstallGlobalFunction( RecogniseGeneric,
     # fails, then somewhere higher up in the recognition tree, a kernel must
     # have been too small.
     if ForAny(mandarins, x->not ValidateHomomInput(ri, x)) then
-        Info(InfoRecog, 2,
-             "Enter Mandarin crisis (depth=", depth, "), ",
+        Info(InfoRecog, 1,
+             "Enter mandarin crisis (depth=", depth, "), ",
              "ValidateHomomInput failed.");
         return MANDARIN_CRISIS;
     fi;
@@ -772,8 +772,8 @@ InstallGlobalFunction( RecogniseGeneric,
             # see the comment at the "check mandarins" part of the non-leaf case.
             and not fhmethsel(ri).successMethod in ["BlocksModScalars", "BlockScalar"]
             and ForAny(kernelMandarins, x -> not ri!.isone(x)) then
-        Info(InfoRecog, 2,
-             "Enter Mandarin crisis (depth=", depth, "), ",
+        Info(InfoRecog, 1,
+             "Enter mandarin crisis (depth=", depth, "), ",
              "kernel can't be trivial.");
         # We handle this in the same way as if recognition of the
         # kernel returned a MANDARIN_CRISIS.
