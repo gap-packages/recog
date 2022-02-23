@@ -512,7 +512,7 @@ InstallGlobalFunction( RecogniseGeneric,
     # Assume all the generators have no memory!
       local depth, ri, allmethods, s, imageMandarins, y, counter_image, rifac,
             kernelGenerationSuccess, l, ll, kernelMandarins, x, z,
-            mandarinSuccess, immediateVerificationSuccess, N, riker,
+            kernelMandarinSuccess, immediateVerificationSuccess, N, riker,
             enlargeKernelSuccess, i, mandarinSLPs, nrNiceGensOfImageNode;
 
     depth := Length(depthString);
@@ -597,6 +597,7 @@ InstallGlobalFunction( RecogniseGeneric,
         fi;
 
         # Check mandarins and compute their SLPs in the nice generators of ri.
+        Info(InfoRecog, 3, "Check mandarins (leaf, depth=", depth,").");
         mandarinSLPs := [];
         for x in mandarins do
             s := SLPforElement(ri, x);
@@ -685,7 +686,8 @@ InstallGlobalFunction( RecogniseGeneric,
         if rifac = MANDARIN_CRISIS then
             # According to the mandarins, somewhere higher up in the recognition
             # tree, a kernel must have been too small.
-            Info(InfoRecog, 2, "Backtrack to the last safe node.");
+            Info(InfoRecog, 2,
+                 "Backtrack to the last safe node (depth=", depth, ").");
             return MANDARIN_CRISIS;
         fi;
         # Check for IsReady after checking for MANDARIN_CRISIS, since
@@ -804,7 +806,7 @@ InstallGlobalFunction( RecogniseGeneric,
     # Due to mandarins or immediate verification we may have to enlarge gensN
     # and then recognise the kernel again.
     repeat
-        mandarinSuccess := false;
+        kernelMandarinSuccess := false;
         immediateVerificationSuccess := false;
 
         SetgensNslp(ri,SLPOfElms(gensN(ri)));
@@ -843,10 +845,10 @@ InstallGlobalFunction( RecogniseGeneric,
                 # TODO: discard and re-recognise the image.
                 ErrorNoReturn("TODO");
             fi;
-            # This restarts the loop, since mandarinSuccess is false.
+            # This restarts the loop, since kernelMandarinSuccess is false.
             continue;
         fi;
-        mandarinSuccess := true;
+        kernelMandarinSuccess := true;
         Info(InfoRecog,2,"Back from kernel (depth=",depth,").");
 
         # Check for IsReady after checking for MANDARIN_CRISIS, since
@@ -858,15 +860,15 @@ InstallGlobalFunction( RecogniseGeneric,
         if not immediateverification(ri) then
             immediateVerificationSuccess := true;
         else
-            Info(InfoRecog,2,"Doing immediate verification (depth=",
+            Info(InfoRecog,3,"Doing immediate verification (depth=",
                  depth,").");
             immediateVerificationSuccess := ImmediateVerification(ri);
         fi;
-    until mandarinSuccess and immediateVerificationSuccess;
+    until kernelMandarinSuccess and immediateVerificationSuccess;
 
     SetNiceGens(ri,Concatenation(pregensfac(ri), NiceGens(riker)));
 
-    # Check mandarins
+    Info(InfoRecog, 3, "Check mandarins (depth=", depth,").");
     mandarinSLPs := [];
     for i in [1..Length(mandarins)] do
         x := mandarins[i];
