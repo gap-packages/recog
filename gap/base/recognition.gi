@@ -885,7 +885,7 @@ InstallGlobalFunction( RecogniseGeneric,
         if not isequal(ri)(x, ResultOfStraightLineProgram(s, NiceGens(ri)))
                 # HACK: something is suuper iffy about the method BlocksModScalars, which
                 # is called by BlockDiagonal. Groups recognized by BlocksModScalars
-                # are to be understood as a projective nor as a matrix group, but
+                # are to be understood neither as a projective nor as a matrix group, but
                 # rather as a "all block-scalars being trivial" group. To be able
                 # to check the mandarins we would thus need special functions
                 # handling isone and isequal, but these do not exist.
