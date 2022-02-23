@@ -18,6 +18,7 @@ ReadPackage("recog","gap/base/hack.g");
 ReadPackage("recog","gap/base/methods.gd");
 ReadPackage("recog","gap/base/methsel.gd");
 ReadPackage("recog","gap/base/recognition.gd");
+ReadPackage("recog","gap/base/kernel.gd");
 
 # The following contain generic declarations for different types of groups:
 ReadPackage("recog","gap/base/projective.gd");
@@ -29,4 +30,3 @@ ReadPackage("recog","gap/matrix/classical.gd");
 ReadPackage("recog","gap/projective/almostsimple.gd");
 ReadPackage("recog","gap/projective/findnormal.gd");
 ReadPackage("recog","gap/projective/AnSnOnFDPM.gd");
-ReadPackage("recog","gap/generic/kernel.gd");
