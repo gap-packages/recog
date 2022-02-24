@@ -128,7 +128,7 @@ function(ri, G)
     InitialDataForKernelRecogNode(ri).blocks := blocks;
     AddMethod(InitialDataForKernelRecogNode(ri).hints, FindHomMethodsPerm.PcgsForBlocks, 400);
     AddMethod(InitialDataForKernelRecogNode(ri).hints, FindHomMethodsPerm.BalTreeForBlocks, 200);
-    findgensNmeth(ri).args[1] := 2 * Length(blocks)+3;
+    findgensNmeth(ri).args[1] := 3 + BAL_CONST * Length(blocks);
     findgensNmeth(ri).args[2] := 5;
     return Success;
 end);
