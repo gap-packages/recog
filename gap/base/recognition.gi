@@ -788,19 +788,7 @@ InstallGlobalFunction( RecogniseGeneric,
         SetNiceGens(ri,pregensfac(ri));
         # Since the kernel is trivial, evaluating the image's mandarinSLPs in
         # pregensfac(ri) must yield the mandarins of the current node.
-        # Since the mandarins agree that the kernel is trivial, the current
-        # node can't be IsSafeForMandarins and we can ignore that case.
         ri!.mandarinSLPs := ShallowCopy(rifac!.mandarinSLPs);
-        for i in [1..Length(mandarins)] do
-            x := mandarins[i];
-            s := ri!.mandarinSLPs[i];
-            if not isequal(ri)(x, ResultOfStraightLineProgram(s, NiceGens(ri)))
-                    # HACK: something is suuper iffy about the method BlocksModScalars,
-                    # see the comment at the "check mandarins" part of the non-leaf case.
-                    and fhmethsel(ri).successMethod <> "BlocksModScalars" then
-                return MANDARIN_CRISIS;
-            fi;
-        od;
         if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
         # StopStoringRandEls(ri);
         SetFilterObj(ri,IsReady);
@@ -887,39 +875,7 @@ InstallGlobalFunction( RecogniseGeneric,
         s := NewProductOfStraightLinePrograms(riker!.mandarinSLPs[i], [nrNiceGensOfImageNode + 1 .. Length(NiceGens(ri))],
                                               rifac!.mandarinSLPs[i], [1..nrNiceGensOfImageNode],
                                               Length(NiceGens(ri)));
-        if not isequal(ri)(x, ResultOfStraightLineProgram(s, NiceGens(ri)))
-                # HACK: something is suuper iffy about the method BlocksModScalars, which
-                # is called by BlockDiagonal. Groups recognized by BlocksModScalars
-                # are to be understood neither as a projective nor as a matrix group, but
-                # rather as a "all block-scalars being trivial" group. To be able
-                # to check the mandarins we would thus need special functions
-                # handling isone and isequal, but these do not exist.
-                # Note that this also has to be considered when doing immediate verification.
-                # To solve that situation we hacked SLPforElementGeneric.
-                and fhmethsel(ri).successMethod <> "BlocksModScalars" then
-            # TODO: with the master branch rewriting the gens as slps never
-            # fails. at least we never enter a second iteration of the
-            # "recognise image" loop.
-            Info(InfoRecog, 2,
-                 "Enter Mandarin crisis (non-leaf, depth=", depth, ").");
-            return MANDARIN_CRISIS;
-        fi;
         Add(mandarinSLPs, s);
-        # WHERE TO PUT THIS?
-        # How can I access / store an slpToPregensfac? I don't want to have a
-        # single slp for every element of pregensfac but one slp which returns all.
-        # Btw. for kernels this is stored in gensNslp.
-        # TODO: I bet I can just call these with NiceGens{[1..Length(NiceGens(rifac))]};
-        # projection SLP, do I need this?
-        #imageMandarinSLPs := List(
-        #    rifac!.mandarinSLPs,
-        #    x -> CompositionOfStraightLinePrograms(
-        #        x,
-        #        projection SLP
-        #    )
-        #);
-        #   StraightLineProgramNC([List([1..Length(NiceGens(rifac))], i -> [i, 1])],
-        #                        Length(NiceGens(ri)))
     od;
     ri!.mandarinSLPs := mandarinSLPs;
 
