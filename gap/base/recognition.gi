@@ -485,14 +485,23 @@ function(ri)
         # than one generator, if the kernel has size two.
         targetNrGensN := 5;
     else
-        targetNrGensN := 2 * Length(gensN(ri));
+        # The goal is to obtain twice as many generators as were in gensN. The
+        # kernel generation methods write directly into gensN and don't provide
+        # a means to specify how many generators should be created. Also, they
+        # might not add a newly created generator, if that one already is in
+        # gensN. If that happens when enlarging a kernel generating set for the
+        # first time and we set the factor below to 2, we might call the
+        # findgensNmeth a second time, tripling instead of doubling the size of
+        # the generating set.
+        targetNrGensN := Int(1.9 * Length(gensN(ri)));
     fi;
     Info(InfoRecog, 2,
          "Enlarging the kernel's generating set due to a mandarin crisis.");
     repeat
-        if gensNWasEmpty and targetNrGensN > 1 then
-            targetNrGensN := targetNrGensN - 1;
-        fi;
+        # It might happen that we enlarge the wrong kernel. If in addition the
+        # kernel is very small, we might never stop looking for new generators,
+        # unless we successively reduce targetNrGensN.
+        targetNrGensN := targetNrGensN - 1;
         # Create additional kernel generators with the stored method:
         # kernelGenerationSuccess is either true or fail.
         kernelGenerationSuccess :=
