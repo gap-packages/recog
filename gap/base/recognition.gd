@@ -599,7 +599,9 @@ DeclareSynonym("RecognizeGroup", RecogniseGroup);
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareGlobalFunction( "RecogniseGeneric" );
+# TODO: change documentation and update references from func to oper
+DeclareOperation( "RecogniseGeneric",
+                  [ IsRecogNode, IsObject, IsString, IsObject, IsBool ] );
 DeclareSynonym("RecognizeGeneric", RecogniseGeneric);
 
 DeclareGlobalFunction( "PrintTreePos" );

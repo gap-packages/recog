@@ -587,15 +587,44 @@ end);
 InstallMethod(ViewString, "for recognition crises", [IsRecogCrisis],
               crisis -> "<recog crisis>");
 
-InstallGlobalFunction( RecogniseGeneric,
-  function(H, methoddb, depthString, knowledge, mandarins, isSafeForMandarins)
+# TODO, disable this to run test suite.
+InstallOtherMethod( RecogniseGeneric,
+"compatibility method",
+[ IsGroup, IsObject, IsString, IsRecord, IsObject, IsBool ],
+function(H, methoddb, depthString, knowledge, mandarins, isSafeForMandarins)
+    local ri;
+    # RecogNode calls ProductReplacer, which needs to have at least one
+    # generator.
+    if Length(GeneratorsOfGroup(H)) = 0 then
+        H := Group([One(H)]);
+    fi;
+    ri := RecogNode(
+        H,
+        IsIdenticalObj( methoddb, FindHomDbProjective ),
+        knowledge
+    );
+    RecogniseGeneric(ri, methoddb, depthString,
+                     mandarins, isSafeForMandarins);
+    return ri;
+end);
+
+# TODO: Update docs: new return value: crisis or true
+# TODO: Rename this into RecogniseRecogNode
+# TODO: isSafeForMandarins could be put into the RecogNode call, then we can
+# remove it here.
+InstallMethod( RecogniseGeneric,
+"TODO",
+[ IsRecogNode, IsObject, IsString, IsObject, IsBool ],
+function(ri, methoddb, depthString, mandarins, isSafeForMandarins)
+    local depth, H, allmethods, mandarinSLPs, s, imageMandarins, y,
+        counter_image, rifac, imageStatus, kernelGenerationSuccess, l, ll,
+        kernelMandarins, crisis, kernelMandarinSuccess,
+        immediateVerificationSuccess, N, riker, kernelStatus, x,
+        nrNiceGensOfImageNode, i;
     # Assume all the generators have no memory!
-      local depth, ri, allmethods, s, imageMandarins, y, counter_image, rifac,
-            kernelGenerationSuccess, l, ll, kernelMandarins, x, z, crisis,
-            kernelMandarinSuccess, immediateVerificationSuccess, N, riker,
-            enlargeKernelSuccess, i, mandarinSLPs, nrNiceGensOfImageNode;
 
     depth := Length(depthString);
+    H := Grp(ri);
 
     PrintTreePos("E",depthString,H);
     Info(InfoRecog,4,"Recognising: ",H);
@@ -614,24 +643,19 @@ InstallGlobalFunction( RecogniseGeneric,
         # TODO: enable passing NUM_MANDARINS as optional arg
         mandarins := List([1..NUM_MANDARINS_DEFAULT_VALUE], i -> PseudoRandom(H));
     fi;
-
-    # Set up the record and the group object:
-    ri := RecogNode(
-        H,
-        IsIdenticalObj( methoddb, FindHomDbProjective ),
-        knowledge
-    );
     ri!.mandarins := mandarins;
     if isSafeForMandarins then
         SetFilterObj(ri, IsSafeForMandarins);
     fi;
+
     # was here earlier: Setcalcnicegens(ri,CalcNiceGensGeneric);
+
     Setmethodsforimage(ri,methoddb);
 
     # Combine database of find homomorphism methods with hints
     allmethods := methoddb;
-    if IsBound(knowledge.hints) then
-        allmethods := Concatenation(allmethods, knowledge.hints);
+    if IsBound(ri!.hints) then
+        allmethods := Concatenation(allmethods, ri!.hints);
         SortBy(allmethods, a -> -a.rank);
     fi;
     # verify no rank occurs more than once
@@ -652,7 +676,7 @@ InstallGlobalFunction( RecogniseGeneric,
         Info(InfoRecog, 1,
              "RecogNode <ri> could not be recognised,",
              " IsReady(<ri>) is not set, recognition aborts");
-        return ri;
+        return true;
     fi;
 
     # Handle the leaf case:
@@ -693,7 +717,7 @@ InstallGlobalFunction( RecogniseGeneric,
         if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
         # StopStoringRandEls(ri);
         SetFilterObj(ri,IsReady);
-        return ri;
+        return true;
     fi;
 
     # The non-leaf case:
@@ -740,7 +764,7 @@ InstallGlobalFunction( RecogniseGeneric,
                  "Kernel generation for RecogNode <ri> failed ",
                  counter_image, " times, ",
                  " IsReady(<ri>) is not set, recognition aborts");
-            return ri;
+            return true;
         fi;
 
         if IsMatrixGroup(Image(Homom(ri))) then
@@ -752,30 +776,33 @@ InstallGlobalFunction( RecogniseGeneric,
               counter_image,").");
         fi;
 
-        Add(depthString,'F');
-        rifac := RecogniseGeneric(
+        rifac := RecogNode(
                   Group(List(GeneratorsOfGroup(H), x->ImageElm(Homom(ri),x))),
-                  methodsforimage(ri), depthString,
-                  InitialDataForImageRecogNode(ri),
+                  IsIdenticalObj(methodsforimage(ri), FindHomDbProjective),
+                  InitialDataForImageRecogNode(ri));
+        SetImageRecogNode(ri,rifac);
+        SetParentRecogNode(rifac,ri);
+        Add(depthString,'F');
+        # TODO Change return value
+        imageStatus := RecogniseGeneric(
+                  rifac,
+                  methodsforimage(ri),
+                  depthString,
                   imageMandarins,
                   IsSafeForMandarins(ri));
         Remove(depthString);
         PrintTreePos("F",depthString,H);
-        SetImageRecogNode(ri,rifac);
-        SetParentRecogNode(rifac,ri);
-        if IsRecogCrisis(rifac) then
+        if IsRecogCrisis(imageStatus) then
             # According to the mandarins, somewhere higher up in the recognition
             # tree, a kernel must have been too small.
             Info(InfoRecog, 2,
                  "Backtrack to the last safe node (depth=", depth, ").");
-            return rifac;
+            return imageStatus;
         fi;
-        # Check for IsReady after checking for a crisis, since
-        # IsReady always returns false for a crisis.
         if not IsReady(rifac) then
             # IsReady was not set, thus abort the whole computation.
             if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
-            return ri;
+            return true;
         fi;
 
         if IsMatrixGroup(H) then
@@ -793,6 +820,7 @@ InstallGlobalFunction( RecogniseGeneric,
 
         # Now create the kernel generators with the stored method:
         # The value of kernelGenerationSuccess is either true or fail.
+        # TODO: why doesn't this throw a crisis?
         kernelGenerationSuccess :=
             CallFuncList(findgensNmeth(ri).method,
                          Concatenation([ri],findgensNmeth(ri).args));
@@ -882,7 +910,7 @@ InstallGlobalFunction( RecogniseGeneric,
         if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
         # StopStoringRandEls(ri);
         SetFilterObj(ri,IsReady);
-        return ri;
+        return true;
     fi;
 
     Info(InfoRecog,2,"Going to the kernel (depth=",depth,").");
@@ -898,9 +926,14 @@ InstallGlobalFunction( RecogniseGeneric,
         # This is now in terms of the generators of H!
         N := Group(StripMemory(gensN(ri)));
 
+        riker := RecogNode(N,
+                           # TODO!! safeguard this against changed method dbs
+                           IsIdenticalObj(methoddb, FindHomDbProjective),
+                           InitialDataForKernelRecogNode(ri));
+        SetKernelRecogNode(ri,riker);
+        SetParentRecogNode(riker,ri);
         Add(depthString,'K');
-        riker := RecogniseGeneric( N, methoddb, depthString,
-                                   InitialDataForKernelRecogNode(ri),
+        kernelStatus := RecogniseGeneric( riker, methoddb, depthString,
                                    kernelMandarins,
                                    # TODO: extend this such that riker can also
                                    # be IsSafeForMandarins, if the responsible
@@ -909,9 +942,7 @@ InstallGlobalFunction( RecogniseGeneric,
                                    false);
         Remove(depthString);
         PrintTreePos("K",depthString,H);
-        SetKernelRecogNode(ri,riker);
-        SetParentRecogNode(riker,ri);
-        if IsRecogCrisis(riker) then
+        if IsRecogCrisis(kernelStatus) then
             # According to the mandarins, there was an error in the kernel
             # generation of the current node or higher up in the recognition
             # tree.
@@ -934,11 +965,9 @@ InstallGlobalFunction( RecogniseGeneric,
         kernelMandarinSuccess := true;
         Info(InfoRecog,2,"Back from kernel (depth=",depth,").");
 
-        # Check for IsReady after checking for a crisis, since
-        # IsReady always returns false for a crisis.
         if not IsReady(riker) then
             # IsReady is not set, thus the whole computation aborts.
-            return ri;
+            return true;
         fi;
         if not immediateverification(ri) then
             immediateVerificationSuccess := true;
@@ -1004,7 +1033,7 @@ InstallGlobalFunction( RecogniseGeneric,
     if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
     # StopStoringRandEls(ri);
     SetFilterObj(ri,IsReady);
-    return ri;
+    return true;
   end);
 
 InstallGlobalFunction( ValidateHomomInput,
