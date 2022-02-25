@@ -484,6 +484,13 @@ BindGlobal( "SLPforElementFuncsGeneric", rec() );
 # name.
 # TODO Wait a second, if the generators of the root can be expressed as SLPs in
 # the nice gens, then the kernels must be correct, right?!
+# Crisis objects
+DeclareCategory("IsRecogCrisis", IsObject);
+BindGlobal("RecogCrisisFamily", NewFamily("RecogCrisisFamily", IsRecogCrisis));
+BindGlobal("RecogCrisisType", NewType(RecogCrisisFamily, IsRecogCrisis));
+DeclareOperation( "RecogCrisis", [IsRecogNode]);
+DeclareFilter( "KernelGeneratorsAlreadyEnlargedByCrisis" );
+# TODO remove this:
 BindGlobal("MANDARIN_CRISIS", MakeImmutable("MANDARIN_CRISIS"));
 BindGlobal("NUM_MANDARINS_DEFAULT_VALUE", 100);
 DeclareFilter( "IsSafeForMandarins" );

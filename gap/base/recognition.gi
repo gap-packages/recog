@@ -229,27 +229,21 @@ InstallOtherMethod( RecogNode,
     return RecogNode(H, projective, rec());
   end );
 
-RECOG.SetXNodeForNodeAndString := function(r, s)
-    if not s = MANDARIN_CRISIS then
-        ErrorNoReturn("<s> must be MANDARIN_CRISIS");
-    fi;
-    return;
-  end;
 
 InstallMethod( SetParentRecogNode,
   "for a recognition node and a string",
-  [ IsRecogNode, IsString ],
-  RECOG.SetXNodeForNodeAndString);
+  [ IsRecogNode, IsRecogCrisis ],
+  function(x,y) return; end);
 
 InstallMethod( SetImageRecogNode,
   "for a recognition node and a string",
-  [ IsRecogNode, IsString ],
-  RECOG.SetXNodeForNodeAndString);
+  [ IsRecogNode, IsRecogCrisis ],
+  function(x,y) return; end);
 
 InstallMethod( SetKernelRecogNode,
   "for a recognition node and a string",
-  [ IsRecogNode, IsString ],
-  RECOG.SetXNodeForNodeAndString);
+  [ IsRecogNode, IsRecogCrisis ],
+  function(x,y) return; end);
 
 # Sets the stamp used by RandomElm, RandomElmOrd, and related functions.
 RECOG.SetPseudoRandomStamp := function(g,st)
@@ -516,14 +510,88 @@ function(ri)
     until Length(gensN(ri)) >= targetNrGensN;
     SetgensNslp(ri,SLPOfElms(gensN(ri)));
     SlotUsagePattern(gensNslp(ri));
+    SetFilterObj(ri, KernelGeneratorsAlreadyEnlargedByCrisis);
     return true;
 end);
+
+# Create an IsRecogCrisis object. The argument `ri` must have a
+# ParentRecogNode. A crisis can have level 1 or level 2.
+# The higher the level, the more we chop off of the tree.
+# How is the level of a new crisis determined? If on the path to the root there
+# is no node marked KernelGeneratorsAlreadyEnlargedByCrisis, then we throw a
+# level 1 crisis. Otherwise we throw a level 2 crisis.
+# Why is it sufficient to only check the path to the root? If we were too
+# conservative by not backtracking all the way to the first IsSafeForMandarins
+# node and instead only backtracked to a node X, then recognising X must again
+# throw a crisis. Thus node X will be on the path to the root.
+InstallMethod(RecogCrisis,
+"for an IsRecogNode",
+[IsRecogNode],
+function(ri)
+    local isKernelNode, unsafeKernelsOnPathToRoot, node, level, i, kernelToChop,
+        result;
+    # This is never called on the root:
+    isKernelNode :=
+        x -> HasKernelRecogNode(ParentRecogNode(x))
+            and IsIdenticalObj(x, KernelRecogNode(ParentRecogNode(x)));
+    # Find unsafe kernel nodes on the path to root
+    unsafeKernelsOnPathToRoot := [];
+    node := ri;
+    repeat
+        if isKernelNode(node) then
+            Add(unsafeKernelsOnPathToRoot, node);
+        fi;
+        node := ParentRecogNode(node);
+    # The root is always safe, so this loop terminates.
+    until IsSafeForMandarins(node);
+    # Determine level
+    if ForAny(unsafeKernelsOnPathToRoot,
+              x -> KernelGeneratorsAlreadyEnlargedByCrisis(ParentRecogNode(x))) then
+        level := 2;
+    else
+        level := 1;
+    fi;
+    # Determine kernelToChop
+    if level = 2 then
+        i := Length(unsafeKernelsOnPathToRoot);
+    else
+        i := Maximum(1, QuoInt(Length(unsafeKernelsOnPathToRoot), 2));
+    fi;
+    kernelToChop := unsafeKernelsOnPathToRoot[i];
+    result := rec(kernelToChop := kernelToChop, level := level);
+    Objectify(RecogCrisisType, result);
+    return result;
+end);
+
+# This is a hack to handle the case where the kernel is trivial and thus
+# instead of a RecogNode, a "fail" is put into the tree.
+InstallOtherMethod(RecogCrisis,
+"for a boolean and an IsRecogNode",
+[IsBool, IsRecogNode],
+function(trivialKernel, parent)
+    local fakeNode, result;
+    if not trivialKernel = fail then
+        ErrorNoReturn("<trivialKernel> must be fail but is ", trivialKernel);
+    fi;
+    fakeNode := RecogNode(Group(()));
+    SetParentRecogNode(fakeNode, parent);
+    SetKernelRecogNode(parent, fakeNode);
+    result := RecogCrisis(fakeNode);
+    SetKernelRecogNode(parent, fail);
+    if IsIdenticalObj(result!.kernelToChop, fakeNode) then
+        result!.kernelToChop := fail;
+    fi;
+    return result;
+end);
+
+InstallMethod(ViewString, "for recognition crises", [IsRecogCrisis],
+              crisis -> "<recog crisis>");
 
 InstallGlobalFunction( RecogniseGeneric,
   function(H, methoddb, depthString, knowledge, mandarins, isSafeForMandarins)
     # Assume all the generators have no memory!
       local depth, ri, allmethods, s, imageMandarins, y, counter_image, rifac,
-            kernelGenerationSuccess, l, ll, kernelMandarins, x, z,
+            kernelGenerationSuccess, l, ll, kernelMandarins, x, z, crisis,
             kernelMandarinSuccess, immediateVerificationSuccess, N, riker,
             enlargeKernelSuccess, i, mandarinSLPs, nrNiceGensOfImageNode;
 
@@ -616,7 +684,7 @@ InstallGlobalFunction( RecogniseGeneric,
             if s = fail then
                 Info(InfoRecog, 1,
                      "Enter mandarin crisis (leaf, depth=", depth, ").");
-                return MANDARIN_CRISIS;
+                return RecogCrisis(ri);
             fi;
             Add(mandarinSLPs, s);
         od;
@@ -644,7 +712,7 @@ InstallGlobalFunction( RecogniseGeneric,
         Info(InfoRecog, 1,
              "Enter mandarin crisis (depth=", depth, "), ",
              "ValidateHomomInput failed.");
-        return MANDARIN_CRISIS;
+        return RecogCrisis(ri);
     fi;
     # Compute the mandarins of the factor
     imageMandarins := [];
@@ -695,15 +763,15 @@ InstallGlobalFunction( RecogniseGeneric,
         PrintTreePos("F",depthString,H);
         SetImageRecogNode(ri,rifac);
         SetParentRecogNode(rifac,ri);
-        if rifac = MANDARIN_CRISIS then
+        if IsRecogCrisis(rifac) then
             # According to the mandarins, somewhere higher up in the recognition
             # tree, a kernel must have been too small.
             Info(InfoRecog, 2,
                  "Backtrack to the last safe node (depth=", depth, ").");
-            return MANDARIN_CRISIS;
+            return rifac;
         fi;
-        # Check for IsReady after checking for MANDARIN_CRISIS, since
-        # IsReady(MANDARIN_CRISIS) always is false.
+        # Check for IsReady after checking for a crisis, since
+        # IsReady always returns false for a crisis.
         if not IsReady(rifac) then
             # IsReady was not set, thus abort the whole computation.
             if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
@@ -776,9 +844,10 @@ InstallGlobalFunction( RecogniseGeneric,
              "Enter mandarin crisis (depth=", depth, "), ",
              "kernel can't be trivial.");
         # We handle this in the same way as if recognition of the
-        # kernel returned a MANDARIN_CRISIS.
-        if not IsSafeForMandarins(ri) then
-            return MANDARIN_CRISIS;
+        # kernel threw a crisis.
+        crisis := RecogCrisis(fail, ri);
+        if crisis!.kernelToChop <> fail then
+            return crisis;
         else
             Info(InfoRecog, 2,
                  "Handle the mandarin crisis (depth=", depth, ").");
@@ -842,14 +911,14 @@ InstallGlobalFunction( RecogniseGeneric,
         PrintTreePos("K",depthString,H);
         SetKernelRecogNode(ri,riker);
         SetParentRecogNode(riker,ri);
-        if riker = MANDARIN_CRISIS then
+        if IsRecogCrisis(riker) then
             # According to the mandarins, there was an error in the kernel
             # generation of the current node or higher up in the recognition
             # tree.
-            if not IsSafeForMandarins(ri) then
+            if not IsIdenticalObj(kernelStatus!.kernelToChop, riker) then
                 Info(InfoRecog, 2,
-                     "Backtrack to the last safe node (depth=", depth, ").");
-                return MANDARIN_CRISIS;
+                     "Backtrack further (depth=", depth, ").");
+                return kernelStatus;
             fi;
             Info(InfoRecog, 2,
                  "Handle the mandarin crisis (depth=", depth, ").");
@@ -865,8 +934,8 @@ InstallGlobalFunction( RecogniseGeneric,
         kernelMandarinSuccess := true;
         Info(InfoRecog,2,"Back from kernel (depth=",depth,").");
 
-        # Check for IsReady after checking for MANDARIN_CRISIS, since
-        # IsReady(MANDARIN_CRISIS) always is false.
+        # Check for IsReady after checking for a crisis, since
+        # IsReady always returns false for a crisis.
         if not IsReady(riker) then
             # IsReady is not set, thus the whole computation aborts.
             return ri;
