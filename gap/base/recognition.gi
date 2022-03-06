@@ -584,6 +584,8 @@ function(trivialKernel, parent)
     return result;
 end);
 
+# This is for debugging purposes. TODO: I don't think we ened this anymore
+# since crises are not added to the tree anymore
 InstallMethod(ViewString, "for recognition crises", [IsRecogCrisis],
               crisis -> "<recog crisis>");
 
@@ -928,6 +930,7 @@ function(ri, methoddb, depthString, mandarins, isSafeForMandarins)
 
         riker := RecogNode(N,
                            # TODO!! safeguard this against changed method dbs
+                           # TODO custom_decide_whether_db_is_projectiv
                            IsIdenticalObj(methoddb, FindHomDbProjective),
                            InitialDataForKernelRecogNode(ri));
         SetKernelRecogNode(ri,riker);
