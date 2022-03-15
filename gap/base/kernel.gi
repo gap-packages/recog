@@ -168,6 +168,7 @@ InstallGlobalFunction( FastNormalClosure , function( G, list, n )
   if IsEmpty(list) then
     return [];
   fi;
+  Info(InfoRecog, 2, "Do FastNormalClosure with n=", n, ".");
   list2 := ShallowCopy(list);
   if IsGroup(G) then
     grpgens := GeneratorsOfGroup(G);
