@@ -915,7 +915,6 @@ function(ri, methoddb, depthString, mandarins, isSafeForMandarins)
         return true;
     fi;
 
-    Info(InfoRecog,2,"Going to the kernel (depth=",depth,").");
     # Due to mandarins or immediate verification we may have to enlarge gensN
     # and then recognise the kernel again.
     repeat
@@ -928,6 +927,7 @@ function(ri, methoddb, depthString, mandarins, isSafeForMandarins)
         # This is now in terms of the generators of H!
         N := Group(StripMemory(gensN(ri)));
 
+        Info(InfoRecog,2,"Going to the kernel (depth=",depth,").");
         riker := RecogNode(N,
                            # TODO!! safeguard this against changed method dbs
                            # TODO custom_decide_whether_db_is_projectiv
