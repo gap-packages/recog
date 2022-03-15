@@ -230,21 +230,6 @@ InstallOtherMethod( RecogNode,
   end );
 
 
-InstallMethod( SetParentRecogNode,
-  "for a recognition node and a string",
-  [ IsRecogNode, IsRecogCrisis ],
-  function(x,y) return; end);
-
-InstallMethod( SetImageRecogNode,
-  "for a recognition node and a string",
-  [ IsRecogNode, IsRecogCrisis ],
-  function(x,y) return; end);
-
-InstallMethod( SetKernelRecogNode,
-  "for a recognition node and a string",
-  [ IsRecogNode, IsRecogCrisis ],
-  function(x,y) return; end);
-
 # Sets the stamp used by RandomElm, RandomElmOrd, and related functions.
 RECOG.SetPseudoRandomStamp := function(g,st)
   if IsBound(g!.pseudorandomfunc) then
