@@ -150,6 +150,8 @@ InstallMethod( RecogNode,
     ri := ShallowCopy(r);
     Objectify( RecogNodeType, ri );
     SetGrp(ri,H);
+    # Used by RecogCrisis
+    ri!.highestCrisisLevel := 0;
     Setslpforelement(ri,SLPforElementGeneric);
     SetgensN(ri,[]);       # this will grow over time
     Setimmediateverification(ri,false);
@@ -454,7 +456,7 @@ InstallGlobalFunction( PrintTreePos,
   end );
 
 BindGlobal("TryToEnlargeKernelGeneratingSetAndUpdateSLPsDuringMandarinCrisis",
-function(ri)
+function(ri, crisis)
     local gensNWasEmpty, targetNrGensN, kernelGenerationSuccess;
     Print("Handling Mandarin Crisis!\n");
     MC_CNT := MC_CNT + 1;
@@ -495,7 +497,7 @@ function(ri)
     until Length(gensN(ri)) >= targetNrGensN;
     SetgensNslp(ri,SLPOfElms(gensN(ri)));
     SlotUsagePattern(gensNslp(ri));
-    SetFilterObj(ri, KernelGeneratorsAlreadyEnlargedByCrisis);
+    ri!.highestCrisisLevel := crisis!.level;
     return true;
 end);
 
@@ -513,8 +515,8 @@ InstallMethod(RecogCrisis,
 "for an IsRecogNode",
 [IsRecogNode],
 function(ri)
-    local isKernelNode, unsafeKernelsOnPathToRoot, node, level, i, kernelToChop,
-        result;
+    local isKernelNode, unsafeKernelsOnPathToRoot, node,
+        nonZeroLevelsOnPathToRoot, level, i, kernelToChop, result;
     # This is never called on the root:
     isKernelNode :=
         x -> HasKernelRecogNode(ParentRecogNode(x))
@@ -530,14 +532,19 @@ function(ri)
     # The root is always safe, so this loop terminates.
     until IsSafeForMandarins(node);
     # Determine level
-    if ForAny(unsafeKernelsOnPathToRoot,
-              x -> KernelGeneratorsAlreadyEnlargedByCrisis(ParentRecogNode(x))) then
-        level := 2;
-    else
+    nonZeroLevelsOnPathToRoot :=
+        Filtered(List(unsafeKernelsOnPathToRoot,
+                      y -> ParentRecogNode(y)!.highestCrisisLevel),
+                 x -> x >= 1);
+    #How to get a "cascading effect"? Only spawn higher level if lower level
+    #existed? Or level X means that 2 of lvl X-1, 4 of lvl X-2 etc were spawned?
+    if IsEmpty(nonZeroLevelsOnPathToRoot) then
         level := 1;
+    else
+        level := 1 + Minimum(nonZeroLevelsOnPathToRoot);
     fi;
     # Determine kernelToChop
-    if level = 2 then
+    if level >= 2 then
         i := Length(unsafeKernelsOnPathToRoot);
     else
         i := Maximum(1, QuoInt(Length(unsafeKernelsOnPathToRoot), 2));
@@ -867,7 +874,7 @@ function(ri, methoddb, depthString, mandarins, isSafeForMandarins)
         else
             Info(InfoRecog, 2,
                  "Handle the mandarin crisis (depth=", depth, ").");
-            if not TryToEnlargeKernelGeneratingSetAndUpdateSLPsDuringMandarinCrisis(ri) then
+            if not TryToEnlargeKernelGeneratingSetAndUpdateSLPsDuringMandarinCrisis(ri, crisis) then
                 # TODO: discard and re-recognise the image.
                 ErrorNoReturn("TODO");
             fi;
@@ -944,7 +951,7 @@ function(ri, methoddb, depthString, mandarins, isSafeForMandarins)
                  "Handle the mandarin crisis (depth=", depth, ").");
             # We are the first safe node on the way to the root and thus need to
             # handle the crisis ourselves.
-            if not TryToEnlargeKernelGeneratingSetAndUpdateSLPsDuringMandarinCrisis(ri) then
+            if not TryToEnlargeKernelGeneratingSetAndUpdateSLPsDuringMandarinCrisis(ri, kernelStatus) then
                 # TODO: discard and re-recognise the image.
                 ErrorNoReturn("TODO");
             fi;
