@@ -545,6 +545,7 @@ function(ri)
     kernelToChop := unsafeKernelsOnPathToRoot[i];
     result := rec(kernelToChop := kernelToChop, level := level);
     Objectify(RecogCrisisType, result);
+    Info(InfoRecog, 1, "Crisis level=", level, ".");
     return result;
 end);
 
