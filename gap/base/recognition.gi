@@ -600,11 +600,6 @@ function(trivialKernel, parent)
     return result;
 end);
 
-# This is for debugging purposes. TODO: I don't think we ened this anymore
-# since crises are not added to the tree anymore
-InstallMethod(ViewString, "for recognition crises", [IsRecogCrisis],
-              crisis -> "<recog crisis>");
-
 # TODO, disable this to run test suite.
 InstallOtherMethod( RecogniseGeneric,
 "compatibility method",
