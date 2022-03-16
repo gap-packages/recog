@@ -536,12 +536,35 @@ function(ri)
         Filtered(List(unsafeKernelsOnPathToRoot,
                       y -> ParentRecogNode(y)!.highestCrisisLevel),
                  x -> x >= 1);
-    #How to get a "cascading effect"? Only spawn higher level if lower level
-    #existed? Or level X means that 2 of lvl X-1, 4 of lvl X-2 etc were spawned?
-    if IsEmpty(nonZeroLevelsOnPathToRoot) then
+    # TODO: fix description how levels are determined.
+    # We distinguish two types of crises. Either the level is one, or the level
+    # is greater or equal than two. We call the crisis of the latter kind a big
+    # crisis. In case of such a big crisis the recognition algorithm backtracks
+    # all the way to the topmost unsafe kernel on the way to the root and
+    # chopping it off. A level one crisis only backtracks part of the way and
+    # thus chops off a smaller subtree than big crises.
+    # TODO: describe that this level is propagated downwards. thus say above,
+    # that each node is initialized with a "highestCrisisLevelSeen". 
+    # The parent of the kernel which is chopped off stores the crisis level.
+    # Note that for a fixed node, these are strictly increasing.
+    #   TODO: explain that
+    # the crisis level of a node determines how often findgensNmeth is called,
+    # namely 2 ^ crisisLevel many times.
+    #   If no node on the way to the root was marked by a level one crisis, we
+    # always throw a level one crisis. Otherwise we take the highest crisis
+    # level seen by the topmost unsafe kernel and increase it by one. Note that
+    # once a node is marked by a big crisis, the next crisis triggered in the
+    # new subtree rooted in its newly constructed kernel node will again be a
+    # level one crisis, since no node will have been marked by a level one
+    # crisis yet.
+    #   In a newly constructed subtree we always first spawn a level one
+    # crisis, to conservatively chop off part of the recognition tree.
+    Print(List(unsafeKernelsOnPathToRoot, y -> ParentRecogNode(y)!.highestCrisisLevel), "\n");
+    if ForAll(nonZeroLevelsOnPathToRoot, x -> x > 1) then
         level := 1;
     else
-        level := 1 + Minimum(nonZeroLevelsOnPathToRoot);
+        # TODO: can there be different non-one levels on different nodes?
+        level := 1 + nonZeroLevelsOnPathToRoot[Length(nonZeroLevelsOnPathToRoot)];
     fi;
     # Determine kernelToChop
     if level >= 2 then
