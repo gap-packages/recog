@@ -192,7 +192,7 @@ function(ri, G)
   Setvalidatehomominput(ri, {ri,p} -> ForAll(o, x -> x^p in seto));
   SetHomom(ri,hom);
   Setimmediateverification(ri,true);
-  findgensNmeth(ri).args[1] := 3 + BAL_CONST * cut;
+  findgensNmeth(ri).args[1] := 3+cut;
   findgensNmeth(ri).args[2] := 5;
   if nrblocks - cut > 1 then
       l := Length(upperhalf[1]);
