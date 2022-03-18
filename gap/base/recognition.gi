@@ -52,6 +52,9 @@ RECOG_ViewObj := function( level, ri )
     elif HasIsRecogInfoForAlmostSimpleGroup(ri) and IsRecogInfoForAlmostSimpleGroup(ri) then
         Print(" AlmostSimple");
     fi;
+    if ri!.crisisLevel > 0 then
+    Print(" crisisLevel=", ri!.crisisLevel);
+    fi;
     if HasSize(ri) then
         Print(" Size=",Size(ri));
     fi;
@@ -459,7 +462,6 @@ BindGlobal("TryToEnlargeKernelGeneratingSetAndUpdateSLPsDuringMandarinCrisis",
 function(ri, crisis)
     local gensNWasEmpty, targetNrGensN, kernelGenerationSuccess;
     Print("Handling Mandarin Crisis!\n");
-    MC_CNT := MC_CNT + 1;
     gensNWasEmpty := IsEmpty(gensN(ri));
     if gensNWasEmpty then
         # The following value was chosen arbitrarily. It gets reduced during

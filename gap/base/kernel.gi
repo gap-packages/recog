@@ -75,7 +75,6 @@ InstallGlobalFunction( ImmediateVerification,
     if verified = true then return true; fi;
     # Now, verified = false.
     Print("Immediate verification: found extra kernel element(s)!\n");
-    IV_CNT := IV_CNT + 1;
     Info(InfoRecog,2,
          "Immediate verification: found extra kernel element(s)!");
     if FindKernelFastNormalClosure(ri,5,5) = fail then
