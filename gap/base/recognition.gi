@@ -154,14 +154,22 @@ InstallMethod( RecogNode,
     Objectify( RecogNodeType, ri );
     SetGrp(ri,H);
     # Used by RecogCrisis
-    ri!.highestCrisisLevel := 0;
+    if not IsBound(ri!.crisisLevel) then
+        ri!.crisisLevel := 0;
+    fi;
     Setslpforelement(ri,SLPforElementGeneric);
     SetgensN(ri,[]);       # this will grow over time
     Setimmediateverification(ri,false);
-    SetInitialDataForKernelRecogNode(ri,rec(hints := []));
-          # this is eventually handed down to the kernel
-    SetInitialDataForImageRecogNode(ri,rec(hints := []));
-          # this is eventually handed down to the image
+    # this is eventually handed down to the kernel
+    SetInitialDataForKernelRecogNode(
+        ri,
+        rec(hints := [], crisisLevel := ri!.crisisLevel)
+    );
+    # this is eventually handed down to the image
+    SetInitialDataForImageRecogNode(
+        ri,
+        rec(hints := [], crisisLevel := ri!.crisisLevel)
+    );
     if projective then
         Setisone(ri,IsOneProjective);
         Setisequal(ri,IsEqualProjective);
@@ -499,7 +507,9 @@ function(ri, crisis)
     until Length(gensN(ri)) >= targetNrGensN;
     SetgensNslp(ri,SLPOfElms(gensN(ri)));
     SlotUsagePattern(gensNslp(ri));
-    ri!.highestCrisisLevel := crisis!.level;
+    ri!.crisisLevel := crisis!.level;
+    InitialDataForImageRecogNode(ri).crisisLevel := crisis!.level;
+    InitialDataForKernelRecogNode(ri).crisisLevel := crisis!.level;
     return true;
 end);
 
@@ -517,8 +527,8 @@ InstallMethod(RecogCrisis,
 "for an IsRecogNode",
 [IsRecogNode],
 function(ri)
-    local isKernelNode, unsafeKernelsOnPathToRoot, node,
-        nonZeroLevelsOnPathToRoot, level, i, kernelToChop, result;
+    local isKernelNode, unsafeKernelsOnPathToRoot, node, highLevel, lowLevel,
+        isSmallCrisis, level, i, kernelToChop, result;
     # This is never called on the root:
     isKernelNode :=
         x -> HasKernelRecogNode(ParentRecogNode(x))
@@ -533,11 +543,14 @@ function(ri)
         node := ParentRecogNode(node);
     # The root is always safe, so this loop terminates.
     until IsSafeForMandarins(node);
-    # Determine level
-    nonZeroLevelsOnPathToRoot :=
-        Filtered(List(unsafeKernelsOnPathToRoot,
-                      y -> ParentRecogNode(y)!.highestCrisisLevel),
-                 x -> x >= 1);
+    # Now unsafeKernelsOnPathToRoot must be non-empty
+    Print(List(unsafeKernelsOnPathToRoot, y -> ParentRecogNode(y)!.crisisLevel), "\n");
+    # Determine whether to return a small crisis, that is whether to cut low.
+    # If unsafeKernelsOnPathToRoot has length one, there is no difference
+    # between a small and a big crisis, so we don't need to special case it.
+    highLevel := unsafeKernelsOnPathToRoot[Length(unsafeKernelsOnPathToRoot)]!.crisisLevel;
+    lowLevel := ri!.crisisLevel;
+    isSmallCrisis := lowLevel = highLevel;
     # TODO: fix description how levels are determined.
     # We distinguish two types of crises. Either the level is one, or the level
     # is greater or equal than two. We call the crisis of the latter kind a big
@@ -545,8 +558,16 @@ function(ri)
     # all the way to the topmost unsafe kernel on the way to the root and
     # chopping it off. A level one crisis only backtracks part of the way and
     # thus chops off a smaller subtree than big crises.
-    # TODO: describe that this level is propagated downwards. thus say above,
-    # that each node is initialized with a "highestCrisisLevelSeen". 
+    # TODO: describe that this level is propagated downwards to all *newly*
+    # created nodes. but only on the kernel side of the marked node! Thus it
+    # might be, that on a path to the root, the level is not strictly
+    # increasing.
+    # TODO TODO actually, I need to propagate it to everything? I had an
+    # example run taking 135 s instead of 2 s. Also, if a node is marked, then
+    # its kernel node is chopped off and that tree is recomputed, the tree
+    # rooted in the image node must have been completely recognized.
+    # TODO thus say above,
+    # that each node is initialized with a "crisisLevelSeen". 
     # The parent of the kernel which is chopped off stores the crisis level.
     # Note that for a fixed node, these are strictly increasing.
     #   TODO: explain that
@@ -561,23 +582,35 @@ function(ri)
     # crisis yet.
     #   In a newly constructed subtree we always first spawn a level one
     # crisis, to conservatively chop off part of the recognition tree.
-    Print(List(unsafeKernelsOnPathToRoot, y -> ParentRecogNode(y)!.highestCrisisLevel), "\n");
-    if ForAll(nonZeroLevelsOnPathToRoot, x -> x > 1) then
-        level := 1;
-    else
-        # TODO: can there be different non-one levels on different nodes?
-        level := 1 + nonZeroLevelsOnPathToRoot[Length(nonZeroLevelsOnPathToRoot)];
-    fi;
+    # should small crises increase level?
+    #0
+    #1
+    #2
+    #
+    #0 0 0 0
+    #-> 1, low
+    #
+    #0 0 1 1
+    #-> 1, high
+    #
+    #1 1 1 1
+    #-> 2, low
+    #
+    #1 1 2 2
+    #-> 2, high
+    #
+    #2 2 2 2
+    level := highLevel + 1;
+    Info(InfoRecog, 1, "Crisis level=", level, ", small=", isSmallCrisis, ".");
     # Determine kernelToChop
-    if level >= 2 then
-        i := Length(unsafeKernelsOnPathToRoot);
+    if isSmallCrisis then
+        i := Maximum(1, QuoInt(1 + Length(unsafeKernelsOnPathToRoot), 2));
     else
-        i := Maximum(1, QuoInt(Length(unsafeKernelsOnPathToRoot), 2));
+        i := Length(unsafeKernelsOnPathToRoot);
     fi;
     kernelToChop := unsafeKernelsOnPathToRoot[i];
     result := rec(kernelToChop := kernelToChop, level := level);
     Objectify(RecogCrisisType, result);
-    Info(InfoRecog, 1, "Crisis level=", level, ".");
     return result;
 end);
 
@@ -835,10 +868,23 @@ function(ri, methoddb, depthString, mandarins, isSafeForMandarins)
 
         # Now create the kernel generators with the stored method:
         # The value of kernelGenerationSuccess is either true or fail.
+        # A non-zero crisisLevel means that somewhere above us a kernel
+        # had to be chopped off due to a crisis. Thus we create more kernel
+        # generators.
+        # We tested running findgensNmeth 2 ^ ri!.crisisLevel times on
+        # the "big imprimitive wreath product" test case (TODO explain what
+        # that is).
+        # Using 2 ^ level was inferior to using 2 * level.
+        # TODO, drop the 2 *: Using 2 ^ level was inferior to using level.
+        # TODO: test running findgensNmeth 2 ^ ri!.crisisLevel times
+        # with improved findgensNmeth args. 
         # TODO: why doesn't this throw a crisis?
-        kernelGenerationSuccess :=
-            CallFuncList(findgensNmeth(ri).method,
-                         Concatenation([ri],findgensNmeth(ri).args));
+        kernelGenerationSuccess := true;
+        for i in [1 .. 1 + ri!.crisisLevel] do
+            kernelGenerationSuccess := kernelGenerationSuccess
+                and (true = CallFuncList(findgensNmeth(ri).method,
+                                         Concatenation([ri],findgensNmeth(ri).args)));
+        od;
     until kernelGenerationSuccess = true;
 
     # If nobody has set how we produce preimages of the nicegens:
