@@ -435,7 +435,7 @@ function(ri, G)
               return NeverApplicable;
           fi;
       fi;
-      o := MovedPoints(G);
+      o := Set(MovedPoints(G));
       hom := ActionHomomorphism(G,o);
       SetHomom(ri,hom);
       Setvalidatehomominput(ri, {ri,p} -> IsSubset(o, MovedPoints(p)));
