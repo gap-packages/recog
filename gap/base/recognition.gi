@@ -1056,15 +1056,16 @@ function(ri, methoddb, depthString, mandarins, isSafeForMandarins)
         s := NewProductOfStraightLinePrograms(riker!.mandarinSLPs[i], [nrNiceGensOfImageNode + 1 .. Length(NiceGens(ri))],
                                               rifac!.mandarinSLPs[i], [1..nrNiceGensOfImageNode],
                                               Length(NiceGens(ri)));
+        # Now check that the SLP evaluates to x. But first we need to do a
+        # hack: something is suuper iffy about the method BlocksModScalars,
+        # which is called by BlockDiagonal. Groups recognized by
+        # BlocksModScalars are to be understood neither as a projective nor as
+        # a matrix group, but rather as a "all block-scalars being trivial"
+        # group. To be able to check the mandarins we would thus need special
+        # functions handling isone and isequal, but these do not exist.
+        # Note that this also poses a problem for immediate verification, which
+        # we circumvent by hacking SLPforElementGeneric.
         if not isequal(ri)(x, ResultOfStraightLineProgram(s, NiceGens(ri)))
-                # HACK: something is suuper iffy about the method BlocksModScalars, which
-                # is called by BlockDiagonal. Groups recognized by BlocksModScalars
-                # are to be understood neither as a projective nor as a matrix group, but
-                # rather as a "all block-scalars being trivial" group. To be able
-                # to check the mandarins we would thus need special functions
-                # handling isone and isequal, but these do not exist.
-                # Note that this also has to be considered when doing immediate verification.
-                # To solve that situation we hacked SLPforElementGeneric.
                 and fhmethsel(ri).successMethod <> "BlocksModScalars" then
             # TODO: with the master branch rewriting the gens as slps never
             # fails. at least we never enter a second iteration of the
@@ -1074,21 +1075,6 @@ function(ri, methoddb, depthString, mandarins, isSafeForMandarins)
             return MANDARIN_CRISIS;
         fi;
         Add(mandarinSLPs, s);
-        # WHERE TO PUT THIS?
-        # How can I access / store an slpToPregensfac? I don't want to have a
-        # single slp for every element of pregensfac but one slp which returns all.
-        # Btw. for kernels this is stored in gensNslp.
-        # TODO: I bet I can just call these with NiceGens{[1..Length(NiceGens(rifac))]};
-        # projection SLP, do I need this?
-        #imageMandarinSLPs := List(
-        #    rifac!.mandarinSLPs,
-        #    x -> CompositionOfStraightLinePrograms(
-        #        x,
-        #        projection SLP
-        #    )
-        #);
-        #   StraightLineProgramNC([List([1..Length(NiceGens(rifac))], i -> [i, 1])],
-        #                        Length(NiceGens(ri)))
     od;
     ri!.mandarinSLPs := mandarinSLPs;
 
