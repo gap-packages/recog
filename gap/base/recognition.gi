@@ -965,6 +965,7 @@ function(ri, methoddb, depthString, mandarins, isSafeForMandarins)
                     # HACK: something is suuper iffy about the method BlocksModScalars,
                     # see the comment at the "check mandarins" part of the non-leaf case.
                     and fhmethsel(ri).successMethod <> "BlocksModScalars" then
+                # TODO remove
                 return MANDARIN_CRISIS;
             fi;
         od;
@@ -1072,6 +1073,7 @@ function(ri, methoddb, depthString, mandarins, isSafeForMandarins)
             # "recognise image" loop.
             Info(InfoRecog, 2,
                  "Enter Mandarin crisis (non-leaf, depth=", depth, ").");
+                # TODO remove
             return MANDARIN_CRISIS;
         fi;
         Add(mandarinSLPs, s);
