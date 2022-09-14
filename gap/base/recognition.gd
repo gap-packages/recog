@@ -94,7 +94,7 @@ DeclareFilter( "IsLeaf" );
 ## <P/>
 ## In particular, any computations using the datastructure set up by the
 ## recognition procedure, like <Ref Oper="Size"/> and membership testing via
-## <Ref Oper="\\in"/>, will error if <Ref Filt="IsReady"/> is not set.
+## <Ref Oper="\in"/>, will error if <Ref Filt="IsReady"/> is not set.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
