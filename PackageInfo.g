@@ -45,7 +45,7 @@ Persons := [
     Email         := "bernhardt@mathb.rwth-aachen.de",
     Place         := "Aachen",
     Institution   := "RWTH Aachen University",
-    WWWHome       := "https://www.mathb.rwth-aachen.de/cms/MATHB/Der-Lehrstuhl/Team/Wissenschaftliche-Beschaeftigte/~rnsg/Dominik-Bernhardt/lidx/1/"
+    #WWWHome       := "https://www.mathb.rwth-aachen.de/cms/MATHB/Der-Lehrstuhl/Team/Wissenschaftliche-Beschaeftigte/~rnsg/Dominik-Bernhardt/lidx/1/"
   ),
   rec(
     LastName      := "Ankaralioglu",
@@ -183,7 +183,7 @@ rec(
     IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "sergio@mathb.rwth-aachen.de",
-    WWWHome       := "https://www.mathematik.rwth-aachen.de/go/id/bkbg/gguid/0x28CF75713F0B7744BEF1377FB3F6748E/ikz/11/allou/1/lidx/1/",
+    #WWWHome       := "https://www.mathematik.rwth-aachen.de/go/id/bkbg/gguid/0x28CF75713F0B7744BEF1377FB3F6748E/ikz/11/allou/1/lidx/1/",
     Place         := "Aachen",
     Institution   := "RWTH Aachen University"
   ), 
