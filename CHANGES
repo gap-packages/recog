@@ -1,5 +1,10 @@
 This file describes changes in the recog package.
 
+1.4.2 (2022-09-27)
+  - Fix more compatibility issues with matgrp <= 0.70
+  - Rename `order` to `OrderFunc` to avoid clashes with existing code
+  - Speed up default test suite
+
 1.4.1 (2022-09-26)
   - Fix compatibility with matgrp <= 0.70
 
