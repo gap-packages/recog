@@ -168,7 +168,8 @@ DeclareAttribute( "NiceGens", IsRecogNode, "mutable" );
 ## </ManSection>
 ## <#/GAPDoc>
 DeclareAttribute( "ImageRecogNode", IsRecogNode, "mutable" );
-DeclareObsoleteSynonymAttr( "RIFac", "ImageRecogNode" );
+DeclareSynonymAttr( "RIFac", ImageRecogNode );
+#DeclareObsoleteSynonymAttr( "RIFac", "ImageRecogNode" ); # FIXME: switch this back one
 
 ## <#GAPDoc Label="KernelRecogNode">
 ## <ManSection>
@@ -187,7 +188,8 @@ DeclareObsoleteSynonymAttr( "RIFac", "ImageRecogNode" );
 ## </ManSection>
 ## <#/GAPDoc>
 DeclareAttribute( "KernelRecogNode", IsRecogNode, "mutable" );
-DeclareObsoleteSynonymAttr( "RIKer", "KernelRecogNode" );
+DeclareSynonymAttr( "RIKer", KernelRecogNode );
+# DeclareObsoleteSynonymAttr( "RIKer", "KernelRecogNode" ); # FIXME: switch this back one
 
 ## <#GAPDoc Label="ParentRecogNode">
 ## <ManSection>
