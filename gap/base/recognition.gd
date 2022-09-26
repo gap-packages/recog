@@ -350,7 +350,7 @@ DeclareAttribute( "isone", IsRecogNode, "mutable" );
 # Used to compare group elements after recognition:
 DeclareAttribute( "isequal", IsRecogNode, "mutable" );
 # Used to compute order of group elements after recognition:
-DeclareAttribute( "order", IsRecogNode, "mutable" );
+DeclareAttribute( "OrderFunc", IsRecogNode, "mutable" );
 # Used to check whether two group elements commute:
 DeclareAttribute( "docommute", IsRecogNode, "mutable" );
 

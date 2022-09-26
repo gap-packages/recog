@@ -479,7 +479,7 @@ set this attribute.
 </ManSection>
 
 <ManSection>
-<Attr Name="order" Arg="ri"/>
+<Attr Name="OrderFunc" Arg="ri"/>
 <Description>
 This attribute returns a function that computes the order of an element
 of the group being recognised. Usually this is just the operation
