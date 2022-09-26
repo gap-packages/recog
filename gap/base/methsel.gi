@@ -20,10 +20,19 @@
 # Add a method to a database with "AddMethod" and call a method from a
 # database with "CallMethods".
 #
-InstallGlobalFunction("AddMethod", function(methodDb, method, rank)
-    local pos;
+InstallGlobalFunction("AddMethod", function(methodDb, method, rank, extra...)
+    local pos, name;
     if not IsRecogMethod(method) then
-        ErrorNoReturn("<method> must be a RecogMethod");
+        if Length(extra) = 2 then
+            # HACK: workaround for matgrp package <= 0.70 which accesses the old
+            # API; a fix to use the new API is already in the matgrp repository
+            # but has not yet been released.
+            method := RecogMethod(extra[1], extra[2], method);
+        else
+            ErrorNoReturn("<method> must be a RecogMethod");
+        fi;
+    elif Length(extra) > 0 then
+        Error("Error, Function: number of arguments must be 3 (not ", 3 + Length(extra), ")");
     fi;
     pos := PositionSortedBy(methodDb, -rank, m -> -m.rank);
     Add(methodDb, rec(method := method, rank := rank), pos);
