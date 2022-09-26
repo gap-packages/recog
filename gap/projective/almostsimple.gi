@@ -1354,7 +1354,7 @@ function(ri,G)
           Info(InfoRecog,2,"Ruled out all sporadic groups.");
           return NeverApplicable;
       elif i <= Length(gens) then
-          r.order := ri!.order(r.el);
+          r.order := OrderFunc(ri)(r.el);
       else
           GetElmOrd(ri,r);
       fi;

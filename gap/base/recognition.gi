@@ -159,11 +159,11 @@ InstallMethod( RecogNode,
     if projective then
         Setisone(ri,IsOneProjective);
         Setisequal(ri,IsEqualProjective);
-        ri!.order := RECOG.ProjectiveOrder;
+        SetOrderFunc(ri, RECOG.ProjectiveOrder);
     else
         Setisone(ri,IsOne);
         Setisequal(ri,\=);
-        ri!.order := Order;
+        SetOrderFunc(ri, Order);
     fi;
     Setdocommute(ri, function(x,y)
       local a,b;
@@ -298,13 +298,13 @@ InstallMethod( RandomElmOrd,
             if not IsBound(ri!.randr[pos]) then
                 ri!.randr[pos] := Next(ri!.prodrep);
             fi;
-            ri!.rando[pos] := ri!.order(ri!.randr[pos]!.el);
+            ri!.rando[pos] := OrderFunc(ri)(ri!.randr[pos]!.el);
         fi;
         res := rec( order := ri!.rando[pos], projective := ri!.projective,
                     el := ri!.randr[pos] );
     else
         res := rec( el := Next(ri!.prodrep) );
-        res.order := ri!.order(res.el!.el);
+        res.order := OrderFunc(ri)(res.el!.el);
         res.projective := ri!.projective;
         Add(ri!.rando,res.order);
     fi;
@@ -326,12 +326,12 @@ InstallMethod( GetElmOrd, "for a recognition node and a record",
         if IsBound(ri!.rando[r.nr]) then
             r.order := ri!.rando[r.nr];
         else
-            ri!.rando[r.nr] := ri!.order(ri!.randr[r.nr]!.el);
+            ri!.rando[r.nr] := OrderFunc(ri)(ri!.randr[r.nr]!.el);
             r.order := ri!.rando[r.nr];
         fi;
     else
         x := StripMemory(r.el);
-        r.order := ri!.order(x);
+        r.order := OrderFunc(ri)(x);
     fi;
   end );
 

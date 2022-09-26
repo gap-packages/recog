@@ -85,7 +85,7 @@ function(ri,G)
   if IsBound(ri!.primes) then    # this is a message from ourselves from above!
       primes := ri!.primes;
   else
-      ords := List(gens,ri!.order);
+      ords := List(gens,OrderFunc(ri));
       primes := Union(List(ords,o->Set(Factors(o))));
       RemoveSet(primes,1);    # in case there were identities!
   fi;
@@ -95,7 +95,7 @@ function(ri,G)
   cut := QuoInt(Length(primes),2);
   data := rec( primesfactor := primes{[1..cut]},
                primeskernel := primes{[cut+1..Length(primes)]},
-               orderfunc := ri!.order );
+               orderfunc := OrderFunc(ri) );
   decompositionData := List(gensm, x-> RECOG.DecomposeNilpotent(data,x));
   gensfac := List(decompositionData,x -> StripMemory(x[2]));
   gensker := List(decompositionData,x -> x[1]);
