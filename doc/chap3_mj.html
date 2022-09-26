@@ -73,7 +73,7 @@
 <span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap3_mj.html#X86F6DB9482B4D8AC">3.2-33 InitialDataForImageRecogNode</a></span>
 <span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap3_mj.html#X814D78347858EC13">3.2-34 isone</a></span>
 <span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap3_mj.html#X7D0F06047B88E5CD">3.2-35 isequal</a></span>
-<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap3_mj.html#X84F59A2687C62763">3.2-36 order</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap3_mj.html#X860CF50D80A4215A">3.2-36 OrderFunc</a></span>
 <span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap3_mj.html#X7EBE1C5D7C99FA2F">3.2-37 <span class="Heading">Other components of recognition nodes</span></a>
 </span>
 </div></div>
@@ -516,11 +516,11 @@
 <div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; isequal</code>( <var class="Arg">ri</var> )</td><td class="tdright">(&nbsp;attribute&nbsp;)</td></tr></table></div>
 <p>This attribute returns a function that compares two elements of the group being recognised. Usually this is just the operation <code class="func">EQ</code> (<a href="https://www.gap-system.org/Manuals/doc/ref/chap29_mj.html#X83A7E6607B1D63BC"><span class="RefLink">Reference: equality of records</span></a>) but for projective groups it is a special function checking for equality up to a scalar factor. In generic code, one should always use the result of this attribute to compare two elements such that the code works also for projective groups. Find homomorphism methods usually do not have to set this attribute.</p>
 
-<p><a id="X84F59A2687C62763" name="X84F59A2687C62763"></a></p>
+<p><a id="X860CF50D80A4215A" name="X860CF50D80A4215A"></a></p>
 
-<h5>3.2-36 order</h5>
+<h5>3.2-36 OrderFunc</h5>
 
-<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; order</code>( <var class="Arg">ri</var> )</td><td class="tdright">(&nbsp;attribute&nbsp;)</td></tr></table></div>
+<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; OrderFunc</code>( <var class="Arg">ri</var> )</td><td class="tdright">(&nbsp;attribute&nbsp;)</td></tr></table></div>
 <p>This attribute returns a function that computes the order of an element of the group being recognised. Usually this is just the operation <code class="func">Order</code> (<a href="https://www.gap-system.org/Manuals/doc/ref/chap31_mj.html#X84F59A2687C62763"><span class="RefLink">Reference: Order</span></a>) but for projective groups it is a special function. In generic code, one should always use the result of this attribute to compute the order of an element such that the code works also for projective groups. Find homomorphism methods usually do not have to set this attribute.</p>
 
 <p><a id="X7EBE1C5D7C99FA2F" name="X7EBE1C5D7C99FA2F"></a></p>

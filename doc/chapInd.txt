@@ -47,7 +47,7 @@
   [10Xmethodsforfactor[110X 8. 
   [2Xmethodsforimage[102X 3.2-17 
   [2XNiceGens[102X 3.2-8 
-  [2Xorder[102X 3.2-36 
+  [2XOrderFunc[102X 3.2-36 
   [2XParentRecogNode[102X 3.2-12 
   [2Xpregensfac[102X 3.2-9 
   [2XRecogMethod[102X 4.1-2 

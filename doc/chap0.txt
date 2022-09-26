@@ -6,10 +6,10 @@
    [1X A package for constructive recognition of permutation and matrix groups [101X
   
   
-                                     1.4.1
+                                     1.4.2
   
   
-                               26 September 2022
+                               27 September 2022
   
   
                                  Max Neunhöffer
@@ -86,7 +86,7 @@
       3.2-33 InitialDataForImageRecogNode
       3.2-34 isone
       3.2-35 isequal
-      3.2-36 order
+      3.2-36 OrderFunc
       3.2-37 [33X[0;0YOther components of recognition nodes[133X
     3.3 [33X[0;0YMethods to find homomorphisms[133X
       3.3-1 FindHomomorphism

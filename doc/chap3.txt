@@ -704,9 +704,9 @@
   also for projective groups. Find homomorphism methods usually do not have to
   set this attribute.[133X
   
-  [1X3.2-36 order[101X
+  [1X3.2-36 OrderFunc[101X
   
-  [33X[1;0Y[29X[2Xorder[102X( [3Xri[103X ) [32X attribute[133X
+  [33X[1;0Y[29X[2XOrderFunc[102X( [3Xri[103X ) [32X attribute[133X
   
   [33X[0;0YThis  attribute  returns a function that computes the order of an element of
   the  group  being  recognised.  Usually  this  is  just  the operation [2XOrder[102X
