@@ -278,7 +278,7 @@ Dependencies := rec(
 ),
 
 AvailabilityTest := ReturnTrue,
-TestFile := "tst/testall.g",
+TestFile := "tst/testquick.g",
 
 Keywords := ["group recognition", "matrix group recognition",
 "permutation group", "black box group", "composition tree",
