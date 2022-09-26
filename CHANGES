@@ -1,5 +1,13 @@
 This file describes changes in the recog package.
 
+1.4.0 (2022-09-26)
+  - A huge number of changes (over 388 commits since the previous release)
+    were made, with many bug fixes and improvements, but also renamed APIs
+    and more. Unfortunately this may break some code using recog. If this
+    happens to, you, please let us know about it via our issue tracker
+    <https://github.com/gap-packages/recog/issues> or by sending and email
+    to Max Horn <horn@mathematik.uni-kl.de>.
+
 1.3.2 (2019-04-15)
   - Many janitorial changes
 
