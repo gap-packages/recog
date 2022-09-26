@@ -2,9 +2,258 @@
   
   [1XReferences[101X
   
-  [[20XNS06[120X]  [16XNeunh{\"o}ffer,  M.  and  Seress, {.[116X, [17XA data structure for a uniform
+  [[20XAB01[120X]  [16XAltseimer,  C.  and  Borovik,  A.  V.[116X,  [17XProbabilistic recognition of
+  orthogonal  and symplectic groups[117X, in Groups and computation, III (Columbus,
+  OH, 1999), de Gruyter, Berlin, [19X8[119X (2001), 1–20.
+  
+  [[20XBB99[120X]  [16XBabai,  L.  and  Beals,  R.[116X,  [17XA  polynomial-time theory of black box
+  groups.  I[117X,  in  Groups  St. Andrews 1997 in Bath, I, Cambridge Univ. Press,
+  Cambridge, London Math. Soc. Lecture Note Ser., [19X260[119X (1999), 30–64.
+  
+  [[20XBBS09[120X]  [16XBabai,  L.,  Beals,  R.  and  Seress, Á.[116X, [17XPolynomial-time theory of
+  matrix  groups[117X,  in  STOC'09–-Proceedings  of  the  2009  ACM  International
+  Symposium on Theory of Computing, ACM, New York (2009), 55–64.
+  
+  [[20XBHLGO15[120X] [16XBäärnhielm, H., Holt, D., Leedham-Green, C. R. and O'Brien, E. A.[116X,
+  [17XA  practical  model for computation with matrix groups[117X, [18XJ. Symbolic Comput.[118X,
+  [19X68[119X, part 1 (2015), 27–60, (https://doi.org/10.1016/j.jsc.2014.08.006).
+  
+  [[20XBK01[120X] [16XBrooksbank, P. A. and Kantor, W. M.[116X, [17XOn constructive recognition of a
+  black  box PSL(d,q)[117X, in Groups and computation, III (Columbus, OH, 1999), de
+  Gruyter, Berlin, Ohio State Univ. Math. Res. Inst. Publ., [19X8[119X (2001), 95–111.
+  
+  [[20XBK06[120X] [16XBrooksbank, P. A. and Kantor, W. M.[116X, [17XFast constructive recognition of
+  black   box   orthogonal   groups[117X,  [18XJ.  Algebra[118X,  [19X300[119X,  1  (2006),  256–288,
+  (https://doi.org/10.1016/j.jalgebra.2006.02.024).
+  
+  [[20XBKPS02[120X]  [16XBabai,  L.,  Kantor, W. M., Pálfy, P. P. and Seress, Á.[116X, [17XBlack-box
+  recognition  of  finite  simple  groups of Lie type by statistics of element
+  orders[117X,      [18XJ.      Group     Theory[118X,     [19X5[119X,     4     (2002),     383–401,
+  (https://doi.org/10.1515/jgth.2002.010).
+  
+  [[20XBLGN+03[120X]  [16XBeals,  R., Leedham-Green, C. R., Niemeyer, A. C., Praeger, C. E.
+  and Seress, Á.[116X, [17XA black-box group algorithm for recognizing finite symmetric
+  and  alternating  groups.  I[117X,  [18XTrans.  Amer.  Math.  Soc.[118X,  [19X355[119X,  5  (2003),
+  2097–2113, (https://doi.org/10.1090/S0002-9947-03-03040-X).
+  
+  [[20XBLGN+05[120X]  [16XBeals,  R., Leedham-Green, C. R., Niemeyer, A. C., Praeger, C. E.
+  and Seress, Á.[116X, [17XConstructive recognition of finite alternating and symmetric
+  groups  acting  as  matrix  groups  on their natural permutation modules[117X, [18XJ.
+  Algebra[118X,             [19X292[119X,             1             (2005),            4–46,
+  (https://doi.org/10.1016/j.jalgebra.2005.01.035).
+  
+  [[20XBLS97[120X]  [16XBabai,  L.,  Luks,  E.  M.  and  Seress,  Á.[116X,  [17XFast  management  of
+  permutation   groups.   I[117X,   [18XSIAM  J.  Comput.[118X,  [19X26[119X,  5  (1997),  1310–1342,
+  (https://doi.org/10.1137/S0097539794229417).
+  
+  [[20XBNS06[120X]  [16XBrooksbank,  P.,  Niemeyer,  A.  C.  and  Seress,  Á.[116X,  [17XA reduction
+  algorithm  for matrix groups with an extraspecial normal subgroup[117X, in Finite
+  geometries, groups, and computation, Walter de Gruyter, Berlin (2006), 1–16.
+  
+  [[20XBro01[120X]  [16XBrooksbank,  P.  A.[116X,  [17XA  constructive recognition algorithm for the
+  matrix group Ω(d,q)[117X, in Groups and computation, III (Columbus, OH, 1999), de
+  Gruyter, Berlin, Ohio State Univ. Math. Res. Inst. Publ., [19X8[119X (2001), 79–93.
+  
+  [[20XBro03[120X]  [16XBrooksbank,  P.  A.[116X,  [17XFast  constructive  recognition  of black-box
+  unitary    groups[117X,    [18XLMS    J.    Comput.   Math.[118X,   [19X6[119X   (2003),   162–197,
+  (https://doi.org/10.1112/S1461157000000437).
+  
+  [[20XBro08[120X]  [16XBrooksbank,  P.  A.[116X,  [17XFast  constructive  recognition  of black box
+  symplectic     groups[117X,    [18XJ.    Algebra[118X,    [19X320[119X,    2    (2008),    885–909,
+  (https://doi.org/10.1016/j.jalgebra.2008.03.021).
+  
+  [[20XBS01[120X]  [16XBabai, L. and Shalev, A.[116X, [17XRecognizing simplicity of black-box groups
+  and  the  frequency  of  p-singular elements in affine groups[117X, in Groups and
+  computation,  III (Columbus, OH, 1999), de Gruyter, Berlin, Ohio State Univ.
+  Math. Res. Inst. Publ., [19X8[119X (2001), 39–62.
+  
+  [[20XCFL97[120X]   [16XCooperman,  G.,  Finkelstein,  L.  and  Linton,  S.[116X,  [17XConstructive
+  recognition  of  a  black  box  group  isomorphic  to GL(n,2)[117X, in Groups and
+  computation, II (New Brunswick, NJ, 1995), Amer. Math. Soc., Providence, RI,
+  DIMACS Ser. Discrete Math. Theoret. Comput. Sci., [19X28[119X (1997), 85–100.
+  
+  [[20XCLG97a[120X]  [16XCeller,  F.  and Leedham-Green, C. R.[116X, [17XCalculating the order of an
+  invertible  matrix[117X, in Groups and computation, II (New Brunswick, NJ, 1995),
+  Amer.  Math.  Soc.,  Providence,  RI,  DIMACS  Ser.  Discrete Math. Theoret.
+  Comput. Sci., [19X28[119X (1997), 55–60.
+  
+  [[20XCLG97b[120X] [16XCeller, F. and Leedham-Green, C. R.[116X, [17XA non-constructive recognition
+  algorithm  for  the special linear and other classical groups[117X, in Groups and
+  computation, II (New Brunswick, NJ, 1995), Amer. Math. Soc., Providence, RI,
+  DIMACS Ser. Discrete Math. Theoret. Comput. Sci., [19X28[119X (1997), 61–67.
+  
+  [[20XCLG98[120X]  [16XCeller,  F.  and  Leedham-Green,  C. R.[116X, [17XA constructive recognition
+  algorithm  for  the special linear group[117X, in The atlas of finite groups: ten
+  years  on (Birmingham, 1995), Cambridge Univ. Press, Cambridge, London Math.
+  Soc.       Lecture       Note       Ser.,       [19X249[119X      (1998),      11–26,
+  (https://doi.org/10.1017/CBO9780511565830.007).
+  
+  [[20XCLG01[120X]  [16XConder,  M. and Leedham-Green, C. R.[116X, [17XFast recognition of classical
+  groups  over  large  fields[117X,  in  Groups and computation, III (Columbus, OH,
+  1999),  de  Gruyter,  Berlin,  Ohio  State  Univ.  Math. Res. Inst. Publ., [19X8[119X
+  (2001), 113–121.
+  
+  [[20XCLGM+95[120X]  [16XCeller,  F., Leedham-Green, C. R., Murray, S. H., Niemeyer, A. C.
+  and  O'Brien,  E.  A.[116X,  [17XGenerating  random elements of a finite group[117X, [18XComm.
+  Algebra[118X,            [19X23[119X,            13           (1995),           4931–4948,
+  (https://doi.org/10.1080/00927879508825509).
+  
+  [[20XCLGO06[120X]  [16XConder,  M.  D.  E.,  Leedham-Green,  C.  R.  and  O'Brien, E. A.[116X,
+  [17XConstructive  recognition  of  PSL(2,q)[117X,  [18XTrans.  Amer.  Math.  Soc.[118X, [19X358[119X, 3
+  (2006), 1203–1221, (https://doi.org/10.1090/S0002-9947-05-03756-6).
+  
+  [[20XCNRD09[120X]  [16XCarlson,  J.  F.,  Neunhöffer,  M.  and  Roney-Dougal,  C.  M.[116X,  [17XA
+  polynomial-time  reduction  algorithm  for  groups of semilinear or subfield
+  class[117X,       [18XJ.       Algebra[118X,       [19X322[119X,       3      (2009),      613–637,
+  (https://doi.org/10.1016/j.jalgebra.2009.04.022).
+  
+  [[20XDLGLO13[120X] [16XDietrich, H., Leedham-Green, C. R., Lübeck, F. and O'Brien, E. A.[116X,
+  [17XConstructive  recognition  of  classical  groups  in even characteristic[117X, [18XJ.
+  Algebra[118X,                 [19X391[119X                 (2013),                227–255,
+  (https://doi.org/10.1016/j.jalgebra.2013.04.031).
+  
+  [[20XDLGO15[120X]  [16XDietrich,  H.,  Leedham-Green, C. R. and O'Brien, E. A.[116X, [17XEffective
+  black-box  constructive  recognition  of  classical  groups[117X, [18XJ. Algebra[118X, [19X421[119X
+  (2015), 460–492, (https://doi.org/10.1016/j.jalgebra.2014.08.039).
+  
+  [[20XGH97[120X]  [16XGlasby,  S.  P.  and  Howlett,  R.  B.[116X, [17XWriting representations over
+  minimal    fields[117X,    [18XComm.    Algebra[118X,    [19X25[119X,    6    (1997),    1703–1711,
+  (https://doi.org/10.1080/00927879708825947).
+  
+  [[20XGLGO06[120X]  [16XGlasby,  S.  P.,  Leedham-Green, C. R. and O'Brien, E. A.[116X, [17XWriting
+  projective representations over subfields[117X, [18XJ. Algebra[118X, [19X295[119X, 1 (2006), 51–61,
+  (https://doi.org/10.1016/j.jalgebra.2005.03.037).
+  
+  [[20XHLGOR96a[120X]  [16XHolt,  D. F., Leedham-Green, C. R., O'Brien, E. A. and Rees, S.[116X,
+  [17XComputing  matrix group decompositions with respect to a normal subgroup[117X, [18XJ.
+  Algebra[118X, [19X184[119X, 3 (1996), 818–838, (https://doi.org/10.1006/jabr.1996.0286).
+  
+  [[20XHLGOR96b[120X]  [16XHolt,  D. F., Leedham-Green, C. R., O'Brien, E. A. and Rees, S.[116X,
+  [17XTesting  matrix  groups for primitivity[117X, [18XJ. Algebra[118X, [19X184[119X, 3 (1996), 795–817,
+  (https://doi.org/10.1006/jabr.1996.0285).
+  
+  [[20XHLO+08[120X]  [16XHolmes,  P.  E., Linton, S. A., O'Brien, E. A., Ryba, A. J. E. and
+  Wilson, R. A.[116X, [17XConstructive membership in black-box groups[117X, [18XJ. Group Theory[118X,
+  [19X11[119X, 6 (2008), 747–763, (https://doi.org/10.1515/JGT.2008.047).
+  
+  [[20XHR94[120X]  [16XHolt,  D.  F.  and  Rees, S.[116X, [17XTesting modules for irreducibility[117X, [18XJ.
+  Austral. Math. Soc. Ser. A[118X, [19X57[119X, 1 (1994), 1–16.
+  
+  [[20XIL00[120X]  [16XIvanyos,  G.  and  Lux,  K.[116X,  [17XTreating  the exceptional cases of the
+  MeatAxe[117X,      [18XExperiment.      Math.[118X,      [19X9[119X,     3     (2000),     373–381,
+  (http://projecteuclid.org/euclid.em/1045604672).
+  
+  [[20XJLNP13[120X]  [16XJambor,  S.,  Leuner,  M.,  Niemeyer,  A. C. and Plesken, W.[116X, [17XFast
+  recognition of alternating groups of unknown degree[117X, [18XJ. Algebra[118X, [19X392[119X (2013),
+  315–335, (https://doi.org/10.1016/j.jalgebra.2013.06.005).
+  
+  [[20XKK15[120X]  [16XKantor,  W.  M.  and  Kassabov,  M.[116X,  [17XBlack box groups isomorphic to
+  PGL(2,2^e)[117X,        [18XJ.        Algebra[118X,        [19X421[119X        (2015),       16–26,
+  (https://doi.org/10.1016/j.jalgebra.2014.08.014).
+  
+  [[20XKM13[120X]  [16XKantor,  W.  M. and Magaard, K.[116X, [17XBlack box exceptional groups of Lie
+  type[117X,    [18XTrans.    Amer.    Math.    Soc.[118X,   [19X365[119X,   9   (2013),   4895–4931,
+  (https://doi.org/10.1090/S0002-9947-2013-05822-9).
+  
+  [[20XKM15[120X]  [16XKantor,  W.  M. and Magaard, K.[116X, [17XBlack box exceptional groups of Lie
+  type       II[117X,       [18XJ.       Algebra[118X,       [19X421[119X       (2015),      524–540,
+  (https://doi.org/10.1016/j.jalgebra.2014.09.003).
+  
+  [[20XKS09[120X]  [16XKantor,  W.  M.  and  Seress,  Á.[116X,  [17XLarge  element  orders  and  the
+  characteristic  of  Lie-type  simple  groups[117X,  [18XJ.  Algebra[118X,  [19X322[119X,  3 (2009),
+  802–832, (https://doi.org/10.1016/j.jalgebra.2009.05.004).
+  
+  [[20XLG01[120X]  [16XLeedham-Green,  C.  R.[116X,  [17XThe  computational matrix group project[117X, in
+  Groups  and  computation, III (Columbus, OH, 1999), de Gruyter, Berlin, Ohio
+  State Univ. Math. Res. Inst. Publ., [19X8[119X (2001), 229–247.
+  
+  [[20XLGO97a[120X]  [16XLeedham-Green,  C.  R.  and  O'Brien,  E.  A.[116X,  [17XRecognising tensor
+  products  of  matrix  groups[117X,  [18XInternat.  J.  Algebra  Comput.[118X, [19X7[119X, 5 (1997),
+  541–559, (https://doi.org/10.1142/S0218196797000241).
+  
+  [[20XLGO97b[120X]  [16XLeedham-Green,  C.  R.  and  O'Brien,  E.  A.[116X, [17XTensor products are
+  projective    geometries[117X,    [18XJ.    Algebra[118X,    [19X189[119X,   2   (1997),   514–528,
+  (https://doi.org/10.1006/jabr.1996.6881).
+  
+  [[20XLGO02[120X]  [16XLeedham-Green, C. R. and O'Brien, E. A.[116X, [17XRecognising tensor-induced
+  matrix     groups[117X,     [18XJ.     Algebra[118X,     [19X253[119X,     1     (2002),     14–30,
+  (https://doi.org/10.1016/S0021-8693(02)00041-8).
+  
+  [[20XLGO09[120X] [16XLeedham-Green, C. R. and O'Brien, E. A.[116X, [17XConstructive recognition of
+  classical  groups in odd characteristic[117X, [18XJ. Algebra[118X, [19X322[119X, 3 (2009), 833–881,
+  (https://doi.org/10.1016/j.jalgebra.2009.04.028).
+  
+  [[20XLMO07[120X] [16XLübeck, F., Magaard, K. and O'Brien, E. A.[116X, [17XConstructive recognition
+  of      SL_3(q)[117X,     [18XJ.     Algebra[118X,     [19X316[119X,     2     (2007),     619–633,
+  (https://doi.org/10.1016/j.jalgebra.2007.01.020).
+  
+  [[20XLNPS06[120X]  [16XLaw,  M.,  Niemeyer,  A.  C.,  Praeger,  C.  E.  and Seress, Á.[116X, [17XA
+  reduction  algorithm  for  large-base  primitive  permutation groups[117X, [18XLMS J.
+  Comput.            Math.[118X,            [19X9[119X            (2006),           159–173,
+  (https://doi.org/10.1112/S1461157000001236).
+  
+  [[20XLO07[120X]  [16XLiebeck,  M.  W. and O'Brien, E. A.[116X, [17XFinding the characteristic of a
+  group  of  Lie  type[117X,  [18XJ.  Lond.  Math.  Soc.  (2)[118X,  [19X75[119X,  3 (2007), 741–754,
+  (https://doi.org/10.1112/jlms/jdm028).
+  
+  [[20XLO16[120X]  [16XLiebeck, M. W. and O'Brien, E. A.[116X, [17XRecognition of finite exceptional
+  groups  of  Lie  type[117X,  [18XTrans.  Amer.  Math. Soc.[118X, [19X368[119X, 9 (2016), 6189–6226,
+  (https://doi.org/10.1090/tran/6534).
+  
+  [[20XNeu09[120X]   [16XNeunhöffer,   M.[116X,   [17XConstructive  Recognition  of  Finite  Groups[117X,
+  Habilitation          thesis,          RWTH          Aachen          (2009),
+  (https://github.com/neunhoef/habil).
+  
+  [[20XNie05[120X]  [16XNiemeyer,  A.  C.[116X, [17XConstructive recognition of normalizers of small
+  extra-special  matrix  groups[117X,  [18XInternat.  J. Algebra Comput.[118X, [19X15[119X, 2 (2005),
+  367–394, (https://doi.org/10.1142/S021819670500230X).
+  
+  [[20XNP92[120X]  [16XNeumann,  P.  M.  and  Praeger,  C.  E.[116X, [17XA recognition algorithm for
+  special  linear  groups[117X, [18XProc. London Math. Soc. (3)[118X, [19X65[119X, 3 (1992), 555–603,
+  (https://doi.org/10.1112/plms/s3-65.3.555).
+  
+  [[20XNP97[120X]  [16XNiemeyer,  A.  C.  and  Praeger,  C.  E.[116X, [17XImplementing a recognition
+  algorithm   for  classical  groups[117X,  in  Groups  and  computation,  II  (New
+  Brunswick, NJ, 1995), Amer. Math. Soc., Providence, RI, DIMACS Ser. Discrete
+  Math. Theoret. Comput. Sci., [19X28[119X (1997), 273–296.
+  
+  [[20XNP98[120X]  [16XNiemeyer,  A.  C.  and  Praeger,  C. E.[116X, [17XA recognition algorithm for
+  classical  groups  over  finite  fields[117X,  [18XProc. London Math. Soc. (3)[118X, [19X77[119X, 1
+  (1998), 117–169, (https://doi.org/10.1112/S0024611598000422).
+  
+  [[20XNP99[120X]  [16XNiemeyer,  A.  C.  and  Praeger,  C. E.[116X, [17XA recognition algorithm for
+  non-generic classical groups over finite fields[117X, [18XJ. Austral. Math. Soc. Ser.
+  A[118X, [19X67[119X, 2 (1999), 223–253.
+  
+  [[20XNS06[120X]  [16XNeunhöffer,  M.  and  Seress,  Á.[116X,  [17XA  data  structure for a uniform
   approach  to  computations  with finite groups[117X, in ISSAC 2006, ACM, New York
-  (2006), 254--261.
+  (2006), 254–261, (https://doi.org/10.1145/1145768.1145811).
+  
+  [[20XO'B06[120X]  [16XO'Brien,  E. A.[116X, [17XTowards effective algorithms for linear groups[117X, in
+  Finite  geometries,  groups,  and  computation,  Walter  de  Gruyter, Berlin
+  (2006), 163–190.
+  
+  [[20XO'B11[120X]  [16XO'Brien,  E. A.[116X, [17XAlgorithms for matrix groups[117X, in Groups St Andrews
+  2009  in Bath. Volume 2, Cambridge Univ. Press, Cambridge, London Math. Soc.
+  Lecture Note Ser., [19X388[119X (2011), 297–323.
+  
+  [[20XPak00[120X]  [16XPak,  I.[116X,  [17XThe product replacement algorithm is polynomial[117X, in 41st
+  Annual  Symposium  on  Foundations  of  Computer Science (Redondo Beach, CA,
+  2000),   IEEE   Comput.  Soc.  Press,  Los  Alamitos,  CA  (2000),  476–485,
+  (https://doi.org/10.1109/SFCS.2000.892135).
+  
+  [[20XPar84[120X]  [16XParker,  R. A.[116X, [17XThe computer calculation of modular characters (the
+  meat-axe)[117X,  in  Computational  group  theory (Durham, 1982), Academic Press,
+  London (1984), 267–274.
+  
+  [[20XPra99[120X] [16XPraeger, C. E.[116X, [17XPrimitive prime divisor elements in finite classical
+  groups[117X,  in  Groups  St.  Andrews  1997  in Bath, II, Cambridge Univ. Press,
+  Cambridge,  London  Math.  Soc.  Lecture  Note  Ser.,  [19X261[119X  (1999), 605–623,
+  (https://doi.org/10.1017/CBO9780511666148.024).
+  
+  [[20XSer03[120X]  [16XSeress,  Á.[116X,  [17XPermutation  group  algorithms[117X,  Cambridge University
+  Press,  Cambridge, Cambridge Tracts in Mathematics, [19X152[119X (2003), x+264 pages,
+  (https://doi.org/10.1017/CBO9780511546549).
   
   
   

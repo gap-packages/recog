@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<title>GAP (recog) - Chapter 9: How to write a recognition method</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="GAPDoc2HTML" />
+<link rel="stylesheet" type="text/css" href="manual.css" />
+<script src="manual.js" type="text/javascript"></script>
+<script type="text/javascript">overwriteStyle();</script>
+</head>
+<body class="chap9"  onload="jscontent()">
+
+
+<div class="chlinktop"><span class="chlink1">Goto Chapter: </span><a href="chap0.html">Top</a>  <a href="chap1.html">1</a>  <a href="chap2.html">2</a>  <a href="chap3.html">3</a>  <a href="chap4.html">4</a>  <a href="chap5.html">5</a>  <a href="chap6.html">6</a>  <a href="chap7.html">7</a>  <a href="chap8.html">8</a>  <a href="chap9.html">9</a>  <a href="chapBib.html">Bib</a>  <a href="chapInd.html">Ind</a>  </div>
+
+<div class="chlinkprevnexttop">&nbsp;<a href="chap0.html">[Top of Book]</a>&nbsp;  <a href="chap0.html#contents">[Contents]</a>&nbsp;  &nbsp;<a href="chap8.html">[Previous Chapter]</a>&nbsp;  &nbsp;<a href="chapBib.html">[Next Chapter]</a>&nbsp;  </div>
+
+<p id="mathjaxlink" class="pcenter"><a href="chap9_mj.html">[MathJax on]</a></p>
+<p><a id="X7E349FA783950EA0" name="X7E349FA783950EA0"></a></p>
+<div class="ChapSects"><a href="chap9.html#X7E349FA783950EA0">9 <span class="Heading">How to write a recognition method</span></a>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap9.html#X87E1C6E07AA0416D">9.1 <span class="Heading">Leaf methods</span></a>
+</span>
+</div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap9.html#X8072F8B27B55D99D">9.2 <span class="Heading">Elements with memory</span></a>
+</span>
+</div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap9.html#X7A62F30582BDA07D">9.3 <span class="Heading">Splitting methods</span></a>
+</span>
+</div>
+</div>
+
+<h3>9 <span class="Heading">How to write a recognition method</span></h3>
+
+<p>This chapter explains how to integrate a newly developed group recognition method into the framework provided by the recog package.</p>
+
+<p>TODO: Refer to Chapter <a href="chap4.html#X8058CC8187162644"><span class="RefLink">4</span></a> for an explanation of methods. There are leaf methods and split methods. The next two sections describe how to implement leaf and split methods respectively, and include example code.</p>
+
+<p><a id="X87E1C6E07AA0416D" name="X87E1C6E07AA0416D"></a></p>
+
+<h4>9.1 <span class="Heading">Leaf methods</span></h4>
+
+<p>A leaf method must at the very least do the following, examples will be provided below (TODO: add a reference):</p>
+
+
+<ul>
+<li><p>Provide the order of the recognized group via <code class="code">SetSize(ri, NNN)</code>.</p>
+
+</li>
+<li><p>Provide a set of SLPs which map the original generators <span class="Math">X</span> to the nice generators <span class="Math">Y</span>, as entry for the attribute <code class="code">slptonice</code>.</p>
+
+</li>
+<li><p>Provide a function which maps any element <span class="Math">g\in G</span> to a corresponding SLP in terms of the nice generators <span class="Math">Y</span>, as entry for the attribute <code class="code">slpforelement</code>.</p>
+
+</li>
+<li><p>Call <code class="code">SetFilterObj(ri, IsLeaf);</code> to mark the node as a leaf node.</p>
+
+</li>
+</ul>
+<p>There are further values that can be provided, in particular to speed up computations; we'll come back to that later. Let's first look at an example: The following method is used by <strong class="pkg">recog</strong> to recognize trivial groups, as a base case for the recursive group recognition algorithm. It works for arbitrary groups.</p>
+
+<p>TODO: AutoDoc inserts extra paragraph commands here:</p>
+
+
+<div class="example"><pre>
+BindRecogMethod(FindHomMethodsGeneric, "TrivialGroup",
+"go through generators and compare to the identity",
+function(ri, G)
+  local gens;
+  # get the generators of the group
+  gens := GeneratorsOfGroup(G);
+&lt;P/&gt;
+  # check whether all generators are trivial
+  # ri!.isone is explained below
+  if not ForAll(gens, ri!.isone) then
+    # NeverApplicable because it makes
+    # no sense to call this method again
+    return NeverApplicable;
+  fi;
+&lt;P/&gt;
+  # The group is trivial! Provide required information:
+&lt;P/&gt;
+  # size of the group
+  SetSize(ri, 1);
+&lt;P/&gt;
+  # explained below
+  Setslpforelement(ri, SLPforElementFuncsGeneric.TrivialGroup);
+&lt;P/&gt;
+  # SLP from given generators to nice generators
+  Setslptonice(ri, StraightLineProgramNC([[[1,0]]],
+                   Length(gens)));
+&lt;P/&gt;
+  # We have reached a leaf node.
+  SetFilterObj(ri, IsLeaf);
+  return Success;
+end);
+</pre></div>
+
+<p>The input is in the format described above (TODO), and the return value is "Success".</p>
+
+<p>Two more comments:</p>
+
+
+<ul>
+<li><p>When we check whether all generators are the identity, we call <code class="code">ri!.isone</code>, instead of <code class="code">IsOne</code>. The reason for this is the need to support <em>projective groups</em>. For permutation groups and matrix groups, <code class="code">ri!.isone</code> is simply defined to be <code class="code">IsOne</code>. For projective groups, it is set to <code class="code">IsOneProjective</code>, which can be read as "is one modulo scalars".</p>
+
+</li>
+<li><p>The function <code class="code">SLPforElementFuncs.TrivialGroup</code> takes <code class="code">ri</code> as well as an element <code class="code">g</code> as input. If <span class="Math">g \in G</span>, then it is supposed to return an SLP for <span class="Math">g</span> in terms of the nice gens <span class="Math">Y</span>. Otherwise it returns <code class="code">fail</code>. Here is the concrete implementation:</p>
+
+</li>
+</ul>
+
+<div class="example"><pre>
+SLPforElementFuncsGeneric.TrivialGroup := function(ri,g)
+    if not ri!.isone(g) then
+        return fail;
+    fi;
+    return StraightLineProgramNC( [ [1,0] ], 1 );
+end;
+</pre></div>
+
+<p>Finally, we need to let <strong class="pkg">recog</strong> know about this new recognition method. This is done via the <code class="code">AddMethod</code> function. Another example!</p>
+
+
+<div class="example"><pre>
+AddMethod(FindHomDbPerm, FindHomMethodsGeneric.TrivialGroup, 300);
+</pre></div>
+
+<p>TODO: refer to the <code class="code">AddMethod</code> documentation instead. Also this is outdated now. The function <code class="code">AddMethod</code> takes four mandatory arguments <code class="code">db</code>, <code class="code">meth</code>, <code class="code">rank</code>, <code class="code">stamp</code>, and an optional fifth argument <code class="code">comment</code>. Their meaning is as follows:</p>
+
+
+<ul>
+<li><p><code class="code">db</code> is the "method database", and determines to which type of groups the methods should be applied. Allowed values are:</p>
+
+
+<ul>
+<li><p><code class="code">FindHomDbPerm</code></p>
+
+</li>
+<li><p><code class="code">FindHomDbMatrix</code></p>
+
+</li>
+<li><p><code class="code">FindHomDbProj</code></p>
+
+</li>
+</ul>
+</li>
+</ul>
+
+<ul>
+<li><p><code class="code">meth</code> is the recognition method we have defined. In our example this is <code class="code">FindHomMethodsGeneric.TrivialGroup</code>.</p>
+
+</li>
+</ul>
+
+<ul>
+<li><p><code class="code">rank</code> is the relative rank of the recognition method, given as an integer. The idea is that methods with a high rank get called before methods with a low rank, so [recog] tries recognition methods starting from the highest rank. What the "right" rank for a given method is depends on which other methods exist and what their ranks are. As a rule of thumb, methods which are either very fast or very likely to be applicable should be tried before slower methods, or methods which are less likely to be relevant.</p>
+
+</li>
+<li><p><code class="code">stamp</code> holds a string value that uniquely describes the method. This is used for bookkeeping. It is also used in the manual, for printing the recognition tree, and for debugging purposes.</p>
+
+</li>
+<li><p><code class="code">comment</code> is a string valued comment which in the example above has been used to explain what the method does. This argument is optional and can be left out.</p>
+
+</li>
+</ul>
+<p>Note that above, we only installed our method into <code class="code">FindHomDbPerm</code>. But in recog, it is actually also installed for matrix and projective groups. We reproduce the corresponding <code class="code">AddMethod</code> calls here. Note that the ranks differ, so the same method can be called with varying priority depending on the type of group.</p>
+
+
+<div class="example"><pre>
+AddMethod(FindHomDbMatrix, FindHomMethodsGeneric.TrivialGroup, 3100);
+</pre></div>
+
+
+<div class="example"><pre>
+AddMethod(FindHomDbProjective, FindHomMethodsGeneric.TrivialGroup, 3000);
+</pre></div>
+
+
+<ul>
+<li><p>TODO: more advanced example?</p>
+
+</li>
+<li><p>TODO: also explain how verification works</p>
+
+</li>
+<li><p>TODO: we need something that demonstrates the other two return values (Oh yes, good point.)</p>
+
+</li>
+</ul>
+<p><a id="X8072F8B27B55D99D" name="X8072F8B27B55D99D"></a></p>
+
+<h4>9.2 <span class="Heading">Elements with memory</span></h4>
+
+<p>When using the memory of group elements, one currently has to always access ri!.gensHmem instead of doing <code class="code">GroupWithMemory(Grp(ri))</code>. Namely, many functions for objects with memory assume that, if the elements live in the same group, then their <code class="code">!.slp</code> components are identical.</p>
+
+<p><a id="X7A62F30582BDA07D" name="X7A62F30582BDA07D"></a></p>
+
+<h4>9.3 <span class="Heading">Splitting methods</span></h4>
+
+<p>Recall that splitting recognition methods produce an epimorphism <span class="Math">\phi:G\to H</span> and then delegate the work to the image <span class="Math">H</span> and the kernel <span class="Math">N:=\ker(\phi)</span>. This means that now <span class="Math">N</span> and <span class="Math">H</span> have to be constructively recognized. Such a splitting recognition method only needs to provide a homomorphism, by calling <code class="code">SetHomom(ri, hom);</code>. However, in practice one will want to provide additional data.</p>
+
+<p>We start with an example, similar to a method used in <strong class="pkg">recog</strong>. This refers to permutation groups only!</p>
+
+
+<div class="example"><pre>
+BindRecogMethod(FindHomMethodsPerm, "NonTransitive",
+"try to find non-transitivity and restrict to orbit",
+rec(validatesOrAlwaysValidInput := true),
+function(ri, G)
+    local hom,la,o;
+&lt;P/&gt;
+    # test whether we can do something:
+    if IsTransitive(G) then
+        return NeverApplicable;
+    fi;
+&lt;P/&gt;
+    # compute orbit of the largest moved point
+    la := LargestMovedPoint(G);
+    o := Orb(G,la,OnPoints);
+    Enumerate(o);
+    # compute homomorphism into Sym(o), i.e, restrict
+    # the permutation action of G to the orbit o
+    hom := OrbActionHomomorphism(G,o);
+    # TODO: explanation
+    Setvalidatehomominput(ri, {ri,p} -&gt; ForAll(o, x -&gt; (x^p in o)));
+    # store the homomorphism into the recognition node
+    SetHomom(ri,hom);
+&lt;P/&gt;
+    # TODO: explanation
+    Setimmediateverification(ri, true);
+&lt;P/&gt;
+    # indicate success
+    return Success;
+end);
+</pre></div>
+
+<p>TODO Alternatively use this:</p>
+
+
+<div class="example"><pre>
+FindHomMethodsPerm.NonTransitive := function(ri, G)
+  local hom, la, o;
+
+  # test whether we can do something:
+  if IsTransitive(G) then
+    # the action is transitive, so we can't do
+    # anything, and there is no point in calling us again.
+    return NeverApplicable;
+  fi;
+
+  # compute orbit of the largest moved point
+  la := LargestMovedPoint(G);
+  o := Orbit(G, la, OnPoints);
+
+  # compute homomorphism into Sym(o), i.e, restrict
+  # the permutation action of G to the orbit o
+  hom := ActionHomomorphism(G, o);
+
+  # store the homomorphism into the recognition node
+  SetHomom(ri, hom);
+
+  # indicate success
+  return Success;
+end;
+</pre></div>
+
+
+<div class="example"><pre>
+AddMethod(FindHomDbPerm, FindHomMethodsPerm.NonTransitive, 90);
+</pre></div>
+
+<p>TODO: More complex example:</p>
+
+
+<div class="example"><pre>
+FindHomMethodsMatrix.BlockLowerTriangular := function(ri, G)
+  # This is only used coming from a hint, we know what to do:
+  # A base change was done to get block lower triangular shape.
+  # We first do the diagonal blocks, then the lower p-part:
+  local H, data, hom, newgens;
+
+  # we need to construct a homomorphism, but to defined it,
+  # we need the image, but of course the image is defined in
+  # terms of the homomorphism... to break this cycle, we do
+  # the following: we first map the input generators using
+  # the helper function RECOG.HomOntoBlockDiagonal; this
+  # function is later also used as the underlying mapping
+  # of the homomorphism.
+  data := rec( blocks := ri!.blocks );
+  newgens := List(GeneratorsOfGroup(G),
+                  x -&gt; RECOG.HomOntoBlockDiagonal(data, x));
+  Assert(0, not fail in newgens);
+
+  # now that we have the images of the generators, we can
+  # defined the image group
+  H := Group(newgens);
+
+  # finally, we define the homomorphism
+  hom := GroupHomByFuncWithData(G, H, RECOG.HomOntoBlockDiagonal, data);
+
+  # ... and store it in the recognition node
+  SetHomom(ri, hom);
+
+  # since we know exactly what kind of group we are looking
+  # at, we don't want to run generic recognition on the
+  # image group and the kernel. So we provide "hints" to
+  # ensure more appropriate recognition methods are applied
+  # first.
+
+  # Give hint to image
+  InitialDataForImageRecogNode(ri).blocks := ri!.blocks;
+  Add(InitialDataForImageRecogNode(ri).hints,
+      rec( method := FindHomMethodsMatrix.BlockDiagonal,
+           rank := 2000,
+           stamp := "BlockDiagonal" ) );
+
+  # Tell recog that we have a better method for finding kernel
+  findgensNmeth(ri).method := FindKernelLowerLeftPGroup;
+  findgensNmeth(ri).args := [];
+
+  # Give hint to kernel N
+  Add(InitialDataForKernelRecogNode(ri).hints,
+      rec( method := FindHomMethodsMatrix.LowerLeftPGroup,
+           rank := 2000,
+           stamp := “LowerLeftPGroup" ));
+  InitialDataForKernelRecogNode(ri).blocks := ri!.blocks;
+
+  # This function always succeeds, because it is only
+  # called for inputs for which it is known to apply.
+  return Success;
+end;
+</pre></div>
+
+
+<div class="chlinkprevnextbot">&nbsp;<a href="chap0.html">[Top of Book]</a>&nbsp;  <a href="chap0.html#contents">[Contents]</a>&nbsp;  &nbsp;<a href="chap8.html">[Previous Chapter]</a>&nbsp;  &nbsp;<a href="chapBib.html">[Next Chapter]</a>&nbsp;  </div>
+
+
+<div class="chlinkbot"><span class="chlink1">Goto Chapter: </span><a href="chap0.html">Top</a>  <a href="chap1.html">1</a>  <a href="chap2.html">2</a>  <a href="chap3.html">3</a>  <a href="chap4.html">4</a>  <a href="chap5.html">5</a>  <a href="chap6.html">6</a>  <a href="chap7.html">7</a>  <a href="chap8.html">8</a>  <a href="chap9.html">9</a>  <a href="chapBib.html">Bib</a>  <a href="chapInd.html">Ind</a>  </div>
+
+<hr />
+<p class="foot">generated by <a href="http://www.math.rwth-aachen.de/~Frank.Luebeck/GAPDoc">GAPDoc2HTML</a></p>
+</body>
+</html>

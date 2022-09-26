@@ -1,14 +1,14 @@
   
   [1X5 [33X[0;0YAfter successful recognition[133X[101X
   
-  [33X[0;0YThis chapter explains, what one can do with recognition info records after a
+  [33X[0;0YThis  chapter  explains,  what  one  can  do  with recognition nodes after a
   successful recognition (and possibly verification).[133X
   
-  [33X[0;0YOf  course,  one can inspect the whole tree of recognition info records just
-  by looking at the stored attribute values. Moreover, constructive membership
-  tests  can  be  performed using the function [2XSLPforElement[102X ([14X3.2-14[114X), thereby
+  [33X[0;0YOf  course,  one  can  inspect  the  whole tree of recognition nodes just by
+  looking  at  the  stored attribute values. Moreover, constructive membership
+  tests  can  be  performed using the function [2XSLPforElement[102X ([14X3.2-15[114X), thereby
   writing  an  arbitrary  element  in  terms of the nice generators, which are
-  stored  in  the  attribute  [2XNiceGens[102X  ([14X3.2-7[114X). If [10Xfail[110X is returned, then the
+  stored  in  the  attribute  [2XNiceGens[102X  ([14X3.2-8[114X). If [9Xfail[109X is returned, then the
   element  in question does not lie in the recognised group or the recognition
   made an error.[133X
   
@@ -19,18 +19,18 @@
     [4X[28XGroup([ (1,2,3,4,5,6,7,8,9,10,11,12), (1,2), (13,14,15,16,17), (13,14) ])[128X[104X
     [4X[25Xgap>[125X [27Xri := RecogniseGroup(g);[127X[104X
     [4X[28X#I  Finished rank 90 method "NonTransitive": success.[128X[104X
-    [4X[28X#I  Going to the factor (depth=0, try=1).[128X[104X
-    [4X[28X#I  Finished rank 95 method "VeryFewPoints": success.[128X[104X
-    [4X[28X#I  Back from factor (depth=0).[128X[104X
+    [4X[28X#I  Going to the image (depth=0, try=1).[128X[104X
+    [4X[28X#I  Finished rank 95 method "MovesOnlySmallPoints": success.[128X[104X
+    [4X[28X#I  Back from image (depth=0).[128X[104X
     [4X[28X#I  Calculating preimages of nice generators.[128X[104X
     [4X[28X#I  Creating 20 random generators for kernel.[128X[104X
     [4X[28X....................[128X[104X
     [4X[28X#I  Going to the kernel (depth=0).[128X[104X
     [4X[28X#I  Finished rank 80 method "Giant": success.[128X[104X
     [4X[28X#I  Back from kernel (depth=0).[128X[104X
-    [4X[28X<recoginfo NonTransitive[128X[104X
-    [4X[28X F:<recoginfo VeryFewPoints Size=120>[128X[104X
-    [4X[28X K:<recoginfo Giant Size=479001600>>[128X[104X
+    [4X[28X<recognition node NonTransitive[128X[104X
+    [4X[28X F:<recognition node MovesOnlySmallPoints Size=120>[128X[104X
+    [4X[28X K:<recognition node Giant Size=479001600>>[128X[104X
   [4X[32X[104X
   
   [33X[0;0YOne  sees  that  the  recursive  process  runs,  first  it  finds  that  the
@@ -56,7 +56,7 @@
   contains the necessary recognition methods.[133X
   
   
-  [1X5.1 [33X[0;0YFunctions and methods for recognition info records[133X[101X
+  [1X5.1 [33X[0;0YFunctions and methods for recognition nodes[133X[101X
   
   [33X[0;0YIf  you  need  an  element  explicitly  written  in  terms  of  the original
   generators, you can use the following function:[133X
@@ -77,12 +77,12 @@
   [1X5.1-2 \in[101X
   
   [33X[1;0Y[29X[2X\in[102X( [3Xx[103X, [3Xri[103X ) [32X method[133X
-  [6XReturns:[106X  [33X[0;10Y[10Xtrue[110X or [10Xfalse[110X[133X
+  [6XReturns:[106X  [33X[0;10Y[9Xtrue[109X or [9Xfalse[109X[133X
   
   [33X[0;0YThis method tests, whether the element [3Xx[103X lies in the group recognised by the
-  recognition  info record [3Xri[103X. Note that this is only a convenience method, in
-  fact  [2XSLPforElement[102X ([14X3.2-14[114X) is used and the resulting straight line program
-  is thrown away.[133X
+  recognition  node  [3Xri[103X.  Note that this is only a convenience method, in fact
+  [2XSLPforElement[102X  ([14X3.2-15[114X)  is  used and the resulting straight line program is
+  thrown away.[133X
   
   [1X5.1-3 Size[101X
   
@@ -90,7 +90,7 @@
   [6XReturns:[106X  [33X[0;10Ythe size of the recognised group[133X
   
   [33X[0;0YThis  method  calculates the size of the recognised group by multiplying the
-  size of the factor and the kernel recursively. It is assumed that leaf nodes
+  size  of the image and the kernel recursively. It is assumed that leaf nodes
   know already or can calculate the size of their group.[133X
   
   [1X5.1-4 DisplayCompositionFactors[101X

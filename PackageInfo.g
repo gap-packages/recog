@@ -1,29 +1,25 @@
 #############################################################################
 ##
+##  This file is part of recog, a package for the GAP computer algebra system
+##  which provides a collection of methods for the constructive recognition
+##  of groups.
+##
+##  Copyright of recog belongs to its developers whose names are too numerous
+##  to list here. Please refer to the COPYRIGHT file for details.
+##
+##  SPDX-License-Identifier: GPL-3.0-or-later
+##
+##
 ##  PackageInfo.g for the package `recog'
 ##
-
-RecogsFunnyNameFormatterFunction := function(st)
-  if Length(st) = 0 then
-      return st;
-  else
-      return Concatenation(" (",st,")");
-  fi;
-end;
-RecogsFunnyWWWURLFunction := function(re)
-  if IsBound(re.WWWHome) then
-      return re.WWWHome;
-  else
-      return "";
-  fi;
-end;
+#############################################################################
 
 SetPackageInfo( rec(
 
 PackageName := "recog",
-Subtitle := "A collection of group recognition methods",
-Version := "1.3.2",
-Date := "15/04/2018", # dd/mm/yyyy format
+Subtitle := "A package for constructive recognition of permutation and matrix groups",
+Version := "1.4.0",
+Date := "22/09/2022", # dd/mm/yyyy format
 License := "GPL-3.0-or-later",
 
 ##  Information about authors and maintainers.
@@ -34,13 +30,6 @@ Persons := [
     IsAuthor      := true,
     IsMaintainer  := false,
     Email         := "max@9hoeffer.de",
-    WWWHome       := "http://www-groups.mcs.st-and.ac.uk/~neunhoef",
-    PostalAddress := Concatenation( [
-                       "Gustav-Freytag-Straße 40\n",
-                       "50354 Hürth\n",
-                       "Germany" ] ),
-    #Place         := "St Andrews",
-    #Institution   := "University of St Andrews"
   ),
   rec(
     LastName      := "Seress",
@@ -49,128 +38,132 @@ Persons := [
     IsMaintainer  := false,
   ),
   rec(
+    LastName      := "Bernhardt",
+    FirstNames    := "Dominik",
+    IsAuthor      := false,
+    IsMaintainer  := false, 
+    Email         := "bernhardt@mathb.rwth-aachen.de",
+    Place         := "Aachen",
+    Institution   := "RWTH Aachen University",
+    #WWWHome       := "https://www.mathb.rwth-aachen.de/cms/MATHB/Der-Lehrstuhl/Team/Wissenschaftliche-Beschaeftigte/~rnsg/Dominik-Bernhardt/lidx/1/"
+  ),
+  rec(
     LastName      := "Ankaralioglu",
     FirstNames    := "Nurullah",
-    IsAuthor      := true,
+    IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "ankarali@atauni.edu.tr",
   ),
   rec(
     LastName      := "Brooksbank",
     FirstNames    := "Peter",
-    IsAuthor      := true,
+    IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "pbrooksb@bucknell.edu",
-    WWWHome       := "http://www.facstaff.bucknell.edu/pbrooksb/",
-    PostalAddress := Concatenation( [
-                       "Peter A. Brooksbank\n",
-                       "Mathematics Department\n",
-                       "Bucknell University\n",
-                       "Lewisburg, PA 17837\n",
-                       "USA" ] ),
     Place         := "Lewisburg",
     Institution   := "Bucknell University"
   ),
   rec(
     LastName      := "Celler",
     FirstNames    := "Frank",
-    IsAuthor      := true,
+    IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "frank@celler.de",
-    WWWHome       := "http://www.celler.de/",
     Place         := "Aachen",
-    Institution   := "Lehrstuhl D fuer Mathematik, RWTH Aachen",
+    Institution   := "Lehrstuhl D für Mathematik, RWTH Aachen",
+  ),
+rec(
+    LastName      := "Hähndel",
+    FirstNames    := "Paula",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "paula.haehndel@mathematik.uni-halle.de",
+    WWWHome       := "https://algebra.mathematik.uni-halle.de/haehndel/",
+    Place         := "Halle (Saale)",
+    Institution   := "Martin-Luther-Universität Halle-Wittenberg"
+  ),
+  rec(
+    LastName      := "Hulpke",
+    FirstNames    := "Alexander",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "hulpke@colostate.edu",
+    WWWHome       := "https://www.math.colostate.edu/~hulpke/",
+    Place         := "Fort Collins",
+    Institution   := "Colorado State University"
   ),
   rec(
     LastName      := "Howe",
     FirstNames    := "Stephen",
-    IsAuthor      := true,
+    IsAuthor      := false,
     IsMaintainer  := false,
-    PostalAddress := "Unknown",
+  ),
+  rec(
+    LastName      := "Jefferson",
+    FirstNames    := "Christopher",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "caj21@st-andrews.ac.uk",
+    WWWHome       := "https://caj.host.cs.st-andrews.ac.uk",
+    Place         := "St Andrews",
+    Institution   := "University of St Andrews"
   ),
   rec(
     LastName      := "Law",
     FirstNames    := "Maska",
-    IsAuthor      := true,
+    IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "maska@maths.uwa.edu.au",
-    #WWWHome       := "http://www.maths.uwa.edu.au/~maska/",
-    PostalAddress := Concatenation( [
-                       "Maska Law\n",
-                       "University of Western Australia\n",
-                       "School of Mathematics and Statistics\n",
-                       "35 Stirling Highway\n",
-                       "Crawley 6009\n",
-                       "Western Australia" ] ),
     Place         := "Perth",
     Institution   := "University of Western Australia"
   ),
   rec(
     LastName      := "Linton",
     FirstNames    := "Steve",
-    IsAuthor      := true,
+    IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "sal@cs.st-andrews.ac.uk",
-    WWWHome       := "http://www-circa.mcs.st-and.ac.uk/~sal/",
-    PostalAddress := Concatenation( [
-                       "School of Computer Science\n",
-                       "Jack Cole Building\n",
-                       "North Haugh\n",
-                       "St Andrews, Fife KY16 9SX\n",
-                       "Scotland, UK" ] ),
+    WWWHome       := "http://www-groups.mcs.st-and.ac.uk/~sal",
     Place         := "St Andrews",
     Institution   := "University of St Andrews"
   ),
   rec(
     LastName      := "Malle",
     FirstNames    := "Gunter",
-    IsAuthor      := true,
+    IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "malle@mathematik.uni-kl.de",
-    WWWHome       := "http://www.mathematik.uni-kl.de/~malle/",
+    WWWHome       := "https://www.mathematik.uni-kl.de/~malle/",
     Place         := "Kaiserslautern",
-    Institution   := "Universitaet Kaiserslautern",
+    Institution   := "Universität Kaiserslautern",
   ),
   rec(
     LastName      := "Niemeyer",
     FirstNames    := "Alice",
-    IsAuthor      := true,
+    IsAuthor      := false,
     IsMaintainer  := false,
-    Email         := "alice@maths.uwa.edu.au",
-    WWWHome       := "http://www.maths.uwa.edu.au/~alice/",
-    PostalAddress := Concatenation( [
-                       "Alice C. Niemeyer\n",
-                       "University of Western Australia\n",
-                       "School of Mathematics and Statistics\n",
-                       "35 Stirling Highway\n",
-                       "Crawley 6009\n",
-                       "Western Australia" ] ),
-    Place         := "Perth",
-    Institution   := "University of Western Australia"
+    Email         := "alice.niemeyer@mathb.rwth-aachen.de",
+    WWWHome       := "http://www.math.rwth-aachen.de/~Alice.Niemeyer/",
+    Place         := "Aachen",
+    Institution   := "RWTH Aachen University"
   ),
   rec(
     LastName      := "O'Brien",
     FirstNames    := "Eamonn",
-    IsAuthor      := true,
+    IsAuthor      := false,
     IsMaintainer  := false,
-    Email         := "obrien@math.auckland.ac.nz",
-    WWWHome       := "http://www.math.auckland.ac.nz/~obrien/",
+    Email         := "e.obrien@auckland.ac.nz",
+    WWWHome       := "https://www.math.auckland.ac.nz/~obrien/",
     Place         := "Auckland",
     Institution   := "University of Auckland",
   ),
   rec(
     LastName      := "Roney-Dougal",
     FirstNames    := "Colva M.",
-    IsAuthor      := true,
+    IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "colva@mcs.st-and.ac.uk",
     WWWHome       := "http://www-groups.mcs.st-and.ac.uk/~colva",
-    PostalAddress := Concatenation( [
-                       "School of Mathematics and Statistics\n",
-                       "Mathematical Institute\n",
-                       "North Haugh\n",
-                       "St Andrews, Fife KY16 9SS\n",
-                       "Scotland, UK" ] ),
     Place         := "St Andrews",
     Institution   := "University of St Andrews"
   ),
@@ -179,16 +172,38 @@ Persons := [
     FirstNames    := "Max",
     IsAuthor      := false,
     IsMaintainer  := true,
-    Email         := "max.horn@uni-siegen.de",
+    Email         := "horn@mathematik.uni-kl.de",
     WWWHome       := "https://www.quendi.de/math",
-    PostalAddress := Concatenation(
-                       "Department Mathematik\n",
-                       "Universität Siegen\n",
-                       "Walter-Flex-Straße 3\n",
-                       "57072 Siegen\n",
-                       "Germany" ),
-    Place         := "Siegen",
-    Institution   := "Universität Siegen"
+    Place         := "Kaiserslautern",
+    Institution   := "TU Kaiserslautern"
+  ),
+ rec(
+    LastName      := "Siccha",
+    FirstNames    := "Sergio",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "sergio@mathb.rwth-aachen.de",
+    #WWWHome       := "https://www.mathematik.rwth-aachen.de/go/id/bkbg/gguid/0x28CF75713F0B7744BEF1377FB3F6748E/ikz/11/allou/1/lidx/1/",
+    Place         := "Aachen",
+    Institution   := "RWTH Aachen University"
+  ), 
+  rec(
+    LastName      := "Wilson",
+    FirstNames    := "Wilf",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "gap@wilf-wilson.net",
+    WWWHome       := "https://wilf.me"
+  ),
+rec(
+    LastName      := "Whybrow",
+    FirstNames    := "Madeleine",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "madeleine.whybrow@famnit.upr.si",
+    WWWHome       := "https://madeleinewhybrow.wordpress.com/contact/",
+    Place         := "Primorska",
+    Institution   := "University of Primorska"
   ),
 ],
 
@@ -231,58 +246,35 @@ ArchiveFormats := ".tar.gz .tar.bz2",
 ##  Please, use '<span class="pkgname">GAP</span>' and
 ##  '<span class="pkgname">MyPKG</span>' for specifing package names.
 ##
-AbstractHTML :=
-  "<b>Warning:</b> This package is still under development and \
-   this version is to be considered a working, but preliminary one. <p/> \
-   This packages contains a collection of methods for the \
-   constructive recognition of groups. It is mostly intended for \
-   permutation groups, matrix groups and projective groups.",
+AbstractHTML := """
+    <p><b>Warning:</b> This package is still under development and
+    this version is to be considered a working, but preliminary one.</p>
+
+    <p>This package contains a collection of methods for the
+    constructive recognition of groups. It is mostly intended for
+    permutation groups, matrix groups and projective groups.</p>
+    """,
 
 PackageDoc := rec(
   BookName  := "recog",
   ArchiveURLSubset := ["doc"],
-  HTMLStart := "doc/chap0.html",
+  HTMLStart := "doc/chap0_mj.html",
   PDFFile   := "doc/manual.pdf",
   SixFile   := "doc/manual.six",
   LongTitle := "A collection of group recognition methods",
 ),
 
 Dependencies := rec(
-  GAP := ">=4.9",
+  GAP := ">=4.11",
   NeededOtherPackages := [
+    ["AtlasRep", ">= 1.4.0"],
+    ["FactInt", ">= 1.5.2"],
     ["Forms", ">= 1.2"],
     ["genss", ">= 1.3"],
     ["Orb", ">= 3.4"],
-    ["FactInt", ">= 1.5.2"],
-    ["AtlasRep", ">= 1.4.0"],
   ],
   SuggestedOtherPackages := [],
   ExternalConditions := []
-),
-
-##  The LoadPackage mechanism can produce a default banner from the info
-##  in this file. If you are not happy with it, you can provide a string
-##  here that is used as a banner. GAP decides when the banner is shown and
-##  when it is not shown. *optional* (note the ~-syntax in this example)
-BannerString := Concatenation(
-  "----------------------------------------------------------------------",
-  "-------\n",
-  "Loading  recog ", ~.Version, " - methods for constructive recognition\n\n",
-  "by ", ~.Persons[1].FirstNames, " ", ~.Persons[1].LastName,
-        " (", ~.Persons[1].WWWHome, ") and\n",
-  "   ", ~.Persons[2].FirstNames, " ", ~.Persons[2].LastName,
-        "\n",
-  "with contributed code by:\n",
-  Concatenation(Concatenation(List(~.Persons{[3..Length(~.Persons)-1]},
-       p->["     ",p.FirstNames," ",p.LastName,
-       RecogsFunnyNameFormatterFunction(
-         RecogsFunnyWWWURLFunction(p)),",\n"]))),
-  " and ",~.Persons[Length(~.Persons)].FirstNames," ",
-  ~.Persons[Length(~.Persons)].LastName,
-  RecogsFunnyNameFormatterFunction(
-    RecogsFunnyWWWURLFunction(~.Persons[Length(~.Persons)])),".\n",
-  "-----------------------------------------------------------------------",
-  "------\n"
 ),
 
 AvailabilityTest := ReturnTrue,
@@ -296,6 +288,7 @@ AutoDoc := rec(
     TitlePage := rec(
         Copyright := Concatenation(
                     "&copyright; 2005-2014 by Max Neunhöffer and Ákos Seress<P/>\n",
+                    "&copyright; 2005-2022 by its authors, see file <F>COPYRIGHT</F> for details.<P/>\n",
                     "\n",
                     "This package may be distributed under the terms and conditions of the\n",
                     "GNU Public License Version 3 or (at your option) any later version.\n"
@@ -304,5 +297,3 @@ AutoDoc := rec(
 ),
 
 ));
-Unbind(RecogsFunnyNameFormatterFunction);
-Unbind(RecogsFunnyWWWURLFunction);

@@ -1,5 +1,5 @@
   
-  [1X4 [33X[0;0YMethod Selection[133X[101X
+  [1X4 [33X[0;0YMethod selection[133X[101X
   
   [33X[0;0YThe  setup  described  in  this chapter is intended for situations, in which
   lots  of  different  methods are available to fulfill a certain task, but in
@@ -28,80 +28,142 @@
   
   [1X4.1 [33X[0;0YWhat are methods?[133X[101X
   
-  [33X[0;0YA  method  is  just  a  [5XGAP[105X  function  together with an agreement about what
-  arguments  it  takes  and  what  result  it returns. The agreement about the
-  arguments of course has to be made for every situation in which this generic
-  method  selection  code  is  used,  and the user is completely free there. A
-  method can (and has to) return one of the following four values:[133X
+  [33X[0;0YRecognition  methods  lie  in  the  filter  [2XIsRecogMethod[102X ([14X4.1-1[114X) and can be
+  created via the function [2XRecogMethod[102X ([14X4.1-2[114X).[133X
   
-  [8X[10XSuccess[110X[8X[108X
+  [1X4.1-1 IsRecogMethod[101X
+  
+  [33X[1;0Y[29X[2XIsRecogMethod[102X [32X Category[133X
+  
+  [33X[0;0YThe  category  of  recognition  methods,  that is of the objects created via
+  [2XRecogMethod[102X ([14X4.1-2[114X).[133X
+  
+  [1X4.1-2 RecogMethod[101X
+  
+  [33X[1;0Y[29X[2XRecogMethod[102X( [3Xstamp[103X, [3Xcomment[103X, [3Xfunc[103X ) [32X function[133X
+  
+  [33X[0;0YReturn  a  recognition  method  [10Xmethod[110X  in the filter [2XIsRecogMethod[102X ([14X4.1-1[114X),
+  where  [3Xstamp[103X is a string describing the method uniquely, [3Xcomment[103X is a string
+  explaining  how  the  method  works,  and  [3Xfunc[103X  is  the  method itself. The
+  components  [3Xstamp[103X  and  [3Xcomment[103X  can  be  accessed  via the attributes [2XStamp[102X
+  ([14X4.1-4[114X) and [2XComment[102X ([14X4.1-5[114X).[133X
+  
+  [33X[0;0YA recognition method returns one of the following four values:[133X
+  
+  [8X[9XSuccess[109X[108X
         [33X[0;6Ymeans  that  the  method was successful and no more methods have to be
         tried.[133X
   
-  [8X[10XNeverApplicable[110X[8X[108X
+  [8X[9XNeverApplicable[109X[108X
         [33X[0;6Ymeans that the method was not successful and that there is no point to
         call the method again in this situation whatsoever.[133X
   
-  [8X[10XTemporaryFailure[110X[8X[108X
+  [8X[9XTemporaryFailure[109X[108X
         [33X[0;6Ymeans  that  the  method  temporarily failed, that it however could be
         sensible  to  call  it  again in this situation at a later stage. This
         value  is  typical for a Las Vegas algorithm using randomised methods,
         which has failed, but which may succeed when called again.[133X
   
-  [8X[10XNotEnoughInformation[110X[8X[108X
+  [8X[9XNotEnoughInformation[109X[108X
         [33X[0;6Ymeans that the method for some reason refused to do its work. However,
         it is possible that it will become applicable later such that it makes
-        sense to call it again, may when more information is available.[133X
+        sense  to  call  it  again,  for  example  when  more  information  is
+        available.[133X
   
-  [33X[0;0YFor  administration  in  the  method  selection,  a method is described by a
-  record with the following components bound:[133X
+  [33X[0;0YA  recognition  method  [10Xmethod[110X  should  always  be stored into the component
+  [10XStamp(method)[110X   of  one  of  the  following  records:  [2XFindHomMethodsGeneric[102X
+  ([14X4.4-4[114X),   [2XFindHomMethodsPerm[102X  ([14X4.4-1[114X),  [2XFindHomMethodsMatrix[102X  ([14X4.4-2[114X),  and
+  [2XFindHomMethodsProjective[102X  ([14X4.4-3[114X).  To  this  end  one  can use the function
+  [2XBindRecogMethod[102X ([14X4.1-3[114X).[133X
+  
+  [1X4.1-3 BindRecogMethod[101X
+  
+  [33X[1;0Y[29X[2XBindRecogMethod[102X( [3Xr[103X, [3Xarg[103X ) [32X function[133X
+  
+  [33X[0;0YCreate  the  recognition  method  [10Xmethod[110X by calling [2XRecogMethod[102X ([14X4.1-2[114X) with
+  arguments [3Xarg[103X. Then bind the component [10XStamp(method)[110X of [3Xr[103X to [3Xmethod[103X.[133X
+  
+  [1X4.1-4 Stamp[101X
+  
+  [33X[1;0Y[29X[2XStamp[102X( [3Xmethod[103X ) [32X attribute[133X
+  
+  [33X[0;0YThe  stamp  of [3Xmethod[103X, see [2XRecogMethod[102X ([14X4.1-2[114X). The argument [3Xmethod[103X must lie
+  in [2XIsRecogMethod[102X ([14X4.1-1[114X).[133X
+  
+  [1X4.1-5 Comment[101X
+  
+  [33X[1;0Y[29X[2XComment[102X( [3Xmethod[103X ) [32X attribute[133X
+  
+  [33X[0;0YThe comment of [3Xmethod[103X, see [2XRecogMethod[102X ([14X4.1-2[114X). The argument [3Xmethod[103X must lie
+  in [2XIsRecogMethod[102X ([14X4.1-1[114X).[133X
+  
+  [1X4.1-6 CallRecogMethod[101X
+  
+  [33X[1;0Y[29X[2XCallRecogMethod[102X( [3Xm[103X, [3Xargs[103X ) [32X function[133X
+  
+  [33X[0;0YCall  [10XUnpackRecogMethod(m)[110X  with arguments [3Xargs[103X and return the return value.
+  The argument [3Xm[103X must lie in [2XIsRecogMethod[102X ([14X4.1-1[114X).[133X
+  
+  
+  [1X4.2 [33X[0;0YMethod Databases[133X[101X
+  
+  [33X[0;0YA  [13Xmethod database[113X is a list of records, where each record has the following
+  components:[133X
   
   [8X[10Xmethod[110X[8X[108X
-        [33X[0;6Yholds the function itself.[133X
+        [33X[0;6YA recognition method created with [2XRecogMethod[102X ([14X4.1-2[114X).[133X
   
   [8X[10Xrank[110X[8X[108X
-        [33X[0;6Yholds an integer used to sort the various methods. Higher numbers mean
-        that  the method is tried earlier. The numbering scheme is left to the
-        user.[133X
+        [33X[0;6YAn  integer used to sort the various methods. Higher numbers mean that
+        the  method  is tried earlier. See [2XCallMethods[102X ([14X4.3-1[114X) for information
+        on how the methods are called.[133X
   
-  [8X[10Xstamp[110X[8X[108X
-        [33X[0;6Yholds  a string value that uniquely describes the method. This is used
-        for bookkeeping and to keep track of what has to be tried how often.[133X
+  [33X[0;0YThe  databases  are  always  sorted  such that the ranks are decreasing. Use
+  [2XAddMethod[102X ([14X4.2-1[114X) to add a method to a database according to its rank.[133X
   
-  [8X[10Xcomment[110X[8X[108X
-        [33X[0;6Ya string valued comment. This field is optional and can be left out.[133X
+  [1X4.2-1 AddMethod[101X
   
-  [33X[0;0YThe  different  methods for a certain task are collected in so-called [21Xmethod
-  databases[121X.  A  [13Xmethod  database[113X is just a list of records, each describing a
-  method in the format described above. Usually, the ranks will be descending,
-  but that is not necessary.[133X
+  [33X[1;0Y[29X[2XAddMethod[102X( [3XmethodDb[103X, [3Xmethod[103X, [3Xrank[103X ) [32X function[133X
   
-  [33X[0;0YThere  is  one  convenience  function  to  put  a  new  method into a method
-  database:[133X
+  [33X[0;0YAdd  the  recognition  method  [3Xmethod[103X  with rank [3Xrank[103X to the method database
+  [3XmethodDb[103X.  Return  nothing.  [3Xmethod[103X  is inserted into [3XmethodDb[103X such that the
+  ranks of its entries are in decreasing order. For information on recognition
+  methods  and  method  databases  see  [2XRecogMethod[102X  ([14X4.1-2[114X)  and Section [14X4.2[114X,
+  respectively.[133X
   
-  [1X4.1-1 AddMethod[101X
+  [33X[0;0YThe  following  databases  contain the methods for finding homomorphisms for
+  permutation, matrix, and projective groups.[133X
   
-  [33X[1;0Y[29X[2XAddMethod[102X( [3Xdb[103X, [3Xmeth[103X, [3Xrank[103X, [3Xstamp[103X[, [3Xcomment[103X] ) [32X function[133X
-  [6XReturns:[106X  [33X[0;10Ynothing[133X
+  [1X4.2-2 FindHomDbPerm[101X
   
-  [33X[0;0Y[3Xdb[103X must be a method database (list of records, see above) with non-ascending
-  rank  values.  [3Xmeth[103X is the method function, [3Xrank[103X the rank and [3Xstamp[103X a string
-  valued  stamp.  The  optional  argument [3Xcomment[103X can be a string comment. The
-  record describing the method is created and inserted at the correct position
-  in the method database. Nothing is returned.[133X
+  [33X[1;0Y[29X[2XFindHomDbPerm[102X [32X global variable[133X
+  
+  [33X[0;0YThe method database for permutation groups.[133X
+  
+  [1X4.2-3 FindHomDbMatrix[101X
+  
+  [33X[1;0Y[29X[2XFindHomDbMatrix[102X [32X global variable[133X
+  
+  [33X[0;0YThe method database for matrix groups.[133X
+  
+  [1X4.2-4 FindHomDbProjective[101X
+  
+  [33X[1;0Y[29X[2XFindHomDbProjective[102X [32X global variable[133X
+  
+  [33X[0;0YThe method database for projective matrix groups.[133X
   
   
-  [1X4.2 [33X[0;0YHow methods are called[133X[101X
+  [1X4.3 [33X[0;0YHow methods are called[133X[101X
   
   [33X[0;0YWhenever  the  method  selection  shall  be  used,  one  calls the following
   function:[133X
   
-  [1X4.2-1 CallMethods[101X
+  [1X4.3-1 CallMethods[101X
   
   [33X[1;0Y[29X[2XCallMethods[102X( [3Xdb[103X, [3Xlimit[103X[, [3Xfurtherargs[103X] ) [32X function[133X
   [6XReturns:[106X  [33X[0;10Ya record [10Xms[110X describing this method selection procedure.[133X
   
-  [33X[0;0YThe argument [3Xdb[103X must be a method database in the sense of Section [14X4.1[114X. [3Xlimit[103X
+  [33X[0;0YThe argument [3Xdb[103X must be a method database in the sense of Section [14X4.2[114X. [3Xlimit[103X
   must  be  a non-negative integer. [3Xfurtherargs[103X stands for an arbitrary number
   of  additional  arguments,  which  are handed down to the called methods. Of
   course  they  must  fulfill  the  conventions defined for the methods in the
@@ -115,11 +177,11 @@
   [33X[0;0YThe method selection record has the following components:[133X
   
   [8X[10XinapplicableMethods[110X[8X[108X
-        [33X[0;6Ya  record, in which for every method that returned [10XNeverApplicable[110X the
+        [33X[0;6Ya  record, in which for every method that returned [9XNeverApplicable[109X the
         value 1 is bound to the component with name the stamp of the method.[133X
   
   [8X[10XfailedMethods[110X[8X[108X
-        [33X[0;6Ya  record,  in which for every time a method returned [10XTemporaryFailure[110X
+        [33X[0;6Ya  record,  in which for every time a method returned [9XTemporaryFailure[109X
         the  value bound to the component with name the stamp of the method is
         increased by 1 (not being bound means zero).[133X
   
@@ -128,7 +190,7 @@
         only bound after successful completion.[133X
   
   [8X[10Xresult[110X[8X[108X
-        [33X[0;6Ya  boolean value which is either [10XSuccess[110X or [10XTemporaryFailure[110X depending
+        [33X[0;6Ya  boolean value which is either [9XSuccess[109X or [9XTemporaryFailure[109X depending
         on  whether  a  successful  method  was found or the procedure gave up
         respectively.  This  component  is  only bound after completion of the
         method selection procedure.[133X
@@ -139,22 +201,22 @@
   [33X[0;0YThe  algorithm  used  by  [2XCallMethods[102X is extremely simple: It sets a counter
   [10Xtolerance[110X  to  zero.  The  main  loop  starts at the beginning of the method
   database and runs through the methods in turn. Provided a method did not yet
-  return  [10XNeverApplicable[110X  and  did  not yet return [10XTemporaryFailure[110X more than
+  return  [9XNeverApplicable[109X  and  did  not yet return [9XTemporaryFailure[109X more than
   [10Xtolerance[110X  times before, it is tried. According to the value returned by the
   method, the following happens:[133X
   
-  [8X[10XNeverApplicable[110X[8X[108X
+  [8X[9XNeverApplicable[109X[108X
         [33X[0;6Ythis is marked in the method selection record and the main loop starts
         again at the beginning of the method database.[133X
   
-  [8X[10XTemporaryFailure[110X[8X[108X
+  [8X[9XTemporaryFailure[109X[108X
         [33X[0;6Ythis  is  counted  in  the  method  selection record and the main loop
         starts again at the beginning of the method database.[133X
   
-  [8X[10XNotEnoughInformation[110X[8X[108X
+  [8X[9XNotEnoughInformation[109X[108X
         [33X[0;6Ythe main loop goes to the next method in the method database.[133X
   
-  [8X[10Xtrue[110X[8X[108X
+  [8X[9XSuccess[109X[108X
         [33X[0;6Ythis  is  marked  in  the  method  selection  record and the procedure
         returns successfully.[133X
   
@@ -169,11 +231,73 @@
   after  each  failed  method call! However, this does not lead to an infinite
   loop,  because  the  failure is recorded in the method selection record such
   that the method is skipped until the [10Xtolerance[110X increases. Once the [10Xtolerance[110X
-  has  been  increased methods having returned [10XTemporaryFailure[110X will be called
+  has  been  increased methods having returned [9XTemporaryFailure[109X will be called
   again. The idea behind this approach is that even failed methods can collect
   additional  information  about the arguments changing them accordingly. This
   might  give  methods that come earlier and were not applicable up to now the
   opportunity  to  begin  working. Therefore one can install very good methods
   that  depend  on  some  already  known knowledge which will only be acquired
   during the method selection procedure by other methods, with a high rank.[133X
+  
+  
+  [1X4.4 [33X[0;0YGlobal records storing functions[133X[101X
+  
+  [33X[0;0YThe following global records store the methods for finding homomorphisms for
+  group  recognition. We collect them in these records such that we do not use
+  up too many global variable names.[133X
+  
+  [1X4.4-1 FindHomMethodsPerm[101X
+  
+  [33X[1;0Y[29X[2XFindHomMethodsPerm[102X [32X global variable[133X
+  
+  [33X[0;0YStores recog methods for permutation groups.[133X
+  
+  [1X4.4-2 FindHomMethodsMatrix[101X
+  
+  [33X[1;0Y[29X[2XFindHomMethodsMatrix[102X [32X global variable[133X
+  
+  [33X[0;0YStores recog methods for matrix groups.[133X
+  
+  [1X4.4-3 FindHomMethodsProjective[101X
+  
+  [33X[1;0Y[29X[2XFindHomMethodsProjective[102X [32X global variable[133X
+  
+  [33X[0;0YStores recog methods for projective groups.[133X
+  
+  [1X4.4-4 FindHomMethodsGeneric[101X
+  
+  [33X[1;0Y[29X[2XFindHomMethodsGeneric[102X [32X global variable[133X
+  
+  [33X[0;0YIn   this   global  record  the  functions  that  are  methods  for  finding
+  homomorphisms  for generic group recognition are stored. We collect them all
+  in this record such that we do not use up too many global variable names.[133X
+  
+  [33X[0;0YThe  following  global records hold the functions for writing group elements
+  as straight line programs (SLPs) in terms of the generators after successful
+  group  recognition. We collect them in these records such that we do not use
+  up too many global variable names.[133X
+  
+  [1X4.4-5 SLPforElementFuncsPerm[101X
+  
+  [33X[1;0Y[29X[2XSLPforElementFuncsPerm[102X [32X global variable[133X
+  
+  [33X[0;0YStores the SLP functions for permutation groups.[133X
+  
+  [1X4.4-6 SLPforElementFuncsMatrix[101X
+  
+  [33X[1;0Y[29X[2XSLPforElementFuncsMatrix[102X [32X global variable[133X
+  
+  [33X[0;0YStores the SLP functions for matrix groups.[133X
+  
+  [1X4.4-7 SLPforElementFuncsProjective[101X
+  
+  [33X[1;0Y[29X[2XSLPforElementFuncsProjective[102X [32X global variable[133X
+  
+  [33X[0;0YStores the SLP functions for projective groups.[133X
+  
+  [1X4.4-8 SLPforElementFuncsGeneric[101X
+  
+  [33X[1;0Y[29X[2XSLPforElementFuncsGeneric[102X [32X global variable[133X
+  
+  [33X[0;0YStores the SLP functions for generic groups.[133X
   

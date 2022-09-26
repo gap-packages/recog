@@ -7,12 +7,12 @@
   [33X[0;0YThis  package is about group recognition. It provides a generic framework to
   implement  methods  of  group  recognition, regardless of what computational
   representation  is used. This means, that the code in this package is useful
-  at  least  for  permutation groups, matrix groups and projective groups. The
-  setup is described in [NS06].[133X
+  at  least  for  permutation  groups, and matrix groups and projective groups
+  over finite fields. The setup is described in [NS06].[133X
   
   [33X[0;0YThe  framework allows to build composition trees and handles the builtup and
   usage  of  these trees in a generic way. It also contains a method selection
-  (described  in  Chapter  [14X4[114X)  that  allows  install  recognition methods in a
+  (described  in  Chapter  [14X4[114X)  that allows to install recognition methods in a
   convenient  way  and that automatically tries to try the different available
   methods in a sensible order.[133X
   
@@ -28,18 +28,39 @@
   an isomorphism) we use another generic procedure, the [21Xmethod selection[121X which
   is not to be confused with the [5XGAP[105X method selection.[133X
   
-  [33X[0;0YOur  own method selection is described in detail in Chapter [14X4[114X, because it is
-  interesting in its own right and might be useful in other circumstances.[133X
+  [33X[0;0YOur own method selection system is described in detail in Chapter [14X4[114X, because
+  it   is  interesting  in  its  own  right  and  might  be  useful  in  other
+  circumstances.[133X
   
-  [33X[0;0YChapter [14X6[114X describes the avalable [21XFindHomomorphism[121X methods.[133X
+  [33X[0;0YChapter [14X6[114X describes the available [21XFindHomomorphism[121X methods.[133X
   
   [33X[0;0YChapter [14X5[114X explains what one can do with a completed recognition tree.[133X
   
-  [33X[0;0YFinally, Chapter [14X7[114X shows instructive examples for the usage of this package.[133X
+  [33X[0;0YFinally,  Chapter  [14X7[114X  shows  some  instructive examples of the usage of this
+  package.[133X
   
   
-  [1X1.3 [33X[0;0YFeedback[133X[101X
+  [1X1.3 [33X[0;0YFeedback and support[133X[101X
   
-  [33X[0;0YFor  bug  reports,  feature  requests  and suggestions, please use our issue
-  tracker ([7Xhttps://github.com/gap-packages/recog/issues[107X).[133X
+  [33X[0;0YIf  you  have any bug reports, feature requests, or suggestions, then please
+  tell       us       via      the      issue      tracker      on      GitHub
+  ([7Xhttps://github.com/gap-packages/recog/issues[107X).[133X
+  
+  [33X[0;0YIn  addition,  the [5Xrecog[105X package has a mailing list, at recog@gap-system.org
+  ([7Xmailto:recog@gap-system.org[107X),  which  can  be used for holding discussions,
+  sharing  information,  and  asking questions about the package. You can find
+  more  information,  and  register  to receive the mail sent to this list, at
+  [7Xhttps://mail.gap-system.org/mailman/listinfo/recog[107X.[133X
+  
+  
+  [1X1.4 [33X[0;0YLiterature (temporary)[133X[101X
+  
+  [33X[0;0YTODO Find the appropriate place to put these references, so that they appear
+  in  the  bibliography: [LNPS06] [BLS97] [JLNP13] [DLGLO13] [LGO09] [BLGN+05]
+  [BLGN+03]  [NP98]  [NP99] [NP97] [Pra99] [CLG97a] [CLG97b] [CLGM+95] [BNS06]
+  [CNRD09]  [BHLGO15]  [Neu09]  [Ser03]  [KK15]  [LO16] [LO07] [HLO+08] [BB99]
+  [BBS09]  [BS01]  [Bro01]  [Bro08]  [Bro03]  [BK06]  [BK01]  [CLG98] [CLGO06]
+  [CLG01] [CFL97] [DLGO15] [GH97] [GLGO06] [HLGOR96a] [HLGOR96b] [HR94] [IL00]
+  [KM13]  [KM15]  [LGO97a]  [LGO02]  [LGO97b]  [LG01]  [LMO07]  [NP92] [Nie05]
+  [O'B11] [O'B06] [Pak00] [Par84][133X
   

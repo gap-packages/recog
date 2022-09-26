@@ -3,127 +3,29 @@
                                     [1X recog [101X
   
   
-                  [1X A collection of group recognition methods [101X
+   [1X A package for constructive recognition of permutation and matrix groups [101X
   
   
-                                     1.3.2
+                                     1.4.0
   
   
-                                 15 April 2018
+                               22 September 2022
   
   
                                  Max Neunhöffer
   
                                   Ákos Seress
   
-                             Nurullah Ankaralioglu
-  
-                                Peter Brooksbank
-  
-                                  Frank Celler
-  
-                                  Stephen Howe
-  
-                                   Maska Law
-  
-                                  Steve Linton
-  
-                                  Gunter Malle
-  
-                                 Alice Niemeyer
-  
-                                 Eamonn O'Brien
-  
-                             Colva M. Roney-Dougal
-  
-                                    Max Horn
-  
   
   
   Max Neunhöffer
       Email:    [7Xmailto:max@9hoeffer.de[107X
-      Homepage: [7Xhttp://www-groups.mcs.st-and.ac.uk/~neunhoef[107X
-      Address:  [33X[0;14YGustav-Freytag-Straße 40[133X
-                [33X[0;14Y50354 Hürth[133X
-                [33X[0;14YGermany[133X
-  
-  
-  Nurullah Ankaralioglu
-      Email:    [7Xmailto:ankarali@atauni.edu.tr[107X
-  Peter Brooksbank
-      Email:    [7Xmailto:pbrooksb@bucknell.edu[107X
-      Homepage: [7Xhttp://www.facstaff.bucknell.edu/pbrooksb/[107X
-      Address:  [33X[0;14YPeter A. Brooksbank[133X
-                [33X[0;14YMathematics Department[133X
-                [33X[0;14YBucknell University[133X
-                [33X[0;14YLewisburg, PA 17837[133X
-                [33X[0;14YUSA[133X
-  
-  
-  Frank Celler
-      Email:    [7Xmailto:frank@celler.de[107X
-      Homepage: [7Xhttp://www.celler.de/[107X
-  Maska Law
-      Email:    [7Xmailto:maska@maths.uwa.edu.au[107X
-      Address:  [33X[0;14YMaska Law[133X
-                [33X[0;14YUniversity of Western Australia[133X
-                [33X[0;14YSchool of Mathematics and Statistics[133X
-                [33X[0;14Y35 Stirling Highway[133X
-                [33X[0;14YCrawley 6009[133X
-                [33X[0;14YWestern Australia[133X
-  
-  
-  Steve Linton
-      Email:    [7Xmailto:sal@cs.st-andrews.ac.uk[107X
-      Homepage: [7Xhttp://www-circa.mcs.st-and.ac.uk/~sal/[107X
-      Address:  [33X[0;14YSchool of Computer Science[133X
-                [33X[0;14YJack Cole Building[133X
-                [33X[0;14YNorth Haugh[133X
-                [33X[0;14YSt Andrews, Fife KY16 9SX[133X
-                [33X[0;14YScotland, UK[133X
-  
-  
-  Gunter Malle
-      Email:    [7Xmailto:malle@mathematik.uni-kl.de[107X
-      Homepage: [7Xhttp://www.mathematik.uni-kl.de/~malle/[107X
-  Alice Niemeyer
-      Email:    [7Xmailto:alice@maths.uwa.edu.au[107X
-      Homepage: [7Xhttp://www.maths.uwa.edu.au/~alice/[107X
-      Address:  [33X[0;14YAlice C. Niemeyer[133X
-                [33X[0;14YUniversity of Western Australia[133X
-                [33X[0;14YSchool of Mathematics and Statistics[133X
-                [33X[0;14Y35 Stirling Highway[133X
-                [33X[0;14YCrawley 6009[133X
-                [33X[0;14YWestern Australia[133X
-  
-  
-  Eamonn O'Brien
-      Email:    [7Xmailto:obrien@math.auckland.ac.nz[107X
-      Homepage: [7Xhttp://www.math.auckland.ac.nz/~obrien/[107X
-  Colva M. Roney-Dougal
-      Email:    [7Xmailto:colva@mcs.st-and.ac.uk[107X
-      Homepage: [7Xhttp://www-groups.mcs.st-and.ac.uk/~colva[107X
-      Address:  [33X[0;14YSchool of Mathematics and Statistics[133X
-                [33X[0;14YMathematical Institute[133X
-                [33X[0;14YNorth Haugh[133X
-                [33X[0;14YSt Andrews, Fife KY16 9SS[133X
-                [33X[0;14YScotland, UK[133X
-  
-  
-  Max Horn
-      Email:    [7Xmailto:max.horn@uni-siegen.de[107X
-      Homepage: [7Xhttps://www.quendi.de/math[107X
-      Address:  [33X[0;14YDepartment Mathematik[133X
-                [33X[0;14YUniversität Siegen[133X
-                [33X[0;14YWalter-Flex-Straße 3[133X
-                [33X[0;14Y57072 Siegen[133X
-                [33X[0;14YGermany[133X
-  
-  
   
   -------------------------------------------------------
   [1XCopyright[101X
   [33X[0;0Y© 2005-2014 by Max Neunhöffer and Ákos Seress[133X
+  
+  [33X[0;0Y© 2005-2022 by its authors, see file [11XCOPYRIGHT[111X for details.[133X
   
   [33X[0;0YThis  package  may  be distributed under the terms and conditions of the GNU
   Public License Version 3 or (at your option) any later version.[133X
@@ -137,113 +39,151 @@
   1 [33X[0;0YIntroduction[133X
     1.1 [33X[0;0YPhilosophy[133X
     1.2 [33X[0;0YOverview over this manual[133X
-    1.3 [33X[0;0YFeedback[133X
-  2 [33X[0;0YInstallation of the [5Xrecog[105X-Package[133X
-  3 [33X[0;0YGroup Recognition[133X
+    1.3 [33X[0;0YFeedback and support[133X
+    1.4 [33X[0;0YLiterature (temporary)[133X
+  2 [33X[0;0YInstallation of the [5Xrecog[105X package[133X
+  3 [33X[0;0YGroup recognition[133X
     3.1 [33X[0;0YThe recursive procedure[133X
       3.1-1 RecogniseGeneric
       3.1-2 RecognisePermGroup
       3.1-3 RecogniseMatrixGroup
       3.1-4 RecogniseProjectiveGroup
       3.1-5 RecogniseGroup
-      3.1-6 FindHomDbPerm
-      3.1-7 FindHomMethodsPerm
-      3.1-8 SLPforElementFuncsPerm
-      3.1-9 FindHomDbMatrix
-      3.1-10 FindHomMethodsMatrix
-      3.1-11 SLPforElementFuncsMatrix
-      3.1-12 FindHomDbProjective
-      3.1-13 FindHomMethodsProjective
-      3.1-14 SLPforElementFuncsProjective
-      3.1-15 TryFindHomMethod
-    3.2 [33X[0;0YRecognition info records[133X
-      3.2-1 RecognitionInfoFamily
-      3.2-2 IsRecognitionInfo
-      3.2-3 IsLeaf
-      3.2-4 IsReady
-      3.2-5 Grp
-      3.2-6 Homom
-      3.2-7 NiceGens
-      3.2-8 pregensfac
-      3.2-9 RIFac
-      3.2-10 RIKer
-      3.2-11 RIParent
-      3.2-12 fhmethsel
-      3.2-13 slpforelement
-      3.2-14 SLPforElement
-      3.2-15 StdPresentation
-      3.2-16 methodsforfactor
-      3.2-17 calcnicegens
-      3.2-18 CalcNiceGensGeneric
-      3.2-19 CalcNiceGensHomNode
-      3.2-20 CalcNiceGens
-      3.2-21 slptonice
-      3.2-22 gensN
-      3.2-23 findgensNmeth
-      3.2-24 FindKernelRandom
-      3.2-25 FindKernelDoNothing
-      3.2-26 FindKernelFastNormalClosure
-      3.2-27 gensNslp
-      3.2-28 immediateverification
-      3.2-29 forkernel
-      3.2-30 forfactor
-      3.2-31 isone
-      3.2-32 isequal
-      3.2-33 [33X[0;0YOther components of recognition info records[133X
+      3.1-6 TryFindHomMethod
+    3.2 [33X[0;0YRecognition nodes[133X
+      3.2-1 RecogNodeFamily
+      3.2-2 IsRecogNode
+      3.2-3 RecogNode
+      3.2-4 IsLeaf
+      3.2-5 IsReady
+      3.2-6 Grp
+      3.2-7 Homom
+      3.2-8 NiceGens
+      3.2-9 pregensfac
+      3.2-10 ImageRecogNode
+      3.2-11 KernelRecogNode
+      3.2-12 ParentRecogNode
+      3.2-13 fhmethsel
+      3.2-14 slpforelement
+      3.2-15 SLPforElement
+      3.2-16 StdPresentation
+      3.2-17 methodsforimage
+      3.2-18 validatehomominput
+      3.2-19 ValidateHomomInput
+      3.2-20 calcnicegens
+      3.2-21 CalcNiceGensGeneric
+      3.2-22 CalcNiceGensHomNode
+      3.2-23 CalcNiceGens
+      3.2-24 slptonice
+      3.2-25 gensN
+      3.2-26 findgensNmeth
+      3.2-27 FindKernelRandom
+      3.2-28 FindKernelDoNothing
+      3.2-29 FindKernelFastNormalClosure
+      3.2-30 gensNslp
+      3.2-31 immediateverification
+      3.2-32 InitialDataForKernelRecogNode
+      3.2-33 InitialDataForImageRecogNode
+      3.2-34 isone
+      3.2-35 isequal
+      3.2-36 order
+      3.2-37 [33X[0;0YOther components of recognition nodes[133X
     3.3 [33X[0;0YMethods to find homomorphisms[133X
       3.3-1 FindHomomorphism
       3.3-2 SLPforElementGeneric
-    3.4 [33X[0;0YConventions for the recognition of permutation groups[133X
-    3.5 [33X[0;0YConventions for the recognition of matrix groups[133X
-    3.6 [33X[0;0YConventions for the recognition of projective groups[133X
-  4 [33X[0;0YMethod Selection[133X
+  4 [33X[0;0YMethod selection[133X
     4.1 [33X[0;0YWhat are methods?[133X
-      4.1-1 AddMethod
-    4.2 [33X[0;0YHow methods are called[133X
-      4.2-1 CallMethods
+      4.1-1 IsRecogMethod
+      4.1-2 RecogMethod
+      4.1-3 BindRecogMethod
+      4.1-4 Stamp
+      4.1-5 Comment
+      4.1-6 CallRecogMethod
+    4.2 [33X[0;0YMethod Databases[133X
+      4.2-1 AddMethod
+      4.2-2 FindHomDbPerm
+      4.2-3 FindHomDbMatrix
+      4.2-4 FindHomDbProjective
+    4.3 [33X[0;0YHow methods are called[133X
+      4.3-1 CallMethods
+    4.4 [33X[0;0YGlobal records storing functions[133X
+      4.4-1 FindHomMethodsPerm
+      4.4-2 FindHomMethodsMatrix
+      4.4-3 FindHomMethodsProjective
+      4.4-4 FindHomMethodsGeneric
+      4.4-5 SLPforElementFuncsPerm
+      4.4-6 SLPforElementFuncsMatrix
+      4.4-7 SLPforElementFuncsProjective
+      4.4-8 SLPforElementFuncsGeneric
   5 [33X[0;0YAfter successful recognition[133X
-    5.1 [33X[0;0YFunctions and methods for recognition info records[133X
+    5.1 [33X[0;0YFunctions and methods for recognition nodes[133X
       5.1-1 SLPforNiceGens
       5.1-2 \in
       5.1-3 Size
       5.1-4 DisplayCompositionFactors
   6 [33X[0;0YMethods for recognition[133X
-    6.1 [33X[0;0YMethods for permutation groups[133X
-      6.1-1 [33X[0;0Y[10XTrivialPermGroup[110X[133X
-      6.1-2 [33X[0;0Y[10XThrowAwayFixedPoints[110X[133X
-      6.1-3 [33X[0;0Y[10XPcgs[110X[133X
-      6.1-4 [33X[0;0Y[10XVeryFewPoints[110X[133X
-      6.1-5 [33X[0;0Y[10XNontransitive[110X[133X
-      6.1-6 [33X[0;0Y[10XGiant[110X[133X
-      6.1-7 [33X[0;0Y[10XImprimitive[110X[133X
-      6.1-8 [33X[0;0Y[10XSnkSetswrSr[110X[133X
-      6.1-9 [33X[0;0Y[10XStabChain[110X[133X
-    6.2 [33X[0;0YMethods for matrix groups[133X
-      6.2-1 [33X[0;0Y[10XTrivialMatrixGroup[110X[133X
-      6.2-2 [33X[0;0Y[10XKnownStabilizerChain[110X[133X
-      6.2-3 [33X[0;0Y[10XDiagonalMatrices[110X[133X
-      6.2-4 [33X[0;0Y[10XFewGensAbelian[110X[133X
-      6.2-5 [33X[0;0Y[10XReducibleIso[110X[133X
-      6.2-6 [33X[0;0Y[10XBlockLowerTriangular[110X[133X
-      6.2-7 [33X[0;0Y[10XBlockDiagonal[110X[133X
-      6.2-8 [33X[0;0Y[10XGoProjective[110X[133X
-      6.2-9 [33X[0;0Y[10XBlockScalar[110X[133X
-      6.2-10 [33X[0;0Y[10XLowerLeftPGroup[110X[133X
-    6.3 [33X[0;0YMethods for projective groups[133X
-      6.3-1 [33X[0;0Y[10XTrivialProjectiveGroup[110X[133X
-      6.3-2 [33X[0;0Y[10XProjDeterminant[110X[133X
-      6.3-3 [33X[0;0Y[10XReducibleIso[110X[133X
-      6.3-4 [33X[0;0Y[10XBlocksModScalars[110X[133X
-      6.3-5 [33X[0;0Y[10XNotAbsolutelyIrred[110X[133X
-      6.3-6 [33X[0;0Y[10XSubfield[110X[133X
-      6.3-7 [33X[0;0Y[10XDerived[110X[133X
-      6.3-8 [33X[0;0Y[10XLowIndex[110X[133X
-      6.3-9 [33X[0;0Y[10XC6[110X[133X
-      6.3-10 [33X[0;0Y[10XTensor[110X[133X
-      6.3-11 [33X[0;0Y[10XTwoLargeElOrders[110X[133X
-      6.3-12 [33X[0;0Y[10XStabilizerChain[110X[133X
-      6.3-13 [33X[0;0Y[10XBlockScalarProj[110X[133X
+    6.1 [33X[0;0YMethods for generic groups[133X
+      6.1-1 [33X[0;0Y[10XFewGensAbelian[110X[133X
+      6.1-2 [33X[0;0Y[10XKnownNilpotent[110X[133X
+      6.1-3 [33X[0;0Y[10XSnAnUnknownDegree[110X[133X
+      6.1-4 [33X[0;0Y[10XTrivialGroup[110X[133X
+    6.2 [33X[0;0YMethods for permutation groups[133X
+      6.2-1 [33X[0;0Y[10XBalTreeForBlocks[110X[133X
+      6.2-2 [33X[0;0Y[10XGiant[110X[133X
+      6.2-3 [33X[0;0Y[10XImprimitive[110X[133X
+      6.2-4 [33X[0;0Y[10XLargeBasePrimitive[110X[133X
+      6.2-5 [33X[0;0Y[10XMovesOnlySmallPoints[110X[133X
+      6.2-6 [33X[0;0Y[10XNonTransitive[110X[133X
+      6.2-7 [33X[0;0Y[10XPcgs[110X[133X
+      6.2-8 [33X[0;0Y[10XPcgsForBlocks[110X[133X
+      6.2-9 [33X[0;0Y[10XStabChain[110X[133X
+      6.2-10 [33X[0;0Y[10XStabilizerChainPerm[110X[133X
+      6.2-11 [33X[0;0Y[10XThrowAwayFixedPoints[110X[133X
+    6.3 [33X[0;0YMethods for matrix groups[133X
+      6.3-1 [33X[0;0Y[10XBlockDiagonal[110X[133X
+      6.3-2 [33X[0;0Y[10XBlockLowerTriangular[110X[133X
+      6.3-3 [33X[0;0Y[10XBlockScalar[110X[133X
+      6.3-4 [33X[0;0Y[10XDiagonalMatrices[110X[133X
+      6.3-5 [33X[0;0Y[10XGoProjective[110X[133X
+      6.3-6 [33X[0;0Y[10XKnownStabilizerChain[110X[133X
+      6.3-7 [33X[0;0Y[10XLowerLeftPGroup[110X[133X
+      6.3-8 [33X[0;0Y[10XNaturalSL[110X[133X
+      6.3-9 [33X[0;0Y[10XReducibleIso[110X[133X
+      6.3-10 [33X[0;0Y[10XScalar[110X[133X
+    6.4 [33X[0;0YMethods for projective groups[133X
+      6.4-1 [33X[0;0Y[10XAltSymBBByDegree[110X[133X
+      6.4-2 [33X[0;0Y[10XBiggerScalarsOnly[110X[133X
+      6.4-3 [33X[0;0Y[10XBlockScalarProj[110X[133X
+      6.4-4 [33X[0;0Y[10XBlocks[110X[133X
+      6.4-5 [33X[0;0Y[10XBlocksBackToMats[110X[133X
+      6.4-6 [33X[0;0Y[10XBlocksModScalars[110X[133X
+      6.4-7 [33X[0;0Y[10XC3C5[110X[133X
+      6.4-8 [33X[0;0Y[10XC6[110X[133X
+      6.4-9 [33X[0;0Y[10XClassicalNatural[110X[133X
+      6.4-10 [33X[0;0Y[10XComputeSimpleSocle[110X[133X
+      6.4-11 [33X[0;0Y[10XD247[110X[133X
+      6.4-12 [33X[0;0Y[10XDoBaseChangeForBlocks[110X[133X
+      6.4-13 [33X[0;0Y[10XFindElmOfEvenNormal[110X[133X
+      6.4-14 [33X[0;0Y[10XKroneckerKernel[110X[133X
+      6.4-15 [33X[0;0Y[10XKroneckerProduct[110X[133X
+      6.4-16 [33X[0;0Y[10XLieTypeNonConstr[110X[133X
+      6.4-17 [33X[0;0Y[10XLowIndex[110X[133X
+      6.4-18 [33X[0;0Y[10XNameSporadic[110X[133X
+      6.4-19 [33X[0;0Y[10XNotAbsolutelyIrred[110X[133X
+      6.4-20 [33X[0;0Y[10XProjDeterminant[110X[133X
+      6.4-21 [33X[0;0Y[10XPrototypeForC2C4[110X[133X
+      6.4-22 [33X[0;0Y[10XSporadicsByOrders[110X[133X
+      6.4-23 [33X[0;0Y[10XStabilizerChainProj[110X[133X
+      6.4-24 [33X[0;0Y[10XSubfield[110X[133X
+      6.4-25 [33X[0;0Y[10XTensorDecomposable[110X[133X
+      6.4-26 [33X[0;0Y[10XThreeLargeElOrders[110X[133X
+    6.5 [33X[0;0YUnused methods[133X
   7 [33X[0;0YExamples[133X
+  8 [33X[0;0YRenaming[133X
+  9 [33X[0;0YHow to write a recognition method[133X
+    9.1 [33X[0;0YLeaf methods[133X
+    9.2 [33X[0;0YElements with memory[133X
+    9.3 [33X[0;0YSplitting methods[133X
   
   
   [32X

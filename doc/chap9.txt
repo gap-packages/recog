@@ -1,0 +1,302 @@
+  
+  [1X9 [33X[0;0YHow to write a recognition method[133X[101X
+  
+  [33X[0;0YThis  chapter  explains how to integrate a newly developed group recognition
+  method into the framework provided by the recog package.[133X
+  
+  [33X[0;0YTODO:  Refer  to  Chapter  [14X4[114X  for  an explanation of methods. There are leaf
+  methods  and  split methods. The next two sections describe how to implement
+  leaf and split methods respectively, and include example code.[133X
+  
+  
+  [1X9.1 [33X[0;0YLeaf methods[133X[101X
+  
+  [33X[0;0YA  leaf  method  must  at  the very least do the following, examples will be
+  provided below (TODO: add a reference):[133X
+  
+  [30X    [33X[0;6YProvide the order of the recognized group via [10XSetSize(ri, NNN)[110X.[133X
+  
+  [30X    [33X[0;6YProvide  a set of SLPs which map the original generators [23XX[123X to the nice
+        generators [23XY[123X, as entry for the attribute [10Xslptonice[110X.[133X
+  
+  [30X    [33X[0;6YProvide  a  function  which maps any element [23Xg\in G[123X to a corresponding
+        SLP  in  terms  of  the  nice generators [23XY[123X, as entry for the attribute
+        [10Xslpforelement[110X.[133X
+  
+  [30X    [33X[0;6YCall [10XSetFilterObj(ri, IsLeaf);[110X to mark the node as a leaf node.[133X
+  
+  [33X[0;0YThere  are  further  values  that can be provided, in particular to speed up
+  computations; we'll come back to that later. Let's first look at an example:
+  The following method is used by [5Xrecog[105X to recognize trivial groups, as a base
+  case  for  the recursive group recognition algorithm. It works for arbitrary
+  groups.[133X
+  
+  [33X[0;0YTODO: AutoDoc inserts extra paragraph commands here:[133X
+  
+  [4X[32X  Code  [32X[104X
+    [4XBindRecogMethod(FindHomMethodsGeneric, "TrivialGroup",[104X
+    [4X"go through generators and compare to the identity",[104X
+    [4Xfunction(ri, G)[104X
+    [4X  local gens;[104X
+    [4X  # get the generators of the group[104X
+    [4X  gens := GeneratorsOfGroup(G);[104X
+    [4X<P/>[104X
+    [4X  # check whether all generators are trivial[104X
+    [4X  # ri!.isone is explained below[104X
+    [4X  if not ForAll(gens, ri!.isone) then[104X
+    [4X    # NeverApplicable because it makes[104X
+    [4X    # no sense to call this method again[104X
+    [4X    return NeverApplicable;[104X
+    [4X  fi;[104X
+    [4X<P/>[104X
+    [4X  # The group is trivial! Provide required information:[104X
+    [4X<P/>[104X
+    [4X  # size of the group[104X
+    [4X  SetSize(ri, 1);[104X
+    [4X<P/>[104X
+    [4X  # explained below[104X
+    [4X  Setslpforelement(ri, SLPforElementFuncsGeneric.TrivialGroup);[104X
+    [4X<P/>[104X
+    [4X  # SLP from given generators to nice generators[104X
+    [4X  Setslptonice(ri, StraightLineProgramNC([[[1,0]]],[104X
+    [4X                   Length(gens)));[104X
+    [4X<P/>[104X
+    [4X  # We have reached a leaf node.[104X
+    [4X  SetFilterObj(ri, IsLeaf);[104X
+    [4X  return Success;[104X
+    [4Xend);[104X
+  [4X[32X[104X
+  
+  [33X[0;0YThe  input  is in the format described above (TODO), and the return value is
+  "Success".[133X
+  
+  [33X[0;0YTwo more comments:[133X
+  
+  [30X    [33X[0;6YWhen  we  check  whether  all  generators  are  the  identity, we call
+        [10Xri!.isone[110X,  instead  of  [10XIsOne[110X.  The  reason  for  this is the need to
+        support  [13Xprojective  groups[113X. For permutation groups and matrix groups,
+        [10Xri!.isone[110X  is simply defined to be [10XIsOne[110X. For projective groups, it is
+        set to [10XIsOneProjective[110X, which can be read as "is one modulo scalars".[133X
+  
+  [30X    [33X[0;6YThe  function  [10XSLPforElementFuncs.TrivialGroup[110X  takes [10Xri[110X as well as an
+        element  [10Xg[110X  as input. If [23Xg \in G[123X, then it is supposed to return an SLP
+        for  [23Xg[123X in terms of the nice gens [23XY[123X. Otherwise it returns [10Xfail[110X. Here is
+        the concrete implementation:[133X
+  
+  [4X[32X  Code  [32X[104X
+    [4XSLPforElementFuncsGeneric.TrivialGroup := function(ri,g)[104X
+    [4X    if not ri!.isone(g) then[104X
+    [4X        return fail;[104X
+    [4X    fi;[104X
+    [4X    return StraightLineProgramNC( [ [1,0] ], 1 );[104X
+    [4Xend;[104X
+  [4X[32X[104X
+  
+  [33X[0;0YFinally,  we  need to let [5Xrecog[105X know about this new recognition method. This
+  is done via the [10XAddMethod[110X function. Another example![133X
+  
+  [4X[32X  Code  [32X[104X
+    [4XAddMethod(FindHomDbPerm, FindHomMethodsGeneric.TrivialGroup, 300);[104X
+  [4X[32X[104X
+  
+  [33X[0;0YTODO:  refer  to  the [10XAddMethod[110X documentation instead. Also this is outdated
+  now.  The  function [10XAddMethod[110X takes four mandatory arguments [10Xdb[110X, [10Xmeth[110X, [10Xrank[110X,
+  [10Xstamp[110X, and an optional fifth argument [10Xcomment[110X. Their meaning is as follows:[133X
+  
+  [30X    [33X[0;6Y[10Xdb[110X  is  the  "method database", and determines to which type of groups
+        the methods should be applied. Allowed values are:[133X
+  
+        [30X    [33X[0;12Y[10XFindHomDbPerm[110X[133X
+  
+        [30X    [33X[0;12Y[10XFindHomDbMatrix[110X[133X
+  
+        [30X    [33X[0;12Y[10XFindHomDbProj[110X[133X
+  
+  [30X    [33X[0;6Y[10Xmeth[110X is the recognition method we have defined. In our example this is
+        [10XFindHomMethodsGeneric.TrivialGroup[110X.[133X
+  
+  [30X    [33X[0;6Y[10Xrank[110X  is  the  relative  rank  of  the recognition method, given as an
+        integer.  The  idea is that methods with a high rank get called before
+        methods with a low rank, so [recog] tries recognition methods starting
+        from  the  highest  rank.  What the "right" rank for a given method is
+        depends  on  which  other methods exist and what their ranks are. As a
+        rule of thumb, methods which are either very fast or very likely to be
+        applicable should be tried before slower methods, or methods which are
+        less likely to be relevant.[133X
+  
+  [30X    [33X[0;6Y[10Xstamp[110X holds a string value that uniquely describes the method. This is
+        used  for bookkeeping. It is also used in the manual, for printing the
+        recognition tree, and for debugging purposes.[133X
+  
+  [30X    [33X[0;6Y[10Xcomment[110X is a string valued comment which in the example above has been
+        used  to  explain  what the method does. This argument is optional and
+        can be left out.[133X
+  
+  [33X[0;0YNote  that  above,  we  only installed our method into [10XFindHomDbPerm[110X. But in
+  recog,  it  is  actually also installed for matrix and projective groups. We
+  reproduce  the  corresponding  [10XAddMethod[110X  calls  here.  Note  that the ranks
+  differ,  so the same method can be called with varying priority depending on
+  the type of group.[133X
+  
+  [4X[32X  Code  [32X[104X
+    [4XAddMethod(FindHomDbMatrix, FindHomMethodsGeneric.TrivialGroup, 3100);[104X
+  [4X[32X[104X
+  
+  [4X[32X  Code  [32X[104X
+    [4XAddMethod(FindHomDbProjective, FindHomMethodsGeneric.TrivialGroup, 3000);[104X
+  [4X[32X[104X
+  
+  [30X    [33X[0;6YTODO: more advanced example?[133X
+  
+  [30X    [33X[0;6YTODO: also explain how verification works[133X
+  
+  [30X    [33X[0;6YTODO:  we need something that demonstrates the other two return values
+        (Oh yes, good point.)[133X
+  
+  
+  [1X9.2 [33X[0;0YElements with memory[133X[101X
+  
+  [33X[0;0YWhen  using the memory of group elements, one currently has to always access
+  ri!.gensHmem   instead   of  doing  [10XGroupWithMemory(Grp(ri))[110X.  Namely,  many
+  functions  for  objects with memory assume that, if the elements live in the
+  same group, then their [10X!.slp[110X components are identical.[133X
+  
+  
+  [1X9.3 [33X[0;0YSplitting methods[133X[101X
+  
+  [33X[0;0YRecall that splitting recognition methods produce an epimorphism [23X\phi:G\to H[123X
+  and then delegate the work to the image [23XH[123X and the kernel [23XN:=\ker(\phi)[123X. This
+  means  that  now  [23XN[123X  and  [23XH[123X  have  to  be  constructively recognized. Such a
+  splitting  recognition  method  only  needs  to  provide  a homomorphism, by
+  calling  [10XSetHomom(ri,  hom);[110X.  However, in practice one will want to provide
+  additional data.[133X
+  
+  [33X[0;0YWe  start with an example, similar to a method used in [5Xrecog[105X. This refers to
+  permutation groups only![133X
+  
+  [4X[32X  Code  [32X[104X
+    [4XBindRecogMethod(FindHomMethodsPerm, "NonTransitive",[104X
+    [4X"try to find non-transitivity and restrict to orbit",[104X
+    [4Xrec(validatesOrAlwaysValidInput := true),[104X
+    [4Xfunction(ri, G)[104X
+    [4X    local hom,la,o;[104X
+    [4X<P/>[104X
+    [4X    # test whether we can do something:[104X
+    [4X    if IsTransitive(G) then[104X
+    [4X        return NeverApplicable;[104X
+    [4X    fi;[104X
+    [4X<P/>[104X
+    [4X    # compute orbit of the largest moved point[104X
+    [4X    la := LargestMovedPoint(G);[104X
+    [4X    o := Orb(G,la,OnPoints);[104X
+    [4X    Enumerate(o);[104X
+    [4X    # compute homomorphism into Sym(o), i.e, restrict[104X
+    [4X    # the permutation action of G to the orbit o[104X
+    [4X    hom := OrbActionHomomorphism(G,o);[104X
+    [4X    # TODO: explanation[104X
+    [4X    Setvalidatehomominput(ri, {ri,p} -> ForAll(o, x -> (x^p in o)));[104X
+    [4X    # store the homomorphism into the recognition node[104X
+    [4X    SetHomom(ri,hom);[104X
+    [4X<P/>[104X
+    [4X    # TODO: explanation[104X
+    [4X    Setimmediateverification(ri, true);[104X
+    [4X<P/>[104X
+    [4X    # indicate success[104X
+    [4X    return Success;[104X
+    [4Xend);[104X
+  [4X[32X[104X
+  
+  [33X[0;0YTODO Alternatively use this:[133X
+  
+  [4X[32X  Example  [32X[104X
+    [4X[28XFindHomMethodsPerm.NonTransitive := function(ri, G)[128X[104X
+    [4X[28X  local hom, la, o;[128X[104X
+    [4X[28X[128X[104X
+    [4X[28X  # test whether we can do something:[128X[104X
+    [4X[28X  if IsTransitive(G) then[128X[104X
+    [4X[28X    # the action is transitive, so we can't do[128X[104X
+    [4X[28X    # anything, and there is no point in calling us again.[128X[104X
+    [4X[28X    return NeverApplicable;[128X[104X
+    [4X[28X  fi;[128X[104X
+    [4X[28X[128X[104X
+    [4X[28X  # compute orbit of the largest moved point[128X[104X
+    [4X[28X  la := LargestMovedPoint(G);[128X[104X
+    [4X[28X  o := Orbit(G, la, OnPoints);[128X[104X
+    [4X[28X[128X[104X
+    [4X[28X  # compute homomorphism into Sym(o), i.e, restrict[128X[104X
+    [4X[28X  # the permutation action of G to the orbit o[128X[104X
+    [4X[28X  hom := ActionHomomorphism(G, o);[128X[104X
+    [4X[28X[128X[104X
+    [4X[28X  # store the homomorphism into the recognition node[128X[104X
+    [4X[28X  SetHomom(ri, hom);[128X[104X
+    [4X[28X[128X[104X
+    [4X[28X  # indicate success[128X[104X
+    [4X[28X  return Success;[128X[104X
+    [4X[28Xend;[128X[104X
+  [4X[32X[104X
+  
+  [4X[32X  Code  [32X[104X
+    [4XAddMethod(FindHomDbPerm, FindHomMethodsPerm.NonTransitive, 90);[104X
+  [4X[32X[104X
+  
+  [33X[0;0YTODO: More complex example:[133X
+  
+  [4X[32X  Example  [32X[104X
+    [4X[28XFindHomMethodsMatrix.BlockLowerTriangular := function(ri, G)[128X[104X
+    [4X[28X  # This is only used coming from a hint, we know what to do:[128X[104X
+    [4X[28X  # A base change was done to get block lower triangular shape.[128X[104X
+    [4X[28X  # We first do the diagonal blocks, then the lower p-part:[128X[104X
+    [4X[28X  local H, data, hom, newgens;[128X[104X
+    [4X[28X[128X[104X
+    [4X[28X  # we need to construct a homomorphism, but to defined it,[128X[104X
+    [4X[28X  # we need the image, but of course the image is defined in[128X[104X
+    [4X[28X  # terms of the homomorphism... to break this cycle, we do[128X[104X
+    [4X[28X  # the following: we first map the input generators using[128X[104X
+    [4X[28X  # the helper function RECOG.HomOntoBlockDiagonal; this[128X[104X
+    [4X[28X  # function is later also used as the underlying mapping[128X[104X
+    [4X[28X  # of the homomorphism.[128X[104X
+    [4X[28X  data := rec( blocks := ri!.blocks );[128X[104X
+    [4X[28X  newgens := List(GeneratorsOfGroup(G),[128X[104X
+    [4X[28X                  x -> RECOG.HomOntoBlockDiagonal(data, x));[128X[104X
+    [4X[28X  Assert(0, not fail in newgens);[128X[104X
+    [4X[28X[128X[104X
+    [4X[28X  # now that we have the images of the generators, we can[128X[104X
+    [4X[28X  # defined the image group[128X[104X
+    [4X[28X  H := Group(newgens);[128X[104X
+    [4X[28X[128X[104X
+    [4X[28X  # finally, we define the homomorphism[128X[104X
+    [4X[28X  hom := GroupHomByFuncWithData(G, H, RECOG.HomOntoBlockDiagonal, data);[128X[104X
+    [4X[28X[128X[104X
+    [4X[28X  # ... and store it in the recognition node[128X[104X
+    [4X[28X  SetHomom(ri, hom);[128X[104X
+    [4X[28X[128X[104X
+    [4X[28X  # since we know exactly what kind of group we are looking[128X[104X
+    [4X[28X  # at, we don't want to run generic recognition on the[128X[104X
+    [4X[28X  # image group and the kernel. So we provide "hints" to[128X[104X
+    [4X[28X  # ensure more appropriate recognition methods are applied[128X[104X
+    [4X[28X  # first.[128X[104X
+    [4X[28X[128X[104X
+    [4X[28X  # Give hint to image[128X[104X
+    [4X[28X  InitialDataForImageRecogNode(ri).blocks := ri!.blocks;[128X[104X
+    [4X[28X  Add(InitialDataForImageRecogNode(ri).hints,[128X[104X
+    [4X[28X      rec( method := FindHomMethodsMatrix.BlockDiagonal,[128X[104X
+    [4X[28X           rank := 2000,[128X[104X
+    [4X[28X           stamp := "BlockDiagonal" ) );[128X[104X
+    [4X[28X[128X[104X
+    [4X[28X  # Tell recog that we have a better method for finding kernel[128X[104X
+    [4X[28X  findgensNmeth(ri).method := FindKernelLowerLeftPGroup;[128X[104X
+    [4X[28X  findgensNmeth(ri).args := [];[128X[104X
+    [4X[28X[128X[104X
+    [4X[28X  # Give hint to kernel N[128X[104X
+    [4X[28X  Add(InitialDataForKernelRecogNode(ri).hints,[128X[104X
+    [4X[28X      rec( method := FindHomMethodsMatrix.LowerLeftPGroup,[128X[104X
+    [4X[28X           rank := 2000,[128X[104X
+    [4X[28X           stamp := “LowerLeftPGroup" ));[128X[104X
+    [4X[28X  InitialDataForKernelRecogNode(ri).blocks := ri!.blocks;[128X[104X
+    [4X[28X[128X[104X
+    [4X[28X  # This function always succeeds, because it is only[128X[104X
+    [4X[28X  # called for inputs for which it is known to apply.[128X[104X
+    [4X[28X  return Success;[128X[104X
+    [4X[28Xend;[128X[104X
+  [4X[32X[104X
+  

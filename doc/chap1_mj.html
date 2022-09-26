@@ -18,7 +18,7 @@
 <body class="chap1"  onload="jscontent()">
 
 
-<div class="chlinktop"><span class="chlink1">Goto Chapter: </span><a href="chap0_mj.html">Top</a>  <a href="chap1_mj.html">1</a>  <a href="chap2_mj.html">2</a>  <a href="chap3_mj.html">3</a>  <a href="chap4_mj.html">4</a>  <a href="chap5_mj.html">5</a>  <a href="chap6_mj.html">6</a>  <a href="chap7_mj.html">7</a>  <a href="chapBib_mj.html">Bib</a>  <a href="chapInd_mj.html">Ind</a>  </div>
+<div class="chlinktop"><span class="chlink1">Goto Chapter: </span><a href="chap0_mj.html">Top</a>  <a href="chap1_mj.html">1</a>  <a href="chap2_mj.html">2</a>  <a href="chap3_mj.html">3</a>  <a href="chap4_mj.html">4</a>  <a href="chap5_mj.html">5</a>  <a href="chap6_mj.html">6</a>  <a href="chap7_mj.html">7</a>  <a href="chap8_mj.html">8</a>  <a href="chap9_mj.html">9</a>  <a href="chapBib_mj.html">Bib</a>  <a href="chapInd_mj.html">Ind</a>  </div>
 
 <div class="chlinkprevnexttop">&nbsp;<a href="chap0_mj.html">[Top of Book]</a>&nbsp;  <a href="chap0_mj.html#contents">[Contents]</a>&nbsp;  &nbsp;<a href="chap0_mj.html">[Previous Chapter]</a>&nbsp;  &nbsp;<a href="chap2_mj.html">[Next Chapter]</a>&nbsp;  </div>
 
@@ -31,7 +31,10 @@
 <div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap1_mj.html#X786BACDB82918A65">1.2 <span class="Heading">Overview over this manual</span></a>
 </span>
 </div>
-<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap1_mj.html#X80D704CC7EBFDF7A">1.3 <span class="Heading">Feedback</span></a>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap1_mj.html#X828241117D993F36">1.3 <span class="Heading">Feedback and support</span></a>
+</span>
+</div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap1_mj.html#X804FB63186BEBD38">1.4 <span class="Heading">Literature (temporary)</span></a>
 </span>
 </div>
 </div>
@@ -42,37 +45,45 @@
 
 <h4>1.1 <span class="Heading">Philosophy</span></h4>
 
-<p>This package is about group recognition. It provides a generic framework to implement methods of group recognition, regardless of what computational representation is used. This means, that the code in this package is useful at least for permutation groups, matrix groups and projective groups. The setup is described in <a href="chapBib_mj.html#biBIssacRecog">[NS06]</a>.</p>
+<p>This package is about group recognition. It provides a generic framework to implement methods of group recognition, regardless of what computational representation is used. This means, that the code in this package is useful at least for permutation groups, and matrix groups and projective groups over finite fields. The setup is described in <a href="chapBib_mj.html#biBNS06">[NS06]</a>.</p>
 
-<p>The framework allows to build composition trees and handles the builtup and usage of these trees in a generic way. It also contains a method selection (described in Chapter <a href="chap4_mj.html#X8058CC8187162644"><span class="RefLink">4</span></a>) that allows install recognition methods in a convenient way and that automatically tries to try the different available methods in a sensible order.</p>
+<p>The framework allows to build composition trees and handles the builtup and usage of these trees in a generic way. It also contains a method selection (described in Chapter <a href="chap4_mj.html#X8058CC8187162644"><span class="RefLink">4</span></a>) that allows to install recognition methods in a convenient way and that automatically tries to try the different available methods in a sensible order.</p>
 
 <p><a id="X786BACDB82918A65" name="X786BACDB82918A65"></a></p>
 
 <h4>1.2 <span class="Heading">Overview over this manual</span></h4>
 
-<p>Chapter <a href="chap2_mj.html#X831000C78574191D"><span class="RefLink">2</span></a> describes the installation of this package.</p>
+<p>Chapter <a href="chap2_mj.html#X7AA0519A7CFE18C2"><span class="RefLink">2</span></a> describes the installation of this package.</p>
 
 <p>Chapter <a href="chap3_mj.html#X7F73983582251807"><span class="RefLink">3</span></a> describes the generic, recursive procedure used for group recognition throughout this package. At the heart of this procedure is the definition of "FindHomomorphism" methods, which is also described in that chapter. For the choice of the right method for finding a homomorphism (or an isomorphism) we use another generic procedure, the "method selection" which is not to be confused with the <strong class="pkg">GAP</strong> method selection.</p>
 
-<p>Our own method selection is described in detail in Chapter <a href="chap4_mj.html#X8058CC8187162644"><span class="RefLink">4</span></a>, because it is interesting in its own right and might be useful in other circumstances.</p>
+<p>Our own method selection system is described in detail in Chapter <a href="chap4_mj.html#X8058CC8187162644"><span class="RefLink">4</span></a>, because it is interesting in its own right and might be useful in other circumstances.</p>
 
-<p>Chapter <a href="chap6_mj.html#X78C5295B86AD0C66"><span class="RefLink">6</span></a> describes the avalable "FindHomomorphism" methods.</p>
+<p>Chapter <a href="chap6_mj.html#X78C5295B86AD0C66"><span class="RefLink">6</span></a> describes the available "FindHomomorphism" methods.</p>
 
 <p>Chapter <a href="chap5_mj.html#X851A3F04786123D5"><span class="RefLink">5</span></a> explains what one can do with a completed recognition tree.</p>
 
-<p>Finally, Chapter <a href="chap7_mj.html#X7A489A5D79DA9E5C"><span class="RefLink">7</span></a> shows instructive examples for the usage of this package.</p>
+<p>Finally, Chapter <a href="chap7_mj.html#X7A489A5D79DA9E5C"><span class="RefLink">7</span></a> shows some instructive examples of the usage of this package.</p>
 
-<p><a id="X80D704CC7EBFDF7A" name="X80D704CC7EBFDF7A"></a></p>
+<p><a id="X828241117D993F36" name="X828241117D993F36"></a></p>
 
-<h4>1.3 <span class="Heading">Feedback</span></h4>
+<h4>1.3 <span class="Heading">Feedback and support</span></h4>
 
-<p>For bug reports, feature requests and suggestions, please use our <span class="URL"><a href="https://github.com/gap-packages/recog/issues">issue tracker</a></span>.</p>
+<p>If you have any bug reports, feature requests, or suggestions, then please tell us via the <span class="URL"><a href="https://github.com/gap-packages/recog/issues">issue tracker on GitHub</a></span>.</p>
+
+<p>In addition, the <strong class="pkg">recog</strong> package has a mailing list, at <span class="URL"><a href="mailto:recog@gap-system.org">recog@gap-system.org</a></span>, which can be used for holding discussions, sharing information, and asking questions about the package. You can find more information, and register to receive the mail sent to this list, at <span class="URL"><a href="https://mail.gap-system.org/mailman/listinfo/recog">https://mail.gap-system.org/mailman/listinfo/recog</a></span>.</p>
+
+<p><a id="X804FB63186BEBD38" name="X804FB63186BEBD38"></a></p>
+
+<h4>1.4 <span class="Heading">Literature (temporary)</span></h4>
+
+<p>TODO Find the appropriate place to put these references, so that they appear in the bibliography: <a href="chapBib_mj.html#biBLNPS06">[LNPS06]</a> <a href="chapBib_mj.html#biBBLS97">[BLS97]</a> <a href="chapBib_mj.html#biBJLNP13">[JLNP13]</a> <a href="chapBib_mj.html#biBDLGLO13">[DLGLO13]</a> <a href="chapBib_mj.html#biBLGO09">[LGO09]</a> <a href="chapBib_mj.html#biBBLGN+05">[BLGN+05]</a> <a href="chapBib_mj.html#biBBLGN+03">[BLGN+03]</a> <a href="chapBib_mj.html#biBNP98">[NP98]</a> <a href="chapBib_mj.html#biBNP99">[NP99]</a> <a href="chapBib_mj.html#biBNP97">[NP97]</a> <a href="chapBib_mj.html#biBPra99">[Pra99]</a> <a href="chapBib_mj.html#biBCLG97a">[CLG97a]</a> <a href="chapBib_mj.html#biBCLG97b">[CLG97b]</a> <a href="chapBib_mj.html#biBCLGM+95">[CLGM+95]</a> <a href="chapBib_mj.html#biBBNS06">[BNS06]</a> <a href="chapBib_mj.html#biBCNRD09">[CNRD09]</a> <a href="chapBib_mj.html#biBBHLGO15">[BHLGO15]</a> <a href="chapBib_mj.html#biBNeu09">[Neu09]</a> <a href="chapBib_mj.html#biBSer03">[Ser03]</a> <a href="chapBib_mj.html#biBKK15">[KK15]</a> <a href="chapBib_mj.html#biBLO16">[LO16]</a> <a href="chapBib_mj.html#biBLO07">[LO07]</a> <a href="chapBib_mj.html#biBHLO+08">[HLO+08]</a> <a href="chapBib_mj.html#biBBB99">[BB99]</a> <a href="chapBib_mj.html#biBBBS09">[BBS09]</a> <a href="chapBib_mj.html#biBBS01">[BS01]</a> <a href="chapBib_mj.html#biBBro01">[Bro01]</a> <a href="chapBib_mj.html#biBBro08">[Bro08]</a> <a href="chapBib_mj.html#biBBro03">[Bro03]</a> <a href="chapBib_mj.html#biBBK06">[BK06]</a> <a href="chapBib_mj.html#biBBK01">[BK01]</a> <a href="chapBib_mj.html#biBCLG98">[CLG98]</a> <a href="chapBib_mj.html#biBCLGO06">[CLGO06]</a> <a href="chapBib_mj.html#biBCLG01">[CLG01]</a> <a href="chapBib_mj.html#biBCFL97">[CFL97]</a> <a href="chapBib_mj.html#biBDLGO15">[DLGO15]</a> <a href="chapBib_mj.html#biBGH97">[GH97]</a> <a href="chapBib_mj.html#biBGLGO06">[GLGO06]</a> <a href="chapBib_mj.html#biBHLGOR96a">[HLGOR96a]</a> <a href="chapBib_mj.html#biBHLGOR96b">[HLGOR96b]</a> <a href="chapBib_mj.html#biBHR94">[HR94]</a> <a href="chapBib_mj.html#biBIL00">[IL00]</a> <a href="chapBib_mj.html#biBKM13">[KM13]</a> <a href="chapBib_mj.html#biBKM15">[KM15]</a> <a href="chapBib_mj.html#biBLGO97a">[LGO97a]</a> <a href="chapBib_mj.html#biBLGO02">[LGO02]</a> <a href="chapBib_mj.html#biBLGO97b">[LGO97b]</a> <a href="chapBib_mj.html#biBLG01">[LG01]</a> <a href="chapBib_mj.html#biBLMO07">[LMO07]</a> <a href="chapBib_mj.html#biBNP92">[NP92]</a> <a href="chapBib_mj.html#biBNie05">[Nie05]</a> <a href="chapBib_mj.html#biBO'B11">[O'B11]</a> <a href="chapBib_mj.html#biBO'B06">[O'B06]</a> <a href="chapBib_mj.html#biBPak00">[Pak00]</a> <a href="chapBib_mj.html#biBPar84">[Par84]</a></p>
 
 
 <div class="chlinkprevnextbot">&nbsp;<a href="chap0_mj.html">[Top of Book]</a>&nbsp;  <a href="chap0_mj.html#contents">[Contents]</a>&nbsp;  &nbsp;<a href="chap0_mj.html">[Previous Chapter]</a>&nbsp;  &nbsp;<a href="chap2_mj.html">[Next Chapter]</a>&nbsp;  </div>
 
 
-<div class="chlinkbot"><span class="chlink1">Goto Chapter: </span><a href="chap0_mj.html">Top</a>  <a href="chap1_mj.html">1</a>  <a href="chap2_mj.html">2</a>  <a href="chap3_mj.html">3</a>  <a href="chap4_mj.html">4</a>  <a href="chap5_mj.html">5</a>  <a href="chap6_mj.html">6</a>  <a href="chap7_mj.html">7</a>  <a href="chapBib_mj.html">Bib</a>  <a href="chapInd_mj.html">Ind</a>  </div>
+<div class="chlinkbot"><span class="chlink1">Goto Chapter: </span><a href="chap0_mj.html">Top</a>  <a href="chap1_mj.html">1</a>  <a href="chap2_mj.html">2</a>  <a href="chap3_mj.html">3</a>  <a href="chap4_mj.html">4</a>  <a href="chap5_mj.html">5</a>  <a href="chap6_mj.html">6</a>  <a href="chap7_mj.html">7</a>  <a href="chap8_mj.html">8</a>  <a href="chap9_mj.html">9</a>  <a href="chapBib_mj.html">Bib</a>  <a href="chapInd_mj.html">Ind</a>  </div>
 
 <hr />
 <p class="foot">generated by <a href="http://www.math.rwth-aachen.de/~Frank.Luebeck/GAPDoc">GAPDoc2HTML</a></p>

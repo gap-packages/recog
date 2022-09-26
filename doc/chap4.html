@@ -5,7 +5,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-<title>GAP (recog) - Chapter 4: Method Selection</title>
+<title>GAP (recog) - Chapter 4: Method selection</title>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 <meta name="generator" content="GAPDoc2HTML" />
 <link rel="stylesheet" type="text/css" href="manual.css" />
@@ -15,26 +15,51 @@
 <body class="chap4"  onload="jscontent()">
 
 
-<div class="chlinktop"><span class="chlink1">Goto Chapter: </span><a href="chap0.html">Top</a>  <a href="chap1.html">1</a>  <a href="chap2.html">2</a>  <a href="chap3.html">3</a>  <a href="chap4.html">4</a>  <a href="chap5.html">5</a>  <a href="chap6.html">6</a>  <a href="chap7.html">7</a>  <a href="chapBib.html">Bib</a>  <a href="chapInd.html">Ind</a>  </div>
+<div class="chlinktop"><span class="chlink1">Goto Chapter: </span><a href="chap0.html">Top</a>  <a href="chap1.html">1</a>  <a href="chap2.html">2</a>  <a href="chap3.html">3</a>  <a href="chap4.html">4</a>  <a href="chap5.html">5</a>  <a href="chap6.html">6</a>  <a href="chap7.html">7</a>  <a href="chap8.html">8</a>  <a href="chap9.html">9</a>  <a href="chapBib.html">Bib</a>  <a href="chapInd.html">Ind</a>  </div>
 
 <div class="chlinkprevnexttop">&nbsp;<a href="chap0.html">[Top of Book]</a>&nbsp;  <a href="chap0.html#contents">[Contents]</a>&nbsp;  &nbsp;<a href="chap3.html">[Previous Chapter]</a>&nbsp;  &nbsp;<a href="chap5.html">[Next Chapter]</a>&nbsp;  </div>
 
 <p id="mathjaxlink" class="pcenter"><a href="chap4_mj.html">[MathJax on]</a></p>
 <p><a id="X8058CC8187162644" name="X8058CC8187162644"></a></p>
-<div class="ChapSects"><a href="chap4.html#X8058CC8187162644">4 <span class="Heading">Method Selection</span></a>
+<div class="ChapSects"><a href="chap4.html#X8058CC8187162644">4 <span class="Heading">Method selection</span></a>
 <div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap4.html#X7F89FF55818F1139">4.1 <span class="Heading">What are methods?</span></a>
 </span>
 <div class="ContSSBlock">
-<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X845DB71C806CADDC">4.1-1 AddMethod</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X80EC4782856AAD35">4.1-1 IsRecogMethod</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7E18720E87B4B2DE">4.1-2 RecogMethod</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X87AA2A587E4E00C2">4.1-3 BindRecogMethod</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7EF3EAEF78786349">4.1-4 Stamp</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7A2F979E86F77A6F">4.1-5 Comment</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X79650A3E79D0E4A3">4.1-6 CallRecogMethod</a></span>
 </div></div>
-<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap4.html#X83FCCBCA78F608E1">4.2 <span class="Heading">How methods are called</span></a>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap4.html#X854385507D03A016">4.2 <span class="Heading">Method Databases</span></a>
 </span>
 <div class="ContSSBlock">
-<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7BC2692183B6C4E6">4.2-1 CallMethods</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X845DB71C806CADDC">4.2-1 AddMethod</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X836B50947A46B1A5">4.2-2 FindHomDbPerm</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7CA5F5FA7E850885">4.2-3 FindHomDbMatrix</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7A4F8342854507E3">4.2-4 FindHomDbProjective</a></span>
+</div></div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap4.html#X83FCCBCA78F608E1">4.3 <span class="Heading">How methods are called</span></a>
+</span>
+<div class="ContSSBlock">
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7BC2692183B6C4E6">4.3-1 CallMethods</a></span>
+</div></div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap4.html#X852A8E538590BCF3">4.4 <span class="Heading">Global records storing functions</span></a>
+</span>
+<div class="ContSSBlock">
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7A94720080D344DA">4.4-1 FindHomMethodsPerm</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X79B60CEF8292F142">4.4-2 FindHomMethodsMatrix</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7D796A2179E9026A">4.4-3 FindHomMethodsProjective</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X78B948847D596167">4.4-4 FindHomMethodsGeneric</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7B5561D187242287">4.4-5 SLPforElementFuncsPerm</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7A2E7DF67F4949C8">4.4-6 SLPforElementFuncsMatrix</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7F6FCC4F81ACF20F">4.4-7 SLPforElementFuncsProjective</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X795ACFD386A106B8">4.4-8 SLPforElementFuncsGeneric</a></span>
 </div></div>
 </div>
 
-<h3>4 <span class="Heading">Method Selection</span></h3>
+<h3>4 <span class="Heading">Method selection</span></h3>
 
 <p>The setup described in this chapter is intended for situations, in which lots of different methods are available to fulfill a certain task, but in which it is not possible in the beginning to decide, which one to use. Therefore this setup regulates, rather than just which method to choose, in which order the various methods are tried. The methods themselves return whether they were successful and, if not, whether it is sensible to try them again at a later stage.</p>
 
@@ -48,75 +73,136 @@
 
 <h4>4.1 <span class="Heading">What are methods?</span></h4>
 
-<p>A method is just a <strong class="pkg">GAP</strong> function together with an agreement about what arguments it takes and what result it returns. The agreement about the arguments of course has to be made for every situation in which this generic method selection code is used, and the user is completely free there. A method can (and has to) return one of the following four values:</p>
+<p>Recognition methods lie in the filter <code class="func">IsRecogMethod</code> (<a href="chap4.html#X80EC4782856AAD35"><span class="RefLink">4.1-1</span></a>) and can be created via the function <code class="func">RecogMethod</code> (<a href="chap4.html#X7E18720E87B4B2DE"><span class="RefLink">4.1-2</span></a>).</p>
+
+<p><a id="X80EC4782856AAD35" name="X80EC4782856AAD35"></a></p>
+
+<h5>4.1-1 IsRecogMethod</h5>
+
+<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; IsRecogMethod</code></td><td class="tdright">(&nbsp;category&nbsp;)</td></tr></table></div>
+<p>The category of recognition methods, that is of the objects created via <code class="func">RecogMethod</code> (<a href="chap4.html#X7E18720E87B4B2DE"><span class="RefLink">4.1-2</span></a>).</p>
+
+<p><a id="X7E18720E87B4B2DE" name="X7E18720E87B4B2DE"></a></p>
+
+<h5>4.1-2 RecogMethod</h5>
+
+<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; RecogMethod</code>( <var class="Arg">stamp</var>, <var class="Arg">comment</var>, <var class="Arg">func</var> )</td><td class="tdright">(&nbsp;function&nbsp;)</td></tr></table></div>
+<p>Return a recognition method <code class="code">method</code> in the filter <code class="func">IsRecogMethod</code> (<a href="chap4.html#X80EC4782856AAD35"><span class="RefLink">4.1-1</span></a>), where <var class="Arg">stamp</var> is a string describing the method uniquely, <var class="Arg">comment</var> is a string explaining how the method works, and <var class="Arg">func</var> is the method itself. The components <var class="Arg">stamp</var> and <var class="Arg">comment</var> can be accessed via the attributes <code class="func">Stamp</code> (<a href="chap4.html#X7EF3EAEF78786349"><span class="RefLink">4.1-4</span></a>) and <code class="func">Comment</code> (<a href="chap4.html#X7A2F979E86F77A6F"><span class="RefLink">4.1-5</span></a>).</p>
+
+<p>A recognition method returns one of the following four values:</p>
 
 
 <dl>
-<dt><strong class="Mark"><code class="code">Success</code></strong></dt>
+<dt><strong class="Mark"><code class="keyw">Success</code></strong></dt>
 <dd><p>means that the method was successful and no more methods have to be tried.</p>
 
 </dd>
-<dt><strong class="Mark"><code class="code">NeverApplicable</code></strong></dt>
+<dt><strong class="Mark"><code class="keyw">NeverApplicable</code></strong></dt>
 <dd><p>means that the method was not successful and that there is no point to call the method again in this situation whatsoever.</p>
 
 </dd>
-<dt><strong class="Mark"><code class="code">TemporaryFailure</code></strong></dt>
+<dt><strong class="Mark"><code class="keyw">TemporaryFailure</code></strong></dt>
 <dd><p>means that the method temporarily failed, that it however could be sensible to call it again in this situation at a later stage. This value is typical for a Las Vegas algorithm using randomised methods, which has failed, but which may succeed when called again.</p>
 
 </dd>
-<dt><strong class="Mark"><code class="code">NotEnoughInformation</code></strong></dt>
-<dd><p>means that the method for some reason refused to do its work. However, it is possible that it will become applicable later such that it makes sense to call it again, may when more information is available.</p>
+<dt><strong class="Mark"><code class="keyw">NotEnoughInformation</code></strong></dt>
+<dd><p>means that the method for some reason refused to do its work. However, it is possible that it will become applicable later such that it makes sense to call it again, for example when more information is available.</p>
 
 </dd>
 </dl>
-<p>For administration in the method selection, a method is described by a record with the following components bound:</p>
+<p>A recognition method <code class="code">method</code> should always be stored into the component <code class="code">Stamp(method)</code> of one of the following records: <code class="func">FindHomMethodsGeneric</code> (<a href="chap4.html#X78B948847D596167"><span class="RefLink">4.4-4</span></a>), <code class="func">FindHomMethodsPerm</code> (<a href="chap4.html#X7A94720080D344DA"><span class="RefLink">4.4-1</span></a>), <code class="func">FindHomMethodsMatrix</code> (<a href="chap4.html#X79B60CEF8292F142"><span class="RefLink">4.4-2</span></a>), and <code class="func">FindHomMethodsProjective</code> (<a href="chap4.html#X7D796A2179E9026A"><span class="RefLink">4.4-3</span></a>). To this end one can use the function <code class="func">BindRecogMethod</code> (<a href="chap4.html#X87AA2A587E4E00C2"><span class="RefLink">4.1-3</span></a>).</p>
+
+<p><a id="X87AA2A587E4E00C2" name="X87AA2A587E4E00C2"></a></p>
+
+<h5>4.1-3 BindRecogMethod</h5>
+
+<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; BindRecogMethod</code>( <var class="Arg">r</var>, <var class="Arg">arg</var> )</td><td class="tdright">(&nbsp;function&nbsp;)</td></tr></table></div>
+<p>Create the recognition method <code class="code">method</code> by calling <code class="func">RecogMethod</code> (<a href="chap4.html#X7E18720E87B4B2DE"><span class="RefLink">4.1-2</span></a>) with arguments <var class="Arg">arg</var>. Then bind the component <code class="code">Stamp(method)</code> of <var class="Arg">r</var> to <var class="Arg">method</var>.</p>
+
+<p><a id="X7EF3EAEF78786349" name="X7EF3EAEF78786349"></a></p>
+
+<h5>4.1-4 Stamp</h5>
+
+<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; Stamp</code>( <var class="Arg">method</var> )</td><td class="tdright">(&nbsp;attribute&nbsp;)</td></tr></table></div>
+<p>The stamp of <var class="Arg">method</var>, see <code class="func">RecogMethod</code> (<a href="chap4.html#X7E18720E87B4B2DE"><span class="RefLink">4.1-2</span></a>). The argument <var class="Arg">method</var> must lie in <code class="func">IsRecogMethod</code> (<a href="chap4.html#X80EC4782856AAD35"><span class="RefLink">4.1-1</span></a>).</p>
+
+<p><a id="X7A2F979E86F77A6F" name="X7A2F979E86F77A6F"></a></p>
+
+<h5>4.1-5 Comment</h5>
+
+<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; Comment</code>( <var class="Arg">method</var> )</td><td class="tdright">(&nbsp;attribute&nbsp;)</td></tr></table></div>
+<p>The comment of <var class="Arg">method</var>, see <code class="func">RecogMethod</code> (<a href="chap4.html#X7E18720E87B4B2DE"><span class="RefLink">4.1-2</span></a>). The argument <var class="Arg">method</var> must lie in <code class="func">IsRecogMethod</code> (<a href="chap4.html#X80EC4782856AAD35"><span class="RefLink">4.1-1</span></a>).</p>
+
+<p><a id="X79650A3E79D0E4A3" name="X79650A3E79D0E4A3"></a></p>
+
+<h5>4.1-6 CallRecogMethod</h5>
+
+<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; CallRecogMethod</code>( <var class="Arg">m</var>, <var class="Arg">args</var> )</td><td class="tdright">(&nbsp;function&nbsp;)</td></tr></table></div>
+<p>Call <code class="code">UnpackRecogMethod(m)</code> with arguments <var class="Arg">args</var> and return the return value. The argument <var class="Arg">m</var> must lie in <code class="func">IsRecogMethod</code> (<a href="chap4.html#X80EC4782856AAD35"><span class="RefLink">4.1-1</span></a>).</p>
+
+<p><a id="X854385507D03A016" name="X854385507D03A016"></a></p>
+
+<h4>4.2 <span class="Heading">Method Databases</span></h4>
+
+<p>A <em>method database</em> is a list of records, where each record has the following components:</p>
 
 
 <dl>
 <dt><strong class="Mark"><code class="code">method</code></strong></dt>
-<dd><p>holds the function itself.</p>
+<dd><p>A recognition method created with <code class="func">RecogMethod</code> (<a href="chap4.html#X7E18720E87B4B2DE"><span class="RefLink">4.1-2</span></a>).</p>
 
 </dd>
 <dt><strong class="Mark"><code class="code">rank</code></strong></dt>
-<dd><p>holds an integer used to sort the various methods. Higher numbers mean that the method is tried earlier. The numbering scheme is left to the user.</p>
-
-</dd>
-<dt><strong class="Mark"><code class="code">stamp</code></strong></dt>
-<dd><p>holds a string value that uniquely describes the method. This is used for bookkeeping and to keep track of what has to be tried how often.</p>
-
-</dd>
-<dt><strong class="Mark"><code class="code">comment</code></strong></dt>
-<dd><p>a string valued comment. This field is optional and can be left out.</p>
+<dd><p>An integer used to sort the various methods. Higher numbers mean that the method is tried earlier. See <code class="func">CallMethods</code> (<a href="chap4.html#X7BC2692183B6C4E6"><span class="RefLink">4.3-1</span></a>) for information on how the methods are called.</p>
 
 </dd>
 </dl>
-<p>The different methods for a certain task are collected in so-called "method databases". A <em>method database</em> is just a list of records, each describing a method in the format described above. Usually, the ranks will be descending, but that is not necessary.</p>
-
-<p>There is one convenience function to put a new method into a method database:</p>
+<p>The databases are always sorted such that the ranks are decreasing. Use <code class="func">AddMethod</code> (<a href="chap4.html#X845DB71C806CADDC"><span class="RefLink">4.2-1</span></a>) to add a method to a database according to its rank.</p>
 
 <p><a id="X845DB71C806CADDC" name="X845DB71C806CADDC"></a></p>
 
-<h5>4.1-1 AddMethod</h5>
+<h5>4.2-1 AddMethod</h5>
 
-<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; AddMethod</code>( <var class="Arg">db</var>, <var class="Arg">meth</var>, <var class="Arg">rank</var>, <var class="Arg">stamp</var>[, <var class="Arg">comment</var>] )</td><td class="tdright">(&nbsp;function&nbsp;)</td></tr></table></div>
-<p>Returns: nothing</p>
+<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; AddMethod</code>( <var class="Arg">methodDb</var>, <var class="Arg">method</var>, <var class="Arg">rank</var> )</td><td class="tdright">(&nbsp;function&nbsp;)</td></tr></table></div>
+<p>Add the recognition method <var class="Arg">method</var> with rank <var class="Arg">rank</var> to the method database <var class="Arg">methodDb</var>. Return nothing. <var class="Arg">method</var> is inserted into <var class="Arg">methodDb</var> such that the ranks of its entries are in decreasing order. For information on recognition methods and method databases see <code class="func">RecogMethod</code> (<a href="chap4.html#X7E18720E87B4B2DE"><span class="RefLink">4.1-2</span></a>) and Section <a href="chap4.html#X854385507D03A016"><span class="RefLink">4.2</span></a>, respectively.</p>
 
-<p><var class="Arg">db</var> must be a method database (list of records, see above) with non-ascending rank values. <var class="Arg">meth</var> is the method function, <var class="Arg">rank</var> the rank and <var class="Arg">stamp</var> a string valued stamp. The optional argument <var class="Arg">comment</var> can be a string comment. The record describing the method is created and inserted at the correct position in the method database. Nothing is returned.</p>
+<p>The following databases contain the methods for finding homomorphisms for permutation, matrix, and projective groups.</p>
+
+<p><a id="X836B50947A46B1A5" name="X836B50947A46B1A5"></a></p>
+
+<h5>4.2-2 FindHomDbPerm</h5>
+
+<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; FindHomDbPerm</code></td><td class="tdright">(&nbsp;global variable&nbsp;)</td></tr></table></div>
+<p>The method database for permutation groups.</p>
+
+<p><a id="X7CA5F5FA7E850885" name="X7CA5F5FA7E850885"></a></p>
+
+<h5>4.2-3 FindHomDbMatrix</h5>
+
+<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; FindHomDbMatrix</code></td><td class="tdright">(&nbsp;global variable&nbsp;)</td></tr></table></div>
+<p>The method database for matrix groups.</p>
+
+<p><a id="X7A4F8342854507E3" name="X7A4F8342854507E3"></a></p>
+
+<h5>4.2-4 FindHomDbProjective</h5>
+
+<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; FindHomDbProjective</code></td><td class="tdright">(&nbsp;global variable&nbsp;)</td></tr></table></div>
+<p>The method database for projective matrix groups.</p>
 
 <p><a id="X83FCCBCA78F608E1" name="X83FCCBCA78F608E1"></a></p>
 
-<h4>4.2 <span class="Heading">How methods are called</span></h4>
+<h4>4.3 <span class="Heading">How methods are called</span></h4>
 
 <p>Whenever the method selection shall be used, one calls the following function:</p>
 
 <p><a id="X7BC2692183B6C4E6" name="X7BC2692183B6C4E6"></a></p>
 
-<h5>4.2-1 CallMethods</h5>
+<h5>4.3-1 CallMethods</h5>
 
 <div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; CallMethods</code>( <var class="Arg">db</var>, <var class="Arg">limit</var>[, <var class="Arg">furtherargs</var>] )</td><td class="tdright">(&nbsp;function&nbsp;)</td></tr></table></div>
 <p>Returns: a record <code class="code">ms</code> describing this method selection procedure.</p>
 
-<p>The argument <var class="Arg">db</var> must be a method database in the sense of Section <a href="chap4.html#X7F89FF55818F1139"><span class="RefLink">4.1</span></a>. <var class="Arg">limit</var> must be a non-negative integer. <var class="Arg">furtherargs</var> stands for an arbitrary number of additional arguments, which are handed down to the called methods. Of course they must fulfill the conventions defined for the methods in the database <var class="Arg">db</var>.</p>
+<p>The argument <var class="Arg">db</var> must be a method database in the sense of Section <a href="chap4.html#X854385507D03A016"><span class="RefLink">4.2</span></a>. <var class="Arg">limit</var> must be a non-negative integer. <var class="Arg">furtherargs</var> stands for an arbitrary number of additional arguments, which are handed down to the called methods. Of course they must fulfill the conventions defined for the methods in the database <var class="Arg">db</var>.</p>
 
 <p>The function first creates a "method selection" record keeping track of the things that happened during the method trying procedure, which is also used during this procedure. Then it calls methods with the algorithm described below and in the end returns the method selection record in its final state.</p>
 
@@ -125,11 +211,11 @@
 
 <dl>
 <dt><strong class="Mark"><code class="code">inapplicableMethods</code></strong></dt>
-<dd><p>a record, in which for every method that returned <code class="code">NeverApplicable</code> the value 1 is bound to the component with name the stamp of the method.</p>
+<dd><p>a record, in which for every method that returned <code class="keyw">NeverApplicable</code> the value 1 is bound to the component with name the stamp of the method.</p>
 
 </dd>
 <dt><strong class="Mark"><code class="code">failedMethods</code></strong></dt>
-<dd><p>a record, in which for every time a method returned <code class="code">TemporaryFailure</code> the value bound to the component with name the stamp of the method is increased by 1 (not being bound means zero).</p>
+<dd><p>a record, in which for every time a method returned <code class="keyw">TemporaryFailure</code> the value bound to the component with name the stamp of the method is increased by 1 (not being bound means zero).</p>
 
 </dd>
 <dt><strong class="Mark"><code class="code">successMethod</code></strong></dt>
@@ -137,7 +223,7 @@
 
 </dd>
 <dt><strong class="Mark"><code class="code">result</code></strong></dt>
-<dd><p>a boolean value which is either <code class="code">Success</code> or <code class="code">TemporaryFailure</code> depending on whether a successful method was found or the procedure gave up respectively. This component is only bound after completion of the method selection procedure.</p>
+<dd><p>a boolean value which is either <code class="keyw">Success</code> or <code class="keyw">TemporaryFailure</code> depending on whether a successful method was found or the procedure gave up respectively. This component is only bound after completion of the method selection procedure.</p>
 
 </dd>
 <dt><strong class="Mark"><code class="code">tolerance</code></strong></dt>
@@ -145,36 +231,100 @@
 
 </dd>
 </dl>
-<p>The algorithm used by <code class="func">CallMethods</code> is extremely simple: It sets a counter <code class="code">tolerance</code> to zero. The main loop starts at the beginning of the method database and runs through the methods in turn. Provided a method did not yet return <code class="code">NeverApplicable</code> and did not yet return <code class="code">TemporaryFailure</code> more than <code class="code">tolerance</code> times before, it is tried. According to the value returned by the method, the following happens:</p>
+<p>The algorithm used by <code class="func">CallMethods</code> is extremely simple: It sets a counter <code class="code">tolerance</code> to zero. The main loop starts at the beginning of the method database and runs through the methods in turn. Provided a method did not yet return <code class="keyw">NeverApplicable</code> and did not yet return <code class="keyw">TemporaryFailure</code> more than <code class="code">tolerance</code> times before, it is tried. According to the value returned by the method, the following happens:</p>
 
 
 <dl>
-<dt><strong class="Mark"><code class="code">NeverApplicable</code></strong></dt>
+<dt><strong class="Mark"><code class="keyw">NeverApplicable</code></strong></dt>
 <dd><p>this is marked in the method selection record and the main loop starts again at the beginning of the method database.</p>
 
 </dd>
-<dt><strong class="Mark"><code class="code">TemporaryFailure</code></strong></dt>
+<dt><strong class="Mark"><code class="keyw">TemporaryFailure</code></strong></dt>
 <dd><p>this is counted in the method selection record and the main loop starts again at the beginning of the method database.</p>
 
 </dd>
-<dt><strong class="Mark"><code class="code">NotEnoughInformation</code></strong></dt>
+<dt><strong class="Mark"><code class="keyw">NotEnoughInformation</code></strong></dt>
 <dd><p>the main loop goes to the next method in the method database.</p>
 
 </dd>
-<dt><strong class="Mark"><code class="code">true</code></strong></dt>
+<dt><strong class="Mark"><code class="keyw">Success</code></strong></dt>
 <dd><p>this is marked in the method selection record and the procedure returns successfully.</p>
 
 </dd>
 </dl>
 <p>If the main loop reaches the end of the method database without calling a method (because all methods have already failed or are not applicable), then the counter <code class="code">tolerance</code> is increased by one and everything starts all over again. This is repeated until <code class="code">tolerance</code> is greater than the <code class="code">limit</code> which is the second argument of <code class="func">CallMethods</code>. The last value of the <code class="code">tolerance</code> counter is returned in the component <code class="code">tolerance</code> of the method selection record.</p>
 
-<p>Note that the main loop starts again at the beginning of the method database after each failed method call! However, this does not lead to an infinite loop, because the failure is recorded in the method selection record such that the method is skipped until the <code class="code">tolerance</code> increases. Once the <code class="code">tolerance</code> has been increased methods having returned <code class="code">TemporaryFailure</code> will be called again. The idea behind this approach is that even failed methods can collect additional information about the arguments changing them accordingly. This might give methods that come earlier and were not applicable up to now the opportunity to begin working. Therefore one can install very good methods that depend on some already known knowledge which will only be acquired during the method selection procedure by other methods, with a high rank.</p>
+<p>Note that the main loop starts again at the beginning of the method database after each failed method call! However, this does not lead to an infinite loop, because the failure is recorded in the method selection record such that the method is skipped until the <code class="code">tolerance</code> increases. Once the <code class="code">tolerance</code> has been increased methods having returned <code class="keyw">TemporaryFailure</code> will be called again. The idea behind this approach is that even failed methods can collect additional information about the arguments changing them accordingly. This might give methods that come earlier and were not applicable up to now the opportunity to begin working. Therefore one can install very good methods that depend on some already known knowledge which will only be acquired during the method selection procedure by other methods, with a high rank.</p>
+
+<p><a id="X852A8E538590BCF3" name="X852A8E538590BCF3"></a></p>
+
+<h4>4.4 <span class="Heading">Global records storing functions</span></h4>
+
+<p>The following global records store the methods for finding homomorphisms for group recognition. We collect them in these records such that we do not use up too many global variable names.</p>
+
+<p><a id="X7A94720080D344DA" name="X7A94720080D344DA"></a></p>
+
+<h5>4.4-1 FindHomMethodsPerm</h5>
+
+<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; FindHomMethodsPerm</code></td><td class="tdright">(&nbsp;global variable&nbsp;)</td></tr></table></div>
+<p>Stores recog methods for permutation groups.</p>
+
+<p><a id="X79B60CEF8292F142" name="X79B60CEF8292F142"></a></p>
+
+<h5>4.4-2 FindHomMethodsMatrix</h5>
+
+<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; FindHomMethodsMatrix</code></td><td class="tdright">(&nbsp;global variable&nbsp;)</td></tr></table></div>
+<p>Stores recog methods for matrix groups.</p>
+
+<p><a id="X7D796A2179E9026A" name="X7D796A2179E9026A"></a></p>
+
+<h5>4.4-3 FindHomMethodsProjective</h5>
+
+<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; FindHomMethodsProjective</code></td><td class="tdright">(&nbsp;global variable&nbsp;)</td></tr></table></div>
+<p>Stores recog methods for projective groups.</p>
+
+<p><a id="X78B948847D596167" name="X78B948847D596167"></a></p>
+
+<h5>4.4-4 FindHomMethodsGeneric</h5>
+
+<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; FindHomMethodsGeneric</code></td><td class="tdright">(&nbsp;global variable&nbsp;)</td></tr></table></div>
+<p>In this global record the functions that are methods for finding homomorphisms for generic group recognition are stored. We collect them all in this record such that we do not use up too many global variable names.</p>
+
+<p>The following global records hold the functions for writing group elements as straight line programs (SLPs) in terms of the generators after successful group recognition. We collect them in these records such that we do not use up too many global variable names.</p>
+
+<p><a id="X7B5561D187242287" name="X7B5561D187242287"></a></p>
+
+<h5>4.4-5 SLPforElementFuncsPerm</h5>
+
+<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; SLPforElementFuncsPerm</code></td><td class="tdright">(&nbsp;global variable&nbsp;)</td></tr></table></div>
+<p>Stores the SLP functions for permutation groups.</p>
+
+<p><a id="X7A2E7DF67F4949C8" name="X7A2E7DF67F4949C8"></a></p>
+
+<h5>4.4-6 SLPforElementFuncsMatrix</h5>
+
+<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; SLPforElementFuncsMatrix</code></td><td class="tdright">(&nbsp;global variable&nbsp;)</td></tr></table></div>
+<p>Stores the SLP functions for matrix groups.</p>
+
+<p><a id="X7F6FCC4F81ACF20F" name="X7F6FCC4F81ACF20F"></a></p>
+
+<h5>4.4-7 SLPforElementFuncsProjective</h5>
+
+<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; SLPforElementFuncsProjective</code></td><td class="tdright">(&nbsp;global variable&nbsp;)</td></tr></table></div>
+<p>Stores the SLP functions for projective groups.</p>
+
+<p><a id="X795ACFD386A106B8" name="X795ACFD386A106B8"></a></p>
+
+<h5>4.4-8 SLPforElementFuncsGeneric</h5>
+
+<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; SLPforElementFuncsGeneric</code></td><td class="tdright">(&nbsp;global variable&nbsp;)</td></tr></table></div>
+<p>Stores the SLP functions for generic groups.</p>
 
 
 <div class="chlinkprevnextbot">&nbsp;<a href="chap0.html">[Top of Book]</a>&nbsp;  <a href="chap0.html#contents">[Contents]</a>&nbsp;  &nbsp;<a href="chap3.html">[Previous Chapter]</a>&nbsp;  &nbsp;<a href="chap5.html">[Next Chapter]</a>&nbsp;  </div>
 
 
-<div class="chlinkbot"><span class="chlink1">Goto Chapter: </span><a href="chap0.html">Top</a>  <a href="chap1.html">1</a>  <a href="chap2.html">2</a>  <a href="chap3.html">3</a>  <a href="chap4.html">4</a>  <a href="chap5.html">5</a>  <a href="chap6.html">6</a>  <a href="chap7.html">7</a>  <a href="chapBib.html">Bib</a>  <a href="chapInd.html">Ind</a>  </div>
+<div class="chlinkbot"><span class="chlink1">Goto Chapter: </span><a href="chap0.html">Top</a>  <a href="chap1.html">1</a>  <a href="chap2.html">2</a>  <a href="chap3.html">3</a>  <a href="chap4.html">4</a>  <a href="chap5.html">5</a>  <a href="chap6.html">6</a>  <a href="chap7.html">7</a>  <a href="chap8.html">8</a>  <a href="chap9.html">9</a>  <a href="chapBib.html">Bib</a>  <a href="chapInd.html">Ind</a>  </div>
 
 <hr />
 <p class="foot">generated by <a href="http://www.math.rwth-aachen.de/~Frank.Luebeck/GAPDoc">GAPDoc2HTML</a></p>
