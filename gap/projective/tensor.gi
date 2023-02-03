@@ -129,7 +129,7 @@ RECOG.FindTensorDecomposition := function(G,N)
       # semilinear, then the product is.)
       ErrorNoReturn("This should never have happened (1), talk to Max.");
   fi;
-  # homsimg is a basis of an N-homogenous component.
+  # homsimg is a basis of an N-homogeneous component.
   # We move that one around with G to find a basis of the natural module:
   # By Clifford's theorem this is a block system:
   if d mod Length(homsimg) <> 0 then
