@@ -1595,8 +1595,6 @@ SLnUpStep uses:
     RECOG.InitSLstd
     RECOG.ResetSLstd
 
-SMTX_InvariantBilinearForm uses:
-
 SanityCheck uses:
 
 ScalarGroupMaps uses:

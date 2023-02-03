@@ -764,45 +764,6 @@ function(ri, G)
     return Success;
 end);
 
-# code prepared by Steve Linton
-# see comment for main function for its description
-# MakeC6Group (Sp(4, 3), Sp (4, 3), 7);
-
-SMTX.SetInvariantBilinearForm:=function(module,b)
-  module.InvariantBilinearForm:=b;
-end;
-
-#############################################################################
-##
-#F  InvariantBilinearForm ( module ) . . . .
-##
-## Look for an invariant bilinear form of the absolutely irreducible
-## GModule module. Return fail, or the matrix of the form.
-SMTX_InvariantBilinearForm := function ( module )
-   local DM, iso;
-
-   if not SMTX.IsMTXModule(module) or
-                            not SMTX.IsAbsolutelyIrreducible(module) then
-      ErrorNoReturn("Argument of InvariantBilinearForm is not an absolutely",
-                    " irreducible module");
-   fi;
-   if IsBound(module.InvariantBilinearForm) then
-     return module.InvariantBilinearForm;
-   fi;
-   DM := SMTX.DualModule(module);
-   iso := MTX.Isomorphism(module,DM);
-   if iso = fail then
-       SMTX.SetInvariantBilinearForm(module, fail);
-       return fail;
-   fi;
-   ConvertToMatrixRep(iso,module.field);
-   MakeImmutable(iso);
-   SMTX.SetInvariantBilinearForm(module, iso);
-   return iso;
-end;
-
-SMTX.InvariantBilinearForm := SMTX_InvariantBilinearForm;
-
 #
 # Inputs are g a group of matrices preserving a symplectic form
 #            over another group of matrices preserving the same symplectic form
