@@ -172,10 +172,10 @@ rec(
     FirstNames    := "Max",
     IsAuthor      := false,
     IsMaintainer  := true,
-    Email         := "horn@mathematik.uni-kl.de",
+    Email         := "mhorn@rptu.de",
     WWWHome       := "https://www.quendi.de/math",
     Place         := "Kaiserslautern",
-    Institution   := "TU Kaiserslautern"
+    Institution   := "RPTU Kaiserslautern-Landau"
   ),
  rec(
     LastName      := "Siccha",
