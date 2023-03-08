@@ -18,15 +18,14 @@ concurrency:
 jobs:
   # The CI test job
   test:
-    name: ${{ matrix.gap-branch }} - ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.gap-branch }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
         gap-branch:
           - master
-          - stable-4.11
+          - stable-4.12
 
     steps:
       - uses: actions/checkout@v3
@@ -51,8 +50,9 @@ jobs:
       - uses: gap-actions/build-pkg-docs@v1
         with:
           use-latex: 'true'
-      - name: "Upload documentation"
+      - name: 'Upload documentation'
         uses: actions/upload-artifact@v3
         with:
           name: manual
           path: ./doc/manual.pdf
+          if-no-files-found: error
