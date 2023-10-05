@@ -58,7 +58,7 @@ gap> RecogniseGroup(SL(2,5));
 # assumed to be true or false, but could be an FFE). This example used to
 # trigger the error, which looked like this:
 #   Error, <expr> must be 'true' or 'false' (not an ffe)
-gap> RECOG.IsThisSL2Natural(rec(), [ [ [ 0*Z(5), Z(5^2)^9 ], [ Z(5^2)^3, 0*Z(5) ] ], [ [ Z(5), 0*Z(5) ], [ 0*Z(5), Z(5)^3 ] ] ], GF(5^2));
+gap> RECOG.IsThisSL2Natural([ [ [ 0*Z(5), Z(5^2)^9 ], [ Z(5^2)^3, 0*Z(5) ] ], [ [ Z(5), 0*Z(5) ], [ 0*Z(5), Z(5)^3 ] ] ], GF(5^2));
 false
 
 #
