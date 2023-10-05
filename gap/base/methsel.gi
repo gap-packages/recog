@@ -67,7 +67,7 @@ InstallGlobalFunction( "CallMethods", function(db, tolerancelimit, methargs...)
         while i <= Length(db) do
             # skip methods which are known to be inapplicableMethods
             if IsBound(ms.inapplicableMethods.(Stamp(db[i].method))) then
-                Info(InfoMethSel, 4, "Skipping inapplicableMethods rank ", db[i].rank,
+                Info(InfoMethSel, 4, "Skipping inapplicable rank ", db[i].rank,
                      " method \"", Stamp(db[i].method), "\".");
                 i := i + 1;
                 continue;
@@ -77,7 +77,7 @@ InstallGlobalFunction( "CallMethods", function(db, tolerancelimit, methargs...)
             # (tolerance + 1) times.
             if IsBound(ms.failedMethods.(Stamp(db[i].method))) and
                 ms.failedMethods.(Stamp(db[i].method)) > tolerance then
-                Info(InfoMethSel, 4, "Skipping rank ", db[i].rank,
+                Info(InfoMethSel, 4, "Skipping temporarily rank ", db[i].rank,
                      " method \"", Stamp(db[i].method), "\".");
                 i := i + 1;
                 continue;
