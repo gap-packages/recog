@@ -219,18 +219,17 @@ BindRecogMethod(FindHomMethodsClassical, "IsGeneric",
 "tests whether group is generic",
 function (recognise, grp)
     if recognise.isGeneric = false then
-        return false;
+        return NeverApplicable;
     fi;
 
     if Length(recognise.E) < 2 or
        Length(recognise.LE) = 0 or
        Length(recognise.BE) = 0 then
-        return fail;
+        return TemporaryFailure;
     fi;
 
     recognise.isGeneric := true;
-
-    return false;
+    return NeverApplicable;
 end);
 
 #enough info to rule out extension field groups...?
@@ -646,7 +645,7 @@ function(recognise, grp)
         AddSet( recognise.porders, ord );
     fi;
 
-    ppd := IsPpdElement (f, cpol, d, recognise.q, 1);
+    ppd := IsPpdElement (f, cpol, d, q, 1);
     # if the element is no ppd we get out
     if ppd = false then
         recognise.isppd := false;

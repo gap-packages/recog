@@ -17,7 +17,7 @@
 ##
 #############################################################################
 
-RECOG.FindTensorKernel := function(ri,G,onlyone)
+RECOG.FindTensorKernel := function(G,onlyone)
   # Assume G respects a tensor product decomposition of its natural
   # module V. Try to find the kernel of the canonical map:
   local N,allps,c,fac,facs,i,j,kgens,newc,notused,o,pfacs,x,z;
@@ -339,7 +339,7 @@ function(ri,G)
 
   # Now assume a tensor factorization exists:
   #Gm := GroupWithMemory(G);???
-  N := RECOG.FindTensorKernel(ri,G,true);
+  N := RECOG.FindTensorKernel(G,true);
   Info(InfoRecog,3,
        "TensorDecomposable: I seem to have found a normal subgroup...");
   r := RECOG.FindTensorDecomposition(G,N);
