@@ -448,14 +448,14 @@ local out, list, out2, currentdim, check, slplist, slpToSmallerGroup, baselist, 
                     
                     # We still have to compute the vector space on which the matrices act in the input group
 
-                    Info(InfoRecog,2,"Debugg Info:\n");
+                    Info(InfoRecog,2,"Debug Info:\n");
                     Info(InfoRecog,2,"Dimension FirstElement: ");
                     Info(InfoRecog,2,out[2]);
                     Info(InfoRecog,2,"\n");
                     Info(InfoRecog,2,"Dimension SecondElement: ");
                     Info(InfoRecog,2,out2[2]);
                     Info(InfoRecog,2,"\n");
-                    Info(InfoRecog,2,"End Debugg Info. \n");
+                    Info(InfoRecog,2,"End Debug Info. \n");
                     
                     Info(InfoRecog,2,"New Dimension: ");
                     Info(InfoRecog,2,out[2]+out2[2]);
