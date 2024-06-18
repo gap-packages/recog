@@ -32,6 +32,9 @@ scan_dirs := [
     "gap/perm",
     "gap/projective",
     "gap/projective/almostsimple",
+    "gap/projective/constructive_recognition",
+    "gap/projective/constructive_recognition/SL",
+    "gap/projective/constructive_recognition/utils",
     ];
 
 AutoDoc(rec(

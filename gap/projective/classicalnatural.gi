@@ -1,3 +1,0 @@
-#! @BeginChunk ClassicalNatural
-#! TODO
-#! @EndChunk
