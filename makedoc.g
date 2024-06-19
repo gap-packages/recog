@@ -21,7 +21,7 @@ if fail = LoadPackage("AutoDoc", ">= 2019.07.03") then
     ErrorNoReturn("AutoDoc 2019.07.03 or newer is required");
 fi;
 
-Read("regen_doc.g");
+Read(Filename(DirectoryCurrent(), "regen_doc.g"));
 
 scan_dirs := [
     "doc",
