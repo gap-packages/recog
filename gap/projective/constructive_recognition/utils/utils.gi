@@ -194,14 +194,14 @@ RECOG.constructppdTwoStingray := function(g,dim,q,type,form)
              list:=[Group(out[1],out2[1]),out[2]+out2[2],q,fail,form];
              currentdim := list[2];
 
-             Info(InfoRecog,2,"Debugg Info:\n");
+             Info(InfoRecog,2,"Debug Info:\n");
              Info(InfoRecog,2,"Dimension FirstElement: ");
              Info(InfoRecog,2,out[2]);
              Info(InfoRecog,2,"\n");
              Info(InfoRecog,2,"Dimension SecondElement: ");
              Info(InfoRecog,2,out2[2]);
              Info(InfoRecog,2,"\n");
-             Info(InfoRecog,2,"End Debugg Info. \n");
+             Info(InfoRecog,2,"End Debug Info. \n");
            
              Info(InfoRecog,2,"New Dimension: ");
              Info(InfoRecog,2,out[2]+out2[2]);
