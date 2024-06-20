@@ -495,7 +495,8 @@ local r,h,slp,sl2,baselist,gens,b,sl2gens,sl2genss,f,eigenspacelist,subspaces,ei
     Add(slp,SLPOfElms(GeneratorsOfGroup(h)));
     #h := RECOG.LinearActionRepresentationSmallerMatrices(h);
     #Add(baselist,h[3]);
-    h := GeneratorsOfGroup(h); h := RECOG.ConstructSL4SmallerMatrices(h[1],h[2],q);
+    h := GeneratorsOfGroup(h);
+    h := RECOG.ConstructSL4SmallerMatrices(h[1],h[2],q);
     Add(baselist,h[2]);
     Add(eigenspacelist,h[3]);
     h[1] := GroupWithMemory(h[1]);
@@ -574,13 +575,13 @@ RECOG.Computesl2Subspace:=function(generators,eigenspaceGenerators)
 local result, i, gens, j, combination, vec, comb, zerovec, sl2eigenspacebase, newsl2eigenspacevectors, ele;
 
     if Size(generators) = 1 then
-        # We startet with a SL(4,q)
+        # We started with a SL(4,q)
         # Just return the 2-dimensional subspace
 
         # TODO return eigenspacebase!!! See else case
 
         sl2eigenspacebase := eigenspaceGenerators[1];
-        zerovec := Zero(result[1,1]) * result[1];
+        zerovec := ZeroOfBaseDomain(result) * result[1];
         for ele in eigenspaceGenerators[2] do
             vec := zerovec;
             for j in [1..Size(ele)] do
@@ -594,7 +595,7 @@ local result, i, gens, j, combination, vec, comb, zerovec, sl2eigenspacebase, ne
         # We start with the 1xd vectors
         result := generators[1];
         sl2eigenspacebase := eigenspaceGenerators[1];
-        zerovec := Zero(result[1,1]) * result[1];
+        zerovec := ZeroOfBaseDomain(result) * result[1];
         for ele in eigenspaceGenerators[2] do
             vec := zerovec;
             for j in [1..Size(ele)] do
