@@ -364,7 +364,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
 
   ch := Factors(CharacteristicPolynomial(f,f,t,1));
   if Length(ch) <> 2 or ch[1] <> ch[2] then
-      Error("matrix is not triagonalizable - this should never happen!");
+      ErrorNoReturn("matrix is not triagonalizable - this should never happen!");
   fi;
 
   one := OneMutable(t);
@@ -401,12 +401,12 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
               xm := o[j];
               j := j + 1;
               c := Comm(tm,xm);
-          until not(IsOne(c^2));
+          until not IsOne(c^2);
           xm := xm * c^(((q-1)*(q+1)-1)/2);
           x := StripMemory(xm);
           xb := bas*x*bas^-1;
           co := Coefficients(can,xb[2,1]);
-      until not(IsContainedInSpan(mb,co));
+      until not IsContainedInSpan(mb,co);
       CloseMutableBasis(mb,co);
       Add(tt,x);
       Add(ttm,xm);
@@ -440,20 +440,20 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
               xm := o[j];
               j := j + 1;
               x := MutableCopyMat(bas*StripMemory(xm)*bas^-1);
-          until not(IsZero(x[1,2]));
+          until not IsZero(x[1,2]);
 
-          if not(IsOne(x[2,2])) then
+          if not IsOne(x[2,2]) then
               el := (One(f)-x[2,2])/x[1,2];
               co := Coefficients(can,el) * mati;
               for i in [1..Length(co)] do
-                  if not(IsZero(co[i])) then
+                  if not IsZero(co[i]) then
                       xm := ttm[i] * xm;
                   fi;
               od;
               x[2] := x[2] + x[1] * el;
               if x <> bas*StripMemory(xm)*bas^-1 then
                 # FIXME: sometimes triggered by RecognizeGroup(GL(2,16));
-                Error("!!!");
+                ErrorNoReturn("!!!");
               fi;
           fi;
           # now x[2,2] is equal to One(f)
@@ -465,7 +465,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
           el := x[2,1];
           co2 := Coefficients(can,el) * mati;
           for i in [1..Length(co2)] do
-              if not(IsZero(co2[i])) then
+              if not IsZero(co2[i]) then
                   xm := xm * ttm[i];
               fi;
           od;
@@ -510,7 +510,9 @@ RECOG.GuessProjSL2ElmOrder := function(x,f)
   fi;
   if p > 2 then
       y := x^p;
-      if IsOneProjective(y) then return p; fi;
+      if IsOneProjective(y) then
+          return p;
+      fi;
   fi;
   if IsOneProjective(x^(q-1)) then
       facts := Collected(FactInt(q-1:cheap)[1]);
@@ -528,7 +530,7 @@ RECOG.GuessProjSL2ElmOrder := function(x,f)
       j := p[2]-1;
       while j >= 0 do
           z := y^(s/p[1]^(p[2]-j));
-          if not(IsOneProjective(z)) then break; fi;
+          if not IsOneProjective(z) then break; fi;
           j := j - 1;
       od;
       o := o * p[1]^(j+1);
@@ -547,24 +549,34 @@ RECOG.IsThisSL2Natural := function(gens,f)
   CheckElm := function(x)
       local o;
       o := RECOG.GuessProjSL2ElmOrder(x,f);
-      if o in [1,2] then return false; fi;
+      if o in [1,2] then
+          return false;
+      fi;
       if o > 5 then
           if notA5 = false then Info(InfoRecog,4,"SL2: Group is not A5"); fi;
           notA5 := true;
-          if seenqp1 and seenqm1 then return true; fi;
+          if seenqp1 and seenqm1 then
+              return true;
+          fi;
       fi;
-      if o = p or o <= 5 then return false; fi;
+      if o = p or o <= 5 then
+          return false;
+      fi;
       if (q+1) mod o = 0 then
-          if not(seenqp1) then
+          if not seenqp1 then
               Info(InfoRecog,4,"SL2: Found element of order dividing q+1.");
               seenqp1 := true;
-              if seenqm1 and notA5 then return true; fi;
+              if seenqm1 and notA5 then
+                  return true;
+              fi;
           fi;
       else
-          if not(seenqm1) then
+          if not seenqm1 then
               Info(InfoRecog,4,"SL2: Found element of order dividing q-1.");
               seenqm1 := true;
-              if seenqp1 and notA5 then return true; fi;
+              if seenqp1 and notA5 then
+                  return true;
+              fi;
           fi;
       fi;
       return false;
@@ -594,7 +606,9 @@ RECOG.IsThisSL2Natural := function(gens,f)
   notA5 := false;
 
   for i in [1..Length(gens)] do
-      if CheckElm(gens[i]) then return true; fi;
+      if CheckElm(gens[i]) then
+          return true;
+      fi;
   od;
   CheckElm(gens[1]*gens[2]);
   if Length(gens) >= 3 then
@@ -610,7 +624,9 @@ RECOG.IsThisSL2Natural := function(gens,f)
       for i in [1..l-1] do
           for j in [i+1..l] do
               x := Comm(gens[i],gens[j]);
-              if CheckElm(x) then return true; fi;
+              if CheckElm(x) then
+                  return true;
+              fi;
               Add(coms,x);
           od;
       od;
@@ -620,7 +636,9 @@ RECOG.IsThisSL2Natural := function(gens,f)
           a := RECOG.RandomSubproduct(gens,rec());
           b := RECOG.RandomSubproduct(gens,rec());
           x := Comm(a,b);
-          if CheckElm(x) then return true; fi;
+          if CheckElm(x) then
+              return true;
+          fi;
           Add(coms,x);
       od;
   fi;
@@ -631,7 +649,9 @@ RECOG.IsThisSL2Natural := function(gens,f)
   Info(InfoRecog,4,"SL2: Computing normal closure...");
   clos := FastNormalClosure(gens,coms,5);
   for i in [Length(coms)+1..Length(clos)] do
-      if CheckElm(clos[i]) then return true; fi;
+      if CheckElm(clos[i]) then
+          return true;
+      fi;
   od;
   if ForAll(clos{[Length(coms)+1..Length(clos)]},
             c->RECOG.IsScalarMat(c) <> false) then
@@ -851,10 +871,10 @@ function(ri, g)
       Info(InfoRecog,2,"ClassicalNatural: this is PSL_2!");
       if IsEvenInt(q) then
           std := RECOG.RecogniseSL2NaturalEvenChar(gm,f,false);
-          ri!.comment := "_PSL2Even";
+          ri!.comment := "PSL2Even";
       else
           std := RECOG.RecogniseSL2NaturalOddCharUsingBSGS(gm,f);
-          ri!.comment := "_PSL2Odd";
+          ri!.comment := "PSL2Odd";
       fi;
       Setslptonice(ri,SLPOfElms(std.all));
       ri!.nicebas := std.bas;
@@ -875,7 +895,7 @@ function(ri, g)
               # FIXME: Note d=3 currently has a problem in the SL2-finder.
               Info(InfoRecog,2,"Classical natural: SL(",d,",",q,"): small ",
                    "case, handing over to Schreier-Sims.");
-              ri!.comment := Concatenation("_SL(",String(d),",",String(q),")",
+              ri!.comment := Concatenation("SL(",String(d),",",String(q),")",
                                            "_StabilizerChain");
               return FindHomMethodsProjective.StabilizerChainProj(ri,g);
           fi;
@@ -890,7 +910,7 @@ function(ri, g)
                       x->std.basi*x*std.bas));
           ri!.fakegens := RECOG.InitSLfake(f,d);
           ri!.fakegens.count := 0;
-          ri!.comment := "_PSLd";
+          ri!.comment := "PSLd";
           ri!.gcd := gcd;
           SetFilterObj(ri,IsLeaf);
           SetSize(ri,Product([0..d-1],i->(q^d-q^i))/((q-1)*gcd.gcd));
