@@ -1,5 +1,12 @@
 This file describes changes in the recog package.
 
+1.4.3 (2024-10-16)
+   - Stop overriding the system library function `MTX.InvariantBilinearForm`
+     with an old version (this was meant to fix a bug in GAP but has been
+     unnecessary for a couple years, and now impedes improvements for this
+     function in GAP)
+  - Various internal and janitorial changes
+
 1.4.2 (2022-09-27)
   - Fix more compatibility issues with matgrp <= 0.70
   - Rename `order` to `OrderFunc` to avoid clashes with existing code
