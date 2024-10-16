@@ -457,7 +457,7 @@
   [33X[0;0YThis  method  is a black box constructive (?) recognition of alternating and
   symmetric groups.[133X
   
-  [33X[0;0YThis algorithm is probably based on the paper [BLGN+05].[133X
+  [33X[0;0YThis algorithm is probably based on the paper [BLN+05].[133X
   
   
   [1X6.4-2 [33X[0;0Y[10XBiggerScalarsOnly[110X[101X[1X[133X[101X

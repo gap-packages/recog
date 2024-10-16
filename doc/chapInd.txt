@@ -26,8 +26,8 @@
   [2XFindKernelDoNothing[102X 3.2-28 
   [2XFindKernelFastNormalClosure[102X 3.2-29 
   [2XFindKernelRandom[102X 3.2-27 
-  [10Xforfactor[110X 8. 
-  [10Xforkernel[110X 8. 
+  [10Xforfactor[110X 8.0 
+  [10Xforkernel[110X 8.0 
   [2XgensN[102X 3.2-25 
   [2XgensNslp[102X 3.2-30 
   [2XGrp[102X 3.2-6 
@@ -41,10 +41,10 @@
   [2Xisone[102X 3.2-34 
   [2XIsReady[102X 3.2-5 
   [2XIsRecogMethod[102X 4.1-1 
-  [10XIsRecognitionInfo[110X 8. 
+  [10XIsRecognitionInfo[110X 8.0 
   [2XIsRecogNode[102X 3.2-2 
   [2XKernelRecogNode[102X 3.2-11 
-  [10Xmethodsforfactor[110X 8. 
+  [10Xmethodsforfactor[110X 8.0 
   [2Xmethodsforimage[102X 3.2-17 
   [2XNiceGens[102X 3.2-8 
   [2XOrderFunc[102X 3.2-36 
@@ -56,7 +56,7 @@
   [2XRecogniseMatrixGroup[102X 3.1-3 
   [2XRecognisePermGroup[102X 3.1-2 
   [2XRecogniseProjectiveGroup[102X 3.1-4 
-  [10XRecognitionInfoFamily[110X 8. 
+  [10XRecognitionInfoFamily[110X 8.0 
   [2XRecognizeGeneric[102X 3.1-1 
   [2XRecognizeGroup[102X 3.1-5 
   [2XRecognizeMatrixGroup[102X 3.1-3 
@@ -64,9 +64,9 @@
   [2XRecognizeProjectiveGroup[102X 3.1-4 
   [2XRecogNode[102X 3.2-3  3.2-3 
   [2XRecogNodeFamily[102X 3.2-1 
-  [10XRIFac[110X 8. 
-  [10XRIKer[110X 8. 
-  [10XRIParent[110X 8. 
+  [10XRIFac[110X 8.0 
+  [10XRIKer[110X 8.0 
+  [10XRIParent[110X 8.0 
   [2XSize[102X 5.1-3 
   [2Xslpforelement[102X 3.2-14 
   [2XSLPforElement[102X 3.2-15 
