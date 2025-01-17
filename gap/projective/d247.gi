@@ -96,6 +96,7 @@ RECOG.DirectFactorsFinder := function(gens,facgens,k,eq)
   pr := ProductReplacer(facgens);
   Add(fgens,Next(pr));
   Add(fgens,Next(pr));
+  Add(fgens,Next(pr));
   if eq(fgens[1]*fgens[2],fgens[2]*fgens[1]) and
      eq(fgens[1]*fgens[3],fgens[3]*fgens[1]) then
       if eq(fgens[2]*fgens[3],fgens[3]*fgens[2]) then
