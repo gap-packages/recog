@@ -6,10 +6,10 @@
    [1X A package for constructive recognition of permutation and matrix groups [101X
   
   
-                                     1.4.3
+                                     1.4.4
   
   
-                                16 October 2024
+                                22 January 2025
   
   
                                  Max Neunhöffer
