@@ -1,10 +1,19 @@
 This file describes changes in the recog package.
 
+1.4.4 (2025-01-DD)
+  - Fix an unexpected error during recognition when trying to split
+    group as direct products (in `RECOG.DirectFactorsFinder`)
+  - Fix an unexpected error in `RECOG.SmallHomomorphicImageProjectiveGroup`
+  - Fix an unexpected error in the C6 recognition code (a call to
+    `ConvertToMatrixRep` was missing)
+  - Remove left-over debug message which sometimes printed "With 2" or
+    similar messages during recognition
+
 1.4.3 (2024-10-16)
-   - Stop overriding the system library function `MTX.InvariantBilinearForm`
-     with an old version (this was meant to fix a bug in GAP but has been
-     unnecessary for a couple years, and now impedes improvements for this
-     function in GAP)
+  - Stop overriding the system library function `MTX.InvariantBilinearForm`
+    with an old version (this was meant to fix a bug in GAP but has been
+    unnecessary for a couple years, and now impedes improvements for this
+    function in GAP)
   - Various internal and janitorial changes
 
 1.4.2 (2022-09-27)
