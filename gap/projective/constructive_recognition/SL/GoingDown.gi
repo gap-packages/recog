@@ -553,7 +553,7 @@ local slp, currentslp, i;
 end;
 
 
-
+# TODO: what does this function do?
 RECOG.Computesl2Subspace:=function(generators,eigenspaceGenerators)
 local result, i, gens, j, combination, vec, comb, zerovec, sl2eigenspacebase, newsl2eigenspacevectors, ele;
 
@@ -564,7 +564,7 @@ local result, i, gens, j, combination, vec, comb, zerovec, sl2eigenspacebase, ne
         # TODO return eigenspacebase!!! See else case
 
         sl2eigenspacebase := eigenspaceGenerators[1];
-        zerovec := ZeroOfBaseDomain(result) * result[1];
+        zerovec := ZeroOfBaseDomain(result) * result[1];  # FIXME: `result` is not defined here. Can this case ever be reached anyway?
         for ele in eigenspaceGenerators[2] do
             vec := zerovec;
             for j in [1..Size(ele)] do
@@ -579,13 +579,15 @@ local result, i, gens, j, combination, vec, comb, zerovec, sl2eigenspacebase, ne
         result := generators[1];
         sl2eigenspacebase := eigenspaceGenerators[1];
         zerovec := ZeroOfBaseDomain(result) * result[1];
-        for ele in eigenspaceGenerators[2] do
-            vec := zerovec;
-            for j in [1..Size(ele)] do
-                vec := vec + ele[j] * result[j];
+        if Length(eigenspaceGenerators) >= 2 then
+            for ele in eigenspaceGenerators[2] do
+                vec := zerovec;
+                for j in [1..Size(ele)] do
+                    vec := vec + ele[j] * result[j];
+                od;
+                Add(sl2eigenspacebase,vec);
             od;
-            Add(sl2eigenspacebase,vec);
-        od;
+        fi;
 
         for i in [2..Size(generators)] do
             combination := generators[i];
