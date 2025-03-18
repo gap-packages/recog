@@ -507,8 +507,6 @@ local r,h,slp,sl2,baselist,gens,b,sl2gens,sl2genss,f,eigenspacelist,subspaces,ei
     Info(InfoRecog,2,"Next goal: Generate SL(2,q). \n");
     if not (q in [2,3,4,5,9]) then
         sl2 := RECOG.SLn_godownfromd(h[1],q,4,h[2]);
-        b := Basis(sl2[2]);
-        f := GF(q);
         sl2gens := StripMemory(GeneratorsOfGroup(sl2[1]));
         Add(eigenspacelist,RECOG.FixspaceMat(sl2gens[1]));
         #eigenspace1 := RECOG.FixspaceMat(sl2gens[1]);
@@ -517,37 +515,22 @@ local r,h,slp,sl2,baselist,gens,b,sl2gens,sl2genss,f,eigenspacelist,subspaces,ei
         #eigenspaceintersection := SumIntersectionMat(eigenspace1,eigenspace2)[2];
         #eigenspaceintersection := SumIntersectionMat(eigenspaceintersection,eigenspace3)[2];
         #Add(eigenspacelist,eigenspaceintersection);
-        # Test by DR:
-        #sl2genss := List(sl2gens,x-> List(b,v->Coefficients(b,v*x)));
-        sl2genss := List(sl2gens,x->RECOG.LinearAction(b,f,x));
-        Add(slp,SLPOfElms(GeneratorsOfGroup(sl2[1])));
-        Add(baselist,BasisVectors(Basis(sl2[2])));
-        # Add(eigenspacelist,RECOG.FixspaceMat(sl2gens[1]));
-        # Just for tests: Add(eigenspacelist,RECOG.FixspaceMat(TransposedMat(sl2gens[1])));
-        Add(sl2,RECOG.ConnectSLPs(slp));
-        Add(sl2,sl2genss);
-        subspaces := RECOG.Computesl2Subspace(baselist,eigenspacelist);
-        sl2[2] := subspaces[1];
-        Add(sl2,subspaces[2]);
-        #        Error("why");
-        return sl2;
     else
         sl2 := RECOG.SLn_exceptionalgodown(h[1],q,h[2]);
-        b := Basis(sl2[2]);
-        f := GF(q);
         sl2gens := StripMemory(GeneratorsOfGroup(sl2[1]));
-        sl2genss := List(sl2gens,x->RECOG.LinearAction(b,f,x));
-        Add(slp,SLPOfElms(GeneratorsOfGroup(sl2[1])));
-        Add(baselist,BasisVectors(Basis(sl2[2])));
-        #Add(eigenspacelist,RECOG.FixspaceMat(sl2gens[1]));
-        Add(sl2,RECOG.ConnectSLPs(slp));
-        Add(sl2,sl2genss);
-        subspaces := RECOG.Computesl2Subspace(baselist,eigenspacelist);
-        sl2[2] := subspaces[1];
-        Add(sl2,subspaces[2]);
-        return sl2;
-    #   return ["sorry only SL(4,q)",h];
     fi;
+    b := Basis(sl2[2]);
+    f := GF(q);
+    sl2genss := List(sl2gens,x->RECOG.LinearAction(b,f,x));
+    Add(slp,SLPOfElms(GeneratorsOfGroup(sl2[1])));
+    Add(baselist,BasisVectors(Basis(sl2[2])));
+    #Add(eigenspacelist,RECOG.FixspaceMat(sl2gens[1]));
+    Add(sl2,RECOG.ConnectSLPs(slp));
+    Add(sl2,sl2genss);
+    subspaces := RECOG.Computesl2Subspace(baselist,eigenspacelist);
+    sl2[2] := subspaces[1];
+    Add(sl2,subspaces[2]);
+    return sl2;
 end;
 
 
