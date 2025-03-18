@@ -2077,7 +2077,6 @@ end;
 SLCR.SLDataStructure := function( bbg, p, e, d )
 local   i, j, stop, q, r, t, u1, u2, sl3, data1, Q, pQ, Lgen,
         Qgamma, genrec, L, data2, vectors, data3;
-Print("with ", d, "\n");
    if d=2 then
      return SLCR.SL2DataStructure( bbg, p, e );
    fi;

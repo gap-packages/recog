@@ -375,6 +375,7 @@ RECOG.rewriteones := function(r,n,q,data,blocks,x)
             fi;
             Add(mat, Z(r)^0*exp);
         od;
+        ConvertToMatrixRep(mat, r);
         return mat;
     else #we are in type 3 output
         return RECOG.ActionOnBlocks(r,n,q,blocks,x);

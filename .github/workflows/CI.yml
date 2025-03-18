@@ -25,6 +25,7 @@ jobs:
       matrix:
         gap-branch:
           - master
+          - stable-4.14
           - stable-4.13
           - stable-4.12
 
@@ -33,6 +34,7 @@ jobs:
       - uses: gap-actions/setup-gap@v2
         with:
           GAPBRANCH: ${{ matrix.gap-branch }}
+          GAP_PKGS_TO_BUILD: 'io profiling orb'
       - uses: gap-actions/build-pkg@v1
       - uses: gap-actions/run-pkg-tests@v2
         with:
@@ -42,7 +44,7 @@ jobs:
           GAP_TESTFILE: tst/testall.g
           only-needed: true
       - uses: gap-actions/process-coverage@v2
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -54,6 +56,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: gap-actions/setup-gap@v2
+        with:
+          GAP_PKGS_TO_BUILD: 'io profiling orb'
       - uses: gap-actions/build-pkg-docs@v1
         with:
           use-latex: 'true'

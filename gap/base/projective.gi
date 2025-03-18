@@ -66,8 +66,3 @@ RECOG.IsScalarMat := function(m)
   fi;
   return x;
 end;
-
-# FIXME This should be removed once recog requires GAP 4.11.
-# Until then, this allows us to call <IsDiagonalMat> on matrices with memory.
-InstallOtherMethod(BaseDomain, "for a matrix with memory", true,
-[IsMatrix and IsObjWithMemory], m -> BaseDomain(m!.el));
