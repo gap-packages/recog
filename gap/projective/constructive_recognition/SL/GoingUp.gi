@@ -178,16 +178,9 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
     # For n=2 we use a transvection for this purpose.
     if w.n > 2 then
         if IsOddInt(w.n) then
-            if w.p > 2 then
-            s := id{Concatenation([1,w.n],[2..w.n-1],[w.n+1..w.d])};
-            ConvertToMatrixRepNC(s,w.f);
-            if IsOddInt(w.n) then s[2] := -s[2]; fi;
-            sf := w.slnstdf[2*w.ext+2];
-            else   # in even characteristic we take the n-cycle:
             s := id{Concatenation([w.n],[1..w.n-1],[w.n+1..w.d])};
             ConvertToMatrixRepNC(s,w.f);
             sf := w.slnstdf[2*w.ext+1];
-            fi;
         else
             Error("this program only works for odd n or n=2");
         fi;
