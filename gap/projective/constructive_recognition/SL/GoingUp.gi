@@ -164,7 +164,7 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
     Info(InfoRecog,2,w.n);
     Info(InfoRecog,2,"\n");
     Info(InfoRecog,2,"New dimension: ");
-    Info(InfoRecog,2,Minimum(2*w.n-1,w.GoalDim));
+    Info(InfoRecog,2,Minimum(2*w.n-1,w.d));
     Info(InfoRecog,2,"\n");
 
     Info(InfoRecog,2,"Preparation done.");
@@ -202,7 +202,7 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
 
     # Find a good random element:
     w.count := 0;
-    aimdim := Minimum(2*w.n-1,w.GoalDim);
+    aimdim := Minimum(2*w.n-1,w.d);
     newdim := aimdim - w.n;
     counter := 0;
     while true do   # will be left by break
@@ -473,7 +473,7 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
         return w;
     fi;
     # We can finish off:
-    if aimdim = w.GoalDim then
+    if aimdim = w.d then
         # In this case we just finish off and do not bother with
         # the transvections, we will only need the standard gens:
         # Now put together the (newdim+1)-cycle:

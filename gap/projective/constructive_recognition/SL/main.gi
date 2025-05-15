@@ -110,13 +110,13 @@ RECOG.FindStdGens_SL := function(sld)
     fakegens := GeneratorsWithMemory(fakegens);
     sl2gensf := ResultOfStraightLineProgram(slptosl2,fakegens);
     sl2stdf := ResultOfStraightLineProgram(slpsl2std,sl2gensf);
-    std := rec( f := f, d := d, GoalDim := d, n := 2, bas := bas, basi := basi,
+    std := rec( f := f, d := d, n := 2, bas := bas, basi := basi,
                 sld := sld, sldf := fakegens, slnstdf := sl2stdf,
                 p := p, ext := ext );
     Info(InfoRecog,2,"Going up to SL_d again...");
     Info(InfoRecog,2,"-----");
     Info(InfoRecog,2,"Start of the GoingUp Algorithm");
-    while std.n < std.GoalDim do
+    while std.n < std.d do
         RECOG.SLn_UpStep(std);
     od;
     Info(InfoRecog,2,"The GoingUp Algorithm was successful.");
@@ -212,13 +212,13 @@ RECOG.FindStdGensSmallerMatrices_SL := function(sld)
     fakegens := GeneratorsWithMemory(fakegens);
     sl2gensf := ResultOfStraightLineProgram(slptosl2,fakegens);
     sl2stdf := ResultOfStraightLineProgram(slpsl2std,sl2gensf);
-    std := rec( f := f, d := d, GoalDim := d, n := 2, bas := bas, basi := basi,
+    std := rec( f := f, d := d, n := 2, bas := bas, basi := basi,
                 sld := sld, sldf := fakegens, slnstdf := sl2stdf,
                 p := p, ext := ext );
     Info(InfoRecog,2,"Going up to SL_d again...");
     Info(InfoRecog,2,"-----");
     Info(InfoRecog,2,"Start of the GoingUp Algorithm");
-    while std.n < std.GoalDim do
+    while std.n < std.d do
         RECOG.SLn_UpStep(std);
     od;
     Info(InfoRecog,2,"The GoingUp Algorithm was successful.");
