@@ -98,22 +98,14 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
     coeffs := IntVecFFE(Coefficients(w.can,lambda));
     if i = w.n then
         for k in [1..w.ext] do
-            if not(IsZero(coeffs[k])) then
-                if IsOne(coeffs[k]) then
-                    el := el * w.transh[(j-1)*w.ext+k];
-                elif not(IsZero(coeffs[k])) then
-                    el := el * w.transh[(j-1)*w.ext+k]^coeffs[k];
-                fi;
+            if not IsZero(coeffs[k]) then
+                el := el * w.transh[(j-1)*w.ext+k]^coeffs[k];
             fi;
         od;
     elif j = w.n then
         for k in [1..w.ext] do
-            if not(IsZero(coeffs[k])) then
-                if IsOne(coeffs[k]) then
-                    el := el * w.transv[(i-1)*w.ext+k];
-                else
-                    el := el * w.transv[(i-1)*w.ext+k]^coeffs[k];
-                fi;
+            if not IsZero(coeffs[k]) then
+                el := el * w.transv[(i-1)*w.ext+k]^coeffs[k];
             fi;
         od;
     else
@@ -128,22 +120,14 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
     coeffs := IntVecFFE(Coefficients(w.can,lambda));
     if j = w.n then
         for k in [1..w.ext] do
-            if not(IsZero(coeffs[k])) then
-                if IsOne(coeffs[k]) then
-                    el := w.transv[(i-1)*w.ext+k] * el;
-                else
-                    el := w.transv[(i-1)*w.ext+k]^coeffs[k] * el;
-                fi;
+            if not IsZero(coeffs[k]) then
+                el := w.transv[(i-1)*w.ext+k]^coeffs[k] * el;
             fi;
         od;
     elif i = w.n then
         for k in [1..w.ext] do
-            if not(IsZero(coeffs[k])) then
-                if IsOne(coeffs[k]) then
-                    el := w.transh[(j-1)*w.ext+k] * el;
-                else
-                    el := w.transh[(j-1)*w.ext+k]^coeffs[k] * el;
-                fi;
+            if not IsZero(coeffs[k]) then
+                el := w.transh[(j-1)*w.ext+k]^coeffs[k] * el;
             fi;
         od;
     else
@@ -374,12 +358,8 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
             vals := BlownUpVector(w.can,cii[i]*lambda);
             for j in [1..w.ext * newdim] do
                 pow := IntFFE(vals[j]);
-                if not(IsZero(pow)) then
-                    if IsOne(pow) then
-                        tf := tf * trans[j];
-                    else
-                        tf := tf * trans[j]^pow;
-                    fi;
+                if not IsZero(pow) then
+                    tf := tf * trans[j]^pow;
                 fi;
             od;
             Add(transd,tf);
@@ -409,12 +389,8 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
         for j in [1..newdim] do
             coeffs := IntVecFFE(Coefficients(w.can,-ci[w.n+j,w.n]));
             for k in [1..w.ext] do
-                if not(IsZero(coeffs[k])) then
-                    if IsOne(coeffs[k]) then
-                        tf := transd[(j-1)*w.ext + k] * tf;
-                    else
-                        tf := transd[(j-1)*w.ext + k]^coeffs[k] * tf;
-                    fi;
+                if not IsZero(coeffs[k]) then
+                    tf := transd[(j-1)*w.ext + k]^coeffs[k] * tf;
                 fi;
             od;
         od;
@@ -433,12 +409,8 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
         for j in [1..newdim] do
             coeffs := IntVecFFE(Coefficients(w.can,ci[w.n+j,w.n]));
             for k in [1..w.ext] do
-                if not(IsZero(coeffs[k])) then
-                    if IsOne(coeffs[k]) then
-                        tf := tf * transd[(j-1)*w.ext + k];
-                    else
-                        tf := tf * transd[(j-1)*w.ext + k]^coeffs[k];
-                    fi;
+                if not IsZero(coeffs[k]) then
+                    tf := tf * transd[(j-1)*w.ext + k]^coeffs[k];
                 fi;
             od;
         od;
