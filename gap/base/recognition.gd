@@ -30,7 +30,6 @@ BindGlobal( "RecogNodeType",
 ## <#GAPDoc Label="RecogNode">
 ## <ManSection>
 ## <Oper Name="RecogNode" Arg="H[, projective][, r]"/>
-## <Oper Name="RecogNode" Arg="r, H, projective"/>
 ## <Returns>a recognition node.</Returns>
 ## <Description>
 ## Create an <Ref Filt="IsRecogNode"/> object <C>node</C> representing the
@@ -40,9 +39,6 @@ BindGlobal( "RecogNodeType",
 ## interpreted as a projective group.
 ## The optional record <A>r</A> defaults to an empty record and is used to
 ## initialize the returned <C>node</C>.
-## <P/>
-## For backwards-compatibility, also the order of arguments
-## <C>r, H, projective</C> is accepted.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
