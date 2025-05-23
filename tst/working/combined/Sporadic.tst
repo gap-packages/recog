@@ -10,19 +10,18 @@ gap> TestSporadic := function(name)
 > end;;
 
 #
-gap> data := ShallowCopy(RECOG.NameSporadicData);;
+gap> data := Set(RECOG.NameSporadicData, x -> x.name);;
 
 # We don't test "HN" and "Ly" at all because they take very long.
 # "HN" is not in RECOG.NameSporadicData. We remove "Ly".
-gap> Remove(data, PositionProperty(data, x -> x.name = "Ly"));;
+gap> RemoveSet(data, "Ly");
 
 # Groups handled by the "quick" or the "veryslow" suite.
-gap> quick := [rec(name := "M23"), rec(name := "Suz"), rec(name := "Fi23")];;
-gap> veryslow := [rec(name := "J4"), rec(name := "Th"), rec(name := "Fi24'")];;
+gap> quick := ["M23", "Suz", "Fi23"];;
+gap> veryslow := ["J4", "Th", "Fi24'"];;
 
 #@if not IsBound(RECOG_TEST_SUITE) or RECOG_TEST_SUITE = "quick"
-gap> for d in quick do
-> name := d.name;
+gap> for name in quick do
 > Print(name, "\n");
 > TestSporadic(name);
 > od;
@@ -31,8 +30,7 @@ Suz
 Fi23
 #@fi
 #@if not IsBound(RECOG_TEST_SUITE) or RECOG_TEST_SUITE = "veryslow"
-gap> for d in veryslow do
-> name := d.name;
+gap> for name in veryslow do
 > Print(name, "\n");
 > TestSporadic(name);
 > od;
@@ -41,28 +39,26 @@ Th
 Fi24'
 #@fi
 #@if not IsBound(RECOG_TEST_SUITE) or RECOG_TEST_SUITE = "slow"
-gap> for r in Concatenation(quick, veryslow) do
-> Remove(data, PositionProperty(data, x -> x.name = r.name));;
-> od;
-gap> for d in data do
-> name := d.name;
+gap> SubtractSet(data, quick);
+gap> SubtractSet(data, veryslow);
+gap> for name in data do
 > Print(name, "\n");
 > TestSporadic(name);
 > od;
+Co1
+Co2
+Co3
+Fi22
+HS
+He
+J1
+J2
+J3
 M11
 M12
 M22
 M24
-J1
-J2
-J3
-HS
 McL
-Ru
-Co3
-Co2
-Co1
 ON
-Fi22
-He
+Ru
 #@fi
