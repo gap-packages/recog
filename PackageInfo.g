@@ -174,6 +174,7 @@ rec(
     IsMaintainer  := true,
     Email         := "mhorn@rptu.de",
     WWWHome       := "https://www.quendi.de/math",
+    GitHubUsername := "fingolfin",
     Place         := "Kaiserslautern",
     Institution   := "RPTU Kaiserslautern-Landau"
   ),
