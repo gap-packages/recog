@@ -31,7 +31,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-      - uses: gap-actions/setup-gap@v2
+      - uses: gap-actions/setup-gap@v3
         with:
           GAPBRANCH: ${{ matrix.gap-branch }}
           GAP_PKGS_TO_BUILD: 'io profiling orb'
@@ -55,7 +55,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-      - uses: gap-actions/setup-gap@v2
+      - uses: gap-actions/setup-gap@v3
         with:
           GAP_PKGS_TO_BUILD: 'io profiling orb'
       - uses: gap-actions/build-pkg-docs@v1
