@@ -269,6 +269,7 @@ Dependencies := rec(
   GAP := ">=4.11",
   NeededOtherPackages := [
     ["AtlasRep", ">= 1.4.0"],
+    ["Alnuth", ">= 3.2.1"],
     ["FactInt", ">= 1.5.2"],
     ["Forms", ">= 1.2"],
     ["genss", ">= 1.3"],
