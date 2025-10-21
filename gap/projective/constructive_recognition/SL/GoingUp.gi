@@ -55,6 +55,7 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
     newbasfi,newbasi,newdim,newpart,perm,pivots,pivots2,pos,pow,s,sf,
     slp,std,sum1,tf,trans,transd,transr,v,vals,zerovec,counter;
 
+    Info(InfoRecog,3,"-----------");
     Info(InfoRecog,3,"Going up: ",w.n," (",w.d,")...");
 
     # Before we begin, we upgrade the data structure with a few internal
@@ -144,14 +145,8 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
     FixSLn := VectorSpace(w.f,id{[w.n+1..w.d]});
     Vn := VectorSpace(w.f,id{[1..w.n]});
 
-    Info(InfoRecog,2,"Current dimension: " );
-    Info(InfoRecog,2,w.n);
-    Info(InfoRecog,2,"\n");
-    Info(InfoRecog,2,"New dimension: ");
-    Info(InfoRecog,2,Minimum(2*w.n-1,w.d));
-    Info(InfoRecog,2,"\n");
-
-    Info(InfoRecog,2,"Preparation done.");
+    Info(InfoRecog,2,"Current dimension: ", w.n, "\n");
+    Info(InfoRecog,2,"Target dimension: ", Minimum(2*w.n-1,w.d), "\n");
 
     ##
     ## Step 1
@@ -181,16 +176,17 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
     w.count := 0;
     aimdim := Minimum(2*w.n-1,w.d);
     newdim := aimdim - w.n;
-    counter := 0;
     while true do   # will be left by break
+        Info(InfoRecog,2," SLn_UpStep: starting new round");
 
         ##
         ## Step 2
         ##
+        counter := 0;
         v := fail;
         repeat
             counter := counter + 1;
-            if InfoLevel(InfoRecog) >= 3 then Print(".\c"); fi;
+            #if InfoLevel(InfoRecog) >= 3 then Print(".\c"); fi;
             w.count := w.count + 1;
             c1 := PseudoRandom(w.sld);
             
@@ -210,8 +206,23 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
                 if v = fail then
                     Info(InfoRecog,2,"Ooops: Component n was zero!");
                 fi;
+
+                # TODO: if aimdim = 2*w.n-1 then actually at this point sum1[2] = [v] = int1
+                # which we should use to avoid one more gaussian elimination.
+                # When aimdim = w.d < 2*w.n - 1 then sum1[2] will be too big and then
+                # we do need to do something here. But we can do better than SumIntersectionMat,
+                # something like this should do it:    RECOG.FixspaceMat(id{[1..w.n]}*c)*id{[1..w.n]}
+                if aimdim < w.d then
+                    Assert(0, sum1[2] = int1);
+                    Assert(0, v = fail or sum1[2] = [v]);
+                else
+                    # TODO: the following multiplication is an expensive way of adding
+                    # zero columns ...
+                    Assert(0, RREF(int1) = RREF(RECOG.FixspaceMat(c{[1..w.n]})*id{[1..w.n]}));
+                fi;
             fi;
         until v <> fail;
+        Info(InfoRecog,2," SLn_UpStep: found good conjugate after ", counter, " tries");
 
         v := v / v[w.n];   # normalize to 1 in position n
         Assert(1,v*c=v);
@@ -234,6 +245,9 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
         # has a d-n-dimensional fixed space W_{d-n} and W contains a complement
         # of that fixed space, the intersection of W and W_{d-n} has dimension
         # newdim.
+# TODO: but that alone does not mean that we have enough vectors in there to
+# be able to extend a basis of V_n + V_n*c  to a basis of V...
+# .... and I think this is why we run into the "Ooops, Fixc intersected" message down below... ???
 
         # Change basis:
         newpart := ExtractSubMatrix(c,[1..(w.n-1)],[1..(w.d)]);
@@ -256,9 +270,13 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
         newbas := Concatenation(id{[1..w.n-1]},[v],newpart);
         if 2*w.n-1 < w.d then
             
+#            if w.n > 3 then Error("breakpoint"); fi;
+
             # intersect Fix(c) with F_{d-n}
             int3 := SumIntersectionMat(RECOG.FixspaceMat(c),id{[w.n+1..w.d]})[2];
+#            Assert(0, int3 = RECOG.FixspaceMat(c{[w.n+1..w.d]})*id{[w.n+1..w.d]});
             if Size(int3) <> w.d - aimdim then
+
                 Info(InfoRecog,2,"Ooops, FixSLn \cap Fixc wrong dimension");
                 continue;
             fi;
@@ -309,6 +327,8 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
     # Now write this matrix newbas as an SLP in the standard generators
     # of our SL_n. Then we know which generators to take for our new
     # standard generators, namely newbas^-1 * std * newbas.
+
+# TODO: why do we do this?????
 
     newbasf := w.One;
     for i in [1..w.n-1] do
@@ -365,6 +385,7 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
             Add(transd,tf);
         od;
     od;
+# TODO: trans consists of fake gens, for debugging I'd like to see the *real* matrices for once...
     Unbind(trans);
 
     Info(InfoRecog,2,"Step 5 done");

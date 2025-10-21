@@ -231,7 +231,14 @@ RECOG.CheckNewStingrayGroupSmallerMatrices := function(g1,dim1,base1,eigenspace1
 
     baseSum := ShallowCopy(base1);
     Append(baseSum,base2);
-    
+# FIXME: it seems at this point we might have e.g. this:
+# brk> out;
+# [ << mutable compressed matrix 28x28 over GF(5) > with mem>, 3, < immutable compressed matrix 3x28 over GF(5) >, < mutable compressed matrix 25x28 over GF(5) > ]
+# brk> out2;
+# [ << mutable compressed matrix 1000x1000 over GF(5) > with mem>, 44, < immutable compressed matrix 44x1000 over GF(5) >, < mutable compressed matrix 956x1000 over GF(5) > ]
+# so concatenating base1 and base2 to get a common nullspace makes absolutely no sense
+Assert(0, Length(g1) = Length(g2));
+
     if NullspaceMat(baseSum) <> [] then
         return [false,[]];
     fi;
@@ -427,6 +434,7 @@ local out, list, out2, currentdim, check, slplist, slpToSmallerGroup, baselist, 
             if out[2]>2 then
             repeat
                     out2:=RECOG.SLn_godownStingrayWithSmallerMatrices(list);
+# TODO: also restart if out[1] and out2[1] differ in size???
                     if out2=fail or out2[1]*out2[1]=One(out2[1]) then
                         if InfoLevel(InfoRecog) >= 3 then Print("B\c"); fi;
                         list:=[g,dim,q,g];
