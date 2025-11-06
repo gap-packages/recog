@@ -460,6 +460,8 @@ end;
 ##
 
 # See Corollary 10.2.2 in [Ser03].
+# See also `DoSnAnGiantTest` in the GAP library which seems to be a
+# close variant of this code.
 RECOG.IsGiant:=function(g,mp)
   local bound, i, p, cycles, l, x, n;
   n := Length(mp);
@@ -708,6 +710,8 @@ RECOG.GiantEpsilon := 1/1024;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsPerm, "Giant",
 "tries to find Sn and An in their natural actions",
+# TODO: expects input to be transitive, so should always be run after
+# FindHomMethodsPerm.NonTransitive; model this better?
 rec(validatesOrAlwaysValidInput := true),
 function(ri, grp)
     local grpmem,mp,res;
