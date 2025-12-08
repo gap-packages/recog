@@ -1,7 +1,4 @@
 #
-# HACK to insert the method
-gap> AddMethod(FindHomDbPerm, FindHomMethodsGeneric.SnAnUnknownDegree, 58);;
-
 # For each entry (d, k) we construct Sym(d)/Alt(d) acting on k-sets.
 # For each entry (d, k), we must have 2 * k ^ 2 > d,
 # otherwise LargeBasePrimitive recognises the group instead of SnAnUnknownDegree.
@@ -64,11 +61,4 @@ gap> for i in [1 .. Length(nonAltOrSymGroups)] do
 >     if FindHomMethodsGeneric.SnAnUnknownDegree(ri, Grp(ri)) = Success then
 >         Print("ERROR: Recognised group [", i, "] wrongly as Sn/An!\n");
 >     fi;
-> od;
-
-#
-# Remove Hacky injection of our method
-gap> for db in [FindHomDbPerm] do
->       Remove(db,
->              PositionProperty(db, x -> Stamp(x.method) = "SnAnUnknownDegree"));;
 > od;
