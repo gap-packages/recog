@@ -2316,7 +2316,7 @@ function( arg )
                   );
   merkinfolevel := InfoLevel(InfoMethSel);
   SetInfoLevel(InfoMethSel,0);
-  CallMethods( ClassicalMethDb, nrrandels, recognise, grp );
+  ret := CallMethods( ClassicalMethDb, nrrandels, recognise, grp );
   SetInfoLevel(InfoMethSel,merkinfolevel);
   # fail: bedeutet, dass entnervt aufgegeben wurde
   # true: bedeutet, dass eine Methode "erfolgreich" war

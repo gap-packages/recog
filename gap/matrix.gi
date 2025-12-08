@@ -915,13 +915,9 @@ AddMethod(FindHomDbMatrix, FindHomMethodsMatrix.DiagonalMatrices, 1100);
 
 AddMethod(FindHomDbMatrix, FindHomMethodsMatrix.KnownStabilizerChain, 1175);
 
-<<<<<<< HEAD
-AddMethod(FindHomDbMatrix, FindHomMethodsGeneric.FewGensAbelian, 1050);
-=======
 AddMethod(FindHomDbMatrix, FindHomMethodsGeneric.SnAnUnknownDegree, 1070);;
 
 AddMethod(FindHomDbPerm, FindHomMethodsGeneric.FewGensAbelian, 1050);
->>>>>>> 7925157 (Integrate SnAn code into library)
 
 AddMethod(FindHomDbMatrix, FindHomMethodsMatrix.ReducibleIso, 1000);
 

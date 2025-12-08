@@ -486,7 +486,7 @@ InstallGlobalFunction( RecogniseGeneric,
     Assert(0, Length(Set(allmethods, m->m.rank)) = Length(allmethods));
 
     # Find a possible homomorphism (or recognise this group as leaf)
-    CallMethods( allmethods, 10, ri, H );
+    Setfhmethsel(ri, CallMethods( allmethods, 10, ri, H ));
     # TODO: extract the value 10 into a named constant, and / or make it
     #       an option parameter to the func
 
@@ -892,9 +892,6 @@ RECOG.TestGroupOptions := rec(
       # a supergroup to check
       inTests := 30,
 
-      # InfoLevel used during the call to TestGroup. Useful for debugging.
-      infoLevel := 0,
-
       # The following options are off by default as they fail on
       # many examples at present
 
@@ -924,7 +921,7 @@ RECOG.TestGroup := function(g,proj,size, optionlist...)
   fi;
 
   lvl:=InfoLevel(InfoRecog);
-  SetInfoLevel(InfoRecog, options.infoLevel);
+  SetInfoLevel(InfoRecog, 0);
   repeat
       count := count + 1;
       #r := Runtime();
