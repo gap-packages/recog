@@ -49,11 +49,11 @@ in the `recog` directory.
 
 ## Dependencies
 
-- [AtlasRep](https://www.math.rwth-aachen.de/homes/Thomas.Breuer/atlasrep/)
-- [FactInt](https://gap-packages.github.io/FactInt/)
-- [Forms](https://gap-packages.github.io/forms)
-- [genss](https://gap-packages.github.io/genss)
-- [orb](https://gap-packages.github.io/orb)
+- [AtlasRep](https://www.gap-system.org/packages/#AtlasRep)
+- [FactInt](https://www.gap-system.org/packages/#FactInt)
+- [Forms](https://www.gap-system.org/packages/#Forms)
+- [genss](https://www.gap-system.org/packages/#genss)
+- [orb](https://www.gap-system.org/packages/#orb)
 
 ## Feedback and support
 
