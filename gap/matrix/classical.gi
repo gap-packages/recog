@@ -1713,7 +1713,7 @@ end);
 BindRecogMethod(FindHomMethodsClassical, "NonGenericOrthogonalPlus",
 "tests whether group is non-generic O+",
 function(recognise,grp)
-    local d, q, gp1, gp2, CheckFlag, pgrp, orbs, isHypForm;
+    local d, q, gp1, gp2, CheckFlag, pgrp, sc, orbs, isHypForm;
 
     isHypForm := f -> IsSesquilinearForm(f) and IsHyperbolicForm(f);
 
@@ -1805,7 +1805,7 @@ function(recognise,grp)
              recognise.isSOContained := false;
              return false;
         fi;
-    elif d = 8 and  q =  5 then
+    elif d = 8 and q = 5 then
         ## 2.July.2019: There is a mistake in the paper here
         ## There are maximal subgroups of Omega+(8,5) that contain
         ## elements of order 7,13,3
@@ -1821,22 +1821,16 @@ function(recognise,grp)
         if not HasElementsMultipleOf( recognise.orders, [3,7,13,31])  then
             return fail;
         fi;
-        ## Such elements also exist in maximal subgroups of
-        ## Omega+(8,5) with composition factors being C_2 and Omega(0,7,5).
-        ## Thus we compute the projective action of grp on the one-dimensional
-        ## subspaces and then compare the size of pgrp to the size of
-        ## POmega(+1,8,5).
-        pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
-        # We take a value for random of only 200 promille, but in practice this
-        # seems to be good enough.
-        # The orders of the remaining maximal subgroups are not divisible
-        # by e.g. 13^2. Also, passing to the projective action reduces the
-        # involved group sizes by a factor of at most 4. So, if we know that
-        # the order of pgrp is divisible by Size(POmega(+1,8,5)), then this
-        # excludes the remaining maximal subgroups.
-        # TODO: IsSOContained -> IsOmegaContained
-        StabChain(pgrp, rec(random := 200, limit := 8911539000000000000));
-        if Size(pgrp) mod 8911539000000000000 = 0 then
+        # Such elements also exist in maximal subgroups of
+        # Omega+(8,5) with composition factors being C_2 and Omega(0,7,5).
+        # Thus we compute the projective action of grp and then compare
+        # the size of resulting stabilizer chain to the size of POmega(+1,8,5).
+        #
+        # Note that 78000 is probably larger than needed (it only occurs for
+        # the conformal orthogonal group)
+        sc := StabilizerChain( grp, rec( Projective := true, OrbitLengthLimit := 39000 ));
+        # Note: Size(POmega(+1,8,5)) = 8911539000000000000
+        if sc = fail or Size(sc) mod 8911539000000000000 = 0 then
              return CheckFlag();
         else
              return fail;
