@@ -32,7 +32,14 @@ To enable GAP to find recog you can start GAP via
 
     gap --packagedirs "~/packages;"
 
-Of course, you can add this option to your GAP startup script.
+> [!IMPORTANT]
+> Note that `--packagedirs` was introduced in GAP 4.15. For older version please
+> refere to this [site](https://docs.gap-system.org/doc/ref/chap76.html) for
+> alternative solutions.
+
+> [!TIP]
+> You can add this option to your GAP startup script. More information about
+> this can be found [here](https://docs.gap-system.org/doc/ref/chap3.html).
 
 ## Loading
 
