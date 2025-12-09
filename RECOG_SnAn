@@ -29,9 +29,12 @@ Here we collect the changes in `SnAnUnknownDegree` compared to the "vanilla" imp
 - Computation of upper bound `N` done as in `[L84]` and `[KL90]`.
 - Computation of lower bound `M` by element orders.
 - For each ThreeCycleCandidate `c` we check if `c^3 = 1` and we check for some random elements `r` if for the element `x := c * c^r` either `x^5 = 1` or `x^6 = 1` holds (The element `x` needs to have order `1`, `2`, `3` or `5`).
-- `ThreeCycleCandidatesIterator` uses a similar approach to that from the Magma Code `GetNextThreeCycle` and thus computes the elements in a different ordering. For every involution, we first consider only up to `K = 5` random conjugates. If none is successful, we move to the next involution. We save all involutions considered so far.
-  - If this failed (i.e., for all `B` involutions all `K` random conjugates failed), we proceed in a linear manner:
-  - We consider each involution in turn, and for each compute `K` new random conjugate.
 - Use `RecogniseSnAnLazy` that caches iterators constructed by `ThreeCycleCandidatesIterator` and returns `TemporaryFailure` more quickly.
-Here we work in batches of at most `L` involutions and batches of at most `K` conjugates per involution.
+- `ThreeCycleCandidatesIterator` uses a similar approach to that from the Magma Code `GetNextThreeCycle` and thus computes the elements in a different ordering.
+  - We work in batches of at most `L = 10` involutions in a linear manner. We save all involutions considered so far.
+  - For every involution, we consider only up to `K = 5` random conjugates. If none is successful, we move to the next involution. We save all involutions considered so far.
+  - If a batch of involutions reaches the last involution, i.e. the `B`-th one, we start with the first involution in the next round.
+  - After a batch of involutions was completely processed, we return `SnAnTryLater` and exit the recognition method in the lazy variant.
+  - However, as in the vanilla implementation, we return `TemporaryFailure` if for all `B` involutions
+  either `C` conjugates have been tested in total or `T` conjugates were proven to commutate with the involution.
 - Use Conder's Thesis to compute images for degree `n <= 10`.
