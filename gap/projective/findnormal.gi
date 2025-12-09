@@ -743,7 +743,7 @@ function(ri,G)
       return fail; # FIXME: fail = TemporaryFailure here really correct?
   fi;
   if not IsBound(r.Nready) or not r.Nready then
-      r.Ngens := FastNormalClosure(GeneratorsOfGroup(G),[r.el],20);
+      r.Ngens := FastNormalClosure(G,[r.el],20);
   fi;
   f := ri!.field;
   m := GModuleByMats(r.Ngens,f);

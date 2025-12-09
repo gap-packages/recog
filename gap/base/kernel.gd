@@ -18,6 +18,8 @@
 
 DeclareGlobalFunction( "RandomSubproduct" );
 DeclareGlobalFunction( "FastNormalClosure" );
+DeclareGlobalFunction( "ImmediateVerification" );
 DeclareGlobalFunction( "FindKernelFastNormalClosure" );
 DeclareGlobalFunction( "FindKernelRandom" );
 DeclareGlobalFunction( "FindKernelDoNothing" );
+DeclareGlobalFunction( "RECOG_HandleSpecialCaseKernelTrivialAndMarkedForImmediateVerification" );

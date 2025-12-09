@@ -70,7 +70,7 @@ RECOG.IndexMaxSub := function( hm, grp, d )
     sub := MTX.ProperSubmoduleBasis(hm);
     sub := MutableCopyMat( sub );  # make mutable copy
     # FIXME: this will be unnecessary:
-    ConvertToMatrixRep(sub);
+    ConvertToMatrixRep(sub,hm.field);
     lastsub := fail;
     lastorb := fail;
     repeat
@@ -98,7 +98,7 @@ RECOG.IndexMaxSub := function( hm, grp, d )
         fi;
         # we try intersecting the subspaces in the orbit:
         Info(InfoRecog,2,"Calculating intersections...");
-        f := FieldOfMatrixGroup(grp);
+        f := hm.field;
         sp := VectorSpace(f,orb[1]);
         dim := Dimension(sp);
         for i in [2..Length(orb)] do
@@ -120,7 +120,7 @@ RECOG.IndexMaxSub := function( hm, grp, d )
         lastorb := orb;
         sub := MutableCopyMat(AsList(Basis(sp)));
         # FIXME: This will vanish:
-        ConvertToMatrixRep(sub);
+        ConvertToMatrixRep(sub,hm.field);
     until false;
 end;
 
@@ -128,7 +128,7 @@ RECOG.SmallHomomorphicImageProjectiveGroup := function ( grp )
 
     local hm, findred, ans, fld, d, i, gens;
 
-    fld := FieldOfMatrixGroup(grp);
+    fld := DefaultFieldOfMatrixGroup(grp);
     d := DimensionOfMatrixGroup(grp);
 
     findred := function( gens )

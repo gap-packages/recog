@@ -16,6 +16,9 @@
 ##
 #############################################################################
 
+BindGlobal("RECOG_FindKernelFastNormalClosureStandardArgumentValues",
+           Immutable([6, 3]));
+BindConstant("RECOG_NrElementsInImmediateVerification", 10);
 
 # a nice view method:
 RECOG_ViewObj := function( level, ri )
@@ -40,7 +43,7 @@ RECOG_ViewObj := function( level, ri )
             Print(ms);
         fi;
         if IsBound(ri!.comment) then
-            Print(ri!.comment);
+            Print(" Comment=", ri!.comment);
         fi;
     fi;
     if HasIsRecogInfoForSimpleGroup(ri) and IsRecogInfoForSimpleGroup(ri) then
@@ -126,7 +129,7 @@ InstallGlobalFunction( RecogniseGroup,
 InstallGlobalFunction( TryFindHomMethod,
   function( g, method, projective )
     local result,ri;
-    ri := EmptyRecognitionInfoRecord(rec(),g,projective);
+    ri := RecogNode(g,projective);
     Unbind(g!.pseudorandomfunc);
     result := method(ri,g);
     if result in [TemporaryFailure, NeverApplicable] then
@@ -138,11 +141,13 @@ InstallGlobalFunction( TryFindHomMethod,
     fi;
   end );
 
-InstallGlobalFunction( EmptyRecognitionInfoRecord,
-  function(r,H,projective)
+InstallMethod( RecogNode,
+  "standard method",
+  [ IsGroup, IsBool, IsRecord ],
+  function(H,projective,r)
     local ri;
     ri := ShallowCopy(r);
-    Objectify( RecognitionInfoType, ri );
+    Objectify( RecogNodeType, ri );
     SetGrp(ri,H);
     Setslpforelement(ri,SLPforElementGeneric);
     SetgensN(ri,[]);       # this will grow over time
@@ -154,11 +159,11 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     if projective then
         Setisone(ri,IsOneProjective);
         Setisequal(ri,IsEqualProjective);
-        ri!.order := RECOG.ProjectiveOrder;
+        SetOrderFunc(ri, RECOG.ProjectiveOrder);
     else
         Setisone(ri,IsOne);
         Setisequal(ri,\=);
-        ri!.order := Order;
+        SetOrderFunc(ri, Order);
     fi;
     Setdocommute(ri, function(x,y)
       local a,b;
@@ -170,8 +175,11 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     # FIXME: perhaps DON'T set a default for findgensNmeth, to ensure
     # people always set a value? Or at least find some way so that
     # methods must explicitly acknowledge that they want the default...
-    SetfindgensNmeth(ri,rec(method := FindKernelFastNormalClosure,
-                            args := [6,3]));
+    SetfindgensNmeth(
+        ri,
+        rec(method := FindKernelFastNormalClosure,
+            args := ShallowCopy(RECOG_FindKernelFastNormalClosureStandardArgumentValues))
+    );
     if IsMatrixGroup(H) then
         ri!.field := FieldOfMatrixGroup(H);
         ri!.dimension := DimensionOfMatrixGroup(H);
@@ -206,6 +214,20 @@ InstallGlobalFunction( EmptyRecognitionInfoRecord,
     return ri;
   end );
 
+InstallOtherMethod( RecogNode,
+  "for a group",
+  [ IsGroup ],
+  function(H)
+    return RecogNode(H, false, rec());
+  end );
+
+InstallOtherMethod( RecogNode,
+  "for a group and a boolean",
+  [ IsGroup, IsBool ],
+  function(H, projective)
+    return RecogNode(H, projective, rec());
+  end );
+
 # Sets the stamp used by RandomElm, RandomElmOrd, and related functions.
 RECOG.SetPseudoRandomStamp := function(g,st)
   if IsBound(g!.pseudorandomfunc) then
@@ -223,9 +245,9 @@ end;
 # if called with stamp := "B".
 #
 # The components of the recog record involved are explained in
-# EmptyRecognitionInfoRecord.
+# RecogNode.
 #
-# HACK: For recog records created by EmptyRecognitionInfoRecord the method
+# HACK: For recog records created by RecogNode the method
 # RandomElm is by default stored in the component ri!.Grp!.pseudorandomfunc.
 # A method for PseudoRandom is installed such that it calls
 # RandomElm(ri, "PseudoRandom", false).
@@ -276,13 +298,13 @@ InstallMethod( RandomElmOrd,
             if not IsBound(ri!.randr[pos]) then
                 ri!.randr[pos] := Next(ri!.prodrep);
             fi;
-            ri!.rando[pos] := ri!.order(ri!.randr[pos]!.el);
+            ri!.rando[pos] := OrderFunc(ri)(ri!.randr[pos]!.el);
         fi;
         res := rec( order := ri!.rando[pos], projective := ri!.projective,
                     el := ri!.randr[pos] );
     else
         res := rec( el := Next(ri!.prodrep) );
-        res.order := ri!.order(res.el!.el);
+        res.order := OrderFunc(ri)(res.el!.el);
         res.projective := ri!.projective;
         Add(ri!.rando,res.order);
     fi;
@@ -304,12 +326,12 @@ InstallMethod( GetElmOrd, "for a recognition node and a record",
         if IsBound(ri!.rando[r.nr]) then
             r.order := ri!.rando[r.nr];
         else
-            ri!.rando[r.nr] := ri!.order(ri!.randr[r.nr]!.el);
+            ri!.rando[r.nr] := OrderFunc(ri)(ri!.randr[r.nr]!.el);
             r.order := ri!.rando[r.nr];
         fi;
     else
         x := StripMemory(r.el);
-        r.order := ri!.order(x);
+        r.order := OrderFunc(ri)(x);
     fi;
   end );
 
@@ -446,35 +468,38 @@ InstallGlobalFunction( RecogniseGeneric,
     fi;
 
     # Set up the record and the group object:
-    if IsIdenticalObj( methoddb, FindHomDbProjective ) then
-        ri := EmptyRecognitionInfoRecord(knowledge,H,true);
-    else
-        ri := EmptyRecognitionInfoRecord(knowledge,H,false);
-    fi;
+    ri := RecogNode(
+        H,
+        IsIdenticalObj( methoddb, FindHomDbProjective ),
+        knowledge
+    );
     # was here earlier: Setcalcnicegens(ri,CalcNiceGensGeneric);
     Setmethodsforimage(ri,methoddb);
 
-    # Find a possible homomorphism (or recognise this group as leaf)
+    # Combine database of find homomorphism methods with hints
     allmethods := methoddb;
     if IsBound(knowledge.hints) then
         allmethods := Concatenation(allmethods, knowledge.hints);
         SortBy(allmethods, a -> -a.rank);
     fi;
-
     # verify no rank occurs more than once
     Assert(0, Length(Set(allmethods, m->m.rank)) = Length(allmethods));
 
+    # Find a possible homomorphism (or recognise this group as leaf)
     Setfhmethsel(ri, CallMethods( allmethods, 10, ri, H ));
     # TODO: extract the value 10 into a named constant, and / or make it
     #       an option parameter to the func
 
     # Reset the pseudo random stamp:
     RECOG.SetPseudoRandomStamp(Grp(ri),"PseudoRandom");
+
+    # Handle the unfinished case:
     if fhmethsel(ri).result = TemporaryFailure then
-        # FIXME: shouldn't we print an error here? at least if the user called us...
-        # Perhaps yes: this is an ri which does NOT have IsReady set, and may be useful for debugging...
         SetFilterObj(ri,IsLeaf);
         if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
+        Info(InfoRecog, 1,
+             "RecogNode <ri> could not be recognised,",
+             " IsReady(<ri>) is not set, recognition aborts");
         return ri;
     fi;
 
@@ -498,14 +523,9 @@ InstallGlobalFunction( RecogniseGeneric,
                 SetNiceGens(ri,GeneratorsOfGroup(H));
             fi;
         fi;
-        # these two were set correctly by FindHomomorphism
-        if IsLeaf(ri) then SetFilterObj(ri,IsReady); fi;
-        # FIXME: settle what IsReady means *exactly*;
-        # if it means that the leaf is "guaranteed" to be mathematically correct,
-        # then we need to verify that this is really always the case (for some
-        # methods, one might doubt this...)
         if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
         # StopStoringRandEls(ri);
+        SetFilterObj(ri,IsReady);
         return ri;
     fi;
 
@@ -517,8 +537,10 @@ InstallGlobalFunction( RecogniseGeneric,
     repeat
         counter := counter + 1;
         if counter > 10 then
-            Info(InfoRecog,1,"Giving up desperately...");
             if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
+            Info(InfoRecog, 1,
+                 "ImageRecogNode of RecogNode <ri> could not be recognised,",
+                 " IsReady(<ri>) is not set, recognition aborts");
             return ri;
         fi;
 
@@ -538,7 +560,7 @@ InstallGlobalFunction( RecogniseGeneric,
         Add(depthString,'F');
         rifac := RecogniseGeneric(
                   Group(List(GeneratorsOfGroup(H), x->ImageElm(Homom(ri),x))),
-                  methodsforimage(ri), depthString, InitialDataForImageRecogNode(ri) ); # TODO: change InitialDataForImageRecogNode to hintsForFactor??)
+                  methodsforimage(ri), depthString, InitialDataForImageRecogNode(ri) );
         Remove(depthString);
         PrintTreePos("F",depthString,H);
         SetImageRecogNode(ri,rifac);
@@ -553,7 +575,7 @@ InstallGlobalFunction( RecogniseGeneric,
         fi;
 
         if not IsReady(rifac) then
-            # the recognition of the image failed, also give up here:
+            # IsReady was not set, thus abort the whole computation.
             if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
             return ri;
         fi;
@@ -566,7 +588,7 @@ InstallGlobalFunction( RecogniseGeneric,
         # Now create the kernel generators with the stored method:
         succ := CallFuncList(findgensNmeth(ri).method,
                              Concatenation([ri],findgensNmeth(ri).args));
-    until succ;
+    until succ = true;
 
     # If nobody has set how we produce preimages of the nicegens:
     if not Hascalcnicegens(ri) then
@@ -574,8 +596,8 @@ InstallGlobalFunction( RecogniseGeneric,
     fi;
 
     # Do a little bit of preparation for the generators of N:
-    l := gensN(ri);
     if not IsBound(ri!.leavegensNuntouched) then
+        l := gensN(ri);
         Sort(l,SortFunctionWithMemory);   # this favours "shorter" memories!
         # FIXME: For projective groups different matrices might stand
         #        for the same element, we might overlook this here!
@@ -589,16 +611,20 @@ InstallGlobalFunction( RecogniseGeneric,
         od;
         SetgensN(ri,ll);
     fi;
-    if Length(gensN(ri)) = 0 then
+    if IsEmpty(gensN(ri)) and immediateverification(ri) then
+        # Special case, for an explanation see the source of the called function.
+        RECOG_HandleSpecialCaseKernelTrivialAndMarkedForImmediateVerification(ri);
+    fi;
+    if IsEmpty(gensN(ri)) then
         # We found out that N is the trivial group!
         # In this case we do nothing, kernel is fail indicating this.
         Info(InfoRecog,2,"Found trivial kernel (depth=",depth,").");
         SetKernelRecogNode(ri,fail);
         # We have to learn from the image, what our nice generators are:
         SetNiceGens(ri,pregensfac(ri));
-        SetFilterObj(ri,IsReady);
         if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
         # StopStoringRandEls(ri);
+        SetFilterObj(ri,IsReady);
         return ri;
     fi;
 
@@ -619,58 +645,22 @@ InstallGlobalFunction( RecogniseGeneric,
         SetParentRecogNode(riker,ri);
         Info(InfoRecog,2,"Back from kernel (depth=",depth,").");
 
+        if not IsReady(riker) then
+            # IsReady is not set, thus the whole computation aborts.
+            return ri;
+        fi;
         done := true;
-        if IsReady(riker) and immediateverification(ri) then
-            # Do an immediate verification:
-            Info(InfoRecog,2,"Doing immediate verification.");
-            for i in [1..5] do
-                # We must use different random elements than the kernel
-                # finding routines!
-                x := RandomElm(ri,"KERNELANDVERIFY",true).el;
-                Assert(2, ValidateHomomInput(ri, x));
-                s := SLPforElement(rifac,ImageElm( Homom(ri), x!.el ));
-                if s = fail then
-                    ErrorNoReturn("Very bad: image was wrongly recognised and we ",
-                                  "found out too late");
-                fi;
-                y := ResultOfStraightLineProgram(s, ri!.pregensfacwithmem);
-                z := x*y^-1;
-                s := SLPforElement(riker,z!.el);
-                if InfoLevel(InfoRecog) >= 2 then Print(".\c"); fi;
-                if s = fail then
-                    # We missed something!
-                    done := false;
-                    Add(gensN(ri),z);
-                    Info(InfoRecog,2,
-                         "Alarm: Found unexpected kernel element! (depth=",
-                         depth,")");
-                fi;
-            od;
-            if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;
-            if not done then
-                succ := FindKernelFastNormalClosure(ri,5,5);
-                Info(InfoRecog,2,"Have now ",Length(gensN(ri)),
-                     " generators for kernel, recognising...");
-                if succ = false then
-                    ErrorNoReturn("Very bad: image was wrongly recognised and we ",
-                                  "found out too late");
-                fi;
-            fi;
+        if immediateverification(ri) then
+            Info(InfoRecog,2,"Doing immediate verification (depth=",
+                 depth,").");
+            done := ImmediateVerification(ri);
         fi;
     until done;
 
-    if IsReady(riker) then    # we are only ready when the kernel is
-        # Now make the two projection slps:
-        SetNiceGens(ri,Concatenation(pregensfac(ri), NiceGens(riker)));
-        #ll := List([1..Length(NiceGens(rifac))],i->[i,1]);
-        #ri!.proj1 := StraightLineProgramNC([ll],Length(NiceGens(ri)));
-        #ll := List([1..Length(NiceGens(riker))],
-        #           i->[i+Length(NiceGens(rifac)),1]);
-        #ri!.proj2 := StraightLineProgramNC([ll],Length(NiceGens(ri)));
-        SetFilterObj(ri,IsReady);
-    fi;
+    SetNiceGens(ri,Concatenation(pregensfac(ri), NiceGens(riker)));
     if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
     # StopStoringRandEls(ri);
+    SetFilterObj(ri,IsReady);
     return ri;
   end);
 
@@ -744,14 +734,22 @@ InstallGlobalFunction( SLPforElementGeneric,
     if s1 = fail then
         return fail;
     fi;
-    # if the kernel is trivial, we are done:
-    if riker = fail then
-        # was: return CompositionOfStraightLinePrograms(s1,gensQslp(ri));
-        return s1;
-    fi;
-    # Otherwise work in the kernel:
+    # The corresponding kernel element:
     y := ResultOfStraightLineProgram(s1,pregensfac(ri));
     n := g*y^-1;
+    # If the kernel is trivial, we check whether n is the identity in ri.
+    # This is necessary during immediate verification, since the kernel might
+    # have incorrectly been recognised as trivial.
+    if riker = fail then
+        if not ri!.isone(n)
+                # Big ugly hack. If the successMethod is BlocksModScalars, then
+                # we can't use ri!.isone, see the documentation of
+                # BlocksModScalars. 
+                and not ri!.fhmethsel.successMethod = "BlocksModScalars" then
+            return fail;
+        fi;
+        return s1;
+    fi;
     s2 := SLPforElement(riker,n);
     if s2 = fail then
         return fail;
@@ -761,9 +759,6 @@ InstallGlobalFunction( SLPforElementGeneric,
     s := NewProductOfStraightLinePrograms(s2,[nr1+1..nr1+nr2],
                                           s1,[1..nr1],
                                           nr1+nr2);
-    #s := ProductOfStraightLinePrograms(
-    #       CompositionOfStraightLinePrograms(s2,ri!.proj2),
-    #       CompositionOfStraightLinePrograms(s1,ri!.proj1));
     return s;
   end);
 
@@ -871,6 +866,9 @@ InstallGlobalFunction( "SLPforNiceGens", function(ri)
   return s;
 end );
 
+# For user debugging purposes. Takes a string consisting of lower- or
+# upper-case "f" and "k". Returns the node one arrives at by descending through
+# the tree, going to the factor for each "f" and to the kernel for each "k".
 InstallGlobalFunction( "GetCompositionTreeNode",
   function( ri, what )
     local r,c;

@@ -96,6 +96,7 @@ RECOG.DirectFactorsFinder := function(gens,facgens,k,eq)
   pr := ProductReplacer(facgens);
   Add(fgens,Next(pr));
   Add(fgens,Next(pr));
+  Add(fgens,Next(pr));
   if eq(fgens[1]*fgens[2],fgens[2]*fgens[1]) and
      eq(fgens[1]*fgens[3],fgens[3]*fgens[1]) then
       if eq(fgens[2]*fgens[3],fgens[3]*fgens[2]) then
@@ -147,7 +148,7 @@ RECOG.DirectFactorsFinder := function(gens,facgens,k,eq)
   od;
 
   if Length(o) < k then
-      Info(InfoRecog,1,"Strange, found less direct factors than expected!");
+      Info(InfoRecog,1,"Strange, found fewer direct factors than expected!");
       return fail;
   fi;
 
@@ -257,7 +258,7 @@ RECOG.SortOutReducibleNormalSubgroup :=
                   4000);
         # This is an isomorphism:
         findgensNmeth(ri).method := FindKernelDoNothing;
-        ri!.comment := "_D4TensorDec";
+        ri!.comment := "D4TensorDec";
         return Success;
     fi;
     Info(InfoRecog,2,"D247:Using action on the set of homogeneous components",
@@ -295,7 +296,7 @@ ConvertToMatrixRep(homcomp,Size(f));
     a := OrbActionHomomorphism(G,o);
     SetHomom(ri,a);
     Setmethodsforimage(ri,FindHomDbPerm);
-    ri!.comment := "_D2Imprimitive";
+    ri!.comment := "D2Imprimitive";
     Setimmediateverification(ri,true);
     findgensNmeth(ri).args[1] := Length(o)+6;
     findgensNmeth(ri).args[2] := 4;
@@ -332,7 +333,7 @@ RECOG.SortOutReducibleSecondNormalSubgroup :=
                 Setmethodsforimage(ri,FindHomDbPerm);
                 Info(InfoRecog,2,"D247: Success, found D7 with action",
                      " on ",mult," direct factors.");
-                ri!.comment := "_D7TensorInduced";
+                ri!.comment := "D7TensorInduced";
                 return Success;
             else
                 Info(InfoRecog,2,"D247: Did not find direct factors!");
@@ -362,7 +363,7 @@ function(ri, G)
     # This is called with an element that we hope lies in a normal subgroup.
     local H,a,basis,collf,conjgensG,count,dim,hom,homcomp,homs,homsimg,i,
           kro,m,mm,mult,ngens,nngens,o,orb,pr,r,subdim,y,z;
-    ngens := FastNormalClosure(GeneratorsOfGroup(G),[x],4);
+    ngens := FastNormalClosure(G,[x],4);
     m := GModuleByMats(ngens,f);
     if MTX.IsIrreducible(m) then
         if not ispower then
@@ -422,45 +423,4 @@ function(ri, G)
   if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;
   Info(InfoRecog,2,"D247: Did not find normal subgroup, giving up.");
   return TemporaryFailure;
-end);
-
-#! @BeginChunk PrototypeForC2C4
-#! TODO/FIXME: PrototypeForC2C4 is not used anywhere
-#! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "PrototypeForC2C4",
-"TODO",
-function(ri, G)
-  # We try to produce an element of a normal subgroup by playing
-  # tricks.
-  local CheckNormalClosure,f,m,res,ngens,l;
-
-  RECOG.SetPseudoRandomStamp(G,"PrototypeForC2C4");
-  f := ri!.field;
-
-  CheckNormalClosure := function(x)
-    # This is called with an element that we hope lies in a normal subgroup.
-    local m,ngens;
-    ngens := FastNormalClosure(GeneratorsOfGroup(G),x,4);
-    m := GModuleByMats(ngens,f);
-    if not IsIrreducible(m) then
-        Info(InfoRecog,2,"Proto: Seem to have found something!");
-        return RECOG.SortOutReducibleNormalSubgroup(ri,G,ngens,m);
-    else
-        return fail;
-    fi;
-  end;
-
-  Info(InfoRecog,2,"Proto: Starting to work...");
-
-  # Make some elements l which have good chances to be in a normal subgroup
-  # ...
-  # Then do:
-  res := CheckNormalClosure(l);
-  if res = true then
-      Info(InfoRecog,2,"Proto: Found a reduction.");
-      return true;
-  fi;
-
-  Info(InfoRecog,2,"Proto: Did not find normal subgroup, giving up.");
-  return fail;
 end);

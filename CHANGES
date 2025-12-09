@@ -1,5 +1,37 @@
 This file describes changes in the recog package.
 
+1.4.4 (2025-01-DD)
+  - Fix an unexpected error during recognition when trying to split
+    group as direct products (in `RECOG.DirectFactorsFinder`)
+  - Fix an unexpected error in `RECOG.SmallHomomorphicImageProjectiveGroup`
+  - Fix an unexpected error in the C6 recognition code (a call to
+    `ConvertToMatrixRep` was missing)
+  - Remove left-over debug message which sometimes printed "With 2" or
+    similar messages during recognition
+
+1.4.3 (2024-10-16)
+  - Stop overriding the system library function `MTX.InvariantBilinearForm`
+    with an old version (this was meant to fix a bug in GAP but has been
+    unnecessary for a couple years, and now impedes improvements for this
+    function in GAP)
+  - Various internal and janitorial changes
+
+1.4.2 (2022-09-27)
+  - Fix more compatibility issues with matgrp <= 0.70
+  - Rename `order` to `OrderFunc` to avoid clashes with existing code
+  - Speed up default test suite
+
+1.4.1 (2022-09-26)
+  - Fix compatibility with matgrp <= 0.70
+
+1.4.0 (2022-09-26)
+  - A huge number of changes (over 388 commits since the previous release)
+    were made, with many bug fixes and improvements, but also renamed APIs
+    and more. Unfortunately this may break some code using recog. If this
+    happens to, you, please let us know about it via our issue tracker
+    <https://github.com/gap-packages/recog/issues> or by sending and email
+    to Max Horn <mhorn@rptu.de>.
+
 1.3.2 (2019-04-15)
   - Many janitorial changes
 
@@ -42,7 +74,7 @@ This file describes changes in the recog package.
   - Detect if DoHintedLowIndex runs into an infinite loop
   - Add various source code comments
   - Move FindKernelLowerLeftPGroup from recogbase to recog
-  - Move website to http://gap-packages.github.io/recog/
+  - Move website to https://gap-packages.github.io/recog/
   - Update documentation
   - Splits some large source files into multiple
   - Remove lots of unused code and files

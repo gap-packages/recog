@@ -122,7 +122,7 @@ function(ri,I,name)
  local rifac,bool;
 
  rifac := rec();
- Objectify(RecognitionInfoType,rifac);;
+ Objectify(RecogNodeType,rifac);;
  SetFilterObj(rifac,IsLeaf);
  SetParentRecogNode(rifac,ri);
  SetImageRecogNode(ri,rifac);

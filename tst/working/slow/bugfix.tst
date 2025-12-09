@@ -1,3 +1,14 @@
+#
+gap> START_TEST("bugfix.tst");
+gap> oldInfoLevel := InfoLevel(InfoRecog);;
+gap> SetInfoLevel(InfoRecog, 0);
+
+# Issue #11.
+gap> G1 := Group(Z(3)^0 * [ [[1,0,0],[0,1,0],[0,0,-1]], [[1,-1,-1],[0,0,1],[0,-1,0]] ]);;
+gap> for i in [1..50] do
+>     ri := RECOG.TestGroup(G1, false, 72);
+> od;
+
 # The following test used to run into an error
 # See https://github.com/gap-packages/recog/issues/35
 gap> seedRS:=[ 5, [ 225113392, 116373310, 13315847, 185413588, 109376684, 208186004, 247160821, 214444193, 32311622, 106294770, 219253574, 169980985, 50045007, 211591822, 54141775, 25691115, 39393953, 200036935, 193770276, 208267651, 39100788, 126999690, 232504932, 226553591, 20638563, 139831559, 121338016, 205231825, 14714209, 127491343, 20425766, 228741984, 241036124, 166916515, 168213747, 135516487, 186091181, 203271793, 17966524, 16814514, 34159989, 240650236, 47708100, 114868532, 30568327, 94464039, 120748884, 52644563, 104015293, 11624778, 68043632, 212959210, 141675590, 139554261, 165463607 ] ];;
@@ -5,6 +16,16 @@ gap> seedMT:=[ "\020\267\245\255\tY\255\226\242\343\237\304!\233\377\336\025b\24
 gap> Reset(GlobalMersenneTwister, seedMT);;
 gap> Reset(GlobalRandomSource, seedRS);;
 gap> G:=ClassicalMaximals("L",3,3)[4];;
-
-# FIXME: check disabled for now, due to regression
 gap> ri:=RECOG.TestGroup(G, false, 24);;
+
+# Issue #37
+gap> for i in [1..50] do
+>     ri := RECOG.TestGroup(GL(9,5), false, Size(GL(9,5)));
+> od;
+gap> for i in [1..50] do
+>     ri := RECOG.TestGroup(GL(8,27), false, Size(GL(8,27)));
+> od;
+
+#
+gap> SetInfoLevel(InfoRecog, oldInfoLevel);
+gap> STOP_TEST("bugfix.tst");

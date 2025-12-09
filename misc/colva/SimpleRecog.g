@@ -186,7 +186,7 @@ RecogniseQuasiSimple := function(G,name)
  else
 # Use Shortotbits and consider the group as a perm grp
    re := rec();
-   Objectify(RecognitionInfoType,re);;
+   Objectify(RecogNodeType,re);;
    FindHomMethodsMatrix.ShortOrbits(re,G);
 # Perm Image
    GtoP := Homom(re);
@@ -513,7 +513,7 @@ RecogniseQuasiSimpleDP := function(G,H,phi,I,name)
 
 # Find generators for one block
  gens := List([1..3],i->FindPoint(H,phi,1,I));
- H1 := SubgroupNC(H,FastNormalClosure(GeneratorsOfGroup(H),gens,1));
+ H1 := SubgroupNC(H,FastNormalClosure(Grp(ri),gens,1));
  H1toblk := phi*projs[1];
  H1toblk!.Source := H1;
  blk := GroupWithGenerators(List(GeneratorsOfGroup(H1),x->ImageElm(H1toblk,x)));

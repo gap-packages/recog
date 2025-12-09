@@ -18,13 +18,31 @@
 
 # The category:
 DeclareCategory( "IsRecogNode", IsObject );
+DeclareObsoleteSynonym( "IsRecognitionNode", "IsRecogNode" );
 # The family:
 BindGlobal( "RecogNodeFamily",
   NewFamily("RecogNodeFamily", IsRecogNode));
+DeclareObsoleteSynonym( "RecognitionInfoFamily", "RecogNodeFamily" );
 # The type:
-BindGlobal( "RecognitionInfoType",
+BindGlobal( "RecogNodeType",
   NewType(RecogNodeFamily, IsRecogNode and IsAttributeStoringRep));
 
+## <#GAPDoc Label="RecogNode">
+## <ManSection>
+## <Oper Name="RecogNode" Arg="H[, projective][, r]"/>
+## <Returns>a recognition node.</Returns>
+## <Description>
+## Create an <Ref Filt="IsRecogNode"/> object <C>node</C> representing the
+## group <A>H</A>.
+## The optional boolean <A>projective</A> defaults to false and specifies,
+## in the case that <A>H</A> is a matrix group, whether <A>H</A> is to be
+## interpreted as a projective group.
+## The optional record <A>r</A> defaults to an empty record and is used to
+## initialize the returned <C>node</C>.
+## </Description>
+## </ManSection>
+## <#/GAPDoc>
+DeclareOperation( "RecogNode", [ IsGroup, IsBool, IsRecord ]);
 
 # The info class:
 DeclareInfoClass( "InfoRecog" );
@@ -57,12 +75,22 @@ DeclareFilter( "IsLeaf" );
 ## <ManSection>
 ## <Filt Name="IsReady" Type="Flag"/>
 ## <Description>
-## This flag indicates during the recognition procedure, whether a node in
-## the recognition tree is already completed or not. It is mainly set for
-## debugging purposes during the recognition. However, if the recognition
-## fails somewhere in a leaf, this flag is not set and all nodes above will
-## also not have this flag set. In this way one can see whether the recognition
-## failed and where the problem was.
+## This flag is set for a <Ref Filt="IsRecogNode"/> object <C>node</C> by <Ref
+## Func="RecogniseGeneric"/>, if recognition of the <E>subtree</E> rooted in
+## <C>node</C> finished successfully.
+## Recognition of a node is considered successful, if two conditions hold.
+## First, the call of <Ref Func="CallMethods"/> for this node reports
+## <K>Success</K>, that is a method from the respective method database (see
+## Section <Ref Sect="methoddatabases"/>) was successful.
+## Secondly, the construction of the kernel generators was successful.
+## <P/>
+## Thus, if the <Ref Filt="IsReady"/> flag is set, this does not necessarily
+## mean, that the result of the recognition procedure was verified and proven
+## to be mathematically correct!
+## <P/>
+## In particular, any computations using the datastructure set up by the
+## recognition procedure, like <Ref Oper="Size"/> and membership testing via
+## <Ref Oper="\in"/>, will error if <Ref Filt="IsReady"/> is not set.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
@@ -136,6 +164,8 @@ DeclareAttribute( "NiceGens", IsRecogNode, "mutable" );
 ## </ManSection>
 ## <#/GAPDoc>
 DeclareAttribute( "ImageRecogNode", IsRecogNode, "mutable" );
+DeclareSynonymAttr( "RIFac", ImageRecogNode );
+#DeclareObsoleteSynonymAttr( "RIFac", "ImageRecogNode" ); # FIXME: switch this back one
 
 ## <#GAPDoc Label="KernelRecogNode">
 ## <ManSection>
@@ -154,6 +184,8 @@ DeclareAttribute( "ImageRecogNode", IsRecogNode, "mutable" );
 ## </ManSection>
 ## <#/GAPDoc>
 DeclareAttribute( "KernelRecogNode", IsRecogNode, "mutable" );
+DeclareSynonymAttr( "RIKer", KernelRecogNode );
+# DeclareObsoleteSynonymAttr( "RIKer", "KernelRecogNode" ); # FIXME: switch this back one
 
 ## <#GAPDoc Label="ParentRecogNode">
 ## <ManSection>
@@ -314,7 +346,7 @@ DeclareAttribute( "isone", IsRecogNode, "mutable" );
 # Used to compare group elements after recognition:
 DeclareAttribute( "isequal", IsRecogNode, "mutable" );
 # Used to compute order of group elements after recognition:
-DeclareAttribute( "order", IsRecogNode, "mutable" );
+DeclareAttribute( "OrderFunc", IsRecogNode, "mutable" );
 # Used to check whether two group elements commute:
 DeclareAttribute( "docommute", IsRecogNode, "mutable" );
 
@@ -438,8 +470,6 @@ BindGlobal( "SLPforElementFuncsGeneric", rec() );
 
 
 # Our global functions for the main recursion:
-
-DeclareGlobalFunction( "EmptyRecognitionInfoRecord" );
 
 ## <#GAPDoc Label="RecognisePermGroup">
 ## <ManSection>
@@ -594,8 +624,9 @@ DeclareGlobalFunction( "CalcNiceGensGeneric" );
 ##     This is the default function for homomorphism node for the attribute
 ##     <Ref Attr="calcnicegens"/>. It just delegates to image and kernel of
 ##     the homomorphism, as the nice generators of a homomorphism (or isomorphism)
-##     node are just the concatenation of the nice generators of the image
-##     and the kernel. A find homomorphism method finding a homomorphism
+##     node are just the concatenation of the preimages of the nice generators
+##     of the image with the nice generators of the kernel.
+##     A find homomorphism method finding a homomorphism
 ##     or isomorphism does not have to do anything with respect to nice
 ##     generators.
 ## </Description>

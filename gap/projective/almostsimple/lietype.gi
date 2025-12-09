@@ -837,7 +837,7 @@ function(ri,G)
             # We found something:
             Info(InfoRecog,2,"LieTypeNonConstr: found ",r,
                  ", lookup up hints...");
-            ri!.comment := Concatenation("_",r);
+            ri!.comment := r;
             res := LookupHintForSimple(ri,G,r);
             # FIXME: LookupHintForSimple is for sporadics... So why do we use it here?
             if res = true then

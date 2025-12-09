@@ -194,7 +194,7 @@ InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
                 SetIsRecogInfoForSimpleGroup(ri,hint.issimple);
             fi;
             SetIsRecogInfoForAlmostSimpleGroup(ri,true);
-            ri!.comment := Concatenation("_",hint.name);
+            ri!.comment := hint.name;
             return true;
         od;
     fi;
@@ -357,7 +357,7 @@ RECOG.ProduceTrivialStabChainHint := function(name,reps,maxes)
       for m in [1..Length(maxes)] do
           Print("Doing maximal subgroup #",m,"\n");
           hint := rec( name := name, size := size, usemax := [m] );
-          ri := EmptyRecognitionInfoRecord(rec(),g,true);
+          ri := RecogNode(rec(),g,true);
           t := Runtime();
           res := DoHintedStabChain(ri,g,hint);
           t := Runtime() - t;
@@ -683,7 +683,7 @@ RECOG.simplesocle := function(ri,g)
     comm3:=Comm(comm2,comm2^y);
   until not ri!.isone(comm3);
 
-  gensH:=FastNormalClosure(GeneratorsOfGroup(g),[comm3],20);
+  gensH:=FastNormalClosure(g,[comm3],20);
 
   return gensH;
 end;
@@ -976,7 +976,7 @@ function(ri,G)
               SetHomom(ri,hom);
               Setmethodsforimage(ri,FindHomDbPerm);
 
-              ri!.comment := "_FDPM";
+              ri!.comment := "FDPM";
               return Success;
           fi;
       fi;
@@ -1024,7 +1024,7 @@ function(ri,G)
 #           ForgetMemory(r[3][1]);
 #           SetFilterObj(ri,IsLeaf);
 #           SetIsRecogInfoForSimpleGroup(ri,true);
-#           ri!.comment := "_Alt";
+#           ri!.comment := "Alt";
 #           return Success;
 #       else   # r[1] = "Sn"
 #           Info(InfoRecog,2,"Found Sym(",deg,")!");
@@ -1037,7 +1037,7 @@ function(ri,G)
 #           ForgetMemory(r[3][1]);
 #           SetFilterObj(ri,IsLeaf);
 #           SetIsRecogInfoForAlmostSimpleGroup(ri,true);
-#           ri!.comment := "_Sym";
+#           ri!.comment := "Sym";
 #           return Success;
 #       fi;
 #   od;
@@ -1354,7 +1354,7 @@ function(ri,G)
           Info(InfoRecog,2,"Ruled out all sporadic groups.");
           return NeverApplicable;
       elif i <= Length(gens) then
-          r.order := ri!.order(r.el);
+          r.order := OrderFunc(ri)(r.el);
       else
           GetElmOrd(ri,r);
       fi;

@@ -57,7 +57,7 @@ function(ri, G)
       Setslptonice( ri, StraightLineProgramNC([[[1,0]]],
                                               Length(GeneratorsOfGroup(G))));
       SetFilterObj(ri,IsLeaf);
-      ri!.comment := "_BlocksDim=1";
+      ri!.comment := "BlocksDim=1";
       return Success;
   fi;
 
@@ -303,7 +303,7 @@ AddMethod(FindHomDbProjective, FindHomMethodsGeneric.TrivialGroup, 3000);
 
 AddMethod(FindHomDbProjective, FindHomMethodsProjective.ProjDeterminant, 1300);
 
-AddMethod(FindHomDbPerm, FindHomMethodsGeneric.FewGensAbelian, 1250);
+AddMethod(FindHomDbProjective, FindHomMethodsGeneric.FewGensAbelian, 1250);
 
 # Note that we *can* in fact use the Matrix method here, because it
 # will do the right thing when used in projective mode:

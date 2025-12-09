@@ -308,13 +308,13 @@ SolveLeafDP := function(ri,rifac,name)
  econj := List([1..Size(e)],i->GroupHomomorphismByFunction(Grp(ri),Grp(ri),g->g^e[i]));
 
  gens := List([1..3],i->FindPoint(Grp(ri),phi,1,I));
- H1 := SubgroupNC(Grp(ri),FastNormalClosure(GeneratorsOfGroup(Grp(ri)),gens,1));
+ H1 := SubgroupNC(Grp(ri),FastNormalClosure(Grp(ri),gens,1));
  H1toblk := phi*projs[1];
  H1toblk!.Source := H1;
  blk := GroupWithGenerators(List(GeneratorsOfGroup(H1),x->ImageElm(H1toblk,x)));
 
  riH1 := rec();
- Objectify(RecognitionInfoType,riH1);;
+ Objectify(RecogNodeType,riH1);;
 
  SetGrp(riH1,H1);
  blkdata := RecogniseLeaf(riH1,blk,name);;

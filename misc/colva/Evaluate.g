@@ -49,7 +49,7 @@ end;
 
 # lri := []; rri := [];
 # lri[1] := rec();
-# Objectify(RecognitionInfoType,lri[1]);;
+# Objectify(RecogNodeType,lri[1]);;
 
 # SetGrp(lri[1],Grp(ri));
 
@@ -125,7 +125,7 @@ end;
 #     b := Basis(B,VV);
 #     VPc := ElementaryAbelianGroup(p^Length(b));
 #     rri[count] := rec();
-#     Objectify(RecognitionInfoType,rri[count]);;
+#     Objectify(RecogNodeType,rri[count]);;
 #     SetGrp(rri[count],VPc);
 # Solve the rewriting problem with these gens
 #     P := Pcgs(VPc);
@@ -186,7 +186,7 @@ InstallGlobalFunction( NormalTree,
 
     # Set up the record and the group object:
     ri := ShallowCopy(knowledge);
-    Objectify( RecognitionInfoType, ri );;
+    Objectify( RecogNodeType, ri );;
     ri!.depth := depth;
     ri!.nrgensH := Length(GeneratorsOfGroup(H));
     Setovergroup(ri,nsm!.Group);

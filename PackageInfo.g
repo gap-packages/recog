@@ -18,8 +18,8 @@ SetPackageInfo( rec(
 
 PackageName := "recog",
 Subtitle := "A package for constructive recognition of permutation and matrix groups",
-Version := "1.3.2dev",
-Date := "09/07/2019", # dd/mm/yyyy format
+Version := "1.4.4dev",
+Date := "22/01/2025", # dd/mm/yyyy format
 License := "GPL-3.0-or-later",
 
 ##  Information about authors and maintainers.
@@ -45,7 +45,7 @@ Persons := [
     Email         := "bernhardt@mathb.rwth-aachen.de",
     Place         := "Aachen",
     Institution   := "RWTH Aachen University",
-    WWWHome       := "https://www.mathb.rwth-aachen.de/cms/MATHB/Der-Lehrstuhl/Team/Wissenschaftliche-Beschaeftigte/~rnsg/Dominik-Bernhardt/lidx/1/"
+    #WWWHome       := "https://www.mathb.rwth-aachen.de/cms/MATHB/Der-Lehrstuhl/Team/Wissenschaftliche-Beschaeftigte/~rnsg/Dominik-Bernhardt/lidx/1/"
   ),
   rec(
     LastName      := "Ankaralioglu",
@@ -172,10 +172,11 @@ rec(
     FirstNames    := "Max",
     IsAuthor      := false,
     IsMaintainer  := true,
-    Email         := "horn@mathematik.uni-kl.de",
+    Email         := "mhorn@rptu.de",
     WWWHome       := "https://www.quendi.de/math",
+    GitHubUsername := "fingolfin",
     Place         := "Kaiserslautern",
-    Institution   := "TU Kaiserslautern"
+    Institution   := "RPTU Kaiserslautern-Landau"
   ),
  rec(
     LastName      := "Siccha",
@@ -183,7 +184,7 @@ rec(
     IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "sergio@mathb.rwth-aachen.de",
-    WWWHome       := "https://www.mathematik.rwth-aachen.de/go/id/bkbg/gguid/0x28CF75713F0B7744BEF1377FB3F6748E/ikz/11/allou/1/lidx/1/",
+    #WWWHome       := "https://www.mathematik.rwth-aachen.de/go/id/bkbg/gguid/0x28CF75713F0B7744BEF1377FB3F6748E/ikz/11/allou/1/lidx/1/",
     Place         := "Aachen",
     Institution   := "RWTH Aachen University"
   ), 
@@ -258,7 +259,7 @@ AbstractHTML := """
 PackageDoc := rec(
   BookName  := "recog",
   ArchiveURLSubset := ["doc"],
-  HTMLStart := "doc/chap0.html",
+  HTMLStart := "doc/chap0_mj.html",
   PDFFile   := "doc/manual.pdf",
   SixFile   := "doc/manual.six",
   LongTitle := "A collection of group recognition methods",
@@ -278,7 +279,7 @@ Dependencies := rec(
 ),
 
 AvailabilityTest := ReturnTrue,
-TestFile := "tst/testall.g",
+TestFile := "tst/testquick.g",
 
 Keywords := ["group recognition", "matrix group recognition",
 "permutation group", "black box group", "composition tree",
@@ -288,6 +289,7 @@ AutoDoc := rec(
     TitlePage := rec(
         Copyright := Concatenation(
                     "&copyright; 2005-2014 by Max Neunhöffer and Ákos Seress<P/>\n",
+                    "&copyright; 2005-2022 by its authors, see file <F>COPYRIGHT</F> for details.<P/>\n",
                     "\n",
                     "This package may be distributed under the terms and conditions of the\n",
                     "GNU Public License Version 3 or (at your option) any later version.\n"
