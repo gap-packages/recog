@@ -98,20 +98,21 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
         # involution
         t,
         # integers, controlling the number of iterations
-        M, B, T, C, logInt2N, K,
+        M, B, T, C, logInt2N, K, L,
         # list of random elements for heuristic three cycle test
         R,
         # list of involution candidates
         involutions,
         # counters
-        nrTriedConjugates, nrThreeCycleCandidates,
+        nrTriedConjugates, nrCommutatingConjugates, nrThreeCycleCandidates,
         # counters
-        Ki, curInvolutionPos,
+        Ki, Li, curInvolutionPos,
         # helper functions
         tryThreeCycleCandidate, oneThreeCycleCandidate,
         # used for debugging
         cache;
     # Step 1: Initialization
+    #########################################################################
     M := constants.M;
     B := constants.B;
     T := constants.T;
@@ -132,6 +133,9 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
     nrTriedConjugates := [];
     # counts the size of the set Gamma_i in step 4 for the current involution
     # t_i
+    nrCommutatingConjugates := [];
+    # counts the actual number of three cycle candidates considered
+    # which are filtered from the Gamma_i via heuristic order tests.
     nrThreeCycleCandidates := [];
 
     # Used for Debugging
@@ -143,6 +147,7 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
         Add(cache.iteratorsLocalVars, rec(
             involutions := involutions,
             nrTriedConjugates := nrTriedConjugates,
+            nrCommutatingConjugates := nrCommutatingConjugates,
             nrThreeCycleCandidates := nrThreeCycleCandidates
         ));
     fi;
@@ -164,6 +169,7 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
             candidate;
 
         # Steps 2 & 3: New involution
+        #########################################################################
         if curInvolutionPos > Length(involutions) then
             r := RandomElm(ri, "SnAnUnknownDegree", true)!.el;
             # In the paper, we have t = r ^ M.
@@ -184,6 +190,7 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
             fi;
             involutions[curInvolutionPos] := tPowerOld;
             nrTriedConjugates[curInvolutionPos] := 0;
+            nrCommutatingConjugates[curInvolutionPos] := 0;
             nrThreeCycleCandidates[curInvolutionPos] := 0;
         fi;
         # Check if we either tried enough conjugates or constructed enough
@@ -191,11 +198,11 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
         # If this is the case, we need to construct the next involution,
         # or we have exhausted all attempts
         if curInvolutionPos = B
-            and (nrTriedConjugates[B] >= C or nrThreeCycleCandidates[B] >= T)
+            and (nrTriedConjugates[B] >= C or nrCommutatingConjugates[B] >= T)
         then
             return TemporaryFailure;
         fi;
-        if nrThreeCycleCandidates[curInvolutionPos] >= T then
+        if nrCommutatingConjugates[curInvolutionPos] >= T then
             curInvolutionPos := curInvolutionPos + 1;
             return SnAnRepeatImmediately;
         fi;
@@ -211,6 +218,7 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
             fi;
         fi;
         # Steps 4 & 5: new three cycle candidate
+        #########################################################################
         # Try to construct a three cycle candidate via a conjugate of t. See
         # the comment above this function.
         t := involutions[curInvolutionPos];
@@ -220,12 +228,13 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
             # we have to call tryThreeCycleCandidate again
             return SnAnRepeatImmediately;
         fi;
+        nrCommutatingConjugates[curInvolutionPos] := nrCommutatingConjugates[curInvolutionPos] + 1;
         candidate := (t * c) ^ 2;
         # We now use a one-sided heuristic to test whether candidate can be a
         # three cycle, that is the heuristic can detect whether candidate can
         # not be a three cycle, e.g. if it does not have order three.
-        nrThreeCycleCandidates[curInvolutionPos] := nrThreeCycleCandidates[curInvolutionPos] + 1;
         if RECOG.HeuristicThreeCycleTest(ri, candidate, logInt2N, R) then
+            nrThreeCycleCandidates[curInvolutionPos] := nrThreeCycleCandidates[curInvolutionPos] + 1;
             return candidate;
         else
             return SnAnRepeatImmediately;
