@@ -33,4 +33,5 @@ Here we collect the changes in `SnAnUnknownDegree` compared to the "vanilla" imp
   - If this failed (i.e., for all `B` involutions all `K` random conjugates failed), we proceed in a linear manner:
   - We consider each involution in turn, and for each compute `K` new random conjugate.
 - Use `RecogniseSnAnLazy` that caches iterators constructed by `ThreeCycleCandidatesIterator` and returns `TemporaryFailure` more quickly.
+Here we work in batches of at most `L` involutions and batches of at most `K` conjugates per involution.
 - Use Conder's Thesis to compute images for degree `n <= 10`.

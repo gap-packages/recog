@@ -53,7 +53,9 @@ RECOG.ThreeCycleCandidatesConstants := function(eps, N)
         B := Int(Ceil(13 * Log(Float(N)) * Log(3 / Float(eps)))),
         T := Int(Ceil(3 * Log(3 / Float(eps)))),
         C := Int(Ceil(Float(3 * N * ~.T / 5))),
-        logInt2N := LogInt(N, 2)
+        logInt2N := LogInt(N, 2),
+        K := 5, # this is an arbitrary number, max number for batch of conjugates per involution
+        L := 10, # this is an arbitrary number, max number for batch of involutions
     );
 end;
 
@@ -79,7 +81,7 @@ RECOG.HeuristicThreeCycleTest := function(ri, c, logInt2N, R)
 end;
 
 # ri : recognition node with group G
-# constants : a record with components M, B, T, C, and logInt2N
+# constants : a record with components M, B, T, C, K, L, and logInt2N
 #
 # The following algorithm constructs a set of possible 3-cycles. It is based
 # on the simple observation that the product of two involutions t1, t2, which
@@ -88,7 +90,8 @@ end;
 # Creates and returns a function, here called oneThreeCycleCandidate. The
 # function oneThreeCycleCandidate returns one of the following:
 # - a three cycle candidate, i.e. an element of G
-# - SnAnTryLater, if we tried all involution candidates K times
+# - SnAnTryLater, if we tried a batch of at most L involutions,
+#                 and for each of these we tried K conjugates
 # - TemporaryFailure, if we exhausted all attempts
 # - NeverApplicable, if we found out that G can't be an Sn or An
 #
@@ -98,7 +101,9 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
         # involution
         t,
         # integers, controlling the number of iterations
-        M, B, T, C, logInt2N, K, L,
+        M, B, T, C, logInt2N,
+        # integers, making the algorithm give up quicker during iterations
+        K, L,
         # list of random elements for heuristic three cycle test
         R,
         # list of involution candidates
@@ -118,7 +123,8 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
     T := constants.T;
     C := constants.C;
     logInt2N := constants.logInt2N;
-    K := 5;
+    K := constants.K;
+    L := constants.L;
     # list containing the constructed involutions t_i in steps 2 & 3
     involutions := EmptyPlist(B);
 
@@ -127,9 +133,9 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
     # Counters
     curInvolutionPos := 1;
     Ki := Minimum(K, C);
+    Li := Minimum(L, B);
     # Counts the elements c in step 4 that we use to conjugate the current
-    # involution t_i.  We initialize nrTriedConjugates to C such that "steps 2
-    # & 3" in tryThreeCycleCandidate immediately construct an involution.
+    # involution t_i.
     nrTriedConjugates := [];
     # counts the size of the set Gamma_i in step 4 for the current involution
     # t_i
@@ -170,6 +176,11 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
 
         # Steps 2 & 3: New involution
         #########################################################################
+        # We consider at most B involutions.
+        if curInvolutionPos > B then
+            curInvolutionPos := 1;
+        fi;
+        # We did not construct yet the involution to consider
         if curInvolutionPos > Length(involutions) then
             r := RandomElm(ri, "SnAnUnknownDegree", true)!.el;
             # In the paper, we have t = r ^ M.
@@ -193,30 +204,39 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
             nrCommutatingConjugates[curInvolutionPos] := 0;
             nrThreeCycleCandidates[curInvolutionPos] := 0;
         fi;
-        # Check if we either tried enough conjugates or constructed enough
-        # three cycle candidates for the current involution t.
-        # If this is the case, we need to construct the next involution,
-        # or we have exhausted all attempts
+        # Check if we either tried enough conjugates or already found enough
+        # commutating conjugates for all involutions t.
+        # If this is the case, then we have exhausted all attempts.
         if curInvolutionPos = B
-            and (nrTriedConjugates[B] >= C or nrCommutatingConjugates[B] >= T)
+            and ForAll([1 .. B], i -> nrTriedConjugates[i] >= C or nrCommutatingConjugates[i] >= T)
         then
             return TemporaryFailure;
         fi;
-        if nrCommutatingConjugates[curInvolutionPos] >= T then
-            curInvolutionPos := curInvolutionPos + 1;
-            return SnAnRepeatImmediately;
-        fi;
-        if nrTriedConjugates[curInvolutionPos] >= Ki then
+        # If we either considered enough conjugates or already found enough
+        # commutating conjugates for the current involution t,
+        # we need to consider the next involution, or reached the end of our batch of involutions.
+        # Recall, that we work in batches for the lazy version.
+        # We work in batches of at most L involutions and for these,
+        # in batches of K conjugates.
+        if nrTriedConjugates[curInvolutionPos] >= Ki or nrCommutatingConjugates[curInvolutionPos] >= T then
             if curInvolutionPos = B then
+                Li := L;
+                Li := Minimum(Li, B);
                 Ki := Ki + K;
                 Ki := Minimum(Ki, C);
                 curInvolutionPos := 1;
+                return SnAnTryLater;
+            elif curInvolutionPos = Li then
+                Li := Li + L;
+                Li := Minimum(Li, B);
+                curInvolutionPos := curInvolutionPos + 1;
                 return SnAnTryLater;
             else
                 curInvolutionPos := curInvolutionPos + 1;
                 return SnAnRepeatImmediately;
             fi;
         fi;
+
         # Steps 4 & 5: new three cycle candidate
         #########################################################################
         # Try to construct a three cycle candidate via a conjugate of t. See
@@ -978,8 +998,8 @@ end;
 # - NeverApplicable, if we found out that G can't be an Sn or An
 RECOG.RecogniseSnAnSingleIteration := function(ri, T, N)
     local cache, iterators, iterator, c, tmp, recogData;
-    cache := RECOG.SnAnGetCache(ri);
     RECOG.SnAnCacheIterators(ri, T, N);
+    cache := RECOG.SnAnGetCache(ri);
     iterators := cache.iterators;
     # each iterator succeeds with probability at least 1/2,
     # if we exhaust all attempts
@@ -1251,7 +1271,8 @@ RECOG.SnAnCacheUpperBoundForDegree := function(ri)
     if not IsInt(N) then
         return;
     fi;
-    # This is usually much smaller than RECOG.SnAnUpperBoundForDegree
+    # This is usually much smaller than RECOG.SnAnUpperBoundForDegree.
+    # The number to compare N with was chosen arbitrarily as a "large" degree.
     if N > 20 then
         degreeData := RECOG.GuessSnAnDegree(ri);
         if degreeData = fail then
@@ -1268,9 +1289,9 @@ end;
 # In order to achieve this, we cache some important values for further
 # computations. It is the main function of SnAnUnknownDegree.
 RECOG.RecogniseSnAnLazy := function(ri)
-    local cache, N, tmp;
-    cache := RECOG.SnAnGetCache(ri);
+    local a, cache, N, tmp;
     RECOG.SnAnCacheUpperBoundForDegree(ri);
+    cache := RECOG.SnAnGetCache(ri);
     N := cache.N;
     if N = TemporaryFailure then
         RECOG.SnAnResetCache(ri);
