@@ -137,7 +137,7 @@ GenerateMethodsListXML := function(shortname, db)
         dbsWhichUseMethod := DbsWhichUseMethod(db, meth);
         nrDbsWhichUseMethod := Length(dbsWhichUseMethod);
         if nrDbsWhichUseMethod = 0 then
-            AppendTo(xmlfile, "unused!");
+            AppendTo(xmlfile, "not used in the default setting!");
         else
             s := "used for recognizing ";
             Append(s, JoinStringsWithSeparator(dbsWhichUseMethod{[1 .. nrDbsWhichUseMethod - 1]},
