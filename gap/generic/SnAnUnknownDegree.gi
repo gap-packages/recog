@@ -1204,7 +1204,7 @@ RECOG.SnAnUpperBoundForDegree := function(ri)
     # N = upper bound for degree
     # Check magma
     if IsPermGroup(G) then
-        # We assume that G is primitive and not a giant.
+        # We assume that G is primitive and not a giant in natural representation.
         # The smallest non-natural primitive action of Sn or An induces
         # a large base group. Thus by [L84] its degree is smallest, when the
         # action is on 2-subsets. Thus its degree is at least n * (n-1) / 2.
@@ -1273,15 +1273,15 @@ RECOG.SnAnCacheUpperBoundForDegree := function(ri)
     fi;
     # This is usually much smaller than RECOG.SnAnUpperBoundForDegree.
     # The number to compare N with was chosen arbitrarily as a "large" degree.
-    if N > 20 then
-        degreeData := RECOG.GuessSnAnDegree(ri);
-        if degreeData = fail then
-            cache.N := TemporaryFailure;
-            return;
-        fi;
-        N := Minimum(N, degreeData.degree);
-        cache.N := N;
-    fi;
+    # if N > 20 then
+    #     degreeData := RECOG.GuessSnAnDegree(ri);
+    #     if degreeData = fail then
+    #         cache.N := TemporaryFailure;
+    #         return;
+    #     fi;
+    #     N := Minimum(N, degreeData.degree);
+    #     cache.N := N;
+    # fi;
 end;
 
 # See RECOG.RecogniseSnAn. The difference is, that we give up at an earlier
