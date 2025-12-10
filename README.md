@@ -34,12 +34,12 @@ To enable GAP to find recog you can start GAP via
 
 > [!IMPORTANT]
 > Note that `--packagedirs` was introduced in GAP 4.15. For older version please
-> refere to this [site](https://docs.gap-system.org/doc/ref/chap76.html) for
-> alternative solutions.
+> refer to [Chapter 76 of the GAP reference manual](https://docs.gap-system.org/doc/ref/chap76.html)
+> for alternative solutions.
 
 > [!TIP]
 > You can add this option to your GAP startup script. More information about
-> this can be found [here](https://docs.gap-system.org/doc/ref/chap3.html).
+> this can be found [in Chapter 3 of the GAP reference manual](https://docs.gap-system.org/doc/ref/chap3.html).
 
 ## Loading
 
@@ -49,8 +49,9 @@ You can load recog via
 
 ## Documentation
 
-The documentation can be found
-[here](https://gap-packages.github.io/recog/doc/chap0_mj.html).
+The [recog documentation](https://gap-packages.github.io/recog/doc/chap0_mj.html)
+describes how to use recog, how it works and how to extend it.
+
 Recompiling the documentation locally is possible by the command `gap makedoc.g`
 in the `recog` directory.
 
