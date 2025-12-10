@@ -24,6 +24,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: gap-actions/setup-gap@v3
+      - run: |
+          cd $GAPROOT/pkg
+          ../bin/BuildPackages.sh --strict cvec io orb
       - uses: gap-actions/build-pkg-docs@v2
         with:
           use-latex: 'true'
