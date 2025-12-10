@@ -86,8 +86,10 @@ end);
 
 InstallGlobalFunction(CallRecogMethod,
 function(m, args)
+    local f;
     if not IsRecogMethod(m) then
         ErrorNoReturn("<m> must be a RecogMethod, but is ", m);
     fi;
-    return CallFuncList(UnpackRecogMethod(m), args);
+    f := UnpackRecogMethod(m);
+    return f(ri)
 end);
