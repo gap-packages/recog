@@ -2476,8 +2476,9 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsMatrix, "NaturalSL",
 "TODO",
-function(ri,G)
-  local data,e,genlist,grpmem,i,j,n,p,q,r,il;
+function(ri)
+  local G, data,e,genlist,grpmem,i,j,n,p,q,r,il;
+  G := Grp(ri);
 
     if not IsMatrixGroup(G) then
         return NeverApplicable;

@@ -82,10 +82,10 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsMatrix, "GoProjective",
 "divide out scalars and recognise projectively",
-function(ri,G)
+function(ri)
   local hom,q;
   Info(InfoRecog,2,"Going projective...");
-  hom := IdentityMapping(G);
+  hom := IdentityMapping(Grp(ri));
   SetHomom(ri,hom);
   # Now give hints downward:
   Setmethodsforimage(ri,FindHomDbProjective);
@@ -111,8 +111,9 @@ end);
 #! @EndChunk
 BindRecogMethod(FindHomMethodsMatrix, "KnownStabilizerChain",
 "use an already known stabilizer chain for this group",
-function(ri,G)
-  local S,hom;
+function(ri)
+  local S,hom,G;
+  G := Grp(ri);
   if HasStoredStabilizerChain(G) then
       Info(InfoRecog,2,"Already know stabilizer chain, using 1st orbit.");
       S := StoredStabilizerChain(G);

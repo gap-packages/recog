@@ -78,9 +78,9 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsGeneric, "KnownNilpotent",
 "method for nilpotent groups which are not p-groups",
-function(ri,G)
+function(ri)
   local H,cut,data,gens,decompositionData,gensfac,gensker,gensm,hom,ords,primes;
-  gens := GeneratorsOfGroup(G);
+  gens := GeneratorsOfGroup(Grp(ri));
   gensm := GeneratorsWithMemory(gens);
   if IsBound(ri!.primes) then    # this is a message from ourselves from above!
       primes := ri!.primes;
@@ -101,7 +101,7 @@ function(ri,G)
   gensker := List(decompositionData,x -> x[1]);
   ri!.decompositionExponents := List(decompositionData, x -> x[3]);
   H := GroupWithGenerators(gensfac);
-  hom := GroupHomByFuncWithData(G,H,RECOG.HomForNilpotent,data);
+  hom := GroupHomByFuncWithData(Grp(ri),H,RECOG.HomForNilpotent,data);
   SetHomom(ri,hom);
   InitialDataForImageRecogNode(ri).primes := primes{[1..cut]};
   InitialDataForKernelRecogNode(ri).primes := primes{[cut+1..Length(primes)]};

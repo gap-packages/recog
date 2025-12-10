@@ -184,7 +184,7 @@ end;
 #
 BindRecogMethod(FindHomMethodsClassical, "IsGenericParameters",
 "tests whether group has generic parameters",
-function( recognise, grp )
+function(recognise)
     local fact, d, q, hint;
 
     hint := recognise.hint;
@@ -258,7 +258,7 @@ end);
 # more random elements.
 BindRecogMethod(FindHomMethodsClassical, "IsGeneric",
 "tests whether group is generic",
-function (recognise, grp)
+function(recognise)
     if recognise.isGeneric = false then
         return NeverApplicable;
     fi;
@@ -285,7 +285,7 @@ end);
 
 BindRecogMethod(FindHomMethodsClassical, "RuledOutExtField",
 "tests whether extension field case is ruled out",
-function (recognise, grp)
+function(recognise)
     local differmodfour, d, q, E, b, bx, hint;
 
     hint := recognise.hint;
@@ -405,7 +405,7 @@ end);
 #
 BindRecogMethod(FindHomMethodsClassical, "IsNotAlternating",
 "tests whether alternating groups are ruled out",
-function( recognise, grp )
+function(recognise)
     local V, P, i, g ,q, o;
 
     q := recognise.q;
@@ -429,7 +429,7 @@ function( recognise, grp )
     fi;
 
     if q = 2 then
-       if Size(grp) <> 2520 then  # 2520 = 3*4*5*6*7 = |A7|
+       if Size(recognise.grp) <> 2520 then  # 2520 = 3*4*5*6*7 = |A7|
            Info( InfoClassical, 2, "G is not an alternating group" );
            recognise.isNotAlternating := true;
            return NeverApplicable;
@@ -462,7 +462,7 @@ end);
 
 BindRecogMethod(FindHomMethodsClassical, "IsNotMathieu",
 "tests whether Mathieu groups are ruled out",
-function( recognise, grp )
+function(recognise)
    local i, fn, g, d, q, E, ord;
 
    d := recognise.d;
@@ -535,7 +535,7 @@ end);
 
 BindRecogMethod(FindHomMethodsClassical, "IsNotPSL",
 "tests whether PSL groups are ruled out",
-function (recognise, grp)
+function(recognise)
    local i, E, LE, d, p, a, q,  str, fn, ord;
 
     E := recognise.E;
@@ -688,11 +688,11 @@ end;
 # generate the next random element and its char polynomial
 BindRecogMethod(FindHomMethodsClassical, "TestRandomElement",
 "makes new random element and stores it and its char poly",
-function(recognise, grp)
+function(recognise)
     local g, ppd, bppd, d, q, cpol, f, deg, facs, r, s, h, gmod,
     ord, bc, phi, kf, o1, o2, cf, i, found, p;
 
-    recognise.g := PseudoRandom(grp);
+    recognise.g := PseudoRandom(recognise.grp);
     recognise.cpol := CharacteristicPolynomial(recognise.g);
     recognise.n := recognise.n + 1;
 
@@ -910,7 +910,7 @@ end);
 # the Meataxe. This function is described in [CLG97b].
 BindRecogMethod(FindHomMethodsClassical, "IsReducible",
 "tests whether current random element rules out reducible",
-function( recognise, grp )
+function(recognise)
     local deg, dims, g;
 
     # compute the degrees of the irreducible factors
@@ -940,9 +940,9 @@ end);
 
 BindRecogMethod(FindHomMethodsClassical, "NoClassicalForms",
 "tests whether we can rule out certain forms",
-function( recognise, grp )
+function(recognise)
     local d,field;
-    PossibleClassicalForms( grp, recognise.g, recognise );
+    PossibleClassicalForms( recognise.grp, recognise.g, recognise );
 
     d := recognise.d;
     field := recognise.field;
@@ -963,7 +963,7 @@ end);
 
 BindRecogMethod(FindHomMethodsClassical, "ClassicalForms",
 "Find the invariant forms",
-function( recognise, grp)
+function(recognise)
     local   field,  z,  d,  i,  qq,  A,  c,  I,  t,  i0,
             a,  l,  g,  module,  forms,  dmodule,  fmodule,  form;
 
@@ -1003,7 +1003,7 @@ function( recognise, grp)
 
     # now try to find an invariant form
     if recognise.maybeDual then
-        dmodule := ClassicalForms_GeneratorsWithoutScalarsDual(grp);
+        dmodule := ClassicalForms_GeneratorsWithoutScalarsDual(recognise.grp);
         if dmodule <> false then
             form := ClassicalForms_InvariantFormDual(module,dmodule);
             if form <> false  then
@@ -1021,7 +1021,7 @@ function( recognise, grp)
     fi;
 
     if recognise.maybeFrobenius then
-        fmodule := ClassicalForms_GeneratorsWithoutScalarsFrobenius(grp);
+        fmodule := ClassicalForms_GeneratorsWithoutScalarsFrobenius(recognise.grp);
         if fmodule <> false then
             form := ClassicalForms_InvariantFormFrobenius(module,fmodule);
             if form <> false  then
@@ -1051,7 +1051,7 @@ end);
 
 BindRecogMethod(FindHomMethodsClassical, "MeatAxe",
 "Test irreducibility",
-function( recognise, grp )
+function(recognise)
     if recognise.n > 15 then
         recognise.needMeataxe := true;
     fi;
@@ -1079,7 +1079,7 @@ end);
 ## Main function to test whether group contains SL
 BindRecogMethod(FindHomMethodsClassical, "IsSLContained",
 "tests whether group contains SL",
-function( recognise, grp )
+function(recognise)
     if recognise.isGeneric <> true or
        recognise.isNotExt <> true or
        recognise.isNotPSL <> true  or
@@ -1122,7 +1122,7 @@ end);
 ## Main function to test whether group contains Sp
 BindRecogMethod(FindHomMethodsClassical, "IsSpContained",
 "tests whether group contains Sp",
-function( recognise, grp )
+function(recognise)
     local isSpForm;
 
     isSpForm := f -> IsSesquilinearForm(f) and IsSymplecticForm(f);
@@ -1180,7 +1180,7 @@ end);
 ## Main function to test whether group contains SU
 BindRecogMethod(FindHomMethodsClassical, "IsSUContained",
 "tests whether group contains SU",
-function( recognise, grp )
+function(recognise)
     local f, isHermForm, q0;
 
     isHermForm := f -> IsSesquilinearForm(f) and IsHermitianForm(f);
@@ -1244,7 +1244,7 @@ end);
 ## Main function to test whether group contains SO
 BindRecogMethod(FindHomMethodsClassical, "isOmegaContained",
 "tests whether group contains SO",
-function( recognise, grp )
+function(recognise)
     local f, isParForm, isEllForm, isHypForm;
 
     isParForm := f -> IsSesquilinearForm(f) and IsParabolicForm(f);
@@ -1356,7 +1356,7 @@ end;
 
 ############################################################################/
 ##
-##  NonGenericLinear (recognise, grp)  . . . . . . . non-generic linear case
+##  NonGenericLinear
 ##
 ##  Recognise non-generic linear matrix groups over finite fields:
 ##  In order to prove that a group G <= GL( 3, 2^s-1) contains SL, we need to
@@ -1365,7 +1365,7 @@ end;
 ##
 BindRecogMethod(FindHomMethodsClassical, "NonGenericLinear",
 "tests whether group is non-generic Linear",
-function( recognise, grp )
+function(recognise)
     local CheckFlag;
 
     # We know that grp has non-generic parameters. Do we know whether the other
@@ -1431,7 +1431,7 @@ end);
 ##
 BindRecogMethod(FindHomMethodsClassical, "NonGenericSymplectic",
 "tests whether group is non-generic Symplectic",
-function(recognise, grp)
+function(recognise)
     local d, q, CheckFlag, isSpForm;
 
     isSpForm := f -> IsSesquilinearForm(f) and IsSymplecticForm(f);
@@ -1502,7 +1502,7 @@ function(recognise, grp)
             return TemporaryFailure;
         fi;
     elif d = 4 and q = 2 then
-        if Size(grp) mod 720 <> 0 then
+        if Size(recognise.grp) mod 720 <> 0 then
             Info(InfoClassical,2,"group does not contain Sp(",
                  recognise.d, ", ", recognise.q, ");");
            recognise.isSpContained := false;
@@ -1551,8 +1551,9 @@ end);
 ##
 BindRecogMethod(FindHomMethodsClassical, "NonGenericUnitary",
 "tests whether group is non-generic Unitary",
-function(recognise, grp)
-    local d, q,  g, f1, f2, o, CheckFlag, isHermForm, order;
+function(recognise)
+    local grp, d, q,  g, f1, f2, o, CheckFlag, isHermForm, order;
+    grp := recognise.grp;
 
     isHermForm := f -> IsSesquilinearForm(f) and IsHermitianForm(f);
 
@@ -1774,8 +1775,9 @@ end);
 
 BindRecogMethod(FindHomMethodsClassical, "NonGenericOrthogonalPlus",
 "tests whether group is non-generic O+",
-function(recognise,grp)
-    local d, q, gp1, gp2, CheckFlag, pgrp, sc, isHypForm, ol;
+function(recognise)
+    local grp, d, q, gp1, gp2, CheckFlag, pgrp, sc, isHypForm, ol;
+    grp := recognise.grp;
 
     isHypForm := f -> IsSesquilinearForm(f) and IsHyperbolicForm(f);
 
@@ -2051,9 +2053,9 @@ end);
 
 BindRecogMethod(FindHomMethodsClassical, "NonGenericOrthogonalMinus",
 "tests whether group is non-generic O-",
-function(recognise, grp)
-    local d, q,  pgrp, h,  g, ppd,  CheckFlag, isEllForm;
-
+function(recognise)
+    local grp, d, q,  pgrp, h,  g, ppd,  CheckFlag, isEllForm;
+    grp := recognise.grp;
 
     isEllForm := f -> IsSesquilinearForm(f) and IsEllipticForm(f);
 
@@ -2159,7 +2161,7 @@ end);
 
 BindRecogMethod(FindHomMethodsClassical, "NonGenericOrthogonalCircle",
 "tests whether group is non-generic Oo",
-function( recognise, grp )
+function(recognise)
     local d, q, g, s, CheckFlag, isParForm;
 
     isParForm := f -> IsSesquilinearForm(f) and IsParabolicForm(f);
@@ -2246,7 +2248,7 @@ function( recognise, grp )
                 return TemporaryFailure;
             fi;
             g := recognise.g^2;
-            if ForAny(GeneratorsOfGroup(grp), h -> not IsOne(Comm(h,g))) then
+            if ForAny(GeneratorsOfGroup(recognise.grp), h -> not IsOne(Comm(h,g))) then
                recognise.hasSpecialEle := true;
                return CheckFlag();
             fi;
@@ -2396,6 +2398,7 @@ function( grp, arg... )
 
   # init record recognition...
   recognise := rec( field :=  f,
+                   grp := grp,
                    d := DimensionOfMatrixGroup(grp),
                    p := Characteristic(f),
                    a := DegreeOverPrimeField(f),
@@ -2454,7 +2457,7 @@ function( grp, arg... )
                   );
   originalInfoLevel := InfoLevel(InfoMethSel);
   SetInfoLevel(InfoMethSel,opt.infoLevel);
-  ret := CallMethods( ClassicalMethDb, opt.nrrandels, recognise, grp );
+  ret := CallMethods( ClassicalMethDb, opt.nrrandels, recognise );
   SetInfoLevel(InfoMethSel,originalInfoLevel);
   # TODO: honor ret in some way?
 

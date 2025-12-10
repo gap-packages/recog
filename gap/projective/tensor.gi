@@ -321,9 +321,10 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "TensorDecomposable",
 "find a tensor decomposition",
-function(ri,G)
-  local H,N,conjgensG,d,f,hom,kro,r;
+function(ri)
+  local G,H,N,conjgensG,d,f,hom,kro,r;
 
+  G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"TensorDecomposable");
 
   # Here we probably want to do an order test and even a polynomial
@@ -399,11 +400,12 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "KroneckerProduct",
 "TODO",
-function(ri, G)
+function(ri)
   # We got the hint that this is a Kronecker product, let's take it apart.
   # We first recognise projectively in one tensor factor and then in the
   # other, life is easy because of projectiveness!
-  local H,data,hom,newgens;
+  local G,H,data,hom,newgens;
+  G := Grp(ri);
   newgens := List(ri!.generatorskronecker,x->x[3]);
   H := GroupWithGenerators(newgens);
   data := rec(blocksize := ri!.blocksize, field := ri!.field);
@@ -427,12 +429,13 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "KroneckerKernel",
 "TODO",
-function(ri, G)
+function(ri)
   # One up in the tree we got the hint about a Kronecker product, this
   # method is called when we have gone to one factor and now are in the
   # kernel. So we know that we are a block diagonal matrix with identical
   # diagonal blocks. All we do is to project down to one of the blocks.
-  local H,data,hom,newgens;
+  local G,H,data,hom,newgens;
+  G := Grp(ri);
   data := rec(blocksize := ri!.blocksize, field := ri!.field);
   newgens := List(GeneratorsOfGroup(G),x->RECOG.HomTensorKernel(data,x));
   H := GroupWithGenerators(newgens);

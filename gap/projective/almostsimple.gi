@@ -696,8 +696,9 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "ComputeSimpleSocle",
 "compute simple socle of almost simple group",
-function(ri,G)
-  local x;
+function(ri)
+  local G,x;
+  G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"ComputeSimpleSocle");
   ri!.simplesocle := Group(RECOG.simplesocle(ri,G));
   ri!.simplesoclepr := ProductReplacer(ri!.simplesocle);
@@ -750,8 +751,9 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "ThreeLargeElOrders",
 "recognise Lie type groups and get its characteristic",
-function(ri,G)
-  local hint,name,namecat,p,res;
+function(ri)
+  local G,hint,name,namecat,p,res;
+  G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"ThreeLargeElOrders");
   ri!.simplesoclerandp := 0;
   p := RECOG.findchar(ri,ri!.simplesocle,RECOG.RandElFuncSimpleSocle);
@@ -942,9 +944,10 @@ end;
 # subroutines are in AnSnOnFDPM.gi and also paper reference
 BindRecogMethod(FindHomMethodsProjective, "AltSymBBByDegree",
 "try BB recognition for dim+1 and/or dim+2 if sensible",
-function(ri,G)
-  local GG,Gm,RecSnAnEq,RecSnAnIsOne,d,deg,f,fact,hom,newgens,o,orders,p,primes,
+function(ri)
+  local G,GG,Gm,RecSnAnEq,RecSnAnIsOne,d,deg,f,fact,hom,newgens,o,orders,p,primes,
         r,totry;
+  G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"AltSymBBByDegree");
   d := ri!.dimension;
   orders := RandomOrdersSeen(ri);
@@ -1331,9 +1334,10 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "SporadicsByOrders",
 "generate a few random elements and compute the proj. orders",
-function(ri,G)
-  local count,gens,i,j,jj,k,killers,l,limit,o,ordersseen,pp,r,raus,res,x;
+function(ri)
+  local G,count,gens,i,j,jj,k,killers,l,limit,o,ordersseen,pp,r,raus,res,x;
 
+  G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"SporadicsByOrders");
 
   l := [1..Length(RECOG.SporadicsNames)];
@@ -1528,10 +1532,9 @@ RECOG.NameSporadicData := MakeImmutable([
 #! simple groups nor the Monster and the Baby Monster group. It is based on the
 #! Magma v2.24.10 function <C>RecognizeSporadic</C>.
 #! @EndChunk
-# TODO G is unused
 BindRecogMethod(FindHomMethodsProjective, "NameSporadic",
 "generate maximal orders",
-function(ri, G)
+function(ri)
     local orders, setOfOrders, maximalOrders, isMaximal,
         namesOfPossibleSporadics, res, i, j, data, name;
     orders := [];

@@ -138,9 +138,10 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "NotAbsolutelyIrred",
 "write over a bigger field with smaller degree",
-function(ri, G)
-  local H,hom,m,r;
+function(ri)
+  local G,H,hom,m,r;
 
+  G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"NotAbsolutelyIrred");
 
   # check whether the action is absolutely irreducibly; this information may
@@ -195,10 +196,11 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "BiggerScalarsOnly",
 "TODO",
-function(ri, G)
+function(ri)
   # We come here only hinted, we project to a little square block in the
   # upper left corner and know that there is no kernel:
-  local H, data, hom;
+  local G, H, data, hom;
+  G := Grp(ri);
   data := rec(poss := [1..ri!.degsplittingfield],
               bas  := ri!.biggerscalarsbas,
               basi := ri!.biggerscalarsbasi);
@@ -396,10 +398,11 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "Subfield",
 "write over a smaller field with same degree",
-function(ri, G)
+function(ri)
     # We assume G to be absolutely irreducible, although this is not
     # necessary:
-    local m,H,b,dim,f,hom;
+    local m,G,H,b,dim,f,hom;
+    G := Grp(ri);
     RECOG.SetPseudoRandomStamp(G,"Subfield");
 
     f := ri!.field;
@@ -456,15 +459,16 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "C3C5",
 "compute a normal subgroup of derived and resolve C3 and C5",
-function(ri, G)
+function(ri)
   # We assume that G acts absolutely irreducibly and that the matrix group
   # G cannot be realised over a smaller field. However, it might still be
   # C3 or C5. We see what we can do by computing a normal subgroup of
   # the derived subgroup...
-  local H,HH,Hgens,a,b,basis,c,cc,cgen,collf,coms,conjgensG,cyc,deg,dim,
+  local G,H,HH,Hgens,a,b,basis,c,cc,cgen,collf,coms,conjgensG,cyc,deg,dim,
         f,g,gens,gensim,hom,homcomp,homs,homsimg,i,j,kro,m,newgens,nr,o,
         pos,pr,pr2,q,r,scalar,subdim,x,poss;
 
+  G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"C3C5");
 
   f := ri!.field;
