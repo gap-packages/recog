@@ -26,16 +26,16 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsMatrix, "DiagonalMatrices",
 "check whether all generators are diagonal matrices",
-function(ri, G)
+function(ri)
   local H,d,f,gens,hom,i,isscalars,j,newgens,upperleft;
 
   d := ri!.dimension;
   if d = 1 then
       Info(InfoRecog,2,"Found dimension 1, going to Scalars method");
-      return FindHomMethodsMatrix.Scalar(ri,G);
+      return FindHomMethodsMatrix.Scalar(ri);
   fi;
 
-  gens := GeneratorsOfGroup(G);
+  gens := GeneratorsOfGroup(Grp(ri));
   if not ForAll(gens, IsDiagonalMat) then
       return NeverApplicable;
   fi;
@@ -61,13 +61,13 @@ function(ri, G)
       # Note that we cannot tell the upper levels that they should better
       # have made some more generators for the kernel!
 
-      return FindHomMethodsMatrix.BlockScalar(ri,G);
+      return FindHomMethodsMatrix.BlockScalar(ri);
   fi;
 
   # Scalar matrices, so go to dimension 1:
   newgens := List(gens,x->ExtractSubMatrix(x,[1],[1]));
   H := Group(newgens);
-  hom := GroupHomByFuncWithData(G,H,RECOG.HomToScalars,rec(poss := [1]));
+  hom := GroupHomByFuncWithData(Grp(ri),H,RECOG.HomToScalars,rec(poss := [1]));
   SetHomom(ri,hom);
   findgensNmeth(ri).method := FindKernelDoNothing;
 
@@ -128,7 +128,7 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsMatrix, "Scalar",
 "Hint TODO",
-function(ri, G)
+function(ri)
   local f,gcd,generator,gens,i,l,o,pows,q,rep,slp,subset,z;
   if ri!.dimension > 1 then
       return NotEnoughInformation;
@@ -137,10 +137,10 @@ function(ri, G)
   # FIXME: FieldOfMatrixGroup
   f := ri!.field;
   o := One(f);
-  gens := List(GeneratorsOfGroup(G),x->x[1,1]);
+  gens := List(GeneratorsOfGroup(Grp(ri)),x->x[1,1]);
   subset := Filtered([1..Length(gens)], i -> not IsOne(gens[i]));
   if subset = [] then
-      return FindHomMethodsGeneric.TrivialGroup(ri,G);
+      return FindHomMethodsGeneric.TrivialGroup(ri);
   fi;
   gens := gens{subset};
   q := Size(f);
@@ -163,7 +163,7 @@ function(ri, G)
           Add(l,rep[i]);
       fi;
   od;
-  slp := StraightLineProgramNC([[l]],Length(GeneratorsOfGroup(G)));
+  slp := StraightLineProgramNC([[l]],Length(GeneratorsOfGroup(Grp(ri))));
   Setslptonice(ri,slp);   # this sets the nice generators
   Setslpforelement(ri,SLPforElementFuncsMatrix.DiscreteLog);
   ri!.generator := z^gcd;
@@ -219,7 +219,7 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsMatrix, "BlockScalar",
 "Hint TODO",
-function(ri, G)
+function(ri)
   # We assume that ri!.blocks is a list of ranges where the non-trivial
   # scalar blocks are. Note that their length does not have to sum up to
   # the dimension, because some blocks at the end might already be trivial.
@@ -228,9 +228,9 @@ function(ri, G)
   if nrblocks <= 2 then   # the image is only one block
       # go directly to scalars in that case:
       data := rec(poss := ri!.blocks[nrblocks]);
-      newgens := List(GeneratorsOfGroup(G),x->RECOG.HomToDiagonalBlock(data,x));
+      newgens := List(GeneratorsOfGroup(Grp(ri)),x->RECOG.HomToDiagonalBlock(data,x));
       H := GroupWithGenerators(newgens);
-      hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
+      hom := GroupHomByFuncWithData(Grp(ri),H,RECOG.HomToDiagonalBlock,data);
       SetHomom(ri,hom);
       AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsMatrix.Scalar, 2000);
 
@@ -255,9 +255,9 @@ function(ri, G)
   middle := QuoInt(nrblocks,2)+1;   # the first one taken
   topblock := ri!.blocks[nrblocks];
   data := rec(poss := [ri!.blocks[middle][1]..topblock[Length(topblock)]]);
-  newgens := List(GeneratorsOfGroup(G),x->RECOG.HomToDiagonalBlock(data,x));
+  newgens := List(GeneratorsOfGroup(Grp(ri)),x->RECOG.HomToDiagonalBlock(data,x));
   H := GroupWithGenerators(newgens);
-  hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
+  hom := GroupHomByFuncWithData(Grp(ri),H,RECOG.HomToDiagonalBlock,data);
   SetHomom(ri,hom);
 
   # the image are the last few blocks:
@@ -378,11 +378,11 @@ BindRecogMethod(FindHomMethodsMatrix, "ReducibleIso",
 "use the MeatAxe to find invariant subspaces",
 # alternative comment:
 #"use MeatAxe to find a composition series, do base change",
-function(ri,G)
+function(ri)
   # First we use the MeatAxe to find an invariant subspace:
   local H,bc,compseries,f,hom,isirred,m,newgens;
 
-  RECOG.SetPseudoRandomStamp(G,"ReducibleIso");
+  RECOG.SetPseudoRandomStamp(Grp(ri),"ReducibleIso");
 
   if IsBound(ri!.isabsolutelyirred) and ri!.isabsolutelyirred then
       # this information is coming from above
@@ -409,9 +409,9 @@ function(ri,G)
        List(bc.blocks,Length)," (dim=",ri!.dimension,")");
 
   # Do the base change:
-  newgens := List(GeneratorsOfGroup(G),x->bc.base*x*bc.baseinv);
+  newgens := List(GeneratorsOfGroup(Grp(ri)),x->bc.base*x*bc.baseinv);
   H := GroupWithGenerators(newgens);
-  hom := GroupHomByFuncWithData(G,H,RECOG.HomDoBaseChange,
+  hom := GroupHomByFuncWithData(Grp(ri),H,RECOG.HomDoBaseChange,
                                 rec(t := bc.base,ti := bc.baseinv));
 
   # Now report back:
@@ -481,17 +481,17 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsMatrix, "BlockLowerTriangular",
 "for a group generated by block lower triangular matrices",
-function(ri,G)
+function(ri)
   # This is only used coming from a hint, we know what to do:
   # A base change was done to get block lower triangular shape.
   # We first do the diagonal blocks, then the lower p-part:
   local H,data,hom,newgens;
   data := rec( blocks := ri!.blocks );
-  newgens := List(GeneratorsOfGroup(G),
+  newgens := List(GeneratorsOfGroup(Grp(ri)),
                   x->RECOG.HomOntoBlockDiagonal(data,x));
   Assert(0, not fail in newgens);
   H := GroupWithGenerators(newgens);
-  hom := GroupHomByFuncWithData(G,H,RECOG.HomOntoBlockDiagonal,data);
+  hom := GroupHomByFuncWithData(Grp(ri),H,RECOG.HomOntoBlockDiagonal,data);
   SetHomom(ri,hom);
 
   # Now give hints downward:
@@ -526,12 +526,12 @@ end);
 #! @EndChunk
 BindRecogMethod(FindHomMethodsMatrix, "BlockDiagonal",
 "for groups generated by block diagonal matrices",
-function(ri,G)
+function(ri)
   # This is only called by a hint, so we know what we have to do:
   # We do all the blocks projectively and thus are left with scalar blocks.
   # In the projective case we still do the same, the BlocksModScalars
   # will automatically take care of the projectiveness!
-  SetHomom(ri, IdentityMapping(G));
+  SetHomom(ri, IdentityMapping(Grp(ri)));
   # Now give hints downward:
   InitialDataForImageRecogNode(ri).blocks := ri!.blocks;
   AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsProjective.BlocksModScalars, 2000);
@@ -782,7 +782,7 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsMatrix, "LowerLeftPGroup",
 "Hint TODO",
-function(ri,G)
+function(ri)
   local f,p;
   # Do we really have our favorite situation?
   if not (IsBound(ri!.blocks) and
@@ -812,10 +812,10 @@ end);
 #! @EndChunk
 BindRecogMethod(FindHomMethodsMatrix, "GoProjective",
 "divide out scalars and recognise projectively",
-function(ri,G)
+function(ri)
   local hom,q;
   Info(InfoRecog,2,"Going projective...");
-  hom := IdentityMapping(G);
+  hom := IdentityMapping(Grp(ri));
   SetHomom(ri,hom);
   # Now give hints downward:
   Setmethodsforimage(ri,FindHomDbProjective);
@@ -841,8 +841,9 @@ end);
 #! @EndChunk
 BindRecogMethod(FindHomMethodsMatrix, "KnownStabilizerChain",
 "use an already known stabilizer chain for this group",
-function(ri,G)
-  local S,hom;
+function(ri)
+  local S,hom,G;
+  G := Grp(ri);
   if HasStoredStabilizerChain(G) then
       Info(InfoRecog,2,"Already know stabilizer chain, using 1st orbit.");
       S := StoredStabilizerChain(G);

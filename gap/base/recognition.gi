@@ -486,7 +486,7 @@ InstallGlobalFunction( RecogniseGeneric,
     Assert(0, Length(Set(allmethods, m->m.rank)) = Length(allmethods));
 
     # Find a possible homomorphism (or recognise this group as leaf)
-    Setfhmethsel(ri, CallMethods( allmethods, 10, ri, H ));
+    Setfhmethsel(ri, CallMethods( allmethods, 10, ri ));
     # TODO: extract the value 10 into a named constant, and / or make it
     #       an option parameter to the func
 

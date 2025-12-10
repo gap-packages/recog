@@ -50,7 +50,7 @@ end);
 #   result        : either fail or true
 #
 
-InstallGlobalFunction( "CallMethods", function(db, tolerancelimit, methargs...)
+InstallGlobalFunction( "CallMethods", function(db, tolerancelimit, ri)
     # First argument is a method database, i.e. list of records
     #   describing recognition methods.
     # Second argument is a number, the tolerance limit.
@@ -86,7 +86,7 @@ InstallGlobalFunction( "CallMethods", function(db, tolerancelimit, methargs...)
             # apply the method
             Info(InfoMethSel, 3, "Calling rank ", db[i].rank,
                      " method \"", Stamp(db[i].method), "\"...");
-            result := CallRecogMethod(db[i].method, methargs);
+            result := CallRecogMethod(db[i].method, ri);
 
             # evaluate the result
             if result = NeverApplicable then
