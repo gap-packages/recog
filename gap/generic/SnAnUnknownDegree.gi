@@ -1052,7 +1052,7 @@ RECOG.RecogniseSnAnSingleIteration := function(ri, T, N)
     # if we exhaust all attempts
     for iterator in iterators do
         c := iterator();
-        while not c in [SnAnTryLater, TemporaryFailure] do
+        while c <> SnAnTryLater and c <> TemporaryFailure do
             if c = NeverApplicable then
                 return c;
             fi;
@@ -1072,10 +1072,9 @@ RECOG.RecogniseSnAnSingleIteration := function(ri, T, N)
             # Now tmp contains [g, c, n] where
             #   g, c correspond to standard generators of An
             recogData := RECOG.ConstructSnAnIsomorphism(ri, tmp[3], tmp{[1,2]});
-            if recogData = fail then
-                continue;
+            if recogData <> fail then
+                return recogData;
             fi;
-            return recogData;
         od;
     od;
     return c;
