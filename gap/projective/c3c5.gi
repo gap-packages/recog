@@ -131,32 +131,25 @@ end;
 #! is handed down to the kernel indicating that the only possible kernel
 #! elements can be elements in the centraliser of <A>G</A> in <M>PGL(d,q)</M>
 #! that come from scalar matrices in the extension field.
+#!
+#! TODO: document that it only can return Success or NeverApplicable; and the status
+#!  is set in ri!.isabsolutelyirred
+#!
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "NotAbsolutelyIrred",
 "write over a bigger field with smaller degree",
 function(ri, G)
-  local H,f,hom,m,r;
+  local H,hom,m,r;
 
   RECOG.SetPseudoRandomStamp(G,"NotAbsolutelyIrred");
 
-  if IsBound(ri!.isabsolutelyirred) and ri!.isabsolutelyirred then
-      # this information is coming from above
+  # check whether the action is absolutely irreducibly; this information may
+  # either be coming from above, or else will be determined using the Meataxe.
+  if RECOG.IsAbsolutelyIrreducible(ri) then
       return NeverApplicable;
   fi;
 
-  f := ri!.field;
-
-  # This usually comes after "ReducibleIso", which provides the following,
-  # however, just to be sure:
-  if not IsBound(ri!.meataxemodule) then
-      ri!.meataxemodule := GModuleByMats(GeneratorsOfGroup(G),f);
-  fi;
-
-  m := ri!.meataxemodule;
-  if MTX.IsAbsolutelyIrreducible(m) then
-      return NeverApplicable;
-  fi;
-
+  m := RECOG.MeataxeModule(ri);
   Info(InfoRecog,2, "Rewriting generators over larger field with smaller ",
                     "degree, factor=", MTX.DegreeSplittingField(m));
 
@@ -172,8 +165,8 @@ function(ri, G)
   # Now report back:
   SetHomom(ri,hom);
 
-  # Hand down hint that no MeatAxe run can help:
-  InitialDataForImageRecogNode(ri).isabsolutelyirred := true;
+  # Hand down hint that no MeatAxe run is needed nor can help:
+  RECOG.SetIsAbsolutelyIrreducible(InitialDataForImageRecogNode(ri), true);
 
   # There might be a kernel, because we have more scalars over the bigger
   # field, so go for it, however, fewer generators should suffice:
@@ -184,7 +177,7 @@ function(ri, G)
             FindHomMethodsProjective.BiggerScalarsOnly,
             2000);
   InitialDataForKernelRecogNode(ri).degsplittingfield := MTX.DegreeSplittingField(m)
-                                   / DegreeOverPrimeField(f);
+                                   / DegreeOverPrimeField(ri!.field);
   InitialDataForKernelRecogNode(ri).biggerscalarsbas := r.inforec.bas;
   InitialDataForKernelRecogNode(ri).biggerscalarsbasi := r.inforec.basi;
 
@@ -272,7 +265,7 @@ RECOG.ScalarsToMultiplyIntoSmallerField := function(l,k)
   return rec(scalars := scalars, newgens := newgens, field := f);
 end;
 
-RECOG.BaseChangeForSmallestPossibleField := function(grp,mtx,k)
+RECOG.BaseChangeForSmallestPossibleField := function(grp,mtx)
   # grp is a matrix group over k, which must be a finite field. mtx must be
   # the GModuleByMats(GeneratorsOfGroup(grp),k).
   # The module mtx must be irreducible (not necessarily absolutely irred).
@@ -288,8 +281,9 @@ RECOG.BaseChangeForSmallestPossibleField := function(grp,mtx,k)
   #   r.field   : the smaller field
 
   local a,algel,b,bi,charPoly,deg,dim,element,f,facs,field,g,i,newgens,
-        r,scalars,seb,v,w;
+        r,scalars,seb,v,w,k;
 
+  k := MTX.Field(mtx);
   f := PrimeField(k);
   MTX.IsAbsolutelyIrreducible(mtx);  # To ensure that the following works:
   deg := MTX.DegreeSplittingField(mtx)/DegreeOverPrimeField(k);
@@ -397,21 +391,21 @@ BindRecogMethod(FindHomMethodsProjective, "Subfield",
 function(ri, G)
     # We assume G to be absolutely irreducible, although this is not
     # necessary:
-    local Gprime,H,b,dim,f,hom,mo,newgens,pf,r;
+    local m,H,b,dim,f,hom;
     RECOG.SetPseudoRandomStamp(G,"Subfield");
+
     f := ri!.field;
     if IsPrimeField(f) then
         return NeverApplicable;     # nothing to do
-    elif not IsBound(ri!.meataxemodule) then
-        ri!.meataxemodule := GModuleByMats(GeneratorsOfGroup(G),f);
     fi;
-    if not MTX.IsIrreducible(ri!.meataxemodule) then
+
+    m := RECOG.MeataxeModule(ri);
+    if not MTX.IsIrreducible(m) then
         return NeverApplicable;     # not our case
     fi;
-    dim := ri!.dimension;
-    pf := PrimeField(f);
-    b := RECOG.BaseChangeForSmallestPossibleField(G,ri!.meataxemodule,f);
+    b := RECOG.BaseChangeForSmallestPossibleField(G,m);
     if b <> fail then
+        dim := ri!.dimension;
         Info(InfoRecog, 2, StringFormatted(
              "Conjugating group from GL({},{}) into GL({},{}).",
              dim, f, dim, b.field));
@@ -461,19 +455,15 @@ function(ri, G)
   # the derived subgroup...
   local H,HH,Hgens,a,b,basis,c,cc,cgen,collf,coms,conjgensG,cyc,deg,dim,
         f,g,gens,gensim,hom,homcomp,homs,homsimg,i,j,kro,m,newgens,nr,o,
-        pf,pos,pr,pr2,q,r,scalar,subdim,x,poss;
+        pos,pr,pr2,q,r,scalar,subdim,x,poss;
 
   RECOG.SetPseudoRandomStamp(G,"C3C5");
 
   f := ri!.field;
-  if not IsBound(ri!.meataxemodule) then
-      ri!.meataxemodule := GModuleByMats(GeneratorsOfGroup(G),f);
-  fi;
-  if not MTX.IsIrreducible(ri!.meataxemodule) then
+  if not MTX.IsIrreducible(RECOG.MeataxeModule(ri)) then
       return NeverApplicable;     # not our case
   fi;
   dim := ri!.dimension;
-  pf := PrimeField(f);
 
   # First compute a few random commutators:
   coms := [];
@@ -558,7 +548,7 @@ function(ri, G)
       # work we settle C3:
 
       if not IsPrimeField(f) then
-          b := RECOG.BaseChangeForSmallestPossibleField(H,m,f);
+          b := RECOG.BaseChangeForSmallestPossibleField(H,m);
           if b <> fail then   # Yes! N is realisable!
                 Info(InfoRecog, 2, StringFormatted(
                      "Can conjugate H subgroup from GL({},{}) into GL({},{}).",

@@ -278,7 +278,6 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
                Length(s),", enumerating orbit...");
           if not IsBound(hint.subspacedims) or
              Length(s) in hint.subspacedims then
-              #orb := RECOG.OrbitSubspaceWithLimit(G,s,orblenlimit);
               orb := Orb(G,s,OnSubspacesByCanonicalBasis,
                          rec(storenumbers := true,
                              hashlen := NextPrimeInt(2*orblenlimit)));

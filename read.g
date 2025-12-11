@@ -14,40 +14,38 @@
 ##
 #############################################################################
 
-# Generic:
+# Base
 ReadPackage("recog","gap/base/methods.gi");
 ReadPackage("recog","gap/base/methsel.gi");
 ReadPackage("recog","gap/base/recognition.gi");
 ReadPackage("recog","gap/base/kernel.gi");
-
-# The following contain generic functionality for different types of groups:
-
-# Projective:
 ReadPackage("recog","gap/base/projective.gi");
 
-
-# Some tools:
+# Some tools
 ReadPackage("recog","gap/utils.gi");
 
-# generic
+# generic (possible "black box" or "gray box") groups
 ReadPackage("recog","gap/generic/TrivialGroup.gi");
 ReadPackage("recog","gap/generic/FewGensAbelian.gi");
 ReadPackage("recog","gap/generic/KnownNilpotent.gi");
+ReadPackage("recog","gap/generic/slconstr.gi");
 
-# Permutations:
+# Permutation groups
 ReadPackage("recog","gap/perm/giant.gi");
 ReadPackage("recog","gap/perm/largebase.gi");
 ReadPackage("recog","gap/SnAnBB.gi");
 ReadPackage("recog","gap/generic/SnAnUnknownDegree.gi");
 
-# Matrices/Projective:
-ReadPackage("recog","gap/projective/findnormal.gi");
+# Matrix groups
 ReadPackage("recog","gap/matrix/matimpr.gi");
-ReadPackage("recog","gap/projective/c6.gi");
-ReadPackage("recog","gap/projective/tensor.gi");
+ReadPackage("recog","gap/matrix/blocks.gi");
 ReadPackage("recog","gap/matrix/ppd.gi");
 ReadPackage("recog","gap/matrix/classical.gi");
-ReadPackage("recog","gap/matrix/slconstr.gi");
+
+# Projective groups
+ReadPackage("recog","gap/projective/findnormal.gi");
+ReadPackage("recog","gap/projective/c6.gi");
+ReadPackage("recog","gap/projective/tensor.gi");
 ReadPackage("recog","gap/projective/c3c5.gi");
 ReadPackage("recog","gap/projective/d247.gi");
 ReadPackage("recog","gap/projective/almostsimple/threeelorders.gi");
