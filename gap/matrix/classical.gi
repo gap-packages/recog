@@ -1316,7 +1316,6 @@ function( recognise, grp )
             recognise.needForms :=  true;
             return fail;
         fi;
-        # TODO? 
         Info(InfoClassical,2,"The group is not generic");
         Info(InfoClassical,2,"and contains SL(", recognise.d, ", ",
              recognise.q, ");");
@@ -1780,8 +1779,8 @@ function(recognise,grp)
         orbs := Orbits( pgrp, MovedPointsPerms( GeneratorsOfGroup(pgrp)));
 
         # Both the conformal orthogonal and the omega for d = 8 and q = 2 have
-        # orbits of these lenghts. The maximal subgroups of the conformal
-        # orthogonal don't have these orbit lenghts.
+        # orbits of these lengths. The maximal subgroups of the conformal
+        # orthogonal don't have these orbit lengths.
         if Set(orbs,Length) <> [ 120, 135 ] then
            recognise.isSOContained := false;
            return false;
@@ -1856,7 +1855,6 @@ function(recognise,grp)
         if not 4 in recognise.LB then
             return fail;
         fi;
-        # TODO: Note down somewhere what "E2" does. What does it do in Magma?
         if not 3 in recognise.E2 then
             return fail;
         fi;
@@ -2333,7 +2331,6 @@ function( arg )
                    p := Characteristic(f),
                    a := DegreeOverPrimeField(f),
                    q := Characteristic(f)^DegreeOverPrimeField(f),
-                   # TODO:
                    # n -> recognise.nrRandomElms
                    # LE = e's of large ppd elements
                    # BE = e's of basic ppd elements
