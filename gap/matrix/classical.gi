@@ -1304,6 +1304,9 @@ BindRecogMethod(FindHomMethodsClassical, "NonGenericLinear",
 function( recognise, grp )
     local CheckFlag;
 
+    # We know that grp has non-generic parameters. Do we know whether the other
+    # prerequisites of Theorem 5.1, [NP99] are fulfilled? If one of them is
+    # unknown signal that they must be computed.
     CheckFlag := function( )
         if recognise.isReducible = "unknown" then
            recognise.needMeataxe := true;
@@ -1320,13 +1323,13 @@ function( recognise, grp )
         return true;
     end;
 
+    # grp is non-generic if either d = 2 or (d,q) = (3, 2^s-1)
     if recognise.d > 3 then
         return false;
     fi;
     if recognise.d = 3 and not IsPowerOfTwo(recognise.q+1) then
         return false;
     fi;
-    # grp is non-generic if either d = 2 or (d,q) = (3, 2^s-1)
 
     if recognise.isReducible = true then
        return false;
@@ -1337,14 +1340,20 @@ function( recognise, grp )
        return false;
     fi;
 
+    if recognise.needLB  = false then
+        recognise.needLB := true;
+        return fail;
+    fi;
+
+    # Now we have confirmed all prerequisites of Theorem 5.1 except for that
+    # grp contains an element of order 4 and a basic lppd(3, q, 3) element.
     if recognise.n <= 5 then
         return fail;
     elif recognise.n = 6 then
         recognise.needOrders := true;
         return fail;
     fi;
-
-    if 3 in recognise.LE and 3 in recognise.BE
+    if 3 in recognise.LB
        and HasElementsMultipleOf(recognise.orders, [4]) then
            return CheckFlag();
     fi;
@@ -1479,7 +1488,7 @@ end);
 BindRecogMethod(FindHomMethodsClassical, "NonGenericUnitary",
 "tests whether group is non-generic Unitary",
 function(recognise, grp)
-    local d, q,  g, f1, f2, o, CheckFlag, isHermForm, str;
+    local d, q,  g, f1, f2, o, CheckFlag, isHermForm, order;
 
     isHermForm := f -> IsSesquilinearForm(f) and IsHermitianForm(f);
 
@@ -1560,23 +1569,27 @@ function(recognise, grp)
             return fail;
         fi;
     elif d = 4 and q > 9 then
+
         if not 3 in recognise.LB then
             return fail;
         fi;
-        if not 2 in recognise.E2  then
+
+        if not 2 in recognise.E2 then
             return fail;
         fi;
-        f1 := Collected(Factors( q^3-1 ));
-        f2 := Collected(Factors( q^2-1 ));
-        # check if we have a prime at least 11
-        if PositionProperty( f1, i-> (i[1] >= 11)) <> fail then
+
+        # ACN 27 Nov 2019 reworked this section.
+        # Let r be the ppd of q^3-1 and s that of q^2-1
+        # either max{r,s} >= 11 and G contains omega
+        # or {r,s} = {5,7} and then we have to rule out 2.A7.
+
+        # check of o is divisible by a prime >= 11
+        f1 := o -> PositionProperty(Factors(o), i-> i >= 11) <> fail;
+        if PositionProperty(recognise.orders, f1) <> fail then
             return CheckFlag();
         fi;
-        if PositionProperty( f2, i-> (i[1] >= 11)) <> fail then
-            return CheckFlag();
-        fi;
-        # Now we know that q^3-1 and q^2-1 only contain primes
-        # at most 7
+
+        # Now we know that element orders only contain primes at most 7
         if not q^3 mod 7 = 1 or q^2 mod 7 = 1 or q mod 7 = 1 then
             # 7 is not ppd of q^3-1
             return CheckFlag();
@@ -1592,10 +1605,11 @@ function(recognise, grp)
          q^3 mod i = 1 and   # order divides q^3-1
         (7*(q-1)) mod i <> 0 # order does not divide 7*(q-1)
          )) then
-            # 5 is not ppd of q^2-1
             return CheckFlag();
         fi;
+        return fail;
     elif d = 3 and q = 4 then
+        # Take the natural action of grp, and compute its order
         if Order(grp) mod 216 = 0 then
             return CheckFlag();
         else
@@ -1607,50 +1621,62 @@ function(recognise, grp)
             return fail;
         fi;
         if recognise.hasSpecialEle = false then
-            if not Order( recognise.g ) mod 6 = 0 then
+            order := Order( recognise.g );
+            if not order mod 6 = 0 then
                 return fail;
             fi;
-            if ForAny( GeneratorsOfGroup(grp),
-                h -> not IsOne(Comm(h,recognise.g^3))) then
+            if not IsCentral(grp, recognise.g ^ (order / 2)) then
                 Info( InfoClassical,2,
-                      "Cube of element of order div by 6 is not central" );
-                      recognise.hasSpecialEle := true;
+                      "Found an element of order divisible by 6 such",
+                      " that the corresponding involution is not central." );
+                recognise.hasSpecialEle := true;
                 return CheckFlag();
-             fi;
-        else return CheckFlag();
+            else
+                return fail;
+            fi;
+        else
+            return CheckFlag();
         fi;
     elif d = 3 and q = 16 then
         if not HasElementsMultipleOf(recognise.orders, [5,13]) then
             return fail;
         fi;
         if recognise.hasSpecialEle = false then
-            if not Order(recognise.g) mod 5  = 0 then
+            order := Order( recognise.g );
+            if not order mod 5  = 0 then
                 return fail;
             fi;
-            if ForAny(GeneratorsOfGroup(grp), h -> not IsOne(Comm(h,recognise.g))) then
+            if not IsCentral(grp, recognise.g ^ (order / 5)) then
                 Info( InfoClassical,2,
-                      "The element of order 5 is not central" );
+                      "The element of order equal 5 is not central" );
                 recognise.hasSpecialEle := true;
                 return CheckFlag();
+            else
+                return fail;
             fi;
-        else return CheckFlag();
+        else
+            return CheckFlag();
         fi;
     elif d = 3 and q = 25 then
         if not HasElementsMultipleOf(recognise.orders, [5,7,8]) then
             return fail;
         fi;
         if recognise.hasSpecialEle = false then
-            if Order(recognise.g) mod 8 <> 0 then
+            order := Order(recognise.g);
+            if order mod 8 <> 0 then
                 return fail;
             fi;
-            g := recognise.g^(Order(recognise.g)/2);
-            if ForAny(GeneratorsOfGroup(grp), h -> not IsOne(Comm(h,g))) then
+            if not IsCentral(grp, recognise.g ^ (order / 2)) then
                 Info( InfoClassical,2,
-                  "involution in cyclic subgroup  of order 8 is not central" );
+                      "Found an element of order divisible by 8 which powers",
+                      " to a non-central involution." );
                 recognise.hasSpecialEle := true;
                 return CheckFlag();
-             fi;
-        else return CheckFlag();
+            else
+                return fail;
+            fi;
+        else
+            return CheckFlag();
         fi;
     elif d = 3 and q >= 49  then
         if not 3 in recognise.LE or not 3 in recognise.BE then
@@ -1661,10 +1687,9 @@ function(recognise, grp)
             return fail;
         fi;
         if recognise.hasSpecialEle = false then
-             str := "Searching for elements of order > 3 mod scalars";
-             str := Concatenation( str,  " and dividing ");
-             str := Concatenation( str,  String(q-1) );
-             Info(InfoClassical,2, str );
+             Info(InfoClassical,2,
+                  "Searching for elements of order > 3 mod scalars",
+                  " and dividing ", String(q-1));
              if not ForAny(recognise.porders, i -> i[1] > 3 and q mod i[1] = 1) then
                  return fail;
              fi;
@@ -1687,7 +1712,7 @@ end);
 BindRecogMethod(FindHomMethodsClassical, "NonGenericOrthogonalPlus",
 "tests whether group is non-generic O+",
 function(recognise,grp)
-    local d, q, gp1, gp2, CheckFlag, pgrp, orbs, isHypForm;
+    local d, q, gp1, gp2, CheckFlag, pgrp, sc, orbs, isHypForm;
 
     isHypForm := f -> IsSesquilinearForm(f) and IsHyperbolicForm(f);
 
@@ -1745,21 +1770,24 @@ function(recognise,grp)
             return fail;
         fi;
     elif d = 8 and q = 2 then
-        if not HasElementsMultipleOf( recognise.orders, [7,9,15]) and
-           not HasElementsMultipleOf( recognise.orders, [7,10,15]) then
+        if not HasElementsMultipleOf( recognise.orders, [7,9,10]) and
+           not HasElementsMultipleOf( recognise.orders, [7,9,15]) then
             return fail;
         fi;
 
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
         orbs := Orbits( pgrp, MovedPointsPerms( GeneratorsOfGroup(pgrp)));
 
-        if Set(List(orbs,Length)) <> [ 120, 135 ] then
+        # Both the conformal orthogonal and the omega for d = 8 and q = 2 have
+        # orbits of these lengths. The maximal subgroups of the conformal
+        # orthogonal don't have these orbit lengths.
+        if Set(orbs,Length) <> [ 120, 135 ] then
            recognise.isSOContained := false;
            return false;
         fi;
-        if Size(pgrp) mod  174182400 = 0 then
+        StabChain(pgrp, rec(random := 200, limit := 174182400));
+        if Size(pgrp) mod 174182400 = 0 then # compare to Size(POmega(+1,8,2))
            return CheckFlag();
-           recognise.isSOContained := true;
         else
            recognise.isSOContained := false;
            return false;
@@ -1768,23 +1796,42 @@ function(recognise,grp)
         if not HasElementsMultipleOf( recognise.orders, [7,13])  then
             return fail;
         fi;
-        pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
-        orbs := Orbits( pgrp, MovedPointsPerms( GeneratorsOfGroup(pgrp)));
-        if Set(List(orbs, Length)) <> [ 1080, 1120] then
-             recognise.isSOContained := false;
-             return false;
-        fi;
-        if Size(pgrp) mod 4952179814400 = 0 then
+        pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
+        StabChain(pgrp, rec(random := 200, limit := 4952179814400));
+        if Size(pgrp) mod 4952179814400 = 0 then # compare to Size(POmega(+1,8,3))
              return CheckFlag();
         else
              recognise.isSOContained := false;
              return false;
         fi;
-    elif d = 8 and  q =  5 then
-        #ACN Feb 07: added fix - need also elements of order a mult of 3
-        #            these are missing in the paper [NP99]
-        if not HasElementsMultipleOf( recognise.orders, [7,13,3])  then
+    elif d = 8 and q = 5 then
+        ## 2.July.2019: There is a mistake in the paper here
+        ## There are maximal subgroups of Omega+(8,5) that contain
+        ## elements of order 7,13,3
+        ## 13.Jan.2021: Added 31
+        # TODO: This means, in Table 4 of [NP99] the second column of the line "d =
+        # 8, q = 5" should be "3, 7, 13, 31 + perm.rep"
+        # We generated 10000 random elements for all groups between
+        # Omega+(8,5) and Delta+(8, 5). The percentage of elements with orders
+        # divisible by 3, 7, 13, 31, and 312 respectively were at least:
+        # 56, 14, 31, 16, 5.71
+        # Since elements of order divisible by 312 are relatively rare, we
+        # don't use these anymore.
+        if not HasElementsMultipleOf( recognise.orders, [3,7,13,31])  then
             return fail;
+        fi;
+        # Such elements also exist in maximal subgroups of
+        # Omega+(8,5) with composition factors being C_2 and Omega(0,7,5).
+        # Thus we compute the projective action of grp and then compare
+        # the size of resulting stabilizer chain to the size of POmega(+1,8,5).
+        #
+        # Note that 39000 is the maximal orbit length of a maximal subgroup
+        pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
+        # Note: Size(POmega(+1,8,5)) = 8911539000000000000
+        if  Size(pgrp) mod 8911539000000000000 = 0 then
+             return CheckFlag();
+        else
+             return fail;
         fi;
     elif d = 8 and (q = 4 or q > 5) then
         if not 6 in recognise.LB then
@@ -1793,16 +1840,15 @@ function(recognise,grp)
         if not 4 in recognise.LS then
             return fail;
         fi;
+    # For each q we have that OmegaPlus(6,q) is isomorphic to PSL(4,q).
     elif d = 6 and q = 2 then
+        # Additionally, OmegaPlus(6,2) is isomorphic to AlternatingGroup(8).
         if not HasElementsMultipleOf( recognise.orders, [7]) and
            not HasElementsMultipleOf( recognise.orders, [15]) then
             return fail;
         fi;
     elif d = 6 and q = 3 then
-        if not HasElementsMultipleOf( recognise.orders, [5])  then
-            return fail;
-        fi;
-        if not 13 in recognise.orders then
+        if not HasElementsMultipleOf( recognise.orders, [5, 13])  then
             return fail;
         fi;
     elif d = 6 and q >= 4 then
@@ -1855,9 +1901,13 @@ function(recognise,grp)
                 return CheckFlag();
         fi;
     elif d = 4 and q =  4 then
-        pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
-        orbs := Orbits( pgrp, MovedPointsPerms(
-           GeneratorsOfGroup(pgrp)));
+        # TODO: check all occurences of Orbit and Orbits for the "conformals
+        # can merge orbits"-bug.
+
+        if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) in [75,60] then
+            return false;
+        fi;
+        pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
         if Size(pgrp) mod 3600 <> 0 then
              recognise.isSOContained := false;
              return false;
@@ -1875,16 +1925,26 @@ function(recognise,grp)
                 return CheckFlag();
         fi;
     elif d = 4 and q = 5 then
-        pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
-        if Size(pgrp) mod 7200 <> 0 then
+        ## Added fast test 4.7.2019 ACN
+        if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) in [144,120] then
+            return false;
+        fi;
+        ## The projective Group has half order of Omega
+        ## Fix 4.7.2019
+        pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
+        if Size(pgrp) mod 3600 <> 0 then
             recognise.isSOContained := false;
             return false;
         else
             return CheckFlag();
         fi;
     elif d = 4 and q = 7 then
-        pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
-        if Size(pgrp) mod 56448  <> 0 then
+        ## Added fast test 4.7.2019 ACN
+        if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) in [384,336] then
+            return false;
+        fi;
+        pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
+        if Size(pgrp) mod 28224  <> 0 then
             recognise.isSOContained := false;
             return false;
         fi;
@@ -1901,8 +1961,12 @@ function(recognise,grp)
                 return CheckFlag();
         fi;
     elif d = 4 and q = 9 then
-        pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
-        if Size(pgrp) mod 259200 <> 0 then
+        ## Added fast test 4.7.2019 ACN
+        if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) in [800,720] then
+            return false;
+        fi;
+        pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
+        if Size(pgrp) mod 129600 <> 0 then
             recognise.isSOContained := false;
             return false;
         else
@@ -2267,6 +2331,11 @@ function( arg )
                    p := Characteristic(f),
                    a := DegreeOverPrimeField(f),
                    q := Characteristic(f)^DegreeOverPrimeField(f),
+                   # n -> recognise.nrRandomElms
+                   # LE = e's of large ppd elements
+                   # BE = e's of basic ppd elements
+                   # LB = e's of large basic ppd elements
+                   # E2 = e's of ppd elements for e=d/2
                    E := [], LE := [], BE := [], LB := [],
                    LS := [], E2 := [], LE2 := [], BE2 := [],
                    g := fail,
@@ -2333,7 +2402,9 @@ DisplayRecog := function( r )
 
            Print("Reducible : ", r.isReducible, "\n" );
            Print("Forms: " );
-           if Length(r.ClassicalForms)<> 1 then
+           if Length(r.ClassicalForms) = 0 then
+              Print("no form preserved\n"); # TODO is this correct?
+           elif Length(r.ClassicalForms)> 1 then
               Print("Several Forms preserved\n");
            elif IsTrivialForm( r.ClassicalForms[1] ) then
               Print("linear i.e. no forms\n");
