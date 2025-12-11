@@ -23,8 +23,6 @@ ReadPackage("recog","gap/base/kernel.gd");
 # The following contain generic declarations for different types of groups:
 ReadPackage("recog","gap/base/projective.gd");
 
-ReadPackage("recog","gap/matrix.gd");
-
 ReadPackage("recog","gap/matrix/ppd.gd");
 ReadPackage("recog","gap/matrix/classical.gd");
 ReadPackage("recog","gap/projective/almostsimple.gd");

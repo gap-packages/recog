@@ -450,7 +450,7 @@ function(ri,G)
   # Now give hints downward:
   InitialDataForImageRecogNode(ri).blocks := ri!.blocks;
   AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsMatrix.BlockDiagonal, 2000);
-  findgensNmeth(ri).method := FindKernelLowerLeftPGroup;
+  findgensNmeth(ri).method := RECOG.FindKernelLowerLeftPGroup;
   findgensNmeth(ri).args := [];
   AddMethod(InitialDataForKernelRecogNode(ri).hints, FindHomMethodsMatrix.LowerLeftPGroup, 2000);
   InitialDataForKernelRecogNode(ri).blocks := ri!.blocks;
@@ -551,8 +551,7 @@ RECOG.ComputeExtractionLayerLengths := function(blocks)
   return lens;
 end;
 
-InstallGlobalFunction( FindKernelLowerLeftPGroup,
-  function(ri)
+RECOG.FindKernelLowerLeftPGroup := function(ri)
     local basisOfFieldExtension,curlay,done,el,f,i,l,lens,lvec,nothingnew,pivots,pos,ready,
           rifac,s,v,x,y;
 
@@ -650,7 +649,7 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
     SetgensN(ri,l);
     ri!.leavegensNuntouched := true;
     return true;
-  end );
+end;
 
 # computes a straight line program (SLP) for an element <g> of a p-group
 # described by <ri> (that corresponds to a matrix group consisting of lower
