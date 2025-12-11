@@ -1797,7 +1797,7 @@ function(recognise,grp)
         if not HasElementsMultipleOf( recognise.orders, [7,13])  then
             return fail;
         fi;
-        pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
+        pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
         StabChain(pgrp, rec(random := 200, limit := 4952179814400));
         if Size(pgrp) mod 4952179814400 = 0 then # compare to Size(POmega(+1,8,3))
              return CheckFlag();
@@ -1826,11 +1826,10 @@ function(recognise,grp)
         # Thus we compute the projective action of grp and then compare
         # the size of resulting stabilizer chain to the size of POmega(+1,8,5).
         #
-        # Note that 78000 is probably larger than needed (it only occurs for
-        # the conformal orthogonal group)
-        sc := StabilizerChain( grp, rec( Projective := true, OrbitLengthLimit := 39000 ));
+        # Note that 39000 is the maximal orbit length of a maximal subgroup
+        pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
         # Note: Size(POmega(+1,8,5)) = 8911539000000000000
-        if sc = fail or Size(sc) mod 8911539000000000000 = 0 then
+        if  Size(pgrp) mod 8911539000000000000 = 0 then
              return CheckFlag();
         else
              return fail;
@@ -1910,9 +1909,7 @@ function(recognise,grp)
         if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) in [75,60] then
             return false;
         fi;
-        pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
-        orbs := Orbits( pgrp, MovedPointsPerms(
-           GeneratorsOfGroup(pgrp)));
+        pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
         if Size(pgrp) mod 3600 <> 0 then
              recognise.isSOContained := false;
              return false;
@@ -1936,7 +1933,7 @@ function(recognise,grp)
         fi;
         ## The projective Group has half order of Omega
         ## Fix 4.7.2019
-        pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
+        pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
         if Size(pgrp) mod 3600 <> 0 then
             recognise.isSOContained := false;
             return false;
@@ -1948,7 +1945,7 @@ function(recognise,grp)
         if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) in [384,336] then
             return false;
         fi;
-        pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
+        pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
         if Size(pgrp) mod 28224  <> 0 then
             recognise.isSOContained := false;
             return false;
@@ -1970,7 +1967,7 @@ function(recognise,grp)
         if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) in [800,720] then
             return false;
         fi;
-        pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
+        pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
         if Size(pgrp) mod 129600 <> 0 then
             recognise.isSOContained := false;
             return false;
@@ -2341,7 +2338,7 @@ function( arg )
                    # LE = e's of large ppd elements
                    # BE = e's of basic ppd elements
                    # LB = e's of large basic ppd elements
-                   # E2 = ?
+                   # E2 = e's of ppd elements for e=d/2
                    E := [], LE := [], BE := [], LB := [],
                    LS := [], E2 := [], LE2 := [], BE2 := [],
                    g := fail,
