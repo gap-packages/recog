@@ -1611,7 +1611,7 @@ function(recognise, grp)
         return fail;
     elif d = 3 and q = 4 then
         # Take the natural action of grp, and compute its order
-        if Order(Action(grp, recognise.field ^ d, OnPoints)) mod 216 = 0 then
+        if Order(grp) mod 216 = 0 then
             return CheckFlag();
         else
             recognise.isSUContained := false;
