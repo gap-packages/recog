@@ -11,20 +11,50 @@
 ##
 ##  SPDX-License-Identifier: GPL-3.0-or-later
 ##
-##  This file contains an implementation of the non-constructive recognition
-##  algorithms for classical groups in their natural representation by
-##  Niemeyer and Praeger.
+##  This file contains an implementation of the naming algorithms
+##  (non-constructive recognition algorithms) for classical groups in their
+##  natural representation by  Niemeyer and Praeger.
 ##
-##  A description of them can be found in [NP97], [NP98], and [NP99].
+##  Details of the algorithms implemented here are in the following publications.
+##  
+##  [NP98] Alice C. Niemeyer and  Cheryl E. Praeger 
+##      "A Recognition Algorithm for Classical Groups over Finite Fields",
+##      Proc. London Math. Soc (3) 77, 1998, 117-169.
+## 
+##  [NP97] Alice C. Niemeyer and  Cheryl E. Praeger 
+##      "Implementing a Recognition Algorithm for Classical Groups"
+##      "Groups and Computation II", Amer. Math. Soc. DIMACS Series 28, 1997.
 ##
-##  This implementation uses some algorithms described elsewhere, in:
-##  [CLG97a], [CLG97b], and [CLGM+95].
+##  [NP99] Alice C. Niemeyer and  Cheryl E. Praeger 
+##      "A Recognition Algorithm for Non-Generic Classical Groups over
+##       Finite Fields",  J. Austral. Math. Soc. (Series A)67 , 223-253, 1999.
 ##
-##  - In this implementation we use the irreducibility test of the algorithm
+##  This implementation uses some algorithms described elsewhere:
+## 
+##  [CLG97a] Frank Celler and C.R. Leedham-Green
+##      "Calculating the order of an invertible matrix",
+##      "Groups and Computation II", Amer. Math. Soc. DIMACS Series 28, 1997.
+##
+##  [CLG97b] Frank Celler and C.R. Leedham-Green
+##      "A non-constructive recognition algorithm for the special linear
+##      and other classical groups"
+##      "Groups and Computation II", Amer. Math. Soc. DIMACS Series 28, 1997.
+##
+##    In this implementation we use the irreducibility test of the algorithm
+##    described in [CL97b], which can often avoid an application  of the Meataxe
+##    algorithm.
+##
+##   An overview on applications of ppd-elements, see
+## 
+##  [Pra99] Cheryl E. Praeger, 
+##      "Primitive prime divisor elements in finite classical groups",
+##       Proc. of Groups St. Andrews in Bath 1997, Cambridge University
+##      Press, 1999.
+##
+##
 ##    described in [CLG97b], which can often avoid an application of the
 ##    Meataxe algorithm.
 ##
-##  For an overview, see also [Pra99].
 ##
 #############################################################################
 
@@ -139,9 +169,15 @@ end;
 
 
 
-# Test to check whether the group contains both a large ppd element
-# and a basic ppd element
-# TODO: Better comments...
+# The naming algorithm for classical groups is divided into two
+# parts: A version that applies to classical groups for sufficiently
+# large parameters, called generic parameters, as described in [NP98, Def.3.2],
+# and a part that applies to smaller cases of classical groups, where
+# the exsistence of sufficiently informative ppd elements is not guaranteed.
+# The naming algorithm for these cases  is decribed in [NP99] and implemented
+# in the functions whose name starts with NonGeneric below. This function tests
+# whether the parameters are generic or not.
+#
 BindRecogMethod(FindHomMethodsClassical, "IsGenericParameters",
 "tests whether group has generic parameters",
 function( recognise, grp )
@@ -211,9 +247,12 @@ function( recognise, grp )
 end);
 
 
-# Generate elements until we find the required ppd type
-# elements...monte  yes
-# TODO: Better comments
+# 
+# In the case of generic parameters we need to have found at least
+# two ppd elements, one large and one basic. If we have not yet
+# found them, we return TemporaryFailure and have to inspect
+# more random elements.
+
 
 BindRecogMethod(FindHomMethodsClassical, "IsGeneric",
 "tests whether group is generic",
@@ -232,8 +271,16 @@ function (recognise, grp)
     return NeverApplicable;
 end);
 
-#enough info to rule out extension field groups...?
-#TODO: comments...
+
+
+#  Once we have verified that  the  group has generic  parameters we need to
+#  rule  out  the  extension  field case, that is we have to show the group
+#  cannot be embedded into GL(d/b,q^b).b. To rule this out, we need to find a
+#  b-witness for each of the pi(d) distinct prime divisors b of d, or
+#  in some cases a pair of witnesses, as discussed in Section 3.3  of
+#  [NP98].   The function RuledOutExtField() tests whether we can
+#  deduce that the group does not preserve an extension field structure.  
+
 BindRecogMethod(FindHomMethodsClassical, "RuledOutExtField",
 "tests whether extension field case is ruled out",
 function (recognise, grp)
@@ -243,6 +290,7 @@ function (recognise, grp)
     d := recognise.d;
     q := recognise.q;
     E := recognise.E;
+
 
     differmodfour := function(E)
         local e;
@@ -339,6 +387,19 @@ function (recognise, grp)
     fi;
 end);
 
+
+#   Methods to rule  out  the   nearly  simple groups
+#  
+#  We assume that we have already tested that the group acts irreducibly
+#  on the  underlying  vector space and has a ppd(d,q;e_1)-element and a
+#  ppd(d,q;e_2)-element for d/2 < e_1 < e_2 <= d of which at least one is
+#  large and one is basic. The nearly simple groups that can have such
+#  ppd elements are listed in Tables  6 and  7 in [NP98]. These could
+#  arise as the commutator  subgroup  of the given group. In these
+#  tables also elements are listed that occur in a classical group put
+#  not in these nearly simple groups. If we find such elements, these
+#  groups are thereby ruled out.
+#
 BindRecogMethod(FindHomMethodsClassical, "IsNotAlternating",
 "tests whether alternating groups are ruled out",
 function( recognise, grp )
@@ -376,23 +437,12 @@ function( recognise, grp )
        fi;
     fi;
 
-
     if q >= 23 then
-        # TODO Check Magma Code
-       o := Order( recognise.g );
-       if o mod 25 = 0 then
+       if 4 in recognise.LE then
            Info( InfoClassical, 2, "G' not alternating;");
            recognise.isNotAlternating := true;
            return false;
        fi;
-       o := Collected( Factors (o) );
-       for i in o do
-           if i[1] >= 11 then
-               Info( InfoClassical, 2, "G' not alternating;");
-               recognise.isNotAlternating := true;
-               return false;
-           fi;
-       od;
 
        if recognise.n > 15 then
            AddSet (recognise.possibleNearlySimple, "2.A7");
@@ -652,6 +702,7 @@ function(recognise, grp)
     else
         AddSet(recognise.E,ppd[1]);
         recognise.currentgcd := GcdInt( recognise.currentgcd, ppd[1] );
+	# check whether we have a large ppd-element
         if ppd[2] = true then
             AddSet(recognise.LE,ppd[1]);
         fi;
@@ -670,6 +721,7 @@ function(recognise, grp)
         fi;
     fi;
     if recognise.needE2 = true then
+        # these are ppd(d,q;e)-elmenets with e=d/2
         ppd := IsPpdElementD2(f, cpol, d, recognise.q, 1);
         if ppd <> false then
             str := "  Found a large and special ppd(";
@@ -843,7 +895,12 @@ end);
 
 
 # Compute the degrees of the irreducible factors of
-# the characteristic polynomial <cpol>
+# the characteristic polynomial recognise.cpol
+# These might already yield enough information to show
+# that the group acts irreducible without calling
+# the Meataxe. This function is described in [CLG97b].
+
+
 BindRecogMethod(FindHomMethodsClassical, "IsReducible",
 "tests whether current random element rules out reducible",
 function( recognise, grp )
@@ -2370,7 +2427,7 @@ function( arg )
                    porders := [],
                    hasSpecialEle := false,
                    bc := "unknown",
-                   kf := "unknown",
+                   kf := "unknown", # kronecker factors
                    plusminus := Set([]),
                    sq1 := [Z(q)*One(GL(2,q))],
                    sq2 := [Z(q)*One(GL(2,q))],
