@@ -1712,7 +1712,7 @@ end);
 BindRecogMethod(FindHomMethodsClassical, "NonGenericOrthogonalPlus",
 "tests whether group is non-generic O+",
 function(recognise,grp)
-    local d, q, gp1, gp2, CheckFlag, pgrp, sc, orbs, isHypForm;
+    local d, q, gp1, gp2, CheckFlag, pgrp, sc, orbs, isHypForm, ol;
 
     isHypForm := f -> IsSesquilinearForm(f) and IsHyperbolicForm(f);
 
@@ -1903,8 +1903,8 @@ function(recognise,grp)
     elif d = 4 and q =  4 then
         # the conformal group can have orbits of length 75 and 180
         # the group Omega can have orbits of lengths 75 and 60
-        if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) mod 60 = 0
-          and not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) mod 75 = 0 then
+	ol := Length(Orbit(grp, IdentityMat(d, GF(q))[1]));
+        if not ol mod 60 = 0 and not ol mod 75 = 0 then
             return false;
         fi;
         pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
@@ -1928,10 +1928,11 @@ function(recognise,grp)
         ## Added fast test 4.7.2019 ACN
         # the conformal group can have orbits of length 144 and 480
         # the group Omega can have orbits of lengths 144 and 120
-        if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) mod 144 = 0
-          and not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) mod 120 = 0 then
-            return false;
+	ol := Length(Orbit(grp, IdentityMat(d, GF(q))[1]));
+        if not ol mod 144 = 0 and not ol mod 120 = 0 then
+           return false;
         fi;
+
         ## The projective Group has half order of Omega
         ## Fix 4.7.2019
         pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
@@ -1945,10 +1946,11 @@ function(recognise,grp)
         ## Added fast test 4.7.2019 ACN
         # the conformal group can have orbits of length 384 and 2016
         # the group Omega can have orbits of lengths 384 and 336
-        if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) mod 384 = 0
-         and not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) mod 336 = 0 then
+	ol := Length(Orbit(grp, IdentityMat(d, GF(q))[1]));
+        if not ol mod 384 = 0 and not ol mod 336 = 0 then
             return false;
         fi;
+
         pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
         if Size(pgrp) mod 28224  <> 0 then
             recognise.isOmegaContained := false;
@@ -1970,10 +1972,11 @@ function(recognise,grp)
         ## Added fast test 4.7.2019 ACN
         # the conformal group can have orbits of length 800 and 5760
         # the group Omega can have orbits of lengths 800 and 720
-        if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) mod 800 = 0
-         and not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) mod 720 = 0 then
+	ol := Length(Orbit(grp, IdentityMat(d, GF(q))[1]));
+        if not ol mod 800 = 0 and not ol mod 720 = 0 then
             return false;
         fi;
+
         pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
         if Size(pgrp) mod 129600 <> 0 then
             recognise.isOmegaContained := false;
