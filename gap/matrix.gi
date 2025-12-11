@@ -16,43 +16,6 @@
 ##
 #############################################################################
 
-#RECOG.DetWrapper := function(m)
-#  local n;
-#  n := ExtractSubMatrix(m,[1],[1]);
-#  n[1][1] := DeterminantMat(m);
-#  return n;
-#end;
-
-#FindHomMethodsMatrix.Determinant := function(ri, G)
-#  local H,d,dets,gens,hom;
-#  d := ri!.dimension;
-#  if d = 1 then
-#      Info(InfoRecog,2,"Found dimension 1, going to Scalar method");
-#      return FindHomMethodsMatrix.Scalar(ri,G);
-#  fi;
-#
-#  # check for a hint from above:
-#  if IsBound(ri!.containedinsl) and ri!.containedinsl = true then
-#      return false;  # will not succeed
-#  fi;
-#
-#  gens := GeneratorsOfGroup(G);
-#  dets := List(gens,RECOG.DetWrapper);
-#  if ForAll(dets,IsOne) then
-#      ri!.containedinsl := true;
-#      return false;  # will not succeed
-#  fi;
-#
-#  H := GroupWithGenerators(dets);
-#  hom := GroupHomomorphismByFunction(G,H,RECOG.DetWrapper);
-#
-#  SetHomom(ri,hom);
-#
-#  # Hint to the kernel:
-#  InitialDataForKernelRecogNode(ri).containedinsl := true;
-#  return true;
-#end;
-
 # helper for recognition nodes for a matrix group: return the corresponding
 # meataxe G-module, either a previously computed one, or a fresh copy.
 #
@@ -107,40 +70,6 @@ RECOG.SetIsAbsolutelyIrreducible := function(ri, flag)
     RECOG.SetIsIrreducible(ri, flag);
   fi;
 end;
-
-#RECOG.HomInducedOnFactor := function(data,el)
-#  local dim,m;
-#  dim := Length(el);
-#  m := ExtractSubMatrix(el,[data.subdim+1..dim],[data.subdim+1..dim]);
-#  # FIXME: no longer necessary when vectors/matrices are in place:
-#  ConvertToMatrixRep(m);
-#  return m;
-#end;
-#
-#FindHomMethodsMatrix.InducedOnFactor := function(ri,G)
-#  local H,dim,gens,hom,newgens,gen,data;
-#  # Are we applicable?
-#  if not IsBound(ri!.subdim) then
-#      return NotEnoughInformation;
-#  fi;
-#
-#  # Project onto image:
-#  gens := GeneratorsOfGroup(G);
-#  dim := ri!.dimension;
-#  data := rec(subdim := ri!.subdim);
-#  newgens := List(gens, x->RECOG.HomInducedOnFactor(data,x));
-#  H := GroupWithGenerators(newgens);
-#  hom := GroupHomByFuncWithData(G,H,RECOG.HomInducedOnFactor,data);
-#
-#  # Now report back:
-#  SetHomom(ri,hom);
-#
-#  # Inform authorities that the kernel can be recognised easily:
-#  InitialDataForKernelRecogNode(ri).subdim := ri!.subdim;
-#  AddMethod(InitialDataForKernelRecogNode(ri).hints, FindHomMethodsMatrix.InducedOnSubspace, 2000);
-#
-#  return true;
-#end;
 
 #! @BeginChunk GoProjective
 #! This method defines a homomorphism from a matrix group <A>G</A>
