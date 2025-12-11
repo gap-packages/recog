@@ -210,6 +210,8 @@ DeclareObsoleteSynonymAttr( "RIParent", "ParentRecogNode", 1 );
 ##     and <A>NiceGens(ri)</A>, respectively) induces an isomorphism from <A>P</A>
 ##     to the group associated to <A>ri</A> (which, in case of a projective node,
 ##     is the central quotient of <A>Grp(ri)</A>).
+##     In particular, <A>GeneratorsOfGroup(P)</A> and <A>NiceGens(ri)</A>
+##     have the same size.
 ##     This is still work in progress, and details of the implementation may change.
 ## </Description>
 ## </ManSection>

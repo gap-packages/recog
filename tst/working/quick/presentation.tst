@@ -3,7 +3,7 @@ gap> START_TEST("presentation.tst");
 gap> oldInfoLevel := InfoLevel(InfoRecog);;
 gap> SetInfoLevel(InfoRecog, 0);;
 gap> testPres := function(G, small, projective)
-> local ri,iso,pres,F,hom,rel,projG;
+> local ri,iso,pres,F,hom,rel,projG,projString;
 > if projective then ri := RecogniseProjectiveGroup(G);; else ri := RecogniseGroup(G);; fi;
 > if not HasStdPresentation(ri) then CalcStdPresentation(ri)(ri);; fi;
 > pres := StdPresentation(ri);;
@@ -13,12 +13,17 @@ gap> testPres := function(G, small, projective)
 # Test that G satisfies all relations in presentation
 > for rel in RelatorsOfFpGroup(pres) do
 >   if not isone(ri)(hom(rel)) then
->       Print(G, " does not satisfy relation\n");;
+>       if projective then projString := " (proj.)";; else projString := "";; fi;
+>       Print(G, projString, " does not satisfy relation\n");;
 >   fi;;
 > od;;
 
 # For small groups, also test that G has same size as presentation
-> projG := Image(ProjectiveActionHomomorphismMatrixGroup(G));
+> if projective then
+>   projG := Image(ProjectiveActionHomomorphismMatrixGroup(G));;
+> else
+>   projG := G;;
+> fi;
 > if small and Size(projG) <> Size(pres) then
 >   Print(G, " does not have same size as FpGroup\n");;
 > fi;

@@ -526,19 +526,40 @@ InstallGlobalFunction( RecogniseGeneric,
         # Handle the case that nobody set StdPresentation
         if not HasStdPresentation(ri) and not HasCalcStdPresentation(ri) then
             SetCalcStdPresentation(ri,function(ri)
-                local iso,G,gens,proj;
-                if ri!.projective then
-                    proj := ProjectiveActionHomomorphismMatrixGroup(Grp(ri));
-                    G := Image(proj);
-                    gens := List(NiceGens(ri), a -> ImageElm(proj, a));
+                local iso,G,gens,proj,rank,F,Fp;
+                if HasSize(ri) and Size(ri) = 1 then
+                    # The group is trivial, so we set a trivial presentation.
+                    # However, we need to guarantee that GeneratorsOfGroup
+                    # of the returned FpGroup is in bijection with NiceGens(ri).
+                    # (We would expect that NiceGens(ri) has only one element
+                    # and that this element is trivial, but better not rely on this.)
+                    rank := Size(NiceGens(ri));
+                    F := FreeGroup(rank);
+                    Fp := F / GeneratorsOfGroup(F); # Trivial presentation
+                    SetStdPresentation(ri, Fp);
                 else
-                    G := Grp(ri);
-                    gens := NiceGens(ri);
+                    # Compute a presentation using IsomorphismFpGroupByGenerators.
+                    # This is an inefficient hack.
+                    # TODO: Properly implement presentations in the corresponding
+                    # (non-generic) leaf methods.
+                    if ri!.projective then
+                        # The group G associated to ri is the quotient of Grp(ri)
+                        # modulo all scalar matrices.
+                        # If ri was constructed as the image node with the method
+                        # "BlocksModScalars", then this is not necessarily correct.
+                        # However, this case can only arise at a leaf node if all
+                        # blocks have size 1, and in this case Size(ri) = 1.
+                        # Hence this case was already covered above.
+                        proj := ProjectiveActionHomomorphismMatrixGroup(Grp(ri));
+                        G := Image(proj);
+                        gens := List(NiceGens(ri), a -> ImageElm(proj, a));
+                    else
+                        G := Grp(ri);
+                        gens := NiceGens(ri);
+                    fi;
+                    iso := IsomorphismFpGroupByGenerators(G, gens);
+                    SetStdPresentation(ri, Range(iso));
                 fi;
-                # Normally the recognition method should set StdPresentation.
-                # Only in the worst case should IsomorphismFpGroupByGenerators be used.
-                iso := IsomorphismFpGroupByGenerators(G, gens);
-                SetStdPresentation(ri, Range(iso));
             end);
         fi;
         if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
