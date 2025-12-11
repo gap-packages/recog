@@ -33,6 +33,7 @@ ReadPackage("recog","gap/utils.gi");
 ReadPackage("recog","gap/generic/TrivialGroup.gi");
 ReadPackage("recog","gap/generic/FewGensAbelian.gi");
 ReadPackage("recog","gap/generic/KnownNilpotent.gi");
+ReadPackage("recog","gap/generic/slconstr.gi");
 
 # Permutations:
 ReadPackage("recog","gap/perm/giant.gi");
@@ -47,7 +48,6 @@ ReadPackage("recog","gap/projective/c6.gi");
 ReadPackage("recog","gap/projective/tensor.gi");
 ReadPackage("recog","gap/matrix/ppd.gi");
 ReadPackage("recog","gap/matrix/classical.gi");
-ReadPackage("recog","gap/matrix/slconstr.gi");
 ReadPackage("recog","gap/projective/c3c5.gi");
 ReadPackage("recog","gap/projective/d247.gi");
 ReadPackage("recog","gap/projective/almostsimple/threeelorders.gi");
