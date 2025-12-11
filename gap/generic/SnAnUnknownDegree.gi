@@ -80,7 +80,6 @@
 RECOG.SnAnDebug := false;
 
 BindGlobal("SnAnTryLater", MakeImmutable("SnAnTryLater"));
-BindGlobal("SnAnRepeatImmediately", MakeImmutable("SnAnRepeatImmediately"));
 
 RECOG.SnAnGetCache := function(ri)
     if not IsBound(ri!.SnAnUnknownDegreeCache) then
@@ -172,7 +171,7 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
         # counters
         Ki, Li, curInvolutionPos,
         # helper functions
-        tryThreeCycleCandidate, oneThreeCycleCandidate,
+        oneThreeCycleCandidate,
         # used for debugging
         cache;
     # Step 1: Initialization
@@ -218,13 +217,12 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
     fi;
 
     # Helper functions
-    # tryThreeCycleCandidate returns one of the following:
+    # oneThreeCycleCandidate returns one of the following:
     # - a three cycle candidate, i.e. an element of G
     # - TemporaryFailure, if we exhausted all attempts
     # - SnAnTryLater, if we tried all involution candidates K times
-    # - SnAnRepeatImmediately, if we have to call tryThreeCycleCandidate again
     # - NeverApplicable, if G can not be an Sn or An
-    tryThreeCycleCandidate := function()
+    oneThreeCycleCandidate := function()
         local
             # integer, loop variable
             a,
@@ -233,102 +231,92 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
             # the three cycle candidate
             candidate;
 
-        # Steps 2 & 3: New involution
-        #########################################################################
-        # We consider at most B involutions.
-        if curInvolutionPos > B then
-            curInvolutionPos := 1;
-        fi;
-        # We did not construct yet the involution to consider
-        if curInvolutionPos > Length(involutions) then
-            r := RandomElm(ri, "SnAnUnknownDegree", true)!.el;
-            # In the paper, we have t = r ^ M.
-            # Invariant: tPower = (r ^ M) ^ (2 ^ a)
-            tPower := r ^ M;
-            # We make a small improvement to the version described in
-            # <Cite Key="JLNP13"/>. The order of r ^ M is a 2-power.
-            # It can be at most 2 ^ logInt2N. Thus, if we find an r such that
-            # (r ^ M) ^ (2 ^ logInt2N) is non-trivial, then we can return
-            # NeverApplicable.
-            for a in [1 .. logInt2N] do
-                tPowerOld := tPower;
-                tPower := tPower ^ 2;
-                if isone(ri)(tPower) then break; fi;
-            od;
-            if not isone(ri)(tPower) then
-                return NeverApplicable;
-            fi;
-            involutions[curInvolutionPos] := tPowerOld;
-            nrTriedConjugates[curInvolutionPos] := 0;
-            nrCommutatingConjugates[curInvolutionPos] := 0;
-            nrThreeCycleCandidates[curInvolutionPos] := 0;
-        fi;
-        # Check if we either tried enough conjugates or already found enough
-        # commutating conjugates for all involutions t.
-        # If this is the case, then we have exhausted all attempts.
-        if curInvolutionPos = B
-            and ForAll([1 .. B], i -> nrTriedConjugates[i] >= C or nrCommutatingConjugates[i] >= T)
-        then
-            return TemporaryFailure;
-        fi;
-        # If we either considered enough conjugates or already found enough
-        # commutating conjugates for the current involution t,
-        # we need to consider the next involution, or reached the end of our batch of involutions.
-        # Recall, that we work in batches for the lazy version.
-        # We work in batches of at most L involutions and for these,
-        # in batches of K conjugates.
-        if nrTriedConjugates[curInvolutionPos] >= Ki or nrCommutatingConjugates[curInvolutionPos] >= T then
-            if curInvolutionPos = B then
-                Li := L;
-                Li := Minimum(Li, B);
-                Ki := Ki + K;
-                Ki := Minimum(Ki, C);
+        while true do
+            # Steps 2 & 3: New involution
+            #########################################################################
+            # We consider at most B involutions.
+            if curInvolutionPos > B then
                 curInvolutionPos := 1;
-                return SnAnTryLater;
-            elif curInvolutionPos = Li then
-                Li := Li + L;
-                Li := Minimum(Li, B);
-                curInvolutionPos := curInvolutionPos + 1;
-                return SnAnTryLater;
-            else
-                curInvolutionPos := curInvolutionPos + 1;
-                return SnAnRepeatImmediately;
             fi;
-        fi;
+            # We did not construct yet the involution to consider
+            if curInvolutionPos > Length(involutions) then
+                r := RandomElm(ri, "SnAnUnknownDegree", true)!.el;
+                # In the paper, we have t = r ^ M.
+                # Invariant: tPower = (r ^ M) ^ (2 ^ a)
+                tPower := r ^ M;
+                # We make a small improvement to the version described in
+                # <Cite Key="JLNP13"/>. The order of r ^ M is a 2-power.
+                # It can be at most 2 ^ logInt2N. Thus, if we find an r such that
+                # (r ^ M) ^ (2 ^ logInt2N) is non-trivial, then we can return
+                # NeverApplicable.
+                for a in [1 .. logInt2N] do
+                    tPowerOld := tPower;
+                    tPower := tPower ^ 2;
+                    if isone(ri)(tPower) then break; fi;
+                od;
+                if not isone(ri)(tPower) then
+                    return NeverApplicable;
+                fi;
+                involutions[curInvolutionPos] := tPowerOld;
+                nrTriedConjugates[curInvolutionPos] := 0;
+                nrCommutatingConjugates[curInvolutionPos] := 0;
+                nrThreeCycleCandidates[curInvolutionPos] := 0;
+            fi;
+            # Check if we either tried enough conjugates or already found enough
+            # commutating conjugates for all involutions t.
+            # If this is the case, then we have exhausted all attempts.
+            if curInvolutionPos = B
+                and ForAll([1 .. B], i -> nrTriedConjugates[i] >= C or nrCommutatingConjugates[i] >= T)
+            then
+                return TemporaryFailure;
+            fi;
+            # If we either considered enough conjugates or already found enough
+            # commutating conjugates for the current involution t,
+            # we need to consider the next involution, or reached the end of our batch of involutions.
+            # Recall, that we work in batches for the lazy version.
+            # We work in batches of at most L involutions and for these,
+            # in batches of K conjugates.
+            if nrTriedConjugates[curInvolutionPos] >= Ki or nrCommutatingConjugates[curInvolutionPos] >= T then
+                if curInvolutionPos = B then
+                    Li := L;
+                    Li := Minimum(Li, B);
+                    Ki := Ki + K;
+                    Ki := Minimum(Ki, C);
+                    curInvolutionPos := 1;
+                    return SnAnTryLater;
+                elif curInvolutionPos = Li then
+                    Li := Li + L;
+                    Li := Minimum(Li, B);
+                    curInvolutionPos := curInvolutionPos + 1;
+                    return SnAnTryLater;
+                else
+                    curInvolutionPos := curInvolutionPos + 1;
+                    continue;  # we have to start over
+                fi;
+            fi;
 
-        # Steps 4 & 5: new three cycle candidate
-        #########################################################################
-        # Try to construct a three cycle candidate via a conjugate of t. See
-        # the comment above this function.
-        t := involutions[curInvolutionPos];
-        nrTriedConjugates[curInvolutionPos] := nrTriedConjugates[curInvolutionPos] + 1;
-        c := t ^ RandomElm(ri, "SnAnUnknownDegree", true)!.el;
-        if isequal(ri)(t * c, c * t) then
-            # we have to call tryThreeCycleCandidate again
-            return SnAnRepeatImmediately;
-        fi;
-        nrCommutatingConjugates[curInvolutionPos] := nrCommutatingConjugates[curInvolutionPos] + 1;
-        candidate := (t * c) ^ 2;
-        # We now use a one-sided heuristic to test whether candidate can be a
-        # three cycle, that is the heuristic can detect whether candidate can
-        # not be a three cycle, e.g. if it does not have order three.
-        if RECOG.HeuristicThreeCycleTest(ri, candidate, logInt2N, R) then
-            nrThreeCycleCandidates[curInvolutionPos] := nrThreeCycleCandidates[curInvolutionPos] + 1;
-            return candidate;
-        else
-            return SnAnRepeatImmediately;
-        fi;
-    end;
+            # Steps 4 & 5: new three cycle candidate
+            #########################################################################
+            # Try to construct a three cycle candidate via a conjugate of t. See
+            # the comment above this function.
+            t := involutions[curInvolutionPos];
+            nrTriedConjugates[curInvolutionPos] := nrTriedConjugates[curInvolutionPos] + 1;
+            c := t ^ RandomElm(ri, "SnAnUnknownDegree", true)!.el;
+            if isequal(ri)(t * c, c * t) then
+                continue;  # we have to start over
+            fi;
+            nrCommutatingConjugates[curInvolutionPos] := nrCommutatingConjugates[curInvolutionPos] + 1;
+            candidate := (t * c) ^ 2;
+            # We now use a one-sided heuristic to test whether candidate can be a
+            # three cycle, that is the heuristic can detect whether candidate can
+            # not be a three cycle, e.g. if it does not have order three.
+            if RECOG.HeuristicThreeCycleTest(ri, candidate, logInt2N, R) then
+                nrThreeCycleCandidates[curInvolutionPos] := nrThreeCycleCandidates[curInvolutionPos] + 1;
+                return candidate;
+            fi;
 
-    # construct the iterator
-    oneThreeCycleCandidate := function()
-        local candidate;
-        repeat
-            candidate := tryThreeCycleCandidate();
-        until candidate <> SnAnRepeatImmediately;
-        # With probability at least 1 - eps we constructed at least one
-        # three cycle with this iterator.
-        return candidate;
+            # if we get here, we'll loop around and start over
+        od;
     end;
 
     return oneThreeCycleCandidate;
