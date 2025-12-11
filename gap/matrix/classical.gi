@@ -1901,10 +1901,10 @@ function(recognise,grp)
                 return CheckFlag();
         fi;
     elif d = 4 and q =  4 then
-        # TODO: check all occurences of Orbit and Orbits for the "conformals
-        # can merge orbits"-bug.
-
-        if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) in [75,60] then
+        # the conformal group can have orbits of length 75 and 180
+        # the group Omega can have orbits of lengths 75 and 60
+        if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) mod 60 = 0
+          and not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) mod 75 = 0 then
             return false;
         fi;
         pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
@@ -1926,7 +1926,10 @@ function(recognise,grp)
         fi;
     elif d = 4 and q = 5 then
         ## Added fast test 4.7.2019 ACN
-        if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) in [144,120] then
+        # the conformal group can have orbits of length 144 and 480
+        # the group Omega can have orbits of lengths 144 and 120
+        if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) mod 144 = 0
+          and not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) mod 120 = 0 then
             return false;
         fi;
         ## The projective Group has half order of Omega
@@ -1940,7 +1943,10 @@ function(recognise,grp)
         fi;
     elif d = 4 and q = 7 then
         ## Added fast test 4.7.2019 ACN
-        if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) in [384,336] then
+        # the conformal group can have orbits of length 384 and 2016
+        # the group Omega can have orbits of lengths 384 and 336
+        if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) mod 384 = 0
+         and not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) mod 336 = 0 then
             return false;
         fi;
         pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
@@ -1962,7 +1968,10 @@ function(recognise,grp)
         fi;
     elif d = 4 and q = 9 then
         ## Added fast test 4.7.2019 ACN
-        if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) in [800,720] then
+        # the conformal group can have orbits of length 800 and 5760
+        # the group Omega can have orbits of lengths 800 and 720
+        if not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) mod 800 = 0
+         and not Length( Orbit( grp, IdentityMat(d, GF(q))[1]) ) mod 720 = 0 then
             return false;
         fi;
         pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
