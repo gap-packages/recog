@@ -755,7 +755,7 @@ function(recognise, grp)
         fi;
      fi;
 
-     if recognise.needKF  = true  then
+     if recognise.needKroneckerFactors  = true  then
             if recognise.bc = "unknown" then
                 recognise.needBaseChange := true;
             else
@@ -768,14 +768,14 @@ function(recognise, grp)
       fi;
 
       if recognise.needPlusMinus = true then
-            if recognise.kf = "unknown" then
-                recognise.needKF := true;
+            if recognise.kroneckerFactors = "unknown" then
+                recognise.needKroneckerFactors := true;
                 return fail;
             fi;
-            if recognise.kf = false then
+            if recognise.kroneckerFactors = false then
                 return fail;
             fi;
-            kf := recognise.kf;
+            kf := recognise.kroneckerFactors;
             o1 := ProjectiveOrder( kf[1] )[1];
             o2 := ProjectiveOrder( kf[2] )[1];
             #o1 := Order( kf[1] );
@@ -820,13 +820,13 @@ function(recognise, grp)
         fi;
 
         if recognise.needDecompose = true then
-            if recognise.kf = "unknown" then
-                recognise.needKF := true;
+            if recognise.kroneckerFactors = "unknown" then
+                recognise.needKroneckerFactors := true;
                 return fail;
-            elif recognise.kf = false then
+            elif recognise.kroneckerFactors = false then
                 return fail;
             fi;
-            kf := recognise.kf;
+            kf := recognise.kroneckerFactors;
 
             if not kf[1] in Group(recognise.sq1) then
                 AddSet(recognise.sq1,kf[1]);
@@ -1453,10 +1453,10 @@ function(recognise, grp)
         if not 4 in recognise.LB then
             return fail;
         fi;
-        if not 2 in  recognise.LS then
+        if not 2 in recognise.LS then
             return fail;
         fi;
-    elif d = 4  and q >= 7 and IsPowerOfTwo(q+1) then
+    elif d = 4 and q >= 7 and IsPowerOfTwo(q+1) then
         if not 4 in recognise.LB then
             return fail;
         fi;
@@ -2337,7 +2337,7 @@ function( arg )
                    # LB = e's of large basic ppd elements
                    # E2 = e's of ppd elements for e=d/2
                    E := [], LE := [], BE := [], LB := [],
-                   LS := [], E2 := [], LE2 := [], BE2 := [],
+                   LS := [], E2 := [],
                    g := fail,
                    cpol := fail,
                    isppd := fail,
@@ -2358,7 +2358,7 @@ function( arg )
                    porders := [],
                    hasSpecialEle := false,
                    bc := "unknown",
-                   kf := "unknown",
+                   kroneckerFactors := "unknown",
                    plusminus := Set([]),
                    sq1 := [Z(q)*One(GL(2,q))],
                    sq2 := [Z(q)*One(GL(2,q))],
@@ -2368,7 +2368,7 @@ function( arg )
                    needOrders := false,
                    needPOrders := false,
                    needBaseChange := false,
-                   needKF := false,
+                   needKroneckerFactors := false,
                    needPlusMinus := false,
                    needDecompose := false,
                    needLB := false,
