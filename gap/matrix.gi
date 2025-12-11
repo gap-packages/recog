@@ -358,6 +358,62 @@ RECOG.FindAdjustedBasis := function(l)
   return rec(base := seb.vectors, baseinv := seb.vectors^-1, blocks := blocks);
 end;
 
+# helper for recognition nodes for a matrix group: return the corresponding
+# meataxe G-module, either a previously computed one, or a fresh copy.
+#
+# We do not use an attribute due to questions about the mutability status of
+# recog nodes, see <https://github.com/gap-packages/recog/issues/356>.
+RECOG.MeataxeModule := function(ri)
+  if not IsBound(ri!.meataxemodule) then
+      ri!.meataxemodule := GModuleByMats(GeneratorsOfGroup(Grp(ri)), ri!.field);
+  fi;
+  return ri!.meataxemodule;
+end;
+
+# helper for recognition nodes for a matrix group: test if the group
+# acts irreducibly.
+#
+# We do not use a property due to questions about the mutability status of
+# recog nodes, see <https://github.com/gap-packages/recog/issues/356>.
+RECOG.IsIrreducible := function(ri)
+  if not IsBound(ri!.isirreducible) then
+      ri!.isirreducible := MTX.IsIrreducible(RECOG.MeataxeModule(ri));
+  fi;
+  return ri!.isirreducible;
+end;
+
+RECOG.SetIsIrreducible := function(ri, flag)
+  Assert(0, flag = true or flag = false);
+  if IsBound(ri!.isirreducible) and ri!.isirreducible <> flag then
+    Error("must not change ri!.isirreducible from ", ri!.isirreducible, " to ", flag);
+  fi;
+  ri!.isirreducible := flag;
+end;
+
+# helper for recognition nodes for a matrix group: test if the group
+# acts absolutely irreducibly.
+#
+# We do not use a property due to questions about the mutability status of
+# recog nodes, see <https://github.com/gap-packages/recog/issues/356>.
+RECOG.IsAbsolutelyIrreducible := function(ri)
+  if not IsBound(ri!.isabsolutelyirred) then
+      ri!.isabsolutelyirred := MTX.IsAbsolutelyIrreducible(RECOG.MeataxeModule(ri));
+  fi;
+  return ri!.isabsolutelyirred;
+end;
+
+RECOG.SetIsAbsolutelyIrreducible := function(ri, flag)
+  Assert(0, flag = true or flag = false);
+  if IsBound(ri!.isabsolutelyirred) and ri!.isabsolutelyirred <> flag then
+    Error("must not change ri!.isabsolutelyirred from ", ri!.isabsolutelyirred, " to ", flag);
+  fi;
+  ri!.isabsolutelyirred := flag;
+  if flag = true then  # absolutely irreducible implies irreducible
+    RECOG.SetIsIrreducible(ri, flag);
+  fi;
+end;
+
+
 #! @BeginChunk ReducibleIso
 #! This method determines whether a matrix group <A>G</A> acts irreducibly.
 #! If yes, then it returns <K>NeverApplicable</K>. If <A>G</A> acts reducibly then
@@ -380,7 +436,7 @@ BindRecogMethod(FindHomMethodsMatrix, "ReducibleIso",
 #"use MeatAxe to find a composition series, do base change",
 function(ri,G)
   # First we use the MeatAxe to find an invariant subspace:
-  local H,bc,compseries,f,hom,isirred,m,newgens;
+  local H,bc,compseries,hom,newgens;
 
   RECOG.SetPseudoRandomStamp(G,"ReducibleIso");
 
@@ -389,20 +445,13 @@ function(ri,G)
       return NeverApplicable;
   fi;
 
-  # FIXME:
-  f := ri!.field;
-  m := GModuleByMats(GeneratorsOfGroup(G),f);
-  isirred := MTX.IsIrreducible(m);
-
-  # Save the MeatAxe module for later use:
-  ri!.meataxemodule := m;
   # Report enduring failure if irreducible:
-  if isirred then
+  if RECOG.IsIrreducible(ri) then
       return NeverApplicable;
   fi;
 
   # Now compute a composition series:
-  compseries := MTX.BasesCompositionSeries(m);
+  compseries := MTX.BasesCompositionSeries(RECOG.MeataxeModule(ri));
   bc := RECOG.FindAdjustedBasis(compseries);
 
   Info(InfoRecog,2,"Found composition series with block sizes ",

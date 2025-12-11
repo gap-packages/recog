@@ -461,7 +461,7 @@ InstallGlobalFunction( RecogniseGeneric,
     depth := Length(depthString);
 
     PrintTreePos("E",depthString,H);
-    Info(InfoRecog,4,"Recognising: ",H);
+    Info(InfoRecog,4,"Recognising group with ",Length(GeneratorsOfGroup(H)), " generators");
 
     if Length(GeneratorsOfGroup(H)) = 0 then
         H := Group([One(H)]);
