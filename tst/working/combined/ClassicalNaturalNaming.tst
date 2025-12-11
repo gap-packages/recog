@@ -1,7 +1,6 @@
 #
 # This file contains tests for the naming (= non-constructive recognition) of
-# classical groups as implemented in classical.gi; see also [NP97],
-# [NP98]
+# classical groups as implemented in classical.gi; see also [NP97], [NP98]
 #
 gap> ReadPackage("recog", "tst/naming.g");
 true
