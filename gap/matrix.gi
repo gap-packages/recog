@@ -640,7 +640,7 @@ end);
 #
 #  return true;
 #end;
-#
+
 RECOG.ExtractLowStuff := function(m,layer,blocks,lens,basisOfFieldExtension)
   local block,i,j,k,l,pos,v,what,where;
   v := ZeroVector(lens[layer],m[1]);
@@ -720,13 +720,14 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
         ready := false;
         while not ready do
             # Find out where there is something left:
-            while pos > Length(v) and not ready do
+            while pos > Length(v) do
                 curlay := curlay + 1;
                 if curlay <= Length(lens) then
                     v := RECOG.ExtractLowStuff(x,curlay,ri!.blocks,lens,basisOfFieldExtension);
                     pos := PositionNonZero(v);
                 else
                     ready := true;   # x is now equal to the identity!
+                    break;
                 fi;
             od;
             # Either there is something left in this layer or we are done
@@ -768,6 +769,7 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
             nothingnew := nothingnew + 1;
         fi;
     od;
+
     # Now make sure those things get handed down to the kernel:
     InitialDataForKernelRecogNode(ri).gensNvectors := lvec;
     InitialDataForKernelRecogNode(ri).gensNpivots := pivots;
@@ -787,7 +789,7 @@ InstallGlobalFunction( FindKernelLowerLeftPGroup,
 # generating sequence) to cancel out the
 # entries in <g>. The coefficents of the process create the SLP.
 # TODO Max H. wants to rewrite the code to work row-by-row
-# instead of blockwise; that should result in both simple and faster code.
+# instead of blockwise; that should result in both simpler and faster code.
 SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
   # First project and calculate the vector:
   local done,h,i,l,layer,pow;
