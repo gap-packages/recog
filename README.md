@@ -39,7 +39,7 @@ To enable GAP to find recog you can start GAP via
 
 > [!TIP]
 > You can add this option to your GAP startup script. More information about
-> this can be found [in Chapter 3 of the GAP reference manual](https://docs.gap-system.org/doc/ref/chap3.html).
+> this can be found in [Chapter 3 of the GAP reference manual](https://docs.gap-system.org/doc/ref/chap3.html).
 
 ## Loading
 
