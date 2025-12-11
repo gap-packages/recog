@@ -8,7 +8,7 @@ TestNaming := function(grpname, param...)
         #isNotPSL := true,
         isReducible := false,
         #isSLContained := false, # problems with e.g. SO(5,7)
-        isSOContained := false,
+        isOmegaContained := false,
         isSpContained := false,
         isSUContained := false,
     );
@@ -20,7 +20,7 @@ TestNaming := function(grpname, param...)
             Assert(0, IsOddInt(param[1]));
             expected.isReducible := true;
         else
-            expected.isSOContained := true;
+            expected.isOmegaContained := true;
         fi;
     elif grpname = "Sp" then
         expected.isSpContained := true;

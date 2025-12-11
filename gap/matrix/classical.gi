@@ -716,7 +716,7 @@ function(recognise, grp)
 
     if ForAny(recognise.E, x -> x mod 2 <> 0) then
         recognise.isSpContained := false;
-        recognise.isSOContained := false;
+        recognise.isOmegaContained := false;
     fi;
     if ForAny(recognise.E, x -> x mod 2 = 0) then
         recognise.isSUContained := false;
@@ -1007,7 +1007,7 @@ function( recognise, grp )
         recognise.isSLContained := false;
         recognise.isSpContained := false;
         recognise.isSUContained := false;
-        recognise.isSOContained := false;
+        recognise.isOmegaContained := false;
         return true;
     fi;
 end);
@@ -1178,7 +1178,7 @@ end);
 
 
 ## Main function to test whether group contains SO
-BindRecogMethod(FindHomMethodsClassical, "IsSOContained",
+BindRecogMethod(FindHomMethodsClassical, "isOmegaContained",
 "tests whether group contains SO",
 function( recognise, grp )
     local f, isParForm, isEllForm, isHypForm;
@@ -1187,7 +1187,7 @@ function( recognise, grp )
     isEllForm := f -> IsSesquilinearForm(f) and IsEllipticForm(f);
     isHypForm := f -> IsSesquilinearForm(f) and IsHyperbolicForm(f);
 
-    if recognise.isSOContained = false then
+    if recognise.isOmegaContained = false then
         return false;
     fi;
 
@@ -1231,7 +1231,7 @@ function( recognise, grp )
             return fail;
         fi;
         recognise.isNotExt := true;
-        recognise.isSOContained := true;
+        recognise.isOmegaContained := true;
         Info(InfoClassical,2,"The group contains SO^o(", recognise.d, ", ",
              recognise.q, ");");
         return true;
@@ -1247,7 +1247,7 @@ function( recognise, grp )
             return fail;
         fi;
         recognise.isNotExt := true;
-        recognise.isSOContained := true;
+        recognise.isOmegaContained := true;
         Info(InfoClassical,2,"The group contains SO+(", recognise.d, ", ",
              recognise.q, ");");
         return true;
@@ -1263,12 +1263,12 @@ function( recognise, grp )
             return fail;
         fi;
         recognise.isNotExt := true;
-        recognise.isSOContained := true;
+        recognise.isOmegaContained := true;
         Info(InfoClassical,2,"The group contains SO-(", recognise.d, ", ",
              recognise.q, ");");
         return true;
     else
-        recognise.isSOContained := false;
+        recognise.isOmegaContained := false;
         Info(InfoClassical,2,"The group does not contain SO(",
              recognise.d, ", ", recognise.q, ");");
         return false;
@@ -1728,7 +1728,7 @@ function(recognise,grp)
         Info(InfoClassical,2,"group contains SO+(",
              recognise.d, ", ", recognise.q, ");");
 
-        recognise.isSOContained := true;
+        recognise.isOmegaContained := true;
         return true;
     end;
 
@@ -1782,14 +1782,14 @@ function(recognise,grp)
         # orbits of these lengths. The maximal subgroups of the conformal
         # orthogonal don't have these orbit lengths.
         if Set(orbs,Length) <> [ 120, 135 ] then
-           recognise.isSOContained := false;
+           recognise.isOmegaContained := false;
            return false;
         fi;
         StabChain(pgrp, rec(random := 200, limit := 174182400));
         if Size(pgrp) mod 174182400 = 0 then # compare to Size(POmega(+1,8,2))
            return CheckFlag();
         else
-           recognise.isSOContained := false;
+           recognise.isOmegaContained := false;
            return false;
          fi;
     elif d = 8 and q = 3 then
@@ -1801,7 +1801,7 @@ function(recognise,grp)
         if Size(pgrp) mod 4952179814400 = 0 then # compare to Size(POmega(+1,8,3))
              return CheckFlag();
         else
-             recognise.isSOContained := false;
+             recognise.isOmegaContained := false;
              return false;
         fi;
     elif d = 8 and q = 5 then
@@ -1868,7 +1868,7 @@ function(recognise,grp)
         fi;
     elif d = 4 and q = 2 then
         if Size(grp) mod 36 <> 0 then
-            recognise.isSOContained := false;
+            recognise.isOmegaContained := false;
             return false;
         fi;
         if recognise.needDecompose = false then
@@ -1885,7 +1885,7 @@ function(recognise,grp)
         fi;
     elif d = 4 and q = 3 then
         if Size(grp) mod 288 <> 0 then
-            recognise.isSOContained := false;
+            recognise.isOmegaContained := false;
             return false;
         fi;
         if recognise.needDecompose = false then
@@ -1909,7 +1909,7 @@ function(recognise,grp)
         fi;
         pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
         if Size(pgrp) mod 3600 <> 0 then
-             recognise.isSOContained := false;
+             recognise.isOmegaContained := false;
              return false;
         fi;
         if recognise.needDecompose = false then
@@ -1933,7 +1933,7 @@ function(recognise,grp)
         ## Fix 4.7.2019
         pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
         if Size(pgrp) mod 3600 <> 0 then
-            recognise.isSOContained := false;
+            recognise.isOmegaContained := false;
             return false;
         else
             return CheckFlag();
@@ -1945,7 +1945,7 @@ function(recognise,grp)
         fi;
         pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
         if Size(pgrp) mod 28224  <> 0 then
-            recognise.isSOContained := false;
+            recognise.isOmegaContained := false;
             return false;
         fi;
         if recognise.needDecompose = false then
@@ -1967,7 +1967,7 @@ function(recognise,grp)
         fi;
         pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
         if Size(pgrp) mod 129600 <> 0 then
-            recognise.isSOContained := false;
+            recognise.isOmegaContained := false;
             return false;
         else
             return CheckFlag();
@@ -2001,7 +2001,7 @@ function(recognise, grp)
         fi;
         Info(InfoClassical,2,"group contains SO-(",
              recognise.d, ", ", recognise.q, ");");
-        recognise.isSOContained := true;
+        recognise.isOmegaContained := true;
         return true;
     end;
 
@@ -2060,7 +2060,7 @@ function(recognise, grp)
         pgrp := ProjectiveActionOnFullSpace( grp, GF(3), 4 );
         orbs := Orbits( pgrp, MovedPointsPerms( GeneratorsOfGroup(pgrp)));
         if Length(orbs) >  3 then # ACN 10/6/08
-            recognise.isSOContained := false;
+            recognise.isOmegaContained := false;
             return false;
          fi;
     elif d = 4 and q >=  4 then
@@ -2080,7 +2080,7 @@ function(recognise, grp)
         od;
         Info(InfoClassical, 2, "grp contained in O-(2,", q,  "^2)" );
         recognise.isNotExt := false;
-        recognise.isSOContained := false;
+        recognise.isOmegaContained := false;
         return false;
     else
       Info(InfoClassical, 2, "NonGenericO-: d and q must be generic" );
@@ -2116,7 +2116,7 @@ function( recognise, grp )
         fi;
         Info(InfoClassical,2,"group contains SOo(",
              recognise.d, ", ", recognise.q, ");");
-        recognise.isSOContained := true;
+        recognise.isOmegaContained := true;
         return true;
     end;
 
@@ -2187,7 +2187,7 @@ function( recognise, grp )
         else
                return CheckFlag();
         fi;
-        recognise.isSOContained := false;
+        recognise.isOmegaContained := false;
         return false;
     elif d = 3 and q = 11 then
         if not HasElementsMultipleOf( recognise.orders, [3,11])  then
@@ -2288,7 +2288,7 @@ AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsSpContained, 17);
 
 AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsSUContained, 18);
 
-AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsSOContained, 19);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.isOmegaContained, 19);
 
 
 
@@ -2381,7 +2381,7 @@ function( arg )
                    isSLContained := "unknown",
                    isSpContained := "unknown",
                    isSUContained := "unknown",
-                   isSOContained := "unknown",
+                   isOmegaContained := "unknown",
                   );
   merkinfolevel := InfoLevel(InfoMethSel);
   SetInfoLevel(InfoMethSel,0);
@@ -2480,7 +2480,7 @@ DisplayRecog := function( r )
                 Print("--------> contains SU(", r.d, ",", q0, ")\n");
             fi;
 
-            if r.isSOContained = true then
+            if r.isOmegaContained = true then
                 Print("--------> contains SO(", r.d, ",", r.q, ")\n");
             fi;
 
