@@ -52,9 +52,6 @@
 ##      Press, 1999.
 ##
 ##
-##    described in [CLG97b], which can often avoid an application of the
-##    Meataxe algorithm.
-##
 ##
 #############################################################################
 
