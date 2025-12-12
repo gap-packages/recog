@@ -289,7 +289,6 @@ function (recognise, grp)
     q := recognise.q;
     E := recognise.E;
 
-
     differmodfour := function(E)
         local e;
         for e in E do
