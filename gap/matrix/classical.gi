@@ -702,7 +702,7 @@ function(recognise, grp)
     else
         AddSet(recognise.E,ppd[1]);
         recognise.currentgcd := GcdInt( recognise.currentgcd, ppd[1] );
-	# check whether we have a large ppd-element
+        # check whether we have a large ppd-element
         if ppd[2] = true then
             AddSet(recognise.LE,ppd[1]);
         fi;
