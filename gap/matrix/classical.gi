@@ -1956,7 +1956,7 @@ function(recognise,grp)
         # the conformal group can have orbits of length 75 and 180
         # the group Omega can have orbits of lengths 75 and 60
         ol := Length(Orbit(grp, IdentityMat(d, GF(q))[1]));
-        if not ol mod 60 = 0 and not ol mod 75 = 0 then
+        if not ol in [60,75,180] then
             return false;
         fi;
         pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
