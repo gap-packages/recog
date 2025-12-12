@@ -2024,7 +2024,7 @@ function(recognise,grp)
         ## Added fast test 4.7.2019 ACN
         # the conformal group can have orbits of length 800 and 5760
         # the group Omega can have orbits of lengths 800 and 720
-	ol := Length(Orbit(grp, IdentityMat(d, GF(q))[1]));
+        ol := Length(Orbit(grp, IdentityMat(d, GF(q))[1]));
         if not ol mod 800 = 0 and not ol mod 720 = 0 then
             return false;
         fi;
