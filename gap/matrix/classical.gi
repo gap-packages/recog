@@ -897,8 +897,6 @@ end);
 # These might already yield enough information to show
 # that the group acts irreducible without calling
 # the Meataxe. This function is described in [CLG97b].
-
-
 BindRecogMethod(FindHomMethodsClassical, "IsReducible",
 "tests whether current random element rules out reducible",
 function( recognise, grp )
