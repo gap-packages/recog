@@ -1955,7 +1955,7 @@ function(recognise,grp)
     elif d = 4 and q =  4 then
         # the conformal group can have orbits of length 75 and 180
         # the group Omega can have orbits of lengths 75 and 60
-	ol := Length(Orbit(grp, IdentityMat(d, GF(q))[1]));
+        ol := Length(Orbit(grp, IdentityMat(d, GF(q))[1]));
         if not ol mod 60 = 0 and not ol mod 75 = 0 then
             return false;
         fi;
