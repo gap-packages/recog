@@ -252,8 +252,6 @@ end);
 # two ppd elements, one large and one basic. If we have not yet
 # found them, we return TemporaryFailure and have to inspect
 # more random elements.
-
-
 BindRecogMethod(FindHomMethodsClassical, "IsGeneric",
 "tests whether group is generic",
 function (recognise, grp)
