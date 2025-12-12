@@ -17,7 +17,81 @@
 ##  <Cite Key="JLNP13"/>.
 ##
 #############################################################################
-#
+
+##  General Strategy
+##  ----------------
+##
+##  Here we describe the general strategy that is used to recognise if a group
+##  is ismorphic to `An` or `Sn` for `n >= 7`.
+##
+##  We have to be careful what we do for small degrees.
+##  If we pass an `A5`, `S5`, `A6`, `S6` into `SnAnUnknownDegree`, then it will not recognize it.
+##  If the input acts on a space with a large dimension, then this can take forever.
+##
+##  - We assume that our input group `G` is a projective irreducible matrix group.
+##  - Deduce an upper bound `N` for the degree of `An`, `Sn` by using bounds provided in [KL90].
+##  - Look at some orders and deduce a lower bound `M` for the degree.
+##      - If `M > N`, then we excluded `An`, `Sn`.
+##      - If `M <= 6`, then we return `TemporaryFailure`.
+##      - TODO: If `N > 20`, use Magma Code `GuessSnAnDegree` to guess the degree by element orders.
+##      - TODO: If `GuessSnAnDegree` was used, then we check if we can found
+##        an element of order in the interval `[N - m, N + m]`.
+##      - Otherwise, we continue.
+##  - Now we can assume for the degree `n >= 7`. We need to ensure this, since
+##    `SnAnUnknownDegree` cannot recognise `A5`, `S5`, `A6`, `S6` and could run
+##    for a considerable time.
+##  - Monte-Carlo: Try to compute standard generators and degree `n` of
+##    largest `An < G` via the algorithm in [JLNP13].
+##  - Try to compute an isomorphism from `G` to `An` or `Sn`.
+##      - If `n < 11`, then use methods from Jonathan Conder (phd thesis)
+##      - Otherwise, we have `n >= 11` and use methods from `SnAnKnownDegree` in [BLGN+03]
+##
+##  Changes
+##  -------
+##  Here we collect the changes in `SnAnUnknownDegree` compared to a "vanilla"
+##  implementation of the algorithm according to the paper [JLNP13].
+##
+##  - Computation of upper bound `N` done as in `[L84]` and `[KL90]`.
+##  - Computation of lower bound `M` by element orders.
+##  - For each ThreeCycleCandidate `c` we check if `c^3 = 1` and we check for
+##    some random elements `r` if for the element `x := c * c^r` either `x^5 = 1`
+##    or `x^6 = 1` holds (The element `x` needs to have order `1`, `2`, `3` or `5`).
+##  - Use `RecogniseSnAnLazy` that caches iterators constructed by
+##    `ThreeCycleCandidatesIterator` and returns `TemporaryFailure` more
+##    quickly.
+##  - `ThreeCycleCandidatesIterator` uses a similar approach to that from the
+##    Magma Code `GetNextThreeCycle` and thus computes the elements in a
+##    different ordering to the paper.
+##    - We work in batches of at most `L = 10` involutions in a linear manner.
+##      We save all involutions considered so far.
+##    - For every involution, we consider only up to `K = 5` random
+##      conjugates. If none is successful, we move to the next involution.
+##    - If a batch of involutions reaches the last involution, i.e. the `B`-th
+##      one, we start with the first involution in the next round.
+##    - After a batch of involutions was completely processed, we return
+##      `SnAnTryLater` and exit the recognition method in the lazy variant.
+##    - However, as in the vanilla implementation, we return
+##      `TemporaryFailure` if for all `B` involutions either `C` conjugates have
+##      been tested in total or `T` conjugates were proven to commutate with the
+##      involution.
+##  - Use Conder's Thesis to compute images for degree `n <= 10`.
+
+
+RECOG.SnAnDebug := false;
+
+BindGlobal("SnAnTryLater", MakeImmutable("SnAnTryLater"));
+
+RECOG.SnAnGetCache := function(ri)
+    if not IsBound(ri!.SnAnUnknownDegreeCache) then
+        ri!.SnAnUnknownDegreeCache := rec();
+    fi;
+    return ri!.SnAnUnknownDegreeCache;
+end;
+
+RECOG.SnAnResetCache := function(ri)
+    ri!.SnAnUnknownDegreeCache := rec();
+end;
+
 # eps : real number, the error bound
 # N : integer, upper bound for the degree of G
 #
@@ -37,12 +111,35 @@ RECOG.ThreeCycleCandidatesConstants := function(eps, N)
         B := Int(Ceil(13 * Log(Float(N)) * Log(3 / Float(eps)))),
         T := Int(Ceil(3 * Log(3 / Float(eps)))),
         C := Int(Ceil(Float(3 * N * ~.T / 5))),
-        logInt2N := LogInt(N, 2)
+        logInt2N := LogInt(N, 2),
+        K := 5, # this is an arbitrary number, max number for batch of conjugates per involution
+        L := 10, # this is an arbitrary number, max number for batch of involutions
     );
 end;
 
+# Return false if c can not be a three cycle. This uses cheap tests to
+# determine this. It is based on the Magma function heuristicThreeCycleTest.
+RECOG.HeuristicThreeCycleTest := function(ri, c, logInt2N, R)
+    local r, y, yTo5, k;
+    c := StripMemory(c);
+    if not isone(ri)(c ^ 3) then
+        return false;
+    fi;
+    for k in [1 .. logInt2N + 1] do
+        r := R[k];
+        # c * c ^ r is a product of two three-cycles, so it should have order
+        # 1, 2, 3 or 5.
+        y := c * c ^ r;
+        yTo5 := y ^ 5;
+        if not isone(ri)(yTo5) and not isone(ri)(yTo5 * y) then
+            return false;
+        fi;
+    od;
+    return true;
+end;
+
 # ri : recognition node with group G
-# constants : a record with components M, B, T, C, and logInt2N
+# constants : a record with components M, B, T, C, K, L, and logInt2N
 #
 # The following algorithm constructs a set of possible 3-cycles. It is based
 # on the simple observation that the product of two involutions t1, t2, which
@@ -51,6 +148,8 @@ end;
 # Creates and returns a function, here called oneThreeCycleCandidate. The
 # function oneThreeCycleCandidate returns one of the following:
 # - a three cycle candidate, i.e. an element of G
+# - SnAnTryLater, if we tried a batch of at most L involutions,
+#                 and for each of these we tried K conjugates
 # - TemporaryFailure, if we exhausted all attempts
 # - NeverApplicable, if we found out that G can't be an Sn or An
 #
@@ -61,101 +160,178 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
         t,
         # integers, controlling the number of iterations
         M, B, T, C, logInt2N,
+        # integers, making the algorithm give up quicker during iterations
+        K, L,
+        # list of random elements for heuristic three cycle test
+        R,
+        # list of involution candidates
+        involutions,
         # counters
-        nrInvolutions, nrTriedConjugates, nrThreeCycleCandidates,
+        nrTriedConjugates, nrCommutatingConjugates, nrThreeCycleCandidates,
+        # counters
+        Ki, Li, curInvolutionPos,
         # helper functions
-        tryThreeCycleCandidate, oneThreeCycleCandidate;
+        oneThreeCycleCandidate,
+        # used for debugging
+        cache;
     # Step 1: Initialization
-    # The current involution t_i
-    t := fail;
-
+    #########################################################################
     M := constants.M;
     B := constants.B;
     T := constants.T;
     C := constants.C;
     logInt2N := constants.logInt2N;
+    K := constants.K;
+    L := constants.L;
+    # list containing the constructed involutions t_i in steps 2 & 3
+    involutions := EmptyPlist(B);
+
+    R := List([1 .. logInt2N + 1], k -> StripMemory(RandomElm(ri, "SnAnUnknownDegree", true)!.el));
 
     # Counters
-    # Counts the constructed involutions t_i in steps 2 & 3.
-    nrInvolutions := 0;
+    curInvolutionPos := 1;
+    Ki := Minimum(K, C);
+    Li := Minimum(L, B);
     # Counts the elements c in step 4 that we use to conjugate the current
-    # involution t_i.  We initialize nrTriedConjugates to C such that "steps 2
-    # & 3" in tryThreeCycleCandidate immediately construct an involution.
-    nrTriedConjugates := C;
+    # involution t_i.
+    nrTriedConjugates := [];
     # counts the size of the set Gamma_i in step 4 for the current involution
     # t_i
-    nrThreeCycleCandidates := 0;
+    nrCommutatingConjugates := [];
+    # counts the actual number of three cycle candidates considered
+    # which are filtered from the Gamma_i via heuristic order tests.
+    nrThreeCycleCandidates := [];
+
+    # Used for Debugging
+    if RECOG.SnAnDebug then
+        cache := RECOG.SnAnGetCache(ri);
+        if not IsBound(cache.iteratorsLocalVars) then
+            cache.iteratorsLocalVars := [];
+        fi;
+        Add(cache.iteratorsLocalVars, rec(
+            involutions := involutions,
+            nrTriedConjugates := nrTriedConjugates,
+            nrCommutatingConjugates := nrCommutatingConjugates,
+            nrThreeCycleCandidates := nrThreeCycleCandidates
+        ));
+    fi;
 
     # Helper functions
-    # tryThreeCycleCandidate returns one of the following:
+    # oneThreeCycleCandidate returns one of the following:
     # - a three cycle candidate, i.e. an element of G
-    # - fail, if the random conjugate c from step 4 and t commute. Then we have
-    #   to call tryThreeCycleCandidate again
+    # - TemporaryFailure, if we exhausted all attempts
+    # - SnAnTryLater, if we tried all involution candidates K times
     # - NeverApplicable, if G can not be an Sn or An
-    tryThreeCycleCandidate := function()
+    oneThreeCycleCandidate := function()
         local
             # integer, loop variable
             a,
             # elements, in G
-            r, tPower, tPowerOld, c;
-        # Steps 2 & 3: New involution
-        # Check if we either tried enough conjugates or constructed enough
-        # three cycle candidates for the current involution t.
-        # If this is the case, we need to construct the next involution
-        if nrTriedConjugates >= C or nrThreeCycleCandidates >= T then
-            r := RandomElm(ri, "SnAnUnknownDegree", true)!.el;
-            tPower := r ^ M;
-            # Invariant: tPower = (r ^ M) ^ (2 ^ a)
-            # We make a small improvement to the version described in
-            # <Cite Key="JLNP13"/>. The order of r ^ M is a 2-power.
-            # It can be at most 2 ^ logInt2N. Thus, if we find an r such that
-            # (r ^ M) ^ (2 ^ logInt2N) is non-trivial, then we can return
-            # NeverApplicable.
-            for a in [1 .. logInt2N] do
-                tPowerOld := tPower;
-                tPower := tPower ^ 2;
-                if isone(ri)(tPower) then break; fi;
-            od;
-            if not isone(ri)(tPower) then
-                return NeverApplicable;
+            r, tPower, tPowerOld, c,
+            # the three cycle candidate
+            candidate;
+
+        while true do
+            # Steps 2 & 3: New involution
+            #########################################################################
+            # We consider at most B involutions.
+            if curInvolutionPos > B then
+                curInvolutionPos := 1;
             fi;
-            t := tPowerOld;
-            nrInvolutions := nrInvolutions + 1;
-            nrTriedConjugates := 0;
-            nrThreeCycleCandidates := 0;
-        fi;
-        # Steps 4 & 5: new three cycle candidate
-        # Try to construct a three cycle candidate via a conjugate of t. See
-        # the comment above this function.
-        nrTriedConjugates := nrTriedConjugates + 1;
-        c := t ^ RandomElm(ri, "SnAnUnknownDegree", true)!.el;
-        if not isequal(ri)(t * c, c * t) then
-            nrThreeCycleCandidates := nrThreeCycleCandidates + 1;
-            return (t * c) ^ 2;
-        else
-            # we have to call tryThreeCycleCandidate again
-            return fail;
-        fi;
-    end;
-    # construct the iterator
-    oneThreeCycleCandidate := function()
-        local candidate;
-        repeat
-            if nrInvolutions >= B
-                and (nrTriedConjugates >= C or nrThreeCycleCandidates >= T)
+            # We did not construct yet the involution to consider
+            if curInvolutionPos > Length(involutions) then
+                r := RandomElm(ri, "SnAnUnknownDegree", true)!.el;
+                # In the paper, we have t = r ^ M.
+                # Invariant: tPower = (r ^ M) ^ (2 ^ a)
+                tPower := r ^ M;
+                # We make a small improvement to the version described in
+                # <Cite Key="JLNP13"/>. The order of r ^ M is a 2-power.
+                # It can be at most 2 ^ logInt2N. Thus, if we find an r such that
+                # (r ^ M) ^ (2 ^ logInt2N) is non-trivial, then we can return
+                # NeverApplicable.
+                for a in [1 .. logInt2N] do
+                    tPowerOld := tPower;
+                    tPower := tPower ^ 2;
+                    if isone(ri)(tPower) then break; fi;
+                od;
+                if not isone(ri)(tPower) then
+                    return NeverApplicable;
+                fi;
+                involutions[curInvolutionPos] := tPowerOld;
+                nrTriedConjugates[curInvolutionPos] := 0;
+                nrCommutatingConjugates[curInvolutionPos] := 0;
+                nrThreeCycleCandidates[curInvolutionPos] := 0;
+            fi;
+            # Check if we either tried enough conjugates or already found enough
+            # commutating conjugates for all involutions t.
+            # If this is the case, then we have exhausted all attempts.
+            if curInvolutionPos = B
+                and ForAll([1 .. B], i -> nrTriedConjugates[i] >= C or nrCommutatingConjugates[i] >= T)
             then
-                # With probability at least 1 - eps we constructed at least one
-                # three cycle with this iterator.
-                return fail;
+                return TemporaryFailure;
             fi;
-            candidate := tryThreeCycleCandidate();
-            if candidate = NeverApplicable then
-                return NeverApplicable;
+            # If we either considered enough conjugates or already found enough
+            # commutating conjugates for the current involution t,
+            # we need to consider the next involution, or reached the end of our batch of involutions.
+            # Recall, that we work in batches for the lazy version.
+            # We work in batches of at most L involutions and for these,
+            # in batches of K conjugates.
+            if nrTriedConjugates[curInvolutionPos] >= Ki or nrCommutatingConjugates[curInvolutionPos] >= T then
+                if curInvolutionPos = B then
+                    Li := L;
+                    Li := Minimum(Li, B);
+                    Ki := Ki + K;
+                    Ki := Minimum(Ki, C);
+                    curInvolutionPos := 1;
+                    return SnAnTryLater;
+                elif curInvolutionPos = Li then
+                    Li := Li + L;
+                    Li := Minimum(Li, B);
+                    curInvolutionPos := curInvolutionPos + 1;
+                    return SnAnTryLater;
+                else
+                    curInvolutionPos := curInvolutionPos + 1;
+                    continue;  # we have to start over
+                fi;
             fi;
-        until candidate <> fail;
-        return candidate;
+
+            # Steps 4 & 5: new three cycle candidate
+            #########################################################################
+            # Try to construct a three cycle candidate via a conjugate of t. See
+            # the comment above this function.
+            t := involutions[curInvolutionPos];
+            nrTriedConjugates[curInvolutionPos] := nrTriedConjugates[curInvolutionPos] + 1;
+            c := t ^ RandomElm(ri, "SnAnUnknownDegree", true)!.el;
+            if isequal(ri)(t * c, c * t) then
+                continue;  # we have to start over
+            fi;
+            nrCommutatingConjugates[curInvolutionPos] := nrCommutatingConjugates[curInvolutionPos] + 1;
+            candidate := (t * c) ^ 2;
+            # We now use a one-sided heuristic to test whether candidate can be a
+            # three cycle, that is the heuristic can detect whether candidate can
+            # not be a three cycle, e.g. if it does not have order three.
+            if RECOG.HeuristicThreeCycleTest(ri, candidate, logInt2N, R) then
+                nrThreeCycleCandidates[curInvolutionPos] := nrThreeCycleCandidates[curInvolutionPos] + 1;
+                return candidate;
+            fi;
+
+            # if we get here, we'll loop around and start over
+        od;
     end;
+
     return oneThreeCycleCandidate;
+end;
+
+RECOG.SnAnCacheIterators := function(ri, T, N)
+    local cache, constants;
+    cache := RECOG.SnAnGetCache(ri);
+    if not IsBound(cache.iterators) then
+        constants := RECOG.ThreeCycleCandidatesConstants(1 / 4., N);
+        if RECOG.SnAnDebug then
+            cache.constants := constants;
+        fi;
+        cache.iterators := List([1 .. T], i -> RECOG.ThreeCycleCandidatesIterator(ri, constants));
+    fi;
 end;
 
 # ri : recognition node with group G
@@ -604,7 +780,7 @@ end;
 #            3-cycle, a standard generator of An < G
 # - kTilde : integer,
 #            degree of group An < G, that is generated by gTilde and cTilde
-RECOG.StandardGenerators := function(ri, g, c, k, eps, N)
+RECOG.SnAnStandardGenerators := function(ri, g, c, k, eps, N)
     local s, k0, c2, r, kTilde, gTilde, i, x, m, tmp, cTilde;
     s := One(g);
     k0 := k - 2;
@@ -641,32 +817,165 @@ RECOG.StandardGenerators := function(ri, g, c, k, eps, N)
     fi;
 end;
 
-# This function is an excerpt of the function RECOG.RecogniseSnAn in gap/SnAnBB.gi
+# The following two functions RECOG.FindAnElementMappingIToJ and
+# RECOG.FindImageSnAnSmallDegree are used for small degrees, 5 <= n < 11, to
+# compute a monomorphism into Sn based on Jonathan Conder's thesis <Cite
+# Key="C12"/>.
+#
+# In Conder's Thesis: Algorithm 7, ConjugateMap
+# Returns an element c such that under the monomorphism Grp(ri) -> S_n given by
+# s and t the image of c maps the point i to j.
+RECOG.FindAnElementMappingIToJ := function(s, t, i, j)
+    if i < 3 then
+        if j < 3 then
+            return t^(j-i);
+        else
+            return t^(3-i)*s^(j-3);
+        fi;
+    else
+        return s^(j-i);
+    fi;
+end;
+
+# In Conder's Thesis: Algorithm 10, ElementToSmallDegreePermutation,
+# correctness see Theorem 3.5.2.
+# Returns the image of g under the monomorphism Grp(ri) -> S_n given by s and
+# t, for n >= 5.
+# Under that monomorphism s is mapped to a long cycle, t to a three cycle,
+# and the list e (E in Conder's Thesis) to [(1,2,3), (1,2,4), (1,2,5)].
+# Note that the arguments are in a different order than in the thesis, such
+# that they are more consistent with the GAP function FindImageSn.
+RECOG.FindImageSnAnSmallDegree := function(ri, n, g, s, t, e)
+    local T, L, H, i, j, k, l, c, h, h1, h2, h2h1, h1h2Comm, S, m, continueI, continueJ;
+    T := [ e[1], e[2], e[3], e[1] ^ 2 * e[2], e[1] ^ 2 * e[3], e[2] ^ 2 * e[3], e[1] * e[2] ^ 2,
+           e[1] * e[3] ^ 2, e[2] * e[3] ^ 2, e[2] * e[3] ^ 2 * e[1] * e[2] ^ 2 ];
+    L := [];
+    # H = [ (1,2,3), (1,4,5) ]
+    H := [T[1], T[6]];
+    for l in [1 .. n] do
+        for j in [1 .. n] do
+            continueJ := false;
+            if j = 1 then
+                c := One(Grp(ri));
+            else
+                h := RECOG.FindAnElementMappingIToJ(s, t, j - 1, j);
+                c := c * h;
+            fi;
+
+            for i in [1 .. Length(H)] do
+                continueI := false;
+                h1 := H[i] ^ g;
+                S := [1, 1];
+                for k in [1 .. Length(S)] do
+                    h2 := T[5 * k - 4] ^ c;
+
+                    h2h1 := h2 * h1;
+                    if isone(ri)(h2h1) or isone(ri)(h2 * h2h1) then
+                        continueI := true; # continue loop i
+                        break;
+                    fi;
+                    h1h2Comm := Comm(h1, h2);
+                    if isone(ri)(h1h2Comm) then
+                        continueJ := true; # continue loop j
+                        break;
+                    elif isone(ri)(h1h2Comm ^ 2) then
+                        S[k] := 2;
+                    fi;
+                od;
+                # Jump to some outer loop.
+                if continueI then
+                    continue;
+                elif continueJ then
+                    break;
+                fi;
+
+                if S[1] = S[2] then
+                    if S[1] = 1 then
+                        for k in [2 .. 5] do
+                            if docommute(ri)(h1, T[k] ^ c) then
+                                continueJ := true; # continue loop j
+                                break;
+                            fi;
+                        od;
+                    fi;
+                else
+                    if S[1] > S[2] then
+                        m := 6;
+                    else
+                        m := 8;
+                    fi;
+                    for k in [1 .. 2] do
+                        if docommute(ri)(h1, T[m + k] ^ c) then
+                            continueJ := true; # continue loop j
+                            break;
+                        fi;
+                    od;
+                fi;
+                # Jump to some outer loop.
+                if continueJ then
+                    break;
+                fi;
+            od;
+
+            if continueJ then
+                continue;
+            else
+                Add(L, j);
+                break;
+            fi;
+        od;
+
+        c := RECOG.FindAnElementMappingIToJ(s, t, l, l + 1);
+        for i in [1 .. Length(H)] do
+            H[i] := H[i] ^ c;
+        od;
+    od;
+
+    return PermList(L);
+end;
+
+# This function is based on the function RECOG.RecogniseSnAn in gap/SnAnBB.gi
 # ri : recognition node with group G,
 # n : degree
 # stdGensAnWithMemory : standard generators of An < G
 #
-# Returns either fail or a record with components:
-# [s, stdGens, xis, n], where:
+# Returns either fail or a record with components type and isoData, where:
 # - type: the isomorphism type, that is either the string "Sn" or "An".
-# - isoData: a list [stdGens, xis, n] where
+# - isoData: a list [stdGens, filter, n] where
 #   - stdGens are the standard generators of G. They do not have memory.
-#   - xis implicitly defines the isomorphism. It is used by RECOG.FindImageSn
-#     and RECOG.FindImageAn to compute the isomorphism.
+#   - filter implicitly defines the isomorphism. It is used by
+#     RECOG.FindImageSn, RECOG.FindImageAn, and RECOG.FindImageSnAnSmallDegree
+#     to compute the isomorphism.
 #   - n is the degree of the group.
-# - slpToStdGens: an SLP to stdGens.
-#
-# TODO: Image Computation requires n >= 11.
+# - slpToStdGens: an SLP from the generators of G to stdGens.
 RECOG.ConstructSnAnIsomorphism := function(ri, n, stdGensAnWithMemory)
-    local stdGensAn, xis, gImage, foundOddPermutation, slp, eval,
+    local stdGensAn, filter, filterPart, gImage, foundOddPermutation, slp, eval,
         hWithMemory, bWithMemory, stdGensSnWithMemory, b, h, g;
     stdGensAn := StripMemory(stdGensAnWithMemory);
-    xis := RECOG.ConstructXiAn(n, stdGensAn[1], stdGensAn[2]);
+    # Construct filter. In <Cite Key="C12"/> filter is called E.
+    # In <Cite Key="JLNP13"/> filter is called `xi`.
+    if n < 11 then
+        filterPart := [stdGensAn[2], (~[1] ^ stdGensAn[1]) ^ (2 * (n mod 2) - 1),
+                       (~[2] ^ stdGensAn[1]) ^ (2 * (n mod 2) - 1)];
+        filter := [[stdGensAn[1], stdGensAn[2]], filterPart];
+    else
+        filter := RECOG.ConstructXiAn(n, stdGensAn[1], stdGensAn[2]);
+    fi;
     foundOddPermutation := false;
+    # For each generator, check whether its image und the monomorphism into the
+    # S_n has odd sign. If so, switch to recognizing S_n.
+    # For each generator also check whether the SLP for its image in the A_n
+    # was computed correctly.
     for g in ri!.gensHmem do
-        gImage := RECOG.FindImageAn(ri, n, StripMemory(g),
-                                    stdGensAn[1], stdGensAn[2],
-                                    xis[1], xis[2]);
+        if n < 11 then
+            gImage := RECOG.FindImageSnAnSmallDegree(ri, n, StripMemory(g),
+                                                     filter[1][1], filter[1][2],
+                                                     filter[2]);
+        else
+            gImage := RECOG.FindImageAn(ri, n, StripMemory(g),
+                                        stdGensAn[1], stdGensAn[2],
+                                        filter[1], filter[2]);
+        fi;
         if gImage = fail then return fail; fi;
         if SignPerm(gImage) = -1 then
             # we found an odd permutation,
@@ -681,7 +990,7 @@ RECOG.ConstructSnAnIsomorphism := function(ri, n, stdGensAnWithMemory)
     od;
     if not foundOddPermutation then
         return rec(type := "An",
-                   isoData := [[stdGensAn[1], stdGensAn[2]], xis, n],
+                   isoData := [[stdGensAn[1], stdGensAn[2]], filter, n],
                    slpToStdGens := SLPOfElms(stdGensAnWithMemory));
     fi;
     # Construct standard generators for Sn: [bWithMemory, hWithMemory].
@@ -700,49 +1009,52 @@ RECOG.ConstructSnAnIsomorphism := function(ri, n, stdGensAnWithMemory)
     if not RECOG.SatisfiesSnPresentation(ri, n, b, h) then
         return fail;
     fi;
-    xis := RECOG.ConstructXiSn(n, b, h);
+    if n >= 11 then
+        filter := RECOG.ConstructXiSn(n, b, h);
+    fi;
     for g in ri!.gensHmem do
-        gImage := RECOG.FindImageSn(ri, n, StripMemory(g),
-                                    b, h,
-                                    xis[1], xis[2]);
+        if n < 11 then
+            gImage := RECOG.FindImageSnAnSmallDegree(ri, n, StripMemory(g),
+                                                     filter[1][1], filter[1][2],
+                                                     filter[2]);
+        else
+            gImage := RECOG.FindImageSn(ri, n, StripMemory(g),
+                                        b, h,
+                                        filter[1], filter[2]);
+        fi;
         if gImage = fail then return fail; fi;
         slp := RECOG.SLPforSn(n, gImage);
         eval := ResultOfStraightLineProgram(slp, [h, b]);
         if not isequal(ri)(eval, StripMemory(g)) then return fail; fi;
     od;
     return rec(type := "Sn",
-               isoData := [[b, h], xis, n],
+               isoData := [[b, h], filter, n],
                slpToStdGens := SLPOfElms(stdGensSnWithMemory));
 end;
 
-# This method is an implementation of <Cite Key="JLNP13"/>. It is the main
-# function of SnAnUnknownDegree.
-# Note that it currently only works for 11 <= <A>n</A>. TODO: make it work with
-# smaller <A>n</A>, that is include fixes from Jonathan Conder's B.Sc.
-# Thesis "Algorithms for Permutation Groups", see PR #265.
+# ri : recognition node with group G,
+# T : integer, number of iterators
+# N : integer, upper bound for the degree of G
 #
-# From <Cite Key="JLNP13" Where="Theorem 1.1"/>:
-# RECOG.RecogniseSnAn is a one-sided Monte-Carlo algorithm with the following
-# properties. It takes as input a black-box group <A>G</A>, a natural number
-# <A>N</A> and a real number <A>eps</A> with 0 < <A>eps</A> < 1. If <A>G</A> is
-# isomorphic to An or Sn for some 9 <= <A>n</A> <= <A>N</A>, it returns with
-# probability at least 1 - <A>eps</A> the degree <A>n</A> and an
-# isomorphism from <A>G</A> to An or Sn.
-RECOG.RecogniseSnAn := function(ri, eps, N)
-    local T, foundPreImagesOfStdGens, constants, iterator, c, tmp, recogData, i;
-    T := Int(Ceil(Log2(1 / Float(eps))));
-    foundPreImagesOfStdGens := false;
-    constants := RECOG.ThreeCycleCandidatesConstants(1. / 4., N);
-    for i in [1 .. T] do
-        iterator := RECOG.ThreeCycleCandidatesIterator(ri, constants);
+# This is the main method used by RECOG.RecogniseSnAn and RECOG.RecogniseSnAnLazy.
+#
+# This function returns one of the following:
+# - an isomorphism from G to Sn or An
+# - SnAnTryLater, if we should try this method at a later point again
+# - TemporaryFailure, if we exhausted all attempts
+# - NeverApplicable, if we found out that G can't be an Sn or An
+RECOG.RecogniseSnAnSingleIteration := function(ri, T, N)
+    local cache, iterators, iterator, c, tmp, recogData;
+    RECOG.SnAnCacheIterators(ri, T, N);
+    cache := RECOG.SnAnGetCache(ri);
+    iterators := cache.iterators;
+    # each iterator succeeds with probability at least 1/2,
+    # if we exhaust all attempts
+    for iterator in iterators do
         c := iterator();
-        while c <> fail do
-            if c = NeverApplicable then return NeverApplicable; fi;
-            # This is a very cheap test to determine
-            # if our candidate c could be a three cycle.
-            if not isone(ri)(StripMemory(c) ^ 3) then
-                c := iterator();
-                continue;
+        while c <> SnAnTryLater and c <> TemporaryFailure do
+            if c = NeverApplicable then
+                return c;
             fi;
             tmp := RECOG.ConstructLongCycle(ri, c, 1. / 8., N);
             if tmp = fail then
@@ -752,7 +1064,7 @@ RECOG.RecogniseSnAn := function(ri, eps, N)
             # Now tmp contains [g, k] where
             #   g corresponds to a long cycle
             #   k is its length
-            tmp := RECOG.StandardGenerators(ri, tmp[1], c, tmp[2], 1. / 8., N);
+            tmp := RECOG.SnAnStandardGenerators(ri, tmp[1], c, tmp[2], 1. / 8., N);
             if tmp = fail then
                 c := iterator();
                 continue;
@@ -760,33 +1072,185 @@ RECOG.RecogniseSnAn := function(ri, eps, N)
             # Now tmp contains [g, c, n] where
             #   g, c correspond to standard generators of An
             recogData := RECOG.ConstructSnAnIsomorphism(ri, tmp[3], tmp{[1,2]});
-            if recogData = fail then continue; fi;
-            return recogData;
+            if recogData <> fail then
+                return recogData;
+            fi;
         od;
     od;
-    return TemporaryFailure;
+    return c;
 end;
 
-#! @BeginChunk SnAnUnknownDegree
-#! This method tries to determine whether the input group given by <A>ri</A> is
-#! isomorphic to a symmetric group Sn or alternating group An with
-#! <M>11 \leq n</M>.
-#! It is an implementation of <Cite Key="JLNP13"/>.
-#!
-#! If <A>Grp(ri)</A> is a permutation group, we assume that it is primitive and
-#! not a giant (a giant is Sn or An in natural action).
-#!
-#! @EndChunk
-BindRecogMethod(FindHomMethodsGeneric, "SnAnUnknownDegree",
-"method groups isomorphic to Sn or An with n >= 11",
-function(ri, G)
-    local eps, N, p, d, recogData, isoData, degree, swapSLP;
-    #G := Grp(ri);
-    # TODO find value for eps
-    eps := 1 / 10^2;
+# This method is an implementation of <Cite Key="JLNP13"/>.
+# From <Cite Key="JLNP13" Where="Theorem 1.1"/>:
+# RECOG.RecogniseSnAn is a one-sided Monte-Carlo algorithm with the following
+# properties. It takes as input a black-box group <A>G</A>, a natural number
+# <A>N</A> and a real number <A>eps</A> with 0 < <A>eps</A> < 1. If <A>G</A> is
+# isomorphic to An or Sn for some 9 <= <A>n</A> <= <A>N</A>, it returns with
+# probability at least 1 - <A>eps</A> the degree <A>n</A> and an
+# isomorphism from <A>G</A> to An or Sn.
+RECOG.RecogniseSnAn := function(ri, eps, N)
+    local T, tmp;
+    T := Int(Ceil(Log2(1 / Float(eps))));
+    tmp := SnAnTryLater;
+    while tmp = SnAnTryLater do
+        tmp := RECOG.RecogniseSnAnSingleIteration(ri, T, N);
+    od;
+    return tmp;
+end;
+
+RECOG.LowerBoundForDegreeOfSnAnViaOrders := function(ri)
+    local G, orders;
+    G := Grp(ri);
+    orders := Set(List(
+        [1..30],
+        i -> RandomElmOrd(ri, "LowerBoundForDegreeOfSnAnViaOrders", false).order
+    ));
+    return Maximum(List(
+        orders,
+        # For a given order, the sum over its factorisation into prime powers,
+        # gives a lower bound for the degree of the smallest symmetric group,
+        # that can contain an element of such an order.
+        o -> Sum(Collected(FactorsInt(o)),
+                 tup -> tup[1] ^ tup[2])
+    ));
+end;
+
+# Inspired from Magma Code: GuessAltsymDegree, in magma/package/Group/GrpFin/SimpleRecog/altsym.m
+# Returns a guess at alternating or symmetric and degree n
+# (It won't work for Sym(3) or Sym(6)!)
+#
+# This function samples projective orders of elements, and attempts to guess
+# degree n and whether it is Alternating or Symmetric.
+# Returns a record with entries:
+#   - type   : string "Alternating" or "Symmetric"
+#   - degree : integer n
+# Returns fail if n<=6 or maxtries elements are sampled with
+# no decision made.
+#
+# At least Max(mintries,fac*n*Log(n)) random elements are chosen without
+# the answer changing, where mintries, fac can be given as an optional
+# arguments.
+#
+# TODO: Investigate why Alt(9) and Sym(8) return fail
+# TODO: Might be inspired from
+# "Fast Constructive Recognition of a Black Box Group Isomorphic to Sn or An using Goldbach’s Conjecture"
+# by Sergey Bratus and Igor Pak,
+# in Chapter 9. "What To Do If n is Not Known?"
+RECOG.GuessSnAnDegree := function(ri, optionlist...)
+    local G, r, options, mintries, maxtries, fac, mindego, mindege, ct, cto, cte, proc, g, o, mindeg, o_fact, mindegforg;
+    # mindego and mindege will be respectively the smallest possible
+    # degrees of symmetric groups that contain the elements of odd and
+    # even orders, in the random sample.
+    # If mindego > mindege we assume the group is alternating, otherwise
+    # that it is symmetric.
+
+    G := Grp(ri);
+    if  (IsPermGroup(G) and NrMovedPoints(G) <= 6)
+                or (IsMatrixGroup(G) and DimensionOfMatrixGroup(G) < 3) then
+        Print("GuessAltsymDegree works only for degree > 6\n");
+        return fail;
+    fi;
+
+    # Set options
+    options := rec(
+        mintries := 100,
+        maxtries := 5000,
+        fac := 4
+    );
+
+    if Length(optionlist) > 0 then
+        for r in RecNames(optionlist[1]) do
+            if not IsBound(options.(r)) then
+                ErrorNoReturn("Invalid option to GuessSnAnDegree: ", r);
+            fi;
+            options.(r) := optionlist[1].(r);
+        od;
+    fi;
+
+    mintries := options.mintries;
+    maxtries := options.maxtries;
+    fac := options.fac;
+
+    # Init Loop
+    mindego := 0;
+    mindege := 0;
+    cto := 0;
+    cte := 0;
+    ct := 0;
+    mindeg := 0;
+    if mintries < 1 then
+        mintries := 1;
+    fi;
+
+    # Main Loop
+    while (ct < Maximum(mintries, fac * mindeg * Int(Ceil(Log(Float(mindeg+1)))))
+                or mindego = mindege+1) and ct <= maxtries do
+        # The situation mindego = mindege+1 was responsible for most errors
+        # in the first version! Alt(n+1) was returned instead of Sym(n).
+        g := RandomElm(ri, "GuessSnAnDegree", false)!.el;;
+        o := OrderFunc(ri)(g);
+        ct := ct + 1; # counter of loop, as long as no new larger degree was detected
+        if o = 1 then
+            continue;
+        fi;
+        o_fact := Collected(Factors(o));
+        mindegforg := Sum(o_fact, f -> f[1] ^ f[2]); # minimum degree is sum over all prime-powers in factorization
+        if o mod 2 = 0 then
+            cte := cte + 1; # counter for even orders
+            if mindegforg > mindege then
+                mindege := mindegforg;
+                if mindege > mindeg then
+                    mindeg := mindege;
+                fi;
+            ct := 0;
+            # vprintf IsAltsym: "New E, E = %o, O = %o, elt order = %o, Randoms = %o\n", mindege, mindego, o_fact, cte+cto;
+            fi;
+        else
+            cto := cto + 1; # counter for odd orders
+            if mindegforg > mindego then
+                mindego := mindegforg;
+                if mindego > mindeg then
+                    mindeg := mindego;
+                fi;
+                ct := 0;
+            # vprintf IsAltsym: "New O, E = %o, O = %o, elt order = %o, Randoms = %o\n", mindege, mindego, o_fact, cte+cto;
+            fi;
+        fi;
+    od;
+
+    if ct > maxtries then
+        # vprintf IsAltsym: "maxtries exceeded - giving up!";
+        return fail;
+    fi;
+
+    # vprintf IsAltsym: "E = %o, O = %o, Randoms = %o\n", mindege, mindego, cte+cto;
+
+    if mindego > mindege then
+        if mindego <= 6 then
+            # vprintf IsAltsym: "GuessAltsymDegree works only for degree > 6";
+            return fail;
+        else
+            # vprintf IsAltsym: "Alternating of degree %o\n", mindego;
+            return rec(type := "Alternating", degree := mindego);
+        fi;
+    else
+        if mindege <= 6 then
+            # vprintf IsAltsym: "GuessAltsymDegree works only for degree > 6";
+            return fail;
+        else
+            # vprintf IsAltsym: "Symmetric of degree %o\n", mindege;
+            return rec(type := "Symmetric", degree := mindege);
+        fi;
+    fi;
+end;
+
+RECOG.SnAnUpperBoundForDegree := function(ri)
+    local G, N, p, d, M;
+    G := Grp(ri);
+    # N = upper bound for degree
     # Check magma
     if IsPermGroup(G) then
-        # We assume that G is primitive and not a giant.
+        # We assume that G is primitive and not a giant in natural representation.
         # The smallest non-natural primitive action of Sn or An induces
         # a large base group. Thus by [L84] its degree is smallest, when the
         # action is on 2-subsets. Thus its degree is at least n * (n-1) / 2.
@@ -826,8 +1290,96 @@ function(ri, G)
                            " <N>, Grp(<ri>) must be an IsPermGroup or an",
                            " IsMatrixGroup");
     fi;
+    # N = lower bound for degree
+    M := RECOG.LowerBoundForDegreeOfSnAnViaOrders(ri);
+    # Our upper bound is smaller than our lower bound.
+    if N < M then
+        return NeverApplicable;
+    fi;
+    # Lower bound does not exclude A5, S5, A6 or S6
+    # If the input group is isomorphic to a symmetric or alternating group of
+    # degrees 5 or 6, then this method might not exit quickly.
+    if M <= 6 then
+        return TemporaryFailure;
+    fi;
+
+    return N;
+end;
+
+RECOG.SnAnCacheUpperBoundForDegree := function(ri)
+    local cache, N, degreeData;
+    cache := RECOG.SnAnGetCache(ri);
+    if IsBound(cache.N) then
+        return;
+    fi;
+    N := RECOG.SnAnUpperBoundForDegree(ri);
+    cache.N := N;
+    if not IsInt(N) then
+        return;
+    fi;
+    # This is usually much smaller than RECOG.SnAnUpperBoundForDegree.
+    # The number to compare N with was chosen arbitrarily as a "large" degree.
+    # if N > 20 then
+    #     degreeData := RECOG.GuessSnAnDegree(ri);
+    #     if degreeData = fail then
+    #         cache.N := TemporaryFailure;
+    #         return;
+    #     fi;
+    #     N := Minimum(N, degreeData.degree);
+    #     cache.N := N;
+    # fi;
+end;
+
+# See RECOG.RecogniseSnAn. The difference is, that we give up at an earlier
+# point, i.e. we try out other recognition methods, before we continue.
+# In order to achieve this, we cache some important values for further
+# computations. It is the main function of SnAnUnknownDegree.
+RECOG.RecogniseSnAnLazy := function(ri)
+    local a, cache, N, tmp;
+    RECOG.SnAnCacheUpperBoundForDegree(ri);
+    cache := RECOG.SnAnGetCache(ri);
+    N := cache.N;
+    if N = TemporaryFailure then
+        RECOG.SnAnResetCache(ri);
+    fi;
+    if not IsInt(N) then
+        return N;
+    fi;
+    tmp := RECOG.RecogniseSnAnSingleIteration(ri, 1, N);
+    if tmp = TemporaryFailure then
+        RECOG.SnAnResetCache(ri);
+    elif tmp = SnAnTryLater then
+        tmp := TemporaryFailure;
+    fi;
+    return tmp;
+end;
+
+#! @BeginChunk SnAnUnknownDegree
+#! This method tries to determine whether the input group given by <A>ri</A> is
+#! isomorphic to a symmetric group Sn or alternating group An with
+#! <M>9 \leq n</M>.
+#! It is an implementation of <Cite Key="JLNP13"/>.
+#!
+#! If <A>Grp(ri)</A> is a permutation group, we assume that it is primitive and
+#! not a giant (a giant is Sn or An in natural action).
+#!
+#! This method can also recognise a symmetric group Sn or alternating group An with
+#! <M>n = 7</M> or <M>n = 8</M>, but is not required to return a result with
+#! the specified error probability.
+#!
+#! This method cannot recognise a symmetric group Sn or alternating group An with
+#! <M>n = 5</M> or <M>n = 6</M>, since it uses pre-bolstering elements,
+#! which need at least 7 moved points.
+#! If the input group is isomorphic to a symmetric or alternating group of
+#! degrees 5 or 6, then this method might not exit quickly.
+#!
+#! @EndChunk
+BindRecogMethod(FindHomMethodsGeneric, "SnAnUnknownDegree",
+"method groups isomorphic to Sn or An with n >= 9",
+function(ri, G)
+    local recogData, isoData, degree, swapSLP, t;
     # Try to find an isomorphism
-    recogData := RECOG.RecogniseSnAn(ri, eps, N);
+    recogData := RECOG.RecogniseSnAnLazy(ri);
     # RECOG.RecogniseSnAn returned NeverApplicable or TemporaryFailure
     if not IsRecord(recogData) then
         return recogData;
@@ -851,12 +1403,40 @@ function(ri, G)
                  CompositionOfStraightLinePrograms(swapSLP,
                                                    recogData.slpToStdGens));
     if recogData.type = "Sn" then
-        Setslpforelement(ri, SLPforElementFuncsGeneric.SnUnknownDegree);
+        if degree < 11 then
+            Setslpforelement(ri, SLPforElementFuncsGeneric.SnSmallDegree);
+        else
+            Setslpforelement(ri, SLPforElementFuncsGeneric.SnUnknownDegree);
+        fi;
     else
-        Setslpforelement(ri, SLPforElementFuncsGeneric.AnUnknownDegree);
+        if degree < 11 then
+            Setslpforelement(ri, SLPforElementFuncsGeneric.AnSmallDegree);
+        else
+            Setslpforelement(ri, SLPforElementFuncsGeneric.AnUnknownDegree);
+        fi;
     fi;
     return Success;
 end);
+
+# The SLP function if G is isomorphic to Sn with small degree.
+SLPforElementFuncsGeneric.SnSmallDegree := function(ri, g)
+    local isoData, degree, image;
+    isoData := ri!.SnAnUnknownDegreeIsoData;
+    degree := isoData[3];
+    image := RECOG.FindImageSnAnSmallDegree(ri, degree, g, isoData[2][1][1], isoData[2][1][2],
+                       isoData[2][2]);
+    return RECOG.SLPforSn(degree, image);
+end;
+
+# The SLP function if G is isomorphic to An with small degree.
+SLPforElementFuncsGeneric.AnSmallDegree := function(ri, g)
+    local isoData, degree, image;
+    isoData := ri!.SnAnUnknownDegreeIsoData;
+    degree := isoData[3];
+    image := RECOG.FindImageSnAnSmallDegree(ri, degree, g, isoData[2][1][1], isoData[2][1][2],
+                       isoData[2][2]);
+    return RECOG.SLPforAn(degree, image);
+end;
 
 # The SLP function if G is isomorphic to Sn.
 SLPforElementFuncsGeneric.SnUnknownDegree := function(ri, g)

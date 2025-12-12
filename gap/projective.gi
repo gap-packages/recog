@@ -311,6 +311,8 @@ AddMethod(FindHomDbProjective, FindHomMethodsMatrix.ReducibleIso, 1200);
 
 AddMethod(FindHomDbProjective, FindHomMethodsProjective.NotAbsolutelyIrred, 1100);
 
+# AddMethod(FindHomDbProjective, FindHomMethodsGeneric.SnAnSmallUnknownDegree, 1075);
+
 AddMethod(FindHomDbProjective, FindHomMethodsProjective.ClassicalNatural, 1050);
 
 AddMethod(FindHomDbProjective, FindHomMethodsProjective.Subfield, 1000);
@@ -331,6 +333,8 @@ AddMethod(FindHomDbProjective, FindHomMethodsProjective.D247, 840);
 # AddMethod(FindHomDbProjective, FindHomMethodsProjective.SporadicsByOrders, 820);
 
 AddMethod(FindHomDbProjective, FindHomMethodsProjective.AltSymBBByDegree, 810);
+
+AddMethod(FindHomDbProjective, FindHomMethodsGeneric.SnAnUnknownDegree, 805);
 
 AddMethod(FindHomDbProjective, FindHomMethodsProjective.TensorDecomposable, 800);
 
