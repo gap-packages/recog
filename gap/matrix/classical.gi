@@ -482,7 +482,7 @@ function( recognise, grp )
    if d  in [5, 6] then
        ord := Order(g);
        if (ord mod 121=0 or (d=5 and ord=13) or (d=6 and ord=7)) then
-          Info( InfoClassical, 2, "G' is not a Mathieu group;");
+          Info( InfoClassical, 2, "G' is not a Mathieu group.;");
           recognise.isNotMathieu := true;
           return false;
        fi;
@@ -496,23 +496,25 @@ function( recognise, grp )
 
 
 # TODO Check how big n should be
+    # if G' might be a Mathieu group, add the Atlas name to
+    # recognise.possibleNearlySimple
     if d = 5 then
         if recognise.n > 15 then
-            AddSet(recognise.possibleNearlySimple, "M_11" );
-            Info( InfoClassical, 2, "G' might be M_11;");
+            AddSet(recognise.possibleNearlySimple, "M11" );
+            Info( InfoClassical, 2, "G' might be M11;");
             return fail;
         fi;
     elif d = 6 then
         if recognise.n > 15 then
-            AddSet(recognise.possibleNearlySimple, "2M_12" );
-            Info( InfoClassical, 2, "G' might be 2M_12;");
+            AddSet(recognise.possibleNearlySimple, "2.M12" );
+            Info( InfoClassical, 2, "G' might be 2.M12;");
             return fail;
         fi;
     else
         if recognise.n > 15 then
-            AddSet(recognise.possibleNearlySimple, "M_23" );
-            AddSet(recognise.possibleNearlySimple, "M_24" );
-            Info( InfoClassical, 2, "G' might be M_23 or M_24;");
+            AddSet(recognise.possibleNearlySimple, "M23" );
+            AddSet(recognise.possibleNearlySimple, "M24" );
+            Info( InfoClassical, 2, "G' might be M23 or M24;");
             return fail;
         fi;
     fi;
@@ -546,9 +548,18 @@ function (recognise, grp)
     fi;
 
     if d = 3 and (q = 5 or q = 2) then
-        Info( InfoClassical, 2,  "G' is not PSL(2,7)");
+        if q = 5 then
+            Info( InfoClassical, 2,  "G' is not PSL(2,7)");
+	fi;
+	# Note PSL(2,7) is isomorphic to PSL(3,2), so don't print this message
         recognise.isNotPSL := true;
         return false;
+    fi;
+
+    if [d,q] = [5,5] or [d,q] = [5,11] then
+       Info( InfoClassical, 2, "G' not PSL(2,11);");
+       recognise.isNotPSL := true;
+       return false;
     fi;
 
     if d = 6 and q = 2 then
@@ -580,7 +591,11 @@ function (recognise, grp)
            fi;
        else
            if p = 3 or p = 7 or 2 in LE then
-                Info( InfoClassical, 2, "G' not PSL(2,7);");
+	        # we are only certain that PSL(2,7) is ruled if 2 in LE
+		# and the cases p=3 or p=7 cannot have the required ppds
+	        if 2 in LE then 
+                    Info( InfoClassical, 2, "G' not PSL(2,7);");
+		fi;
                 recognise.isNotPSL := true;
                 return false;
            fi;
@@ -611,15 +626,15 @@ function (recognise, grp)
            recognise.isNotPSL := true;
            return false;
        fi;
-   else
-       Info( InfoClassical, 2, "G' not PSL(2,r);");
-       recognise.isNotPSL := true;
-       return false;
+   #else
+       #Info( InfoClassical, 2, "G' not PSL(2,r);");
+       #recognise.isNotPSL := true;
+       #return false;
    fi;
 
 
-   if recognise.n > 15  and Length(recognise.E) > 2 then
-       str := Concatenation("PSL(2,",Int(2*E[2]+1));
+   if recognise.n > 15  and Length(recognise.E) = 2 then
+       str := Concatenation("PSL(2,", String(Int(2*E[2]+1)));
        str := Concatenation(str, ")");
        Info( InfoClassical, 2, "G' might be ", str);
        AddSet( recognise.possibleNearlySimple, str );
@@ -2175,7 +2190,7 @@ function( recognise, grp )
             recognise.needForms :=  true;
             return fail;
         fi;
-        Info(InfoClassical,2,"group contains SOo(",
+        Info(InfoClassical,2,"group contains Omega(",
              recognise.d, ", ", recognise.q, ");");
         recognise.isOmegaContained := true;
         return true;
@@ -2499,9 +2514,6 @@ DisplayRecog := function( r )
            fi;
            if Length(r.E2) > 0 then
                Print("E2 : ", r.E2, "\n" );
-           fi;
-           if Length(r.LE2) > 0 then
-               Print("LE2 : ", r.LE2, "\n" );
            fi;
            if Length(r.BE2) > 0 then
                Print("BE2 : ", r.BE2, "\n" );
