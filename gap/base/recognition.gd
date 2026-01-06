@@ -216,7 +216,7 @@ DeclareObsoleteSynonymAttr( "RIParent", "ParentRecogNode", 1 );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "StdPresentation", IsRecogNode, "mutable" );    # TODO: implement
+DeclareAttribute( "StdPresentation", IsRecogNode, "mutable" );
 
 ## <#GAPDoc Label="CalcStdPresentation">
 ## <ManSection>
