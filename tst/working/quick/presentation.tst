@@ -5,7 +5,6 @@ gap> SetInfoLevel(InfoRecog, 0);;
 gap> testPres := function(G, small, projective)
 > local ri,iso,pres,F,hom,rel,projG,projString;
 > if projective then ri := RecogniseProjectiveGroup(G);; else ri := RecogniseGroup(G);; fi;
-> if not HasStdPresentation(ri) then CalcStdPresentation(ri)(ri);; fi;
 > pres := StdPresentation(ri);;
 > F := FreeGroupOfFpGroup(pres);;
 > hom := GroupHomomorphismByImages(F, G, GeneratorsOfGroup(F), NiceGens(ri));;

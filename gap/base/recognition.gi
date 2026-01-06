@@ -451,6 +451,14 @@ InstallGlobalFunction( PrintTreePos,
     fi;
   end );
 
+InstallMethod( StdPresentation, [ IsRecogNode and HasCalcStdPresentation],
+  function(ri)
+    if not HasStdPresentation(ri) then
+        CalcStdPresentation(ri)(ri);
+    fi;
+    return StdPresentation(ri);
+  end );
+
 InstallGlobalFunction( RecogniseGeneric,
   function(H, methoddb, depthString, knowledge)
     # Assume all the generators have no memory!
