@@ -453,9 +453,7 @@ InstallGlobalFunction( PrintTreePos,
 
 InstallMethod( StdPresentation, [ IsRecogNode and HasCalcStdPresentation],
   function(ri)
-    if not HasStdPresentation(ri) then
-        CalcStdPresentation(ri)(ri);
-    fi;
+    CalcStdPresentation(ri)(ri);
     return StdPresentation(ri);
   end );
 
@@ -827,12 +825,6 @@ InstallGlobalFunction( CalcStdPresentationGeneric,
     # Child nodes
     riKer := KernelRecogNode(ri); # might be fail
     riFac := ImageRecogNode(ri);
-    # Compute StdPresentation of riKer and riFac if necessary
-    for riChild in [riKer,riFac] do
-        if riChild <> fail and not HasStdPresentation(riChild) then
-            CalcStdPresentation(riChild)(riChild);
-        fi;
-    od;
     # If riKer = fail, then Homom(ri) is an isomorphism (or, in the projective case,
     # induces an isomorphism between the central quotients) and hence there is nothing
     # to do: We just take the presentation from riFac.

@@ -18,13 +18,15 @@ gap> testPres := function(G, small, projective)
 > od;;
 
 # For small groups, also test that G has same size as presentation
-> if projective then
->   projG := Image(ProjectiveActionHomomorphismMatrixGroup(G));;
-> else
->   projG := G;;
-> fi;
-> if small and Size(projG) <> Size(pres) then
->   Print(G, " does not have same size as FpGroup\n");;
+> if small then
+>   if projective then
+>     projG := Image(ProjectiveActionHomomorphismMatrixGroup(G));;
+>   else
+>     projG := G;;
+>   fi;
+>   if Size(projG) <> Size(pres) then
+>     Print(G, " does not have same size as FpGroup\n");;
+>   fi;
 > fi;
 > end;;
 gap> smallMatGroups := Concatenation([
