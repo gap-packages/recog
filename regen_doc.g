@@ -97,32 +97,6 @@ local dir, xmlfile, meth;
 
 end;
 
-GenerateUnusedMethodsTableXML := function()
-    local xmlfile, meth;
-
-    xmlfile := Filename(DirectoryCurrent(), "doc/_methods_unused_table.xml");
-    xmlfile := OutputTextFile(xmlfile, false);
-    SetPrintFormattingStatus(xmlfile, false);
-
-    PrintTo(xmlfile, "<Table Align=\"|l|l|l|\">\n");
-    AppendTo(xmlfile, "<Caption>Unused group find homomorphism methods</Caption>\n");
-    AppendTo(xmlfile, "<HorLine/>\n");
-
-    for meth in ListOfUnusedMethods() do
-        AppendTo(xmlfile, "<Row>\n");
-        AppendTo(xmlfile, "<Item><C>", meth[1], "</C></Item>\n");
-        AppendTo(xmlfile, "<Item><C>", meth[2], "</C></Item>\n");
-        AppendTo(xmlfile, "<Item><Ref Subsect=\"", meth[1], "\"/></Item>\n");
-        AppendTo(xmlfile, "</Row>\n");
-        AppendTo(xmlfile, "<HorLine/>\n");
-    od;
-
-    AppendTo(xmlfile, "</Table>\n");
-
-    CloseStream(xmlfile);
-
-end;
-
 GenerateMethodsListXML := function(shortname, db)
     local dir, xmlfile, dbsWhichUseMethod, nrDbsWhichUseMethod, s, meth;
 
@@ -139,7 +113,7 @@ GenerateMethodsListXML := function(shortname, db)
         dbsWhichUseMethod := DbsWhichUseMethod(db, meth);
         nrDbsWhichUseMethod := Length(dbsWhichUseMethod);
         if nrDbsWhichUseMethod = 0 then
-            AppendTo(xmlfile, "unused!");
+            AppendTo(xmlfile, "not used in the default setting!");
         else
             s := "used for recognizing ";
             Append(s, JoinStringsWithSeparator(dbsWhichUseMethod{[1 .. nrDbsWhichUseMethod - 1]},
@@ -165,8 +139,6 @@ end;
 GenerateMethodsTableXML("matrix", "Matrix", FindHomDbMatrix);
 GenerateMethodsTableXML("perm", "Permutation", FindHomDbPerm);
 GenerateMethodsTableXML("proj", "Projective", FindHomDbProjective);
-
-GenerateUnusedMethodsTableXML();
 
 GenerateMethodsListXML("generic", FindHomMethodsGeneric);
 GenerateMethodsListXML("matrix", FindHomMethodsMatrix);

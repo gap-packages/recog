@@ -8,31 +8,60 @@ A GAP package for group recognition
 ## Installation
 
 To get the newest version of this GAP 4 package download the
-archive file `recog-x.x.tar.gz` and unpack it using
+archive file `recog-x.x.tar.gz` from
+[here](https://github.com/gap-packages/recog/releases/latest).
+
+### Standard installation
+Unpack the archive using
 
     tar xvf recog-x.x.tar.gz
 
-Do this in a directory called `pkg`, preferably (but not necessarily)
-in the `pkg` subdirectory of your GAP 4 installation. It creates a
+Do this in the `pkg` subdirectory of your GAP 4 installation. It creates a
 subdirectory called `recog`.
 
-This is all which is needed if you installed the package in the standard
-`pkg` subdirectory.
+### Custom installation
 
-Note that the recog package needs the `AtlasRep`, `FactInt`, `Forms`,
-`genss`, and `orb` packages to work.
+If you want to contribute to recog you might want to install it
+into a custom directory. For example into the directory `~/packages`. Then you
+can clone recog (or perhaps your personal fork of it) into `~/packages` via
 
-If you installed the package in another `pkg` directory than the standard
-`pkg` directory in your GAP 4 installation, then you have to add the path
-to the directory containing your `pkg` directory to GAP's list of directories.
-This can be done by starting GAP with the `-l` command line option
-followed by the name of the directory and a semicolon. Then your directory
-is prepended to the list of directories searched. Otherwise the package
-is not found by GAP. Of course, you can add this option to your GAP
-startup script.
+    cd ~/packages
+    git clone git@github.com:gap-packages/recog.git
 
-Recompiling the documentation is possible by the command `gap makedoc.g`
-in the recog directory. But this should not be necessary.
+To enable GAP to find recog you can start GAP via
+
+    gap --packagedirs "~/packages;"
+
+> [!IMPORTANT]
+> Note that `--packagedirs` was introduced in GAP 4.15. For older version please
+> refer to [Chapter 76 of the GAP reference manual](https://docs.gap-system.org/doc/ref/chap76.html)
+> for alternative solutions.
+
+> [!TIP]
+> You can add this option to your GAP startup script. More information about
+> this can be found in [Chapter 3 of the GAP reference manual](https://docs.gap-system.org/doc/ref/chap3.html).
+
+## Loading
+
+You can load recog via
+
+    LoadPackage( "recog" );
+
+## Documentation
+
+The [recog documentation](https://gap-packages.github.io/recog/doc/chap0_mj.html)
+describes how to use recog, how it works and how to extend it.
+
+Recompiling the documentation locally is possible by the command `gap makedoc.g`
+in the `recog` directory.
+
+## Dependencies
+
+- [AtlasRep](https://www.gap-system.org/packages/#AtlasRep)
+- [FactInt](https://www.gap-system.org/packages/#FactInt)
+- [Forms](https://www.gap-system.org/packages/#Forms)
+- [genss](https://www.gap-system.org/packages/#genss)
+- [orb](https://www.gap-system.org/packages/#orb)
 
 ## Feedback and support
 
@@ -42,6 +71,6 @@ tell us via the
 
 In addition, the recog package has a mailing list, at
 <recog@gap-system.org>, which can be used for holding discussions,
-sharing information, and asking questions about the package.  You can find
+sharing information, and asking questions about the package. You can find
 more information, and register to receive the mail sent to this list, at
 <https://mail.gap-system.org/mailman/listinfo/recog>.
