@@ -1,5 +1,11 @@
-##### (c)  Frank Lübeck ############
+################################ (c) 2009 Frank Lübeck ############
 
+# Remark: Since 2009 some methods for finite fields have changed.
+# Before using the code in recog some fixes are needed if the code
+# will be used for finite fields with more than 2^16 elements:
+# Search for '65536' in various places below and adjust to the current
+# GAP (probably code can be simplified because LogFFE and IntFFE now
+# works for more (all?) finite fields.
 
 #Read("slptools.gd");
 #Read("memory.gd");
