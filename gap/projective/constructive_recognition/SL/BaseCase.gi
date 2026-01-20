@@ -27,7 +27,7 @@
 # This algorithm is an implementation of the paper
 # "Fast Recognition of Classical Groups over Large Fields"
 # by Marston Conder and Charles Leedham-Green
-RECOG.ConstructiveRecognitionSL2NaturalRepresentation := function(G, q, epsilon)
+RECOG.ConstructiveRecognitionSL2NaturalRepresentation := function(G, q, epsilon)  # TODO: never called
 local F, factors, counter, one, factor, foundEle, passed, max, eigenvalues, eigenvalues2, eigenvectors, eigenvectors2, A, B, rand, foundConjugate, test, BDiag, C, basechange, v, d, CC, check, i, j, D, DD, T, S, o, t1, t2, zero, slp;
 
     factors := PrimeDivisors(q-1);
@@ -208,7 +208,7 @@ end;
 
 # Note that we use the discrete logarithm to normalise the primitive element at position [1,1]. But this is not necessarly as the entry at position [1,1] is primitive.
 # Hence, this function can be adapted to larger fields by avoiding the normalisation step
-RECOG.ConstructiveRecognitionSL2NaturalRepresentationCompleteBasis := function(list,F,q,p,f)
+RECOG.ConstructiveRecognitionSL2NaturalRepresentationCompleteBasis := function(list,F,q,p,f)  # TODO: never called
 local w, k, Diag, coeffs, coeff, cong, t, s, SC, i, res, res2, A, S, T, upper, lower, basis, slp;
 
     list := GeneratorsWithMemory(list);
