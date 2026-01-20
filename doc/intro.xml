@@ -35,7 +35,9 @@ tries to try the different available methods in a sensible order.
 Chapter <Ref Chap="install"/> describes the installation of this package.<P/>
 
 Chapter <Ref Chap="user"/> presents a user-friendly introduction to this
-package.<P/>
+package. Furthermore, some instructive examples of the usage of this package
+are shown in section <Ref Sect="examples"/> and possible applications of a
+completed recognition tree are explained in section <Ref Sect="application"/>. <P/>
 
 Chapter <Ref Chap="recognition"/> describes the generic, recursive procedure
 used for group recognition throughout this package. At the heart of this
@@ -51,12 +53,6 @@ useful in other circumstances.<P/>
 
 Chapter <Ref Chap="methods"/> describes the available <Q>FindHomomorphism</Q>
 methods.<P/>
-
-Chapter <Ref Chap="afterrecog"/> explains what one can do with a
-completed recognition tree.<P/>
-
-Finally, Chapter <Ref Chap="examples"/> shows some instructive examples of the
-usage of this package.<P/>
 
 </Section>
 

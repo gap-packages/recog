@@ -13,7 +13,12 @@ presents the basic theoretical background, the functionality, basic applications
 to help you get started quickly in recognising groups with <Package>recog</Package>.
 <P/>
 
-TODO explain sections
+In Section <Ref Sect="background"/>, we explain the theoretical background
+needed to understand how group recognition works in this package. Section <Ref
+Sect="functions"/> presents the main functions provided by this package to
+recognise groups. In Section <Ref Sect="examples"/>, we show some instructive
+examples of the usage of this package. Finally, Section <Ref Sect="application"/>
+explains possible applications of a completed recognition tree.<P/>
 
 <Section Label="background">
 <Heading>Theoretical background</Heading>
@@ -31,7 +36,7 @@ im<M>(\varphi) \cong G/N</M>. This continues until the remaining groups
 are (quasi-)simple, which are the fundamental building blocks of all
 groups. The resulting tree represents the entire structure of the original group
 <M>G</M>, where the root is given by <M>G</M> and the leaves are the
-(quasi-)simple groups obtained in the process.
+(quasi- or almost) simple groups obtained in the process.
 The leaf nodes are the groups being directly recognised, and the
 result is then assembled back up the tree until the group <M>G</M>
 is recognised.<P/>
@@ -44,7 +49,8 @@ generators. Instead of a potentially very long word in terms of the
 generators that evaluates to <M>g</M>,
 an SLP is a short sequence of steps to compute the element <M>g</M>.
 This makes it possible to work with very large groups
-effectively.<P/>
+effectively. More details about Straight-Line Programs in &GAP; can be found in
+<Ref Sect="Straight Line Programs" BookName="Ref"/>. <P/>
 
 A key problem that <Package>recog</Package> helps to solve is the
 <Q>constructive membership problem</Q>.
@@ -65,7 +71,9 @@ The main function to recognise a group is the following.
 
 <#Include Label="RecogniseGroup">
 
-Alternatively, if you know the type of the given group, you can directly call the specialised functions for permutation, matrix, or projective groups.
+Alternatively, if you know the type of the given group, you can directly call
+the specialised functions for permutation, matrix, or projective groups. These
+specialised functions are described in 
 
 <#Include Label="RecognisePermGroup">
 <#Include Label="RecogniseMatrixGroup">
@@ -82,7 +90,7 @@ recognition node are given in <Ref Sect="application"/>.
 <Heading>Examples</Heading>
 
 In order to understand the output we consider some examples. Note that many
-methods used to compute a recognition tree a randomised algorithms. This means
+methods used to compute a recognition tree are using randomised algorithms. This means
 that the function <Ref Func="RecogniseGroup"/> may yield slightly
 different results when called multiple times.<P/>
 
@@ -105,7 +113,7 @@ recognition tree. Each node representing a group <M>H</M> has two children: a
 factor of <M>H</M> (abbreviated with <Q>F</Q> which stands for Factor) and a normal
 subgroup of <M>H</M> (abbreviated with <Q>K</Q> which stands for Kernel). <P/>
 
-In this example the root node presents the input group <M>SL(10,5)</M>. Starting
+In this example the root node represents the input group <M>SL(10,5)</M>. Starting
 at this root node the method <C>GoProjective</C> (<Ref Subsect="GoProjective"/>)
 finds a homomorphism from the group 
 <M>SL(10,5)</M> to itself modular scalar matrices. The image
@@ -127,9 +135,7 @@ This recognition tree only consists of the root node representing the input
 group <M>S_{10}</M>. The group is recognised to only move a few points. Its size
 is also recognised.<P/>
 
-As a third example we consider a group that yields a larger recognition tree.
-
-TODO
+TODO: another nice example would be the Rubik's cube group
 
 </Section>
 
@@ -161,7 +167,7 @@ gap> ri := RecogniseGroup(G);
 </Log>
 
 Note that the first few lines are not part of the returned recognition node. You
-can obtain these further information by setting the InfoLevel accordingly.
+can obtain such further information by setting the InfoLevel accordingly.
 <P/>
 
 One sees that the recursive process runs, first it finds that the
