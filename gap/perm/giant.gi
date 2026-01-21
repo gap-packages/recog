@@ -23,51 +23,83 @@ SetInfoLevel( InfoGiants, 1 );
 
 #######################################################################
 ##
-#F  NiceGeneratorsSn(<n>,<grp>,<N>) ...... find n-cycle, transposition
+#F  NiceGeneratorsSn(<grp>,<N>) ...... find n-cycle, transposition
 ##
-##
+## For a permutation group grp on n points, this function tries to return a list
+## [ fullCycle, transp ] consisting of an n-cycle fullCycle in grp and a transposition
+## tranps in grp which interchanges successive points of fullCycle.
+## (It then follows that grp is the full permutation group on n points and that
+## [ fullCycle, transp ] is a generating set of grp.)
+## Thus up to renaming the points, fullCycle = (1,...,n) and transp = (1,2).
+## If n<=2, returns fail.
+## This is done by drawing at most N random elements of grp.
+## If no such generating set is found, the function returns fail.
 
-RECOG.NiceGeneratorsSn := function ( mp, grp, N )
+RECOG.NiceGeneratorsSn := function ( grp, N )
 
-    local t, cyclen, g, y, h, i, x, supp, n;
+    local cyclen, fullCycle, transp, rand, orders, i, supp, suppNew, n, mp,
+        numTries;
 
+    mp := MovedPoints(grp);
     n := Length(mp);
-    while N > 0 do
+
+    if n<=2 then
+        return fail;
+    fi;
+
+    # Random search for an n-cycle and a transposition in grp
+    fullCycle := fail;
+    transp := fail;
+    while (fullCycle = fail or transp = fail) and N > 0 do
         N := N - 1;
-        t := PseudoRandom( grp );
-        # was: cyclen := Collected( CycleLengths( t, [1..n] ) );
-        cyclen := CycleStructurePerm(t);
-
-        # was: if IsBound(g) = false and [n,1] in cyclen then
-        if IsBound(g) = false and IsBound(cyclen[n-1]) then
-            # we found an $n$-cycle
-            g := t;
+        rand := PseudoRandom( grp );
+        # If cyclen[i] is bound, it is the number of cycles of length i+1 in rand.
+        # Otherwise rand has no cycle of length i+1.
+        cyclen := CycleStructurePerm(rand);
+        # Is rand an n-cycle?
+        # Check that at least one n-cycle appears in the cycle decomposition of rand.
+        # In this case, rand must be equal to this n-cycle.
+        if fullCycle = fail and IsBound(cyclen[n-1]) then
+            fullCycle := rand;
         fi;
-
-        if IsBound(y) = false and IsBound(cyclen[1]) and cyclen[1] = 1 and
-               ForAll([1..QuoInt(n,2)-1],i->not IsBound(cyclen[2*i+1]))
-               # was: Filtered( cyclen, x -> x[1] mod 2 = 0 ) = [ [ 2,1 ] ]
-        then
-            # we can get a transposition
-            y := t^(Lcm(Filtered([2..n],x->IsBound(cyclen[x-1])))/2);
-        fi;
-
-        if IsBound(g) and IsBound(y) then
-            i := 10*n;
-            supp := MovedPoints( y );
-            while i > 0 do  # take up to i conjugates,
-                            # check if they match the $n$-cycle
-                i := i-1;
-                x := PseudoRandom( grp );
-                if (supp[1]^x)^g = supp[2]^x or (supp[2]^x)^g = supp[1]^x
-                    then h := y^x;
-                    return [ g, h ];
+        # Can we construct a transposition from rand?
+        # Check that the cycle decomposition of rand contains exactly one 2-cycle
+        # and no cycle of length k where k is even and 4<=k<n.
+        if transp = fail and IsBound(cyclen[1]) and cyclen[1] = 1 then
+            # orders is a the list of all k>2 such that rand contains a k-cycle.
+            # Since rand contains a 2-cycle, we only have to check up to n-2.
+            orders := Filtered([3..n-2],x->IsBound(cyclen[x-1]));
+            if ForAll(orders, IsOddInt) then
+                if IsEmpty(orders) then # rand is a 2-cycle
+                    transp := rand;
+                else
+                    # Raising to the power of Lcm(orders) kills all cycles of
+                    # odd length. The single 2-cycle in rand remains
+                    transp := rand^(Lcm(orders));
                 fi;
-            od;
-            return fail;
+            fi;
         fi;
+    od;
 
-    od; # loop over random elements
+    # Conjugate transp by random elements until we obtain a transposition that
+    # interchanges successive elements of fullCycle.
+    if fullCycle <> fail and transp <> fail then
+        numTries := 10*n; # TODO: Why do we choose this constant?
+        supp := MovedPoints( transp ); # Support of transp
+        while numTries > 0 do
+            numTries := numTries-1;
+            rand := PseudoRandom( grp );
+            suppNew := List(supp, x->x^rand); # Support of transp^rand
+            # Check that transp^rand interchanges successive points of fullCycle,
+            # or equivalently, that fullCycle moves one point of transp^rand
+            # to the other one.
+            if suppNew[1]^fullCycle = suppNew[2]
+                or suppNew[2]^fullCycle = suppNew[1]
+            then
+                return [ fullCycle, transp^rand ];
+            fi;
+        od;
+    fi;
 
     return fail;
 
@@ -125,9 +157,11 @@ RECOG.RecogniseSn :=  function( mp, grp, eps )
         le := le + 1;
     od;
 
+    # TODO: Document these magic constants. They are probably from some paper.
+    # Also, Max Horn suggested that it may be better to use a smaller N.
     N := Int(24 * (4/3)^3 * le * 6 * n);
 
-    gens := RECOG.NiceGeneratorsSn( mp, grp, N );
+    gens := RECOG.NiceGeneratorsSn( grp, N );
     if gens = fail then
         Info(InfoGiants,1,"couldn't find nice generators for Sn");
         return fail;
@@ -441,6 +475,7 @@ end;
 ##
 ##
 ##  This is the main function.
+##  TODO: Document the precise meaning of the threshold eps. Does it come from a specific paper?
 ##
 
 RECOG.RecogniseGiant :=  function( mp, grp, eps )
@@ -694,7 +729,8 @@ RECOG.SLPforAn :=  function( n, pi )
 
 end;
 
-
+# TODO: Document this magic constant properly.
+# (It is apparently the default for eps in FindHomMethodsPerm.)
 RECOG.GiantEpsilon := 1/1024;
 
 #! @BeginChunk Giant
