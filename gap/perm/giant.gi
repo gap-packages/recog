@@ -25,15 +25,20 @@ SetInfoLevel( InfoGiants, 1 );
 ##
 #F  NiceGeneratorsSn(<grp>,<N>) ...... find n-cycle, transposition
 ##
-## For a permutation group grp on n points, this function tries to return a list
-## [ fullCycle, transp ] consisting of an n-cycle fullCycle in grp and a transposition
-## tranps in grp which interchanges successive points of fullCycle.
-## (It then follows that grp is the full permutation group on n points and that
-## [ fullCycle, transp ] is a generating set of grp.)
-## Thus up to renaming the points, fullCycle = (1,...,n) and transp = (1,2).
-## If n<=2, returns fail.
-## This is done by drawing at most N random elements of grp.
-## If no such generating set is found, the function returns fail.
+## For a permutation group grp on n points, this function returns either fail
+## or a list [ fullCycle, transp ] such that the following hold:
+## - n > 2.
+## - fullCycle is an n-cycle.
+## - transp is a transposition, i.e., a 2-cycle.
+## - transp interchanges two successive points of fullCycle. In other words,
+##   fullCycle = (1,...,n) and transp = (1,2) up to renaming the n points.
+## The conditions on [ fullCycle, transp ] imply that grp is the full symmetric
+## group on n points. Thus the function always returns fail if grp is not the
+## full symmetric group, and also if n <= 2.
+## fullCycle, transp are found by a random search, drawing at most N random
+## elements from grp.
+## Thus if grp is the full symmetric group on n points, then the function does not
+## return fail with a probability that grows as N grows.
 
 RECOG.NiceGeneratorsSn := function ( grp, N )
 
