@@ -2121,7 +2121,7 @@ RECOG.SLn_UpStep := function(w)
           fi;
           Append(newbas,BasisVectors(Basis(int3)));
       fi;
-      ConvertToMatrixRep(newbas,Size(w.f));
+      ConvertToMatrixRep(newbas,w.f);
       newbasi := newbas^-1;
       if newbasi = fail then
           Info(InfoRecog,2,"Ooops, Fixc intersected too much, we try again");
@@ -2129,7 +2129,7 @@ RECOG.SLn_UpStep := function(w)
       fi;
       ci := newbas * ci * newbasi;
       cii := ExtractSubMatrix(ci,[w.n+1..aimdim],[1..w.n-1]);
-      ConvertToMatrixRep(cii,Size(w.f));
+      ConvertToMatrixRep(cii,w.f);
       cii := TransposedMat(cii);
       # The rows of cii are now what used to be the columns,
       # their length is newdim, we need to span the full newdim-dimensional
