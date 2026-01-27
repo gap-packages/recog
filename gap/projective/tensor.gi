@@ -112,8 +112,7 @@ RECOG.FindTensorDecomposition := function(G,N)
   w := m[Length(m)];   # An irreducible FN-module
   homs := MTX.Homomorphisms(w,m[1]);
   homsimg := Concatenation(homs);
-  # FIXME:
-  ConvertToMatrixRep(homsimg);
+  ConvertToMatrixRep(homsimg,f);
   if Length(homsimg) = d then    # we see one homogeneous component
       basis := homsimg;
       basisi := homsimg^-1;
@@ -157,7 +156,7 @@ RECOG.FindTensorDecomposition := function(G,N)
       i := i + 1;
   od;
   h := Concatenation(h);
-  ConvertToMatrixRep(h);
+  ConvertToMatrixRep(h,f);
 
   if i > Length(l) then    # by Clifford this should never happen, but still...
       if Length(l) = 1 then
