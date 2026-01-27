@@ -649,13 +649,13 @@ function(ri, G)
           basis := Concatenation(homs);
           ConvertToMatrixRep(basis,Size(f));
           subdim := MTX.Dimension(collf[1][1]);
-          r := rec(t := basis, ti := basis^-1,
+          r := rec(t := basis, ti := basis^-1, field := f,
                    blocksize := MTX.Dimension(collf[1][1]));
           # Note that we already checked for semilinear, so we know that
           # the irreducible N-submodule is absolutely irreducible!
           # Now we believe to have a tensor decomposition:
           conjgensG := List(gens,x->r.t * x * r.ti);
-          kro := List(conjgensG,g->RECOG.IsKroneckerProduct(g,r.blocksize));
+          kro := List(conjgensG,g->RECOG.IsKroneckerProduct(g,r));
           if not ForAll(kro, k -> k[1]) then
               Info(InfoRecog, 1, "VERY, VERY, STRANGE!");
               Info(InfoRecog, 1, "False alarm, was not a tensor decomposition.");
