@@ -333,7 +333,7 @@ IsGroupClassical := function(G,classicalrec)
    return ClassicalNametoStandardName(G,"symplectic");
  elif classicalrec.isSUContained=true then
    return ClassicalNametoStandardName(G,"unitary");
- elif classicalrec.isSOContained=true then
+ elif classicalrec.isOmegaContained=true then
    return ClassicalNametoStandardName(G,classicalrec.ClassicalForms[1]);
  else
    return false;

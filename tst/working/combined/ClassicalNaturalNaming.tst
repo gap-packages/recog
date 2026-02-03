@@ -1,7 +1,6 @@
 #
 # This file contains tests for the naming (= non-constructive recognition) of
-# classical groups as implemented in classical.gi; see also [NP97],
-# [NP98]
+# classical groups as implemented in classical.gi; see also [NP97], [NP98]
 #
 gap> ReadPackage("recog", "tst/naming.g");
 true
@@ -25,10 +24,10 @@ gap> d:=5;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SL", d, q); od
 gap> d:=3;; for q in [2, 3] do TestNaming("SO", d, q); od;
 #@fi
 
-# FIXME/TODO: SO(3,9) has bad value for isSOContained; expected true, got unknown
-# FIXME/TODO: sometimes get SO(3,11) has bad value for isSOContained; expected true, got unknown
-# FIXME/TODO: sometimes get SO(5,3) has bad value for isSOContained; expected true, got unknown
-# FIXME/TODO: sometimes get SO(7,3) has bad value for isSOContained; expected true, got unknown
+# FIXME/TODO: SO(3,9) has bad value for isOmegaContained; expected true, got unknown
+# FIXME/TODO: sometimes get SO(3,11) has bad value for isOmegaContained; expected true, got unknown
+# FIXME/TODO: sometimes get SO(5,3) has bad value for isOmegaContained; expected true, got unknown
+# FIXME/TODO: sometimes get SO(7,3) has bad value for isOmegaContained; expected true, got unknown
 #@if not IsBound(RECOG_TEST_SUITE) or RECOG_TEST_SUITE = "slow"
 gap> d:=3;; for q in [4, 5, 7, 8, 13] do TestNaming("SO", d, q); od;
 gap> d:=5;; for q in [2, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SO", d, q); od;
@@ -44,7 +43,7 @@ gap> d:=7;; for q in [2, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SO", d, q); od;
 gap> d:=4;; for q in [2, 3] do TestNaming("SO", +1, d, q); od;
 #@fi
 
-# FIXME/TODO: sometimes get "SO(1,d,q) has bad value for isSOContained;
+# FIXME/TODO: sometimes get "SO(1,d,q) has bad value for isOmegaContained;
 # expected true, got unknown" for
 # (d,q) in [ (4,11), (4,13), (8,4), (8,7), (8,8) ]
 #@if not IsBound(RECOG_TEST_SUITE) or RECOG_TEST_SUITE = "slow"
@@ -60,8 +59,8 @@ gap> d:=8;; for q in [2, 3, 5, 9, 11, 13] do TestNaming("SO", +1, d, q); od;
 gap> d:=4;; for q in [2, 3] do TestNaming("SO", -1, d, q); od;
 #@fi
 
-# FIXME/TODO: sometimes get SO(-1,6,2) has bad value for isSOContained; expected true, got unknown
-# FIXME/TODO: sometimes get SO(-1,6,3) has bad value for isSOContained; expected true, got unknown
+# FIXME/TODO: sometimes get SO(-1,6,2) has bad value for isOmegaContained; expected true, got unknown
+# FIXME/TODO: sometimes get SO(-1,6,3) has bad value for isOmegaContained; expected true, got unknown
 #@if not IsBound(RECOG_TEST_SUITE) or RECOG_TEST_SUITE = "slow"
 gap> d:=4;; for q in [4, 5, 7, 8, 9, 11, 13] do TestNaming("SO", -1, d, q); od;
 gap> d:=6;; for q in [4, 5, 7, 8, 9, 11, 13] do TestNaming("SO", -1, d, q); od;
