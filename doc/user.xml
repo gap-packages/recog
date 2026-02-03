@@ -33,7 +33,7 @@ The process typically involves finding a homomorphism <M>\varphi \colon G \to
 H</M>, and then recursively analysing both the kernel
 <M>\ker(\varphi) = N \unlhd G</M> and the image
 im<M>(\varphi) \cong G/N</M>. This continues until the remaining groups
-are (quasi-)simple, which are the fundamental building blocks of all
+are (quasi- or almost)simple, which are the fundamental building blocks of all
 groups. The resulting tree represents the entire structure of the original group
 <M>G</M>, where the root is given by <M>G</M> and the leaves are the
 (quasi- or almost) simple groups obtained in the process.
