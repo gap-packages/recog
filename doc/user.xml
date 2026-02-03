@@ -148,6 +148,23 @@ recognition.<P/>
 Here is an example of a successful recognition tree:
 
 <Log><![CDATA[
+gap> G := DirectProduct(SymmetricGroup(12),SymmetricGroup(5));;
+gap> ri := RecogniseGroup(G);
+<recognition node NonTransitive
+ F:<recognition node MovesOnlySmallPoints Size=120>
+ K:<recognition node Giant AlmostSimple Size=479001600>>
+]]></Log>
+
+This tells us that the group was split into a factor (indicated by <C>F:</C>)
+of size 120, and a kernel (<C>K:</C>) of size 479001600.
+<P/>
+
+We can obtain some more information about the recognition process itself
+by setting a so-called <C>InfoLevel</C>:
+
+<Log><![CDATA[
+gap> SetInfoLevel(InfoRecog, 2);
+gap> SetInfoLevel(InfoMethSel, 2);
 gap> G := DirectProduct(SymmetricGroup(12),SymmetricGroup(5));
 Group([ (1,2,3,4,5,6,7,8,9,10,11,12), (1,2), (13,14,15,16,17), (13,14) ])
 gap> ri := RecogniseGroup(G);
