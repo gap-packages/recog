@@ -13,7 +13,7 @@ This package is about group recognition.<P/>
 In computational group theory, group recognition is the task of identifying a
 given group. The main goal is to determine if the given group is isomorphic to a
 well-understood known group, such as a symmetric group or a classical matrix
-group, and construct an explicit isomorphism between the two groups. The first
+group, and to construct an explicit isomorphism between the two groups. The first
 task is called <Q>naming</Q> or <Q>non-constructive</Q> recognition, the latter
 task is called <Q>constructive</Q> recognition.<P/>
 

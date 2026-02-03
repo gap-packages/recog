@@ -43,7 +43,7 @@ is recognised.<P/>
 
 In order to work with group elements efficiently and constructively throughout
 this process, 
-<Package>recog</Package> uses <Q>Straight-Line Programs</Q> (or <Q>SLPs</Q>). An <Q>SLP</Q> is a
+<Package>recog</Package> uses <Q>Straight-Line Programs</Q> (or <Q>SLPs</Q>). An SLP is a
 highly efficient way to record how a group element <M>g \in G</M> is built from the group's
 generators. Instead of a potentially very long word in terms of the
 generators that evaluates to <M>g</M>,
@@ -108,7 +108,7 @@ gap> RecogniseGroup(G);
     K:<trivial kernel>>]]>
 </Log>
 
-The output is a recognition node that graphically displays the structure of the
+The output is a recognition node that visualises the structure of the
 recognition tree. Each node representing a group <M>H</M> has two children: a
 factor of <M>H</M> (abbreviated with <Q>F</Q> which stands for Factor) and a normal
 subgroup of <M>H</M> (abbreviated with <Q>K</Q> which stands for Kernel). <P/>
