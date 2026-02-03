@@ -732,7 +732,7 @@ end;
 RECOG.CheckPolynomialForSelfConjugate := function (f)
 local ind, coeff, aZero, i, fld, deg, pol;
 
-    fld := FieldOfPolynomial(f);
+    fld := Field(CoefficientsOfUnivariatePolynomial(f));
     ind := IndeterminateOfLaurentPolynomial(f);
     coeff := CoefficientsOfLaurentPolynomial(f)[1];
     deg := Length(coeff);
