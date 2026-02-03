@@ -147,8 +147,8 @@ recognition.<P/>
 
 Here is an example of a successful recognition tree:
 
-<Log>
-<![CDATA[gap> G := DirectProduct(SymmetricGroup(12),SymmetricGroup(5));
+<Log><![CDATA[
+gap> G := DirectProduct(SymmetricGroup(12),SymmetricGroup(5));
 Group([ (1,2,3,4,5,6,7,8,9,10,11,12), (1,2), (13,14,15,16,17), (13,14) ])
 gap> ri := RecogniseGroup(G);
 #I  Finished rank 90 method "NonTransitive": success.
@@ -163,8 +163,8 @@ gap> ri := RecogniseGroup(G);
 #I  Back from kernel (depth=0).
 <recognition node NonTransitive
  F:<recognition node MovesOnlySmallPoints Size=120>
- K:<recognition node Giant Size=479001600>>]]>
-</Log>
+ K:<recognition node Giant Size=479001600>>
+]]></Log>
 
 Note that the first few lines are not part of the returned recognition node. You
 can obtain such further information by setting the InfoLevel accordingly.
@@ -195,10 +195,10 @@ of a recognised group.
 
 For the group from our example above we obtain the following result.
 
-<Log>
-<![CDATA[gap> Size(ri);
-57480192000]]>
-</Log>
+<Log><![CDATA[
+gap> Size(ri);
+57480192000
+]]></Log>
 
 Moreover, constructive membership tests can be performed which is explained
 above in Section <Ref Sect="background"/>. For this you can use the function <Ref
@@ -208,15 +208,14 @@ are stored in the attribute <Ref Attr="NiceGens"/>. If <K>fail</K> is returned,
 then the element in question does not lie in the recognised group or
 the recognition made an error.
 
-<Log>
-<![CDATA[
+<Log><![CDATA[
 gap> x := PseudoRandom(G);
 (1,12)(2,5,9,11,10,3,4)(7,8)(13,14,16,15,17)
 gap> slp := SLPforElement(ri,x);
 <straight line program>
 gap> ResultOfStraightLineProgram(slp,NiceGens(ri));
-(1,12)(2,5,9,11,10,3,4)(7,8)(13,14,16,15,17)]]>
-</Log>
+(1,12)(2,5,9,11,10,3,4)(7,8)(13,14,16,15,17)
+]]></Log>
 
 A convenient function for testing membership of an element is the following function.
 
