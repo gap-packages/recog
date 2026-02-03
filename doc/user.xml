@@ -182,11 +182,8 @@ gap> ri := RecogniseGroup(G);
  K:<recognition node Giant Size=479001600>>
 ]]></Log>
 
-Note that the first few lines are not part of the returned recognition node. You
-can obtain this additional information by setting the <C>InfoLevel</C> accordingly.
-<P/>
-
-One sees that the recursive process runs, first it finds that the
+The lines starting with <C>#I</C> indicate so-called info messages, which inform
+us about the progress of the computation. Here it first finds that the
 permutation action is not transitive, a homomorphism is found by mapping
 onto the action on one of the orbits. The image is recognised to permute
 only a few points. The kernel is recognised to be a full symmetric group
