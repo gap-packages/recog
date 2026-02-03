@@ -19,6 +19,7 @@ ReadPackage("recog","gap/base/methods.gi");
 ReadPackage("recog","gap/base/methsel.gi");
 ReadPackage("recog","gap/base/recognition.gi");
 ReadPackage("recog","gap/base/kernel.gi");
+ReadPackage("recog","gap/obsolete.gi");
 
 # The following contain generic functionality for different types of groups:
 
@@ -44,7 +45,7 @@ ReadPackage("recog","gap/generic/SnAnUnknownDegree.gi");
 ReadPackage("recog","gap/projective/findnormal.gi");
 ReadPackage("recog","gap/matrix/matimpr.gi");
 ReadPackage("recog","gap/projective/c6.gi");
-ReadPackage("recog","gap/projective/tensor.gi");
+ReadPackage("recog","gap/projective/tensor/tensor.gi");
 ReadPackage("recog","gap/matrix/ppd.gi");
 ReadPackage("recog","gap/matrix/classical.gi");
 ReadPackage("recog","gap/matrix/slconstr.gi");
@@ -53,9 +54,29 @@ ReadPackage("recog","gap/projective/d247.gi");
 ReadPackage("recog","gap/projective/almostsimple/threeelorders.gi");
 ReadPackage("recog","gap/projective/almostsimple.gi");
 ReadPackage("recog","gap/projective/almostsimple/lietype.gi");
+ReadPackage("recog","gap/projective/naming/ClassicalNamingAndUtils.gi");
 ReadPackage("recog","gap/projective/almostsimple/hints.gi");
-ReadPackage("recog","gap/projective/classicalnatural.gi");
-ReadPackage("recog","gap/projective/AnSnOnFDPM.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/utils/achieve.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/utils/utils.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/SL/BaseCase.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/SL/GoingDown.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/SL/GoingUp.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/SL/main.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/SL/sl2_BlackBox.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/Sp/BaseCase.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/Sp/GoingDown.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/Sp/GoingUp.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/Sp/main.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/SU/BaseCase.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/SU/GoingDown.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/SU/GoingUp.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/SU/main.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/O/BaseCase.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/O/GoingDown.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/O/GoingUp.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/O/main.gi");
+ReadPackage("recog","gap/projective/blackbox/blackboxClassical.gi");
+ReadPackage("recog","gap/projective/AnSn/AnSnOnFDPM.gi");
 
 # All the method installations are now here:
 ReadPackage("recog","gap/perm.gi");

@@ -68,6 +68,9 @@ function(stamp, comment, arg...)
 
     r := rec(func := func);
     if IsBound(opt.validatesOrAlwaysValidInput) then
+        # method.validatesOrAlwaysValidInput for now only stores
+        # meta-information. It may be used in the future, see github issue
+        # #184, PR #175, and issue #107.
         r.validatesOrAlwaysValidInput := opt.validatesOrAlwaysValidInput;
     fi;
     ObjectifyWithAttributes(r, RecogMethodType,
