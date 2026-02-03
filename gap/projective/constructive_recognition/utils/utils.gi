@@ -730,26 +730,22 @@ end;
 
 
 RECOG.CheckPolynomialForSelfConjugate := function (f)
-local ind, coeff, aZero, i, fld, deg, pol;
-
-    fld := Field(CoefficientsOfUnivariatePolynomial(f));
+local ind, coeff, a0, i, deg, pol;
+    # TODO: this function could be optimized: no need to construct the new
+    # polynomial, just directly work with coeff
     ind := IndeterminateOfLaurentPolynomial(f);
-    coeff := CoefficientsOfLaurentPolynomial(f)[1];
+    coeff := CoefficientsOfUnivariatePolynomial(f);
     deg := Length(coeff);
-    aZero := coeff[1];
-    
-    pol := ind^0 * Zero(fld);
+    a0 := coeff[1];
+
+    pol := ind * 0;
     for i in [1..deg] do
         pol := pol + ind^(deg-i)*coeff[i];
     od;
     
-    pol := aZero * pol;
+    pol := a0 * pol;
 
-    if pol = f then
-        return true;
-    else
-        return false;
-    fi;
+    return pol = f;
 end;
 
 
