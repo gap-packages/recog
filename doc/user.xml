@@ -9,8 +9,8 @@ itself to the information needed for a pleasant user-experience.
 <Heading>Recog package for user</Heading>
 
 This chapter provides a user-friendly introduction to the <Package>recog</Package> package. It
-presents the basic theoretical background, the functionality, basic applications, and the most important commands
-to help you get started quickly in recognising groups with <Package>recog</Package>.
+presents the basic theoretical background, functionality, representative applications, and the most important commands
+needed to get you started with group recognition.
 <P/>
 
 In Section <Ref Sect="background"/>, we explain the theoretical background
