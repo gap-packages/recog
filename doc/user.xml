@@ -165,19 +165,18 @@ by setting a so-called <C>InfoLevel</C>:
 <Log><![CDATA[
 gap> SetInfoLevel(InfoRecog, 2);
 gap> SetInfoLevel(InfoMethSel, 2);
-gap> G := DirectProduct(SymmetricGroup(12),SymmetricGroup(5));
-Group([ (1,2,3,4,5,6,7,8,9,10,11,12), (1,2), (13,14,15,16,17), (13,14) ])
+gap> G := DirectProduct(SymmetricGroup(12),SymmetricGroup(5));;
 gap> ri := RecogniseGroup(G);
 #I  Finished rank 90 method "NonTransitive": success.
 #I  Going to the image (depth=0, try=1).
 #I  Finished rank 95 method "MovesOnlySmallPoints": success.
 #I  Back from image (depth=0).
 #I  Calculating preimages of nice generators.
-#I  Creating 20 random generators for kernel.
-....................
+#I  Creating 6 random generators for kernel.
 #I  Going to the kernel (depth=0).
 #I  Finished rank 80 method "Giant": success.
 #I  Back from kernel (depth=0).
+#I  Doing immediate verification (depth=0).
 <recognition node NonTransitive
  F:<recognition node MovesOnlySmallPoints Size=120>
  K:<recognition node Giant Size=479001600>>
