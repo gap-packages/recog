@@ -1,0 +1,261 @@
+<!--
+
+This chapter is a user-friendly introduction to the recog package that limits
+itself to the information needed for a pleasant user-experience.
+
+-->
+
+<Chapter Label="user">
+<Heading>Recog package for user</Heading>
+
+This chapter provides a user-friendly introduction to the <Package>recog</Package> package. It
+presents the basic theoretical background, functionality, representative applications, and the most important commands
+needed to get you started with group recognition.
+<P/>
+
+In Section <Ref Sect="background"/>, we explain the theoretical background
+needed to understand how group recognition works in this package. Section <Ref
+Sect="functions"/> presents the main functions provided by this package to
+recognise groups. In Section <Ref Sect="examples"/>, we show some instructive
+examples of the usage of this package. Finally, Section <Ref Sect="application"/>
+explains possible applications of a completed recognition tree.<P/>
+
+<Section Label="background">
+<Heading>Theoretical background</Heading>
+
+At its core, <Package>recog</Package> uses a "divide and conquer" strategy to
+understand the structure of a given group <M>G</M>. This process builds a data
+structure called a <Q>recognition tree</Q> (also referred to as a <Q>composition
+tree</Q>).<P/>
+
+A recognition tree breaks down the group <M>G</M> into smaller, more manageable groups.
+The process typically involves finding a homomorphism <M>\varphi \colon G \to
+H</M>, and then recursively analysing both the kernel
+<M>\ker(\varphi) = N \unlhd G</M> and the image
+im<M>(\varphi) \cong G/N</M>. This continues until the remaining groups
+are (quasi- or almost)simple, which are the fundamental building blocks of all
+groups. The resulting tree represents the entire structure of the original group
+<M>G</M>, where the root is given by <M>G</M> and the leaves are the
+(quasi- or almost) simple groups obtained in the process.
+The leaf nodes are the groups being directly recognised, and the
+result is then assembled back up the tree until the group <M>G</M>
+is recognised.<P/>
+
+In order to work with group elements efficiently and constructively throughout
+this process, 
+<Package>recog</Package> uses <Q>Straight-Line Programs</Q> (or <Q>SLPs</Q>). An SLP is a
+highly efficient way to record how a group element <M>g \in G</M> is built from the group's
+generators. Instead of a potentially very long word in terms of the
+generators that evaluates to <M>g</M>,
+an SLP is a short sequence of steps to compute the element <M>g</M>.
+This makes it possible to work with very large groups
+effectively. More details about Straight-Line Programs in &GAP; can be found in
+<Ref Sect="Straight Line Programs" BookName="Ref"/>. <P/>
+
+A key problem that <Package>recog</Package> helps to solve is the
+<Q>constructive membership problem</Q>.
+Given a group <M>G = \langle X \rangle</M> by a set of generators <M>X \subseteq
+G</M> and an element <M>g</M>, the problem is twofold. First, is
+<M>g</M> an element of <M>G</M>? Second, if it is, how can <M>g</M> be written as a word in the generators <M>X</M>? The "constructive"
+part of the solution is providing this representation, and <Package>recog</Package> does this by producing an SLP for
+<M>g</M>. This provides a concrete certificate of membership that can be used in
+further computations. Solving this problem efficiently is fundamental to many
+other group algorithms.
+
+</Section>
+
+<Section Label="functions">
+<Heading>Functions</Heading>
+
+The main function to recognise a group is the following.
+
+<#Include Label="RecogniseGroup">
+
+Alternatively, if you know the type of the given group, you can directly call
+the specialised functions for permutation, matrix, or projective groups. These
+specialised functions are described in 
+
+<#Include Label="RecognisePermGroup">
+<#Include Label="RecogniseMatrixGroup">
+<#Include Label="RecogniseProjectiveGroup">
+
+Each of these functions returns a recognition node which is a &GAP; component
+object. Further details to this data structure as well as its attributes are
+given in <Ref Sect="rirecord"/>. Some examples of what a user can do with a
+recognition node are given in <Ref Sect="application"/>.
+
+</Section>
+
+<Section Label="examples">
+<Heading>Examples</Heading>
+
+In order to understand the output we consider some examples. Note that many
+methods used to compute a recognition tree are using randomised algorithms. This means
+that the function <Ref Func="RecogniseGroup"/> may yield slightly
+different results when called multiple times.<P/>
+
+The first example we consider is the special linear group.
+
+<Log>
+<![CDATA[gap> G := SL(10,5);
+SL(10,5)
+gap> RecogniseGroup(G);
+<recognition node GoProjective Dim=10 Field=5
+ F:<recognition node (projective) ClassicalNatural Comment=PSLd Simple Size=
+749746041218752566202615590039253234863281250000000000000000000000000 Dim=10 Field=5>
+ K:<recognition node DiagonalMatrices Dim=10 Field=5
+    F:<recognition node Scalar Dim=1 Field=5>
+    K:<trivial kernel>>]]>
+</Log>
+
+The output is a recognition node that visualises the structure of the
+recognition tree. Each node representing a group <M>H</M> has two children: a
+factor of <M>H</M> (abbreviated with <Q>F</Q> which stands for Factor) and a normal
+subgroup of <M>H</M> (abbreviated with <Q>K</Q> which stands for Kernel). <P/>
+
+In this example the root node represents the input group <M>SL(10,5)</M>. Starting
+at this root node the method <C>GoProjective</C> (<Ref Subsect="GoProjective"/>)
+finds a homomorphism from the group 
+<M>SL(10,5)</M> to itself modular scalar matrices. The image
+of this homomorphism is the group <M>PSL(10,5)</M> which is a leaf node in the
+recognition tree. The kernel of this homomorphism is the group of diagonal matrices <M>a
+\cdot Id_{10}</M> for <M>a \in \mathbb{F}_5^*</M>. This group is recognised to
+be isomorphic to <M>\mathbb{F}_5^*</M> itself.<P/>
+
+A second example we consider is a symmetric group on a few points.
+
+<Log>
+<![CDATA[gap> G := SymmetricGroup(10);
+Sym( [ 1 .. 10 ] )
+gap> ri := RecogniseGroup(G);
+<recognition node MovesOnlySmallPoints Size=3628800>]]>
+</Log>
+
+This recognition tree only consists of the root node representing the input
+group <M>S_{10}</M>. The group is recognised to only move a few points. Its size
+is also recognised.<P/>
+
+TODO: another nice example would be the Rubik's cube group
+
+</Section>
+
+<Section Label="application">
+<Heading>Possible applications</Heading>
+
+This section explains what you can do with recognition nodes after a successful
+recognition.<P/>
+
+Here is an example of a successful recognition tree:
+
+<Log><![CDATA[
+gap> G := DirectProduct(SymmetricGroup(12),SymmetricGroup(5));;
+gap> ri := RecogniseGroup(G);
+<recognition node NonTransitive
+ F:<recognition node MovesOnlySmallPoints Size=120>
+ K:<recognition node Giant AlmostSimple Size=479001600>>
+]]></Log>
+
+This tells us that the group was split into a factor (indicated by <C>F:</C>)
+of size 120, and a kernel (<C>K:</C>) of size 479001600.
+<P/>
+
+We can obtain some more information about the recognition process itself
+by setting a so-called <C>InfoLevel</C>:
+
+<Log><![CDATA[
+gap> SetInfoLevel(InfoRecog, 2);
+gap> SetInfoLevel(InfoMethSel, 2);
+gap> G := DirectProduct(SymmetricGroup(12),SymmetricGroup(5));;
+gap> ri := RecogniseGroup(G);
+#I  Finished rank 90 method "NonTransitive": success.
+#I  Going to the image (depth=0, try=1).
+#I  Finished rank 95 method "MovesOnlySmallPoints": success.
+#I  Back from image (depth=0).
+#I  Calculating preimages of nice generators.
+#I  Creating 6 random generators for kernel.
+#I  Going to the kernel (depth=0).
+#I  Finished rank 80 method "Giant": success.
+#I  Back from kernel (depth=0).
+#I  Doing immediate verification (depth=0).
+<recognition node NonTransitive
+ F:<recognition node MovesOnlySmallPoints Size=120>
+ K:<recognition node Giant Size=479001600>>
+]]></Log>
+
+The lines starting with <C>#I</C> indicate so-called info messages, which inform
+us about the progress of the computation. Here it first finds that the
+permutation action is not transitive, a homomorphism is found by mapping
+onto the action on one of the orbits. The image is recognised to permute
+only a few points. The kernel is recognised to be a full symmetric group
+in its natural action on at least 10 points (recognised as <Q>Giant</Q>).
+<P/>
+
+In order to analyse the recognised group <M>G</M>, you can look at the stored attribute
+values of the returned recognition node. A list of all attributes can be found
+in Section <Ref Sect="rirecord"/>. As an example we demonstrate how to compute the size
+of a recognised group.
+
+<ManSection>
+<Meth Name="Size" Arg="ri"/>
+<Returns>the size of the recognised group</Returns>
+<Description>
+    This method calculates the size of the recognised group
+    by multiplying the size of the image and the kernel recursively.
+    It is assumed that leaf nodes know already or can calculate the
+    size of their group.
+</Description>
+</ManSection>
+
+For the group from our example above we obtain the following result.
+
+<Log><![CDATA[
+gap> Size(ri);
+57480192000
+]]></Log>
+
+Moreover, constructive membership tests can be performed which is explained
+above in Section <Ref Sect="background"/>. For this you can use the function <Ref
+Func="SLPforElement"/> that writes an arbitrary element in terms of the nice
+generators that were computed in the process of recognising the group and that
+are stored in the attribute <Ref Attr="NiceGens"/>. If <K>fail</K> is returned,
+then the element in question does not lie in the recognised group or
+the recognition made an error.
+
+<Log><![CDATA[
+gap> x := PseudoRandom(G);
+(1,12)(2,5,9,11,10,3,4)(7,8)(13,14,16,15,17)
+gap> slp := SLPforElement(ri,x);
+<straight line program>
+gap> ResultOfStraightLineProgram(slp,NiceGens(ri));
+(1,12)(2,5,9,11,10,3,4)(7,8)(13,14,16,15,17)
+]]></Log>
+
+A convenient function for testing membership of an element is the following function.
+
+<ManSection>
+<Meth Name="\in" Arg="x, ri"/>
+<Returns><K>true</K> or <K>false</K></Returns>
+<Description>
+    This method tests, whether the element <A>x</A> lies in the group
+    recognised by the recognition node <A>ri</A>. Note that
+    this is only a convenience method, in fact <Ref
+        Func="SLPforElement"/> is used and the resulting straight line
+    program is thrown away.
+</Description>
+</ManSection>
+
+If you need an element explicitly written in terms of the original
+generators, you can use the following function.
+
+<#Include Label="SLPforNiceGens">
+
+Lastly, a function to compute the composition series of a recognised group is
+the following.
+
+<#Include Label="DisplayCompositionFactors">
+
+</Section>
+
+<!-- ############################################################ -->
+
+</Chapter>

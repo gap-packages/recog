@@ -147,12 +147,7 @@ recognition function:
 <#Include Label="RecogniseGeneric">
 
 The user will usually not call this function directly, but will use the
-following convenience functions:
-
-<#Include Label="RecognisePermGroup">
-<#Include Label="RecogniseMatrixGroup">
-<#Include Label="RecogniseProjectiveGroup">
-<#Include Label="RecogniseGroup">
+convenience functions that are described in <Ref Sect="functions"/>.
 
 <ManSection>
 <Func Name="TryFindHomMethod" Arg="H, method, projective"/>
