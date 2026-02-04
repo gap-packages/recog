@@ -16,21 +16,21 @@
 ##  natural representation by  Niemeyer and Praeger.
 ##
 ##  Details of the algorithms implemented here are in the following publications.
-##  
-##  [NP98] Alice C. Niemeyer and  Cheryl E. Praeger 
+##
+##  [NP98] Alice C. Niemeyer and  Cheryl E. Praeger
 ##      "A Recognition Algorithm for Classical Groups over Finite Fields",
 ##      Proc. London Math. Soc (3) 77, 1998, 117-169.
-## 
-##  [NP97] Alice C. Niemeyer and  Cheryl E. Praeger 
+##
+##  [NP97] Alice C. Niemeyer and  Cheryl E. Praeger
 ##      "Implementing a Recognition Algorithm for Classical Groups"
 ##      "Groups and Computation II", Amer. Math. Soc. DIMACS Series 28, 1997.
 ##
-##  [NP99] Alice C. Niemeyer and  Cheryl E. Praeger 
+##  [NP99] Alice C. Niemeyer and  Cheryl E. Praeger
 ##      "A Recognition Algorithm for Non-Generic Classical Groups over
 ##       Finite Fields",  J. Austral. Math. Soc. (Series A)67 , 223-253, 1999.
 ##
 ##  This implementation uses some algorithms described elsewhere:
-## 
+##
 ##  [CLG97a] Frank Celler and C.R. Leedham-Green
 ##      "Calculating the order of an invertible matrix",
 ##      "Groups and Computation II", Amer. Math. Soc. DIMACS Series 28, 1997.
@@ -45,8 +45,8 @@
 ##    algorithm.
 ##
 ##   An overview on applications of ppd-elements, see
-## 
-##  [Pra99] Cheryl E. Praeger, 
+##
+##  [Pra99] Cheryl E. Praeger,
 ##      "Primitive prime divisor elements in finite classical groups",
 ##       Proc. of Groups St. Andrews in Bath 1997, Cambridge University
 ##      Press, 1999.
@@ -244,7 +244,7 @@ function( recognise, grp )
 end);
 
 
-# 
+#
 # In the case of generic parameters we need to have found at least
 # two ppd elements, one large and one basic. If we have not yet
 # found them, we return TemporaryFailure and have to inspect
@@ -274,7 +274,7 @@ end);
 #  b-witness for each of the pi(d) distinct prime divisors b of d, or
 #  in some cases a pair of witnesses, as discussed in Section 3.3  of
 #  [NP98].   The function RuledOutExtField() tests whether we can
-#  deduce that the group does not preserve an extension field structure.  
+#  deduce that the group does not preserve an extension field structure.
 
 BindRecogMethod(FindHomMethodsClassical, "RuledOutExtField",
 "tests whether extension field case is ruled out",
@@ -383,7 +383,7 @@ end);
 
 
 #   Methods to rule  out  the   nearly  simple groups
-#  
+#
 #  We assume that we have already tested that the group acts irreducibly
 #  on the  underlying  vector space and has a ppd(d,q;e_1)-element and a
 #  ppd(d,q;e_2)-element for d/2 < e_1 < e_2 <= d of which at least one is
@@ -593,7 +593,7 @@ function (recognise, grp)
            if p = 3 or p = 7 or 2 in LE then
 	        # we are only certain that PSL(2,7) is ruled if 2 in LE
 		# and the cases p=3 or p=7 cannot have the required ppds
-	        if 2 in LE then 
+	        if 2 in LE then
                     Info( InfoClassical, 2, "G' not PSL(2,7);");
 		fi;
                 recognise.isNotPSL := true;
@@ -1469,7 +1469,7 @@ function(recognise, grp)
        return false;
     fi;
 
-    if d > 8 then 
+    if d > 8 then
         return false;
     fi;
 
@@ -1574,7 +1574,7 @@ function(recognise, grp)
     d := recognise.d;
     q := recognise.q;
 
-    if d > 6 then 
+    if d > 6 then
         return false;
     fi;
 
