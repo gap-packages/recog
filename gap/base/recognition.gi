@@ -451,6 +451,12 @@ InstallGlobalFunction( PrintTreePos,
     fi;
   end );
 
+InstallMethod( StdPresentation, [ IsRecogNode and HasCalcStdPresentation],
+  function(ri)
+    CalcStdPresentation(ri)(ri);
+    return StdPresentation(ri);
+  end );
+
 InstallGlobalFunction( RecogniseGeneric,
   function(H, methoddb, depthString, knowledge)
     # Assume all the generators have no memory!
@@ -522,6 +528,45 @@ InstallGlobalFunction( RecogniseGeneric,
                 # maybe an error would be better for debugging
                 SetNiceGens(ri,GeneratorsOfGroup(H));
             fi;
+        fi;
+        # Handle the case that nobody set StdPresentation
+        if not HasStdPresentation(ri) and not HasCalcStdPresentation(ri) then
+            SetCalcStdPresentation(ri,function(ri)
+                local iso,G,gens,proj,rank,F,Fp;
+                if HasSize(ri) and Size(ri) = 1 then
+                    # The group is trivial, so we set a trivial presentation.
+                    # However, we need to guarantee that GeneratorsOfGroup
+                    # of the returned FpGroup is in bijection with NiceGens(ri).
+                    # (We would expect that NiceGens(ri) has only one element
+                    # and that this element is trivial, but better not rely on this.)
+                    rank := Size(NiceGens(ri));
+                    F := FreeGroup(rank);
+                    Fp := F / GeneratorsOfGroup(F); # Trivial presentation
+                    SetStdPresentation(ri, Fp);
+                else
+                    # Compute a presentation using IsomorphismFpGroupByGenerators.
+                    # This is an inefficient hack.
+                    # TODO: Properly implement presentations in the corresponding
+                    # (non-generic) leaf methods.
+                    if ri!.projective then
+                        # The group G associated to ri is the quotient of Grp(ri)
+                        # modulo all scalar matrices.
+                        # If ri was constructed as the image node with the method
+                        # "BlocksModScalars", then this is not necessarily correct.
+                        # However, this case can only arise at a leaf node if all
+                        # blocks have size 1, and in this case Size(ri) = 1.
+                        # Hence this case was already covered above.
+                        proj := ProjectiveActionHomomorphismMatrixGroup(Grp(ri));
+                        G := Image(proj);
+                        gens := List(NiceGens(ri), a -> ImageElm(proj, a));
+                    else
+                        G := Grp(ri);
+                        gens := NiceGens(ri);
+                    fi;
+                    iso := IsomorphismFpGroupByGenerators(G, gens);
+                    SetStdPresentation(ri, Range(iso));
+                fi;
+            end);
         fi;
         if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
         # StopStoringRandEls(ri);
@@ -620,8 +665,11 @@ InstallGlobalFunction( RecogniseGeneric,
         # In this case we do nothing, kernel is fail indicating this.
         Info(InfoRecog,2,"Found trivial kernel (depth=",depth,").");
         SetKernelRecogNode(ri,fail);
-        # We have to learn from the image, what our nice generators are:
+        # We have to learn from the image what our nice generators and presentation are:
         SetNiceGens(ri,pregensfac(ri));
+        if not HasStdPresentation(ri) and not HasCalcStdPresentation(ri) then
+            SetCalcStdPresentation(ri,CalcStdPresentationGeneric);
+        fi;
         if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
         # StopStoringRandEls(ri);
         SetFilterObj(ri,IsReady);
@@ -657,7 +705,12 @@ InstallGlobalFunction( RecogniseGeneric,
         fi;
     until done;
 
+    # Set nice generators and CalcStdPresentation of ri
     SetNiceGens(ri,Concatenation(pregensfac(ri), NiceGens(riker)));
+    if not HasStdPresentation(ri) and not HasCalcStdPresentation(ri) then
+        SetCalcStdPresentation(ri,CalcStdPresentationGeneric);
+    fi;
+
     if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
     # StopStoringRandEls(ri);
     SetFilterObj(ri,IsReady);
@@ -760,6 +813,85 @@ InstallGlobalFunction( SLPforElementGeneric,
                                           s1,[1..nr1],
                                           nr1+nr2);
     return s;
+  end);
+
+InstallGlobalFunction( CalcStdPresentationGeneric,
+  # generic method for a non-leaf node
+  function(ri)
+    local riKer,riFac,riChild,presKer,presFac,
+        frKer,frKerGens,relsKer,rankKer,frFac,frFacGens,relsFac,rankFac,
+        frTot,frTotGens,epiTot,embFrFac,embFrKer,relsTot,rel,
+        k,slp,relKer,x0,x,conj,presTot;
+    # Child nodes
+    riKer := KernelRecogNode(ri); # might be fail
+    riFac := ImageRecogNode(ri);
+    # If riKer = fail, then Homom(ri) is an isomorphism (or, in the projective case,
+    # induces an isomorphism between the central quotients) and hence there is nothing
+    # to do: We just take the presentation from riFac.
+    if riKer = fail then
+        SetStdPresentation(ri,StdPresentation(riFac));
+        return;
+    fi;
+    # FpGroups
+    presKer := StdPresentation(riKer);
+    presFac := StdPresentation(riFac);
+    # Corresponding free groups, generators and relators
+    frKer := FreeGroupOfFpGroup(presKer);
+    frKerGens := FreeGeneratorsOfFpGroup(presKer);
+    relsKer := RelatorsOfFpGroup(presKer);
+    rankKer := Size(frKerGens);
+    frFac := FreeGroupOfFpGroup(presFac);
+    frFacGens := FreeGeneratorsOfFpGroup(presFac);
+    relsFac := RelatorsOfFpGroup(presFac);
+    rankFac := Size(frFacGens);
+    # Construct free group frTot which has Grp(ri) as a quotient; 
+    # from frKer, frFac to frTot and from frTot to Grp(ri).
+    # The first generators in frTot correspond to frFac, the last ones to frKer.
+    frTot := FreeGroup(rankKer+rankFac);
+    frTotGens := GeneratorsOfGroup(frTot);
+    # Natural homomorphisms from/to the free groups.
+    # Note: embFrFac*epiTot maps generator of frFrac to
+    # the chosen preimage in pregensfac(ri)
+    epiTot := GroupHomomorphismByImages(
+        frTot, Grp(ri), frTotGens, NiceGens(ri)
+    );
+    embFrFac := GroupHomomorphismByImages(
+        frFac, frTot, frFacGens, frTotGens{[1..rankFac]}
+    );
+    embFrKer := GroupHomomorphismByImages(
+        frKer, frTot, frKerGens, frTotGens{[rankFac+1..rankFac+rankKer]}
+    );
+
+    # Construct defining relations (A-C) of Grp(ri) w.r.t. frTot, and store them in relsTot.
+    # We follow the strategy in [BHLO15, 4.5.1].
+    # A. Relations from the subgroup riKer
+    relsTot := List(relsKer, x -> ImageElm(embFrKer, x));
+    # B. Relations from the factor group frFac
+    for rel in List(relsFac, a -> ImageElm(embFrFac, a)) do
+        # The image of rel in Grp(ri) lies in the kernel of Homom(ri)
+        # because it is a relator in Grp(riFac),
+        # so we can rewrite it as a word relKer in the generators of frKer.
+        # In the notation of [BHLO15], rel is r and relKer is w_r
+        slp := SLPforElement(riKer, ImageElm(epiTot, rel));
+        relKer := ResultOfStraightLineProgram(slp, frKerGens);
+        # relKer and rel represent the same element in Grp(ri).
+        Add(relsTot, rel*embFrKer(relKer^-1));
+    od;
+    # C. Relations which encode that riKer is normal in ri.
+    # x0, x are as in [BHLO15].
+    for x0 in List(frKerGens, a -> ImageElm(embFrKer, a)) do
+        for x in List(frFacGens, a -> ImageElm(embFrFac, a)) do
+            # conj lies in riKer, and hence can be written in the gens of riKer.
+            conj := x^-1*x0*x;
+            slp := SLPforElement(riKer, epiTot(conj));
+            relKer := ResultOfStraightLineProgram(slp, frKerGens);
+            Add(relsTot, conj*embFrKer(relKer^-1));
+        od;
+    od;
+
+    # Construct presentation of Grp(ri) and isomorphism from the presentation to Grp(ri)
+    presTot := frTot / relsTot;
+    SetStdPresentation(ri, presTot);
   end);
 
 # Some helper functions for generic code:

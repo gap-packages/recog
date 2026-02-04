@@ -204,12 +204,34 @@ DeclareObsoleteSynonymAttr( "RIParent", "ParentRecogNode", 1 );
 ## <ManSection>
 ## <Attr Name="StdPresentation" Arg="ri"/>
 ## <Description>
-##     After the verification phase, the presentation is stored here. Details
-##     have still to be decided upon.
+##     The value of this attribute is an <A>FpGroup</A> <A>P</A> such that the following
+##     holds: The map which maps the generators of <A>P</A> to the nice generators
+##     of <A>ri</A> (in the order prescribed by <A>GeneratorsOfGroup(P)</A>
+##     and <A>NiceGens(ri)</A>, respectively) induces an isomorphism from <A>P</A>
+##     to the group associated to <A>ri</A> (which, in case of a projective node,
+##     is the central quotient of <A>Grp(ri)</A>).
+##     In particular, <A>GeneratorsOfGroup(P)</A> and <A>NiceGens(ri)</A>
+##     have the same size.
+##     This is still work in progress, and details of the implementation may change.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "StdPresentation", IsRecogNode, "mutable" );    # TODO: implement
+DeclareAttribute( "StdPresentation", IsRecogNode, "mutable" );
+
+## <#GAPDoc Label="CalcStdPresentation">
+## <ManSection>
+## <Attr Name="CalcStdPresentation" Arg="ri"/>
+## <Description>
+##     The value of this attribute is a function which takes the recognition node
+##     <A>ri</A> as the first and only argument. Calling this function ensures that
+##     <A>StdPresentation</A> of <A>ri</A> is set. Hence it is usually called as follows:
+##     <Listing>
+##         CalcStdPresentation(ri)(ri);
+##     </Listing>
+## </Description>
+## </ManSection>
+## <#/GAPDoc>
+DeclareAttribute( "CalcStdPresentation", IsRecogNode, "mutable" );
 
 DeclareProperty( "IsRecogInfoForSimpleGroup", IsRecogNode );
 DeclareProperty( "IsRecogInfoForAlmostSimpleGroup", IsRecogNode );
@@ -634,6 +656,9 @@ DeclareGlobalFunction( "CalcNiceGensGeneric" );
 ## <#/GAPDoc>
 DeclareGlobalFunction( "CalcNiceGensHomNode" );
 DeclareGlobalFunction( "SLPforElementGeneric" );
+
+## TODO: Documentation!
+DeclareGlobalFunction( "CalcStdPresentationGeneric" );
 
 ## <#GAPDoc Label="SLPforElement">
 ## <ManSection>

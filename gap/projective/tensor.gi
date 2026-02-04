@@ -112,8 +112,7 @@ RECOG.FindTensorDecomposition := function(G,N)
   w := m[Length(m)];   # An irreducible FN-module
   homs := MTX.Homomorphisms(w,m[1]);
   homsimg := Concatenation(homs);
-  # FIXME:
-  ConvertToMatrixRep(homsimg);
+  ConvertToMatrixRep(homsimg,f);
   if Length(homsimg) = d then    # we see one homogeneous component
       basis := homsimg;
       basisi := homsimg^-1;
@@ -157,7 +156,7 @@ RECOG.FindTensorDecomposition := function(G,N)
       i := i + 1;
   od;
   h := Concatenation(h);
-  ConvertToMatrixRep(h);
+  ConvertToMatrixRep(h,f);
 
   if i > Length(l) then    # by Clifford this should never happen, but still...
       if Length(l) = 1 then
@@ -167,15 +166,16 @@ RECOG.FindTensorDecomposition := function(G,N)
           return rec(orbit := lset);
       fi;
   else
-      ConvertToMatrixRep(basis);
+      ConvertToMatrixRep(basis,f);
       basisi := basis^-1;
-      return rec(t := basis, ti := basisi, spaces := lset,
+      return rec(t := basis, ti := basisi, spaces := lset, field := f,
                  blocksize := Length(lset[1]));
   fi;
 end;
 
-RECOG.IsKroneckerProduct := function(m,blocksize)
-  local a,ac,ar,b,blockpos,d,entrypos,i,j,mul,pos;
+RECOG.IsKroneckerProduct := function(m,r)
+  local blocksize,a,ac,ar,b,blockpos,d,entrypos,i,j,mul,pos;
+  blocksize := r.blocksize;
   if Length(m) mod blocksize <> 0 then
       return [false];
   fi;
@@ -200,9 +200,8 @@ RECOG.IsKroneckerProduct := function(m,blocksize)
       od;
       Add(ac,ar);
   od;
-  # FIXME:
-  ConvertToMatrixRep(a);
-  ConvertToMatrixRep(ac);
+  ConvertToMatrixRep(a,r.field);
+  ConvertToMatrixRep(ac,r.field);
   return [true,a,ac];
 end;
 
@@ -212,7 +211,7 @@ end;
 #   newgensdec := [];
 #   yes := true;
 #   for g in newgens do
-#       res := RECOG.IsKroneckerProduct(g,r.blocksize);
+#       res := RECOG.IsKroneckerProduct(g,r);
 #       if res[1] = false then
 #           Add(newgensdec,fail);
 #           yes := false;
@@ -361,7 +360,7 @@ function(ri,G)
 
   # Now we believe to have a tensor decomposition:
   conjgensG := List(GeneratorsOfGroup(G),x->r.t * x * r.ti);
-  kro := List(conjgensG,g->RECOG.IsKroneckerProduct(g,r.blocksize));
+  kro := List(conjgensG,g->RECOG.IsKroneckerProduct(g,r));
   if not ForAll(kro, k -> k[1]) then
       Info(InfoRecog,1,"VERY, VERY, STRANGE!");
       Info(InfoRecog,1,"False alarm, was not a tensor decomposition.",
@@ -388,7 +387,7 @@ end);
 
 RECOG.HomTensorFactor := function(data,m)
   local k;
-  k := RECOG.IsKroneckerProduct(m,data.blocksize);
+  k := RECOG.IsKroneckerProduct(m,data);
   if k[1] <> true then
       return fail;
   fi;
@@ -407,7 +406,7 @@ function(ri, G)
   local H,data,hom,newgens;
   newgens := List(ri!.generatorskronecker,x->x[3]);
   H := GroupWithGenerators(newgens);
-  data := rec(blocksize := ri!.blocksize);
+  data := rec(blocksize := ri!.blocksize, field := ri!.field);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomTensorFactor,data);
   SetHomom(ri,hom);
 
@@ -434,7 +433,7 @@ function(ri, G)
   # kernel. So we know that we are a block diagonal matrix with identical
   # diagonal blocks. All we do is to project down to one of the blocks.
   local H,data,hom,newgens;
-  data := rec(blocksize := ri!.blocksize);
+  data := rec(blocksize := ri!.blocksize, field := ri!.field);
   newgens := List(GeneratorsOfGroup(G),x->RECOG.HomTensorKernel(data,x));
   H := GroupWithGenerators(newgens);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomTensorKernel,data);
