@@ -164,7 +164,7 @@ FindHomMethodsMatrix.BlockLowerTriangular := function(ri, G)
 
   # Give hint to image
   InitialDataForImageRecogNode(ri).blocks := ri!.blocks;
-  Add(InitialDataForImageRecogNode(ri).hints,
+  AddMethod(InitialDataForImageRecogNode(ri).hints,
       rec( method := FindHomMethodsMatrix.BlockDiagonal,
            rank := 2000,
            stamp := "BlockDiagonal" ) );
@@ -174,7 +174,7 @@ FindHomMethodsMatrix.BlockLowerTriangular := function(ri, G)
   findgensNmeth(ri).args := [];
 
   # Give hint to kernel N
-  Add(InitialDataForKernelRecogNode(ri).hints,
+  AddMethod(InitialDataForKernelRecogNode(ri).hints,
       rec( method := FindHomMethodsMatrix.LowerLeftPGroup,
            rank := 2000,
            stamp := “LowerLeftPGroup" ));
