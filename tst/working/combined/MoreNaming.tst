@@ -291,8 +291,7 @@ gap> grp := Group(
 >         Z(2)^0, Z(2)^0, Z(2)^0 ], 
 >     [ 0*Z(2), 0*Z(2), 0*Z(2), 0*Z(2), Z(2)^0, Z(2)^0, Z(2)^0, Z(2)^0, 
 >         0*Z(2), 0*Z(2), Z(2)^0 ] ] ]);;
-gap> ri := RecogniseClassical(grp);;
-gap> "PSL(2,23)" in ri.possibleNearlySimple;
+gap> Number([1..100], i -> "PSL(2,23)" in RecogniseClassical(grp).possibleNearlySimple) >= 90;
 true
 
 # PSL(2,23) gens := AtlasGenerators("L2(23)", 2); 11a
