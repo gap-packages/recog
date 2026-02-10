@@ -550,8 +550,8 @@ function (recognise, grp)
     if d = 3 and (q = 5 or q = 2) then
         if q = 5 then
             Info( InfoClassical, 2,  "G' is not PSL(2,7)");
-	fi;
-	# Note PSL(2,7) is isomorphic to PSL(3,2), so don't print this message
+        fi;
+        # Note PSL(2,7) is isomorphic to PSL(3,2), so don't print this message
         recognise.isNotPSL := true;
         return false;
     fi;
@@ -591,11 +591,11 @@ function (recognise, grp)
            fi;
        else
            if p = 3 or p = 7 or 2 in LE then
-	        # we are only certain that PSL(2,7) is ruled if 2 in LE
-		# and the cases p=3 or p=7 cannot have the required ppds
-	        if 2 in LE then
+                # we are only certain that PSL(2,7) is ruled if 2 in LE
+                # and the cases p=3 or p=7 cannot have the required ppds
+                if 2 in LE then
                     Info( InfoClassical, 2, "G' not PSL(2,7);");
-		fi;
+                fi;
                 recognise.isNotPSL := true;
                 return false;
            fi;
