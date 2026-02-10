@@ -65,7 +65,7 @@ RECOG.FindStdGens_SL := function(sld)
     Info(InfoRecog,2,"-----");
     Info(InfoRecog,2,"Solving the base case");
     if q in [2,3,4,5,9] then
-        Info(InfoRecog,2,"In fact found an SL4...");
+        Info(InfoRecog,2,"Small q=",q,", searching for SL4 instead...");
         stdgens := RECOG.MakeSL_StdGens(p,ext,4,4).all;
         slpsl2std := RECOG.FindStdGensUsingBSGS(Group(sl2genss),stdgens,
                                                 false,false);
@@ -173,7 +173,7 @@ RECOG.FindStdGensSmallerMatrices_SL := function(sld)
     Info(InfoRecog,2,"-----");
     Info(InfoRecog,2,"Solving the base case");
     if q in [2,3,4,5,9] then
-        Info(InfoRecog,2,"In fact found an SL4...");
+        Info(InfoRecog,2,"Small q=",q,", searching for SL4 instead...");
         stdgens := RECOG.MakeSL_StdGens(p,ext,4,4).all;
         slpsl2std := RECOG.FindStdGensUsingBSGS(Group(sl2genss),stdgens,
                                                 false,false);
