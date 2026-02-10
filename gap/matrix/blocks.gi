@@ -323,11 +323,10 @@ end;
 #! If yes, then it returns <K>NeverApplicable</K>. If <A>G</A> acts reducibly then
 #! a composition series of the underlying module is computed and a base
 #! change is performed to write <A>G</A> in a block lower triangular form.
-#! Also, the method passes a hint to the image group that it is in
-#! block lower triangular form, so the image immediately can make
-#! recursive calls for the actions on the diagonal blocks, and then to the
-#! lower <M>p</M>-part. For the image the method
-#! <Ref Subsect="BlockLowerTriangular" Style="Text"/> is used.
+#! Also, the method passes a hint to the image that it is in block lower
+#! triangular form, so the image immediately can make recursive calls for the
+#! actions on the diagonal blocks, and then to the lower <M>p</M>-part. For the
+#! image the method <Ref Subsect="BlockLowerTriangular" Style="Text"/> is used.
 #! 
 #! Note that this method is implemented in a way such that it can also be
 #! used as a method for a projective group <A>G</A>. In that case the

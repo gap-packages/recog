@@ -135,12 +135,12 @@ DeclareAttribute( "Homom", IsRecogNode, "mutable" );
 ##     to set the value of <Ref Attr="NiceGens"/>. By default, the original
 ##     generators of the group at this node are taken. For a homomorphism
 ##     (or isomorphism), the <Ref Attr="NiceGens"/> will be the concatenation
-##     of preimages of the <Ref Attr="NiceGens"/> of the image group
+##     of preimages of the <Ref Attr="NiceGens"/> of the image
 ##     (see <Ref Attr="pregensfac"/>) and
 ##     the <Ref Attr="NiceGens"/> of the kernel. A find homomorphism method
 ##     does not have to set <Ref Attr="NiceGens"/> if it finds a homomorphism.
 ##     Note however, that such a find homomorphism method has to ensure somehow,
-##     that preimages of the <Ref Attr="NiceGens"/> of the image group
+##     that preimages of the <Ref Attr="NiceGens"/> of the image
 ##     can be acquired. See <Ref Attr="calcnicegens"/>, <Ref Func="CalcNiceGens"/>
 ##     and <Ref Attr="slptonice"/>
 ##     for instructions.
@@ -242,8 +242,8 @@ InstallTrueMethod( IsRecogInfoForAlmostSimpleGroup, IsRecogInfoForSimpleGroup );
 ## <Attr Name="pregensfac" Arg="ri"/>
 ## <Description>
 ##     The value of this attribute is only set for homomorphism nodes. In that
-##     case it contains preimages of the nice generators in the image group.
-##     This attribute is set automatically by the generic recursive recognition
+##     case it contains preimages of the nice generators in the image. This
+##     attribute is set automatically by the generic recursive recognition
 ##     function using the mechanism described with the attribute
 ##     <Ref Attr="calcnicegens"/> below. A find homomorphism does not have
 ##     to touch this attribute.
@@ -258,17 +258,15 @@ DeclareAttribute( "validatehomominput", IsRecogNode);
 ## <Attr Name="calcnicegens" Arg="ri"/>
 ## <Description>
 ##     To make the recursion work, we have to acquire preimages of the
-##     nice generators in image groups under the homomorphism found.
-##     But we want to keep the information, how the nice generators
-##     were found, locally at the node where they were found. This
-##     attribute solves this problem of acquiring preimages in the following
-##     way: Its value must be a function, taking the recognition
-##     node <A>ri</A> as first argument, and a list <A>origgens</A> of
-##     preimages of the
-##     original generators of the current node, and has to
-##     return corresponding preimages of the nice generators. Usually this
-##     task can be done by storing a straight line program writing the
-##     nice generators in terms of the original generators and executing
+##     nice generators in images under the homomorphism found. But we want to
+##     keep the information, how the nice generators were found, locally at the
+##     node where they were found. This attribute solves this problem of
+##     acquiring preimages in the following way: Its value must be a function,
+##     taking the recognition node <A>ri</A> as first argument, and a list
+##     <A>origgens</A> of preimages of the original generators of the current
+##     node, and has to return corresponding preimages of the nice generators.
+##     Usually this task can be done by storing a straight line program writing
+##     the nice generators in terms of the original generators and executing
 ##     this with inputs <A>origgens</A>. Therefore the default value of
 ##     this attribute is the function <Ref Func="CalcNiceGensGeneric"/>
 ##     described below.
