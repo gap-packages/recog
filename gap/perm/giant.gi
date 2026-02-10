@@ -368,7 +368,7 @@ RECOG.NiceGeneratorsAnOdd := function ( grp, N )
 
     if cyc3Cons <> fail then
         # cycN * cyc3Cons^2 = (1,...,n)*(p,p+2,p+1)=(1,...,p-1,p+2,p+3,...,n)
-        # = (n-2)-cycle whose support intersects [p,p+1,p+2] is one point.
+        # = (n-2)-cycle whose support intersects [p,p+1,p+2] in one point.
         return [ cycN * cyc3Cons^2, cyc3Cons];
     else
         return fail;
