@@ -247,91 +247,183 @@ end;
 
 
 #########################################################################
+## For a permutation group grp on n points and a list lenList of integers,
+## returns a list cycList such that cycList[i] is a cycle of length lenList[i]
+## for all 1 <= i <= Length(lenList).
+## Each entry of lenList must be either a prime number or n.
+## If no such list can be constructed in a random search with at most N tries
+## or if lenList[i]>n for some i, then returns fail.
+RECOG.FindCycles := function ( grp, lenList, N )
+
+    local mp, n, cycList, rand, cyclen, i, k, orders, finished;
+
+    mp := MovedPoints(grp);
+    n := Length(mp);
+    cycList := [];
+
+    finished := false;
+    while N > 0 and not finished do
+        N := N - 1;
+        rand := PseudoRandom( grp );
+        # If cyclen[i] is bound, it is the number of cycles of length i+1 in rand.
+        # Otherwise rand has no cycle of length i+1.
+        cyclen := CycleStructurePerm(rand);
+        # If finished is not changed to false in the following loop, then we are done
+        finished := true;
+        for i in [1..Length(lenList)] do
+            if not IsBound(cycList[i]) then # no cycle of desired length has been found yet
+                k := lenList[i];
+                # Check that rand contains exactly one cycle of length k and
+                # no cycle whose length is a proper multiple of k
+                if IsBound(cyclen[k-1]) and cyclen[k-1] = 1 then
+                    if k = n then
+                        # The existence of a full cycle in rand guarantees that
+                        # rand is equal to this full cycle.
+                        cycList[i] := rand;
+                    else
+                        # orders is a the list of all l>=2 such that rand contains a l-cycle and
+                        #  l<>k. Since rand contains a k-cycle, we only have to check up to n-k.
+                        orders := Filtered([2..n-k],x->IsBound(cyclen[x-1]) and x<>k);
+                        if ForAll(orders, x->(x=k) or (x mod k <> 0)) then
+                            if IsEmpty(orders) then
+                                cycList[i] := rand; # rand is a k-cycle
+                            else
+                                # Raising to the power of Lcm(orders) kills all cycles of rand
+                                # whose length is not k. Further, the condition that k
+                                # is a prime guarantees that every non-trivial power of
+                                # a k-cycle is a k-cycle. Thus rand^(Lcm(orders))
+                                # is a k-cycle.
+                                cycList[i] := rand^(Lcm(orders));
+                            fi;
+                        fi;
+                    fi;
+                fi;
+                if not IsBound(cycList[i]) then
+                    finished := false;
+                fi;
+            fi;
+        od;
+    od;
+
+    if finished then
+        return cycList;
+    else
+        return fail;
+    fi;
+end;
+
+#########################################################################
 ##
 #F  NiceGeneratorsAnOdd(<n>,<grp>,<N>) . . . . find (n-2)-cycle, 3-cycle
 ##
 ##
+## For a permutation group grp on n points, this function returns either fail
+## or a list [ longCycle, shortCycle ] such that the following hold:
+## - n > 4 and n is odd.
+## - longCycle is an (n-2)-cycle.
+## - shortCycle is a 3-cycle.
+## - The supports of longCycle and shortCycle intersect in a single point. In
+##   other words, longCycle = (3,...,n) and shortCycle=(1,2,3) up to renaming
+##   the n points.
+## The conditions on [ longCycle, shortCycle ] imply that grp is the full alternating
+## group on n points. Thus the function always returns fail if grp is not the
+## full alternating group, and also if n <= 4.
+## longCycle, shortCycle are found by a random search, drawing at most N random
+## elements from grp.
+## Thus if grp is the full alternating group on an odd number of points, then the
+## function does not return fail with a probability that grows as N grows.
 
-RECOG.NiceGeneratorsAnOdd := function ( mp, grp, N )
+RECOG.NiceGeneratorsAnOdd := function ( grp, N )
 
-    local l, t, cyclen, a, b, i, suppb, suppc, suppca, imc, h, g, n;
+    local mp, l, t, cyclen, nCyc, shCyc, rand, i, suppb, suppc, suppca, imc, h, g, n, orders;
 
+    mp := MovedPoints(grp);
     n := Length(mp);
     l := One(grp);
 
-    while N > 0 do
-        N := N - 1;
-        t := PseudoRandom( grp );
-        # was: cyclen := Collected( CycleLengths( t, [1..n] ) );
-        cyclen := CycleStructurePerm(t);
+    # Random search for an n-cycle (not an (n-2)-cycle!) and a 3-cycle
+    nCyc := fail;
+    shCyc := fail;
+    # while N > 0 do
+    #     N := N - 1;
+    #     rand := PseudoRandom( grp );
+    #     # If cyclen[i] is bound, it is the number of cycles of length i+1 in rand.
+    #     # Otherwise rand has no cycle of length i+1.
+    #     cyclen := CycleStructurePerm(rand);
+    #     # Is rand an n-cycle?
+    #     # Check that at least one n-cycle appears in the cycle decomposition of rand.
+    #     # In this case, rand must be equal to this n-cycle.
+    #     if nCyc <> fail and IsBound(cyclen[n-1]) then
+    #         # we found an n-cycle
+    #         nCyc := rand;
+    #     fi;
+    #     # Can we construct a 3-cycle from rand?
+    #     # Check that the cycle decomposition of rand contains exactly one 3-cycle
+    #     # and no cycle of length k where k is a multiple of 3 and 6<=k<n.
+    #     if shCyc <> fail and IsBound(cyclen[2]) and cyclen[2] = 1 then
+    #         # orders is a the list of all k>3 such that rand contains a k-cycle.
+    #         # Since rand contains a 3-cycle, we only have to check up to n-3.
+    #         orders := Filtered([3..n-3],x->IsBound(cyclen[x-1]));
+    #     and
+    #            ForAll( [2..QuoInt(n,3)], x->not IsBound(cyclen[3*x-1]) )
+    #     then
+    #         # we can get a $3$-cycle
+    #         #b := rand^(Lcm(List(cyclen,x->x[1]))/3);
+    #         shCyc := rand^(Lcm(Filtered([2..n],x->IsBound(cyclen[x-1])))/3);
+    #     fi;
+    # od;
 
-        if IsBound(a) = false and IsBound(cyclen[n-1]) then
-            # we found an $n$-cycle
-            a := t;
-        fi;
+    # if nCyc <> fail and shCyc <> fail then
+    #     i := 10*n;
+    #     suppb := MovedPoints( b );
+    #     while i > 0 do
+    #         i := i-1;
+    #         t := PseudoRandom( grp );
 
-        if IsBound(b) = false and IsBound(cyclen[2]) and cyclen[2] = 1 and
-               # was: Filtered( cyclen, x -> x[1] mod 3 = 0 ) = [ [ 3,1 ] ]
-               ForAll( [2..QuoInt(n,3)], x->not IsBound(cyclen[3*x-1]) )
-        then
-            # we can get a $3$-cycle
-            #b := t^(Lcm(List(cyclen,x->x[1]))/3);
-            b := t^(Lcm(Filtered([2..n],x->IsBound(cyclen[x-1])))/3);
-        fi;
+    #         suppc := List( suppb, x -> x^rand );
+    #         # support of c=b^rand, say [i,j,k]
 
-        if IsBound(a) and IsBound(b) then
-            i := 10*n;
-            suppb := MovedPoints( b );
-            while i > 0 do
-                i := i-1;
-                t := PseudoRandom( grp );
+    #         suppca := List( suppc, x -> x^nCyc );
+    #         # support of c^nCyc, so [i^nCyc,j^nCyc,k^nCyc]
 
-                suppc := List( suppb, x -> x^t );
-                # support of c=b^t, say [i,j,k]
+    #         imc := List( suppc, x -> ((x^(rand^-1))^b)^rand );
+    #         # [i^c,j^c,k^c]
 
-                suppca := List( suppc, x -> x^a );
-                # support of c^a, so [i^a,j^a,k^a]
+    #         if Length( Intersection( suppc, suppca ) ) = 2 then
+    #             # so c=b^rand moves three consecutive points of a
+    #             if  suppca[1] = imc[1] or
+    #                 suppca[2] = imc[2] or
+    #                 suppca[3] = imc[3] then
+    #                 # so c moves points in same order as a
+    #                 h := b^rand;
+    #             else
+    #                 # so c moves points in opposite order to a
+    #                 h := (b^2)^rand;
+    #             fi;
+    #         elif Length( Intersection( suppc, suppca ) ) = 1 then
+    #             # so c=b^rand moves only two consecutive points of a
+    #             if suppca[1] = imc[1] or
+    #                 suppca[2] = imc[2] or
+    #                 suppca[3] = imc[3] then
+    #                 # so c moves points in same order as a
+    #                 h := b^rand;
+    #                 h := Comm( h^2, h^a );
+    #             else
+    #                 # so c moves points in opposite order to a
+    #                 h := b^rand;
+    #                 h := Comm( h, (h^a)^2 );
+    #             fi;
+    #         fi;
 
-                imc := List( suppc, x -> ((x^(t^-1))^b)^t );
-                # [i^c,j^c,k^c]
+    #         if IsBound( h ) then
+    #             g := a * h^2;
+    #             return [ g, h ];
+    #         fi;
 
-                if Length( Intersection( suppc, suppca ) ) = 2 then
-                    # so c=b^t moves three consecutive points of a
-                    if  suppca[1] = imc[1] or
-                        suppca[2] = imc[2] or
-                        suppca[3] = imc[3] then
-                        # so c moves points in same order as a
-                        h := b^t;
-                    else
-                        # so c moves points in opposite order to a
-                        h := (b^2)^t;
-                    fi;
-                elif Length( Intersection( suppc, suppca ) ) = 1 then
-                    # so c=b^t moves only two consecutive points of a
-                    if suppca[1] = imc[1] or
-                       suppca[2] = imc[2] or
-                       suppca[3] = imc[3] then
-                        # so c moves points in same order as a
-                        h := b^t;
-                        h := Comm( h^2, h^a );
-                    else
-                        # so c moves points in opposite order to a
-                        h := b^t;
-                        h := Comm( h, (h^a)^2 );
-                    fi;
-                fi;
+    #     od; # while
 
-                if IsBound( h ) then
-                    g := a * h^2;
-                    return [ g, h ];
-                fi;
-
-            od; # while
-
-            return fail;
-        fi;
-
-    od; # loop over random elements
+    #     return fail;
+    # fi;
 
     return fail;
 
