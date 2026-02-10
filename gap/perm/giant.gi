@@ -22,11 +22,13 @@ SetInfoLevel( InfoGiants, 1 );
 
 #########################################################################
 ## For a permutation group grp on n points and a list lenList of integers,
-## returns a list cycList such that cycList[i] is a cycle of length lenList[i]
-## for all 1 <= i <= Length(lenList).
+## returns either a list cycList such that cycList[i] is a cycle of length lenList[i]
+## for all 1 <= i <= Length(lenList), or fail.
 ## Each entry of lenList must be either a prime number or n.
-## If no such list can be constructed in a random search with at most N tries
-## or if lenList[i]>n for some i, then returns fail.
+## The desired circles are found by a random search, drawing at most N random
+## elements from grp.
+## Thus if grp actually contains cycles of the desired shape, then the function does not
+## return fail with a probability that grows as N grows.
 RECOG.FindCycles := function ( grp, lenList, N )
 
     local mp, n, cycList, rand, cyclen, i, k, orders, finished;
