@@ -1,5 +1,6 @@
 TestNaming := function(grpname, param...)
-    local expected, G, actual, i, n;
+    local expected, G, actual, i, n, failures;
+    failures := 0;
     expected := rec(
         #isGeneric := true,
         isNotAlternating := true,
@@ -43,6 +44,7 @@ TestNaming := function(grpname, param...)
                     ") has bad value for ", n,
                     "; expected ", expected.(n),
                     ", got ", actual.(n), "\n");
+                failures := failures + 1;
             fi;
         od;
         # TODO: also verify maximal subgroups are *not* recognized as the full
@@ -50,4 +52,5 @@ TestNaming := function(grpname, param...)
         # (yet) fully available for the classical groups in GAP
         #MaximalSubgroupClassReps
     od;
+    return failures;
 end;
