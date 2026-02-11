@@ -2369,44 +2369,47 @@ AddMethod(ClassicalMethDb, FindHomMethodsClassical.isOmegaContained, 19);
 
 
 InstallGlobalFunction( RecogniseClassical,
-function( arg )
-  local ret, recognise, grp, case, nrrandels, i, f, q, merkinfolevel;
+function( grp, arg... )
+  local ret, recognise, opt, f, q, originalInfoLevel;
 
-  if Length( arg ) < 1 or Length( arg ) > 3 then
-      ErrorNoReturn( "Usage: RecogniseClassical( grp [,nrrandels][,case] )" );
+  f := FieldOfMatrixGroup(grp);
+  q := Size(f);
+
+  opt := rec();
+  if Length(arg) > 0 and IsRecord(arg[Length(arg)]) then
+      opt := Remove(arg);
   fi;
-  grp := arg[1];
-  nrrandels := 30;
-  if DimensionOfMatrixGroup(grp) = 8 then
-     nrrandels := 200;
-  elif DimensionOfMatrixGroup(grp) = 4 and
-      Size(FieldOfMatrixGroup(grp)) = 8 then
-     nrrandels := 300;
-  elif DimensionOfMatrixGroup(grp) <= 10 then
-      nrrandels := 50;
+  if Length(arg) > 0 then
+      ErrorNoReturn( "Usage: RecogniseClassical( grp[,opt] )" );
   fi;
-  case := "unknown";
-  for i in [2..Length(arg)] do
-      if IsInt(arg[i]) then
-          nrrandels := arg[i];
-      else
-          if arg[i] in ["linear", "symplectic", "unitary",
-           "orthogonalplus", "orthogonalcircle", "unknown" ] then
-              case := arg[i];
-          else
-              Info(InfoClassical,2,"Unknown case ",arg[i]," - ignored.");
-          fi;
+
+  # set default
+  if not IsBound(opt.case) then
+      opt.case := "unknown";
+  fi;
+  if not IsBound(opt.nrrandels) then
+      opt.nrrandels := 30;
+      if DimensionOfMatrixGroup(grp) = 8 then
+          opt.nrrandels := 200;
+      elif DimensionOfMatrixGroup(grp) = 4 and q = 8 then
+          opt.nrrandels := 300;
+      elif DimensionOfMatrixGroup(grp) <= 10 then
+          opt.nrrandels := 50;
       fi;
-  od;
+  fi;
+  if not IsBound(opt.infoLevel) then
+      opt.infoLevel := 0;
+  fi;
+  if not opt.case in ["linear", "symplectic", "unitary", "orthogonalplus", "orthogonalcircle", "unknown" ] then
+      Error("Unknown case ",opt.case);
+  fi;
 
   # init record recognition...
-  f := FieldOfMatrixGroup(grp);
-  q := Characteristic(f)^DegreeOverPrimeField(f);
   recognise := rec( field :=  f,
                    d := DimensionOfMatrixGroup(grp),
                    p := Characteristic(f),
                    a := DegreeOverPrimeField(f),
-                   q := Characteristic(f)^DegreeOverPrimeField(f),
+                   q := q,
                    # n -> recognise.nrRandomElms
                    # LE = e's of large ppd elements
                    # BE = e's of basic ppd elements
@@ -2423,7 +2426,7 @@ function( arg )
                    isReducible := "unknown",
                    isGeneric := "unknown",
                    isNotExt  := "unknown",
-                   hint := case,
+                   hint := opt.case,
                    hintIsWrong := false,
                    isNotMathieu := "unknown",
                    isNotAlternating := "unknown",
@@ -2459,10 +2462,10 @@ function( arg )
                    isSUContained := "unknown",
                    isOmegaContained := "unknown",
                   );
-  merkinfolevel := InfoLevel(InfoMethSel);
-  SetInfoLevel(InfoMethSel,0);
-  ret := CallMethods( ClassicalMethDb, nrrandels, recognise, grp );
-  SetInfoLevel(InfoMethSel,merkinfolevel);
+  originalInfoLevel := InfoLevel(InfoMethSel);
+  SetInfoLevel(InfoMethSel,opt.infoLevel);
+  ret := CallMethods( ClassicalMethDb, opt.nrrandels, recognise, grp );
+  SetInfoLevel(InfoMethSel,originalInfoLevel);
   # fail: bedeutet, dass entnervt aufgegeben wurde
   # true: bedeutet, dass eine Methode "erfolgreich" war
 
