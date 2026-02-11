@@ -186,61 +186,61 @@ function( recognise, grp )
     q := recognise.q;
 
     if hint = "unknown"  then
-        return false;
+        return NeverApplicable;
 
     elif hint = "linear" and d <= 2 then
         recognise.isGeneric := false;
-        return false;
+        return NeverApplicable;
 
     elif hint = "linear" and d = 3 then
         #q = 2^s-1
         if IsPowerOfTwo( q+1 ) then
             recognise.isGeneric := false;
         fi;
-        return false;
+        return NeverApplicable;
 
     elif hint = "symplectic" and
       (d < 6 or (d mod 2 <> 0) or
        [d,q] in [[6,2],[6,3],[8,2]]) then
         recognise.isGeneric := false;
-        return false;
+        return NeverApplicable;
 
     elif hint = "unitary" and
       (d < 5 or d = 6 or [d,q] = [5,4]) then
         recognise.isGeneric := false;
-        return false;
+        return NeverApplicable;
 
     elif hint = "orthogonalplus" and
       (d mod 2 <> 0 or d < 10
        or (d = 10 and q = 2)) then
         recognise.isGeneric := false;
-        return false;
+        return NeverApplicable;
 
     elif hint = "orthogonalminus" and
       (d mod 2 <> 0 or d < 6
        or [d,q] in [[6,2],[6,3],[8,2]]) then
         recognise.isGeneric := false;
-        return false;
+        return NeverApplicable;
 
     elif hint = "orthogonalcircle" then
         if d < 7 or [d,q] = [7,3] then
             recognise.isGeneric := false;
-            return false;
+            return NeverApplicable;
         fi;
         if d mod 2 = 0 then
             recognise.isGeneric := false;
-            return false;
+            return NeverApplicable;
         fi;
         if q mod 2 = 0 then
             #TODO: INFORECOG1 ... not irreducible
             #TODO: INFORECOG2 ... d odd --> q odd
             recognise.isReducible := true;
             recognise.isGeneric := false;
-            return false;
+            return NeverApplicable;
         fi;
     fi;
 
-    return false;
+    return NeverApplicable;
 end);
 
 
@@ -308,14 +308,14 @@ function (recognise, grp)
     if b < bx then
         if hint <> "unknown" then
            recognise.hintIsWrong := true;
-           # raeume auf + komme nie wieder
-           return true;
+           # clean up and never come back
+           return Success;
         fi;
         recognise.isNotExt := true;
-        return false;
+        return NeverApplicable;
     fi;
     if b > bx then
-        return fail;
+        return TemporaryFailure;
     fi;
 
     if hint = "linear" then
@@ -323,17 +323,17 @@ function (recognise, grp)
            or E <> [d-1,d]
            or d-1 in recognise.LE then
             recognise.isNotExt  := true;
-            return false;
+            return NeverApplicable;
         fi;
 
     elif hint = "unitary" then
         recognise.isNotExt  := true;
-        return false;
+        return NeverApplicable;
 
     elif hint = "symplectic" then
         if d mod 4 = 2 and q mod 2 = 1 then
              recognise.isNotExt := ForAny(E, x -> x mod 4 = 0);
-        elif  d mod 4 = 0 and q mod 2 = 0 then
+        elif d mod 4 = 0 and q mod 2 = 0 then
              recognise.isNotExt := ForAny(E, x -> x mod 4 = 2);
         elif d mod 4 = 0 and q mod 2 = 1 then
              recognise.isNotExt := differmodfour(E);
@@ -342,8 +342,8 @@ function (recognise, grp)
         else
            Info( InfoClassical, 2, "d cannot be odd in hint Sp");
            recognise.hintIsWrong := true;
-           # raeume auf + komme nie wieder
-           return true;
+           # clean up and never come back
+           return Success;
         fi;
 
     elif hint = "orthogonalplus" then
@@ -354,8 +354,8 @@ function (recognise, grp)
         else
            Info( InfoClassical, 2, "d cannot be odd in hint O+");
            recognise.hintIsWrong := true;
-           # raeume auf + komme nie wieder
-           return true;
+           # clean up and never come back
+           return Success;
         fi;
 
 
@@ -367,17 +367,19 @@ function (recognise, grp)
         else
            Info( InfoClassical, 2, "d cannot be odd in hint O-");
            recognise.hintIsWrong := true;
-           # raeume auf + komme nie wieder
-           return true;
+           # clean up and never come back
+           return Success;
         fi;
 
     elif hint = "orthogonalcircle" then
         recognise.isNotExt  := true;
-        return false;
+        return NeverApplicable;
     fi;
 
-    if recognise.isNotExt = true then return false;
-    else return fail;
+    if recognise.isNotExt = true then
+        return NeverApplicable;
+    else
+        return TemporaryFailure;
     fi;
 end);
 
@@ -404,30 +406,30 @@ function( recognise, grp )
 #   if recognise.hint <> "unknown" and recognise.hint <> "linear" then
 #       Info( InfoClassical, 2, "G' not an AlternatingGroup;");
 #       recognise.isNotAlternating := true;
-#       return false;
+#       return NeverApplicable;
 #   fi;
 
     if Length(recognise.ClassicalForms) > 0 and
         First(recognise.ClassicalForms,IsTrivialForm)=fail then
        recognise.isNotAlternating := true;
-       return false;
+       return NeverApplicable;
     fi;
 
     if recognise.d <> 4 or q <> recognise.p or (3 <= q and q < 23) then
        Info( InfoClassical, 2, "G is not an alternating group" );
        recognise.isNotAlternating := true;
-       return false;
+       return NeverApplicable;
     fi;
 
     if q = 2 then
        if Size(grp) <> 2520 then  # 2520 = 3*4*5*6*7 = |A7|
            Info( InfoClassical, 2, "G is not an alternating group" );
            recognise.isNotAlternating := true;
-           return false;
+           return NeverApplicable;
        else
            Info( InfoClassical, 2, "G' might be A7;");
            AddSet(recognise.possibleNearlySimple,"A7");
-           return true;
+           return Success;
        fi;
     fi;
 
@@ -435,17 +437,17 @@ function( recognise, grp )
        if 4 in recognise.LE then
            Info( InfoClassical, 2, "G' not alternating;");
            recognise.isNotAlternating := true;
-           return false;
+           return NeverApplicable;
        fi;
 
        if recognise.n > 15 then
            AddSet (recognise.possibleNearlySimple, "2.A7");
            Info( InfoClassical, 2, "G' might be 2.A7;");
-           return  fail;
+           return TemporaryFailure;
        fi;
    fi;
 
-   return fail;
+   return TemporaryFailure;
 
 end);
 
@@ -464,19 +466,19 @@ function( recognise, grp )
 #   if recognise.hint <> "unknown" and recognise.hint <> "linear" then
 #       Info( InfoClassical, 2, "G' not a Mathieu Group;");
 #       recognise.isNotMathieu := true;
-#       return false;
+#       return NeverApplicable;
 #   fi;
 
     if Length(recognise.ClassicalForms) > 0 and
         First(recognise.ClassicalForms,IsTrivialForm)=fail then
        recognise.isNotMathieu := true;
-       return false;
+       return NeverApplicable;
     fi;
 
    if not [d, q]  in [ [5, 3], [6,3], [11, 2] ] then
        Info( InfoClassical, 2, "G' is not a Mathieu group;");
        recognise.isNotMathieu := true;
-       return false;
+       return NeverApplicable;
    fi;
 
    if d  in [5, 6] then
@@ -484,13 +486,13 @@ function( recognise, grp )
        if (ord mod 121=0 or (d=5 and ord=13) or (d=6 and ord=7)) then
           Info( InfoClassical, 2, "G' is not a Mathieu group.;");
           recognise.isNotMathieu := true;
-          return false;
+          return NeverApplicable;
        fi;
    else
        if ForAny([6,7,8,9], m -> m in E) then
           Info( InfoClassical, 2, "G' is not a Mathieu group;");
            recognise.isNotMathieu := true;
-           return false;
+           return NeverApplicable;
        fi;
    fi;
 
@@ -502,24 +504,24 @@ function( recognise, grp )
         if recognise.n > 15 then
             AddSet(recognise.possibleNearlySimple, "M11" );
             Info( InfoClassical, 2, "G' might be M11;");
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 6 then
         if recognise.n > 15 then
             AddSet(recognise.possibleNearlySimple, "2.M12" );
             Info( InfoClassical, 2, "G' might be 2.M12;");
-            return fail;
+            return TemporaryFailure;
         fi;
     else
         if recognise.n > 15 then
             AddSet(recognise.possibleNearlySimple, "M23" );
             AddSet(recognise.possibleNearlySimple, "M24" );
             Info( InfoClassical, 2, "G' might be M23 or M24;");
-            return fail;
+            return TemporaryFailure;
         fi;
     fi;
 
-   return fail;
+   return TemporaryFailure;
 
 end);
 
@@ -539,12 +541,12 @@ function (recognise, grp)
 #    if recognise.hint <> "unknown" and recognise.hint <> "linear" then
 #        Info( InfoClassical, 2, "G' not PSL(2,r);");
 #        recognise.isNotPSL := true;
-#        return false;
+#        return NeverApplicable;
 #    fi;
     if Length(recognise.ClassicalForms) > 0 and
         First(recognise.ClassicalForms,IsTrivialForm)=fail then
        recognise.isNotPSL := true;
-       return false;
+       return NeverApplicable;
     fi;
 
     if d = 3 and (q = 5 or q = 2) then
@@ -553,19 +555,19 @@ function (recognise, grp)
         fi;
         # Note PSL(2,7) is isomorphic to PSL(3,2), so don't print this message
         recognise.isNotPSL := true;
-        return false;
+        return NeverApplicable;
     fi;
 
     if [d,q] = [5,5] or [d,q] = [5,11] then
        Info( InfoClassical, 2, "G' not PSL(2,11);");
        recognise.isNotPSL := true;
-       return false;
+       return NeverApplicable;
     fi;
 
     if d = 6 and q = 2 then
         Info( InfoClassical, 2,  "G' is not PSL(2,11)");
         recognise.isNotPSL := true;
-        return false;
+        return NeverApplicable;
     fi;
 
     # test whether e_2 = e_1 + 1 and
@@ -575,7 +577,7 @@ function (recognise, grp)
             not IsPrimeInt(E[1]+1) or not IsPrimeInt(2*E[2]+1) then
             Info(InfoClassical, 2, " G' is not PSL(2,r)");
             recognise.isNotPSL := true;
-            return false;
+            return NeverApplicable;
         fi;
     fi;
 
@@ -587,7 +589,7 @@ function (recognise, grp)
             if (ord mod 8 <> 0 or (p^(2*a)-1) mod ord = 0) then
                 Info( InfoClassical, 2, "G' not PSL(2,7);");
                 recognise.isNotPSL := true;
-                return false;
+                return NeverApplicable;
            fi;
        else
            if p = 3 or p = 7 or 2 in LE then
@@ -597,7 +599,7 @@ function (recognise, grp)
                     Info( InfoClassical, 2, "G' not PSL(2,7);");
                 fi;
                 recognise.isNotPSL := true;
-                return false;
+                return NeverApplicable;
            fi;
        fi;
    elif [d, q]  = [5,3] then
@@ -605,31 +607,31 @@ function (recognise, grp)
        if (ord mod 11^2 = 0  or ord mod 20 = 0) then
            Info( InfoClassical, 2, "G' not PSL(2,11);");
            recognise.isNotPSL := true;
-           return false;
+           return NeverApplicable;
        fi;
    elif d = 5  and p <> 5 and p <> 11 then
        if (3 in LE or 4 in LE) then
            Info( InfoClassical, 2, "G' not PSL(2,11);");
            recognise.isNotPSL := true;
-           return false;
+           return NeverApplicable;
        fi;
    elif [d, q]  = [6, 3] then
        ord := Order(recognise.g);
        if (ord mod (11^2)=0 or 6 in E) then
            Info( InfoClassical, 2, "G' not PSL(2,11);");
            recognise.isNotPSL := true;
-           return false;
+           return NeverApplicable;
        fi;
    elif d = 6 and p <> 5 and p <> 11 then
        if  (6 in E or 4 in LE) then
            Info( InfoClassical, 2, "G' not PSL(2,11);");
            recognise.isNotPSL := true;
-           return false;
+           return NeverApplicable;
        fi;
    #else
        #Info( InfoClassical, 2, "G' not PSL(2,r);");
        #recognise.isNotPSL := true;
-       #return false;
+       #return NeverApplicable;
    fi;
 
 
@@ -638,9 +640,9 @@ function (recognise, grp)
        str := Concatenation(str, ")");
        Info( InfoClassical, 2, "G' might be ", str);
        AddSet( recognise.possibleNearlySimple, str );
-       return fail;
+       return TemporaryFailure;
    fi;
-   return fail;
+   return TemporaryFailure;
 end);
 
 
@@ -812,7 +814,7 @@ function(recognise, grp)
         od;
         if not found then
             Info(InfoClassical, 2, "need basechange only in O+");
-            return fail;
+            return TemporaryFailure;
         fi;
      fi;
 
@@ -831,10 +833,10 @@ function(recognise, grp)
       if recognise.needPlusMinus = true then
             if recognise.kroneckerFactors = "unknown" then
                 recognise.needKroneckerFactors := true;
-                return fail;
+                return TemporaryFailure;
             fi;
             if recognise.kroneckerFactors = false then
-                return fail;
+                return TemporaryFailure;
             fi;
             kf := recognise.kroneckerFactors;
             o1 := ProjectiveOrder( kf[1] )[1];
@@ -883,9 +885,9 @@ function(recognise, grp)
         if recognise.needDecompose = true then
             if recognise.kroneckerFactors = "unknown" then
                 recognise.needKroneckerFactors := true;
-                return fail;
+                return TemporaryFailure;
             elif recognise.kroneckerFactors = false then
-                return fail;
+                return TemporaryFailure;
             fi;
             kf := recognise.kroneckerFactors;
 
@@ -897,7 +899,7 @@ function(recognise, grp)
             fi;
        fi;
 
-    return fail;
+    return TemporaryFailure;
 
 end);
 
@@ -932,10 +934,10 @@ function( recognise, grp )
     # G acts irreducibly if only 0 and d are possible
     if Length(recognise.dimsReducible)=2 then
         recognise.isReducible := false;
-        return false;
+        return NeverApplicable;
     fi;
 
-    return fail;
+    return TemporaryFailure;
 end);
 
 BindRecogMethod(FindHomMethodsClassical, "NoClassicalForms",
@@ -952,10 +954,10 @@ function( recognise, grp )
               Add(recognise.ClassicalForms,
               BilinearFormByMatrix(NullMat(d,d,field),field));
           fi;
-          return false;
+          return NeverApplicable;
    fi;
 
-    return fail;
+    return TemporaryFailure;
 
 end);
 
@@ -978,7 +980,7 @@ function( recognise, grp)
     # the group has to be absolutely irreducible
     if recognise.isReducible = "unknown"  then
         recognise.needMeataxe := true;
-        return fail;
+        return TemporaryFailure;
     fi;
 
     # set up the field and other information
@@ -997,7 +999,7 @@ function( recognise, grp)
             Add(recognise.ClassicalForms,
             BilinearFormByMatrix(NullMat(d,d,field), field ) );
         fi;
-        return false;
+        return NeverApplicable;
     fi;
 
 
@@ -1013,7 +1015,7 @@ function( recognise, grp)
                     recognise.QuadraticFormType := form[1];
                     recognise.QuadraticForm := QuadraticFormByMatrix(form[4]);
                 fi;
-                return false;
+                return NeverApplicable;
             else
                 recognise.maybeDual := false;
             fi;
@@ -1027,7 +1029,7 @@ function( recognise, grp)
             if form <> false  then
                 Add( recognise.ClassicalForms,
                      HermitianFormByMatrix(form[2], field));
-               return false;
+               return NeverApplicable;
             else
                 recognise.maybeFrobenius := false;
             fi;
@@ -1040,11 +1042,11 @@ function( recognise, grp)
         if First(recognise.ClassicalForms,IsTrivialForm)=fail then
             Add(recognise.ClassicalForms,
             BilinearFormByMatrix(NullMat(d,d,field), field));
-            return false;
+            return NeverApplicable;
         fi;
     fi;
 
-    return fail;
+    return TemporaryFailure;
 
 end);
 
@@ -1063,7 +1065,7 @@ function( recognise, grp )
 
     if MTX.IsIrreducible(recognise.module) then
         recognise.isReducible := false;
-        return false;
+        return NeverApplicable;
     else
         Info( InfoClassical, 2,
         "The group acts reducibly and thus doesn't contain a classical group");
@@ -1072,7 +1074,7 @@ function( recognise, grp )
         recognise.isSpContained := false;
         recognise.isSUContained := false;
         recognise.isOmegaContained := false;
-        return true;
+        return Success;
     fi;
 end);
 
@@ -1086,7 +1088,7 @@ function( recognise, grp )
        recognise.isReducible = true or
        recognise.isNotMathieu <> true or
        recognise.isNotAlternating <> true  then
-          return fail;
+          return TemporaryFailure;
     fi;
 
 
@@ -1109,12 +1111,12 @@ function( recognise, grp )
         recognise.isSLContained := true;
         Info(InfoClassical,2,"The group contains SL(", recognise.d, ", ",
              recognise.q, ");");
-        return true;
+        return Success;
     else
         recognise.isSLContained := false;
         Info(InfoClassical,2,"The group does not contain SL(",
              recognise.d, ", ", recognise.q, ");");
-        return false;
+        return NeverApplicable;
     fi;
 
 end);
@@ -1130,7 +1132,7 @@ function( recognise, grp )
     # if the dimension is not even, the group cannot be symplectic
     if recognise.d mod 2 <> 0 or recognise.isSpContained = false then
         recognise.isSpContained := false;
-        return false;
+        return NeverApplicable;
     fi;
 
     if recognise.isGeneric <> true or
@@ -1139,7 +1141,7 @@ function( recognise, grp )
        recognise.isNotPSL <> true  or
        recognise.isNotMathieu <> true or
        recognise.isNotAlternating <> true  then
-          return fail;
+          return TemporaryFailure;
     fi;
 
 
@@ -1167,12 +1169,12 @@ function( recognise, grp )
         recognise.isNotExt := true;
         Info(InfoClassical,2,"The group contains Sp(", recognise.d, ", ",
              recognise.q, ");");
-        return true;
+        return Success;
     else
         recognise.isSpContained := false;
         Info(InfoClassical,2,"The group does not contain Sp(",
              recognise.d, ", ", recognise.q, ");");
-        return false;
+        return NeverApplicable;
     fi;
 end);
 
@@ -1190,7 +1192,7 @@ function( recognise, grp )
     # if size of field not a square, the group cannot be unitary
     if LogInt(Size(f),Characteristic(f))  mod 2 <> 0 then
         recognise.isSUContained := false;
-        return false;
+        return NeverApplicable;
     fi;
 
     q0 := Characteristic(recognise.field)^
@@ -1199,7 +1201,7 @@ function( recognise, grp )
 
 
     if recognise.isSUContained = false then
-        return false;
+        return NeverApplicable;
     fi;
 
     if recognise.isGeneric <> true or
@@ -1208,7 +1210,7 @@ function( recognise, grp )
        recognise.isNotPSL <> true  or
        recognise.isNotMathieu <> true or
        recognise.isNotAlternating <> true  then
-          return fail;
+          return TemporaryFailure;
     fi;
 
 
@@ -1231,12 +1233,12 @@ function( recognise, grp )
         recognise.isSUContained := true;
         Info(InfoClassical,2,"The group contains SU(", recognise.d, ", ",
              q0, ");");
-        return true;
+        return Success;
     else
         recognise.isSUContained := false;
         Info(InfoClassical,2,"The group does not contain SU(",
              recognise.d, ", ", q0, ");");
-        return false;
+        return NeverApplicable;
     fi;
 end);
 
@@ -1252,12 +1254,12 @@ function( recognise, grp )
     isHypForm := f -> IsSesquilinearForm(f) and IsHyperbolicForm(f);
 
     if recognise.isOmegaContained = false then
-        return false;
+        return NeverApplicable;
     fi;
 
 
     if IsOddInt(recognise.d) and not IsOddInt(recognise.q) then
-        return false;
+        return NeverApplicable;
     fi;
 
     if recognise.isGeneric <> true or
@@ -1266,7 +1268,7 @@ function( recognise, grp )
        recognise.isReducible = true or
        recognise.isNotMathieu <> true or
        recognise.isNotAlternating <> true  then
-          return fail;
+          return TemporaryFailure;
     fi;
 
 
@@ -1289,53 +1291,53 @@ function( recognise, grp )
         recognise.QuadraticFormType = "orthogonalcircle" then
         #orthogonal circle
         if recognise.d mod 2 = 0 then
-            return false;
+            return NeverApplicable;
         fi;
         if recognise.currentgcd <> 1 then
-            return fail;
+            return TemporaryFailure;
         fi;
         recognise.isNotExt := true;
         recognise.isOmegaContained := true;
         Info(InfoClassical,2,"The group contains SO^o(", recognise.d, ", ",
              recognise.q, ");");
-        return true;
+        return Success;
 
     elif First(recognise.ClassicalForms,isHypForm) <> fail or
         IsQuadraticForm( recognise.QuadraticForm) and
         recognise.QuadraticFormType = "orthogonalplus" then
         #orthogonal plus
         if recognise.d mod 2 <> 0 then
-            return false;
+            return NeverApplicable;
         fi;
         if recognise.currentgcd <> 2 then
-            return fail;
+            return TemporaryFailure;
         fi;
         recognise.isNotExt := true;
         recognise.isOmegaContained := true;
         Info(InfoClassical,2,"The group contains SO+(", recognise.d, ", ",
              recognise.q, ");");
-        return true;
+        return Success;
 
     elif First(recognise.ClassicalForms,isEllForm) <> fail or
         IsQuadraticForm( recognise.QuadraticForm) and
         recognise.QuadraticFormType = "orthogonalminus" then
         # orthogonal minus
         if recognise.d mod 2 <> 0 then
-            return false;
+            return NeverApplicable;
         fi;
         if recognise.currentgcd <> 2 then
-            return fail;
+            return TemporaryFailure;
         fi;
         recognise.isNotExt := true;
         recognise.isOmegaContained := true;
         Info(InfoClassical,2,"The group contains SO-(", recognise.d, ", ",
              recognise.q, ");");
-        return true;
+        return Success;
     else
         recognise.isOmegaContained := false;
         Info(InfoClassical,2,"The group does not contain SO(",
              recognise.d, ", ", recognise.q, ");");
-        return false;
+        return NeverApplicable;
     fi;
 end);
 
@@ -1374,55 +1376,55 @@ function( recognise, grp )
     CheckFlag := function( )
         if recognise.isReducible = "unknown" then
            recognise.needMeataxe := true;
-           return fail;
+           return TemporaryFailure;
         fi;
         if  Length(recognise.ClassicalForms) = 0 then
             recognise.needForms :=  true;
-            return fail;
+            return TemporaryFailure;
         fi;
         Info(InfoClassical,2,"The group is not generic");
         Info(InfoClassical,2,"and contains SL(", recognise.d, ", ",
              recognise.q, ");");
         recognise.isSLContained := true;
-        return true;
+        return Success;
     end;
 
     # grp is non-generic if either d = 2 or (d,q) = (3, 2^s-1)
     if recognise.d > 3 then
-        return false;
+        return NeverApplicable;
     fi;
     if recognise.d = 3 and not IsPowerOfTwo(recognise.q+1) then
-        return false;
+        return NeverApplicable;
     fi;
 
     if recognise.isReducible = true then
-       return false;
+       return NeverApplicable;
     fi;
 
     if Length( recognise.ClassicalForms ) > 0 and
        First(recognise.ClassicalForms,IsTrivialForm) = fail then
-       return false;
+       return NeverApplicable;
     fi;
 
     if recognise.needLB  = false then
         recognise.needLB := true;
-        return fail;
+        return TemporaryFailure;
     fi;
 
     # Now we have confirmed all prerequisites of Theorem 5.1 except for that
     # grp contains an element of order 4 and a basic lppd(3, q, 3) element.
     if recognise.n <= 5 then
-        return fail;
+        return TemporaryFailure;
     elif recognise.n = 6 then
         recognise.needOrders := true;
-        return fail;
+        return TemporaryFailure;
     fi;
     if 3 in recognise.LB
        and HasElementsMultipleOf(recognise.orders, [4]) then
            return CheckFlag();
     fi;
 
-    return fail;
+    return TemporaryFailure;
 end);
 
 ############################################################################/
@@ -1439,45 +1441,45 @@ function(recognise, grp)
     CheckFlag := function( )
         if recognise.isReducible = "unknown" then
            recognise.needMeataxe := true;
-           return fail;
+           return TemporaryFailure;
         fi;
         if  Length(recognise.ClassicalForms) = 0 then
             recognise.needForms :=  true;
-            return fail;
+            return TemporaryFailure;
         fi;
         Info(InfoClassical,2,"The group is not generic");
         Info(InfoClassical,2,"and contains Sp(", recognise.d, ", ",
              recognise.q, ");");
         recognise.isSpContained := true;
-        return true;
+        return Success;
     end;
 
     d := recognise.d;
     q := recognise.q;
 
     if not IsEvenInt(recognise.d) then
-        return false;
+        return NeverApplicable;
     fi;
 
     if recognise.isReducible = true then
-       return false;
+       return NeverApplicable;
     fi;
 
     if Length( recognise.ClassicalForms ) > 0 and
        recognise.QuadraticForm = false and
        First( recognise.ClassicalForms, isSpForm) = fail then
-       return false;
+       return NeverApplicable;
     fi;
 
     if d > 8 then
-        return false;
+        return NeverApplicable;
     fi;
 
     if recognise.n <= 5 then
         return NotEnoughInformation;
     elif recognise.n <= 6 and d <> 4 then
         recognise.needOrders := true;
-        return fail;
+        return TemporaryFailure;
     elif d = 4 then
         recognise.needOrders := true;
         recognise.needLB := true;
@@ -1487,58 +1489,58 @@ function(recognise, grp)
 
     if d = 8 and q = 2 then
         if not HasElementsMultipleOf(recognise.orders, [5,9,17]) then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 6 and q = 2 then
         if not HasElementsMultipleOf(recognise.orders, [5,7,9]) then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 6 and q = 3 then
         if not HasElementsMultipleOf(recognise.orders, [5,7]) then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 4 and q = 3 then
         if not HasElementsMultipleOf(recognise.orders, [5,9]) then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 4 and q = 2 then
         if Size(grp) mod 720 <> 0 then
             Info(InfoClassical,2,"group does not contain Sp(",
                  recognise.d, ", ", recognise.q, ");");
            recognise.isSpContained := false;
-           return false;
+           return NeverApplicable;
         fi;
     elif d = 4 and q = 5 then
         if not HasElementsMultipleOf(recognise.orders, [13,15]) then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 4 and not IsPowerOfTwo(q+1) and not ((q+1) mod 3 = 0 and
                    IsPowerOfTwo((q+1)/3)) and q<>2 then
         if not 4 in recognise.LB then
-            return fail;
+            return TemporaryFailure;
         fi;
         if not 2 in recognise.LS then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 4 and q >= 7 and IsPowerOfTwo(q+1) then
         if not 4 in recognise.LB then
-            return fail;
+            return TemporaryFailure;
         fi;
         if not HasElementsMultipleOf(recognise.orders, [4]) then
-            return fail;
+            return TemporaryFailure;
         fi;
 
     elif d = 4 and q >= 11 and IsPowerOfTwo((q+1)/3) then
         if not HasElementsMultipleOf(recognise.orders, [3,4]) then
-            return fail;
+            return TemporaryFailure;
         fi;
         if not 4 in recognise.LB then
-            return fail;
+            return TemporaryFailure;
         fi;
     else
         Info(InfoClassical,2,
              "NonGenericSymplectic: d and q must have been generic");
-        return false;
+        return NeverApplicable;
     fi;
 
     return CheckFlag();
@@ -1559,36 +1561,36 @@ function(recognise, grp)
     CheckFlag := function( )
         if recognise.isReducible = "unknown" then
            recognise.needMeataxe := true;
-           return fail;
+           return TemporaryFailure;
         fi;
         if  Length(recognise.ClassicalForms) = 0 then
             recognise.needForms :=  true;
-            return fail;
+            return TemporaryFailure;
         fi;
          Info(InfoClassical,2,"group contains SU(",
               recognise.d, ", ", recognise.q, ");");
         recognise.isSUContained := true;
-        return true;
+        return Success;
     end;
 
     d := recognise.d;
     q := recognise.q;
 
     if d > 6 then
-        return false;
+        return NeverApplicable;
     fi;
 
     if recognise.isReducible = true then
-       return false;
+       return NeverApplicable;
     fi;
 
     if Length( recognise.ClassicalForms ) > 0 and
        First( recognise.ClassicalForms, isHermForm )=fail then
-       return false;
+       return NeverApplicable;
     fi;
 
     if recognise.maybeFrobenius = false then
-        return false;
+        return NeverApplicable;
     fi;
 
     if recognise.n <= 5 then
@@ -1605,41 +1607,41 @@ function(recognise, grp)
                recognise.needLB := true;
             fi;
         fi;
-        return fail;
+        return TemporaryFailure;
     fi;
 
     if d = 6 and q = 4 then
         if not HasElementsMultipleOf(recognise.orders, [7,10,11]) then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 6 and q >= 9 then
         if not 3 in recognise.E2 then
-            return fail;
+            return TemporaryFailure;
         fi;
         if not 5 in recognise.LB then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 5 and q = 4 then
         if not HasElementsMultipleOf(recognise.orders, [11,12]) then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 4 and q = 4 then
         #TO DO : check this is same in Magma
         if not HasElementsMultipleOf(recognise.orders, [5,9]) then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 4 and q = 9 then
         if not HasElementsMultipleOf(recognise.orders, [5,7,9]) then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 4 and q > 9 then
 
         if not 3 in recognise.LB then
-            return fail;
+            return TemporaryFailure;
         fi;
 
         if not 2 in recognise.E2 then
-            return fail;
+            return TemporaryFailure;
         fi;
 
         # ACN 27 Nov 2019 reworked this section.
@@ -1671,23 +1673,23 @@ function(recognise, grp)
          )) then
             return CheckFlag();
         fi;
-        return fail;
+        return TemporaryFailure;
     elif d = 3 and q = 4 then
         # Take the natural action of grp, and compute its order
         if Order(grp) mod 216 = 0 then
             return CheckFlag();
         else
             recognise.isSUContained := false;
-            return false;
+            return NeverApplicable;
         fi;
     elif d = 3 and q = 9 then
         if not HasElementsMultipleOf(recognise.orders, [7]) then
-            return fail;
+            return TemporaryFailure;
         fi;
         if recognise.hasSpecialEle = false then
             order := Order( recognise.g );
             if not order mod 6 = 0 then
-                return fail;
+                return TemporaryFailure;
             fi;
             if not IsCentral(grp, recognise.g ^ (order / 2)) then
                 Info( InfoClassical,2,
@@ -1696,19 +1698,19 @@ function(recognise, grp)
                 recognise.hasSpecialEle := true;
                 return CheckFlag();
             else
-                return fail;
+                return TemporaryFailure;
             fi;
         else
             return CheckFlag();
         fi;
     elif d = 3 and q = 16 then
         if not HasElementsMultipleOf(recognise.orders, [5,13]) then
-            return fail;
+            return TemporaryFailure;
         fi;
         if recognise.hasSpecialEle = false then
             order := Order( recognise.g );
             if not order mod 5  = 0 then
-                return fail;
+                return TemporaryFailure;
             fi;
             if not IsCentral(grp, recognise.g ^ (order / 5)) then
                 Info( InfoClassical,2,
@@ -1716,19 +1718,19 @@ function(recognise, grp)
                 recognise.hasSpecialEle := true;
                 return CheckFlag();
             else
-                return fail;
+                return TemporaryFailure;
             fi;
         else
             return CheckFlag();
         fi;
     elif d = 3 and q = 25 then
         if not HasElementsMultipleOf(recognise.orders, [5,7,8]) then
-            return fail;
+            return TemporaryFailure;
         fi;
         if recognise.hasSpecialEle = false then
             order := Order(recognise.g);
             if order mod 8 <> 0 then
-                return fail;
+                return TemporaryFailure;
             fi;
             if not IsCentral(grp, recognise.g ^ (order / 2)) then
                 Info( InfoClassical,2,
@@ -1737,25 +1739,25 @@ function(recognise, grp)
                 recognise.hasSpecialEle := true;
                 return CheckFlag();
             else
-                return fail;
+                return TemporaryFailure;
             fi;
         else
             return CheckFlag();
         fi;
     elif d = 3 and q >= 49  then
         if not 3 in recognise.LE or not 3 in recognise.BE then
-           return fail;
+           return TemporaryFailure;
         fi;
         if not recognise.ppd[1] = 3 or not recognise.ppd[2]=true
            or not recognise.ppd[3]=true then
-            return fail;
+            return TemporaryFailure;
         fi;
         if recognise.hasSpecialEle = false then
              Info(InfoClassical,2,
                   "Searching for elements of order > 3 mod scalars",
                   " and dividing ", String(q-1));
              if not ForAny(recognise.porders, i -> i[1] > 3 and q mod i[1] = 1) then
-                 return fail;
+                 return TemporaryFailure;
              fi;
              recognise.hasSpeccialEle := true;
              return CheckFlag();
@@ -1765,7 +1767,7 @@ function(recognise, grp)
     else
         Info(InfoClassical,2,
             "NonGenericUnitary: d and q must have been be generic");
-        return false;
+        return NeverApplicable;
     fi;
 
 
@@ -1783,38 +1785,38 @@ function(recognise,grp)
     CheckFlag := function( )
         if recognise.isReducible = "unknown" then
            recognise.needMeataxe := true;
-           return fail;
+           return TemporaryFailure;
         fi;
         if  Length(recognise.ClassicalForms) = 0 then
             recognise.needForms :=  true;
-            return fail;
+            return TemporaryFailure;
         fi;
         Info(InfoClassical,2,"group contains SO+(",
              recognise.d, ", ", recognise.q, ");");
 
         recognise.isOmegaContained := true;
-        return true;
+        return Success;
     end;
 
     d := recognise.d;
     q := recognise.q;
 
     if not d in [4,6,8,10] then
-        return false;
+        return NeverApplicable;
     fi;
     if d = 10 and q <> 2 then
-        return false;
+        return NeverApplicable;
     fi;
 
     if recognise.isReducible = true then
-       return false;
+       return NeverApplicable;
     fi;
 
     if (Length( recognise.ClassicalForms ) > 0 and
        First(recognise.ClassicalForms, isHypForm)=fail) and
        (not IsQuadraticForm(recognise.QuadraticForm) or not
        recognise.QuadraticFormType = "orthogonalplus") then
-       return false;
+       return NeverApplicable;
     fi;
 
     if d = 6 or d = 8 then
@@ -1826,17 +1828,17 @@ function(recognise,grp)
         return NotEnoughInformation;
     elif recognise.n = 6 then
         recognise.needOrders := true;
-        return fail;
+        return TemporaryFailure;
     fi;
 
     if d = 10 and q = 2 then
         if not HasElementsMultipleOf( recognise.orders, [17,31])  then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 8 and q = 2 then
         if not HasElementsMultipleOf( recognise.orders, [7,9,10]) and
            not HasElementsMultipleOf( recognise.orders, [7,9,15]) then
-            return fail;
+            return TemporaryFailure;
         fi;
 
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
@@ -1847,18 +1849,18 @@ function(recognise,grp)
         # orthogonal don't have these orbit lengths.
         if Set(orbs,Length) <> [ 120, 135 ] then
            recognise.isOmegaContained := false;
-           return false;
+           return NeverApplicable;
         fi;
         StabChain(pgrp, rec(random := 200, limit := 174182400));
         if Size(pgrp) mod 174182400 = 0 then # compare to Size(POmega(+1,8,2))
            return CheckFlag();
         else
            recognise.isOmegaContained := false;
-           return false;
+           return NeverApplicable;
          fi;
     elif d = 8 and q = 3 then
         if not HasElementsMultipleOf( recognise.orders, [7,13])  then
-            return fail;
+            return TemporaryFailure;
         fi;
         pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
         StabChain(pgrp, rec(random := 200, limit := 4952179814400));
@@ -1866,7 +1868,7 @@ function(recognise,grp)
              return CheckFlag();
         else
              recognise.isOmegaContained := false;
-             return false;
+             return NeverApplicable;
         fi;
     elif d = 8 and q = 5 then
         ## 2.July.2019: There is a mistake in the paper here
@@ -1882,7 +1884,7 @@ function(recognise,grp)
         # Since elements of order divisible by 312 are relatively rare, we
         # don't use these anymore.
         if not HasElementsMultipleOf( recognise.orders, [3,7,13,31])  then
-            return fail;
+            return TemporaryFailure;
         fi;
         # Such elements also exist in maximal subgroups of
         # Omega+(8,5) with composition factors being C_2 and Omega(0,7,5).
@@ -1895,32 +1897,32 @@ function(recognise,grp)
         if  Size(pgrp) mod 8911539000000000000 = 0 then
              return CheckFlag();
         else
-             return fail;
+             return TemporaryFailure;
         fi;
     elif d = 8 and (q = 4 or q > 5) then
         if not 6 in recognise.LB then
-            return fail;
+            return TemporaryFailure;
         fi;
         if not 4 in recognise.LS then
-            return fail;
+            return TemporaryFailure;
         fi;
     # For each q we have that OmegaPlus(6,q) is isomorphic to PSL(4,q).
     elif d = 6 and q = 2 then
         # Additionally, OmegaPlus(6,2) is isomorphic to AlternatingGroup(8).
         if not HasElementsMultipleOf( recognise.orders, [7]) and
            not HasElementsMultipleOf( recognise.orders, [15]) then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 6 and q = 3 then
         if not HasElementsMultipleOf( recognise.orders, [5, 13])  then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 6 and q >= 4 then
         if not 4 in recognise.LB then
-            return fail;
+            return TemporaryFailure;
         fi;
         if not 3 in recognise.E2 then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 4 and (q = 8 or q >= 11) then
         if recognise.needPlusMinus = false then
@@ -1928,16 +1930,16 @@ function(recognise,grp)
             return NotEnoughInformation;
         fi;
         if not IsSubset(recognise.plusminus,[[1,1],[1,-1],[-1,-1]]) then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 4 and q = 2 then
         if Size(grp) mod 36 <> 0 then
             recognise.isOmegaContained := false;
-            return false;
+            return NeverApplicable;
         fi;
         if recognise.needDecompose = false then
            recognise.needDecompose := true;
-           return fail;
+           return TemporaryFailure;
         fi;
         gp1 := Group(recognise.sq1);
         gp2 := Group(recognise.sq2);
@@ -1950,11 +1952,11 @@ function(recognise,grp)
     elif d = 4 and q = 3 then
         if Size(grp) mod 288 <> 0 then
             recognise.isOmegaContained := false;
-            return false;
+            return NeverApplicable;
         fi;
         if recognise.needDecompose = false then
            recognise.needDecompose := true;
-           return fail;
+           return TemporaryFailure;
         fi;
         gp1 := Group(recognise.sq1);
         gp2 := Group(recognise.sq2);
@@ -1969,16 +1971,16 @@ function(recognise,grp)
         # the group Omega can have orbits of lengths 75 and 60
         ol := Length(Orbit(grp, IdentityMat(d, GF(q))[1]));
         if not ol in [60,75,180] then
-            return false;
+            return NeverApplicable;
         fi;
         pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
         if Size(pgrp) mod 3600 <> 0 then
              recognise.isOmegaContained := false;
-             return false;
+             return NeverApplicable;
         fi;
         if recognise.needDecompose = false then
            recognise.needDecompose := true;
-           return fail;
+           return TemporaryFailure;
         fi;
         gp1 := Group(recognise.sq1);
         gp2 := Group(recognise.sq2);
@@ -1994,7 +1996,7 @@ function(recognise,grp)
         # the group Omega can have orbits of lengths 144 and 120
         ol := Length(Orbit(grp, IdentityMat(d, GF(q))[1]));
         if not ol mod 144 = 0 and not ol mod 120 = 0 then
-           return false;
+           return NeverApplicable;
         fi;
 
         ## The projective Group has half order of Omega
@@ -2002,7 +2004,7 @@ function(recognise,grp)
         pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
         if Size(pgrp) mod 3600 <> 0 then
             recognise.isOmegaContained := false;
-            return false;
+            return NeverApplicable;
         else
             return CheckFlag();
         fi;
@@ -2012,17 +2014,17 @@ function(recognise,grp)
         # the group Omega can have orbits of lengths 384 and 336
         ol := Length(Orbit(grp, IdentityMat(d, GF(q))[1]));
         if not ol mod 384 = 0 and not ol mod 336 = 0 then
-            return false;
+            return NeverApplicable;
         fi;
 
         pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
         if Size(pgrp) mod 28224  <> 0 then
             recognise.isOmegaContained := false;
-            return false;
+            return NeverApplicable;
         fi;
         if recognise.needDecompose = false then
            recognise.needDecompose := true;
-           return fail;
+           return TemporaryFailure;
         fi;
         gp1 := Group(recognise.sq1);
         gp2 := Group(recognise.sq2);
@@ -2038,20 +2040,20 @@ function(recognise,grp)
         # the group Omega can have orbits of lengths 800 and 720
         ol := Length(Orbit(grp, IdentityMat(d, GF(q))[1]));
         if not ol mod 800 = 0 and not ol mod 720 = 0 then
-            return false;
+            return NeverApplicable;
         fi;
 
         pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
         if Size(pgrp) mod 129600 <> 0 then
             recognise.isOmegaContained := false;
-            return false;
+            return NeverApplicable;
         else
             return CheckFlag();
         fi;
     else
         Info(InfoClassical, 2,
              "NonGenericO+: d and q must have  been be generic");
-        return false;
+        return NeverApplicable;
     fi;
 
      return CheckFlag();
@@ -2069,80 +2071,80 @@ function(recognise, grp)
     CheckFlag := function( )
         if recognise.isReducible = "unknown" then
            recognise.needMeataxe := true;
-           return fail;
+           return TemporaryFailure;
         fi;
         if  Length(recognise.ClassicalForms) = 0 then
             recognise.needForms :=  true;
-            return fail;
+            return TemporaryFailure;
         fi;
         Info(InfoClassical,2,"group contains SO-(",
              recognise.d, ", ", recognise.q, ");");
         recognise.isOmegaContained := true;
-        return true;
+        return Success;
     end;
 
     d := recognise.d;
     q := recognise.q;
 
     if not d in [4,6,8] then
-        return false;
+        return NeverApplicable;
     fi;
     if d = 8 and q <> 2 then
-        return false;
+        return NeverApplicable;
     fi;
     if d = 6 and q > 3 then
-        return false;
+        return NeverApplicable;
     fi;
 
     if recognise.isReducible = true then
-       return false;
+       return NeverApplicable;
     fi;
 
     if (Length(recognise.ClassicalForms) > 0 and
        First(recognise.ClassicalForms,isEllForm)=fail) and
        (not IsQuadraticForm(recognise.QuadraticForm) or not
        recognise.QuadraticFormType = "orthogonalminus") then
-       return false;
+       return NeverApplicable;
     fi;
 
     if recognise.n <= 5 then
         return NotEnoughInformation;
     elif recognise.n = 6 then
         recognise.needOrders := true;
-        return fail;
+        return TemporaryFailure;
     fi;
 
 
     if d = 8 and q = 2 then
         if not HasElementsMultipleOf( recognise.orders, [9,17])  then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 6 and q = 3 then
         if not HasElementsMultipleOf( recognise.orders, [5,7,9])  then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 6 and q = 2 then
         if not HasElementsMultipleOf( recognise.orders, [5,9])  then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 4 and q = 2 then
         if not HasElementsMultipleOf( recognise.orders, [3,5])  then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 4 and q = 3 then
         if not HasElementsMultipleOf( recognise.orders, [3,5])  then
-            return fail;
+            return TemporaryFailure;
         fi;
         pgrp := ProjectiveActionOnFullSpace( grp, GF(3), 4 );
         orbs := Orbits( pgrp, MovedPointsPerms( GeneratorsOfGroup(pgrp)));
         if Length(orbs) >  3 then # ACN 10/6/08
             recognise.isOmegaContained := false;
-            return false;
+            return NeverApplicable;
          fi;
     elif d = 4 and q >=  4 then
         ppd := IsPpdElement( recognise.field, recognise.cpol, d, q, 1 );
         if ppd = false or ppd[1] <> 4  or ppd[2] <> true then
-            return fail;
+            return TemporaryFailure;
         fi;
         # found a ppd( 4, q; 4)-element
         g := recognise.g;
@@ -2157,10 +2159,10 @@ function(recognise, grp)
         Info(InfoClassical, 2, "grp contained in O-(2,", q,  "^2)" );
         recognise.isNotExt := false;
         recognise.isOmegaContained := false;
-        return false;
+        return NeverApplicable;
     else
       Info(InfoClassical, 2, "NonGenericO-: d and q must be generic" );
-        return false;
+        return NeverApplicable;
     fi;
 
      return CheckFlag();
@@ -2175,39 +2177,39 @@ function( recognise, grp )
     isParForm := f -> IsSesquilinearForm(f) and IsParabolicForm(f);
 
     if not IsOddInt(recognise.d) then
-        return false;
+        return NeverApplicable;
     fi;
     if not IsOddInt(recognise.q) then
-        return false;
+        return NeverApplicable;
     fi;
 
     CheckFlag := function( )
         if recognise.isReducible = "unknown" then
            recognise.needMeataxe := true;
-           return fail;
+           return TemporaryFailure;
         fi;
         if  Length(recognise.ClassicalForms) = 0 then
             recognise.needForms :=  true;
-            return fail;
+            return TemporaryFailure;
         fi;
         Info(InfoClassical,2,"group contains Omega(",
              recognise.d, ", ", recognise.q, ");");
         recognise.isOmegaContained := true;
-        return true;
+        return Success;
     end;
 
     d := recognise.d;
     q := recognise.q;
 
     if recognise.isReducible = true then
-       return false;
+       return NeverApplicable;
    fi;
 
     if (Length( recognise.ClassicalForms ) > 0 and
        First(recognise.ClassicalForms, isParForm)=fail) and
        (not IsQuadraticForm(recognise.QuadraticForm) or not
        recognise.QuadraticFormType = "orthogonalcircle") then
-       return false;
+       return NeverApplicable;
     fi;
 
 
@@ -2215,7 +2217,7 @@ function( recognise, grp )
         return NotEnoughInformation;
     elif recognise.n = 6 then
         recognise.needOrders := true;
-        return fail;
+        return TemporaryFailure;
     fi;
 
     if d = 3 then
@@ -2225,35 +2227,35 @@ function( recognise, grp )
 
     if d = 7 and q = 3 then
         if not HasElementsMultipleOf( recognise.orders, [5,7,13])  then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 5 and q = 3 then
         if not HasElementsMultipleOf( recognise.orders, [5,9])  then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 5 and q >= 5 then
         if not 4 in recognise.LE then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 3 and q = 3 then
         if not HasElementsMultipleOf( recognise.orders, [3])  then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 3 and q = 5 then
         if not HasElementsMultipleOf( recognise.orders, [3,5])  then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 3 and q = 7 then
         if not HasElementsMultipleOf( recognise.orders, [4,7])  then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 3 and q = 9 then
         if not HasElementsMultipleOf( recognise.orders, [3,5])  then
-            return fail;
+            return TemporaryFailure;
         fi;
         if recognise.hasSpecialEle = false then
             if not Order(recognise.g) in [4,8] then
-                return fail;
+                return TemporaryFailure;
             fi;
             g := recognise.g^2;
             if ForAny(GeneratorsOfGroup(grp), h -> not IsOne(Comm(h,g))) then
@@ -2264,49 +2266,49 @@ function( recognise, grp )
                return CheckFlag();
         fi;
         recognise.isOmegaContained := false;
-        return false;
+        return NeverApplicable;
     elif d = 3 and q = 11 then
         if not HasElementsMultipleOf( recognise.orders, [3,11])  then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 3 and q = 19 then
         if not HasElementsMultipleOf( recognise.orders, [5,9,19])  then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 3 and q >=31 and IsPowerOfTwo(q+1) then
         s := Log2Int(q+1);
         if not ForAny(recognise.orders, i -> i > 2 and (q-1) mod i = 0) then
-            return fail;
+            return TemporaryFailure;
         fi;
         if not ForAny(recognise.orders, i -> i mod 2^(s-1) = 0) then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 3 and q>11 and ((q+1) mod 3=0 and
         IsPowerOfTwo((q+1)/3)) then
         s := Log2Int((q+1)/3);
         if not ForAny(recognise.orders, i -> i mod (3*2^(s-1)) = 0) then
-            return fail;
+            return TemporaryFailure;
         fi;
         if not ForAny(recognise.orders, i -> i > 2 and (q-1) mod i = 0) then
-            return fail;
+            return TemporaryFailure;
         fi;
     elif d = 3 and ((q+1) mod 3 <> 0 or not IsPowerOfTwo((q+1)/3)) and
                    not IsPowerOfTwo(q+1) then
         if not 2 in recognise.LB then
-            return fail;
+            return TemporaryFailure;
         fi;
         if not ForAny(recognise.orders, i -> i > 2 and (q-1) mod i = 0) then
-            return fail;
+            return TemporaryFailure;
         fi;
         ## need to check that the basic lppd( 3,q;2) elements have order
         ## greater than 5.
         s := LogInt(q, recognise.p);
         if not ForAny(recognise.orders, i -> HasLBGgt5(i, recognise.p, s, 2)) then
-            return fail;
+            return TemporaryFailure;
         fi;
     else
        Info(InfoClassical, 2, "NonGenericOo: d and q must be generic" );
-        return false;
+        return NeverApplicable;
     fi;
 
 
@@ -2466,11 +2468,9 @@ function( grp, arg... )
   SetInfoLevel(InfoMethSel,opt.infoLevel);
   ret := CallMethods( ClassicalMethDb, opt.nrrandels, recognise, grp );
   SetInfoLevel(InfoMethSel,originalInfoLevel);
-  # fail: bedeutet, dass entnervt aufgegeben wurde
-  # true: bedeutet, dass eine Methode "erfolgreich" war
+  # TODO: honor ret in some way?
 
   return recognise;
-  # return result
 end);
 
 # The following function pretty prints the output of RecogniseClassical.
