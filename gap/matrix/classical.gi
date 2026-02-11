@@ -62,7 +62,7 @@ BindGlobal( "FindHomMethodsClassical", rec() );
 #
 ###
 # Test whether <n> (assumed integer) is a power of 2
-IsPowerOfTwo := n -> n > 1 and 2 ^ Log2Int(n) = n;
+IsPowerOfTwo := n -> IsInt(n) and n > 1 and 2 ^ Log2Int(n) = n;
 
 
 # Check if m > 5 and the order of a basic lppd(d,q;e) element
@@ -682,7 +682,7 @@ end;
 BindRecogMethod(FindHomMethodsClassical, "TestRandomElement",
 "makes new random element and stores it and its char poly",
 function(recognise, grp)
-    local g, ppd, bppd, d, q, cpol, f, deg, facs, r, s, h, gmod, str,
+    local g, ppd, bppd, d, q, cpol, f, deg, facs, r, s, h, gmod,
     ord, bc, phi, kf, o1, o2, cf, i, found, p;
 
     recognise.g := PseudoRandom(grp);
@@ -698,7 +698,6 @@ function(recognise, grp)
 
     if recognise.needOrders then
         ord := Order(g);
-        recognise.ord := ord;
         AddSet( recognise.orders, ord );
     fi;
     if recognise.needPOrders then
@@ -706,7 +705,7 @@ function(recognise, grp)
         AddSet( recognise.porders, ord );
     fi;
 
-    ppd := IsPpdElement (f, cpol, d, q, 1);
+    ppd := IsPpdElement(f, cpol, d, q, 1);
     # if the element is no ppd we get out
     if ppd = false then
         recognise.isppd := false;
@@ -732,18 +731,9 @@ function(recognise, grp)
         fi;
     fi;
     if recognise.needE2 = true then
-        # these are ppd(d,q;e)-elmenets with e=d/2
+        # these are ppd(d,q;e)-elements with e=d/2
         ppd := IsPpdElementD2(f, cpol, d, recognise.q, 1);
         if ppd <> false then
-            str := "  Found a large and special ppd(";
-            str := Concatenation(str, String(recognise.d));
-            str := Concatenation(str, ", " );
-            str := Concatenation(str, String(recognise.q));
-            str := Concatenation(str, "; " );
-            str := Concatenation(str, String(ppd[1]));
-            str := Concatenation(str,  ")-element");
-
-
             AddSet( recognise.E2, ppd[1] );
             if ppd[2] = true then
 
@@ -767,7 +757,7 @@ function(recognise, grp)
               cf := MTX.CollectedFactors(gmod);
               if Length(cf) = 2 and cf[1][2] = cf[2][2] then
                 # we have two non-isomorphic composition factors
-                Info(InfoClassical,2, str );
+                Info(InfoClassical, 2, "Found a large and special ppd(",d,", ",q,"; ",ppd[1],")-element" );
                 AddSet(recognise.LS, ppd[1] );
               fi;
 
