@@ -324,7 +324,7 @@ end;
 #! a composition series of the underlying module is computed and a base
 #! change is performed to write <A>G</A> in a block lower triangular form.
 #! Also, the method sets a hint that the image is in block lower
-#! triangular form, so the image immediately can make recursive calls for the
+#! triangular form, so for the image the code immediately makes recursive calls for the
 #! actions on the diagonal blocks, and then to the lower <M>p</M>-part. For the
 #! image the method <Ref Subsect="BlockLowerTriangular" Style="Text"/> is used.
 #! 
