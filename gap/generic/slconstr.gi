@@ -2485,7 +2485,7 @@ function(ri,G)
 
     il := InfoLevel(InfoMethSel);
     SetInfoLevel(InfoMethSel,0);
-    r:=RecogniseClassical(G,"linear");
+    r:=RecogniseClassical(G,rec(case:="linear"));
     SetInfoLevel(InfoMethSel,il);
     if not( (IsBound(r.isSLContained) and r.isSLContained = true) ) then
         return TemporaryFailure;
