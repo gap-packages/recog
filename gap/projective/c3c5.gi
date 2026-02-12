@@ -360,7 +360,7 @@ RECOG.ForceToOtherField := function(m,field)
       # to resort to the following, which is somewhat less efficient if
       # some rows are already defined over subfields.
       q := ConvertToVectorRep(w);
-      if q = fail then
+      if IsBool(q) then
         if fieldsize <= 256 or not ForAll(w, x -> x in field) then
           return fail;
         fi;
