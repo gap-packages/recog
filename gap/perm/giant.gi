@@ -57,7 +57,7 @@ RECOG.FindCycles := function ( grp, lenList, N )
                         # rand is equal to this full cycle.
                         cycList[i] := rand;
                     else
-                        # orders is a the list of all l>=2 such that rand contains a l-cycle and
+                        # set orders to the list of all l>=2 such that rand contains an l-cycle and
                         #  l<>k. Since rand contains a k-cycle, we only have to check up to n-k.
                         orders := Filtered([2..n-k],x->IsBound(cyclen[x-1]) and x<>k);
                         if ForAll(orders, x->(x=k) or (x mod k <> 0)) then
