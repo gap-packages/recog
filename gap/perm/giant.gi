@@ -27,8 +27,8 @@ SetInfoLevel( InfoGiants, 1 );
 ## Each entry of lenList must be either a prime number or n.
 ## The desired cycles are found by a random search, drawing at most N random
 ## elements from grp.
-## Thus if grp actually contains cycles of the desired shape, then the function does not
-## return fail with a probability that grows as N grows.
+## Thus if grp actually contains cycles of the desired shape, then the function
+## succeeds with a probability that grows as N grows.
 RECOG.FindCycles := function ( grp, lenList, N )
 
     local mp, n, cycList, rand, cyclen, i, k, orders, finished;
