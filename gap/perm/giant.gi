@@ -22,8 +22,8 @@ SetInfoLevel( InfoGiants, 1 );
 
 #########################################################################
 ## For a permutation group grp on n points and a list lenList of integers,
-## returns either a list cycList such that cycList[i] is a cycle of length lenList[i]
-## for all 1 <= i <= Length(lenList), or fail.
+## returns either a list cycList of equal length such that cycList[i] is a
+## cycle of length lenList[i] for all 1 <= i <= Length(lenList), or fail.
 ## Each entry of lenList must be either a prime number or n.
 ## The desired circles are found by a random search, drawing at most N random
 ## elements from grp.
