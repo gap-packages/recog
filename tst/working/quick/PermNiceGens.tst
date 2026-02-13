@@ -74,7 +74,7 @@ gap> testNiceGeneratorsAn := function(grp)
 >      fi;
 >    fi;
 
-# Test for even m is still missing
+# TODO: Test for even m is still missing
 >  fi;
 > end;;
 
