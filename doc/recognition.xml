@@ -94,7 +94,7 @@ we first summarise it in steps:
     calls itself with the image of the homomorphism. Note that this
     might use another database of recognition methods because the
     homomorphism might change the representation of the group.</Item>
-<Item>After successful recognition of the image group the procedure has
+<Item>After successful recognition of the image the procedure has
     to recognise the kernel of the homomorphism. The first step for this
     is to find generators. If they are not already known from the
     <C>FindHomomorphism</C> method, they are created by producing random
@@ -119,8 +119,8 @@ group as a straight line program in the generators as follows:
 
 <Enum>
 <Item>Map the element through the homomorphism.</Item>
-<Item>Write the element in the image group as a product of the nice
-    generators in the image group.</Item>
+<Item>Write the element in the image as a product of the nice
+    generators in the image.</Item>
 <Item>Apply the resulting straight line program to the preimages of those
     nice generators and calculate the quotient, which will now lie in
     the kernel.</Item>
