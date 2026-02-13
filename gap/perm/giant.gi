@@ -25,7 +25,7 @@ SetInfoLevel( InfoGiants, 1 );
 ## returns either a list cycList of equal length such that cycList[i] is a
 ## cycle of length lenList[i] for all 1 <= i <= Length(lenList), or fail.
 ## Each entry of lenList must be either a prime number or n.
-## The desired circles are found by a random search, drawing at most N random
+## The desired cycles are found by a random search, drawing at most N random
 ## elements from grp.
 ## Thus if grp actually contains cycles of the desired shape, then the function does not
 ## return fail with a probability that grows as N grows.
