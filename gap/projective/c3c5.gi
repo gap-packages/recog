@@ -363,9 +363,10 @@ RECOG.ForceToOtherField := function(m,field)
       if IsBool(q) then
         if fieldsize <= 256 or not ForAll(w, x -> x in field) then
           return fail;
+        elif fieldsize <= MAXSIZE_GF_INTERNAL then
+          # Convert to the internal representation of FFEs.
+          w:= List( w, AsInternalFFE );
         fi;
-        # TODO: if fieldsize <= MAXSIZE_GF_INTERNAL we should at least make sure all
-        # matrix entries are in internal rep
       elif (fieldsize mod q) <> 0 then
           return fail;
       fi;
