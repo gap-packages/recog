@@ -164,7 +164,14 @@ FindBaseC2 := function( field, qf )
 
 end;
 
-
+# Helper function which tries to compute the order of a matrix group G
+# treated as a projective group. The result may be too small, but it
+# will divide the actual order.
+RECOG.EstimateProjOrder := function(G)
+  local S;
+  S := StabilizerChain(G,rec( Projective := true ));
+  return Size(S);
+end;
 
 # The naming algorithm for classical groups is divided into two
 # parts: A version that applies to classical groups for sufficiently
@@ -780,7 +787,8 @@ function(recognise, grp)
             recognise.needForms := true;
             return NotEnoughInformation;
         fi;
-        i := 1;  found := false;
+        i := 1;
+        found := false;
         while not found and  i <= Length(recognise.ClassicalForms) do
            phi := recognise.ClassicalForms[i];
            if IsSesquilinearForm(phi)  then
@@ -1764,11 +1772,10 @@ function(recognise, grp)
     return CheckFlag();
 end);
 
-
 BindRecogMethod(FindHomMethodsClassical, "NonGenericOrthogonalPlus",
 "tests whether group is non-generic O+",
 function(recognise,grp)
-    local d, q, gp1, gp2, CheckFlag, pgrp, sc, orbs, isHypForm, ol;
+    local d, q, gp1, gp2, CheckFlag, pgrp, sc, isHypForm, ol;
 
     isHypForm := f -> IsSesquilinearForm(f) and IsHyperbolicForm(f);
 
@@ -1832,12 +1839,11 @@ function(recognise,grp)
         fi;
 
         pgrp := ProjectiveActionOnFullSpace( grp, recognise.field, d );
-        orbs := Orbits( pgrp, MovedPointsPerms( GeneratorsOfGroup(pgrp)));
 
         # Both the conformal orthogonal and the omega for d = 8 and q = 2 have
         # orbits of these lengths. The maximal subgroups of the conformal
         # orthogonal don't have these orbit lengths.
-        if Set(orbs,Length) <> [ 120, 135 ] then
+        if OrbitLengthsDomain(pgrp) <> [ 120, 135 ] then
            recognise.isOmegaContained := false;
            return NeverApplicable;
         fi;
@@ -1852,9 +1858,7 @@ function(recognise,grp)
         if not HasElementsMultipleOf( recognise.orders, [7,13])  then
             return TemporaryFailure;
         fi;
-        pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
-        StabChain(pgrp, rec(random := 200, limit := 4952179814400));
-        if Size(pgrp) mod 4952179814400 = 0 then # compare to Size(POmega(+1,8,3))
+        if RECOG.EstimateProjOrder(grp) mod 4952179814400 = 0 then # compare to Size(POmega(+1,8,3))
              return CheckFlag();
         else
              recognise.isOmegaContained := false;
@@ -1881,13 +1885,12 @@ function(recognise,grp)
         # Thus we compute the projective action of grp and then compare
         # the size of resulting stabilizer chain to the size of POmega(+1,8,5).
         #
-        # Note that 39000 is the maximal orbit length of a maximal subgroup
-        pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
         # Note: Size(POmega(+1,8,5)) = 8911539000000000000
-        if  Size(pgrp) mod 8911539000000000000 = 0 then
+        if RECOG.EstimateProjOrder(grp) mod 8911539000000000000 = 0 then
              return CheckFlag();
         else
-             return TemporaryFailure;
+             recognise.isOmegaContained := false;
+             return NeverApplicable;
         fi;
     elif d = 8 and (q = 4 or q > 5) then
         if not 6 in recognise.LB then
@@ -1963,8 +1966,7 @@ function(recognise,grp)
         if not ol in [60,75,180] then
             return NeverApplicable;
         fi;
-        pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
-        if Size(pgrp) mod 3600 <> 0 then
+        if RECOG.EstimateProjOrder(grp) mod 3600 <> 0 then
              recognise.isOmegaContained := false;
              return NeverApplicable;
         fi;
@@ -1991,8 +1993,7 @@ function(recognise,grp)
 
         ## The projective Group has half order of Omega
         ## Fix 4.7.2019
-        pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
-        if Size(pgrp) mod 3600 <> 0 then
+        if RECOG.EstimateProjOrder(grp) mod 3600 <> 0 then
             recognise.isOmegaContained := false;
             return NeverApplicable;
         else
@@ -2007,8 +2008,7 @@ function(recognise,grp)
             return NeverApplicable;
         fi;
 
-        pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
-        if Size(pgrp) mod 28224  <> 0 then
+        if RECOG.EstimateProjOrder(grp) mod 28224 <> 0 then
             recognise.isOmegaContained := false;
             return NeverApplicable;
         fi;
@@ -2033,8 +2033,7 @@ function(recognise,grp)
             return NeverApplicable;
         fi;
 
-        pgrp := Image(ProjectiveActionHomomorphismMatrixGroup(grp));
-        if Size(pgrp) mod 129600 <> 0 then
+        if RECOG.EstimateProjOrder(grp) mod 129600 <> 0 then
             recognise.isOmegaContained := false;
             return NeverApplicable;
         else
@@ -2053,7 +2052,7 @@ end);
 BindRecogMethod(FindHomMethodsClassical, "NonGenericOrthogonalMinus",
 "tests whether group is non-generic O-",
 function(recognise, grp)
-    local d, q,  orbs, pgrp, h,  g, ppd,  CheckFlag, isEllForm;
+    local d, q,  pgrp, h,  g, ppd,  CheckFlag, isEllForm;
 
 
     isEllForm := f -> IsSesquilinearForm(f) and IsEllipticForm(f);
@@ -2126,8 +2125,7 @@ function(recognise, grp)
             return TemporaryFailure;
         fi;
         pgrp := ProjectiveActionOnFullSpace( grp, GF(3), 4 );
-        orbs := Orbits( pgrp, MovedPointsPerms( GeneratorsOfGroup(pgrp)));
-        if Length(orbs) >  3 then # ACN 10/6/08
+        if Length(OrbitLengthsDomain(pgrp)) > 3 then # ACN 10/6/08
             recognise.isOmegaContained := false;
             return NeverApplicable;
          fi;
