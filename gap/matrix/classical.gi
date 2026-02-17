@@ -2508,9 +2508,6 @@ DisplayRecog := function( r )
            if Length(r.E2) > 0 then
                Print("E2 : ", r.E2, "\n" );
            fi;
-           if Length(r.BE2) > 0 then
-               Print("BE2 : ", r.BE2, "\n" );
-           fi;
            if r.isNotMathieu <> "unknown" then
                Print( "Mathieu ruled out: ", r.isNotMathieu, "\n");
            fi;
