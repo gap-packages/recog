@@ -936,3 +936,55 @@ gap> ri.isNotPSL;
 true
 gap> ri.isSLContained;
 "unknown"
+
+# some maximal subgroups of the conformal group CGO^+(8,5)
+gap> ri := RecogniseClassical(maxes_cgo_plus_8_5[1]);;
+gap> ri.isNotPSL;
+true
+gap> ri.isSLContained;
+"unknown"
+gap> ri.isOmegaContained;
+false
+gap> ri.isSUContained;
+false
+gap> ri.isSpContained;
+"unknown"
+
+#
+gap> ri := RecogniseClassical(maxes_cgo_plus_8_5[2]);;
+gap> ri.isNotPSL;
+true
+gap> ri.isSLContained;
+"unknown"
+gap> ri.isOmegaContained;
+false
+gap> ri.isSUContained;
+false
+gap> ri.isSpContained;
+"unknown"
+
+#
+gap> ri := RecogniseClassical(maxes_cgo_plus_8_5[3]);;
+gap> ri.isNotPSL;
+true
+gap> ri.isSLContained;
+"unknown"
+gap> ri.isOmegaContained;
+false
+gap> ri.isSUContained;
+false
+gap> ri.isSpContained;
+"unknown"
+
+#
+gap> ri := RecogniseClassical(maxes_cgo_plus_8_5[4]);;
+gap> ri.isNotPSL;
+true
+gap> ri.isSLContained;
+"unknown"
+gap> ri.isOmegaContained;
+false
+gap> ri.isSUContained;
+false
+gap> ri.isSpContained;
+"unknown"
