@@ -82,11 +82,7 @@ RECOG.FindStdGens_SL := function(sld)
         Info(InfoRecog,2,
             "Recognising this SL2 constructively in 2 dimensions...");
         sl2genss := GeneratorsWithMemory(sl2genss);
-        if IsEvenInt(q) then
-            resl2 := RECOG.RecogniseSL2NaturalEvenChar(Group(sl2genss),f,false);
-        else
-            resl2 := RECOG.RecogniseSL2NaturalOddCharUsingBSGS(Group(sl2genss),f);
-        fi;
+        resl2 := RECOG.ConRecogNaturalSL2(Groupt(sl2gens),f);
         slpsl2std := SLPOfElms(resl2.all);
         bas := resl2.bas * bas;
         # We need the actual transvections:
@@ -185,11 +181,8 @@ RECOG.FindStdGensSmallerMatrices_SL := function(sld)
         Info(InfoRecog,2,
             "Recognising this SL2 constructively in 2 dimensions...");
         sl2genss := GeneratorsWithMemory(sl2genss);
-        if IsEvenInt(q) then
-            resl2 := RECOG.RecogniseSL2NaturalEvenChar(Group(sl2genss),f,false);
-        else
-            resl2 := RECOG.RecogniseSL2NaturalOddCharUsingBSGS(Group(sl2genss),f);
-        fi;
+        resl2 := RECOG.ConRecogNaturalSL2(Group(sl2genss),f);
+
         slpsl2std := SLPOfElms(resl2.all);
         if resl2.bas <> [[1,0],[0,1]]*One(f) then
         Error("So i have to deal with this case...");
