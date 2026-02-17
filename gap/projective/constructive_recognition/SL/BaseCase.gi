@@ -727,7 +727,7 @@ if diag^res[2] = true_diag and u1^res[2] = true_u1 and u2^res[2] = true_u2 then
 break; 
 fi;
 od;
-Print("i = " , i ,"\n");
+
 if IsEvenInt(q) then
 ## even characteristic: conjugation by diag generates all of GF(q)* directly
 lmat := [];
@@ -769,14 +769,6 @@ od;
 fi;
 basi := res[2];
 bas := basi^(-1);
-Print("umats: \n");
-for i in [1..Length(umat)] do
-Display(umat[i]^basi);
-od;
-Print("lmats: \n");
-for i in [1..Length(lmat)] do
-Display(lmat[i]^basi);
-od;
 result :=  rec( g := G, t := lmat, s := umat, bas := bas, basi := basi,
               one := One(f), a := umat[1]*lmat[1]*umat[1], b := One(umat[1]),
 One := One(umat[1]), f := f, q := q, p := Characteristic(f), ext := j,
