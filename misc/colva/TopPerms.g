@@ -64,7 +64,7 @@ while (HasParentRecogNode(nri)) do
   perms:= List(pregensfac(nri), x ->MySocleAction(soc,x));
 
   #first do the case where this is not a new action - must belong to a lower
-  #image group or be trivial.
+  #image or be trivial.
   if IsSubgroup(P, GroupWithGenerators(perms)) then
     if HasTFordered(ImageRecogNode(KernelRecogNode(nri))) and (ImageRecogNode(KernelRecogNode(nri))!.TFordered = "Socle") then
       #don't reorder, just label this as the beginning of Pker

@@ -348,9 +348,10 @@ RECOG.BaseChangeForSmallestPossibleField := function(grp,mtx)
   return rec( newgens := newgens, field := f, t := b, ti := bi );
 end;
 
-RECOG.ForceToOtherField := function(m,fieldsize)
-  local n,v,w,q;
+RECOG.ForceToOtherField := function(m,field)
+  local fieldsize,n,v,w,q;
   n := [];
+  fieldsize := Size(field);
   for v in m do
       w := List(v,x->x);  # this unpacks
       # Note: we used to call ConvertToVectorRep(w,fieldsize), which
@@ -359,19 +360,25 @@ RECOG.ForceToOtherField := function(m,fieldsize)
       # to resort to the following, which is somewhat less efficient if
       # some rows are already defined over subfields.
       q := ConvertToVectorRep(w);
-      if q = fail or (fieldsize mod q) <> 0 then
+      if IsBool(q) then
+        if fieldsize <= 256 or not ForAll(w, x -> x in field) then
+          return fail;
+        fi;
+        # TODO: if fieldsize <= MAXSIZE_GF_INTERNAL we should at least make sure all
+        # matrix entries are in internal rep
+      elif (fieldsize mod q) <> 0 then
           return fail;
       fi;
       Add(n,w);
   od;
-  ConvertToMatrixRep(n,fieldsize);
+  ConvertToMatrixRep(n,field);
   return n;
 end;
 
 RECOG.HomDoBaseAndFieldChange := function(data,el)
   local m;
   m := data.t * el * data.ti;
-  return RECOG.ForceToOtherField(m,Size(data.field));
+  return RECOG.ForceToOtherField(m,data.field);
 end;
 
 RECOG.HomDoBaseAndFieldChangeWithScalarFinding := function(data,el)
@@ -380,7 +387,7 @@ RECOG.HomDoBaseAndFieldChangeWithScalarFinding := function(data,el)
   p := PositionNonZero(m[1]);
   m := (m[1][p]^-1) * m;     # this gets rid of any possible scalar
                              # from some bigger field
-  return RECOG.ForceToOtherField(m,Size(data.field));
+  return RECOG.ForceToOtherField(m,data.field);
 end;
 
 #! @BeginChunk Subfield

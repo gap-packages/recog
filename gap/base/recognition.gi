@@ -745,7 +745,7 @@ InstallGlobalFunction( CalcNiceGensHomNode,
   # function for the situation on a homomorphism node (non-Leaf):
   function(ri, origgens)
     local nicegens, kernelgens;
-    # compute preimages of the nicegens of the image group
+    # compute preimages of the nicegens of the image
     nicegens := CalcNiceGens(ImageRecogNode(ri), origgens);
     # Is there a non-trivial kernel? then add its nicegens
     if HasKernelRecogNode(ri) and KernelRecogNode(ri) <> fail then
