@@ -29,12 +29,12 @@ gap> testFindCyclesFail := function(G, lenList, N)
 # Test groups where we should find all cycles (with very high probability)
 gap> for i in [1..5] do
 >  testFindCyclesNoFail(SymmetricGroup(3), [2,3], 10000);
->  testFindCyclesNoFail(SymmetricGroup(5), [3,5], 10000);
->  testFindCyclesNoFail(SymmetricGroup(10), [2,3,5,7,10], 10000);
->  testFindCyclesNoFail(SymmetricGroup(53), [3,11,23,53], 10000);
+>  testFindCyclesNoFail(SymmetricGroup(5), [3,4,5], 10000);
+>  testFindCyclesNoFail(SymmetricGroup(10), [2,3,5,7,9,10], 10000);
+>  testFindCyclesNoFail(SymmetricGroup(53), [3,11,23,52,53], 10000);
 >  testFindCyclesNoFail(AlternatingGroup(3), [3], 10000);
 >  testFindCyclesNoFail(AlternatingGroup(5), [3,5], 10000);
->  testFindCyclesNoFail(AlternatingGroup(10), [3,5,7], 10000);
+>  testFindCyclesNoFail(AlternatingGroup(10), [3,5,7,9], 10000);
 >  testFindCyclesNoFail(AlternatingGroup(53), [3,11,23,53], 10000);
 > od;
 
