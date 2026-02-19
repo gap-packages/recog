@@ -20,6 +20,74 @@
 DeclareInfoClass( "InfoGiants" );
 SetInfoLevel( InfoGiants, 1 );
 
+#########################################################################
+## For a permutation group grp on n points and a list lenList of integers,
+## returns either a list cycList of equal length such that cycList[i] is a
+## cycle of length lenList[i] for all 1 <= i <= Length(lenList), or fail.
+## Each entry of lenList must be either a prime number or n or n-1. Further,
+## each entry must be at least 2.
+## The desired cycles are found by a random search, drawing at most N random
+## elements from grp.
+## Thus if grp actually contains cycles of the desired shape, then the function
+## succeeds with a probability that grows as N grows.
+RECOG.FindCycles := function ( grp, lenList, N )
+
+    local mp, n, cycList, rand, cyclen, i, k, orders, finished;
+
+    mp := MovedPoints(grp);
+    n := Length(mp);
+    cycList := [];
+
+    finished := false;
+    while N > 0 and not finished do
+        N := N - 1;
+        rand := PseudoRandom( grp );
+        # If cyclen[i] is bound, it is the number of cycles of length i+1 in rand.
+        # Otherwise rand has no cycle of length i+1.
+        cyclen := CycleStructurePerm(rand);
+        # If `finished` is not changed to false in the following loop, then we are done
+        finished := true;
+        for i in [1..Length(lenList)] do
+            if not IsBound(cycList[i]) then # no cycle of desired length has been found yet
+                k := lenList[i];
+                # Check that rand contains exactly one cycle of length k and
+                # no cycle whose length is a proper multiple of k
+                if IsBound(cyclen[k-1]) and cyclen[k-1] = 1 then
+                    if k = n-1 or k = n then
+                        # The existence of a full cycle in rand guarantees that
+                        # rand is equal to this full cycle.
+                        cycList[i] := rand;
+                    else
+                        # set orders to the list of all l>=2 such that rand contains an l-cycle and
+                        #  l<>k. Since rand contains a k-cycle, we only have to check up to n-k.
+                        orders := Filtered([2..n-k],x->IsBound(cyclen[x-1]) and x<>k);
+                        if ForAll(orders, x->(x=k) or (x mod k <> 0)) then
+                            if IsEmpty(orders) then
+                                cycList[i] := rand; # rand is a k-cycle
+                            else
+                                # Raising to the power of Lcm(orders) kills all cycles of rand
+                                # whose length is not k. Further, the condition that k
+                                # is a prime guarantees that every non-trivial power of
+                                # a k-cycle is a k-cycle. Thus rand^(Lcm(orders))
+                                # is a k-cycle.
+                                cycList[i] := rand^(Lcm(orders));
+                            fi;
+                        fi;
+                    fi;
+                fi;
+                if not IsBound(cycList[i]) then
+                    finished := false;
+                fi;
+            fi;
+        od;
+    od;
+
+    if finished then
+        return cycList;
+    else
+        return fail;
+    fi;
+end;
 
 #######################################################################
 ##
@@ -43,7 +111,7 @@ SetInfoLevel( InfoGiants, 1 );
 RECOG.NiceGeneratorsSn := function ( grp, N )
 
     local cyclen, fullCycle, transp, rand, orders, i, supp, suppNew, n, mp,
-        numTries;
+        numTries, cycles;
 
     mp := MovedPoints(grp);
     n := Length(mp);
@@ -53,58 +121,30 @@ RECOG.NiceGeneratorsSn := function ( grp, N )
     fi;
 
     # Random search for an n-cycle and a transposition in grp
-    fullCycle := fail;
-    transp := fail;
-    while (fullCycle = fail or transp = fail) and N > 0 do
-        N := N - 1;
-        rand := PseudoRandom( grp );
-        # If cyclen[i] is bound, it is the number of cycles of length i+1 in rand.
-        # Otherwise rand has no cycle of length i+1.
-        cyclen := CycleStructurePerm(rand);
-        # Is rand an n-cycle?
-        # Check that at least one n-cycle appears in the cycle decomposition of rand.
-        # In this case, rand must be equal to this n-cycle.
-        if fullCycle = fail and IsBound(cyclen[n-1]) then
-            fullCycle := rand;
-        fi;
-        # Can we construct a transposition from rand?
-        # Check that the cycle decomposition of rand contains exactly one 2-cycle
-        # and no cycle of length k where k is even and 4<=k<n.
-        if transp = fail and IsBound(cyclen[1]) and cyclen[1] = 1 then
-            # orders is a the list of all k>2 such that rand contains a k-cycle.
-            # Since rand contains a 2-cycle, we only have to check up to n-2.
-            orders := Filtered([3..n-2],x->IsBound(cyclen[x-1]));
-            if ForAll(orders, IsOddInt) then
-                if IsEmpty(orders) then # rand is a 2-cycle
-                    transp := rand;
-                else
-                    # Raising to the power of Lcm(orders) kills all cycles of
-                    # odd length. The single 2-cycle in rand remains
-                    transp := rand^(Lcm(orders));
-                fi;
-            fi;
-        fi;
-    od;
+    cycles := RECOG.FindCycles(grp, [2, n], N);
+    if cycles = fail then
+        return fail;
+    fi;
+    fullCycle := cycles[2];
+    transp := cycles[1];
 
     # Conjugate transp by random elements until we obtain a transposition that
     # interchanges successive elements of fullCycle.
-    if fullCycle <> fail and transp <> fail then
-        numTries := 10*n; # TODO: Why do we choose this constant?
-        supp := MovedPoints( transp ); # Support of transp
-        while numTries > 0 do
-            numTries := numTries-1;
-            rand := PseudoRandom( grp );
-            suppNew := List(supp, x->x^rand); # Support of transp^rand
-            # Check that transp^rand interchanges successive points of fullCycle,
-            # or equivalently, that fullCycle moves one point of transp^rand
-            # to the other one.
-            if suppNew[1]^fullCycle = suppNew[2]
-                or suppNew[2]^fullCycle = suppNew[1]
-            then
-                return [ fullCycle, transp^rand ];
-            fi;
-        od;
-    fi;
+    numTries := 10*n; # TODO: Why do we choose this constant?
+    supp := MovedPoints( transp ); # Support of transp
+    while numTries > 0 do
+        numTries := numTries-1;
+        rand := PseudoRandom( grp );
+        suppNew := List(supp, x->x^rand); # Support of transp^rand
+        # Check that transp^rand interchanges successive points of fullCycle,
+        # or equivalently, that fullCycle moves one point of transp^rand
+        # to the other one.
+        if suppNew[1]^fullCycle = suppNew[2]
+            or suppNew[2]^fullCycle = suppNew[1]
+        then
+            return [ fullCycle, transp^rand ];
+        fi;
+    od;
 
     return fail;
 
@@ -182,159 +222,162 @@ end;
 
 ########################################################################
 ##
-#F  NiceGeneratorsAnEven(<n>,<grp>,<N>) . . find (2,n-2)-cycle, 3-cycle
+#F  NiceGeneratorsAnEven(<grp>,<N>) . .
 ##
 ##
+## For a permutation group grp on n points, this function returns either fail
+## or a list [ longPerm, cyc3 ] such that the following hold:
+## - n > 3 and n is even.
+## - longPerm is the product of a 2-cycle and an (n-2)-cycle that are disjoint.
+## - cyc3 is a 3-cycle.
+## - The support of the 2-cycle in longPerm is contained in the support of cyc3.
+##   In other words, longPerm = (1,2)(3,...,n) and cyc3=(1,2,3) up to renaming
+##   the n points.
+## The conditions on [ longPerm, cyc3 ] imply that grp contains the full alternating
+## group on n points. Thus the function always returns fail if grp does not contain the
+## full alternating group, and also if n <= 3.
+## long, cyc3 are found by a random search, drawing at most N random
+## elements from grp.
+## Thus if grp contains the full alternating group on an even number of points, then the
+## function succeeds with a probability that grows as N grows.
 
-RECOG.NiceGeneratorsAnEven := function ( mp, grp, N )
+RECOG.NiceGeneratorsAnEven := function ( grp, N )
 
-    local l, t, cyclen, a, b, c, i, fp, suppb, others, g, h, n;
+    local mp, fp, supp3, others, n, cycles, cyc3, cyc3New, cycNm1, numTries, rand, a, b;
 
+    mp := MovedPoints(grp);
     n := Length(mp);
-    l := One(grp);
 
-    while N > 0 do
-        N := N - 1;
-        t := PseudoRandom( grp );
-        # was: cyclen := Collected( CycleLengths( t, [1..n] ) );
-        cyclen := CycleStructurePerm(t);
+    # Random search for an (n-1)-cycle (not an (n-2)-cycle!) and a 3-cycle
+    cycles := RECOG.FindCycles(grp, [3, n-1], N);
+    if cycles = fail then
+        return fail;
+    fi;
+    cyc3 := cycles[1]; # 3-cycle
+    cycNm1 := cycles[2]; # (n-1)-cycle ("Nm1" = "n minus 1")
 
-        # was: if IsBound(a) = false and [n-1,1] in cyclen then
-        if IsBound(a) = false and IsBound(cyclen[n-2]) then
-            # we found an $n-1$-cycle
-            a := t;
+    # Random search for a permutation rand such that the support of
+    # cyc3^rand contains the fixed point of cycNm1
+    numTries := 10*n; # TODO: Why do we choose this constant?
+    fp := Difference( mp, MovedPoints(cycNm1) )[1]; # Fixed point of cycNm1
+    supp3 := MovedPoints( cyc3 ); # Support of cyc3
+    while numTries > 0 do
+        numTries := numTries-1;
+        rand := PseudoRandom( grp );
+        if fp in List( supp3, x -> x^rand ) then # if fp in support of cyc3^rand
+            cyc3 := cyc3^rand; # We found the desired 3-cycle
+            # Define points a,b such that cyc3 = (fp, a, b)
+            a := fp^cyc3;
+            b := a^cyc3;
+            # Define a new 3-cycle cyc3New of the form (fp, c, d) for points c,d with c^cycNm1=d
+            if a^cycNm1 = b then
+                cyc3New := cyc3; 
+            elif b^cycNm1 = a then
+                cyc3New := cyc3^2; # = (fp, b, a)
+            else
+                # In this case, g := cyc3^cycNm1 has the form (fp, p, q)
+                # where {p=a^cycNm1,q^cycNm1} is disjoint from {a,b}. Hence
+                # [g,cyc3] = g^-1 g^cyc3 = (fp,q,p) (a,p,q)=(fp,a,p).
+                cyc3New := Comm(cyc3^cycNm1,cyc3);
+            fi;
+            # Rename points so that fp=1, c=2, d=3, cycNm1=(2,...,n). Then
+            # cyc3New = (1,2,3), cycNm1*cyc3New=(2,...,n)*(1,2,3)=(1,2)(3,...,n).
+            return [ cycNm1 * cyc3New, cyc3New ];
         fi;
-
-        if IsBound(b) = false and IsBound(cyclen[2]) and cyclen[2] = 1 and
-               # Filtered( cyclen, x -> x[1] mod 3 = 0 ) = [ [ 3,1 ] ]
-               ForAll( [2..QuoInt(n,3)], x->not IsBound(cyclen[3*x-1]) )
-        then
-            # we can get a $3$-cycle
-            #b := t^(Lcm(List(cyclen,x->x[1]))/3);
-            b := t^(Lcm(Filtered([2..n],x->IsBound(cyclen[x-1])))/3);
-        fi;
-
-        if IsBound(a) and IsBound(b) then
-            i := 10*n;
-            fp := Difference( mp, MovedPoints(a) )[1];
-            suppb:= MovedPoints( b );
-            while i > 0 do
-                i := i-1;
-                t := PseudoRandom( grp );
-                if fp in List( suppb, x -> x^t ) then
-                    c := b^t;
-                    others := [ fp^c, (fp^c)^c ];
-                    if others[1]^a = others[2] then
-                        h := c;
-                    elif others[2]^a = others[1] then
-                        h := c^2;
-                    else
-                        h := Comm(c^a,c);   # h = (1,i,i+1)
-                    fi;
-                    g := a * h;
-                    return [ g, h ];
-                fi;
-            od; # while
-
-            return fail;
-        fi;
-
-    od; # loop over random elements
-
+    od;
     return fail;
-
 end;
-
 
 #########################################################################
 ##
-#F  NiceGeneratorsAnOdd(<n>,<grp>,<N>) . . . . find (n-2)-cycle, 3-cycle
+#F  NiceGeneratorsAnOdd(<grp>,<N>) . . . . find (n-2)-cycle, 3-cycle
 ##
 ##
+## For a permutation group grp on n points, this function returns either fail
+## or a list [ longCycle, shortCycle ] such that the following hold:
+## - n > 4 and n is odd.
+## - longCycle is an (n-2)-cycle.
+## - shortCycle is a 3-cycle.
+## - The supports of longCycle and shortCycle intersect in a single point. In
+##   other words, longCycle = (3,...,n) and shortCycle=(1,2,3) up to renaming
+##   the n points.
+## The conditions on [ longCycle, shortCycle ] imply that grp contains the full alternating
+## group on n points. Thus the function always returns fail if grp does not contain the
+## full alternating group, and also if n <= 4.
+## longCycle, shortCycle are found by a random search, drawing at most N random
+## elements from grp.
+## Thus if grp contains the full alternating group on an odd number of points, then the
+## function does not return fail with a probability that grows as N grows.
 
-RECOG.NiceGeneratorsAnOdd := function ( mp, grp, N )
+RECOG.NiceGeneratorsAnOdd := function ( grp, N )
 
-    local l, t, cyclen, a, b, i, suppb, suppc, suppca, imc, h, g, n;
+    local cyclen, cycN, cyc3, cyc3Cons, cyc3New, cyc3NewNew, rand, supp3, supp3New, 
+        supp3NewShifted, numConsecutives, cycles, numTries, n;
 
-    n := Length(mp);
-    l := One(grp);
+    n := Length(MovedPoints(grp));
 
-    while N > 0 do
-        N := N - 1;
-        t := PseudoRandom( grp );
-        # was: cyclen := Collected( CycleLengths( t, [1..n] ) );
-        cyclen := CycleStructurePerm(t);
+    # Random search for an n-cycle (not an (n-2)-cycle!) and a 3-cycle
+    cycles := RECOG.FindCycles(grp, [3, n], N);
+    if cycles = fail then
+        return fail;
+    fi;
+    cyc3 := cycles[1]; # 3-cycle
+    cycN := cycles[2]; # n-cycle
 
-        if IsBound(a) = false and IsBound(cyclen[n-1]) then
-            # we found an $n$-cycle
-            a := t;
+    # Random search for cyc3Cons, a 3-cycle that moves 3 consecutive points of cycN.
+    # In the following comments, we assume that the points in mp are renamed
+    # so that cycN = (1,...,n). We look for a cycle of the form (i,i+1,i+2) (mod n).
+    numTries := 10*n; # TODO: Why do we choose this constant?
+    supp3 := MovedPoints( cyc3 );
+    cyc3Cons := fail;
+    while numTries > 0 and cyc3Cons = fail do
+        numTries := numTries-1;
+        rand := PseudoRandom( grp );
+        # support of cyc3New:=cyc3^rand, say [i,j,k].
+        # We will compute cyc3New only later because we might not need it.
+        supp3New := List( supp3, x -> x^rand );
+        # support of cyc3New^cycN, so [i,j,k]^cycN=[i+1,j+1,k+1] (mod n)
+        supp3NewShifted := List( supp3New, x -> x^cycN );
+        # Number of p \in [i,j,k] s.t. p+1 \in [i,j,k] (mod n)
+        numConsecutives := Length( Intersection( supp3New, supp3NewShifted ) );
+        if numConsecutives = 2 then
+            # In this case, {i,j,k} = {p,p+1,p+2} for some p.
+            # Thus cyc3New is either (p,p+1,p+2) or (p,p+2,p+1) (mod n).
+            cyc3New := cyc3^rand;
+            if ForAny(supp3New, x->x^cycN=x^cyc3New) then
+                # In this case, cyc3New = (p,p+1,p+2) (mod n).
+                # I.e. cyc3New moves points in same order as cycN.
+                cyc3Cons := cyc3New;
+            else
+                # In this case, cyc3New = (p,p+2,p+1) (mod n).
+                cyc3Cons := cyc3New^2; # = cyc3New^-1
+            fi;
+        elif numConsecutives = 1 then
+            # In this case, {i,j,k}={p,p+1,q} (mod n) for some p,q
+            # with q not in [p-1,p+2] (mod n).
+            # Again, cyc3New is either (p,p+1,q) or (p,q,p+1) (mod n).
+            cyc3New := cyc3^rand;
+            # We define cyc3NewNew to be (p,p+1,q):
+            if ForAny(supp3New, x->x^cycN=x^cyc3New) then
+                # In this case, cyc3New = (p,p+1,q) (mod n)
+                cyc3NewNew := cyc3^rand;
+            else
+                # In this case, cyc3New = (p,q,p+1) (mod n)
+                cyc3NewNew := (cyc3^rand)^2;
+            fi;
+            cyc3Cons := Comm( cyc3NewNew^2, cyc3NewNew^cycN );
+            # = cyc3NewNew^-2 * (cyc3NewNew^2)^(cyc3NewNew^cycN)
+            # = (p,p+1,q)*(p,q,p+2) = (p,p+1,p+2)
         fi;
+    od;
 
-        if IsBound(b) = false and IsBound(cyclen[2]) and cyclen[2] = 1 and
-               # was: Filtered( cyclen, x -> x[1] mod 3 = 0 ) = [ [ 3,1 ] ]
-               ForAll( [2..QuoInt(n,3)], x->not IsBound(cyclen[3*x-1]) )
-        then
-            # we can get a $3$-cycle
-            #b := t^(Lcm(List(cyclen,x->x[1]))/3);
-            b := t^(Lcm(Filtered([2..n],x->IsBound(cyclen[x-1])))/3);
-        fi;
-
-        if IsBound(a) and IsBound(b) then
-            i := 10*n;
-            suppb := MovedPoints( b );
-            while i > 0 do
-                i := i-1;
-                t := PseudoRandom( grp );
-
-                suppc := List( suppb, x -> x^t );
-                # support of c=b^t, say [i,j,k]
-
-                suppca := List( suppc, x -> x^a );
-                # support of c^a, so [i^a,j^a,k^a]
-
-                imc := List( suppc, x -> ((x^(t^-1))^b)^t );
-                # [i^c,j^c,k^c]
-
-                if Length( Intersection( suppc, suppca ) ) = 2 then
-                    # so c=b^t moves three consecutive points of a
-                    if  suppca[1] = imc[1] or
-                        suppca[2] = imc[2] or
-                        suppca[3] = imc[3] then
-                        # so c moves points in same order as a
-                        h := b^t;
-                    else
-                        # so c moves points in opposite order to a
-                        h := (b^2)^t;
-                    fi;
-                elif Length( Intersection( suppc, suppca ) ) = 1 then
-                    # so c=b^t moves only two consecutive points of a
-                    if suppca[1] = imc[1] or
-                       suppca[2] = imc[2] or
-                       suppca[3] = imc[3] then
-                        # so c moves points in same order as a
-                        h := b^t;
-                        h := Comm( h^2, h^a );
-                    else
-                        # so c moves points in opposite order to a
-                        h := b^t;
-                        h := Comm( h, (h^a)^2 );
-                    fi;
-                fi;
-
-                if IsBound( h ) then
-                    g := a * h^2;
-                    return [ g, h ];
-                fi;
-
-            od; # while
-
-            return fail;
-        fi;
-
-    od; # loop over random elements
-
-    return fail;
-
+    if cyc3Cons <> fail then
+        # cycN * cyc3Cons^2 = (1,...,n)*(p,p+2,p+1)=(1,...,p-1,p+2,p+3,...,n)
+        # = (n-2)-cycle whose support intersects [p,p+1,p+2] in one point.
+        return [ cycN * cyc3Cons^2, cyc3Cons];
+    else
+        return fail;
+    fi;
 end;
 
 
@@ -453,9 +496,9 @@ RECOG.RecogniseAn :=  function( mp, grp, eps )
         N := Int(24 * (4/3)^3 * le * 6 * n);
 
         if n mod 2 = 0 then
-            gens := RECOG.NiceGeneratorsAnEven( mp, grp, N );
+            gens := RECOG.NiceGeneratorsAnEven( grp, N );
         else
-            gens := RECOG.NiceGeneratorsAnOdd( mp, grp, N );
+            gens := RECOG.NiceGeneratorsAnOdd( grp, N );
         fi;
 
         if gens = fail then
