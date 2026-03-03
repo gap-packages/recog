@@ -445,7 +445,7 @@ end;
 RECOG.HomCommutator := function(data,el)
   local y;
   y := Comm(data.x,el);
-  if RECOG.IsScalarMat(y) = false then
+  if not RECOG.IsScalarMat(y) then
       return fail;
   fi;
   return ExtractSubMatrix(y,[1],[1]);
@@ -479,7 +479,7 @@ function(ri, G)
   for i in [1..10] do
       x := Comm(PseudoRandom(G),PseudoRandom(G));
       Add(coms,x);
-      if RECOG.IsScalarMat(x) = false then scalar := false; fi;
+      if not RECOG.IsScalarMat(x) then scalar := false; fi;
   od;
   # Let N to be the normaliser of Group(coms) in G, N is a normal subgroup
   # of G which is contained in G'.
@@ -491,7 +491,7 @@ function(ri, G)
                     # fact scalar or not!
       Info( InfoRecog, 3, "Suspect that G' is scalar, checking..." );
       i := 1;
-      while RECOG.IsScalarMat(gens[i]) <> false do
+      while RECOG.IsScalarMat(gens[i]) do
           i := i + 1;
       od;
       # It cannot happen that all matrices are scalar, because then
@@ -502,7 +502,7 @@ function(ri, G)
       while j <= Length(gens) do
           if j <> i then
               x := Comm(gens[i],gens[j]);
-              if RECOG.IsScalarMat(x) = false then
+              if not RECOG.IsScalarMat(x) then
                   Add(coms,x);
                   scalar := false;
                   Info( InfoRecog, 3, "NO! G' is not scalar after all!" );

@@ -275,7 +275,7 @@ end;
 #       timeout := timeout - 1;
 #       if timeout = 0 then return fail; fi;
 #       x := RECOG.FindInvolution(N);
-#       if x <> fail and RECOG.IsScalarMat(x) = false then
+#       if x <> fail and not RECOG.IsScalarMat(x) then
 #           break;
 #       fi;
 #   od;

@@ -21,7 +21,7 @@
 InstallGlobalFunction( IsOneProjective,
   function(m)
     Assert(1, NrRows(m) > 0 and NrRows(m) = NrCols(m));
-    return not IsZero(m[1,1]) and RECOG.IsScalarMat(m) <> false;
+    return not IsZero(m[1,1]) and RECOG.IsScalarMat(m);
   end );
 
 # Assumes <a> and <b> are non-empty equal-dimension square matrices over equal
@@ -55,14 +55,11 @@ RECOG.ProjectiveOrder := m -> ProjectiveOrder(m)[1];
 # <m> is a scalar matrix iff it is a scalar multiple of the identity matrix,
 # i.e. a diagonal square matrix with the same value along its main diagonal.
 #
-# If <m> is a scalar matrix, then this function returns the scalar that appears
-# on its main diagonal. Otherwise, this function returns <false>.
+# If <m> is a scalar matrix, then this function returns <true>. Otherwise, this
+# function returns <false>.
 RECOG.IsScalarMat := function(m)
   local x;
   Assert(1, NrRows(m) > 0 and NrRows(m) = NrCols(m));
   x := m[1,1];
-  if ForAny([2..NrRows(m)], i -> m[i,i] <> x) or not IsDiagonalMat(m) then
-    return false;
-  fi;
-  return x;
+  return ForAll([2..NrRows(m)], i -> m[i,i] = x) and IsDiagonalMat(m);
 end;

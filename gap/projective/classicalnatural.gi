@@ -279,7 +279,7 @@ InstallMethod( Eigenspaces, "for a field and a memory element matrix",
 #       o := Order(y);
 #       if o mod (q-1) = 0 then
 #           y := y^(o/(q-1));
-#           if RECOG.IsScalarMat(y) = false then break; fi;
+#           if not RECOG.IsScalarMat(y) then break; fi;
 #       fi;
 #   od;
 #   # Now y has order q-1 and n-2 dimensional eigenspace
@@ -1593,7 +1593,7 @@ RECOG.IsThisSL2Natural := function(gens,f)
       a := RECOG.RandomSubproduct(clos,rec());
       b := RECOG.RandomSubproduct(clos,rec());
       x := Comm(a,b);
-      if RECOG.IsScalarMat(x) = false then isabelian := false; break; fi;
+      if not RECOG.IsScalarMat(x) then isabelian := false; break; fi;
   od;
   if isabelian then
       Info(InfoRecog,4,
