@@ -495,6 +495,7 @@ end;
 ##  
 ##  Some comments:
 ##    - Does not work for q = 2,3,5
+## 
 ##    - To find short SLP to the nice generators we avoid 'PseudoRandom(g)'
 ##      and instead just start with the trivial element and multiply random
 ##      generators to it.
@@ -724,7 +725,7 @@ RECOG.ConRecogNaturalSL2 := function(G, f)
   ## retry until RecogNaturalSL2 returns generators matching the standard form
   ## TODO: Perhaps remove this for-loop
   for i in [1..100] do
-    res := RecogNaturalSL2(G,q);
+    res := RECOG.RecogNaturalSL2(G,q);
     nicegens :=List(res[1],a->ResultOfStraightLineProgram(a,GeneratorsOfGroup(G)));
     diag := nicegens[1];
     u1 := nicegens[2];
@@ -794,7 +795,7 @@ end;
 test_ConRecogNaturalSL2 := function(input)
   local i, G, list, qlist, res_old, res, f, q, valid;
   if Length(input) = 0 then
-    qlist := [2^3, 2^5, 3^4, 25, 17^3, 9967]; 
+    qlist := [2^3, 2^5, 3^4, 25, 17^3, 9967, 9967^3]; 
   else
     qlist := Filtered(input, IsPrimePowerInt);
   fi;
@@ -805,18 +806,14 @@ test_ConRecogNaturalSL2 := function(input)
     f := GF(q);
     list := [];
     for i in [1..5] do
-      Add(list, RandomInvertibleMat(2,f));
+      Add(list, Random(SL(2,q)));
     od;
     G := GroupWithGenerators(list);
-    if IsEvenInt(q) then
-      res_old := RECOG.RecogniseSL2NaturalEvenChar(G,f,false);
-    else
-      res_old := RECOG.RecogniseSL2NaturalOddCharUsingBSGS(G,f);
-    fi;
     res := RECOG.ConRecogNaturalSL2(G,f);
+    std := RECOG.MakeSL_StdGens(Characteristic(f),DegreeOverPrimeField(f),2,2);
     ## compare all generators after change of basis
     for i in [1..Length(res.all)] do
-      if res.all[i]^res.basi <> res_old.all[i]^res_old.basi then
+      if res.all[i]^res.basi <> std.all[i] then
         Print("Test failed for q = ", q, ", index i = ", i, " in the list \"all\" failed\n");
         valid := false;
       fi;
