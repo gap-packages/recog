@@ -818,7 +818,7 @@ test_ConRecogNaturalSL2 := function(input)
     for i in [1..Length(res.all)] do
       if res.all[i]^res.basi <> res_old.all[i]^res_old.basi then
         Print("Test failed for q = ", q, ", index i = ", i, " in the list \"all\" failed\n");
-          valid := false;
+        valid := false;
       fi;
     od;
   od;
