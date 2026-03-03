@@ -82,7 +82,7 @@ RECOG.FindStdGens_SL := function(sld)
         Info(InfoRecog,2,
             "Recognising this SL2 constructively in 2 dimensions...");
         sl2genss := GeneratorsWithMemory(sl2genss);
-        resl2 := RECOG.ConRecogNaturalSL2(Groupt(sl2gens),f);
+        resl2 := RECOG.ConRecogNaturalSL2(Group(sl2gens),f);
         slpsl2std := SLPOfElms(resl2.all);
         bas := resl2.bas * bas;
         # We need the actual transvections:
