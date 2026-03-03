@@ -153,69 +153,50 @@ end;
 
 ######################################################################
 ##
-#F  ConjEltSn(<n>,<g>,<h>) . . . element c s.t. g^c=(1..n), h^c=(1,2)
+#F  ConjEltSn(<grp>,<fullCycle>,<transp>)
 ##
 ##
+## For a permutation group grp and elements fullCycle, transp that satisfy the conditions
+## of NiceGeneratorsSn, returns a permutation conj such that 
+## fullCycle^conj = (1,...,n) and transp^conj=(1,2).
+## The permutation conj lies in SymmetricGroup(la) where la is the largest moved point
+## of grp. However, conj need not lie in grp (e.g. if 1 is not a moved point of grp).
+RECOG.ConjEltSn :=  function( grp, fullCycle, transp )
 
-RECOG.ConjEltSn :=  function( mp, g, h )
+    local c,i,la,n,rest,pos1,nextPos,suppTransp,mp;
 
-    local c,i,la,n,oo,pos,supp;
-
+    mp := MovedPoints(grp); # = MovedPoints(fullCycle)
     n := Length(mp);
     la := mp[n];   # this is the largest moved point
 
-    supp := MovedPoints( h );
+    suppTransp := MovedPoints( transp );
 
-    if supp[1]^g = supp[2] then pos := supp[1];
-    else pos := supp[2];
+    # Define pos1 to be the unique element of suppTransp that is mapped by fullCycle
+    # to the other element of suppTransp.
+    # Thus pos1 must be mapped to 1 by conj, and the other element of suppTransp is mapped to 2.
+    if suppTransp[1]^fullCycle = suppTransp[2] then
+        pos1 := suppTransp[1];
+    else
+        pos1 := suppTransp[2];
     fi;
 
+    ## We construct a list c that defines the desired permutation conj
     c := [];
+    # conj maps the elements of mp bijectively to [1..n], in the order prescribed by fullCycle.
+    # In particular, it maps pos1, pos1^fullCycle to 1, 2.
+    nextPos := pos1;
     for i in [ 1 .. n ] do
-        c[pos] := i;
-        pos := pos^g;
+        c[nextPos] := i;
+        nextPos := nextPos^fullCycle;
     od;
-    oo := Difference([1..la],mp);
-    for i in [1..Length(oo)] do
-        c[oo[i]] := i+n;
+    # The remaining points in [1..la] must be mapped bijectivey to [n+1..la] to ensure that
+    # conj is a permutation. However, the precise values of individual points are irrelevant.
+    rest := Difference([1..la],mp);
+    for i in [1..Length(rest)] do
+        c[rest[i]] := i+n;
     od;
 
     return PermList( c );
-
-end;
-
-
-######################################################################
-##
-#F  RecogniseSn(<n>, <grp>, <N>) . . . . . . recognition function
-##
-##
-
-RECOG.RecogniseSn :=  function( mp, grp, eps )
-
-    local le, N, gens, c, n;
-
-    n := Length(mp);
-
-    le := 0;
-    while 2^le < eps^-1 do
-        le := le + 1;
-    od;
-
-    # TODO: Document these magic constants. They are probably from some paper.
-    # Also, Max Horn suggested that it may be better to use a smaller N.
-    N := Int(24 * (4/3)^3 * le * 6 * n);
-
-    gens := RECOG.NiceGeneratorsSn( grp, N );
-    if gens = fail then
-        Info(InfoGiants,1,"couldn't find nice generators for Sn");
-        return fail;
-    fi;
-
-    c := RECOG.ConjEltSn( mp, gens[1], gens[2] );
-
-    return rec( stamp := "Sn", degree := n,
-                gens := Reversed(gens),  conjperm := c );
 
 end;
 
@@ -383,57 +364,64 @@ end;
 
 #########################################################################
 ##
-#F  ConjEltAnEven(<n>,<g>,<h>) . . . c s.t. g^c=(1,2)(3..n), h^c=(1,2,3)
+#F  ConjEltAnEven(<grp>,<longPerm>,<cyc3>)
 ##
 ##
+## For a permutation group grp and elements longPerm, cyc3 that satisfy the conditions
+## of NiceGeneratorsAnEven, returns a permutation conj such that 
+## longPerm^conj = (1,2)(3,...,n) and cyc3^conj=(1,2,3).
+## The permutation conj lies in SymmetricGroup(la) where la is the largest moved point
+## of grp. However, conj need not lie in grp (e.g. if 1 is not a moved point of grp).
 
-RECOG.ConjEltAnEven := function( mp, g, h )
-    local c,i,la,n,oo,pos,s1,s1g,supp;
+RECOG.ConjEltAnEven := function( grp, longPerm, cyc3 )
+    local c,i,la,n,rest,pos,s1,s1lo,supp3,mp,p1,p2,p3;
 
+    mp := MovedPoints(grp);
     n := Length(mp);
     la := mp[n];    # this is the largest moved point
 
-    supp := MovedPoints(h);  # {i,j,k} where h=(i,j,k), i^g=j, j^g=i
-    s1 := supp[1];
-    s1g := s1^g;
+    # In the following, we denote by p1,p2,p3 the three points s.t. cyc3=(p1,p2,p3)
+    # and p1^longPerm=p2, p2^longPerm=p1.
+    # conj should map p1 to 1, p2 to 2, 3 to 3.
+    supp3 := MovedPoints(cyc3);  # = {p1,p2,p3} as a set, but not necessarily as a list
 
-    c := [];
-    if s1g in supp then      # {s1,s1g} = {i,j}
-        if s1^h = s1g then   # [s1,s1g] = [i,j]
-            c[s1] := 1;
-            c[s1g] := 2;
+    ## Identify which point in supp3 is p1, which one is p2, which one is p3.
+    # Note: p1 is the unique p in supp3 with p^longPerm=p^cyc3.
+    s1 := supp3[1];
+    s1lo := s1^longPerm;
+    if s1lo in supp3 then # if {s1,s1lo} = {p1,p2}
+        if s1^cyc3 = s1lo then # if [s1,s1lo] = [p1,p2]
+            p1 := s1;
+            p2 := s1lo;
         else
-            c[s1g] := 1;
-            c[s1] := 2;
+            p1 := s1lo;
+            p2 := s1;
         fi;
-        pos := Difference(supp,Set([s1,s1g]))[1];
-        for i in [3..n] do
-            c[pos] := i;
-            pos := pos^g;
-        od;
-        oo := Difference([1..la],mp);
-        for i in [1..Length(oo)] do
-            c[oo[i]] := i+n;
-        od;
-
-    else   # s1 = k
-        if supp[2]^h = supp[2]^g then
-            c[supp[2]] := 1;
-            c[supp[3]] := 2;
+    else   # if s1 = p3
+        if supp3[2]^cyc3 = supp3[2]^longPerm then # if supp3[2] = p1
+            p1 := supp3[2];
+            p2 := supp3[3];
         else
-            c[supp[3]] := 1;
-            c[supp[2]] := 2;
+            p1 := supp3[3];
+            p2 := supp3[2];
         fi;
-        pos := s1;
-        for i in [3..n] do
-            c[pos] := i;
-            pos := pos^g;
-        od;
-        oo := Difference([1..la],mp);
-        for i in [1..Length(oo)] do
-            c[oo[i]] := i+n;
-        od;
     fi;
+
+    ## Construct a list c that defines the permutation conj.
+    c := [];
+    c[p1] := 1;
+    c[p2] := 2;
+    pos := Difference(supp3,Set([p1,p2]))[1]; # = p3
+    for i in [3..n] do
+        c[pos] := i;
+        pos := pos^longPerm;
+    od;
+    # The remaining points in [1..la] must be mapped bijectivey to [n+1..la] to ensure that
+    # conj is a permutation. However, the precise values of individual points are irrelevant.
+    rest := Difference([1..la],mp);
+    for i in [1..Length(rest)] do
+        c[rest[i]] := i+n;
+    od;
 
     return PermList( c );
 
@@ -442,33 +430,42 @@ end;
 
 ######################################################################
 ##
-#F  ConjEltAnOdd(<n>,<g>,<h>) . . . . c s.t. g^c=(3..n), h^c=(1,2,3)
+#F  ConjEltAnOdd(<grp>,<longCycle>,<shortCycle>)
 ##
 ##
+## For a permutation group grp and elements longCycle, shortCycle that satisfy the conditions
+## of NiceGeneratorsAnOdd, returns a permutation conj such that 
+## longCycle^conj = (3,...,n) and shortCycle^conj=(1,2,3).
+## The permutation conj lies in SymmetricGroup(la) where la is the largest moved point
+## of grp. However, conj need not lie in grp (e.g. if 1 is not a moved point of grp).
 
-RECOG.ConjEltAnOdd := function( mp, g, h )
-    local c,compt,i,la,n,oo,pos;
+RECOG.ConjEltAnOdd := function( grp, longCycle, shortCycle )
+    local c,compt,i,la,n,rest,pos,mp;
 
+    mp := MovedPoints(grp);
     n := Length(mp);
     la := mp[n];   # this is the largest moved point
 
-    compt := Intersection( MovedPoints( g ), MovedPoints( h ) )[1];
-    # compt is the common point moved by both g and h : so becomes 3
-
+    # compt is the common point moved by both longCycle and shortCycle.
+    # It is mapped to 3 by conj.
+    compt := Intersection( MovedPoints( longCycle ), MovedPoints( shortCycle ) )[1];
+    
+    ## Construct a list c that defines the permutation conj.
     c := [];
-    c[ compt^h ] := 1;
-    c[ (compt^h)^h ] := 2;
-
+    # The points in MovedPoints(shortCycle) \ {compt} are mapped to 1 and 2.
+    c[ compt^shortCycle ] := 1;
+    c[ (compt^shortCycle)^shortCycle ] := 2;
+    # The points in MovedPoints(longCycle) are mapped to 3,...,n
     pos := compt;
-
     for i in [3..n] do
         c[pos] := i;
-        pos := pos^g;
+        pos := pos^longCycle;
     od;
-
-    oo := Difference([1..la],mp);
-    for i in [1..Length(oo)] do
-        c[oo[i]] := i+n;
+    # The remaining points in [1..la] must be mapped bijectivey to [n+1..la] to ensure that
+    # conj is a permutation. However, the precise values of individual points are irrelevant.
+    rest := Difference([1..la],mp);
+    for i in [1..Length(rest)] do
+        c[rest[i]] := i+n;
     od;
 
     return PermList(c);
@@ -478,62 +475,70 @@ end;
 
 ######################################################################
 ##
-#F  RecogniseAn(<n>, <grp>, <N>) . . . . . . recognition function
-##
-##
-
-RECOG.RecogniseAn :=  function( mp, grp, eps )
-
-        local le, N, gens, c, n;
-
-        n := Length(mp);
-
-        le := 0;
-        while 2^le < eps^-1 do
-            le := le + 1;
-        od;
-
-        N := Int(24 * (4/3)^3 * le * 6 * n);
-
-        if n mod 2 = 0 then
-            gens := RECOG.NiceGeneratorsAnEven( grp, N );
-        else
-            gens := RECOG.NiceGeneratorsAnOdd( grp, N );
-        fi;
-
-        if gens = fail then
-            Info(InfoGiants,1,"couldn't find nice generators for An");
-            return fail;
-        fi;
-
-        if n mod 2 = 0 then
-            c := RECOG.ConjEltAnEven( mp, gens[1], gens[2] );
-        else
-            c := RECOG.ConjEltAnOdd( mp, gens[1], gens[2] );
-        fi;
-
-        return rec( stamp := "An", degree := n,
-                    gens := Reversed(gens), conjperm := c );
-end;
-
-
-######################################################################
-##
-#F  RecogniseGiant(<n>, <grp>, <N>) . . . . . . recognition function
+#F  RecogniseGiant(<grp>, <eps>) . . . . . . recognition function
 ##
 ##
 ##  This is the main function.
-##  TODO: Document the precise meaning of the threshold eps. Does it come from a specific paper?
+##  For a permutation group grp, returns either fail or a record with the following entries:
+##  - stamp: either "Sn" or "An".
+##  - degree: An integer such that grp is isomorphic (as a permutation group) to
+##    S_degree if stamp="Sn" and to A_degree if stamp="An"
+##  - conjPerm: A permutation such that x -> x^conj is an isomorphism from grp to
+##    S_degree or A_degree
+##  - gens: Nice generators of grp. That is, the images of the following permutations
+##    under the isomorphisms described above:
+##    - (1,2), (1,...,degree) if stamp="Sn"
+##    - (1,2,3), (1,2)(3,...,degree) if stamp="An" and degree is even
+##    - (1,2,3), (3,...,degree) if stamp="An" and degree is odd
+##  The recognition is performed by a random search with threshold eps>0.
+##  The smaller eps is, the longer we search before we give up.
+##  TODO: Can we give more details on the threshold eps? Does it come from a specific paper?
 ##
 
-RECOG.RecogniseGiant :=  function( mp, grp, eps )
+RECOG.RecogniseGiant :=  function( grp, eps )
 
+    local le, N, gens, conj, n, conjFunc, grpName, infoString, mp;
+
+    mp := MovedPoints(grp);
+    n := Length(mp);
+
+    # Define le to be the smallest integer such that 2^le >= eps^-1
+    le := 0;
+    while 2^le < eps^-1 do
+        le := le + 1;
+    od;
+
+    # TODO: Document these magic constants. They are probably from some paper.
+    # Further, Max Horn suggested that it may be better to use a smaller N.
+    N := Int(24 * (4/3)^3 * le * 6 * n);
+
+    # If grp contains any element of negative sign, we try to recognise Sn, otherwise An.
+    # Recognition succeeds if and only if gens <> fail.
     if ForAny(GeneratorsOfGroup( grp ), x -> SignPerm(x) = -1) then
-        return RECOG.RecogniseSn( mp, grp, eps );
+        gens := RECOG.NiceGeneratorsSn( grp, N );
+        conjFunc := RECOG.ConjEltSn;
+        grpName := "Sn";
     else
-        return RECOG.RecogniseAn( mp, grp, eps );
+        grpName := "An";
+        if n mod 2 = 0 then
+            gens := RECOG.NiceGeneratorsAnEven( grp, N );
+            conjFunc := RECOG.ConjEltAnEven;
+        else
+            gens := RECOG.NiceGeneratorsAnOdd( grp, N );
+            conjFunc := RECOG.ConjEltAnOdd;
+        fi;
     fi;
 
+    if gens = fail then
+        infoString := Concatenation("couldn't find nice generators for ", grpName);
+        Info(InfoGiants,1,infoString);
+        return fail;
+    fi;
+
+    conj := conjFunc( grp, gens[1], gens[2] );
+
+    return rec( stamp := grpName, degree := n,
+                gens := Reversed(gens),  conjperm := conj );
 end;
 
 
@@ -816,7 +821,7 @@ function(ri, grp)
        args := [ri])];
 
     # Do constructive recognition for giants
-    res := RECOG.RecogniseGiant(mp,grpmem,RECOG.GiantEpsilon);
+    res := RECOG.RecogniseGiant(grpmem,RECOG.GiantEpsilon);
     if res = fail then
         return TemporaryFailure;
     fi;
