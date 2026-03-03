@@ -805,7 +805,7 @@ test_ConRecogNaturalSL2 := function(input)
     f := GF(q);
     list := [];
     for i in [1..5] do
-      Add(list, Random(SL(2,q)));
+      Add(list, RandomInvertibleMat(2,f));
     od;
     G := GroupWithGenerators(list);
     if IsEvenInt(q) then
