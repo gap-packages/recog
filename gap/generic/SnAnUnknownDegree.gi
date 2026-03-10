@@ -131,8 +131,10 @@ RECOG.HeuristicThreeCycleTest := function(ri, c, logInt2N, R)
         # c * c ^ r is a product of two three-cycles, so it should have order
         # 1, 2, 3 or 5.
         y := c * c ^ r;
-        yTo5 := y ^ 5;
-        if not isone(ri)(yTo5) and not isone(ri)(yTo5 * y) then
+        y2 := y^2;
+        if not isone(ri)(y2) then
+          y3 := y2 * y;
+          if not isone(ri)(y3) and not isone(ri)(y2 * y3) then
             return false;
         fi;
     od;
