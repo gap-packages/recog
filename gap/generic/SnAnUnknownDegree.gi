@@ -34,7 +34,7 @@
 ##      - If `M > N`, then we excluded `An`, `Sn`.
 ##      - If `M <= 6`, then we return `TemporaryFailure`.
 ##      - TODO: If `N > 20`, use Magma Code `GuessSnAnDegree` to guess the degree by element orders.
-##      - TODO: If `GuessSnAnDegree` was used, then we check if we can found
+##      - TODO: If `GuessSnAnDegree` was used, then we check if we can find
 ##        an element of order in the interval `[N - m, N + m]`.
 ##      - Otherwise, we continue.
 ##  - Now we can assume for the degree `n >= 7`. We need to ensure this, since
@@ -43,7 +43,7 @@
 ##  - Monte-Carlo: Try to compute standard generators and degree `n` of
 ##    largest `An < G` via the algorithm in [JLNP13].
 ##  - Try to compute an isomorphism from `G` to `An` or `Sn`.
-##      - If `n < 11`, then use methods from Jonathan Conder (phd thesis)
+##      - If `n < 11`, then use methods from [C12]
 ##      - Otherwise, we have `n >= 11` and use methods from `SnAnKnownDegree` in [BLGN+03]
 ##
 ##  Changes
@@ -119,6 +119,7 @@ end;
 
 # Return false if c can not be a three cycle. This uses cheap tests to
 # determine this. It is based on the Magma function heuristicThreeCycleTest.
+# R is a list of logInt2N+1 many random elements of the group of ri.
 RECOG.HeuristicThreeCycleTest := function(ri, c, logInt2N, R)
     local r, y, yTo5, k;
     c := StripMemory(c);
@@ -140,6 +141,7 @@ end;
 
 # ri : recognition node with group G
 # constants : a record with components M, B, T, C, K, L, and logInt2N
+# whose meaning is documented at the beginning of this file
 #
 # The following algorithm constructs a set of possible 3-cycles. It is based
 # on the simple observation that the product of two involutions t1, t2, which
