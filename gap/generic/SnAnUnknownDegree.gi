@@ -121,7 +121,7 @@ end;
 # determine this. It is based on the Magma function heuristicThreeCycleTest.
 # R is a list of logInt2N+1 many random elements of the group of ri.
 RECOG.HeuristicThreeCycleTest := function(ri, c, logInt2N, R)
-    local r, y, yTo5, k;
+    local r, y, y2, y3, yTo5, k;
     c := StripMemory(c);
     if not isone(ri)(c ^ 3) then
         return false;
@@ -136,6 +136,7 @@ RECOG.HeuristicThreeCycleTest := function(ri, c, logInt2N, R)
           y3 := y2 * y;
           if not isone(ri)(y3) and not isone(ri)(y2 * y3) then
             return false;
+          fi;
         fi;
     od;
     return true;
