@@ -53,6 +53,7 @@ ReadPackage("recog","gap/projective/almostsimple.gi");
 ReadPackage("recog","gap/projective/almostsimple/lietype.gi");
 ReadPackage("recog","gap/projective/almostsimple/hints.gi");
 ReadPackage("recog","gap/projective/classicalnatural.gi");
+ReadPackage("recog","gap/projective/sl.gi");
 ReadPackage("recog","gap/projective/AnSnOnFDPM.gi");
 
 # All the method installations are now here:
