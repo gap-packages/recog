@@ -17,24 +17,6 @@
 ##
 #############################################################################
 
-InstallMethod( CharacteristicPolynomial, "for a memory element matrix",
-  [ IsMatrix and IsObjWithMemory ],
-  function(m)
-    return CharacteristicPolynomial(m!.el);
-  end );
-
-InstallOtherMethod( \-, "for two memory elements",
-  [ IsMatrix and IsObjWithMemory, IsMatrix and IsObjWithMemory ],
-  function(m,n)
-    return m!.el - n!.el;
-  end );
-
-InstallMethod( Eigenspaces, "for a field and a memory element matrix",
-  [ IsField, IsMatrix and IsObjWithMemory ],
-  function( f, m )
-    return Eigenspaces(f,m!.el);
-  end );
-
 RECOG.FindStdGensUsingBSGS := function(g,stdgens,projective,large)
   # stdgens generators for the matrix group g
   # returns an SLP expressing stdgens in the generators of g
