@@ -17,23 +17,6 @@
 ##
 #############################################################################
 
-InstallMethod( CharacteristicPolynomial, "for a memory element matrix",
-  [ IsMatrix and IsObjWithMemory ],
-  function(m)
-    return CharacteristicPolynomial(m!.el);
-  end );
-
-InstallOtherMethod( \-, "for two memory elements",
-  [ IsMatrix and IsObjWithMemory, IsMatrix and IsObjWithMemory ],
-  function(m,n)
-    return m!.el - n!.el;
-  end );
-
-InstallMethod( Eigenspaces, "for a field and a memory element matrix",
-  [ IsField, IsMatrix and IsObjWithMemory ],
-  function( f, m )
-    return Eigenspaces(f,m!.el);
-  end );
 
 RECOG.FindStdGensUsingBSGS := function(g,stdgens,projective,large)
   # stdgens generators for the matrix group g
@@ -365,7 +348,7 @@ end;
 
 
 # TODO: which algorithm is this? reference?
-RECOG.FindStdGens_SL := function(sld,f)
+RECOG.FindStdGens_SL := function(sld)
   # gens of sld must be gens for SL(d,q) in its natural rep with memory
   # This function calls RECOG.SLn_constructsl2 and then extends
   # the basis to a basis of the full row space and calls
@@ -373,9 +356,10 @@ RECOG.FindStdGens_SL := function(sld,f)
   # that the SL(d,q) standard generators with respect to this basis are
   # expressed by the slp in terms of the original generators of sld.
   local V,b,bas,basi,basit,d,data,ext,fakegens,id,nu,nu2,p,q,resl2,sl2,sl2gens,
-        sl2gensf,sl2genss,sl2stdf,slp,slpsl2std,slptosl2,st,std,stdgens,i,ex;
+        sl2gensf,sl2genss,sl2stdf,slp,slpsl2std,slptosl2,st,std,stdgens,i,ex,f;
 
   # Some setup:
+  f := FieldOfMatrixGroup(sld);
   p := Characteristic(f);
   q := Size(f);
   ext := DegreeOverPrimeField(f);
@@ -927,13 +911,13 @@ RECOG.SLn_constructsl4:=function(g,dim,q,r)
   local s,h,count,readydim4,readydim3,ready,u,orderu,
         nullr,nulls,nullspacer,nullspaces,int,intbasis,nullintbasis,
         newu,newbasis,newbasisinv,newr,news,outputu,mat,i,shorts,shortr;
-  nullr:=NullspaceMat(r-One(r));
+  nullr:=NullspaceMat(StripMemory(r)-One(StripMemory(r)));
   nullspacer:=VectorSpace(GF(q),nullr);
   mat:=One(r);
   ready:=false;
   repeat
     s:=r^PseudoRandom(g);
-    nulls:=NullspaceMat(s-One(s));
+    nulls:=NullspaceMat(StripMemory(s)-One(StripMemory(s)));
     nullspaces:=VectorSpace(GF(q),nulls);
     int:=Intersection(nullspacer,nullspaces);
     intbasis:=Basis(int);
@@ -1799,7 +1783,7 @@ function(ri, g)
               return FindHomMethodsProjective.StabilizerChainProj(ri,g);
           fi;
           Info(InfoRecog,2,"ClassicalNatural: this is PSL_n!");
-          std := RECOG.FindStdGens_SL(gm,f);
+          std := RECOG.FindStdGens_SL(gm);
           Setslptonice(ri,std.slpstd);
           ri!.nicebas := std.bas;
           ri!.nicebasi := std.basi;
