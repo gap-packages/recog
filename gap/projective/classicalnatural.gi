@@ -1520,7 +1520,7 @@ RECOG.IsThisSL2Natural := function(gens,f)
 
   q := Size(f);
   p := Characteristic(f);
-  # For small q, comput the order of the group via a stabilizer chain.
+  # For small q, compute the order of the group via a stabilizer chain.
   # Note that at this point we are usually working projective, and thus
   # scalars are factored out "implicitly". Thus the generators we are
   # looking at may generate a group which only contains SL2 as a subgroup.
@@ -1572,7 +1572,7 @@ RECOG.IsThisSL2Natural := function(gens,f)
           Add(coms,x);
       od;
   fi;
-  if ForAll(coms, IsDiagonalMat) then
+  if ForAll(coms, RECOG.IsScalarMat) then
       Info(InfoRecog,4,"SL2: Group is soluble, commutators are central");
       return false;
   fi;
@@ -1583,7 +1583,7 @@ RECOG.IsThisSL2Natural := function(gens,f)
           return true;
       fi;
   od;
-  if ForAll(clos{[Length(coms)+1..Length(clos)]}, IsDiagonalMat) then
+  if ForAll(clos{[Length(coms)+1..Length(clos)]}, RECOG.IsScalarMat) then
       Info(InfoRecog,4,"SL2: Group is soluble, derived subgroup central");
       return false;
   fi;
@@ -3184,7 +3184,7 @@ end;
 BindRecogMethod(FindHomMethodsProjective, "ClassicalNatural",
 "check whether it is a classical group in its natural representation",
 function(ri, g)
-  local changed,classical,d,det,ext,f,gcd,gens,gg,gm,i,p,pr,q,root,std,stdg,z;
+  local changed,classical,d,det,ext,f,gcd,gens,gm,i,p,pr,q,root,std,stdg,z;
   d := ri!.dimension;
   f := ri!.field;
   q := Size(f);
@@ -3222,12 +3222,10 @@ function(ri, g)
       fi;
   od;
   if changed then
-      gg := GroupWithGenerators(gens);
       gm := GroupWithMemory(gens);
       pr := ProductReplacer(GeneratorsOfGroup(gm),rec(maxdepth := 500));
       gm!.pseudorandomfunc := [rec( func := Next, args := [pr] )];
   else
-      gg := g;
       gm := Group(ri!.gensHmem);
       gm!.pseudorandomfunc := [rec(func := function(ri,name,bool)
                                       return RandomElm(ri,name,bool).el;
