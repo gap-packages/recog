@@ -78,6 +78,12 @@ gap> G:=Group(List(gens, g -> ImmutableMatrix(GF(9), g)));; # ... but compress g
 gap> RECOG.SmallHomomorphicImageProjectiveGroup(G);  # this call used to raise an error
 fail
 
+# Bug in RECOG.ForceToOtherField when working over large, non-internal fields
+# See <https://github.com/gap-packages/recog/issues/383>
+gap> m:=[[Z(17^4)^290]];;
+gap> RECOG.ForceToOtherField(m,GF(17,2)) = m;
+true
+
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
 gap> STOP_TEST("bugfix.tst");

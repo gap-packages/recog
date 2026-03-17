@@ -348,9 +348,10 @@ RECOG.BaseChangeForSmallestPossibleField := function(grp,mtx)
   return rec( newgens := newgens, field := f, t := b, ti := bi );
 end;
 
-RECOG.ForceToOtherField := function(m,fieldsize)
-  local n,v,w,q;
+RECOG.ForceToOtherField := function(m,field)
+  local fieldsize,n,v,w,q;
   n := [];
+  fieldsize := Size(field);
   for v in m do
       w := List(v,x->x);  # this unpacks
       # Note: we used to call ConvertToVectorRep(w,fieldsize), which
@@ -359,19 +360,26 @@ RECOG.ForceToOtherField := function(m,fieldsize)
       # to resort to the following, which is somewhat less efficient if
       # some rows are already defined over subfields.
       q := ConvertToVectorRep(w);
-      if q = fail or (fieldsize mod q) <> 0 then
+      if IsBool(q) then
+        if fieldsize <= 256 or not ForAll(w, x -> x in field) then
+          return fail;
+        elif fieldsize <= MAXSIZE_GF_INTERNAL then
+          # Convert to the internal representation of FFEs.
+          w:= List( w, AsInternalFFE );
+        fi;
+      elif (fieldsize mod q) <> 0 then
           return fail;
       fi;
       Add(n,w);
   od;
-  ConvertToMatrixRep(n,fieldsize);
+  ConvertToMatrixRep(n,field);
   return n;
 end;
 
 RECOG.HomDoBaseAndFieldChange := function(data,el)
   local m;
   m := data.t * el * data.ti;
-  return RECOG.ForceToOtherField(m,Size(data.field));
+  return RECOG.ForceToOtherField(m,data.field);
 end;
 
 RECOG.HomDoBaseAndFieldChangeWithScalarFinding := function(data,el)
@@ -380,7 +388,7 @@ RECOG.HomDoBaseAndFieldChangeWithScalarFinding := function(data,el)
   p := PositionNonZero(m[1]);
   m := (m[1][p]^-1) * m;     # this gets rid of any possible scalar
                              # from some bigger field
-  return RECOG.ForceToOtherField(m,Size(data.field));
+  return RECOG.ForceToOtherField(m,data.field);
 end;
 
 #! @BeginChunk Subfield
@@ -437,7 +445,7 @@ end;
 RECOG.HomCommutator := function(data,el)
   local y;
   y := Comm(data.x,el);
-  if RECOG.IsScalarMat(y) = false then
+  if not RECOG.IsScalarMat(y) then
       return fail;
   fi;
   return ExtractSubMatrix(y,[1],[1]);
@@ -471,7 +479,7 @@ function(ri, G)
   for i in [1..10] do
       x := Comm(PseudoRandom(G),PseudoRandom(G));
       Add(coms,x);
-      if RECOG.IsScalarMat(x) = false then scalar := false; fi;
+      if not RECOG.IsScalarMat(x) then scalar := false; fi;
   od;
   # Let N to be the normaliser of Group(coms) in G, N is a normal subgroup
   # of G which is contained in G'.
@@ -483,7 +491,7 @@ function(ri, G)
                     # fact scalar or not!
       Info( InfoRecog, 3, "Suspect that G' is scalar, checking..." );
       i := 1;
-      while RECOG.IsScalarMat(gens[i]) <> false do
+      while RECOG.IsScalarMat(gens[i]) do
           i := i + 1;
       od;
       # It cannot happen that all matrices are scalar, because then
@@ -494,7 +502,7 @@ function(ri, G)
       while j <= Length(gens) do
           if j <> i then
               x := Comm(gens[i],gens[j]);
-              if RECOG.IsScalarMat(x) = false then
+              if not RECOG.IsScalarMat(x) then
                   Add(coms,x);
                   scalar := false;
                   Info( InfoRecog, 3, "NO! G' is not scalar after all!" );
