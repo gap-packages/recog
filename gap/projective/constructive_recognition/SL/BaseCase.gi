@@ -527,7 +527,7 @@ RECOG.RecogNaturalSL2 := function(G, q)
         mat, tm, ym, y, ymat, tr, d, cm, r1, r2, r, log, i, trupm, 
         smm, trlowm, F, a2, bas, e, l, emax, tmp;
   GM := GroupWithMemory(G);
-  one := One(G.1[1,1]);
+  one := OneOfBaseDomain(G.1);
   zero := Zero(one);
   
   # find element x of order q-1
@@ -587,6 +587,8 @@ RECOG.RecogNaturalSL2 := function(G, q)
   # now y^(tm * mat) = diag(a, a^-1) 
   tr := tm*mat;
 
+  Assert(3, y^(tm * mat) = DiagonalMat([a, a^-1]) );
+
   # a-eigenvector of x in new basis
   d := tr^-1 * [mat[1,1],mat[2,1]];
   # can be scaled to [1,d]
@@ -612,7 +614,7 @@ RECOG.RecogNaturalSL2 := function(G, q)
       # this will in most cases be a transvection normalized by x
       trupm := Comm(xm, ym^i*cm);
       smm := trupm^mat;
-      if smm[1,2] = zero then
+      if smm[1,2] = zero or smm[2,1] <> zero then
         i := false;
       else
         # rescale first column of mat such that trupm^mat = [[1,1],[0,1]]
@@ -622,6 +624,8 @@ RECOG.RecogNaturalSL2 := function(G, q)
       fi;
     fi;
   until IsInt(i);
+
+  Assert(3, trupm^mat = [[1,1],[0,1]] * one);
 
   # same for the other eigenvector of x:
   # 1/a-eigenvector of x in new basis
@@ -651,7 +655,7 @@ RECOG.RecogNaturalSL2 := function(G, q)
       # that the conjugate matrix is [[1,0],[1,1]]).
       trlowm := Comm(xm, ym^i*cm);
       smm := trlowm^mat;
-      if smm[2,1] = zero then
+      if smm[2,1] = zero or smm[1,2] <> zero then
         i := false;
       fi;
     fi;
@@ -688,11 +692,15 @@ RECOG.RecogNaturalSL2 := function(G, q)
     od;
   fi;
 
+  Assert(3, trlowm^mat = [[1,0],[1,1]] * one);
+
   # finally power x to change a to 1/Z(q)
   if a <> 1/Z(q) then
     log := DLog(a, 1/Z(q), qm1fac);
     xm := xm^log;
   fi;
+
+  Assert(3, xm^mat = DiagonalMat([Z(q)^-1, Z(q)]));
 
   # return SLPs of elements mapped by mat to 
   # diag(1/Z(q),Z(q))[[1,0],[1,1]], [[1,1],[0,1]],
@@ -722,19 +730,13 @@ RECOG.ConRecogNaturalSL2 := function(G, f)
   true_diag  := [[Z(q)^(-1),0*Z(q)],[0*Z(q),Z(q)]];
   true_u1 := [[Z(q)^0,0*Z(q)],[Z(q)^0,Z(q)^0]];
   true_u2 := [[Z(q)^0,Z(q)^0],[0*Z(q),Z(q)^0]];
-  ## retry until RecogNaturalSL2 returns generators matching the standard form
-  ## TODO: Perhaps remove this for-loop
-  for i in [1..100] do
-    res := RECOG.RecogNaturalSL2(G,q);
-    nicegens :=List(res[1],a->ResultOfStraightLineProgram(a,GeneratorsOfGroup(G)));
-    diag := nicegens[1];
-    u1 := nicegens[2];
-    u2 := nicegens[3];
-    ## check if we found the correct generators
-    if diag^res[2] = true_diag and u1^res[2] = true_u1 and u2^res[2] = true_u2 then 
-      break; 
-    fi;
-  od;
+
+  res := RECOG.RecogNaturalSL2(G,q);
+  nicegens :=List(res[1],a->ResultOfStraightLineProgram(a,GeneratorsOfGroup(G)));
+  diag := nicegens[1];
+  u1 := nicegens[2];
+  u2 := nicegens[3];
+
 
   if IsEvenInt(q) then
     ## even characteristic: conjugation by diag generates all of GF(q)* directly
@@ -793,7 +795,7 @@ end;
 ## Input: either a list of prime powers or the empty list 
 ## (then a preset list of prime powers is tested).
 test_ConRecogNaturalSL2 := function(input)
-  local i, G, list, qlist, res_old, res, f, q, valid;
+  local i, G, list, qlist, res_old, res, f, q, valid, std;
   if Length(input) = 0 then
     qlist := [2^3, 2^5, 3^4, 25, 17^3, 9967, 9967^3]; 
   else
@@ -823,5 +825,3 @@ test_ConRecogNaturalSL2 := function(input)
     Print("All tests passed.\n");
   fi;
 end;
-
-
