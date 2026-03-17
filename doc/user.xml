@@ -96,8 +96,8 @@ different results when called multiple times.<P/>
 
 The first example we consider is the special linear group.
 
-<Log>
-<![CDATA[gap> G := SL(10,5);
+<Log><![CDATA[
+gap> G := SL(10,5);
 SL(10,5)
 gap> RecogniseGroup(G);
 <recognition node GoProjective Dim=10 Field=5
@@ -105,8 +105,8 @@ gap> RecogniseGroup(G);
 749746041218752566202615590039253234863281250000000000000000000000000 Dim=10 Field=5>
  K:<recognition node DiagonalMatrices Dim=10 Field=5
     F:<recognition node Scalar Dim=1 Field=5>
-    K:<trivial kernel>>]]>
-</Log>
+    K:<trivial kernel>>
+]]></Log>
 
 The output is a recognition node that visualises the structure of the
 recognition tree. Each node representing a group <M>H</M> has two children: a
@@ -124,12 +124,12 @@ be isomorphic to <M>\mathbb{F}_5^*</M> itself.<P/>
 
 A second example we consider is a symmetric group on a few points.
 
-<Log>
-<![CDATA[gap> G := SymmetricGroup(10);
+<Log><![CDATA[
+gap> G := SymmetricGroup(10);
 Sym( [ 1 .. 10 ] )
 gap> ri := RecogniseGroup(G);
-<recognition node MovesOnlySmallPoints Size=3628800>]]>
-</Log>
+<recognition node MovesOnlySmallPoints Size=3628800>
+]]></Log>
 
 This recognition tree only consists of the root node representing the input
 group <M>S_{10}</M>. The group is recognised to only move a few points. Its size
