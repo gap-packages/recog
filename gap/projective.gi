@@ -332,6 +332,8 @@ AddMethod(FindHomDbProjective, FindHomMethodsProjective.D247, 840);
 
 AddMethod(FindHomDbProjective, FindHomMethodsProjective.AltSymBBByDegree, 810);
 
+AddMethod(FindHomDbProjective, FindHomMethodsGeneric.SnAnUnknownDegree, 805);
+
 AddMethod(FindHomDbProjective, FindHomMethodsProjective.TensorDecomposable, 800);
 
 AddMethod(FindHomDbProjective, FindHomMethodsProjective.FindElmOfEvenNormal, 700);
