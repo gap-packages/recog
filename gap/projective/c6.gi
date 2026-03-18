@@ -726,9 +726,10 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "C6",
 "find either an (imprimitive) action or a symplectic one",
-function(ri, G)
-    local r,re,hom;
+function(ri)
+    local G,r,re,hom;
 
+    G := Grp(ri);
     RECOG.SetPseudoRandomStamp(G,"C6");
 
     re := RECOG.New2RecogniseC6(G);

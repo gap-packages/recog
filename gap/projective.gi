@@ -40,7 +40,7 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "BlocksModScalars",
 "TODO",
-function(ri, G)
+function(ri)
   # We assume that ri!.blocks is a list of ranges where the diagonal
   # blocks are. Note that their length does not have to sum up to
   # the dimension, because some blocks at the end might already be trivial.
@@ -48,7 +48,8 @@ function(ri, G)
   # be recognised as a matrix group *nor* as a projective group. Rather,
   # all "block-scalars" shall be ignored. This method is only used when
   # used as a hint by FindHomMethodsMatrix.BlockDiagonal!
-  local H,data,hom,middle,newgens,nrblocks,topblock;
+  local G,H,data,hom,middle,newgens,nrblocks,topblock;
+  G := Grp(ri);
   nrblocks := Length(ri!.blocks);  # this is always >= 1
   if ForAll(ri!.blocks,b->Length(b)=1) then
       # All blocks are projectively trivial, so nothing to do here:
@@ -121,7 +122,7 @@ end;
 # TODO: merge FindHomMethodsPerm.StabilizerChainPerm and  FindHomMethodsProjective.StabilizerChainProj ?
 BindRecogMethod(FindHomMethodsProjective, "StabilizerChainProj",
 "last resort: compute a stabilizer chain (projectively)",
-function(ri, G)
+function(ri)
   local Gm,S,SS,d,f,fu,opt,perms,q;
   d := ri!.dimension;
   f := ri!.field;
@@ -142,7 +143,7 @@ function(ri, G)
       SetFilterObj(ri,IsLeaf);
   else
       ForgetMemory(S);
-      SetHomom(ri,OrbActionHomomorphism(G,S!.orb));
+      SetHomom(ri,OrbActionHomomorphism(Grp(ri),S!.orb));
       Setmethodsforimage(ri,FindHomDbPerm);
   fi;
   return Success;
@@ -166,8 +167,9 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "ProjDeterminant",
 "find homomorphism to non-zero scalars mod d-th powers",
-function(ri, G)
-  local H,c,d,detsadd,f,gcd,hom,newgens,q,z;
+function(ri)
+  local G,H,c,d,detsadd,f,gcd,hom,newgens,q,z;
+  G := Grp(ri);
   f := ri!.field;
   d := ri!.dimension;
   q := Size(f);
@@ -236,9 +238,10 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "BlockScalarProj",
 "TODO",
-function(ri, G)
+function(ri)
   # We just norm the last block and go to matrix methods.
-  local H,data,hom,newgens,g;
+  local G,H,data,hom,newgens,g;
+  G := Grp(ri);
   data := rec( blocks := ri!.blocks );
   newgens := [];
   for g in GeneratorsOfGroup(G) do

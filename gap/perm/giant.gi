@@ -802,8 +802,9 @@ BindRecogMethod(FindHomMethodsPerm, "Giant",
 # TODO: expects input to be transitive, so should always be run after
 # FindHomMethodsPerm.NonTransitive; model this better?
 rec(validatesOrAlwaysValidInput := true),
-function(ri, grp)
-    local grpmem,mp,res;
+function(ri)
+    local grp,grpmem,mp,res;
+    grp := Grp(ri);
     if not IsPermGroup(grp) then
         return NeverApplicable;
     fi;

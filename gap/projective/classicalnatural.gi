@@ -861,8 +861,9 @@ end;
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "ClassicalNatural",
 "check whether it is a classical group in its natural representation",
-function(ri, g)
-  local changed,classical,d,det,ext,f,gcd,gens,gm,i,p,pr,q,root,std,stdg,z;
+function(ri)
+  local g,changed,classical,d,det,ext,f,gcd,gens,gm,i,p,pr,q,root,std,stdg,z;
+  g := Grp(ri);
   d := ri!.dimension;
   f := ri!.field;
   q := Size(f);
@@ -948,7 +949,7 @@ function(ri, g)
                    "case, handing over to Schreier-Sims.");
               ri!.comment := Concatenation("SL(",String(d),",",String(q),")",
                                            "_StabilizerChain");
-              return FindHomMethodsProjective.StabilizerChainProj(ri,g);
+              return FindHomMethodsProjective.StabilizerChainProj(ri);
           fi;
           Info(InfoRecog,2,"ClassicalNatural: this is PSL_n!");
           std := RECOG.FindStdGens_SL(gm);

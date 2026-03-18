@@ -32,10 +32,10 @@ end;
 #! @BeginCode FindHomMethodsGeneric.TrivialGroup
 BindRecogMethod(FindHomMethodsGeneric, "TrivialGroup",
 "go through generators and compare to the identity",
-function(ri, G)
+function(ri)
   local gens;
   # get the generators of the group
-  gens := GeneratorsOfGroup(G);
+  gens := GeneratorsOfGroup(Grp(ri));
 
   # check whether all generators are trivial
   # ri!.isone is explained below

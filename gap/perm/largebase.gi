@@ -531,8 +531,9 @@ end;
 BindRecogMethod(FindHomMethodsPerm, "LargeBasePrimitive",
 "recognises large-base primitive permutation groups",
 rec(validatesOrAlwaysValidInput := true),
-function(ri, grp)
-    local res,T,seen,imgens,hom;
+function(ri)
+    local grp,res,T,seen,imgens,hom;
+    grp := Grp(ri);
     if not IsPermGroup(grp) then
         return NeverApplicable;
     fi;

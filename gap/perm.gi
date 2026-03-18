@@ -31,9 +31,9 @@
 BindRecogMethod(FindHomMethodsPerm, "MovesOnlySmallPoints",
 "calculate a stabilizer chain if only small points are moved",
 rec(validatesOrAlwaysValidInput := true),
-function(ri, G)
-  if LargestMovedPoint(G) <= 10 then
-      return FindHomMethodsPerm.StabChain(ri, G);
+function(ri)
+  if LargestMovedPoint(Grp(ri)) <= 10 then
+      return FindHomMethodsPerm.StabChain(ri);
   fi;
   return NeverApplicable;
 end);
@@ -48,8 +48,9 @@ end);
 BindRecogMethod(FindHomMethodsPerm, "NonTransitive",
 "try to find non-transitivity and restrict to orbit",
 rec(validatesOrAlwaysValidInput := true),
-function(ri, G)
-    local hom,la,o;
+function(ri)
+    local G,hom,la,o;
+    G := Grp(ri);
 
     # test whether we can do something:
     if IsTransitive(G) then
@@ -93,8 +94,9 @@ end);
 BindRecogMethod(FindHomMethodsPerm, "Imprimitive",
 "for a imprimitive permutation group, restricts to block system",
 rec(validatesOrAlwaysValidInput := true),
-function(ri, G)
-    local blocks,hom,pcgs,subgens;
+function(ri)
+    local G,blocks,hom,pcgs,subgens;
+    G := Grp(ri);
 
     # Only look for primitivity once we know transitivity:
     # This ensures the right trying order even if the ranking is wrong.
@@ -144,8 +146,9 @@ end);
 #! @EndChunk
 BindRecogMethod(FindHomMethodsPerm, "PcgsForBlocks",
 "TODO",
-function(ri, G)
-  local blocks,pcgs,subgens;
+function(ri)
+  local G,blocks,pcgs,subgens;
+  G := Grp(ri);
   blocks := ri!.blocks;   # we know them from above!
   subgens := List(GeneratorsOfGroup(G),g->RestrictedPerm(g,blocks[1]));
   pcgs := Pcgs(Group(subgens));
@@ -168,8 +171,9 @@ end);
 #! @EndChunk
 BindRecogMethod(FindHomMethodsPerm, "BalTreeForBlocks",
 "TODO",
-function(ri, G)
-  local blocks,cut,hom,lowerhalf,nrblocks,o,upperhalf,l,n,seto;
+function(ri)
+  local G,blocks,cut,hom,lowerhalf,nrblocks,o,upperhalf,l,n,seto;
+  G := Grp(ri);
 
   blocks := ri!.blocks;
 
@@ -230,8 +234,9 @@ end;
 BindRecogMethod(FindHomMethodsPerm, "StabChain",
 "for a permutation group using a stabilizer chain",
 rec(validatesOrAlwaysValidInput := true),
-function(ri, G)
-     local Gmem,S,si;
+function(ri)
+     local G,Gmem,S,si;
+     G := Grp(ri);
 
      # We know transitivity and primitivity, because there are higher ranked
      # methods checking for them!
@@ -275,7 +280,7 @@ Concatenation(
     "https://gap-packages.github.io/genss/",
     "</URL>"),
 rec(validatesOrAlwaysValidInput := true),
-function(ri, G)
+function(ri)
   local Gm,S;
   Gm := Group(ri!.gensHmem);
   Gm!.pseudorandomfunc := [rec(
@@ -410,9 +415,10 @@ end;
 BindRecogMethod(FindHomMethodsPerm, "ThrowAwayFixedPoints",
 "try to find a huge amount of (possible internal) fixed points",
 rec(validatesOrAlwaysValidInput := true),
-function(ri, G)
+function(ri)
       # Check, whether we can throw away fixed points
-      local gens,nrStoredPoints,n,largest,isApplicable,o,hom;
+      local G,gens,nrStoredPoints,n,largest,isApplicable,o,hom;
+      G := Grp(ri);
 
       gens := GeneratorsOfGroup(G);
       nrStoredPoints := Maximum(List(gens,StoredPointsPerm));
@@ -450,8 +456,9 @@ end);
 BindRecogMethod(FindHomMethodsPerm, "Pcgs",
 "use a Pcgs to calculate a stabilizer chain",
 rec(validatesOrAlwaysValidInput := true),
-function(ri, G)
-    local GM,S,pcgs;
+function(ri)
+    local G,GM,S,pcgs;
+    G := Grp(ri);
     GM := Group(ri!.gensHmem);
     GM!.pseudorandomfunc := [rec(
        func := function(ri) return RandomElm(ri,"PCGS",true).el; end,
