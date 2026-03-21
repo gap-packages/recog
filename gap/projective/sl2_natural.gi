@@ -345,7 +345,6 @@ end;
 ## two transvections directly by explicit matrix multiplication,
 ## exploiting the fact that SL(2,2) has only 6 elements and GF(2)*={1}.
 ## No base change is needed since the transvections are unique over GF(2).
-
 RECOG.ConRecogNaturalSL22 := function(G, f)
   local one, zero, gens, pair, e2, e3, o3,
         m1, m2, lowerm, upperm,
