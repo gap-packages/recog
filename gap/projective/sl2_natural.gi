@@ -233,7 +233,7 @@ RECOG.ConRecogNaturalSL2 := function(G, f)
   q := Size(f);
 
   ## if q = 2,3,5 then RecogNaturalSL2 does not work
-  if q = 2 then
+  if (q mod 2) = 0 then
     return RECOG.RecogniseSL2NaturalEvenChar(G,f,false);
   fi;
   if q = 3 or q = 5 then
@@ -245,10 +245,9 @@ RECOG.ConRecogNaturalSL2 := function(G, f)
   diag := nicegens[1];
   u1 := nicegens[2];
   u2 := nicegens[3];
-    
+  j := DegreeOverPrimeField(GF(q));    
   if IsEvenInt(q) then
     ## even characteristic: conjugation by diag generates all of GF(q)* directly
-    j := DegreeOverPrimeField(GF(q));
     lmat := [];
     for k in [0..j-1] do
       i := (q-1-k)*Int(2)^-1 mod (q-1);
