@@ -197,13 +197,13 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
     curInvolutionPos := 1;
     Ki := Minimum(K, C);
     Li := Minimum(L, B);
-    # Counts the elements c in step 4 that we use to conjugate the current
+    # Entry i of this list counts the elements c in step 4 that we use to conjugate the current
     # involution t_i.
     nrTriedConjugates := [];
-    # counts the size of the set Gamma_i in step 4 for the current involution
-    # t_i
+# Entry i of this list counts the size of the set Gamma_i in step 4
+# for the current involution t_i
     nrCommutatingConjugates := [];
-    # counts the actual number of three cycle candidates considered
+    # Entry i of this list counts the actual number of three cycle candidates considered
     # which are filtered from the Gamma_i via heuristic order tests.
     nrThreeCycleCandidates := [];
 
@@ -944,7 +944,7 @@ end;
 # n : degree
 # stdGensAnWithMemory : standard generators of An < G
 #
-# Returns either fail or a record with components type and isoData, where:
+# Returns either fail or a record with components type, isoData and slpToStdGens, where:
 # - type: the isomorphism type, that is either the string "Sn" or "An".
 # - isoData: a list [stdGens, filter, n] where
 #   - stdGens are the standard generators of G. They do not have memory.
@@ -967,7 +967,7 @@ RECOG.ConstructSnAnIsomorphism := function(ri, n, stdGensAnWithMemory)
         filter := RECOG.ConstructXiAn(n, stdGensAn[1], stdGensAn[2]);
     fi;
     foundOddPermutation := false;
-    # For each generator, check whether its image und the monomorphism into the
+    # For each generator, check whether its image under the monomorphism into the
     # S_n has odd sign. If so, switch to recognizing S_n.
     # For each generator also check whether the SLP for its image in the A_n
     # was computed correctly.
