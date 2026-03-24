@@ -1104,8 +1104,7 @@ RECOG.RecogniseSnAn := function(ri, eps, N)
 end;
 
 RECOG.LowerBoundForDegreeOfSnAnViaOrders := function(ri)
-    local G, orders;
-    G := Grp(ri);
+    local orders;
     orders := Set(List(
         [1..30],
         i -> RandomElmOrd(ri, "LowerBoundForDegreeOfSnAnViaOrders", false).order
