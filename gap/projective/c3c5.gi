@@ -23,7 +23,8 @@ RECOG.WriteOverBiggerFieldWithSmallerDegree :=
   function( inforec, gen )
     # inforec needs:
     #  bas, basi, sample, newdim, FF, d, qd from the Finder
-    local i,k,newgen,row,t,val;
+    local d,i,k,newgen,row,t,coeff,val,mat;
+    d := inforec.d;
     gen := inforec.bas * gen * inforec.basi;
     newgen := [];  # FIXME: this will later be:
     #newgen := Matrix([],Length(inforec.sample),inforec.bas);
@@ -34,10 +35,15 @@ RECOG.WriteOverBiggerFieldWithSmallerDegree :=
         # row := ZeroVector(inforec.newdim,inforec.sample);
         for k in [1..inforec.newdim] do
             val := Zero(inforec.FF);
-            for t in [1..inforec.d] do
-                val := gen[(i-1)*inforec.d+1][(k-1)*inforec.d+t]
-                       * inforec.pows[t] + val;
+            mat := NullMat(d, d, inforec.FF);
+            for t in [1..d] do
+                coeff := gen[(i-1)*d+1, (k-1)*d+t];
+                val := val + coeff * inforec.pows[t];
+                mat := mat + coeff * inforec.mats[t];
             od;
+            if gen{[(i-1)*d+1..i*d]}{[(k-1)*d+1..k*d]} <> mat then
+                return fail;
+            fi;
             row[k] := val;
         od;
         Add(newgen,row);
@@ -49,7 +55,7 @@ ConvertToMatrixRep(newgen,inforec.qd);
 
 RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
   # m a MeatAxe-module
-  local F,bas,d,dim,e,fac,facs,gens,i,inforec,j,k,mp,mu,new,newgens,pr,q,v;
+  local F,bas,d,dim,e,fac,facs,gens,i,inforec,j,k,mp,mu,new,newgens,pr,pr_mat,q,v;
 
   if not MTX.IsIrreducible(m) then
       ErrorNoReturn("cannot work for reducible modules");
@@ -108,9 +114,12 @@ ConvertToMatrixRep(bas,q);
   facs := Factors(PolynomialRing(inforec.FF),mp : stopdegs := [1]);
   fac := First(facs,x->Degree(x)=1);
   pr := -(CoefficientsOfLaurentPolynomial(fac)[1][1]);
+  pr_mat := e{[1..d]}{[1..d]};
   inforec.pows := [pr^0];
+  inforec.mats := [pr_mat^0];
   for k in [1..d-1] do
       Add(inforec.pows,inforec.pows[k]*pr);
+      Add(inforec.mats,inforec.mats[k]*pr_mat);
   od;
   inforec.newdim := dim/inforec.d;
   inforec.sample := ListWithIdenticalEntries(inforec.newdim,Zero(inforec.FF));
