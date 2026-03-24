@@ -30,7 +30,7 @@
 ##      needs the quadratic extension GF(2^(2m)).
 ##
 RECOG.RecogNaturalSL2 := function(G, q)
-  local GM, one, zero, qm1fac, c, m, gens, xm, x, pol, v, z, exp, a, 
+   local GM, one, zero, qm1fac, c, m, gens, xm, x, pol, v, z, exp, a, 
         mat, tm, ym, y, ymat, tr, d, cm, r1, r2, r, log, i, trupm, 
         smm, trlowm, F, a2, bas, e, l, emax, tmp;
   GM := GroupWithMemory(G);
@@ -52,7 +52,7 @@ RECOG.RecogNaturalSL2 := function(G, q)
     v := [zero, one];
     v := PowerModCoeffs(v, m, pol);
   until PowerModCoeffs(v, c, pol) = [one] and
-            ForAll(qm1fac, p -> PowerModCoeffs(v, c/p, pol) <> [one]);
+            ForAll(qm1fac, p-> PowerModCoeffs(v, c/p, pol) <> [one]);
   # eigenvalues and eigenvectors of x (zeroes of pol)
   # we use Cantor-Zassenhaus
   z := Z(q);
@@ -233,6 +233,9 @@ RECOG.ConRecogNaturalSL2 := function(G, f)
   q := Size(f);
 
   ## if q = 2,3,5 then RecogNaturalSL2 does not work
+  if q = 2 then
+    RECOG.ConRecogNaturalSL22(G,f);
+  fi;
   if (q mod 2) = 0 then
     return RECOG.RecogniseSL2NaturalEvenChar(G,f,false);
   fi;
