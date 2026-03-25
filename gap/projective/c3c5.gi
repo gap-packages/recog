@@ -41,8 +41,8 @@ RECOG.WriteOverBiggerFieldWithSmallerDegree :=
             row[k] := val;
         od;
         Add(newgen,row);
-# FIXME: this will go eventually:
-ConvertToMatrixRep(newgen,inforec.qd);
+        # FIXME: this will go eventually:
+        ConvertToMatrixRep(newgen,inforec.qd);
     od;
     return newgen;
   end;
@@ -68,6 +68,7 @@ RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
   v[1] := One(F);
   bas := [v]; # FIXME, this will later be:
   #bas := Matrix([v],Length(v),gens[1]);
+
   # Do the first E = <e>-dimension:
   for i in [1..d-1] do
       Add(bas,bas[i]*e);
@@ -96,11 +97,13 @@ RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
       od;
       i := i + d;
   od;
+
+  # FIXME: this will later go:
+  # was: ConvertToMatrixRep(bas,q^d);  but this seems to be a bug!!!
+  ConvertToMatrixRep(bas,q);
+
   # Since the module is irreducible i will not run over the length of bas
   # now we can write down the new action over the bigger field immediately:
-# FIXME: this will later go:
-# was: ConvertToMatrixRep(bas,q^d);  but this seems to be a bug!!!
-ConvertToMatrixRep(bas,q);
   newgens := [];
   inforec := rec( bas := bas, basi := bas^-1, FF := GF(F,d), d := d,
                   qd := q^d );
@@ -114,8 +117,10 @@ ConvertToMatrixRep(bas,q);
   od;
   inforec.newdim := dim/inforec.d;
   inforec.sample := ListWithIdenticalEntries(inforec.newdim,Zero(inforec.FF));
-# FIXME: this will later go:
-ConvertToVectorRep(inforec.sample,inforec.qd);
+
+  # FIXME: this will later go:
+  ConvertToVectorRep(inforec.sample,inforec.qd);
+
   for j in [1..Length(gens)] do
       Add(newgens,RECOG.WriteOverBiggerFieldWithSmallerDegree(inforec,gens[j]));
   od;
