@@ -84,6 +84,14 @@ gap> m:=[[Z(17^4)^290]];;
 gap> RECOG.ForceToOtherField(m,GF(17,2)) = m;
 true
 
+# The semilinear rewrite for NotAbsolutelyIrred must accept genuine
+# semilinear elements, not only E-linear ones. This random seed used to
+# produce a failed recognition node on the branch for issue #399.
+gap> i:=4;; Reset(GlobalRandomSource,i);; Reset(GlobalMersenneTwister,1);;
+gap> ri:=RecognizeGroup(SO(+1,4,3));;
+gap> IsReady(ri);
+true
+
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
 gap> STOP_TEST("bugfix.tst");
