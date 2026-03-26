@@ -37,6 +37,10 @@ RECOG.WriteOverBiggerFieldWithSmallerDegree := function(inforec, gen)
 
   d := inforec.d;
   gen := inforec.bas * gen * inforec.basi;
+  i := PositionNonZero(gen[1]);
+  if not gen[1,i] in GF(inforec.q) then
+    gen := gen / gen[1,i];
+  fi;
   newgen := [];  # FIXME: this will later be:
   #newgen := Matrix([],Length(inforec.sample),inforec.bas);
   for i in [1..inforec.newdim] do
@@ -49,18 +53,25 @@ RECOG.WriteOverBiggerFieldWithSmallerDegree := function(inforec, gen)
           # the field element describing the E-linear map on that block.
           val := Sum([1..d], t -> gen[(i-1)*d+1,(k-1)*d+t] * inforec.pows[t]);
 
-          # Every other row must be multiplication by the same field element
-          # on the basis 1, alpha, ..., alpha^(d-1) of E/F.
-          for t in [1..d] do
-              coords := Coefficients(inforec.powsbasis, inforec.pows[t] * val);
-              if coords = fail then
+          if IsZero(val) then
+              # must be a zero block
+              if not ForAll([(i-1)*d+1 ..  i*d], t -> IsZero(gen[t]{[(k-1)*d+1 .. k*d]})) then
                   return fail;
               fi;
-              col := gen[(i-1)*d+t]{[(k-1)*d+1..k*d]};
-              if col <> coords then
-                  return fail;
-              fi;
-          od;
+          else
+              # Every other row must be multiplication by the same field element
+              # on the basis 1, alpha, ..., alpha^(d-1) of E/F.
+              for t in [1..d] do
+                  coords := Coefficients(inforec.powsbasis, inforec.pows[t] * val);
+                  if coords = fail then
+                      return fail;
+                  fi;
+                  col := gen[(i-1)*d+t]{[(k-1)*d+1..k*d]};
+                  if col <> coords then
+                      return fail;
+                  fi;
+              od;
+          fi;
 
           row[k] := val;
       od;
@@ -149,7 +160,7 @@ RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
   # now we can write down the new action over the bigger field immediately:
   newgens := [];
   inforec := rec( bas := bas, basi := bas^-1, FF := GF(F,d), d := d,
-                  qd := q^d );
+                  qd := q^d, q := q );
   mp := MTX.FGCentMatMinPoly(m);
   facs := Factors(PolynomialRing(inforec.FF),mp : stopdegs := [1]);
   fac := First(facs,x->Degree(x)=1);
