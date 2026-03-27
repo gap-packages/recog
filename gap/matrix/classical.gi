@@ -92,15 +92,15 @@ HasLBGgt5 := function( m, p, a, e )
         ## Now we know (e+1) divides ppds and (e+1) has to be
         ## a prime since all ppds are at least (e+1)
         if not IsPrimeInt (e+1) then
-             return false;
-         fi;
-         # if (e+1)^2 does not divide m, then not large
-         if not (m mod (e+1)^2) = 0 then
-             return false;
-         fi;
-     fi;
+            return false;
+        fi;
+        # if (e+1)^2 does not divide m, then not large
+        if not (m mod (e+1)^2) = 0 then
+            return false;
+        fi;
+    fi;
 
-     return true;
+    return true;
 end;
 
 
@@ -824,7 +824,7 @@ function(recognise)
                 if kf = false then
                     kf := KroneckerFactors( (g^2)^recognise.bc );
                 fi;
-                recognise.kf  := kf;
+                recognise.kroneckerFactors := kf;
             fi;
       fi;
 
@@ -1776,7 +1776,7 @@ end);
 BindRecogMethod(FindHomMethodsClassical, "NonGenericOrthogonalPlus",
 "tests whether group is non-generic O+",
 function(recognise)
-    local grp, d, q, gp1, gp2, CheckFlag, pgrp, sc, isHypForm, ol;
+    local grp, d, q, gp1, gp2, CheckFlag, pgrp, sc, isHypForm, ol, ord;
     grp := recognise.grp;
 
     isHypForm := f -> IsSesquilinearForm(f) and IsHyperbolicForm(f);
@@ -1845,7 +1845,7 @@ function(recognise)
         # Both the conformal orthogonal and the omega for d = 8 and q = 2 have
         # orbits of these lengths. The maximal subgroups of the conformal
         # orthogonal don't have these orbit lengths.
-        if OrbitLengthsDomain(pgrp) <> [ 120, 135 ] then
+        if SortedList(OrbitLengthsDomain(pgrp)) <> [ 120, 135 ] then
            recognise.isOmegaContained := false;
            return NeverApplicable;
         fi;
@@ -1961,15 +1961,23 @@ function(recognise)
            Size(gp2/recognise.scalars) mod 12 = 0 then
                 return CheckFlag();
         fi;
-    elif d = 4 and q =  4 then
+    elif d = 4 and q = 4 then
         # the conformal group can have orbits of length 75 and 180
         # the group Omega can have orbits of lengths 75 and 60
         ol := Length(Orbit(grp, IdentityMat(d, GF(q))[1]));
         if not ol in [60,75,180] then
             return NeverApplicable;
         fi;
-        if RECOG.EstimateProjOrder(grp) mod 3600 <> 0 then
-             recognise.isOmegaContained := false;
+
+        # avoid warnings 'Giving up, Schreier tree is not shallow' (in general
+        # one shouldn't ignore this kind of warning but here we know which
+        # groups are input, and it is acceptable)
+        ol := InfoLevel(InfoOrb);
+        SetInfoLevel(InfoOrb, 0);
+        ord := RECOG.EstimateProjOrder(grp);
+        SetInfoLevel(InfoOrb, ol);
+        if ord mod 3600 <> 0 then  # FIXME: Giving up, Schreier tree is not shallow
+            recognise.isOmegaContained := false;
              return NeverApplicable;
         fi;
         if recognise.needDecompose = false then
@@ -1982,7 +1990,7 @@ function(recognise)
              Size(gp1/recognise.scalars), "x", Size(gp2/recognise.scalars));
         if Size(gp1/recognise.scalars) mod 3 = 0 and
            Size(gp2/recognise.scalars) mod 3 = 0 then
-                return CheckFlag();
+            return CheckFlag();
         fi;
     elif d = 4 and q = 5 then
         ## Added fast test 4.7.2019 ACN
@@ -2024,7 +2032,7 @@ function(recognise)
              Size(gp1/recognise.scalars), "x", Size(gp2/recognise.scalars));
         if Size(gp1/recognise.scalars) mod 168 = 0 and
            Size(gp2/recognise.scalars) mod 168 = 0 then
-                return CheckFlag();
+            return CheckFlag();
         fi;
     elif d = 4 and q = 9 then
         ## Added fast test 4.7.2019 ACN
@@ -2142,7 +2150,7 @@ function(recognise)
 # ACN May 2007
             if Comm(h,g) <> One(grp) then
                 if Comm(Comm(h,g),g) <> One(grp) then
-                        return CheckFlag();
+                    return CheckFlag();
                 fi;
             fi;
         od;
@@ -2253,7 +2261,7 @@ function(recognise)
                return CheckFlag();
             fi;
         else
-               return CheckFlag();
+           return CheckFlag();
         fi;
         recognise.isOmegaContained := false;
         return NeverApplicable;
