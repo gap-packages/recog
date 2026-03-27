@@ -12,19 +12,43 @@
 ##  SPDX-License-Identifier: GPL-3.0-or-later
 ##
 ##
-## TODO: Maybe ask Colva about this:
-## This algorithm is probably based on the paper [CNRD09].
+## The semilinear rewrite below follows the construction in [CNRD09],
+## Section 6.4, for the irreducible-but-not-absolutely-irreducible case.
 ##
 ##  Handle the (projective) semilinear and subfield cases.
 ##
 #############################################################################
 
+##
+##  Input: `inforec` from `RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder`
+##  and a matrix `gen` on the original F-space V.
+##
+##  Output: either the corresponding matrix on the E-space V_E, where
+##  E = End_{F G}(V) is represented as GF(q^d), or `fail` if `gen` does not
+##  preserve the E-vector space structure encoded by `inforec`.
+##
+##  This is the "write over a bigger field with smaller degree" step from
+##  [CNRD09, Section 6.4]: after choosing an E-adapted basis of V, valid
+##  inputs become block matrices whose d x d blocks are multiplication maps
+##  by elements of E.
+##
 RECOG.WriteOverBiggerFieldWithSmallerDegree :=
   function( inforec, gen )
     # inforec needs:
     #  bas, basi, sample, newdim, FF, d, qd from the Finder
-    local i,k,newgen,row,t,val;
+    local col, coords, i, k, newgen, row, t, val, d;
+
+    d := inforec.d;
     gen := inforec.bas * gen * inforec.basi;
+
+    # since the input is projective, it may happen that it is not over the right
+    # field -- in that case, we scale the matrix so that the first non-zero entry
+    # is in the right field; then either all entries are, or else the input matrix
+    # is not valid and we later return `fail`
+    i := PositionNonZero(gen[1]);
+    if not gen[1,i] in GF(inforec.q) then
+      gen := gen / gen[1,i];
+    fi;
     newgen := [];  # FIXME: this will later be:
     #newgen := Matrix([],Length(inforec.sample),inforec.bas);
     for i in [1..inforec.newdim] do
@@ -33,11 +57,23 @@ RECOG.WriteOverBiggerFieldWithSmallerDegree :=
         # FIXME: this will later be:
         # row := ZeroVector(inforec.newdim,inforec.sample);
         for k in [1..inforec.newdim] do
-            val := Zero(inforec.FF);
-            for t in [1..inforec.d] do
-                val := gen[(i-1)*inforec.d+1][(k-1)*inforec.d+t]
-                       * inforec.pows[t] + val;
+            # The first row of each d x d block is the coordinate vector of
+            # the field element describing the E-linear map on that block.
+            val := Sum([1..d], t -> gen[(i-1)*d+1,(k-1)*d+t] * inforec.pows[t]);
+
+            # Validation: every row must be multiplication by the same field element
+            # on the basis 1, alpha, ..., alpha^(d-1) of E/F.
+            for t in [1..d] do
+                coords := Coefficients(inforec.powsbasis, inforec.pows[t] * val);
+                if coords = fail then
+                    return fail;
+                fi;
+                col := gen[(i-1)*d+t]{[(k-1)*d+1..k*d]};
+                if col <> coords then
+                    return fail;
+                fi;
             od;
+
             row[k] := val;
         od;
         Add(newgen,row);
@@ -47,6 +83,19 @@ RECOG.WriteOverBiggerFieldWithSmallerDegree :=
     return newgen;
   end;
 
+##
+##  Input: an irreducible but not absolutely irreducible MeatAxe module `m`
+##  over F = GF(q).
+##
+##  Output: a record containing:
+##    `newgens`  the generators rewritten as matrices of size dim/d over GF(q^d)
+##    `inforec`  the basis change and field data needed to rewrite later inputs
+##
+##  The centralising matrix `e := MTX.FieldGenCentMat(m)` generates
+##  E = End_{F G}(V). Following [CNRD09, Section 6.4], we use `e` to view V
+##  as an E-vector space and construct an E-adapted basis by spinning in
+##  blocks of length d over E instead of single vectors over F.
+##
 RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
   # m a MeatAxe-module
   local F,bas,d,dim,e,fac,facs,gens,i,inforec,j,k,mp,mu,new,newgens,pr,q,v;
@@ -69,7 +118,9 @@ RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
   bas := [v]; # FIXME, this will later be:
   #bas := Matrix([v],Length(v),gens[1]);
 
-  # Do the first E = <e>-dimension:
+  # The powers of e generate the first E-line through v, namely
+  # v, v*e, ..., v*e^(d-1). These vectors form the first block of the
+  # eventual E-adapted basis.
   for i in [1..d-1] do
       Add(bas,bas[i]*e);
   od;
@@ -78,7 +129,9 @@ RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
   for i in bas do
       RECOG.CleanRow(mu,ShallowCopy(i),true,fail);
   od;
-  # Now we spin up but think over the vector space E:
+  # Spin up as in a standard basis computation, but whenever a new F-vector
+  # appears we immediately add its whole E-orbit. Thus the list grows in
+  # blocks of length d, one block for each basis vector over E.
   i := 1;
   while Length(bas) < dim do
       for j in [1..Length(gens)] do
@@ -95,6 +148,8 @@ RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
               od;
           fi;
       od;
+      # Move to the next E-basis vector, skipping over the d vectors that
+      # form its E-orbit in the F-basis.
       i := i + d;
   od;
 
@@ -106,7 +161,7 @@ RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
   # now we can write down the new action over the bigger field immediately:
   newgens := [];
   inforec := rec( bas := bas, basi := bas^-1, FF := GF(F,d), d := d,
-                  qd := q^d );
+                  qd := q^d, q := q );
   mp := MTX.FGCentMatMinPoly(m);
   facs := Factors(PolynomialRing(inforec.FF),mp : stopdegs := [1]);
   fac := First(facs,x->Degree(x)=1);
@@ -115,6 +170,10 @@ RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
   for k in [1..d-1] do
       Add(inforec.pows,inforec.pows[k]*pr);
   od;
+  # These are the basis vectors 1, alpha, ..., alpha^(d-1) of E/F, where
+  # alpha = pr is a root of the minimal polynomial of the centralising field
+  # generator. They let us pass between d x d blocks over F and scalars in E.
+  inforec.powsbasis := Basis(inforec.FF, inforec.pows);
   inforec.newdim := dim/inforec.d;
   inforec.sample := ListWithIdenticalEntries(inforec.newdim,Zero(inforec.FF));
 
@@ -122,7 +181,11 @@ RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
   ConvertToVectorRep(inforec.sample,inforec.qd);
 
   for j in [1..Length(gens)] do
-      Add(newgens,RECOG.WriteOverBiggerFieldWithSmallerDegree(inforec,gens[j]));
+      new := RECOG.WriteOverBiggerFieldWithSmallerDegree(inforec,gens[j]);
+      if new = fail then
+          ErrorNoReturn("internal error: semilinear basis rejected a generator");
+      fi;
+      Add(newgens,new);
   od;
   return rec( newgens := newgens, inforec := inforec );
 end;
@@ -170,6 +233,10 @@ function(ri)
 
   # Now report back:
   SetHomom(ri,hom);
+  Setvalidatehomominput(ri,
+      function(ri,x)
+        return RECOG.WriteOverBiggerFieldWithSmallerDegree(r.inforec, x) <> fail;
+      end);
 
   # Hand down hint that no MeatAxe run is needed nor can help:
   RECOG.SetIsAbsolutelyIrreducible(InitialDataForImageRecogNode(ri), true);
@@ -237,7 +304,7 @@ RECOG.ScalarToMultiplyIntoSmallerField := function(m,k)
       return fail;
   fi;
   pos := PositionNonZero(m[1]);
-  s := m[1][pos]^-1;
+  s := m[1,pos]^-1;
   mm := s * m;
   f := FieldOfMatrixList([mm]);
   if k = f then
@@ -393,7 +460,7 @@ RECOG.HomDoBaseAndFieldChangeWithScalarFinding := function(data,el)
   local m,p;
   m := data.t * el * data.ti;
   p := PositionNonZero(m[1]);
-  m := (m[1][p]^-1) * m;     # this gets rid of any possible scalar
+  m := (m[1,p]^-1) * m;     # this gets rid of any possible scalar
                              # from some bigger field
   return RECOG.ForceToOtherField(m,data.field);
 end;
