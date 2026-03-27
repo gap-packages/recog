@@ -96,6 +96,27 @@ DeclareFilter( "IsLeaf" );
 ## <#/GAPDoc>
 DeclareFilter( "IsReady" );
 
+## <#GAPDoc Label="IsVerified">
+## <ManSection>
+## <Filt Name="IsVerified" Type="Flag"/>
+## <Description>
+## This flag is set for a <Ref Filt="IsRecogNode"/> object <C>node</C> by <Ref
+## Func="VerifyGroup"/> or <Ref Attr="CalcStdPresentation"> if verification
+## of the <E>subtree</E> rooted in <C>node</C> finished successfully.
+## Thus, if the <Ref Filt="IsVerified"/> flag is set, the result of the
+## recognition procedure was verified and proven to be mathematically correct.
+## This means that if <A>ri</A> is a node in this subtree, <M>H</M> is the group
+## associated to <A>ri</A> and <A>riKer</A> is the left child of <A>ri</A>,
+## then the group associated to <A>riKer</A> (or rather, its embedding into <M>H</M>)
+## equals the kernel of the homomorphism from <M>H</M> to the group associated
+## to the right child of <A>ri</A>.
+## Without verification, the group of <A>riKer</A> may be smaller than the kernel.
+## <P/>
+## </Description>
+## </ManSection>
+## <#/GAPDoc>
+DeclareFilter( "IsVerified" );
+
 ## <#GAPDoc Label="Grp">
 ## <ManSection>
 ## <Attr Name="Grp" Arg="ri"/>
@@ -678,11 +699,19 @@ DeclareOperation( "GetElmOrd", [ IsRecogNode, IsRecord ] );
 DeclareOperation( "GetElmPpd", [ IsRecogNode, IsRecord ] );
 
 
-# Finally the generic verification procedure:
-
-DeclareGlobalFunction( "VerifyPermGroup" );
-DeclareGlobalFunction( "VerifyMatrixGroup" );
-DeclareGlobalFunction( "VerifyProjectiveGroup" );
+## <#GAPDoc Label="VerifyGroup">
+## <ManSection>
+## <Func Name="VerifyGroup" Arg="ri"/>
+## <Returns><K>true</K> if verification of <A>ri</A> suceeds, and <K>false</K> otherwise.
+## </Returns>
+## <Description>
+##     This function will prove (or disprove) that the recognition tree for
+##     <A>ri</A> is (mathematically) correct.
+##     If everything is correct, it will set <Ref Attr="IsVerified"/> for <A>ri</A>.
+##     See the documentation of <Ref Attr="IsVerified"/> for more details.
+## </Description>
+## </ManSection>
+## <#/GAPDoc>
 DeclareGlobalFunction( "VerifyGroup" );
 
 # Some more user functions:
