@@ -32,54 +32,62 @@
 ##  inputs become block matrices whose d x d blocks are multiplication maps
 ##  by elements of E.
 ##
-RECOG.WriteOverBiggerFieldWithSmallerDegree := function(inforec, gen)
-  local col, coords, i, k, newgen, row, t, val,d ;
+RECOG.WriteOverBiggerFieldWithSmallerDegree :=
+  function( inforec, gen )
+    # inforec needs:
+    #  bas, basi, sample, newdim, FF, d, qd from the Finder
+    local col, coords, i, k, newgen, row, t, val, d;
 
-  d := inforec.d;
-  gen := inforec.bas * gen * inforec.basi;
-  i := PositionNonZero(gen[1]);
-  if not gen[1,i] in GF(inforec.q) then
-    gen := gen / gen[1,i];
-  fi;
-  newgen := [];  # FIXME: this will later be:
-  #newgen := Matrix([],Length(inforec.sample),inforec.bas);
-  for i in [1..inforec.newdim] do
-      row := ListWithIdenticalEntries(inforec.newdim,Zero(inforec.FF));
-      ConvertToVectorRep(row,inforec.qd);
-      # FIXME: this will later be:
-      # row := ZeroVector(inforec.newdim,inforec.sample);
-      for k in [1..inforec.newdim] do
-          # The first row of each d x d block is the coordinate vector of
-          # the field element describing the E-linear map on that block.
-          val := Sum([1..d], t -> gen[(i-1)*d+1,(k-1)*d+t] * inforec.pows[t]);
+    d := inforec.d;
+    gen := inforec.bas * gen * inforec.basi;
 
-          if IsZero(val) then
-              # must be a zero block
-              if not ForAll([(i-1)*d+1 ..  i*d], t -> IsZero(gen[t]{[(k-1)*d+1 .. k*d]})) then
-                  return fail;
-              fi;
-          else
-              # Every other row must be multiplication by the same field element
-              # on the basis 1, alpha, ..., alpha^(d-1) of E/F.
-              for t in [1..d] do
-                  coords := Coefficients(inforec.powsbasis, inforec.pows[t] * val);
-                  if coords = fail then
-                      return fail;
-                  fi;
-                  col := gen[(i-1)*d+t]{[(k-1)*d+1..k*d]};
-                  if col <> coords then
-                      return fail;
-                  fi;
-              od;
-          fi;
+    # since the input is projective, it may happen that it is not over the right
+    # field -- in that case, we scale the matrix so that the first non-zero entry
+    # is in the right field; then either all entries are, or else the input matrix
+    # is not valid and we later return `fail`
+    i := PositionNonZero(gen[1]);
+    if not gen[1,i] in GF(inforec.q) then
+      gen := gen / gen[1,i];
+    fi;
+    newgen := [];  # FIXME: this will later be:
+    #newgen := Matrix([],Length(inforec.sample),inforec.bas);
+    for i in [1..inforec.newdim] do
+        row := ListWithIdenticalEntries(inforec.newdim,Zero(inforec.FF));
+        ConvertToVectorRep(row,inforec.qd);
+        # FIXME: this will later be:
+        # row := ZeroVector(inforec.newdim,inforec.sample);
+        for k in [1..inforec.newdim] do
+            # The first row of each d x d block is the coordinate vector of
+            # the field element describing the E-linear map on that block.
+            val := Sum([1..d], t -> gen[(i-1)*d+1,(k-1)*d+t] * inforec.pows[t]);
 
-          row[k] := val;
-      od;
-      Add(newgen,row);
-      # FIXME: this will go eventually:
-      ConvertToMatrixRep(newgen,inforec.qd);
-  od;
-  return newgen;
+            if IsZero(val) then
+                # must be a zero block
+                if not ForAll([(i-1)*d+1 ..  i*d], t -> IsZero(gen[t]{[(k-1)*d+1 .. k*d]})) then
+                    return fail;
+                fi;
+            else
+                # Every other row must be multiplication by the same field element
+                # on the basis 1, alpha, ..., alpha^(d-1) of E/F.
+                for t in [1..d] do
+                    coords := Coefficients(inforec.powsbasis, inforec.pows[t] * val);
+                    if coords = fail then
+                        return fail;
+                    fi;
+                    col := gen[(i-1)*d+t]{[(k-1)*d+1..k*d]};
+                    if col <> coords then
+                        return fail;
+                    fi;
+                od;
+            fi;
+
+            row[k] := val;
+        od;
+        Add(newgen,row);
+        # FIXME: this will go eventually:
+        ConvertToMatrixRep(newgen,inforec.qd);
+    od;
+    return newgen;
 end;
 
 ##
