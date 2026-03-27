@@ -155,7 +155,7 @@ function(ri)
   if pcgs <> fail then
       # We now know that the kernel is solvable, go directly to
       # the Pcgs method:
-      return FindHomMethodsPerm.Pcgs(ri,G);
+      return FindHomMethodsPerm.Pcgs(ri);
   fi;
   # We have failed, let others do the work...
   return NeverApplicable;
