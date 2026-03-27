@@ -1873,17 +1873,26 @@ function(recognise)
         ## 13.Jan.2021: Added 31
         # TODO: This means, in Table 4 of [NP99] the second column of the line "d =
         # 8, q = 5" should be "3, 7, 13, 31 + perm.rep"
-        # We generated 10000 random elements for all groups between
-        # Omega+(8,5) and Delta+(8, 5). The percentage of elements with orders
-        # divisible by 3, 7, 13, 31, and 312 respectively were at least:
-        # 56, 14, 31, 16, 5.71
-        # Since elements of order divisible by 312 are relatively rare, we
-        # don't use these anymore.
         if not HasElementsMultipleOf( recognise.orders, [3,7,13,31])  then
             return TemporaryFailure;
         fi;
         # Such elements also exist in maximal subgroups of
         # Omega+(8,5) with composition factors being C_2 and Omega(0,7,5).
+        # So we need more work to distinguish them
+        #
+        # It turns out that these groups don't contain elements of
+        # order 312, so if we see one, we are good.
+        if HasElementsMultipleOf( recognise.orders, [312]) then
+             return CheckFlag();
+        fi;
+        # We generated 10000 random elements for all groups between
+        # Omega+(8,5) and Delta+(8, 5). The percentage of elements with orders
+        # divisible by 3, 7, 13, 31, and 312 respectively were at least:
+        # 56, 14, 31, 16, 5.71
+        # Since elements of order divisible by 312 are relatively rare, we
+        # don't want to conclude too much from there not being such an
+        # element among those we generated randomly.
+        #
         # Thus we compute the projective action of grp and then compare
         # the size of resulting stabilizer chain to the size of POmega(+1,8,5).
         #
