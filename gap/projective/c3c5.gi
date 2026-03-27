@@ -61,25 +61,18 @@ RECOG.WriteOverBiggerFieldWithSmallerDegree :=
             # the field element describing the E-linear map on that block.
             val := Sum([1..d], t -> gen[(i-1)*d+1,(k-1)*d+t] * inforec.pows[t]);
 
-            if IsZero(val) then
-                # must be a zero block
-                if not ForAll([(i-1)*d+1 ..  i*d], t -> IsZero(gen[t]{[(k-1)*d+1 .. k*d]})) then
+            # Validation: every row must be multiplication by the same field element
+            # on the basis 1, alpha, ..., alpha^(d-1) of E/F.
+            for t in [1..d] do
+                coords := Coefficients(inforec.powsbasis, inforec.pows[t] * val);
+                if coords = fail then
                     return fail;
                 fi;
-            else
-                # Every other row must be multiplication by the same field element
-                # on the basis 1, alpha, ..., alpha^(d-1) of E/F.
-                for t in [1..d] do
-                    coords := Coefficients(inforec.powsbasis, inforec.pows[t] * val);
-                    if coords = fail then
-                        return fail;
-                    fi;
-                    col := gen[(i-1)*d+t]{[(k-1)*d+1..k*d]};
-                    if col <> coords then
-                        return fail;
-                    fi;
-                od;
-            fi;
+                col := gen[(i-1)*d+t]{[(k-1)*d+1..k*d]};
+                if col <> coords then
+                    return fail;
+                fi;
+            od;
 
             row[k] := val;
         od;
@@ -88,7 +81,7 @@ RECOG.WriteOverBiggerFieldWithSmallerDegree :=
         ConvertToMatrixRep(newgen,inforec.qd);
     od;
     return newgen;
-end;
+  end;
 
 ##
 ##  Input: an irreducible but not absolutely irreducible MeatAxe module `m`
