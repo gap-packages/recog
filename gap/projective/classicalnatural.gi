@@ -17,6 +17,11 @@
 ##
 #############################################################################
 
+InstallMethod( Eigenspaces, "for a field and a memory element matrix",
+  [ IsField, IsMatrix and IsObjWithMemory ],
+  function( f, m )
+    return Eigenspaces(f,m!.el);
+  end );
 
 RECOG.FindStdGensUsingBSGS := function(g,stdgens,projective,large)
   # stdgens generators for the matrix group g
