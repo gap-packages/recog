@@ -272,11 +272,11 @@ end;
 
 #! @BeginChunk BiggerScalarsOnly
 #! This kernel method is used only after
-#! <Ref Func="FindHomMethodsProjective.NotAbsolutelyIrred"/>. In the projective version of
+#! <Ref Subsect="NotAbsolutelyIrred" Style="Text"/>. In the projective version of
 #! [CNRD09, Theorem 6.5], rewriting over <M>GF(q^e)</M> leaves a second kernel
 #! consisting only of <M>GF(q^e)</M>-scalars modulo <M>GF(q)</M>-scalars.
 #! Using the <M>E</M>-adapted basis prepared by
-#! <Ref Func="FindHomMethodsProjective.NotAbsolutelyIrred"/>, the method
+#! <Ref Subsect="NotAbsolutelyIrred" Style="Text"/>, the method
 #! extracts one diagonal <M>e\times e</M> block. For such scalar elements this
 #! block determines the whole matrix, so this yields a faithful reduction of
 #! that kernel.
