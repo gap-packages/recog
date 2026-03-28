@@ -200,9 +200,14 @@ end;
 #! elements can be elements in the centraliser of <A>G</A> in <M>PGL(d,q)</M>
 #! that come from scalar matrices in the extension field.
 #!
-#! TODO: document that it only can return Success or NeverApplicable; and the status
-#!  is set in ri!.isabsolutelyirred
+#! This is the irreducible-but-not-absolutely-irreducible branch of the
+#! semilinear reduction from
+#! <Cite Key="CNRD09" Where="Section 6.4, Proposition 6.4 and Theorem 6.5"/>.
+#! In the present situation the semilinear action has trivial field
+#! automorphism part, so the whole group can be rewritten over
+#! <M>GF(q^e)</M> in dimension <M>d/e</M>.
 #!
+#! The method returns only <K>Success</K> or <K>NeverApplicable</K>.
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "NotAbsolutelyIrred",
 "write over a bigger field with smaller degree",
@@ -265,10 +270,19 @@ RECOG.HomBCToDiagonalBlock := function(data,x)
 end;
 
 #! @BeginChunk BiggerScalarsOnly
-#! TODO
+#! This kernel method is used only after
+#! <Ref Subsect="NotAbsolutelyIrred" Style="Text"/>. In the projective version
+#! of <Cite Key="CNRD09" Where="Theorem 6.5"/>, rewriting over
+#! <M>GF(q^e)</M> leaves a second kernel consisting only of
+#! <M>GF(q^e)</M>-scalars modulo <M>GF(q)</M>-scalars.
+#! Using the <M>E</M>-adapted basis prepared by
+#! <Ref Subsect="NotAbsolutelyIrred" Style="Text"/>, the method
+#! extracts one diagonal <M>e\times e</M> block. For such scalar elements this
+#! block determines the whole matrix, so this yields a faithful reduction of
+#! that kernel.
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "BiggerScalarsOnly",
-"TODO",
+"handle extension-field scalars left by the C3 rewrite",
 function(ri)
   # We come here only hinted, we project to a little square block in the
   # upper left corner and know that there is no kernel:
@@ -467,7 +481,16 @@ RECOG.HomDoBaseAndFieldChangeWithScalarFinding := function(data,el)
 end;
 
 #! @BeginChunk Subfield
-#! TODO
+#! This method handles the direct subfield reduction for irreducible
+#! projective groups. If <A>G</A><M>\le PGL(d,q)</M> can be conjugated into
+#! <M>PGL(d,q_0)</M> for a proper subfield <M>GF(q_0)</M> of <M>GF(q)</M>
+#! without needing extra projective scalar adjustments, then the method
+#! returns <K>Success</K> and installs the corresponding isomorphism.
+#! Otherwise it returns <K>NeverApplicable</K>.
+#!
+#! This is the easy part of the <M>C_5</M> reduction from
+#! <Cite Key="CNRD09" Where="Section 6.3, Theorem 6.3"/>, using the
+#! smallest-field base change described earlier there.
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "Subfield",
 "write over a smaller field with same degree",
@@ -528,7 +551,31 @@ RECOG.HomCommutator := function(data,el)
 end;
 
 #! @BeginChunk C3C5
-#! TODO
+#! This method implements the main case distinction of
+#! <Cite Key="CNRD09" Where="Sections 6.3-6.7"/> for absolutely irreducible
+#! projective groups after the immediate reducibility, subfield and
+#! non-absolute-irreducibility tests have been dealt with elsewhere.
+#!
+#! It first constructs a subgroup <A>H</A> that behaves like a normal subgroup
+#! of the derived group <M>G'</M>. The action of <A>H</A> on the natural module
+#! then determines the reduction:
+#! <List>
+#! <Item>if <A>H</A> is absolutely irreducible, test for the subfield case
+#! <M>C_5</M> as in Section 6.3 / Theorem 6.3;</Item>
+#! <Item>if <A>H</A> is irreducible but not absolutely irreducible, compute
+#! the semilinear <M>C_3</M> action as in Section 6.4 / Theorem 6.5;</Item>
+#! <Item>if a nonscalar generator has only scalar commutators, use the scalar
+#! homomorphism from Section 6.7 / Proposition 6.9;</Item>
+#! <Item>if <A>H</A> is reducible, use Clifford-theoretic reductions via
+#! homogeneous components or tensor decomposition, matching Sections 6.5
+#! and 6.6.</Item>
+#! </List>
+#!
+#! The method returns <K>Success</K> when one of these reductions is found,
+#! <K>NeverApplicable</K> if the analysed subgroup witnesses that none of the
+#! <M>C_3</M>/<M>C_5</M> branches applies, and <K>TemporaryFailure</K> in the
+#! exceptional situation discussed at the end of Section 6.4 where the sampled
+#! subgroup is too small to expose the correct endomorphism ring.
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "C3C5",
 "compute a normal subgroup of derived and resolve C3 and C5",
