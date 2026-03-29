@@ -172,6 +172,30 @@ RECOG.HomToDiagonalBlock := function(data,el)
   return ExtractSubMatrix(el,data.poss,data.poss);
 end;
 
+RECOG.FindKernelBlockScalar := function(ri)
+  local gens, s, x, y, z;
+  gens := [];
+  for x in ri!.gensHmem do
+      # For BlockScalar nodes the kernel is abelian and determined by the
+      # scalar discrepancy between each original generator and the chosen lift
+      # of its image. So we compute those residuals directly instead of hoping
+      # that random kernel search stumbles across a generating set.
+      s := SLPforElement(ImageRecogNode(ri), ImageElm(Homom(ri), x!.el));
+      if s = fail then
+          return fail;
+      fi;
+      y := ResultOfStraightLineProgram(s, ri!.pregensfacwithmem);
+      z := x^-1 * y;
+      # Keep only genuinely non-trivial residuals; duplicate removal happens
+      # later in the generic recursion code.
+      if not isone(ri)(z) then
+          Add(gens, z);
+      fi;
+  od;
+  SetgensN(ri, gens);
+  return true;
+end;
+
 #! @BeginChunk BlockScalar
 #! This method is only called by a hint. Alongside with the hint it gets
 #! a block decomposition respected by the matrix group <A>G</A> to be recognised
@@ -200,11 +224,8 @@ function(ri)
       if nrblocks = 1 then     # no kernel:
           findgensNmeth(ri).method := FindKernelDoNothing;
       else   # exactly two blocks:
-          # FIXME: why don't we just compute a precise set of generators of the kernel?
-          # That should be easily and efficiently possible at this point, no?
-          # The kernel is abelian, so we don't need to do normal closures.
-          findgensNmeth(ri).method := FindKernelRandom;
-          findgensNmeth(ri).args := [7];
+          findgensNmeth(ri).method := RECOG.FindKernelBlockScalar;
+          findgensNmeth(ri).args := [];
           InitialDataForKernelRecogNode(ri).blocks := ri!.blocks{[1]};
           # We have to go to BlockScalar with 1 block because the one block
           # is only a part of the whole matrix:
@@ -229,10 +250,8 @@ function(ri)
   AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
 
   # the kernel is the first few blocks (can be only one!):
-  # FIXME: why don't we just compute a precise set of generators of the kernel?
-  # That should be easily and efficiently possible at this point, no?
-  findgensNmeth(ri).args[1] := 3 + nrblocks;
-  findgensNmeth(ri).args[2] := 5;
+  findgensNmeth(ri).method := RECOG.FindKernelBlockScalar;
+  findgensNmeth(ri).args := [];
   InitialDataForKernelRecogNode(ri).blocks := ri!.blocks{[1..middle-1]};
   AddMethod(InitialDataForKernelRecogNode(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
   Setimmediateverification(ri,true);
