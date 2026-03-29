@@ -1038,7 +1038,7 @@ RECOG.TestGroupOptions := rec(
 # 'optionlist' is an optional list of options overriding
 # RECOG.TestGroupOptions
 RECOG.TestGroup := function(g,proj,size, optionlist...)
-  local l,r,ri,s,x,count,lvl,seedMT,seedRS,gens,supergroup, options;
+  local l,r,ri,s,x,count,lvl,seed,gens,supergroup, options;
   count := 0;
   
   options := ShallowCopy(RECOG.TestGroupOptions);
@@ -1054,11 +1054,13 @@ RECOG.TestGroup := function(g,proj,size, optionlist...)
 
   lvl:=InfoLevel(InfoRecog);
   SetInfoLevel(InfoRecog, 0);
+  seed := Random(0,2^24);
   repeat
       count := count + 1;
+      seed := seed + 1;
       #r := Runtime();
-      seedMT := State(GlobalMersenneTwister);
-      seedRS := State(GlobalRandomSource);
+      Reset(GlobalMersenneTwister, seed);
+      Reset(GlobalRandomSource, seed);
       if proj then
           ri := RecogniseProjectiveGroup(g);
       else
@@ -1071,8 +1073,7 @@ RECOG.TestGroup := function(g,proj,size, optionlist...)
           Print("recogsize := ", Size(ri), ";\n");
           Print("truesize := ", size, ";\n");
           Print("proj := ", proj, ";\n");
-          Print("seedMT := ", seedMT, ";\n");
-          Print("seedRS := ", seedRS, ";\n");
+          Print("seed := ", seed, ";\n");
           Error("Alarm: Size not correct!\n");
           if count = -1 then
               return fail;
