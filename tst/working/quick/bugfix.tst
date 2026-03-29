@@ -16,7 +16,7 @@ gap> outsider:=Reversed(IdentityMat(4,GF(2)));;
 gap> outsider in ri;
 false
 
-# Issue #16
+# See https://github.com/gap-packages/recog/issues/16
 gap> g := DirectProduct(SymmetricGroup(12),SymmetricGroup(5));;
 gap> for i in [1..30] do
 >   h:=g^Random(SymmetricGroup(37));
@@ -24,7 +24,7 @@ gap> for i in [1..30] do
 >   if Size(r) <> Size(g) then ErrorNoReturn("wrong size"); fi;
 > od;
 
-# verify issue #38 is resolved
+# See https://github.com/gap-packages/recog/issues/38
 gap> RECOG.TestGroup(SymmetricGroup(11), false, Factorial(11));
 <recognition node Giant AlmostSimple Size=39916800>
 
@@ -79,7 +79,7 @@ gap> RECOG.SmallHomomorphicImageProjectiveGroup(G);  # this call used to raise a
 fail
 
 # Bug in RECOG.ForceToOtherField when working over large, non-internal fields
-# See <https://github.com/gap-packages/recog/issues/383>
+# See https://github.com/gap-packages/recog/issues/383
 gap> m:=[[Z(17^4)^290]];;
 gap> RECOG.ForceToOtherField(m,GF(17,2)) = m;
 true
@@ -89,6 +89,40 @@ true
 # produce a failed recognition node on the branch for issue #399.
 gap> i:=4;; Reset(GlobalRandomSource,i);; Reset(GlobalMersenneTwister,1);;
 gap> ri:=RecognizeGroup(SO(+1,4,3));;
+gap> IsReady(ri);
+true
+
+# A projective tensor-factor image used to miss scalar multiples, so this
+# reproducible seed produced a failed KroneckerProduct node.
+# See https://github.com/gap-packages/recog/issues/302
+gap> z := Z(3^2);;
+gap> gens := [ [ [ z^0, z^3, z^7, z^0, z^6, z^5, z^5, z^2 ],
+>       [ z^4, z^5, z^6, z^2, z^6, z^3, z^0, z^0 ],
+>       [ z^5, 0*z, z^4, z, z^3, 0*z, z^2, z^3 ],
+>       [ z, z^7, z^6, z^2, z^3, z^5, z^0, z^0 ],
+>       [ z^6, z^5, z^5, z^2, z^0, z^3, z^7, z^0 ],
+>       [ z^6, z^3, z^0, z^0, z^4, z^5, z^6, z^2 ],
+>       [ z^3, 0*z, z^2, z^3, z^5, 0*z, z^4, z ],
+>       [ z^3, z^5, z^0, z^0, z, z^7, z^6, z^2 ] ],
+>   [ [ z^5, z^6, z^3, z^5, z^5, z^6, z^3, z^5 ],
+>       [ z^3, z^3, z, 0*z, z^7, z^7, z^5, 0*z ],
+>       [ z^3, z^4, 0*z, z^5, z^3, z^4, 0*z, z^5 ],
+>       [ z^0, z^2, z, z^3, z^4, z^6, z^5, z^7 ],
+>       [ z, z^6, z^7, z^5, z^5, z^2, z^3, z ],
+>       [ z^7, z^3, z^5, 0*z, z^7, z^3, z^5, 0*z ],
+>       [ z^7, z^4, 0*z, z^5, z^3, z^0, 0*z, z ],
+>       [ z^4, z^2, z^5, z^3, z^4, z^2, z^5, z^3 ] ] ];;
+gap> g := Group(gens);;
+gap> i := 13;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
+gap> ri := RecogniseGroup(g);;
+gap> IsReady(ri);
+true
+
+# Generic projective image verification must also accept representatives that
+# differ by scalars after rewriting over a bigger field.
+# See https://github.com/gap-packages/recog/issues/33
+gap> i := 123;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
+gap> ri := RecognizeGroup(ClassicalMaximals("L",4,3)[7]);;
 gap> IsReady(ri);
 true
 

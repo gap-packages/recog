@@ -100,13 +100,6 @@ RECOG.FindTensorDecomposition := function(G,N)
       Add(n,MTX.ProperSubmoduleBasis(m[i+1]));
       i := i + 1;
   od;
-  i := i - 1;
-  b := n[i];
-  i := i - 1;
-  while i >= 1 do
-      b := b * n[i];
-      i := i - 1;
-  od;
 
   # Compute the homogeneous component:
   w := m[Length(m)];   # An irreducible FN-module
@@ -307,17 +300,19 @@ end;
 
 
 #! @BeginChunk TensorDecomposable
-#! TODO/FIXME: it is unclear if the following description actually belongs
-#! to this method, so be cautious!
+#! This method looks for the tensor-decomposable situation described in
+#! <Cite Key="Neu09" Where="Section VII.(6.6)"/>. It first searches for a
+#! non-scalar normal subgroup
+#! whose restriction to the natural module is homogeneous. From such a
+#! subgroup it reconstructs a basis in which the group acts by Kronecker
+#! products. If the homogeneous constituent is not absolutely irreducible,
+#! then the same setup instead points to a semilinear structure; otherwise it
+#! yields a genuine tensor decomposition.
 #! 
-#! 
-#! This method currently tries to find one tensor factor by powering up
-#! commutators of random elements to elements of prime order. This seems
-#! to work quite well provided that the two tensor factors are not
-#! <Q>linked</Q> too much such that there exist enough elements that act
-#! with different orders on both tensor factors.
-#! 
-#! This method and its description needs some improvement.
+#! In practical terms the implementation starts from random elements and their
+#! commutators to obtain suitable normal subgroups, then uses MeatAxe data for
+#! the restriction to that subgroup to build the actual tensor basis, as in
+#! Lemma VII.6.6 and Theorem VII.6.7 of <Cite Key="Neu09"/>.
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "TensorDecomposable",
 "find a tensor decomposition",
@@ -396,10 +391,22 @@ RECOG.HomTensorFactor := function(data,m)
 end;
 
 #! @BeginChunk KroneckerProduct
-#! TODO
+#! This method is only used after a previous step has already found a tensor
+#! decomposition and rewritten the generators accordingly. It projects to one
+#! tensor factor, recognises that factor projectively, and then continues with
+#! the other factor in the kernel.
+#!
+#! The underlying tensor-decomposition argument is the one used for the
+#! tensor-decomposable case in <Cite Key="Neu09"
+#! Where="Section VII.(6.6), especially pp. 125-126"/>: after a suitable base
+#! change, and using the constructive reduction from Theorem VII.6.7, each
+#! group element acts as a Kronecker product on
+#! <M>V_1 \otimes_{\mathbb{F}_q} V_2</M>. In projective recognition one has to allow
+#! for scalar ambiguity in the extracted tensor factor, so the generic
+#! projective SLP machinery must treat representatives up to scalars.
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "KroneckerProduct",
-"TODO",
+"split off one factor of a tensor decomposition projectively",
 function(ri)
   # We got the hint that this is a Kronecker product, let's take it apart.
   # We first recognise projectively in one tensor factor and then in the
@@ -425,10 +432,18 @@ RECOG.HomTensorKernel := function(data,m)
 end;
 
 #! @BeginChunk KroneckerKernel
-#! TODO
+#! This method handles the kernel left behind by
+#! <Ref Subsect="KroneckerProduct" Style="Text"/>. In that kernel the second
+#! tensor factor is projectively scalar, so every element is represented by a
+#! block-diagonal matrix with identical diagonal blocks. The homomorphism used
+#! here simply projects to one of those blocks.
+#!
+#! As for <Ref Subsect="KroneckerProduct" Style="Text"/>, this is part of the
+#! tensor-decomposition strategy discussed in <Cite Key="Neu09"
+#! Where="Section VII.(6.6), especially p. 126"/>.
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "KroneckerKernel",
-"TODO",
+"project from the tensor kernel to the repeated diagonal block",
 function(ri)
   # One up in the tree we got the hint about a Kronecker product, this
   # method is called when we have gone to one factor and now are in the
