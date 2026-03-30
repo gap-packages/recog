@@ -212,6 +212,14 @@ gap> ri := RecognizeGroup(G);;
 gap> IsReady(ri);
 true
 
+# Issue #417: a contradictory homogeneous C3/C5 witness for SO(+1,4,3)
+# must not raise an internal error.
+# See https://github.com/gap-packages/recog/issues/417
+gap> i := 138;; Reset(GlobalMersenneTwister, 1);; Reset(GlobalRandomSource, i);;
+gap> ri := RecognizeGroup(SO(+1,4,3));;
+gap> IsReady(ri);
+true
+
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
 gap> STOP_TEST("bugfix.tst");

@@ -728,7 +728,10 @@ function(ri)
           fi;
           Info(InfoRecog, 2, "Restriction to H is homogeneous.");
           if not MTX.IsAbsolutelyIrreducible(collf[1][1]) then
-              ErrorNoReturn("Is this really possible? G acts absolutely irred!");
+              # This random normalizer witness is  inconsistent, so C3C5 gives up for now.
+              Info(InfoRecog, 1, "C3C5 found a homogeneous restriction whose ",
+                                 "factor is not absolutely irreducible.");
+              return TemporaryFailure;
           fi;
           homs := MTX.Homomorphisms(collf[1][1],m);
           basis := Concatenation(homs);
