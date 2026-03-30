@@ -191,6 +191,21 @@ gap> Size(ri);
 gap> ForAll(GeneratorsOfGroup(G), x -> SLPforElement(ri, x) <> fail);
 true
 
+# Issue #392: a projective TrivialGroup leaf must keep a scalar representative
+# so parent nodes can lift words back through the image.
+gap> i := 228;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
+gap> G := Group([ [ 0*Z(3), Z(3)^0 ], [ Z(3), 0*Z(3) ] ]);;
+gap> ri := RecognizeGroup(G);;
+gap> IsReady(ri);
+true
+
+# Issue #423: return of issue #392 with different setup
+gap> i := 1226;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
+gap> G := Group([ [ 0*Z(3), Z(3)^0 ], [ Z(3), 0*Z(3) ] ]);;
+gap> ri := RecognizeGroup(G);;
+gap> IsReady(ri);
+true
+
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
 gap> STOP_TEST("bugfix.tst");
