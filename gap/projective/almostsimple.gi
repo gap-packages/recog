@@ -251,7 +251,7 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
               triesinner := triesinner + 1;
               hm := GModuleByMats(gens,fld);
               if MTX.IsIrreducible(hm) then
-                  Unbind(gens[Length(gens)]);
+                  Remove(gens);
               fi;
           od;
       fi;
@@ -264,10 +264,10 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
               s := MTX.ProperSubmoduleBasis(hm);
               Add(bas,s);
           od;
-          Unbind(bas[Length(bas)]);
-          s := bas[Length(bas)];
-          for i in [Length(bas)-1,Length(bas)-2..1] do
-              s := s * bas[i];
+          Remove(bas); # drop last element, which is `fail`
+          s := Remove(bas);
+          while Length(bas) > 0 do
+              s := s * Remove(bas);
           od;
           # Now s is the basis of a minimal submodule, permute that:
           s := MutableCopyMat(s);
@@ -368,7 +368,7 @@ RECOG.ProduceTrivialStabChainHint := function(name,reps,maxes)
               else
                   Add(values,[QuoInt(Length(o)+99,100),Length(o)]);
               fi;
-              Print("value=",values[Length(values)]," time=",t," orblen=",
+              Print("value=",Last(values)," time=",t," orblen=",
                     Length(o)," subspace=");
               ViewObj(x);
               Print("\n");
@@ -1546,7 +1546,7 @@ function(ri)
     # order of another group element.
     setOfOrders := AsSet(orders);
     # All orders we look for are <= 66.
-    if setOfOrders[Length(setOfOrders)] > 67 then
+    if Last(setOfOrders) > 67 then
         return NeverApplicable;
     fi;
     maximalOrders := [];

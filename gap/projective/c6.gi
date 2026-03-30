@@ -580,10 +580,10 @@ RECOG.TestAbelian := function (n,grp,u)
         y  := RandomSubproduct(list);
         # check whether y commutes with the element computed
         # in the previous iteration
-        x := list[Length(list)];
+        x := Last(list);
         h := x * y; g := y * x;
         pos := PositionNonZero( h[1] );
-        if g <> g[1][pos]/h[1][pos]   * h then
+        if not IsEqualProjective(g, h) then
             # x and y do not commute
              return [ false, g/h ];
         fi;
@@ -591,7 +591,7 @@ RECOG.TestAbelian := function (n,grp,u)
         x := y^PseudoRandom(grp);
         h := x * y; g := y * x;
         pos := PositionNonZero( h[1] );
-        if g <> g[1][pos]/h[1][pos]   * h then
+        if not IsEqualProjective(g, h) then
             # x and y do not commute
              return [ false, g/h ];
         fi;

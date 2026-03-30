@@ -2385,7 +2385,7 @@ function( grp, arg... )
   q := Size(f);
 
   opt := rec();
-  if Length(arg) > 0 and IsRecord(arg[Length(arg)]) then
+  if Length(arg) > 0 and IsRecord(Last(arg)) then
       opt := Remove(arg);
   fi;
   if Length(arg) > 0 then
