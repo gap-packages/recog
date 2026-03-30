@@ -20,12 +20,6 @@ SLPforElementFuncsGeneric.TrivialGroup := function(ri,g)
     fi;
     return StraightLineProgramNC( [ [1,0] ], 1 );
 end;
-SLPforElementFuncsProjective.TrivialGroup := function(ri,g)
-    if not ri!.isone(g) then
-        return fail;
-    fi;
-    return StraightLineProgramNC( [ [1,1] ], 1 );
-end;
 #! @EndCode
 
 #! @BeginChunk TrivialGroup
@@ -56,21 +50,12 @@ function(ri)
   # size of the group
   SetSize(ri, 1);
 
-  if IsBound(ri!.projective) and ri!.projective then
-    # For projective groups we use one actual input scalar as the leaf's nice
-    # generator, instead of the identity word, so parent nodes can lift words
-    # back through the image without losing the scalar representative.
-    Setslpforelement(ri, SLPforElementFuncsProjective.TrivialGroup);
-    Setslptonice(ri, StraightLineProgramNC([[[1,1]]],
-                     Length(gens)));
-  else
-    # explained below
-    Setslpforelement(ri, SLPforElementFuncsGeneric.TrivialGroup);
+  # explained below
+  Setslpforelement(ri, SLPforElementFuncsGeneric.TrivialGroup);
 
-    # SLP from given generators to nice generators
-    Setslptonice(ri, StraightLineProgramNC([[[1,0]]],
-                     Length(gens)));
-  fi;
+  # SLP from given generators to nice generators
+  Setslptonice(ri, StraightLineProgramNC([[[1,0]]],
+                   Length(gens)));
 
   # We have reached a leaf node.
   SetFilterObj(ri, IsLeaf);

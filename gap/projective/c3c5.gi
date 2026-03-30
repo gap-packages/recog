@@ -246,6 +246,7 @@ function(ri)
   # Also, doing normal closure will not help!
   findgensNmeth(ri).method := FindKernelRandom;
   findgensNmeth(ri).args := [5];
+  Setimmediateverification(ri, true);
   AddMethod(InitialDataForKernelRecogNode(ri).hints,
             FindHomMethodsProjective.BiggerScalarsOnly,
             2000);
