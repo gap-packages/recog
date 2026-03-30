@@ -545,7 +545,7 @@ RECOG.ExtractLowStuff := function(m,layer,blocks,lens,basisOfFieldExtension)
       what := blocks[block[2]];
       for k in blocks[block[1]] do
           where := [pos+1..pos+Length(what)];
-          CopySubVector(m[k],v,what,where);
+          RECOG.CopySubVectorCompat(m[k],v,what,where);
           pos := pos + Length(what);
       od;
   od;

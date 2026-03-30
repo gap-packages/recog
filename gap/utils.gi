@@ -130,3 +130,11 @@ RECOG.CachePrimesUpTo := function(n)
     RECOG.PrimesCacheUpperBound := n;
 end;
 
+RECOG.CopySubVectorCompat := function(src, dst, from, to)
+    if IsVectorObj(src) and IsVectorObj(dst) then
+        CopySubVector(src, dst, from, to);
+    else
+        dst{to} := src{from};
+    fi;
+    return dst;
+end;
