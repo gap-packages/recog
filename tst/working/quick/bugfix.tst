@@ -54,6 +54,12 @@ gap> RecogniseGroup(SL(2,5));
     F:<recognition node Scalar Dim=1 Field=5>
     K:<trivial kernel>>
 
+# Issue #66: direct products over larger fields must not rely on
+# CopySubVector only handling IsVectorObj rows.
+gap> ri := RecognizeGroup(DirectProduct(SU(3,17), SL(3,17)));;
+gap> IsReady(ri);
+true
+
 # We had a bug where RECOG.IsScalarMat was used incorrectly (return value was
 # assumed to be true or false, but could be an FFE). This example used to
 # trigger the error, which looked like this:
