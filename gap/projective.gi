@@ -106,7 +106,17 @@ function(ri)
 end);
 
 SLPforElementFuncsProjective.StabilizerChainProj := function(ri,x)
-  local r;
+  local z, r;
+  # Over GF(2), genss uses OnPoints as an optimization even in projective
+  # stabilizer chains. In that case we must normalize extension-field scalar
+  # multiples back to a representative over ri!.field before sifting, or else
+  # orb hashes the resulting point as the wrong type.
+  if IsIdenticalObj(ri!.stabilizerchain!.orb!.op, OnPoints) then
+      z := x[1,PositionNonZero(x[1])];
+      if not IsOne(z) then
+          x := x / z;
+      fi;
+  fi;
   r := SiftGroupElementSLP(ri!.stabilizerchain,x);
   return r.slp;
 end;

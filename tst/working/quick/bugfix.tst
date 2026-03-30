@@ -118,24 +118,17 @@ gap> ri := RecogniseGroup(g);;
 gap> IsReady(ri);
 true
 
-# Generic projective image verification must also accept representatives that
-# differ by scalars after rewriting over a bigger field.
+# Issue #33: Generic projective image verification must also accept
+# representatives that differ by scalars after rewriting over a bigger field.
 # See https://github.com/gap-packages/recog/issues/33
 gap> i := 123;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
 gap> ri := RecognizeGroup(ClassicalMaximals("L",4,3)[7]);;
 gap> IsReady(ri);
 true
 
-# Issue #392: a projective TrivialGroup leaf must keep a scalar representative
-# so parent nodes can lift words back through the image.
-gap> i := 228;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
-gap> G := Group([ [ 0*Z(3), Z(3)^0 ], [ Z(3), 0*Z(3) ] ]);;
-gap> ri := RecognizeGroup(G);;
-gap> IsReady(ri);
-true
-
 # Issue #36: a diagonal 7x7 group over GF(9) used to miss one BlockScalar
 # kernel generator, leading to an underestimated size and failed SLPs.
+# See https://github.com/gap-packages/recog/issues/36
 gap> z := Z(3^2);;
 gap> diags := [
 >   [ z^7, z^6, z, z^6, z^3, Z(3)^0, z^5 ],
@@ -150,6 +143,29 @@ gap> ri := RecognizeGroup(g);;
 gap> Size(ri);
 16384
 gap> ForAll(GeneratorsOfGroup(g), x -> SLPforElement(ri, x) <> fail);
+true
+
+# Issue #392: a projective TrivialGroup leaf must keep a scalar representative
+# so parent nodes can lift words back through the image.
+# See https://github.com/gap-packages/recog/issues/392
+gap> i := 228;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
+gap> G := Group([ [ 0*Z(3), Z(3)^0 ], [ Z(3), 0*Z(3) ] ]);;
+gap> ri := RecognizeGroup(G);;
+gap> IsReady(ri);
+true
+
+# Issue #393: projective stabilizer-chain sifting over GF(2) must normalize
+# extension-field scalar multiples before calling into genss, otherwise the
+# OnPoints optimization hashes the wrong kind of vectors.
+# See https://github.com/gap-packages/recog/issues/393
+gap> Reset(GlobalMersenneTwister, 1);; Reset(GlobalRandomSource, 1);;
+gap> G := SylowSubgroup(GL(6,2),3);;
+gap> ri := RecognizeGroup(G);;
+gap> IsReady(ri);
+true
+gap> Size(ri);
+81
+gap> ForAll(GeneratorsOfGroup(G), x -> SLPforElement(ri, x) <> fail);
 true
 
 #
