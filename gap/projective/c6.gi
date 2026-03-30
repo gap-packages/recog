@@ -57,12 +57,12 @@ RECOG.whichpower:=function(r,n,q,spa,spb,x)
 
     v:=spa[1]*x;
     w:=SolutionMat(spa,v);
-    j:=Position(List(w,y->y<>0*Z(q)),true);
+    j:=PositionNonZero(w);
     j:=Int( (j-1)/r ^(n-1));
 
     v:=spb[1]*x;
     w:=SolutionMat(spb,v);
-    i:=Position(List(w,y->y<>0*Z(q)),true);
+    i:=PositionNonZero(w);
     i:=Int( (i-1)/r ^(n-1));
 
     return [i,j];
@@ -81,7 +81,7 @@ RECOG.ActionOnBlocks := function(r,n,q,blks,x)
     perm:=[];
     for i in [1..ell] do
       w:=blocks[1+(i-1)*(Length(blocks)/ell)];
-      j:=Position(List(w,y->y<>0*Z(q)),true);
+      j:=PositionNonZero(w);
       j:=1+Int( (j-1)/(Length(blocks)/ell));
       perm[i]:=j;
     od;
