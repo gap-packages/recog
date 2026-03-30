@@ -164,24 +164,31 @@ RECOG.RadBasis:=function(r,n,q,rad)
          Collected(List(rad,x->IsDiagonalMat(nicebasis*x*niceinv))));
     diagrad:=List(rad,x->DiagonalOfMat(nicebasis*x*niceinv));
 
-    #write each vector in diagrad as scalar times a vector over GF(r)
+    # write each vector in diagrad as scalar times a vector over GF(r)
     action:= [];
     for i in [1..Length(diagrad)] do
         action[i]:=List(diagrad[i],x-> x/diagrad[i][1]);
     od;
-        action := TransposedMatMutable(action);
+    action := TransposedMatMutable(action);
 
-if Length(action) <> Length(nicebasis) then
-    ErrorNoReturn("what's wrong?");
-fi;
+    # CommonDiagonal2 should give one normalized character row for each basis
+    # vector. If that count already disagrees, then this commuting subgroup is
+    # not the kind of uniform radical subgroup that the C6 code expects.
+    if Length(action) <> Length(nicebasis) then
+        return fail;
+    fi;
 
     # The identical rows of action correspond to vectors in
     # a  homogeneous component
     s := Set( action );
 
-if Length(nicebasis) mod Length(s)  <> 0 then
-    ErrorNoReturn("what's wrong2?");
-fi;
+    # rewriteones/ActionOnBlocks treat equal rows as equal-size homogeneous
+    # blocks, so the number of distinct rows must divide the full dimension.
+    # If it does not, BlindDescent found a bad abelian witness rather than a
+    # valid C6 radical, and the caller must reject this attempt.
+    if Length(nicebasis) mod Length(s) <> 0 then
+        return fail;
+    fi;
     # all vectors in nicebasis whose rows in action are
     # identical form a block
     f := function (a, b) return Position(s,a) <= Position(s,b); end;
@@ -299,7 +306,11 @@ RECOG.basis2:=function(r,n,q,g)
     Info(InfoRecog,3,"exit basis2");
 
     if Length(rad) > 0 then
-        return rec( basis := rec(), blocks := RECOG.RadBasis(r,n,q,rad) );
+        rad := RECOG.RadBasis(r,n,q,rad);
+        if rad = fail then
+            return fail;
+        fi;
+        return rec( basis := rec(), blocks := rad );
     else
         return rec( basis := rec(sympl:=list,es:=list2), blocks := [] );
     fi;
@@ -700,6 +711,12 @@ RECOG.New2RecogniseC6 := function(grp)
     rgrp := Group(b[2]);
     ## try to find a set of standard gens for <rgrp>
     grpbasis := RECOG.basis2(r,n,q,rgrp);
+    # BlindDescent is randomized and only tests for an abelian witness. If the
+    # stronger basis construction fails, reject this C6 attempt and let method
+    # selection retry later instead of aborting recognition.
+    if grpbasis = fail then
+        return TemporaryFailure;
+    fi;
 
     ## construct image of <grp> in classical group
     Info(InfoRecog,3,"enter image computation");
