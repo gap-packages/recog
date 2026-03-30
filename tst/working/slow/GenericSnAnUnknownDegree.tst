@@ -4,6 +4,8 @@
 #@local S11On2Sets, d, sets, SdOn2Sets, success, res, isoData, gens, g1, img1, g2, img2
 #@local SymOnKSets, AltOnKSets
 #@local db
+gap> START_TEST("GenericSnAnUnknownDegree.tst");
+
 #
 # HACK to insert the method
 gap> AddMethod(FindHomDbPerm, FindHomMethodsGeneric.SnAnUnknownDegree, 58);;
@@ -303,3 +305,6 @@ gap> for db in [FindHomDbPerm, FindHomDbMatrix, FindHomDbProjective] do
 >       Remove(db,
 >              PositionProperty(db, x -> Stamp(x.method) = "SnAnUnknownDegree"));;
 > od;
+
+#
+gap> STOP_TEST("GenericSnAnUnknownDegree.tst");
