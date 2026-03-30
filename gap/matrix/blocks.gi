@@ -238,7 +238,7 @@ function(ri)
   # We hack away at least two blocks and leave at least one:
   middle := QuoInt(nrblocks,2)+1;   # the first one taken
   topblock := ri!.blocks[nrblocks];
-  data := rec(poss := [ri!.blocks[middle][1]..topblock[Length(topblock)]]);
+  data := rec(poss := [ri!.blocks[middle][1]..Last(topblock)]);
   newgens := List(GeneratorsOfGroup(G),x->RECOG.HomToDiagonalBlock(data,x));
   H := GroupWithGenerators(newgens);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);

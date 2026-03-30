@@ -614,7 +614,7 @@ RECOG.SLPforSn :=  function( n, pi )
             for k in [ 2 .. Length(ci)-1 ] do
                 Append( cycslp, [ 2,1, 3,ci[k]-ci[k+1] ] );
             od;
-            Append( cycslp, [ 2,1, 3,ci[Length(ci)]-ci[1]-1 ] );
+            Append( cycslp, [ 2,1, 3,Last(ci)-ci[1]-1 ] );
             Append( R, [ [cycslp,4] ]);
         else    # we carry forward cycle product computed so far
             Append( R, [ [[1,1],4] ] );

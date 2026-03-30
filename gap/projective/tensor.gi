@@ -102,7 +102,7 @@ RECOG.FindTensorDecomposition := function(G,N)
   od;
 
   # Compute the homogeneous component:
-  w := m[Length(m)];   # An irreducible FN-module
+  w := Last(m);   # An irreducible FN-module
   homs := MTX.Homomorphisms(w,m[1]);
   homsimg := Concatenation(homs);
   ConvertToMatrixRep(homsimg,f);
