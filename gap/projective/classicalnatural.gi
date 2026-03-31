@@ -897,7 +897,13 @@ function(ri)
   for i in [1..Length(gens)] do
       det := DeterminantMat(gens[i]);
       if not IsOne(det) then
-          root := RECOG.ComputeRootInFiniteField(det,gcd.gcd,f);
+          # If gcd(d, q-1) = 1 and d=2, det^-1 is a square in f.
+          # Thus use root s.t. root^2 = det^-1, so that det * root^2 = 1.
+          if gcd.gcd = 1 and d = 2 then
+              root := RECOG.ComputeRootInFiniteField(det^-1, 2, f);
+          else
+              root := RECOG.ComputeRootInFiniteField(det, gcd.gcd, f);
+          fi;
           if root = fail then
               ErrorNoReturn("Should not have happened, 15634, tell Max!");
           fi;
