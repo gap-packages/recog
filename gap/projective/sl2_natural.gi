@@ -195,6 +195,7 @@ RECOG.RecogNaturalSL2 := function(G, q)
     mat[1,2] := x[2,2]-1/a; mat[2,2] := -x[2,1];
   fi;
 
+  Assert(3, xm^mat = DiagonalMat([a, a^-1]) );
 
   # find conjugate of x with different eigenspaces
   # (almost all conjugates will do)
@@ -208,8 +209,6 @@ RECOG.RecogNaturalSL2 := function(G, q)
         ymat[1,2]*mat[2,2]-ymat[2,2]*mat[1,2] <> zero;
   # now y^(tm * mat) = diag(a, a^-1) 
   tr := tm*mat;
-
-  Assert(3, y^(tm * mat) = DiagonalMat([a, a^-1]) );
 
   # a-eigenvector of x in new basis
   d := tr^-1 * [mat[1,1],mat[2,1]];
@@ -236,7 +235,7 @@ RECOG.RecogNaturalSL2 := function(G, q)
       # this will in most cases be a transvection normalized by x
       trupm := Comm(xm, ym^i*cm);
       smm := trupm^mat;
-      if smm[1,2] = zero or smm[2,1] <> zero then
+      if smm[1,2] = zero or smm[2,1] <> zero or smm[1,1] <> one then
         i := false;
       else
         # rescale first column of mat such that trupm^mat = [[1,1],[0,1]]
@@ -277,7 +276,7 @@ RECOG.RecogNaturalSL2 := function(G, q)
       # that the conjugate matrix is [[1,0],[1,1]]).
       trlowm := Comm(xm, ym^i*cm);
       smm := trlowm^mat;
-      if smm[2,1] = zero or smm[1,2] <> zero then
+      if smm[2,1] = zero or smm[1,2] <> zero or smm[1,1] <> one then
         i := false;
       fi;
     fi;
