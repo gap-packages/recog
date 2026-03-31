@@ -41,6 +41,8 @@ jobs:
           ../bin/BuildPackages.sh --strict cvec io orb
       - uses: gap-actions/build-pkg@v2
       - uses: gap-actions/run-pkg-tests@v4
+        with:
+          testfile: tst/testall.g
       - uses: gap-actions/run-pkg-tests@v4
         with:
           mode: onlyneeded

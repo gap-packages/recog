@@ -12,19 +12,43 @@
 ##  SPDX-License-Identifier: GPL-3.0-or-later
 ##
 ##
-## TODO: Maybe ask Colva about this:
-## This algorithm is probably based on the paper [CNRD09].
+## The semilinear rewrite below follows the construction in [CNRD09],
+## Section 6.4, for the irreducible-but-not-absolutely-irreducible case.
 ##
 ##  Handle the (projective) semilinear and subfield cases.
 ##
 #############################################################################
 
+##
+##  Input: `inforec` from `RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder`
+##  and a matrix `gen` on the original F-space V.
+##
+##  Output: either the corresponding matrix on the E-space V_E, where
+##  E = End_{F G}(V) is represented as GF(q^d), or `fail` if `gen` does not
+##  preserve the E-vector space structure encoded by `inforec`.
+##
+##  This is the "write over a bigger field with smaller degree" step from
+##  [CNRD09, Section 6.4]: after choosing an E-adapted basis of V, valid
+##  inputs become block matrices whose d x d blocks are multiplication maps
+##  by elements of E.
+##
 RECOG.WriteOverBiggerFieldWithSmallerDegree :=
   function( inforec, gen )
     # inforec needs:
     #  bas, basi, sample, newdim, FF, d, qd from the Finder
-    local i,k,newgen,row,t,val;
+    local col, coords, i, k, newgen, row, t, val, d;
+
+    d := inforec.d;
     gen := inforec.bas * gen * inforec.basi;
+
+    # since the input is projective, it may happen that it is not over the right
+    # field -- in that case, we scale the matrix so that the first non-zero entry
+    # is in the right field; then either all entries are, or else the input matrix
+    # is not valid and we later return `fail`
+    i := PositionNonZero(gen[1]);
+    if not gen[1,i] in GF(inforec.q) then
+      gen := gen / gen[1,i];
+    fi;
     newgen := [];  # FIXME: this will later be:
     #newgen := Matrix([],Length(inforec.sample),inforec.bas);
     for i in [1..inforec.newdim] do
@@ -33,20 +57,45 @@ RECOG.WriteOverBiggerFieldWithSmallerDegree :=
         # FIXME: this will later be:
         # row := ZeroVector(inforec.newdim,inforec.sample);
         for k in [1..inforec.newdim] do
-            val := Zero(inforec.FF);
-            for t in [1..inforec.d] do
-                val := gen[(i-1)*inforec.d+1][(k-1)*inforec.d+t]
-                       * inforec.pows[t] + val;
+            # The first row of each d x d block is the coordinate vector of
+            # the field element describing the E-linear map on that block.
+            val := Sum([1..d], t -> gen[(i-1)*d+1,(k-1)*d+t] * inforec.pows[t]);
+
+            # Validation: every row must be multiplication by the same field element
+            # on the basis 1, alpha, ..., alpha^(d-1) of E/F.
+            for t in [1..d] do
+                coords := Coefficients(inforec.powsbasis, inforec.pows[t] * val);
+                if coords = fail then
+                    return fail;
+                fi;
+                col := gen[(i-1)*d+t]{[(k-1)*d+1..k*d]};
+                if col <> coords then
+                    return fail;
+                fi;
             od;
+
             row[k] := val;
         od;
         Add(newgen,row);
-# FIXME: this will go eventually:
-ConvertToMatrixRep(newgen,inforec.qd);
+        # FIXME: this will go eventually:
+        ConvertToMatrixRep(newgen,inforec.qd);
     od;
     return newgen;
   end;
 
+##
+##  Input: an irreducible but not absolutely irreducible MeatAxe module `m`
+##  over F = GF(q).
+##
+##  Output: a record containing:
+##    `newgens`  the generators rewritten as matrices of size dim/d over GF(q^d)
+##    `inforec`  the basis change and field data needed to rewrite later inputs
+##
+##  The centralising matrix `e := MTX.FieldGenCentMat(m)` generates
+##  E = End_{F G}(V). Following [CNRD09, Section 6.4], we use `e` to view V
+##  as an E-vector space and construct an E-adapted basis by spinning in
+##  blocks of length d over E instead of single vectors over F.
+##
 RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
   # m a MeatAxe-module
   local F,bas,d,dim,e,fac,facs,gens,i,inforec,j,k,mp,mu,new,newgens,pr,q,v;
@@ -68,7 +117,10 @@ RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
   v[1] := One(F);
   bas := [v]; # FIXME, this will later be:
   #bas := Matrix([v],Length(v),gens[1]);
-  # Do the first E = <e>-dimension:
+
+  # The powers of e generate the first E-line through v, namely
+  # v, v*e, ..., v*e^(d-1). These vectors form the first block of the
+  # eventual E-adapted basis.
   for i in [1..d-1] do
       Add(bas,bas[i]*e);
   od;
@@ -77,7 +129,9 @@ RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
   for i in bas do
       RECOG.CleanRow(mu,ShallowCopy(i),true,fail);
   od;
-  # Now we spin up but think over the vector space E:
+  # Spin up as in a standard basis computation, but whenever a new F-vector
+  # appears we immediately add its whole E-orbit. Thus the list grows in
+  # blocks of length d, one block for each basis vector over E.
   i := 1;
   while Length(bas) < dim do
       for j in [1..Length(gens)] do
@@ -94,16 +148,20 @@ RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
               od;
           fi;
       od;
+      # Move to the next E-basis vector, skipping over the d vectors that
+      # form its E-orbit in the F-basis.
       i := i + d;
   od;
+
+  # FIXME: this will later go:
+  # was: ConvertToMatrixRep(bas,q^d);  but this seems to be a bug!!!
+  ConvertToMatrixRep(bas,q);
+
   # Since the module is irreducible i will not run over the length of bas
   # now we can write down the new action over the bigger field immediately:
-# FIXME: this will later go:
-# was: ConvertToMatrixRep(bas,q^d);  but this seems to be a bug!!!
-ConvertToMatrixRep(bas,q);
   newgens := [];
   inforec := rec( bas := bas, basi := bas^-1, FF := GF(F,d), d := d,
-                  qd := q^d );
+                  qd := q^d, q := q );
   mp := MTX.FGCentMatMinPoly(m);
   facs := Factors(PolynomialRing(inforec.FF),mp : stopdegs := [1]);
   fac := First(facs,x->Degree(x)=1);
@@ -112,12 +170,22 @@ ConvertToMatrixRep(bas,q);
   for k in [1..d-1] do
       Add(inforec.pows,inforec.pows[k]*pr);
   od;
+  # These are the basis vectors 1, alpha, ..., alpha^(d-1) of E/F, where
+  # alpha = pr is a root of the minimal polynomial of the centralising field
+  # generator. They let us pass between d x d blocks over F and scalars in E.
+  inforec.powsbasis := Basis(inforec.FF, inforec.pows);
   inforec.newdim := dim/inforec.d;
   inforec.sample := ListWithIdenticalEntries(inforec.newdim,Zero(inforec.FF));
-# FIXME: this will later go:
-ConvertToVectorRep(inforec.sample,inforec.qd);
+
+  # FIXME: this will later go:
+  ConvertToVectorRep(inforec.sample,inforec.qd);
+
   for j in [1..Length(gens)] do
-      Add(newgens,RECOG.WriteOverBiggerFieldWithSmallerDegree(inforec,gens[j]));
+      new := RECOG.WriteOverBiggerFieldWithSmallerDegree(inforec,gens[j]);
+      if new = fail then
+          ErrorNoReturn("internal error: semilinear basis rejected a generator");
+      fi;
+      Add(newgens,new);
   od;
   return rec( newgens := newgens, inforec := inforec );
 end;
@@ -132,9 +200,14 @@ end;
 #! elements can be elements in the centraliser of <A>G</A> in <M>PGL(d,q)</M>
 #! that come from scalar matrices in the extension field.
 #!
-#! TODO: document that it only can return Success or NeverApplicable; and the status
-#!  is set in ri!.isabsolutelyirred
+#! This is the irreducible-but-not-absolutely-irreducible branch of the
+#! semilinear reduction from
+#! <Cite Key="CNRD09" Where="Section 6.4, Proposition 6.4 and Theorem 6.5"/>.
+#! In the present situation the semilinear action has trivial field
+#! automorphism part, so the whole group can be rewritten over
+#! <M>GF(q^e)</M> in dimension <M>d/e</M>.
 #!
+#! The method returns only <K>Success</K> or <K>NeverApplicable</K>.
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "NotAbsolutelyIrred",
 "write over a bigger field with smaller degree",
@@ -165,6 +238,10 @@ function(ri)
 
   # Now report back:
   SetHomom(ri,hom);
+  Setvalidatehomominput(ri,
+      function(ri,x)
+        return RECOG.WriteOverBiggerFieldWithSmallerDegree(r.inforec, x) <> fail;
+      end);
 
   # Hand down hint that no MeatAxe run is needed nor can help:
   RECOG.SetIsAbsolutelyIrreducible(InitialDataForImageRecogNode(ri), true);
@@ -174,6 +251,7 @@ function(ri)
   # Also, doing normal closure will not help!
   findgensNmeth(ri).method := FindKernelRandom;
   findgensNmeth(ri).args := [5];
+  Setimmediateverification(ri, true);
   AddMethod(InitialDataForKernelRecogNode(ri).hints,
             FindHomMethodsProjective.BiggerScalarsOnly,
             2000);
@@ -192,10 +270,19 @@ RECOG.HomBCToDiagonalBlock := function(data,x)
 end;
 
 #! @BeginChunk BiggerScalarsOnly
-#! TODO
+#! This kernel method is used only after
+#! <Ref Subsect="NotAbsolutelyIrred" Style="Text"/>. In the projective version
+#! of <Cite Key="CNRD09" Where="Theorem 6.5"/>, rewriting over
+#! <M>GF(q^e)</M> leaves a second kernel consisting only of
+#! <M>GF(q^e)</M>-scalars modulo <M>GF(q)</M>-scalars.
+#! Using the <M>E</M>-adapted basis prepared by
+#! <Ref Subsect="NotAbsolutelyIrred" Style="Text"/>, the method
+#! extracts one diagonal <M>e\times e</M> block. For such scalar elements this
+#! block determines the whole matrix, so this yields a faithful reduction of
+#! that kernel.
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "BiggerScalarsOnly",
-"TODO",
+"handle extension-field scalars left by the C3 rewrite",
 function(ri)
   # We come here only hinted, we project to a little square block in the
   # upper left corner and know that there is no kernel:
@@ -232,7 +319,7 @@ RECOG.ScalarToMultiplyIntoSmallerField := function(m,k)
       return fail;
   fi;
   pos := PositionNonZero(m[1]);
-  s := m[1][pos]^-1;
+  s := m[1,pos]^-1;
   mm := s * m;
   f := FieldOfMatrixList([mm]);
   if k = f then
@@ -388,13 +475,22 @@ RECOG.HomDoBaseAndFieldChangeWithScalarFinding := function(data,el)
   local m,p;
   m := data.t * el * data.ti;
   p := PositionNonZero(m[1]);
-  m := (m[1][p]^-1) * m;     # this gets rid of any possible scalar
+  m := (m[1,p]^-1) * m;     # this gets rid of any possible scalar
                              # from some bigger field
   return RECOG.ForceToOtherField(m,data.field);
 end;
 
 #! @BeginChunk Subfield
-#! TODO
+#! This method handles the direct subfield reduction for irreducible
+#! projective groups. If <A>G</A><M>\le PGL(d,q)</M> can be conjugated into
+#! <M>PGL(d,q_0)</M> for a proper subfield <M>GF(q_0)</M> of <M>GF(q)</M>
+#! without needing extra projective scalar adjustments, then the method
+#! returns <K>Success</K> and installs the corresponding isomorphism.
+#! Otherwise it returns <K>NeverApplicable</K>.
+#!
+#! This is the easy part of the <M>C_5</M> reduction from
+#! <Cite Key="CNRD09" Where="Section 6.3, Theorem 6.3"/>, using the
+#! smallest-field base change described earlier there.
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "Subfield",
 "write over a smaller field with same degree",
@@ -455,7 +551,31 @@ RECOG.HomCommutator := function(data,el)
 end;
 
 #! @BeginChunk C3C5
-#! TODO
+#! This method implements the main case distinction of
+#! <Cite Key="CNRD09" Where="Sections 6.3-6.7"/> for absolutely irreducible
+#! projective groups after the immediate reducibility, subfield and
+#! non-absolute-irreducibility tests have been dealt with elsewhere.
+#!
+#! It first constructs a subgroup <A>H</A> that behaves like a normal subgroup
+#! of the derived group <M>G'</M>. The action of <A>H</A> on the natural module
+#! then determines the reduction:
+#! <List>
+#! <Item>if <A>H</A> is absolutely irreducible, test for the subfield case
+#! <M>C_5</M> as in Section 6.3 / Theorem 6.3;</Item>
+#! <Item>if <A>H</A> is irreducible but not absolutely irreducible, compute
+#! the semilinear <M>C_3</M> action as in Section 6.4 / Theorem 6.5;</Item>
+#! <Item>if a nonscalar generator has only scalar commutators, use the scalar
+#! homomorphism from Section 6.7 / Proposition 6.9;</Item>
+#! <Item>if <A>H</A> is reducible, use Clifford-theoretic reductions via
+#! homogeneous components or tensor decomposition, matching Sections 6.5
+#! and 6.6.</Item>
+#! </List>
+#!
+#! The method returns <K>Success</K> when one of these reductions is found,
+#! <K>NeverApplicable</K> if the analysed subgroup witnesses that none of the
+#! <M>C_3</M>/<M>C_5</M> branches applies, and <K>TemporaryFailure</K> in the
+#! exceptional situation discussed at the end of Section 6.4 where the sampled
+#! subgroup is too small to expose the correct endomorphism ring.
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "C3C5",
 "compute a normal subgroup of derived and resolve C3 and C5",

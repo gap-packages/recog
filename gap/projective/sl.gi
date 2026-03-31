@@ -607,7 +607,7 @@ RECOG.SLn_UpStep := function(w)
       # Clean out the first n entries to go to the fixed space of SL_n:
       zerovec := Zero(newpart[1]);
       for i in [1..w.n-1] do
-          CopySubVector(zerovec,newpart[i],[1..w.n],[1..w.n]);
+          RECOG.CopySubVectorCompat(zerovec,newpart[i],[1..w.n],[1..w.n]);
       od;
       MB := MutableBasis(w.f,[],zerovec);
       i := 1;

@@ -11,3 +11,12 @@ html:
 
 check:
 	$(GAP) $(GAP_ARGS) tst/testall.g
+
+check-quick:
+	$(GAP) $(GAP_ARGS) tst/testquick.g
+
+check-slow:
+	$(GAP) $(GAP_ARGS) tst/testslow.g
+
+check-veryslow:
+	$(GAP) $(GAP_ARGS) tst/testveryslow.g

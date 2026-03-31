@@ -78,7 +78,7 @@ function(ri)
   # Otherwise more than one block, cut in half:
   middle := QuoInt(nrblocks,2)+1;   # the first one taken
   topblock := ri!.blocks[nrblocks];
-  data := rec(poss := [ri!.blocks[middle][1]..topblock[Length(topblock)]]);
+  data := rec(poss := [ri!.blocks[middle][1]..Last(topblock)]);
   newgens := List(GeneratorsOfGroup(G),x->RECOG.HomToDiagonalBlock(data,x));
   H := GroupWithGenerators(newgens);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
@@ -106,7 +106,17 @@ function(ri)
 end);
 
 SLPforElementFuncsProjective.StabilizerChainProj := function(ri,x)
-  local r;
+  local z, r;
+  # Over GF(2), genss uses OnPoints as an optimization even in projective
+  # stabilizer chains. In that case we must normalize extension-field scalar
+  # multiples back to a representative over ri!.field before sifting, or else
+  # orb hashes the resulting point as the wrong type.
+  if IsIdenticalObj(ri!.stabilizerchain!.orb!.op, OnPoints) then
+      z := x[1,PositionNonZero(x[1])];
+      if not IsOne(z) then
+          x := x / z;
+      fi;
+  fi;
   r := SiftGroupElementSLP(ri!.stabilizerchain,x);
   return r.slp;
 end;
@@ -150,8 +160,20 @@ function(ri)
 end);
 
 RECOG.HomProjDet := function(data,m)
-  local x;
-  x := LogFFE(DeterminantMat(m),data.z);
+  local i, mm, x;
+  # Since the input is projective, it may be scaled out of the node's base
+  # field. Normalize by the first non-zero entry in the first row; then either
+  # all entries lie in the base field, or else the input is invalid.
+  i := PositionNonZero(m[1]);
+  mm := m;
+  if not mm[1,i] in data.field then
+      mm := mm / mm[1,i];
+  fi;
+  # verify the matrix is defined over data.field, or a subfield
+  if not IsSubset(data.field, FieldOfMatrixList([mm])) then
+      return fail;
+  fi;
+  x := LogFFE(DeterminantMat(mm),data.z);
   if x = fail then
       return fail;
   fi;
@@ -168,7 +190,7 @@ end;
 BindRecogMethod(FindHomMethodsProjective, "ProjDeterminant",
 "find homomorphism to non-zero scalars mod d-th powers",
 function(ri)
-  local G,H,c,d,detsadd,f,gcd,hom,newgens,q,z;
+  local G,H,c,d,data,detsadd,f,gcd,hom,newgens,q,z;
   G := Grp(ri);
   f := ri!.field;
   d := ri!.dimension;
@@ -186,9 +208,10 @@ function(ri)
   c := PermList(Concatenation([2..gcd],[1]));
   newgens := List(detsadd,x->c^x);
   H := GroupWithGenerators(newgens);
-  hom := GroupHomByFuncWithData(G,H,RECOG.HomProjDet,
-                                rec(c := c, z := z, gcd := gcd));
+  data := rec(c := c, z := z, gcd := gcd, field := f);
+  hom := GroupHomByFuncWithData(G,H,RECOG.HomProjDet,data);
   SetHomom(ri,hom);
+  Setvalidatehomominput(ri, {ri,x} -> RECOG.HomProjDet(data, x) <> fail);
   Setmethodsforimage(ri,FindHomDbPerm);
   findgensNmeth(ri).args[1] := 8;
   findgensNmeth(ri).args[2] := 5;
@@ -219,7 +242,7 @@ RECOG.HomNormLastBlock := function(data, x)
   if not RECOG.IsBlockScalarMatrix(blocks, x) then
       return fail;
   fi;
-  pos := blocks[Length(blocks)][1];
+  pos := Last(blocks)[1];
   s := x[pos,pos];
   if not IsOne(s) then
       x := s^-1 * x;

@@ -4,6 +4,8 @@
 #@local S11On2Sets, d, sets, SdOn2Sets, success, res, isoData, gens, g1, img1, g2, img2
 #@local SymOnKSets, AltOnKSets
 #@local db
+gap> START_TEST("GenericSnAnUnknownDegree.tst");
+
 #
 # HACK to insert the method
 gap> AddMethod(FindHomDbPerm, FindHomMethodsGeneric.SnAnUnknownDegree, 58);;
@@ -137,7 +139,7 @@ gap> for i in [1 .. Length(altMatGroups)] do
 >     RECOG.TestGroup(altMatGroups[i], true, Size(altMatGroups[i]));
 > od;
 gap> for i in [1 .. Length(nonAltOrSymGroups)] do
->     if FindHomMethodsGeneric.SnAnUnknownDegree(RecogNode(nonAltOrSymGroups[i]), nonAltOrSymGroups[i]) = Success then
+>     if FindHomMethodsGeneric.SnAnUnknownDegree(RecogNode(nonAltOrSymGroups[i])) = Success then
 >         Print("ERROR: Recognised group [", i, "] wrongly as Sn/An!\n");
 >     fi;
 > od;
@@ -251,7 +253,7 @@ gap> RECOG.BuildCycle(ri, c, x, 10);
 gap> sets := Combinations([1 .. 11], 2);;
 gap> S11On2Sets := Action(SymmetricGroup(11), sets, OnSets);;
 gap> ri := RecogNode(S11On2Sets);;
-gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri, S11On2Sets);;
+gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri);;
 gap> isoData := ri!.SnAnUnknownDegreeIsoData;;
 gap> gens := GeneratorsOfGroup(S11On2Sets);;
 gap> g1 := gens[1];;
@@ -271,7 +273,7 @@ gap> for d in [11 .. 14] do
 > sets := Combinations([1 .. d], 2);;
 > SdOn2Sets := Action(SymmetricGroup(d), sets, OnSets);;
 > ri := RecogNode(SdOn2Sets);;
-> success := FindHomMethodsGeneric.SnAnUnknownDegree(ri, SdOn2Sets);
+> success := FindHomMethodsGeneric.SnAnUnknownDegree(ri);
 > if not success or not Size(ri) = Factorial(d) then
 >   Print("wrong result! degree ", d, "\n");
 > fi;
@@ -282,7 +284,7 @@ gap> for d in [11 .. 14] do
 > sets := Combinations([1 .. d], 2);;
 > SdOn2Sets := Action(AlternatingGroup(d), sets, OnSets);;
 > ri := RecogNode(SdOn2Sets);;
-> success := FindHomMethodsGeneric.SnAnUnknownDegree(ri, SdOn2Sets);
+> success := FindHomMethodsGeneric.SnAnUnknownDegree(ri);
 > if not success or not Size(ri) = Factorial(d)/2 then
 >   Print("wrong result! degree ", d, "\n");
 > fi;
@@ -290,7 +292,7 @@ gap> for d in [11 .. 14] do
 
 # Check Slp function
 gap> ri := RecogNode(S11On2Sets);;
-gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri, S11On2Sets);
+gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri);
 true
 gap> x := PseudoRandom(Grp(ri));;
 gap> slp := SLPforElement(ri, x);;
@@ -303,3 +305,6 @@ gap> for db in [FindHomDbPerm, FindHomDbMatrix, FindHomDbProjective] do
 >       Remove(db,
 >              PositionProperty(db, x -> Stamp(x.method) = "SnAnUnknownDegree"));;
 > od;
+
+#
+gap> STOP_TEST("GenericSnAnUnknownDegree.tst");
