@@ -39,9 +39,6 @@ RECOG.ConRecogNaturalSL2 := function(G, f)
   ## if q = 2,3,5 then RecogNaturalSL2 does not work
   if q = 2 then
     return RECOG.ConRecogNaturalSL22(G,f);
-  fi;
-  if (q mod 2) = 0 then
-    return RECOG.RecogniseSL2NaturalEvenChar(G,f,false);
   elif q = 5 then
     return RECOG.ConRecogNaturalSL25(G,f);
   elif q = 3 then
@@ -69,33 +66,46 @@ RECOG.ConRecogNaturalSL2 := function(G, f)
       Add(umat, el);
     od;
   else
-    ## odd characteristic: conjugation only yields squares, so express z^l
-    ## in the Fp-basis {z^0, z^2, ..., z^(2(j-1))} and multiply conjugates
-    ## TODO: Perhaps create the lower/upper matrices with z^0, z^2, ..., z^(2(j-1)) 
-    ##       as entries instead of z^0, z^1, ..., z^(j-1)
-    basis := List([0..j-1], i -> Z(q)^(2*i));
-    basis := Basis(GF(q), basis);
+    #create the lower/upper matrices with z^0, z^2, ..., z^(2(j-1)) as entries
     lmat := [];
-    for l in [0..j-1] do
-      coeffs := Coefficients(basis, Z(q)^l);
-      m := u1^0;
-      for i in [0..j-1] do
-        c := IntFFE(coeffs[i+1]);
-        m := m * (diag^i * u1 * diag^(-i))^c;
-      od;
-      Add(lmat, m);
+    for k in [0..j-1] do
+      el := u1^(diag^k);
+      Add(lmat, el);
     od;
     umat := [];
-    for l in [0..j-1] do
-      coeffs := Coefficients(basis, Z(q)^l);
-      m := u2^0;
-      for i in [0..j-1] do
-        c := IntFFE(coeffs[i+1]);
-        m := m * (diag^(-i) * u2 * diag^i)^c;
-      od;
-      Add(umat, m);
+    for k in [0..j-1] do
+      el := u2^(diag^k);
+      Add(umat, el);
     od;
   fi;
+
+    ###### the following is an old version that might be needed in the future ######
+    ## odd characteristic: conjugation only yields squares, so express z^l
+    ## in the Fp-basis {z^0, z^2, ..., z^(2(j-1))} and multiply conjugates.
+    ## Then create the lower/upper matrices with z^0, z^1, ..., z^(j-1) as entries
+  #   basis := List([0..j-1], i -> Z(q)^(2*i));
+  #   basis := Basis(GF(q), basis);
+  #   lmat := [];
+  #   for l in [0..j-1] do
+  #     coeffs := Coefficients(basis, Z(q)^l);
+  #     m := u1^0;
+  #     for i in [0..j-1] do
+  #       c := IntFFE(coeffs[i+1]);
+  #       m := m * (diag^i * u1 * diag^(-i))^c;
+  #     od;
+  #     Add(lmat, m);
+  #   od;
+  #   umat := [];
+  #   for l in [0..j-1] do
+  #     coeffs := Coefficients(basis, Z(q)^l);
+  #     m := u2^0;
+  #     for i in [0..j-1] do
+  #       c := IntFFE(coeffs[i+1]);
+  #       m := m * (diag^(-i) * u2 * diag^i)^c;
+  #     od;
+  #     Add(umat, m);
+  #   od;
+  # fi;
   basi := res[2];
   bas := basi^(-1);
   a := umat[1]^(-1)*lmat[1]*umat[1]^(-1);
@@ -479,7 +489,7 @@ RECOG.ConRecogNaturalSL25 := function(G,f)
   GM := GroupWithMemory(G);
   one := One(f);
   zero := Zero(f);
-  gens := GeneratorsOfGroup(G);
+  gens := GeneratorsOfGroup(GM);
 
   # Find element xm of order 4 with eigenvalues Z(5) and 1/Z(5).
   # We detect order 4 directly from the matrix entries. 
@@ -526,7 +536,7 @@ RECOG.ConRecogNaturalSL25 := function(G,f)
         if smm[1,1] <> Z(5)^2 then
             trupm := cur;
         else
-            trupm := cur * x^2;
+            trupm := cur * xm^2;
         fi;
       fi;
     elif smm[1,2] = zero and smm[2,1] <> zero and trlowm = fail then
@@ -534,7 +544,7 @@ RECOG.ConRecogNaturalSL25 := function(G,f)
         if smm[1,1] <> Z(5)^2 then
             trlowm := cur;
         else
-            trlowm := cur * x^2;
+            trlowm := cur * xm^2;
         fi;
       fi;
     fi;
@@ -581,7 +591,7 @@ local GM, one, zero, gens, xm, x, o, trupm, trlowm,
   GM := GroupWithMemory(G);
   one := One(f);
   zero := Zero(f);
-  gens := GeneratorsOfGroup(G);
+  gens := GeneratorsOfGroup(GM);
 
   # Find transvections via random walk directly in standard basis.
   # (No base change needed since SL(2,3) has no useful order-2 element
