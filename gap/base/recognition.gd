@@ -675,7 +675,8 @@ DeclareGlobalFunction( "CalcNiceGensHomNode" );
 DeclareGlobalFunction( "SLPforElementGeneric" );
 
 ## TODO: Documentation!
-DeclareGlobalFunction( "CalcStdPresentationGeneric" );
+DeclareGlobalFunction( "CalcStdPresentationGenericLeaf" );
+DeclareGlobalFunction( "CalcStdPresentationGenericNonLeaf" );
 
 ## <#GAPDoc Label="SLPforElement">
 ## <ManSection>
