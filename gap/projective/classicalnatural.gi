@@ -926,13 +926,8 @@ function(ri)
 
       # This is (P)SL2, lets set up the recognition:
       Info(InfoRecog,2,"ClassicalNatural: this is PSL_2!");
-      if IsEvenInt(q) then
-          std := RECOG.RecogniseSL2NaturalEvenChar(gm,f,false);
-          ri!.comment := "PSL2Even";
-      else
-          std := RECOG.RecogniseSL2NaturalOddCharUsingBSGS(gm,f);
-          ri!.comment := "PSL2Odd";
-      fi;
+      std := RECOG.ConRecogNaturalSL2(gm,f);
+      ri!.comment := "PSL2";
       Setslptonice(ri,SLPOfElms(std.all));
       ri!.nicebas := std.bas;
       ri!.nicebasi := std.basi;
