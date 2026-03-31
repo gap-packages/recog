@@ -31,8 +31,7 @@ gap> matGroupList := [
 >    Omega(1,4,3)
 > ];;
 gap> for G in matGroupList do
-
-#>  testGroup(G);
+>  testGroup(G);
 > od;
 gap> permGroupList := [
 >    SymmetricGroup(3), SymmetricGroup(5), SymmetricGroup(10),
