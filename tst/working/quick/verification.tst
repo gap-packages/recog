@@ -41,6 +41,47 @@ gap> permGroupList := [
 gap> for G in permGroupList do
 >  testGroup(G);
 > od;
+
+# Input: homomorphism G -> H
+# Output: A recognition node for G with (leaf) children K and H where
+# K is properly contained in the kernel of homom.
+# Sets some attributes of the recognition node, but probably not everything
+# that is needed. Work in progress.
+gap> createIncorrectRecogNode := function(homom)
+>   local G, gensG, H, kern, K, i, g, ri, riF, riK;
+>   G := Source(homom);
+>   gensG := GeneratorsOfGroup(G);
+>   H := Range(homom);
+>   kern := Kernel(homom);
+>   K := Group(One(G));
+>   for i in [1..10] do
+>     g := Random(kern);
+>     if Order(g) < Size(kern) then
+>       K := Group(g);
+>       break;
+>     fi;
+>   od;
+>   ri := RecogNode(G);
+>   riF := RecogNode(H);
+>   riK := RecogNode(K);
+>   SetNiceGens(riF, List(gensG, x -> ImageElm(homom, x)));
+>   SetNiceGens(riK, GeneratorsOfGroup(K));
+>   SetNiceGens(ri, Concatenation(gensG, NiceGens(riK)));
+>   SetCalcStdPresentation(riF, CalcStdPresentationGenericLeaf);
+>   SetCalcStdPresentation(riK, CalcStdPresentationGenericLeaf);
+>   SetCalcStdPresentation(ri, CalcStdPresentationGenericNonLeaf);
+>   SetImageRecogNode(ri, riF);
+>   SetKernelRecogNode(ri, riK);
+>   SetParentRecogNode(riK, ri);
+>   SetParentRecogNode(riF, ri);
+>   SetHomom(ri, homom);
+>   SetFilterObj(riK, IsLeaf);
+>   SetFilterObj(riF, IsLeaf);
+>   SetFilterObj(riK, IsReady);
+>   SetFilterObj(riF, IsReady);
+>   SetFilterObj(ri, IsReady);
+>   return ri;
+> end;;
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
 gap> SetInfoLevel(InfoOrb, oldInfoOrbLevel);
 gap> STOP_TEST("verification.tst");
