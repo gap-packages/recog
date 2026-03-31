@@ -2483,7 +2483,7 @@ end);
 
 # The following function pretty prints the output of RecogniseClassical.
 # This can be helpful when debugging it.
-DisplayRecog := function( r )
+InstallGlobalFunction( DisplayRecog, function( r )
 
     local q0;
 
@@ -2569,4 +2569,4 @@ DisplayRecog := function( r )
                 Print("--------> reducible + not classical \n");
             fi;
 
-end;
+end );
