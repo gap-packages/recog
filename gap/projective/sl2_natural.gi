@@ -36,13 +36,15 @@ RECOG.ConRecogNaturalSL2 := function(G, f)
         basis, coeffs, m, c, l, a, b;
   q := Size(f);
 
-  ## if q = 2,3,5 then RecogNaturalSL2 does not work
+  ## if q = 2,3,4 then RecogNaturalSL2 does not work
   if q = 2 then
     return RECOG.ConRecogNaturalSL22(G,f);
   elif q = 5 then
     return RECOG.ConRecogNaturalSL25(G,f);
   elif q = 3 then
     return RECOG.ConRecogNaturalSL23(G,f);
+  elif q = 4 then 
+    return RECOG.RecogniseSL2NaturalEvenChar(G,f,false);;
   fi;
   
   res := RECOG.RecogNaturalSL2(G,q);
@@ -78,34 +80,6 @@ RECOG.ConRecogNaturalSL2 := function(G, f)
       Add(umat, el);
     od;
   fi;
-
-    ###### the following is an old version that might be needed in the future ######
-    ## odd characteristic: conjugation only yields squares, so express z^l
-    ## in the Fp-basis {z^0, z^2, ..., z^(2(j-1))} and multiply conjugates.
-    ## Then create the lower/upper matrices with z^0, z^1, ..., z^(j-1) as entries
-  #   basis := List([0..j-1], i -> Z(q)^(2*i));
-  #   basis := Basis(GF(q), basis);
-  #   lmat := [];
-  #   for l in [0..j-1] do
-  #     coeffs := Coefficients(basis, Z(q)^l);
-  #     m := u1^0;
-  #     for i in [0..j-1] do
-  #       c := IntFFE(coeffs[i+1]);
-  #       m := m * (diag^i * u1 * diag^(-i))^c;
-  #     od;
-  #     Add(lmat, m);
-  #   od;
-  #   umat := [];
-  #   for l in [0..j-1] do
-  #     coeffs := Coefficients(basis, Z(q)^l);
-  #     m := u2^0;
-  #     for i in [0..j-1] do
-  #       c := IntFFE(coeffs[i+1]);
-  #       m := m * (diag^(-i) * u2 * diag^i)^c;
-  #     od;
-  #     Add(umat, m);
-  #   od;
-  # fi;
   basi := res[2];
   bas := basi^(-1);
   a := umat[1]^(-1)*lmat[1]*umat[1]^(-1);
@@ -155,9 +129,14 @@ end;
 ##      needs the quadratic extension GF(2^(2m)).
 
 RECOG.RecogNaturalSL2 := function(G, q)
-   local GM, one, zero, qm1fac, c, m, gens, xm, x, pol, v, z, exp, a, 
+  local GM, one, zero, qm1fac, c, m, gens, xm, x, pol, v, z, exp, a, 
         mat, tm, ym, y, ymat, tr, d, cm, r1, r2, r, log, i, trupm, 
         smm, trlowm, F, a2, bas, e, l, emax, tmp;
+
+  if q < 5 then
+    Error("Prime power q must be at least 5.");
+  fi;
+
   GM := GroupWithMemory(G);
   one := OneOfBaseDomain(G.1);
   zero := Zero(one);
@@ -205,7 +184,6 @@ RECOG.RecogNaturalSL2 := function(G, q)
     mat[1,2] := x[2,2]-1/a; mat[2,2] := -x[2,1];
   fi;
 
-  Assert(3, xm^mat = DiagonalMat([a, a^-1]) );
 
   # find conjugate of x with different eigenspaces
   # (almost all conjugates will do)
@@ -214,11 +192,15 @@ RECOG.RecogNaturalSL2 := function(G, q)
     tm := tm * Random(gens);
     ym := tm*xm*tm^-1;
     y := StripMemory(ym);
-    ymat := y*mat;
-  until ymat[1,1]*mat[2,1]-ymat[2,1]*mat[1,1] <> zero and
-        ymat[1,2]*mat[2,2]-ymat[2,2]*mat[1,2] <> zero;
+    # in this basis x is diagonal, so different eigenspaces means all
+    # entries non-zero
+    ymat := y^mat;
+  until ymat[1,1] <> zero and ymat[1,2] <> zero and ymat[2,1] <> zero
+        and ymat[2,2] <> zero;
   # now y^(tm * mat) = diag(a, a^-1) 
   tr := tm*mat;
+
+  Assert(3, y^(tm * mat) = DiagonalMat([a, a^-1]) );
 
   # a-eigenvector of x in new basis
   d := tr^-1 * [mat[1,1],mat[2,1]];
@@ -226,26 +208,27 @@ RECOG.RecogNaturalSL2 := function(G, q)
   d := d[2]/d[1];
   cm := One(GM);
   repeat
-    # look for cm with non-trivial conditions (i <> 0, (q-1)/2)
+    # look for cm such that [1,d] is also eigenvector of (y^i cm)^tr
     repeat 
       cm := cm*Random(gens);
       c := StripMemory(cm)^tr;
       r1 := c[2,1]+d*c[2,2];
       r2 := d^2*c[1,2]+d*c[1,1];
-    until r2 <> zero and r1 <> zero and r1 <> r2 and r1 <> -r2;;
+    until r2 <> zero and r1 <> zero;
     r := r1 / r2;
     log := DLog(a, r, qm1fac);
     i := false;
     if log mod 2 = 0 then
       i := log/2;
     elif q mod 2 = 0 then
-      i := (q-1-log)/2;
+      # in char two r is always a square
+      i := log/2 mod (q-1);
     fi;
     if IsInt(i) then
       # this will in most cases be a transvection normalized by x
       trupm := Comm(xm, ym^i*cm);
       smm := trupm^mat;
-      if smm[1,2] = zero or smm[2,1] <> zero or smm[1,1] <> one then
+      if smm[1,2] = zero or smm[2,1] <> zero then
         i := false;
       else
         # rescale first column of mat such that trupm^mat = [[1,1],[0,1]]
@@ -265,20 +248,21 @@ RECOG.RecogNaturalSL2 := function(G, q)
   d := d[2]/d[1];
   cm := One(GM);
   repeat
-    # look for cm with non-trivial conditions (i <> 0, (q-1)/2)
-    repeat
+    # look for cm such that [1,d] is also eigenvector of (y^i cm)^tr
+    repeat 
       cm := cm*Random(gens);
       c := StripMemory(cm)^tr;
       r1 := c[2,1]+d*c[2,2];
       r2 := d^2*c[1,2]+d*c[1,1];
-    until r2 <> zero and r1 <> zero and r1 <> r2 and r1 <> -r2;;
+    until r2 <> zero and r1 <> zero;
     r := r1 / r2;
     log := DLog(a, r, qm1fac);
     i := false;
     if log mod 2 = 0 then
       i := log/2;
     elif q mod 2 = 0 then
-      i := (q-1-log)/2;
+      # in char two r is always a square
+      i := log/2 mod (q-1);
     fi;
     if IsInt(i) then
       # in most cases a transvection which becomes conjugated by mat
@@ -286,11 +270,13 @@ RECOG.RecogNaturalSL2 := function(G, q)
       # that the conjugate matrix is [[1,0],[1,1]]).
       trlowm := Comm(xm, ym^i*cm);
       smm := trlowm^mat;
-      if smm[2,1] = zero or smm[1,2] <> zero or smm[1,1] <> one then
+      if smm[2,1] = zero or smm[1,2] <> zero then
         i := false;
       fi;
     fi;
   until IsInt(i);
+
+  Assert(3, IsZero((trlowm^mat)[1,2]) and IsOne((trlowm^mat)[1,1]));
 
   # adjust lower left entry of trlowm^mat to one
   # (we use F_p linear algebra in F_q to find the nice element
