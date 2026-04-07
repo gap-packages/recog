@@ -36,6 +36,18 @@ else
     fi;
 fi;
 
+PlaceDefiningMethod := function(methodsRecord, methodName)
+    local method, dir, file, line;
+    method := methodsRecord.(methodName);
+    dir := Filename(DirectoriesPackageLibrary("recog", ""), "");
+    file := method!.filename;
+    line := method!.linenumber;
+    if StartsWith(file, dir) then
+        file := file{[Length(dir)+1..Length(file)]};
+    fi;
+    return JoinStringsWithSeparator([file, line], ":");
+end;
+
 DbsWhichUseMethod := function(methodsRecord, methodName)
     local result, method, methodDbs, types, db, i;
     result := [];
@@ -105,7 +117,7 @@ GenerateMethodsListXML := function(shortname, db)
 
     for meth in Set(RecNames(db)) do
         AppendTo(xmlfile, "<Subsection Label=\"", meth, "\">\n");
-        AppendTo(xmlfile, "<Heading><C>", meth, "</C></Heading>\n");
+        AppendTo(xmlfile, "<Heading><C>", meth, " - ", PlaceDefiningMethod(db, meth),"</C></Heading>\n");
         # Where is this method used?
         AppendTo(xmlfile, "This method is ");
         dbsWhichUseMethod := DbsWhichUseMethod(db, meth);

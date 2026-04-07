@@ -86,6 +86,8 @@ function(rname, arg...)
     r.(arg[1]) := CallFuncList(RecogMethod, arg);
     name := JoinStringsWithSeparator([rname, arg[1]], ".");
     SetNameFunction(r.(arg[1])!.func, name);
+    r.(arg[1])!.linenumber := INPUT_LINENUMBER();
+    r.(arg[1])!.filename := INPUT_FILENAME();
 end);
 
 InstallGlobalFunction(CallRecogMethod,
