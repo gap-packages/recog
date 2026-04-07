@@ -30,7 +30,7 @@ end;
 #! take this case into account in the other methods.
 #! @EndChunk
 #! @BeginCode FindHomMethodsGeneric.TrivialGroup
-BindRecogMethod(FindHomMethodsGeneric, "TrivialGroup",
+BindRecogMethod("FindHomMethodsGeneric", "TrivialGroup",
 "go through generators and compare to the identity",
 function(ri)
   local gens;

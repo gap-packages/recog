@@ -143,7 +143,7 @@ end;
 #! orbit of subspaces or <K>fail</K>. In the current setup, <Q>short orbit</Q>
 #! is defined to have length at most <M>4d</M>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "LowIndex",
+BindRecogMethod("FindHomMethodsProjective", "LowIndex",
 "find an (imprimitive) action on subspaces",
 function(ri)
   local res;
@@ -180,7 +180,7 @@ end);
 #! @BeginChunk DoBaseChangeForBlocks
 #! TODO
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "DoBaseChangeForBlocks",
+BindRecogMethod("FindHomMethodsProjective", "DoBaseChangeForBlocks",
 "Hint TODO",
 function(ri)
   # Do the base change:
@@ -207,7 +207,7 @@ end);
 #! @BeginChunk Blocks
 #! TODO
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "Blocks",
+BindRecogMethod("FindHomMethodsProjective", "Blocks",
 "Hint TODO",
 function(ri)
   # Here we use BlocksModScalars and then get a kernel of scalar blocks
@@ -240,7 +240,7 @@ end;
 #! @BeginChunk BlocksBackToMats
 #! TODO
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "BlocksBackToMats",
+BindRecogMethod("FindHomMethodsProjective", "BlocksBackToMats",
 "Hint TODO",
 function(ri)
   # This is only called as hint from Blocks, so we know that we in fact

@@ -548,7 +548,7 @@ end;
 #! <A>G</A> into <M>Sp(2n,r)</M>, or a homomorphism into the C2 permutation
 #! action of <A>G</A> on a decomposition of <M>GF(q)^d</M>, or <K>fail</K>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "C6",
+BindRecogMethod("FindHomMethodsProjective", "C6",
 "find either an (imprimitive) action or a symplectic one",
 function(ri)
     local G,r,re,hom;

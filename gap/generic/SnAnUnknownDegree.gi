@@ -777,7 +777,7 @@ end;
 #! not a giant (a giant is Sn or An in natural action).
 #!
 #! @EndChunk
-BindRecogMethod(FindHomMethodsGeneric, "SnAnUnknownDegree",
+BindRecogMethod("FindHomMethodsGeneric", "SnAnUnknownDegree",
 "method groups isomorphic to Sn or An with n >= 11",
 function(ri)
     local eps, N, p, d, recogData, isoData, degree, swapSLP, G;

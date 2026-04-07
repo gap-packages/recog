@@ -694,7 +694,7 @@ end;
 #! computed the function does not need to be called again for this
 #! node and therefore returns <K>NeverApplicable</K>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "ComputeSimpleSocle",
+BindRecogMethod("FindHomMethodsProjective", "ComputeSimpleSocle",
 "compute simple socle of almost simple group",
 function(ri)
   local G,x;
@@ -749,7 +749,7 @@ end;
 #!
 #! This recognition method is based on the paper <Cite Key="KS09"/>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "ThreeLargeElOrders",
+BindRecogMethod("FindHomMethodsProjective", "ThreeLargeElOrders",
 "recognise Lie type groups and get its characteristic",
 function(ri)
   local G,hint,name,namecat,p,res;
@@ -942,7 +942,7 @@ end;
 #! This algorithm is probably based on the paper <Cite Key="BLGN+05"/>.
 #! @EndChunk
 # subroutines are in AnSnOnFDPM.gi and also paper reference
-BindRecogMethod(FindHomMethodsProjective, "AltSymBBByDegree",
+BindRecogMethod("FindHomMethodsProjective", "AltSymBBByDegree",
 "try BB recognition for dim+1 and/or dim+2 if sensible",
 function(ri)
   local G,GG,Gm,RecSnAnEq,RecSnAnIsOne,d,deg,f,fact,hom,newgens,o,orders,p,primes,
@@ -1332,7 +1332,7 @@ end;
 #! Afterwards it creates hints that come out of a table for the sporadic
 #! simple groups.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "SporadicsByOrders",
+BindRecogMethod("FindHomMethodsProjective", "SporadicsByOrders",
 "generate a few random elements and compute the proj. orders",
 function(ri)
   local G,count,gens,i,j,jj,k,killers,l,limit,o,ordersseen,pp,r,raus,res,x;
@@ -1532,7 +1532,7 @@ RECOG.NameSporadicData := MakeImmutable([
 #! simple groups nor the Monster and the Baby Monster group. It is based on the
 #! Magma v2.24.10 function <C>RecognizeSporadic</C>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "NameSporadic",
+BindRecogMethod("FindHomMethodsProjective", "NameSporadic",
 "generate maximal orders",
 function(ri)
     local orders, setOfOrders, maximalOrders, isMaximal,

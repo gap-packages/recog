@@ -80,8 +80,12 @@ function(stamp, comment, arg...)
 end);
 
 InstallGlobalFunction(BindRecogMethod,
-function(r, arg...)
+function(rname, arg...)
+    local r, name;
+    r := ValueGlobal(rname);
     r.(arg[1]) := CallFuncList(RecogMethod, arg);
+    name := JoinStringsWithSeparator([rname, arg[1]], ".");
+    SetNameFunction(r.(arg[1])!.func, name);
 end);
 
 InstallGlobalFunction(CallRecogMethod,
