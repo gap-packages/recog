@@ -533,6 +533,10 @@ function(recognise)
 end);
 
 
+#
+# This method is meant to rule out the situation PSL(2,r) <= G <= Z x PGL(2,r)
+# for some central factor Z. For more information, see Section 8.4 in [NP98].
+#
 BindRecogMethod(FindHomMethodsClassical, "IsNotPSL",
 "tests whether PSL groups are ruled out",
 function(recognise)
@@ -550,10 +554,20 @@ function(recognise)
 #        recognise.isNotPSL := true;
 #        return NeverApplicable;
 #    fi;
+
+    # if there is an invariant form, then this can't be PSL(2,r)
     if Length(recognise.ClassicalForms) > 0 and
         First(recognise.ClassicalForms,IsTrivialForm)=fail then
        recognise.isNotPSL := true;
        return NeverApplicable;
+    fi;
+
+    # By [NP98, Section 8.4], if we are in that situation then G
+    # contains ppd(d,q;e) elements for only two values of e
+    if Length(E) > 2 then
+        Info(InfoClassical, 2, " G' is not PSL(2,r)");
+        recognise.isNotPSL := true;
+        return NeverApplicable;
     fi;
 
     if d = 3 and (q = 5 or q = 2) then
