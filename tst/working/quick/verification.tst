@@ -4,10 +4,14 @@ gap> oldInfoLevel := InfoLevel(InfoRecog);;
 gap> oldInfoOrbLevel := InfoLevel(InfoOrb);;
 gap> SetInfoLevel(InfoRecog, 0);;
 gap> SetInfoLevel(InfoOrb, 0);;
+
+# Prints error if verification for G does not return true at least
+# 4 ot of 5 times.
 gap> testGroup := function(G)
->  local numSuccessful, i, ri;
+>  local numSuccessful, i, ri, numTests;
 >  numSuccessful := 0;
->  for i in [1..5] do
+>  numTests := 5;
+>  for i in [1..numTests] do
 >    ri := RecogniseGroup(G);
 >    if VerifyGroup(ri) = true then
 >      numSuccessful := numSuccessful + 1;
@@ -16,7 +20,7 @@ gap> testGroup := function(G)
 >  if numSuccessful < 4 then
 >    Display(
 >       "Verification for ", G, " was succesful only ", numSuccessful,
->       " out of 5 times"
+>       " out of ", numTests, " times"
 >    );
 >  fi;
 > end;;
@@ -42,46 +46,66 @@ gap> for G in permGroupList do
 >  testGroup(G);
 > od;
 
+# Now test some groups for which verification returns false.
+
 # Input: homomorphism G -> H
 # Output: A recognition node for G with (leaf) children K and H where
 # K is properly contained in the kernel of homom.
-# Sets some attributes of the recognition node, but probably not everything
-# that is needed. Work in progress.
+# Sets some attributes of the recognition node, but possibly not everything
+# that is needed for a proper recognition node.
 gap> createIncorrectRecogNode := function(homom)
->   local G, gensG, H, kern, K, i, g, ri, riF, riK;
+>   local G, gensG, gensH, H, kern, K, i, g, ri, riF, riK;
 >   G := Source(homom);
 >   gensG := GeneratorsOfGroup(G);
->   H := Range(homom);
+>   gensH := List(gensG, g -> ImageElm(homom, g));
+>   H := GroupWithGenerators(gensH);
 >   kern := Kernel(homom);
+
+# Construct a proper subgroup K of kern (either cyclic or, if this is impossible, trivial)
 >   K := Group(One(G));
 >   for i in [1..10] do
 >     g := Random(kern);
->     if Order(g) < Size(kern) then
+>     if Order(g) < Size(kern) and g <> One(G) then
 >       K := Group(g);
 >       break;
 >     fi;
 >   od;
 >   ri := RecogNode(G);
->   riF := RecogNode(H);
->   riK := RecogNode(K);
->   SetNiceGens(riF, List(gensG, x -> ImageElm(homom, x)));
->   SetNiceGens(riK, GeneratorsOfGroup(K));
->   SetNiceGens(ri, Concatenation(gensG, NiceGens(riK)));
->   SetCalcStdPresentation(riF, CalcStdPresentationGenericLeaf);
->   SetCalcStdPresentation(riK, CalcStdPresentationGenericLeaf);
+>   riF := RecogniseGroup(H);
+>   riK := RecogniseGroup(K);
+
+# Set preimages of NiceGens(riF) in G. These lines are copied from RecogniseGeneric.
+>   ri!.gensHmem := GeneratorsWithMemory(GeneratorsOfGroup(G));
+>   ri!.pregensfacwithmem := CalcNiceGens(riF, ri!.gensHmem);
+>   Setpregensfac(ri, StripMemory(ri!.pregensfacwithmem));
+
+# Set remaining attributes of ri.
+>   SetNiceGens(ri, Concatenation(pregensfac(ri), NiceGens(riK)));
 >   SetCalcStdPresentation(ri, CalcStdPresentationGenericNonLeaf);
 >   SetImageRecogNode(ri, riF);
 >   SetKernelRecogNode(ri, riK);
 >   SetParentRecogNode(riK, ri);
 >   SetParentRecogNode(riF, ri);
 >   SetHomom(ri, homom);
->   SetFilterObj(riK, IsLeaf);
->   SetFilterObj(riF, IsLeaf);
->   SetFilterObj(riK, IsReady);
->   SetFilterObj(riF, IsReady);
 >   SetFilterObj(ri, IsReady);
 >   return ri;
 > end;;
+gap> homByIm := function(gens, ims)
+>   return GroupHomomorphismByImages(
+>       Group(gens), Group(ims), gens, ims
+>   );
+> end;;
+gap> homList := [
+>   homByIm([(1,2), (3,4)], [(1,2), ()]), # Z_2^2 -> Z_2
+>   homByIm([(1,2), (3,4), (5,6)], [(1,2), (), ()]), # Z_2^3 -> Z_2
+>   homByIm([(1,2), (2,3)], [(1,2), (1,2)]), # sign homomorphism
+>   homByIm([(1,2), (2,3)], [(), ()]) # trivial homomorphism
+> ];;
+gap> for hom in homList do
+>    if VerifyGroup(createIncorrectRecogNode(hom)) <> false then
+>      Display("Incorrect recog node was verified");
+>    fi;
+> od;
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
 gap> SetInfoLevel(InfoOrb, oldInfoOrbLevel);
 gap> STOP_TEST("verification.tst");
