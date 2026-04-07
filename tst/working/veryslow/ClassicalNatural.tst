@@ -109,7 +109,8 @@ gap> TestRecogGL(19,5);;
 Stamp: ClassicalNatural
 
 #
-gap> #TestRecogGL(2,8);; # FIXME: see issue #12
+gap> TestRecogGL(2,8);;
+Stamp: ClassicalNatural
 gap> TestRecogGL(3,8);;
 Stamp: ClassicalNatural
 gap> TestRecogGL(4,8);;
@@ -159,7 +160,8 @@ Stamp: ClassicalNatural
 gap> #TestRecogGL(19,9);; # disabled to speedup this .tst file
 
 #
-gap> #TestRecogGL(2,16);; # FIXME: see issue #12
+gap> TestRecogGL(2,16);;
+Stamp: ClassicalNatural
 gap> TestRecogGL(3,16);;
 Stamp: ClassicalNatural
 gap> TestRecogGL(4,16);;
