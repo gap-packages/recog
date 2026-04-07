@@ -533,14 +533,14 @@ function(recognise)
 end);
 
 
-#
 # This method is meant to rule out the situation PSL(2,r) <= G <= Z x PGL(2,r)
-# for some central factor Z. For more information, see Section 8.4 in [NP98].
+# for some central factor Z, i.e. G' is PSL(2,r).
 #
+# For more information, see Section 8.4 in [NP98].
 BindRecogMethod(FindHomMethodsClassical, "IsNotPSL",
 "tests whether PSL groups are ruled out",
 function(recognise)
-   local i, E, LE, d, p, a, q, str, fn, ord;
+   local i, E, LE, d, p, a, q, str, fn, ord, r;
 
     E := recognise.E;
     LE := recognise.LE;
@@ -565,105 +565,102 @@ function(recognise)
     # By [NP98, Section 8.4], if we are in that situation then G
     # contains ppd(d,q;e) elements for only two values of e
     if Length(E) > 2 then
-        Info(InfoClassical, 2, " G' is not PSL(2,r)");
+        Info(InfoClassical, 2, "G' is not PSL(2,r)");
         recognise.isNotPSL := true;
         return NeverApplicable;
     fi;
 
-    if d = 3 and (q = 5 or q = 2) then
-        if q = 5 then
-            Info( InfoClassical, 2, "G' is not PSL(2,7)");
-        fi;
-        # Note PSL(2,7) is isomorphic to PSL(3,2), so don't print this message
-        recognise.isNotPSL := true;
-        return NeverApplicable;
-    fi;
-
-    if d = 5 and (q = 5 or q = 11) then
-       Info( InfoClassical, 2, "G' not PSL(2,11);");
-       recognise.isNotPSL := true;
-       return NeverApplicable;
-    fi;
-
-    if d = 6 and q = 2 then
-        Info( InfoClassical, 2, "G' is not PSL(2,11)");
-        recognise.isNotPSL := true;
-        return NeverApplicable;
-    fi;
-
-    # test whether e_2 = e_1 + 1 and
-    # e_1 + 1 and 2* e_2 + 1 are primes
-    if Length(E) >= 2 then
-        if E[2]-1<>E[1] or
-            not IsPrimeInt(E[1]+1) or not IsPrimeInt(2*E[2]+1) then
-            Info(InfoClassical, 2, " G' is not PSL(2,r)");
+    # By [NP98, Table 3], for G' to be PSL(2,r), we must have...
+    # - e_2 = e_1 + 1
+    # - r_1 = e_2 = e_1 + 1 is a prime
+    # - r_2 = r = 2*e_2 + 1 is a prime
+    if Length(E) = 2 then
+        r := 2 * E[2] + 1;
+        if not (E[2] = E[1] + 1 and IsPrimeInt(E[1]+1) and IsPrimeInt(r)) then
+            Info(InfoClassical, 2, "G' is not PSL(2,r)");
             recognise.isNotPSL := true;
             return NeverApplicable;
         fi;
     fi;
 
-   if d = 3 then
-       # q = 3*2^s-1 and q^2-1 has no large ppd.
-       # TODO recheck this
-       if (q = 2 or ((q+1) mod 3 = 0 and IsPowerOfTwo((q+1)/3))) then
+    # Handle some special cases
+    if d = 3 then
+        # Try to rule out PSL(2,7)
+        if q = 2 or q = 5 then
+            # Note PSL(2,7) is isomorphic to SL(3,2), so don't print the
+            # message if q = 2
+            if q = 5 then
+                Info( InfoClassical, 2, "G' is not PSL(2,7)");
+            fi;
+            recognise.isNotPSL := true;
+            return NeverApplicable;
+        elif ((q+1) mod 3 = 0 and IsPowerOfTwo((q+1)/3)) then
+            # q = 3*2^s-1 and q^2-1 has no large ppd.
+            # TODO recheck this
+             ord := Order(recognise.g);
+             if (ord mod 8 <> 0 or (p^(2*a)-1) mod ord = 0) then
+                 Info( InfoClassical, 2, "G' is not PSL(2,7)");
+                 recognise.isNotPSL := true;
+                 return NeverApplicable;
+            fi;
+        elif p = 3 or p = 7 or 2 in LE then
+             # we are only certain that PSL(2,7) is ruled if 2 in LE
+             # and the cases p=3 or p=7 cannot have the required ppds
+             if 2 in LE then
+                 Info( InfoClassical, 2, "G' is not PSL(2,7)");
+             fi;
+             recognise.isNotPSL := true;
+             return NeverApplicable;
+        fi;
+    elif d = 5 then
+        # Try to rule out PSL(2,11)
+        if q = 5 or q = 11 then
+            Info( InfoClassical, 2, "G' is not PSL(2,11)");
+            recognise.isNotPSL := true;
+            return NeverApplicable;
+        elif q = 3 then
             ord := Order(recognise.g);
-            if (ord mod 8 <> 0 or (p^(2*a)-1) mod ord = 0) then
-                Info( InfoClassical, 2, "G' not PSL(2,7);");
+            if (ord mod 11^2 = 0 or ord mod 20 = 0) then
+                Info( InfoClassical, 2, "G' is not PSL(2,11)");
                 recognise.isNotPSL := true;
                 return NeverApplicable;
-           fi;
-       else
-           if p = 3 or p = 7 or 2 in LE then
-                # we are only certain that PSL(2,7) is ruled if 2 in LE
-                # and the cases p=3 or p=7 cannot have the required ppds
-                if 2 in LE then
-                    Info( InfoClassical, 2, "G' not PSL(2,7);");
-                fi;
+            fi;
+        elif p <> 5 and p <> 11 then
+            if (3 in LE or 4 in LE) then
+                Info( InfoClassical, 2, "G' is not PSL(2,11)");
                 recognise.isNotPSL := true;
                 return NeverApplicable;
-           fi;
-       fi;
-   elif d = 5 and q = 3 then
-       ord := Order(recognise.g);
-       if (ord mod 11^2 = 0 or ord mod 20 = 0) then
-           Info( InfoClassical, 2, "G' not PSL(2,11);");
-           recognise.isNotPSL := true;
-           return NeverApplicable;
-       fi;
-   elif d = 5 and p <> 5 and p <> 11 then
-       if (3 in LE or 4 in LE) then
-           Info( InfoClassical, 2, "G' not PSL(2,11);");
-           recognise.isNotPSL := true;
-           return NeverApplicable;
-       fi;
-   elif d = 6 and q = 3 then
-       ord := Order(recognise.g);
-       if (ord mod (11^2)=0 or 6 in E) then
-           Info( InfoClassical, 2, "G' not PSL(2,11);");
-           recognise.isNotPSL := true;
-           return NeverApplicable;
-       fi;
-   elif d = 6 and p <> 5 and p <> 11 then
-       if (6 in E or 4 in LE) then
-           Info( InfoClassical, 2, "G' not PSL(2,11);");
-           recognise.isNotPSL := true;
-           return NeverApplicable;
-       fi;
-   #else
-       #Info( InfoClassical, 2, "G' not PSL(2,r);");
-       #recognise.isNotPSL := true;
-       #return NeverApplicable;
-   fi;
+            fi;
+        fi;
+    elif d = 6 then
+        # Try to rule out PSL(2,11)
+        if q = 2 then
+            Info( InfoClassical, 2, "G' is not PSL(2,11)");
+            recognise.isNotPSL := true;
+            return NeverApplicable;
+        elif q = 3 then
+            ord := Order(recognise.g);
+            if (ord mod (11^2)=0 or 6 in E) then
+                Info( InfoClassical, 2, "G' is not PSL(2,11)");
+                recognise.isNotPSL := true;
+                return NeverApplicable;
+            fi;
+        elif p <> 5 and p <> 11 then
+            if (6 in E or 4 in LE) then
+                Info( InfoClassical, 2, "G' is not PSL(2,11)");
+                recognise.isNotPSL := true;
+                return NeverApplicable;
+            fi;
+        fi;
+    fi;
 
-
-   if recognise.n > 15 and Length(recognise.E) = 2 then
-       str := Concatenation("PSL(2,", String(Int(2*E[2]+1)));
-       str := Concatenation(str, ")");
-       Info( InfoClassical, 2, "G' might be ", str);
-       AddSet( recognise.possibleNearlySimple, str );
-       return TemporaryFailure;
-   fi;
-   return TemporaryFailure;
+    if recognise.n > 15 and Length(recognise.E) = 2 then
+        str := Concatenation("PSL(2,", String(r), ")");
+        Info( InfoClassical, 2, "G' might be ", str);
+        AddSet( recognise.possibleNearlySimple, str );
+        return TemporaryFailure;
+    fi;
+    return TemporaryFailure;
 end);
 
 
