@@ -800,31 +800,6 @@ RECOG.SetupNormalisationListForPSLd := function(f,d)
   return list;
 end;
 
-# el: a field element
-# d: a positive integer (typically ri!.gcd.gcd)
-# f: a galois field (typically ri!.field)
-#
-# Compute a primitive d-th root of el in the field f.
-# TODO: This function copies the code from RootFFE, which will
-# appear in GAP 4.9. Once GAP 4.9 is out, we can switch
-# to using RootFFE directly.
-RECOG.ComputeRootInFiniteField := function(el, d, f)
-    local z, e, m, p, a;
-    if IsZero(el) or IsOne(el)  then
-        return el;
-    fi;
-    z := PrimitiveRoot(f);
-    m := Size(f) - 1;
-    e := LogFFE(el, z);
-    p := GcdInt(m, e);
-    d := d mod m;
-    a := GcdInt(m, d);
-    if p mod a <> 0  then
-        return fail;
-    fi;
-    a := e * (a / d mod (m / p)) / a mod m;
-    return z ^ a;
-end;
 
 # Express an element of PSL_d as an slp in terms of standard generators.
 SLPforElementFuncsProjective.PSLd := function(ri,x)
@@ -842,7 +817,7 @@ SLPforElementFuncsProjective.PSLd := function(ri,x)
       # We thus can compute a d-th root of 1/det, and scale y with it,
       # in order to obtain a matrix with determinant 1 in the same
       # projective class.
-      root := RECOG.ComputeRootInFiniteField(1/det,Length(y),ri!.field);
+      root := RootFFE(ri!.field,1/det,Length(y));
       if root = fail then
           return fail;
       fi;
@@ -897,13 +872,7 @@ function(ri)
   for i in [1..Length(gens)] do
       det := DeterminantMat(gens[i]);
       if not IsOne(det) then
-          # If gcd(d, q-1) = 1 and d=2, det^-1 is a square in f.
-          # Thus use root s.t. root^2 = det^-1, so that det * root^2 = 1.
-          if gcd.gcd = 1 and d = 2 then
-              root := RECOG.ComputeRootInFiniteField(det^-1, 2, f);
-          else
-              root := RECOG.ComputeRootInFiniteField(det, gcd.gcd, f);
-          fi;
+          root := RootFFE(f, det^-1, d);
           if root = fail then
               ErrorNoReturn("Should not have happened, 15634, tell Max!");
           fi;
