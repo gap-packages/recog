@@ -66,7 +66,11 @@ function(stamp, comment, arg...)
         opt := rec();
     fi;
 
-    r := rec(func := func);
+    r := rec(
+        func := func,
+        linenumber := INPUT_LINENUMBER(),
+        filename := INPUT_FILENAME(),
+        );
     if IsBound(opt.validatesOrAlwaysValidInput) then
         # method.validatesOrAlwaysValidInput for now only stores
         # meta-information. It may be used in the future, see github issue
@@ -84,10 +88,8 @@ function(rname, arg...)
     local r, name;
     r := ValueGlobal(rname);
     r.(arg[1]) := CallFuncList(RecogMethod, arg);
-    name := JoinStringsWithSeparator([rname, arg[1]], ".");
+    name := Concatenation(rname, ".", arg[1]);
     SetNameFunction(r.(arg[1])!.func, name);
-    r.(arg[1])!.linenumber := INPUT_LINENUMBER();
-    r.(arg[1])!.filename := INPUT_FILENAME();
 end);
 
 InstallGlobalFunction(CallRecogMethod,
