@@ -100,8 +100,8 @@ DeclareFilter( "IsReady" );
 ## <ManSection>
 ## <Filt Name="IsVerified" Type="Flag"/>
 ## <Description>
-## This flag is set for a <Ref Filt="IsRecogNode"/> object <C>node</C> by <Ref
-## Func="VerifyGroup"/> or <Ref Attr="CalcStdPresentation"> if verification
+## This flag is set for a <Ref Filt="IsRecogNode"/> object <C>node</C> by 
+## <Ref Func="VerifyGroup"/> or <Ref Attr="CalcStdPresentation"/> if verification
 ## of the <E>subtree</E> rooted in <C>node</C> finished successfully.
 ## Thus, if the <Ref Filt="IsVerified"/> flag is set, the result of the
 ## recognition procedure was verified and proven to be mathematically correct.
