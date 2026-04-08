@@ -926,7 +926,7 @@ function(ri)
 
       # This is (P)SL2, lets set up the recognition:
       Info(InfoRecog,2,"ClassicalNatural: this is PSL_2!");
-      std := RECOG.ConRecogNaturalSL2(gm,f);
+      std := RECOG.RecogniseSL2Natural(gm,f);
       ri!.comment := "PSL2";
       Setslptonice(ri,SLPOfElms(std.all));
       ri!.nicebas := std.bas;

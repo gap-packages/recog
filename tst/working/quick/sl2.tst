@@ -7,7 +7,7 @@ gap> testConRecogNaturalSL2 := function(q)
 >     Add(list, Random(SL(2,q)));
 >   od;
 >   G := GroupWithGenerators(list);
->   res := RECOG.ConRecogNaturalSL2(G,f);
+>   res := RECOG.RecogniseSL2Natural(G,f);
 >   std := RECOG.MakeSL_StdGens(Characteristic(f),DegreeOverPrimeField(f),2,2);
 >   for i in [1..Length(res.all)] do
 >     if res.all[i]^res.basi <> std.all[i] then
@@ -25,7 +25,7 @@ gap> testConRecogNaturalSL22 := function()
 >       list := List([1..10], i -> Random(SL(2,2)));
 >       G := GroupWithGenerators(list);
 >     until Size(G) = 6;
->     res := RECOG.ConRecogNaturalSL22(G, f);
+>     res := RECOG.RecogniseSL2Natural2(G, f);
 >     for i in [1..Length(res.all)] do
 >       if StripMemory(res.all[i])^res.basi <> std.all[i] then
 >         Print("FAILED at index ", i, "\n");
@@ -41,11 +41,11 @@ gap> testConRecogNaturalSL25 := function()
 >   for j in [1..50] do
 >     list := List([1..15], i -> Random(SL(2,5)));
 >     G := GroupWithGenerators(list);
->     res := RECOG.ConRecogNaturalSL25(G,f);
+>     res := RECOG.RecogniseSL2Natural5(G,f);
 >     u1 := [[Z(5)^0,Z(5)^0],[0*Z(5)^0,Z(5)^0]];
 >     l1 := [[Z(5)^0,0*Z(5)^0],[Z(5)^0,Z(5)^0]];
 >     m := [[0*Z(5)^0,Z(5)^2],[Z(5)^0,0*Z(5)^0]];
->     id := [[Z(5)^0,0*Z(5)^0],[0*Z(5)^0,Z(5)^0]];
+>     id := [[Z(5)^0,0*Z(5)^0],[0*Z(5)^0,Z(5)^0]];‚
 >       if res.all[1]^res.basi <> u1 or res.all[2]^res.basi <> l1 or res.all[3]^res.basi <> m or res.all[4]^res.bas <> id then
 >         Print("FAILED\n", j,"\n");
 >         return false;
