@@ -574,9 +574,10 @@ function(recognise)
     # - e_2 = e_1 + 1
     # - r_1 = e_2 = e_1 + 1 is a prime
     # - r_2 = r = 2*e_2 + 1 is a prime
+    # - d = 1/2 (r \pm 1), or equivalently: r = 2*d \pm 1
     if Length(E) = 2 then
         r := 2 * E[2] + 1;
-        if not (E[2] = E[1] + 1 and IsPrimeInt(E[1]+1) and IsPrimeInt(r)) then
+        if not (E[2] = E[1] + 1 and r in [2*d-1, 2*d+1] and IsPrimeInt(E[1]+1) and IsPrimeInt(r)) then
             Info(InfoClassical, 2, "G' is not PSL(2,r)");
             recognise.isNotPSL := true;
             return NeverApplicable;
