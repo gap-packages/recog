@@ -117,8 +117,10 @@ GenerateMethodsListXML := function(shortname, db)
 
     for meth in Set(RecNames(db)) do
         AppendTo(xmlfile, "<Subsection Label=\"", meth, "\">\n");
-        AppendTo(xmlfile, "<Heading><C>", meth, " - ", PlaceDefiningMethod(db, meth),"</C></Heading>\n");
+        AppendTo(xmlfile, "<Heading><C>", meth, "</C></Heading>\n");
         # Where is this method used?
+        AppendTo(xmlfile, "This method is defined in <F>", PlaceDefiningMethod(db, meth), "</F>.");
+        AppendTo(xmlfile, "<P/>\n");
         AppendTo(xmlfile, "This method is ");
         dbsWhichUseMethod := DbsWhichUseMethod(db, meth);
         nrDbsWhichUseMethod := Length(dbsWhichUseMethod);
