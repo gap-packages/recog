@@ -325,6 +325,9 @@ end;
 
 RECOG.FindAdjustedBasis := function(l)
   # l must be a list of matrices coming from MTX.BasesCompositionSeries.
+  # The returned block ranges are the coordinate ranges of the successive
+  # composition factors in the adjusted basis. They are contiguous, disjoint,
+  # increasing, and together cover the whole new basis.
   local blocks,i,pos,seb,v;
   blocks := [];
   seb := rec( vectors := [], pivots := [] );
@@ -533,8 +536,35 @@ function(ri)
   return Success;
 end);
 
+# Extract one strict lower block diagonal from a matrix that is written in the
+# basis described by `blocks`, and flatten the extracted entries into a single
+# row vector.
+#
+# Arguments:
+#   `m`: matrix in the adjusted basis used by `ReducibleIso`; it may carry
+#        memory, but row access must behave exactly like for an ordinary matrix.
+#   `layer`: 1-based index of the strict lower block diagonal to extract.
+#        `layer = 1` means block positions `(2,1),(3,2),...`;
+#        `layer = 2` means `(3,1),(4,2),...`; and so on.
+#   `blocks`: increasing list of disjoint contiguous index ranges describing
+#        the diagonal blocks. The intended invariant is
+#        `Concatenation(blocks) = [1..Length(m)]`.
+#   `lens`: layer lengths as returned by `RECOG.ComputeExtractionLayerLengths`.
+#        If `basisOfFieldExtension <> fail`, then the caller must already have
+#        multiplied these lengths by `Length(basisOfFieldExtension)`.
+#   `basisOfFieldExtension`: either `fail` for prime fields, or a basis of the
+#        coefficient field over its prime field. In the latter case the result
+#        is expanded to prime-field coordinates via `BlownUpVector`.
+#
+# This helper does not do any row reduction and does not modify `m`; the
+# callers perform the linear algebra and mirror it by multiplying group
+# elements. In particular, if `m` is the identity matrix and `blocks` really do
+# describe a partition of the basis, then the result must be the zero vector.
 RECOG.ExtractLowStuff := function(m,layer,blocks,lens,basisOfFieldExtension)
   local block,i,j,k,l,pos,v,what,where;
+  Assert(1, ForAll(blocks, b -> Length(b) > 0 and b = [b[1]..Last(b)]));
+  Assert(1, Concatenation(blocks) = [1..Length(m)]);
+  Assert(1, layer in [1..Length(lens)]);
   v := ZeroVector(lens[layer],m[1]);
   pos := 0;
   i := layer+1;
@@ -558,8 +588,15 @@ RECOG.ExtractLowStuff := function(m,layer,blocks,lens,basisOfFieldExtension)
   return v;
 end;
 
+# For a block decomposition as above, compute the number of field entries on
+# each strict lower block diagonal. Entry `i` corresponds to `layer = i`, i.e.
+# to block positions `(i+1,1),(i+2,2),...`.
 RECOG.ComputeExtractionLayerLengths := function(blocks)
   local block,i,j,l,len,lens;
+  Assert(1, ForAll(blocks, b -> Length(b) > 0 and b = [b[1]..Last(b)]));
+  if Length(blocks) > 0 then
+      Assert(1, Concatenation(blocks) = [1..Last(Last(blocks))]);
+  fi;
   lens := [];
   l := Length(blocks);
   for i in [2..Length(blocks)] do
@@ -586,6 +623,9 @@ RECOG.FindKernelLowerLeftPGroup := function(ri)
     lens := RECOG.ComputeExtractionLayerLengths(ri!.blocks);
 
     if not IsPrimeField(f) then
+        # The p-group routines below work over the prime field, so each entry
+        # in an extracted layer contributes one coordinate per basis vector of
+        # the field extension.
         basisOfFieldExtension := CanonicalBasis(f);  # a basis over the prime field
         lens := lens * Length(basisOfFieldExtension);
     else
@@ -605,6 +645,7 @@ RECOG.FindKernelLowerLeftPGroup := function(ri)
         # Now clean out this vector and remember what we did:
         curlay := 1;
         v := RECOG.ExtractLowStuff(x,curlay,ri!.blocks,lens,basisOfFieldExtension);
+        Assert(1, not IsOne(x) or IsZero(v));
         pos := PositionNonZero(v);
         i := 1;
         done := 0*[1..Length(lvec)];   # this refers to the current gens
@@ -615,6 +656,7 @@ RECOG.FindKernelLowerLeftPGroup := function(ri)
                 curlay := curlay + 1;
                 if curlay <= Length(lens) then
                     v := RECOG.ExtractLowStuff(x,curlay,ri!.blocks,lens,basisOfFieldExtension);
+                    Assert(1, not IsOne(x) or IsZero(v));  # IsOne(x) should imply IsZero(v)
                     pos := PositionNonZero(v);
                 else
                     ready := true;   # x is now equal to the identity!
@@ -632,6 +674,7 @@ RECOG.FindKernelLowerLeftPGroup := function(ri)
                     if not IsZero(done) then
                         AddRowVector(v,lvec[i],done);
                         x := x * l[i]^IntFFE(done);
+                        Assert(1, not IsOne(x) or IsZero(v));  # IsOne(x) should imply IsZero(v)
                     fi;
                 fi;
                 i := i + 1;
@@ -648,10 +691,12 @@ RECOG.FindKernelLowerLeftPGroup := function(ri)
         #     then a power of x will be a new generator in that layer and
         #     has to be added in position i in the list of generators
         if curlay <= Length(lens) then   # a new generator
+            Assert(1, not IsOne(x));
             # Now find a new pivot:
             el := v[pos]^-1;
             MultRowVector(v,el);
             x := x ^ IntFFE(el);
+            Assert(1, not IsOne(x));
             Add(l,x,i);
             Add(lvec,v,i);
             Add(pivots,[curlay,pos],i);
@@ -720,7 +765,11 @@ end;
 #! The method uses the fact that this kernel is a <M>p</M>-group where
 #! <M>p</M> is the characteristic of the underlying field. It exploits
 #! this fact and uses this special structure to find nice generators
-#! and a method to express group elements in terms of these.
+#! and a method to express group elements in terms of these. Internally it
+#! works layer-by-layer with the strict lower block diagonals determined by
+#! <C>ri!.blocks</C>; the auxiliary data <C>ri!.lens</C> records the length of
+#! each extracted layer, measured over the prime field if
+#! <C>ri!.basisOfFieldExtension</C> is bound to a non-<K>fail</K> value.
 #! @EndChunk
 BindRecogMethod(FindHomMethodsMatrix, "LowerLeftPGroup",
 "Hint TODO",
