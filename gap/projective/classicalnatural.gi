@@ -464,8 +464,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
           x := StripMemory(xm);
           xb := bas*x*bas^-1;
           co := Coefficients(can,xb[2,1]);
-      until not IsContainedInSpan(mb,co);
-      CloseMutableBasis(mb,co);
+      until CloseMutableBasis(mb,co);
       Add(tt,x);
       Add(ttm,xm);
       Add(mat,co);
