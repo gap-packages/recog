@@ -759,6 +759,39 @@ SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
   return StraightLineProgramNC([l], Length(ri!.gensNvectors));
 end;
 
+BindGlobal("CalcStdPresentationLowerLeftPGroup",
+function(ri)
+  local f, fgens, i, ng, p, rels, rhs, slp, rank, pres, j;
+
+  ng := NiceGens(ri);
+  rank := Length(ng);
+  f := FreeGroup(rank);
+  fgens := GeneratorsOfGroup(f);
+  p := Characteristic(ri!.field);
+  rels := [];
+
+  for i in [1..rank] do
+      slp := SLPforElement(ri, ng[i]^p);
+      if slp = fail then
+          ErrorNoReturn("LowerLeftPGroup power relation rewrite failed");
+      fi;
+      rhs := ResultOfStraightLineProgram(slp, fgens);
+      Add(rels, fgens[i]^p * rhs^-1);
+
+      for j in [1..i-1] do
+          slp := SLPforElement(ri, ng[i]^ng[j]);
+          if slp = fail then
+              ErrorNoReturn("LowerLeftPGroup conjugation rewrite failed");
+          fi;
+          rhs := ResultOfStraightLineProgram(slp, fgens);
+          Add(rels, (fgens[i]^fgens[j]) * rhs^-1);
+      od;
+  od;
+
+  pres := f / rels;
+  SetStdPresentation(ri, pres);
+end);
+
 #! @BeginChunk LowerLeftPGroup
 #! This method is only called by a hint from <Ref Subsect="BlockLowerTriangular" Style="Text"/>
 #! as the kernel of the homomorphism mapping to the diagonal blocks.
@@ -788,6 +821,7 @@ function(ri)
   p := Characteristic(f);
   SetFilterObj(ri,IsLeaf);
   Setslpforelement(ri,SLPforElementFuncsMatrix.LowerLeftPGroup);
+  SetCalcStdPresentation(ri, CalcStdPresentationLowerLeftPGroup);
   SetSize(ri,p^Length(ri!.gensNvectors));
   return Success;
 end);
