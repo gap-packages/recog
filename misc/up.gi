@@ -217,9 +217,8 @@ SLnUpStep := function(w)
       i := 1;
       pivots := EmptyPlist(newdim);
       while i <= Length(newpart) and NrBasisVectors(MB) < newdim do
-          if not IsContainedInSpan(MB,newpart[i]) then
+          if CloseMutableBasis(MB,newpart[i]) then
               Add(pivots,i);
-              CloseMutableBasis(MB,newpart[i]);
           fi;
           i := i + 1;
       od;
@@ -248,9 +247,8 @@ SLnUpStep := function(w)
       i := 1;
       pivots2 := EmptyPlist(newdim);
       while i <= Length(cii) and NrBasisVectors(MB) < newdim do
-          if not IsContainedInSpan(MB,cii[i]) then
+          if CloseMutableBasis(MB,cii[i]) then
               Add(pivots2,i);
-              CloseMutableBasis(MB,cii[i]);
           fi;
           i := i + 1;
       od;
