@@ -291,6 +291,60 @@ gap> Size(ri);
 gap> ForAll(GeneratorsOfGroup(H), x -> SLPforElement(ri, x) <> fail);
 true
 
+# Issue #444: a projective C6 block kernel must keep the full scalar-block
+# size when passing through DoBaseChangeForBlocks and BlocksBackToMats.
+# See https://github.com/gap-packages/recog/issues/444
+gap> i := 1;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
+gap> m := ClassicalMaximals("L",8,7);;
+gap> g := m[10];;
+gap> re := RECOG.New2RecogniseC6(g);;
+gap> hom := GroupHomByFuncWithData(g, GroupWithGenerators(re.igens),
+>   RECOG.HomFuncActionOnBlocks,
+>   rec(r := re.r, n := re.n, q := re.q, blks := re.basis.blocks));;
+gap> k := KernelOfMultiplicativeGeneralMapping(hom);;
+gap> data := rec(hints := []);;
+gap> data.t := re.basis.blocks.blocks;;
+gap> data.blocksize := 8 / re.basis.blocks.ell;;
+gap> AddMethod(data.hints, FindHomMethodsProjective.DoBaseChangeForBlocks, 2000);;
+gap> ri := RecogniseGeneric(k, FindHomDbProjective, "", data);;
+gap> IsReady(ri);
+true
+gap> h := Group(List(GeneratorsOfGroup(k), RECOG.HomBackToMats));;
+gap> Size(h);
+139968
+gap> Size(ri);
+139968
+
+# Issue #471: projective Blocks below the C6 path must collect enough
+# scalar-block kernel generators for the final SLP coverage check.
+# See https://github.com/gap-packages/recog/issues/471
+gap> i := 21;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
+gap> G:=Group(Z(5)^0 * [
+> [ [ 0,0,1,0,0,0,0,0 ], [ 0,1,0,0,0,0,0,0 ], [ 0,0,0,0,1,0,0,0 ],
+>     [ 0,0,0,0,0,0,0,1 ], [ 1,0,0,0,0,0,0,0 ], [ 0,0,0,1,0,0,0,0 ],
+>     [ 0,0,0,0,0,0,1,0 ], [ 0,0,0,0,0,1,0,0 ] ],
+>   [ [ 1,0,0,0,0,0,0,0 ], [ 0,0,0,0,0,1,0,0 ], [ 0,0,0,0,1,0,0,0 ],
+>     [ 0,1,0,0,0,0,0,0 ], [ 0,0,0,0,0,0,1,0 ], [ 0,0,0,1,0,0,0,0 ],
+>     [ 0,0,1,0,0,0,0,0 ], [ 0,0,0,0,0,0,0,1 ] ],
+>   [ [ 0,0,1,0,0,0,0,0 ], [ 0,1,0,0,0,0,0,0 ], [ 1,0,0,0,0,0,0,0 ],
+>     [ 0,0,0,1,0,0,0,0 ], [ 0,0,0,0,1,0,0,0 ], [ 0,0,0,0,0,0,0,1 ],
+>     [ 0,0,0,0,0,0,1,0 ], [ 0,0,0,0,0,1,0,0 ] ],
+>   [ [ 0,0,0,0,0,0,0,1 ], [ 0,1,0,0,0,0,0,0 ], [ 0,0,0,0,0,1,0,0 ],
+>     [ 0,0,0,1,0,0,0,0 ], [ 0,0,0,0,1,0,0,0 ], [ 0,0,1,0,0,0,0,0 ],
+>     [ 0,0,0,0,0,0,1,0 ], [ 1,0,0,0,0,0,0,0 ] ],
+>   [ [ 4,0,0,0,0,0,0,0 ], [ 0,1,0,0,0,0,0,0 ], [ 0,0,1,0,0,0,0,0 ],
+>     [ 0,0,0,1,0,0,0,0 ], [ 0,0,0,0,1,0,0,0 ], [ 0,0,0,0,0,1,0,0 ],
+>     [ 0,0,0,0,0,0,1,0 ], [ 0,0,0,0,0,0,0,4 ] ],
+>   [ [ 3,0,0,0,0,0,0,0 ], [ 0,1,0,0,0,0,0,0 ], [ 0,0,2,0,0,0,0,0 ],
+>     [ 0,0,0,1,0,0,0,0 ], [ 0,0,0,0,1,0,0,0 ], [ 0,0,0,0,0,3,0,0 ],
+>     [ 0,0,0,0,0,0,1,0 ], [ 0,0,0,0,0,0,0,2 ] ]
+> ]);;
+gap> ri := RecognizeGroup(G);;
+gap> IsReady(ri);
+true
+gap> ForAll(GeneratorsOfGroup(G), x -> SLPforElement(ri, x) <> fail);
+true
+
 # Issue #450: a D247 tensor witness contradicted by a tensor-factor swap
 # must not raise an internal error.
 # See https://github.com/gap-packages/recog/issues/450

@@ -224,8 +224,22 @@ function(ri)
   InitialDataForImageRecogNode(ri).blocks := blocks;
   AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsProjective.BlocksModScalars, 2000);
   # For the kernel:
+  # The scalar-block kernel is abelian, so random kernel sampling is enough
+  # and avoids under-generating it via the default normal-closure path.
+  findgensNmeth(ri).method := FindKernelRandom;
+  findgensNmeth(ri).args := [Length(blocks)+10];
+  if ri!.blocksize = 1 then
+      # BlocksModScalars is trivial in this case, so the whole group is the
+      # kernel that must be passed on to BlocksBackToMats.
+      findgensNmeth(ri).method := function(ri)
+        SetgensN(ri, ShallowCopy(ri!.gensHmem));
+        return true;
+      end;
+      findgensNmeth(ri).args := [];
+  fi;
   InitialDataForKernelRecogNode(ri).blocks := blocks;
   AddMethod(InitialDataForKernelRecogNode(ri).hints, FindHomMethodsProjective.BlocksBackToMats, 2000);
+  Setimmediateverification(ri, true);
   return Success;
 end);
 
