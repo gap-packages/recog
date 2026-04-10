@@ -256,16 +256,32 @@ function(ri)
             2000);
   InitialDataForKernelRecogNode(ri).degsplittingfield := MTX.DegreeSplittingField(m)
                                    / DegreeOverPrimeField(ri!.field);
-  InitialDataForKernelRecogNode(ri).biggerscalarsbas := r.inforec.bas;
-  InitialDataForKernelRecogNode(ri).biggerscalarsbasi := r.inforec.basi;
+  InitialDataForKernelRecogNode(ri).biggerscalarsrewrite := r.inforec;
 
   return Success;
 end);
 
-RECOG.HomBCToDiagonalBlock := function(data,x)
-  local el;
-  el := data.bas * x * data.basi;
-  return ExtractSubMatrix(el,data.poss,data.poss);
+RECOG.BiggerScalarsExponent := function(data, x)
+  local el, exp;
+  el := RECOG.WriteOverBiggerFieldWithSmallerDegree(data.rewrite, x);
+  if el = fail or not RECOG.IsScalarMat(el) then
+      return fail;
+  fi;
+  exp := LogFFE(el[1,1], data.generator);
+  if exp = fail then
+      return fail;
+  fi;
+  return exp mod data.modulus;
+end;
+
+SLPforElementFuncsProjective.BiggerScalarsOnly := function(ri, x)
+  local exp;
+  exp := RECOG.BiggerScalarsExponent(ri!.biggerscalarsdata, x);
+  if exp = fail or exp mod ri!.biggerscalarsgcd <> 0 then
+      return fail;
+  fi;
+  return StraightLineProgramNC(
+      [[1, (exp / ri!.biggerscalarsgcd) mod ri!.biggerscalarsorder]], 1);
 end;
 
 #! @BeginChunk BiggerScalarsOnly
@@ -274,31 +290,56 @@ end;
 #! of <Cite Key="CNRD09" Where="Theorem 6.5"/>, rewriting over
 #! <M>GF(q^e)</M> leaves a second kernel consisting only of
 #! <M>GF(q^e)</M>-scalars modulo <M>GF(q)</M>-scalars.
-#! Using the <M>E</M>-adapted basis prepared by
+#! Using the rewrite data prepared by
 #! <Ref Subsect="NotAbsolutelyIrred" Style="Text"/>, the method
-#! extracts one diagonal <M>e\times e</M> block. For such scalar elements this
-#! block determines the whole matrix, so this yields a faithful reduction of
-#! that kernel.
+#! rewrites kernel elements over <M>GF(q^e)</M>, verifies that they are scalar
+#! matrices there, and identifies their exponents modulo the
+#! <M>GF(q)</M>-scalars. The resulting quotient is cyclic of order dividing
+#! <M>(q^e-1)/(q-1)</M>, so the method recognizes it directly as a cyclic
+#! projective leaf.
 #! @EndChunk
 BindRecogMethod(FindHomMethodsProjective, "BiggerScalarsOnly",
 "handle extension-field scalars left by the C3 rewrite",
 function(ri)
-  # We come here only hinted, we project to a little square block in the
-  # upper left corner and know that there is no kernel:
-  local G, H, data, hom;
+  # We come here only hinted. The projective quotient of the remaining
+  # extension-field scalars is cyclic, so we recognize it directly by
+  # discrete logs modulo the base-field scalars.
+  local G, data, exps, gcd, i, l, pows, rep, subset;
   G := Grp(ri);
-  data := rec(poss := [1..ri!.degsplittingfield],
-              bas  := ri!.biggerscalarsbas,
-              basi := ri!.biggerscalarsbasi);
-  H := List(GeneratorsOfGroup(G), x-> RECOG.HomBCToDiagonalBlock(data, x));
-  hom := GroupHomByFuncWithData(G, Group(H), RECOG.HomBCToDiagonalBlock, data);
-  SetHomom(ri,hom);
+  data := rec(
+      rewrite := ri!.biggerscalarsrewrite,
+      modulus := (ri!.biggerscalarsrewrite.qd - 1)
+                 / (ri!.biggerscalarsrewrite.q - 1),
+      generator := Z(ri!.biggerscalarsrewrite.qd)
+  );
+  exps := List(GeneratorsOfGroup(G), x -> RECOG.BiggerScalarsExponent(data, x));
+  if fail in exps then
+      return NeverApplicable;
+  fi;
+  subset := Filtered([1..Length(exps)], i -> exps[i] <> 0);
+  if subset = [] then
+      return FindHomMethodsGeneric.TrivialGroup(ri);
+  fi;
 
-  AddMethod(InitialDataForImageRecogNode(ri).hints,
-            FindHomMethodsProjective.StabilizerChainProj,
-            4000);
+  pows := exps{subset};
+  Add(pows, data.modulus);
+  gcd := Gcd(Integers, pows);
+  rep := GcdRepresentation(Integers, pows);
+  l := [];
+  for i in [1..Length(pows)-1] do
+      if rep[i] <> 0 then
+          Add(l, subset[i]);
+          Add(l, rep[i]);
+      fi;
+  od;
 
-  findgensNmeth(ri).method := FindKernelDoNothing;
+  Setslptonice(ri, StraightLineProgramNC([[l]], Length(GeneratorsOfGroup(G))));
+  Setslpforelement(ri, SLPforElementFuncsProjective.BiggerScalarsOnly);
+  ri!.biggerscalarsdata := data;
+  ri!.biggerscalarsgcd := gcd;
+  ri!.biggerscalarsorder := data.modulus / gcd;
+  SetSize(ri, ri!.biggerscalarsorder);
+  SetFilterObj(ri, IsLeaf);
 
   return Success;
 end);
