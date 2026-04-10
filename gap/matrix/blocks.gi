@@ -117,12 +117,12 @@ function(ri)
       gcd := Gcd(Integers,pows);
       i := i + 1;
   od;
-  rep := GcdRepresentation(Integers,pows);
+  rep := GcdRepresentation(Integers, pows);
   l := [];
   for i in [1..Length(pows)-1] do
       if rep[i] <> 0 then
-          Add(l,subset[i]);
-          Add(l,rep[i]);
+          Add(l, subset[i]);
+          Add(l, rep[i]);
       fi;
   od;
   slp := StraightLineProgramNC([[l]],Length(GeneratorsOfGroup(G)));
