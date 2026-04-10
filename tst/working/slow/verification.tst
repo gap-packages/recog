@@ -107,6 +107,7 @@ gap> homList := [
 >   homByIm([(1,2), (3,4)], [(1,2), ()]), # Z_2^2 -> Z_2
 >   homByIm([(1,2), (3,4), (5,6)], [(1,2), (), ()]), # Z_2^3 -> Z_2
 >   homByIm([(1,2), (2,3)], [(1,2), (1,2)]), # sign homomorphism
+>   homByIm([(1,2), (2,3), (3,4)], [(1,2), (1,2), (1,2)]), # sign homomorphism
 >   homByIm([(1,2), (2,3)], [(), ()]) # trivial homomorphism
 > ];;
 
