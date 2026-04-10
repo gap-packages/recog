@@ -78,9 +78,8 @@ RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
       for j in [1..Length(gens)] do
           new := bas[i] * gens[j];
           if not RECOG.CleanRow(mu,ShallowCopy(new),true,fail) then
-          #if not IsContainedInSpan(mu,new) then
+          #if CloseMutableBasis(mu,new) then
               Add(bas,new);
-              #CloseMutableBasis(mu,new);
               for k in [1..d-1] do
                   new := new * e;
                   RECOG.CleanRow(mu,ShallowCopy(new),true,fail);

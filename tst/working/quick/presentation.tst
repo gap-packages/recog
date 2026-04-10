@@ -39,6 +39,29 @@ gap> smallMatGroups := Concatenation([
 > ]);;
 gap> largeMatGroups := [SL(4,3), Sp(4,7), SO(5,3)];;
 gap> permGroups := [SymmetricGroup(5), AlternatingGroup(7)];;
+
+# LowerLeftPGroup leaves should expose a pc presentation with one power
+# relation per generator and one conjugation relation per pair.
+gap> gens := [];;
+gap> for i in [2..3] do
+>   m := IdentityMat(3, GF(2));;
+>   m[i,i-1] := One(GF(2));;
+>   Add(gens, m);
+> od;
+gap> ri := RecognizeGroup(Group(gens));;
+gap> Size(ri);
+8
+gap> Size(StdPresentation(ri));
+8
+gap> leaf := GetCompositionTreeNode(ri, "fk");;
+gap> std := StdPresentation(leaf);;
+gap> Size(std);
+8
+gap> RelatorsOfFpGroup(StdPresentation(leaf));
+[ f1^2, f2^2, f1^-1*f2*f1*f3^-1*f2^-1, f3^2, f1^-1*f3*f1*f3^-1, 
+  f2^-1*f3*f2*f3^-1 ]
+
+#
 gap> for G in smallMatGroups do testPres(G, true, false); od;
 gap> for G in largeMatGroups do testPres(G, false, false); od;
 gap> for G in smallMatGroups do testPres(G, true, true); od;

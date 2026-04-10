@@ -60,6 +60,19 @@ gap> ri := RecognizeGroup(DirectProduct(SU(3,17), SL(3,17)));;
 gap> IsReady(ri);
 true
 
+# Issue #343: extracting a strict lower block diagonal from an immutable
+# identity matrix over GF(2) must not create phantom ones.
+gap> blocks := [ [ 1 .. 11 ], [ 12 .. 22 ], [ 23 .. 33 ], [ 34 .. 44 ],
+>   [ 45 .. 55 ], [ 56 .. 66 ], [ 67 .. 77 ], [ 78 .. 88 ], [ 89 .. 99 ],
+>   [ 100 .. 110 ], [ 111 ], [ 112 .. 121 ], [ 122 .. 132 ], [ 133 .. 143 ],
+>   [ 144 .. 154 ], [ 155 .. 165 ], [ 166 .. 176 ], [ 177 .. 187 ],
+>   [ 188 .. 198 ] ];;
+gap> lens := [ 1946, 1815, 1694, 1573, 1452, 1331, 1210, 1100, 1089, 968,
+>   957, 847, 726, 605, 484, 363, 242, 121 ];;
+gap> x := IdentityMat(198, GF(2));;
+gap> IsZero(RECOG.ExtractLowStuff(x, 6, blocks, lens, fail));
+true
+
 # We had a bug where RECOG.IsScalarMat was used incorrectly (return value was
 # assumed to be true or false, but could be an FFE). This example used to
 # trigger the error, which looked like this:
@@ -209,6 +222,14 @@ true
 gap> i := 1226;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
 gap> G := Group([ [ 0*Z(3), Z(3)^0 ], [ Z(3), 0*Z(3) ] ]);;
 gap> ri := RecognizeGroup(G);;
+gap> IsReady(ri);
+true
+
+# Issue #417: a contradictory homogeneous C3/C5 witness for SO(+1,4,3)
+# must not raise an internal error.
+# See https://github.com/gap-packages/recog/issues/417
+gap> i := 138;; Reset(GlobalMersenneTwister, 1);; Reset(GlobalRandomSource, i);;
+gap> ri := RecognizeGroup(SO(+1,4,3));;
 gap> IsReady(ri);
 true
 

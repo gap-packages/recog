@@ -878,13 +878,13 @@ InstallGlobalFunction( CalcStdPresentationGenericNonLeaf,
     # Natural homomorphisms from/to the free groups.
     # Note: embFrFac*epiTot maps generator of frFrac to
     # the chosen preimage in pregensfac(ri)
-    epiTot := GroupHomomorphismByImages(
+    epiTot := GroupHomomorphismByImagesNC(
         frTot, Grp(ri), frTotGens, NiceGens(ri)
     );
-    embFrFac := GroupHomomorphismByImages(
+    embFrFac := GroupHomomorphismByImagesNC(
         frFac, frTot, frFacGens, frTotGens{[1..rankFac]}
     );
-    embFrKer := GroupHomomorphismByImages(
+    embFrKer := GroupHomomorphismByImagesNC(
         frKer, frTot, frKerGens, frTotGens{[rankFac+1..rankFac+rankKer]}
     );
 
