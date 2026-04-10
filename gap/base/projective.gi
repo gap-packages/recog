@@ -34,7 +34,7 @@ InstallGlobalFunction( IsEqualProjective,
     local n, p, s;
     n := NrRows(a);
     Assert(1, n > 0 and n = NrRows(b) and n = NrCols(a) and n = NrCols(b));
-    p := First([1..n], i -> not IsZero(a[1,i])); # Find non-zero entry in <a[1]>
+    p := PositionNonZeroInRow(a, 1); # Find non-zero entry in <a[1]>
     Assert(1, p <> fail);
     s := b[1,p] / a[1,p]; # The unique scalar <s> with <s * a[1,p] = b[1,p]>.
     if IsZero(s) then

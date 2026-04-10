@@ -760,7 +760,7 @@ SLPforElementFuncsProjective.PSL2 := function(ri,x)
       ri!.normlist := RECOG.SetupNormalisationListForPSLd(ri!.field,
                                                           ri!.gcd.gcd);
   fi;
-  pos := PositionNonZero(y[1]);
+  pos := PositionNonZeroInRow(y, 1);
   s := RECOG.NormaliseScalarForPSLd(y[1,pos],ri!.normlist);
   slp := RECOG.ExpressInStd_SL2(s * y,ri!.fakegens);
   return slp;
@@ -833,7 +833,7 @@ SLPforElementFuncsProjective.PSLd := function(ri,x)
       ri!.normlist := RECOG.SetupNormalisationListForPSLd(ri!.field,
                                                           ri!.gcd.gcd);
   fi;
-  pos := PositionNonZero(y[1]);
+  pos := PositionNonZeroInRow(y, 1);
   s := RECOG.NormaliseScalarForPSLd(y[1,pos],ri!.normlist);
   slp := RECOG.ExpressInStd_SL(s * y,ri!.fakegens);
   return slp;

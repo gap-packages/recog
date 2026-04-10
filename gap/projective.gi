@@ -106,13 +106,14 @@ function(ri)
 end);
 
 SLPforElementFuncsProjective.StabilizerChainProj := function(ri,x)
-  local z, r;
+  local i, z, r;
   # Over GF(2), genss uses OnPoints as an optimization even in projective
   # stabilizer chains. In that case we must normalize extension-field scalar
   # multiples back to a representative over ri!.field before sifting, or else
   # orb hashes the resulting point as the wrong type.
   if IsIdenticalObj(ri!.stabilizerchain!.orb!.op, OnPoints) then
-      z := x[1,PositionNonZero(x[1])];
+      i := PositionNonZeroInRow(x, 1);
+      z := x[1,i];
       if not IsOne(z) then
           x := x / z;
       fi;
@@ -164,7 +165,7 @@ RECOG.HomProjDet := function(data,m)
   # Since the input is projective, it may be scaled out of the node's base
   # field. Normalize by the first non-zero entry in the first row; then either
   # all entries lie in the base field, or else the input is invalid.
-  i := PositionNonZero(m[1]);
+  i := PositionNonZeroInRow(m, 1);
   mm := m;
   if not mm[1,i] in data.field then
       mm := mm / mm[1,i];
