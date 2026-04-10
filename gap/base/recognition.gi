@@ -897,7 +897,7 @@ InstallGlobalFunction( CalcStdPresentationGenericNonLeaf,
     presAbort := function()
         Info(
             InfoRecog, 1,
-            "Verification for RecogNode <ri> failed: Something went wrong earlier,",
+            "Construction of presentation for RecogNode <ri> failed: Something went wrong earlier,",
             "reset IsReady(<ri>)"
         );
         ResetFilterObj(ri, IsReady);
@@ -937,9 +937,10 @@ InstallGlobalFunction( CalcStdPresentationGenericNonLeaf,
     # Construct presentation of Grp(ri) and isomorphism from the presentation to Grp(ri)
     presTot := frTot / relsTot;
     SetStdPresentation(ri, presTot);
-    # The success of our construction, together with the fact that NiceGens(ri)
-    # generates our group (which is verified in RecogniseGeneric), finishes verification.
-    SetFilterObj(ri, IsVerified);
+    # We do not set IsVerified(ri) to true because a full verification also requires the
+    # check that all input generators can be expressed as SLPs in the nice generators.
+    # This check is already performed in RecogniseGeneric, but if our recog node was
+    # constructed in some other way (as unlikely as this seems), it might not be.
   end);
 
 InstallGlobalFunction( VerifyGroup, 
@@ -963,7 +964,6 @@ InstallGlobalFunction( VerifyGroup,
     if StdPresentation(ri) = fail then
         return false;
     else
-        # (Calc)StdPresentation should have already set IsVerified, but let's be safe.
         SetFilterObj(ri, IsVerified);
         return true;
     fi;
