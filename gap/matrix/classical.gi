@@ -286,9 +286,10 @@ end);
 BindRecogMethod("FindHomMethodsClassical", "RuledOutExtField",
 "tests whether extension field case is ruled out",
 function(recognise)
-    local differmodfour, d, q, E, b, bx, hint;
+    local differmodfour, d, q, E, b, bx, hint, exthint;
 
     hint := recognise.hint;
+    exthint := recognise.hint;
     d := recognise.d;
     q := recognise.q;
     E := recognise.E;
@@ -305,7 +306,29 @@ function(recognise)
 
     b := recognise.currentgcd;
 
-    if hint in ["linear","unitary","orthogonalcircle"] then
+    if exthint = "unknown" then
+        if Length(recognise.ClassicalForms) > 0 then
+            if d > 3 and First(recognise.ClassicalForms, IsTrivialForm) <> fail then
+                exthint := "linear";
+            elif First(recognise.ClassicalForms, IsHermitianForm) <> fail then
+                exthint := "unitary";
+            elif First(recognise.ClassicalForms, IsSymplecticForm) <> fail then
+                exthint := "symplectic";
+            elif First(recognise.ClassicalForms, IsHyperbolicForm) <> fail then
+                exthint := "orthogonalplus";
+            elif First(recognise.ClassicalForms, IsEllipticForm) <> fail then
+                exthint := "orthogonalminus";
+            elif First(recognise.ClassicalForms, IsParabolicForm) <> fail then
+                exthint := "orthogonalcircle";
+            fi;
+        fi;
+    fi;
+
+    if exthint = "unknown" and d > 3 and b < 2 then
+        return TemporaryFailure;
+    fi;
+
+    if exthint in ["linear","unitary","orthogonalcircle"] then
         bx := 1;
     else
         bx := 2;
@@ -313,7 +336,7 @@ function(recognise)
 
 
     if b < bx then
-        if hint <> "unknown" then
+        if recognise.hint <> "unknown" then
            recognise.hintIsWrong := true;
            # clean up and never come back
            return Success;
@@ -325,19 +348,31 @@ function(recognise)
         return TemporaryFailure;
     fi;
 
-    if hint = "linear" then
-        if not IsPrime(d)
-           or E <> [d-1,d]
-           or d-1 in recognise.LE then
-            recognise.isNotExt := true;
-            return NeverApplicable;
+    if exthint = "linear" then
+        if d > 3 then
+            if not IsPrime(d)
+               or ForAny(E, e -> e <> d-1 and e <> d)
+               or d-1 in recognise.LE then
+                recognise.isNotExt := true;
+                return NeverApplicable;
+            fi;
+            if E <> [d-1,d] then
+                return TemporaryFailure;
+            fi;
+        else
+            if not IsPrime(d)
+               or E <> [d-1,d]
+               or d-1 in recognise.LE then
+                recognise.isNotExt := true;
+                return NeverApplicable;
+            fi;
         fi;
 
-    elif hint = "unitary" then
+    elif exthint = "unitary" then
         recognise.isNotExt := true;
         return NeverApplicable;
 
-    elif hint = "symplectic" then
+    elif exthint = "symplectic" then
         if d mod 4 = 2 and q mod 2 = 1 then
              recognise.isNotExt := ForAny(E, x -> x mod 4 = 0);
         elif d mod 4 = 0 and q mod 2 = 0 then
@@ -353,7 +388,7 @@ function(recognise)
            return Success;
         fi;
 
-    elif hint = "orthogonalplus" then
+    elif exthint = "orthogonalplus" then
         if d mod 4 = 2 then
             recognise.isNotExt := ForAny(E, x -> x mod 4 = 0);
         elif d mod 4 = 0 then
@@ -366,7 +401,7 @@ function(recognise)
         fi;
 
 
-    elif hint = "orthogonalminus" then
+    elif exthint = "orthogonalminus" then
         if d mod 4 = 0 then
             recognise.isNotExt := ForAny(E, x -> x mod 4 = 2);
         elif d mod 4 = 2 then
@@ -378,7 +413,7 @@ function(recognise)
            return Success;
         fi;
 
-    elif hint = "orthogonalcircle" then
+    elif exthint = "orthogonalcircle" then
         recognise.isNotExt := true;
         return NeverApplicable;
     fi;

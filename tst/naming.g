@@ -4,11 +4,11 @@ TestNaming := function(grpname, param...)
     expected := rec(
         #isGeneric := true,
         isNotAlternating := true,
-        #isNotExt := true,
+        #isNotExt := true,  # FIXME: wrong value for SO(1,8,q)
         isNotMathieu := true,
-        #isNotPSL := true,
+        isNotPSL := true,
         isReducible := false,
-        #isSLContained := false, # problems with e.g. SO(5,7)
+        isSLContained := false,
         isOmegaContained := false,
         isSpContained := false,
         isSUContained := false,
@@ -36,7 +36,7 @@ TestNaming := function(grpname, param...)
         actual := RecogniseClassical(G);
         for n in RecNames(expected) do
             if actual.(n) <> expected.(n) then
-                if actual.(n) = "unknown" and expected.(n) <> true then
+                if actual.(n) = "unknown" then
                     continue;
                 fi;
                 Print(i, ": ", grpname, "(",

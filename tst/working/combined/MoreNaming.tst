@@ -672,6 +672,20 @@ true
 gap> ri.isSLContained;
 "unknown"
 
+# Singer cycle normalizers in prime dimension should not be named as SL
+gap> grp := ClassicalMaximals("L",7,3)[7];;
+gap> Size(grp);
+7651
+gap> ri := RecogniseClassical(grp);;
+gap> ri.isSLContained;
+"unknown"
+gap> grp := ClassicalMaximals("L",7,5)[8];;
+gap> Size(grp);
+136717
+gap> ri := RecogniseClassical(grp);;
+gap> ri.isSLContained;
+"unknown"
+
 # some maximal subgroups of the conformal group CGO^+(8,5)
 gap> ri := RecogniseClassical(maxes_cgo_plus_8_5[1]);;
 gap> ri.isNotPSL;
