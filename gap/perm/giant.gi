@@ -797,7 +797,7 @@ RECOG.GiantEpsilon := 1/1024;
 #! the construction of <M>D</M> was unsuccessful.
 #! If the method constructs <M>D</M> then the calling node becomes a leaf.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsPerm, "Giant",
+BindRecogMethod("FindHomMethodsPerm", "Giant",
 "tries to find Sn and An in their natural actions",
 # TODO: expects input to be transitive, so should always be run after
 # FindHomMethodsPerm.NonTransitive; model this better?

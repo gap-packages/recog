@@ -182,7 +182,7 @@ end;
 # in the functions whose name starts with NonGeneric below. This function tests
 # whether the parameters are generic or not.
 #
-BindRecogMethod(FindHomMethodsClassical, "IsGenericParameters",
+BindRecogMethod("FindHomMethodsClassical", "IsGenericParameters",
 "tests whether group has generic parameters",
 function(recognise)
     local fact, d, q, hint;
@@ -256,7 +256,7 @@ end);
 # two ppd elements, one large and one basic. If we have not yet
 # found them, we return TemporaryFailure and have to inspect
 # more random elements.
-BindRecogMethod(FindHomMethodsClassical, "IsGeneric",
+BindRecogMethod("FindHomMethodsClassical", "IsGeneric",
 "tests whether group is generic",
 function(recognise)
     if recognise.isGeneric = false then
@@ -283,7 +283,7 @@ end);
 #  [NP98].   The function RuledOutExtField() tests whether we can
 #  deduce that the group does not preserve an extension field structure.
 
-BindRecogMethod(FindHomMethodsClassical, "RuledOutExtField",
+BindRecogMethod("FindHomMethodsClassical", "RuledOutExtField",
 "tests whether extension field case is ruled out",
 function(recognise)
     local differmodfour, d, q, E, b, bx, hint;
@@ -403,7 +403,7 @@ end);
 #  not in these nearly simple groups. If we find such elements, these
 #  groups are thereby ruled out.
 #
-BindRecogMethod(FindHomMethodsClassical, "IsNotAlternating",
+BindRecogMethod("FindHomMethodsClassical", "IsNotAlternating",
 "tests whether alternating groups are ruled out",
 function(recognise)
     local V, P, i, g ,q, o;
@@ -460,7 +460,7 @@ end);
 
 
 
-BindRecogMethod(FindHomMethodsClassical, "IsNotMathieu",
+BindRecogMethod("FindHomMethodsClassical", "IsNotMathieu",
 "tests whether Mathieu groups are ruled out",
 function(recognise)
    local i, fn, g, d, q, E, ord;
@@ -537,7 +537,7 @@ end);
 # for some central factor Z, i.e. G' is PSL(2,r).
 #
 # For more information, see Section 8.4 in [NP98].
-BindRecogMethod(FindHomMethodsClassical, "IsNotPSL",
+BindRecogMethod("FindHomMethodsClassical", "IsNotPSL",
 "tests whether PSL groups are ruled out",
 function(recognise)
    local i, E, LE, d, p, a, q, str, fn, ord, r;
@@ -698,7 +698,7 @@ IsPrimitivePrimeDivisor := function( b, a, p )
 end;
 
 # generate the next random element and its char polynomial
-BindRecogMethod(FindHomMethodsClassical, "TestRandomElement",
+BindRecogMethod("FindHomMethodsClassical", "TestRandomElement",
 "makes new random element and stores it and its char poly",
 function(recognise)
     local g, ppd, bppd, d, q, cpol, f, deg, facs, r, s, h, gmod,
@@ -920,7 +920,7 @@ end);
 # These might already yield enough information to show
 # that the group acts irreducible without calling
 # the Meataxe. This function is described in [CLG97b].
-BindRecogMethod(FindHomMethodsClassical, "IsReducible",
+BindRecogMethod("FindHomMethodsClassical", "IsReducible",
 "tests whether current random element rules out reducible",
 function(recognise)
     local deg, dims, g;
@@ -950,7 +950,7 @@ function(recognise)
     return TemporaryFailure;
 end);
 
-BindRecogMethod(FindHomMethodsClassical, "NoClassicalForms",
+BindRecogMethod("FindHomMethodsClassical", "NoClassicalForms",
 "tests whether we can rule out certain forms",
 function(recognise)
     local d,field;
@@ -973,7 +973,7 @@ end);
 
 
 
-BindRecogMethod(FindHomMethodsClassical, "ClassicalForms",
+BindRecogMethod("FindHomMethodsClassical", "ClassicalForms",
 "Find the invariant forms",
 function(recognise)
     local   field,  z,  d,  i,  qq,  A,  c,  I,  t,  i0,
@@ -1061,7 +1061,7 @@ function(recognise)
 end);
 
 
-BindRecogMethod(FindHomMethodsClassical, "MeatAxe",
+BindRecogMethod("FindHomMethodsClassical", "MeatAxe",
 "Test irreducibility",
 function(recognise)
     if recognise.n > 15 then
@@ -1089,7 +1089,7 @@ function(recognise)
 end);
 
 ## Main function to test whether group contains SL
-BindRecogMethod(FindHomMethodsClassical, "IsSLContained",
+BindRecogMethod("FindHomMethodsClassical", "IsSLContained",
 "tests whether group contains SL",
 function(recognise)
     if recognise.isGeneric <> true or
@@ -1132,7 +1132,7 @@ function(recognise)
 end);
 
 ## Main function to test whether group contains Sp
-BindRecogMethod(FindHomMethodsClassical, "IsSpContained",
+BindRecogMethod("FindHomMethodsClassical", "IsSpContained",
 "tests whether group contains Sp",
 function(recognise)
     local isSpForm;
@@ -1190,7 +1190,7 @@ end);
 
 
 ## Main function to test whether group contains SU
-BindRecogMethod(FindHomMethodsClassical, "IsSUContained",
+BindRecogMethod("FindHomMethodsClassical", "IsSUContained",
 "tests whether group contains SU",
 function(recognise)
     local f, isHermForm, q0;
@@ -1254,7 +1254,7 @@ end);
 
 
 ## Main function to test whether group contains SO
-BindRecogMethod(FindHomMethodsClassical, "isOmegaContained",
+BindRecogMethod("FindHomMethodsClassical", "isOmegaContained",
 "tests whether group contains SO",
 function(recognise)
     local f, isParForm, isEllForm, isHypForm;
@@ -1375,7 +1375,7 @@ end;
 ##  find an element of order a multiple of 4 and a large and basic ppd(3,q;3)-
 ##  element
 ##
-BindRecogMethod(FindHomMethodsClassical, "NonGenericLinear",
+BindRecogMethod("FindHomMethodsClassical", "NonGenericLinear",
 "tests whether group is non-generic Linear",
 function(recognise)
     local CheckFlag;
@@ -1441,7 +1441,7 @@ end);
 ##
 ##  Recognise non-generic symplectic matrix groups over finite fields
 ##
-BindRecogMethod(FindHomMethodsClassical, "NonGenericSymplectic",
+BindRecogMethod("FindHomMethodsClassical", "NonGenericSymplectic",
 "tests whether group is non-generic Symplectic",
 function(recognise)
     local d, q, CheckFlag, isSpForm;
@@ -1561,7 +1561,7 @@ end);
 ##
 ##  Recognise non-generic unitary matrix groups over finite fields
 ##
-BindRecogMethod(FindHomMethodsClassical, "NonGenericUnitary",
+BindRecogMethod("FindHomMethodsClassical", "NonGenericUnitary",
 "tests whether group is non-generic Unitary",
 function(recognise)
     local grp, d, q, g, f1, f2, o, CheckFlag, isHermForm, order;
@@ -1785,7 +1785,7 @@ function(recognise)
     return CheckFlag();
 end);
 
-BindRecogMethod(FindHomMethodsClassical, "NonGenericOrthogonalPlus",
+BindRecogMethod("FindHomMethodsClassical", "NonGenericOrthogonalPlus",
 "tests whether group is non-generic O+",
 function(recognise)
     local grp, d, q, gp1, gp2, CheckFlag, pgrp, sc, isHypForm, ol, ord;
@@ -2080,7 +2080,7 @@ function(recognise)
 
 end);
 
-BindRecogMethod(FindHomMethodsClassical, "NonGenericOrthogonalMinus",
+BindRecogMethod("FindHomMethodsClassical", "NonGenericOrthogonalMinus",
 "tests whether group is non-generic O-",
 function(recognise)
     local grp, d, q, pgrp, h, g, ppd, CheckFlag, isEllForm;
@@ -2188,7 +2188,7 @@ function(recognise)
 
 end);
 
-BindRecogMethod(FindHomMethodsClassical, "NonGenericOrthogonalCircle",
+BindRecogMethod("FindHomMethodsClassical", "NonGenericOrthogonalCircle",
 "tests whether group is non-generic Oo",
 function(recognise)
     local d, q, g, s, CheckFlag, isParForm;

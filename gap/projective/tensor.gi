@@ -314,7 +314,7 @@ end;
 #! the restriction to that subgroup to build the actual tensor basis, as in
 #! Lemma VII.6.6 and Theorem VII.6.7 of <Cite Key="Neu09"/>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "TensorDecomposable",
+BindRecogMethod("FindHomMethodsProjective", "TensorDecomposable",
 "find a tensor decomposition",
 function(ri)
   local G,H,N,conjgensG,d,f,hom,kro,r;
@@ -405,7 +405,7 @@ end;
 #! for scalar ambiguity in the extracted tensor factor, so the generic
 #! projective SLP machinery must treat representatives up to scalars.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "KroneckerProduct",
+BindRecogMethod("FindHomMethodsProjective", "KroneckerProduct",
 "split off one factor of a tensor decomposition projectively",
 function(ri)
   # We got the hint that this is a Kronecker product, let's take it apart.
@@ -442,7 +442,7 @@ end;
 #! tensor-decomposition strategy discussed in <Cite Key="Neu09"
 #! Where="Section VII.(6.6), especially p. 126"/>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "KroneckerKernel",
+BindRecogMethod("FindHomMethodsProjective", "KroneckerKernel",
 "project from the tensor kernel to the repeated diagonal block",
 function(ri)
   # One up in the tree we got the hint about a Kronecker product, this

@@ -2474,7 +2474,7 @@ end;
 #! @BeginChunk NaturalSL
 #! TODO
 #! @EndChunk
-BindRecogMethod(FindHomMethodsMatrix, "NaturalSL",
+BindRecogMethod("FindHomMethodsMatrix", "NaturalSL",
 "TODO",
 function(ri)
   local G, data,e,genlist,grpmem,i,j,n,p,q,r,il;

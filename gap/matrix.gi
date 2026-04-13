@@ -80,7 +80,7 @@ end;
 #! The bulk of the work in matrix recognition is done in the projective group
 #! setting.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsMatrix, "GoProjective",
+BindRecogMethod("FindHomMethodsMatrix", "GoProjective",
 "divide out scalars and recognise projectively",
 function(ri)
   local hom,q;
@@ -109,7 +109,7 @@ end);
 #! the computation of a stabilizer chain of this node. This stabilizer chain
 #! is then used in the same way as above.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsMatrix, "KnownStabilizerChain",
+BindRecogMethod("FindHomMethodsMatrix", "KnownStabilizerChain",
 "use an already known stabilizer chain for this group",
 function(ri)
   local S,hom,G;

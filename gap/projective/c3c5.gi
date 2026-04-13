@@ -208,7 +208,7 @@ end;
 #!
 #! The method returns only <K>Success</K> or <K>NeverApplicable</K>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "NotAbsolutelyIrred",
+BindRecogMethod("FindHomMethodsProjective", "NotAbsolutelyIrred",
 "write over a bigger field with smaller degree",
 function(ri)
   local G,H,hom,m,r;
@@ -298,7 +298,7 @@ end;
 #! <M>(q^e-1)/(q-1)</M>, so the method recognizes it directly as a cyclic
 #! projective leaf.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "BiggerScalarsOnly",
+BindRecogMethod("FindHomMethodsProjective", "BiggerScalarsOnly",
 "handle extension-field scalars left by the C3 rewrite",
 function(ri)
   # We come here only hinted. The projective quotient of the remaining
@@ -532,7 +532,7 @@ end;
 #! <Cite Key="CNRD09" Where="Section 6.3, Theorem 6.3"/>, using the
 #! smallest-field base change described earlier there.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "Subfield",
+BindRecogMethod("FindHomMethodsProjective", "Subfield",
 "write over a smaller field with same degree",
 function(ri)
     # We assume G to be absolutely irreducible, although this is not
@@ -617,7 +617,7 @@ end;
 #! exceptional situation discussed at the end of Section 6.4 where the sampled
 #! subgroup is too small to expose the correct endomorphism ring.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "C3C5",
+BindRecogMethod("FindHomMethodsProjective", "C3C5",
 "compute a normal subgroup of derived and resolve C3 and C5",
 function(ri)
   # We assume that G acts absolutely irreducibly and that the matrix group
