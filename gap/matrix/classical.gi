@@ -1211,8 +1211,8 @@ function(recognise)
     if recognise.QuadraticForm = false and
         First(recognise.ClassicalForms,isSpForm) <> fail then
         # symplectic form
-        recognise.isSpContained := true;
         recognise.isNotExt := true;
+        recognise.isSpContained := true;
         Info(InfoClassical,2,"The group contains Sp(", recognise.d, ", ",
              recognise.q, ");");
         return Success;
@@ -1428,9 +1428,10 @@ function(recognise)
             recognise.needForms := true;
             return TemporaryFailure;
         fi;
-        Info(InfoClassical,2,"The group is not generic");
-        Info(InfoClassical,2,"and contains SL(", recognise.d, ", ",
-             recognise.q, ");");
+        Info(InfoClassical,2,"The group is not generic and contains SL(",
+             recognise.d, ", ", recognise.q, ");");
+        recognise.isGeneric := false;
+        recognise.isNotExt := true;
         recognise.isSLContained := true;
         return Success;
     end;
@@ -1489,13 +1490,14 @@ function(recognise)
            recognise.needMeataxe := true;
            return TemporaryFailure;
         fi;
-        if  Length(recognise.ClassicalForms) = 0 then
+        if Length(recognise.ClassicalForms) = 0 then
             recognise.needForms := true;
             return TemporaryFailure;
         fi;
-        Info(InfoClassical,2,"The group is not generic");
-        Info(InfoClassical,2,"and contains Sp(", recognise.d, ", ",
-             recognise.q, ");");
+        Info(InfoClassical,2,"The group is not generic and contains Sp(",
+             recognise.d, ", ", recognise.q, ");");
+        recognise.isGeneric := false;
+        recognise.isNotExt := true;
         recognise.isSpContained := true;
         return Success;
     end;
@@ -1614,8 +1616,10 @@ function(recognise)
             recognise.needForms := true;
             return TemporaryFailure;
         fi;
-         Info(InfoClassical,2,"group contains SU(",
-              recognise.d, ", ", recognise.q, ");");
+        Info(InfoClassical,2,"The group is not generic and contains SU(",
+             recognise.d, ", ", recognise.q, ");");
+        recognise.isGeneric := false;
+        recognise.isNotExt := true;
         recognise.isSUContained := true;
         return Success;
     end;
@@ -1838,9 +1842,10 @@ function(recognise)
             recognise.needForms := true;
             return TemporaryFailure;
         fi;
-        Info(InfoClassical,2,"group contains SO+(",
+        Info(InfoClassical,2,"The group is not generic and contains SO+(",
              recognise.d, ", ", recognise.q, ");");
-
+        recognise.isGeneric := false;
+        recognise.isNotExt := true;
         recognise.isOmegaContained := true;
         return Success;
     end;
@@ -2133,8 +2138,10 @@ function(recognise)
             recognise.needForms := true;
             return TemporaryFailure;
         fi;
-        Info(InfoClassical,2,"group contains SO-(",
+        Info(InfoClassical,2,"The group is not generic and contains SO-(",
              recognise.d, ", ", recognise.q, ");");
+        recognise.isGeneric := false;
+        recognise.isNotExt := true;
         recognise.isOmegaContained := true;
         return Success;
     end;
@@ -2247,8 +2254,10 @@ function(recognise)
             recognise.needForms := true;
             return TemporaryFailure;
         fi;
-        Info(InfoClassical,2,"group contains Omega(",
+        Info(InfoClassical,2,"The group is not generic and contains Omega(",
              recognise.d, ", ", recognise.q, ");");
+        recognise.isGeneric := false;
+        recognise.isNotExt := true;
         recognise.isOmegaContained := true;
         return Success;
     end;
