@@ -379,6 +379,9 @@ function(recognise)
         elif d mod 4 = 0 and q mod 2 = 0 then
              recognise.isNotExt := ForAny(E, x -> x mod 4 = 2);
         elif d mod 4 = 0 and q mod 2 = 1 then
+             if Length(E) < 2 then
+                 return TemporaryFailure;
+             fi;
              recognise.isNotExt := differmodfour(E);
         elif d mod 4 = 2 and q mod 2 = 0 then
             recognise.isNotExt := (Length(E) > 0);
@@ -393,6 +396,12 @@ function(recognise)
         if d mod 4 = 2 then
             recognise.isNotExt := ForAny(E, x -> x mod 4 = 0);
         elif d mod 4 = 0 then
+            # With only one observed ppd exponent there is no mod 4
+            # discrepancy yet, so we cannot conclude that the extension-field
+            # case is still possible.
+            if Length(E) < 2 then
+                return TemporaryFailure;
+            fi;
             recognise.isNotExt := differmodfour(E);
         else
            Info( InfoClassical, 2, "d cannot be odd in hint O+");
@@ -406,6 +415,9 @@ function(recognise)
         if d mod 4 = 0 then
             recognise.isNotExt := ForAny(E, x -> x mod 4 = 2);
         elif d mod 4 = 2 then
+            if Length(E) < 2 then
+                return TemporaryFailure;
+            fi;
             recognise.isNotExt := differmodfour(E);
         else
            Info( InfoClassical, 2, "d cannot be odd in hint O-");
