@@ -772,10 +772,10 @@ function(ri)
               if hint <> fail then
                   res := DoHintedLowIndex(ri,G,hint);
               else   # we use Pete Brooksbank's methods
-                  return SLCR.FindHom(ri,G,2,name[3]);
+                  res := SLCR.FindHom(ri,G,2,name[3]);
               fi;
           else
-              return SLCR.FindHom(ri,G,name[2],name[3]);
+              res := SLCR.FindHom(ri,G,name[2],name[3]);
           fi;
       else
           if Length(name) = 3 then
@@ -787,7 +787,7 @@ function(ri)
           fi;
           res := LookupHintForSimple(ri,G,namecat);
       fi;
-      if res = true then
+      if res = true or res = Success then
           return Success;
       fi;
   od;
