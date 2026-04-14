@@ -286,10 +286,9 @@ end);
 BindRecogMethod("FindHomMethodsClassical", "RuledOutExtField",
 "tests whether extension field case is ruled out",
 function(recognise)
-    local differmodfour, d, q, E, b, bx, hint, exthint;
+    local differmodfour, d, q, E, b, bx, hint;
 
     hint := recognise.hint;
-    exthint := recognise.hint;
     d := recognise.d;
     q := recognise.q;
     E := recognise.E;
@@ -306,33 +305,33 @@ function(recognise)
 
     b := recognise.currentgcd;
 
-    if exthint = "unknown" then
+    if hint = "unknown" then
         if Length(recognise.ClassicalForms) > 0 then
             # A trivial form only tells us that we are in the linear case.
             # For generic linear groups, use that to avoid ruling out Singer
             # normalizers too early. The d <= 3 linear cases are handled by
             # NonGenericLinear, so there is no need to force isNotExt here.
             if d > 3 and First(recognise.ClassicalForms, IsTrivialForm) <> fail then
-                exthint := "linear";
+                hint := "linear";
             elif First(recognise.ClassicalForms, IsHermitianForm) <> fail then
-                exthint := "unitary";
+                hint := "unitary";
             elif First(recognise.ClassicalForms, IsSymplecticForm) <> fail then
-                exthint := "symplectic";
+                hint := "symplectic";
             elif First(recognise.ClassicalForms, IsHyperbolicForm) <> fail then
-                exthint := "orthogonalplus";
+                hint := "orthogonalplus";
             elif First(recognise.ClassicalForms, IsEllipticForm) <> fail then
-                exthint := "orthogonalminus";
+                hint := "orthogonalminus";
             elif First(recognise.ClassicalForms, IsParabolicForm) <> fail then
-                exthint := "orthogonalcircle";
+                hint := "orthogonalcircle";
             fi;
         fi;
     fi;
 
-    if exthint = "unknown" and b < 2 then
+    if hint = "unknown" and b < 2 then
         return TemporaryFailure;
     fi;
 
-    if exthint in ["linear","unitary","orthogonalcircle"] then
+    if hint in ["linear","unitary","orthogonalcircle"] then
         bx := 1;
     else
         bx := 2;
@@ -352,7 +351,7 @@ function(recognise)
         return TemporaryFailure;
     fi;
 
-    if exthint = "linear" then
+    if hint = "linear" then
         if d > 3 then
             # For generic linear groups, E is built from random elements.
             # Seeing only part of the expected extension-field pattern is not
@@ -370,11 +369,11 @@ function(recognise)
             fi;
         fi;
 
-    elif exthint = "unitary" then
+    elif hint = "unitary" then
         recognise.isNotExt := true;
         return NeverApplicable;
 
-    elif exthint = "symplectic" then
+    elif hint = "symplectic" then
         if d mod 4 = 2 and q mod 2 = 1 then
              recognise.isNotExt := ForAny(E, x -> x mod 4 = 0);
         elif d mod 4 = 0 and q mod 2 = 0 then
@@ -390,7 +389,7 @@ function(recognise)
            return Success;
         fi;
 
-    elif exthint = "orthogonalplus" then
+    elif hint = "orthogonalplus" then
         if d mod 4 = 2 then
             recognise.isNotExt := ForAny(E, x -> x mod 4 = 0);
         elif d mod 4 = 0 then
@@ -403,7 +402,7 @@ function(recognise)
         fi;
 
 
-    elif exthint = "orthogonalminus" then
+    elif hint = "orthogonalminus" then
         if d mod 4 = 0 then
             recognise.isNotExt := ForAny(E, x -> x mod 4 = 2);
         elif d mod 4 = 2 then
@@ -415,7 +414,7 @@ function(recognise)
            return Success;
         fi;
 
-    elif exthint = "orthogonalcircle" then
+    elif hint = "orthogonalcircle" then
         recognise.isNotExt := true;
         return NeverApplicable;
     fi;
