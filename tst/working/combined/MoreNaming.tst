@@ -600,7 +600,7 @@ gap> ri.isNotPSL;
 true
 
 #
-# PSL(2,7)  in dimension 3a over GF(2)
+# PSL(2,7)  in dimension 3a over GF(2) -- this is just SL(3,2)
 gap> grp := Group(
 >  [
 >     [ [ 1, 0, 0 ],
@@ -613,7 +613,7 @@ gap> ri := RecogniseClassical(grp);;
 gap> ri.isSLContained;
 true
 
-# PSL(2,7)  in dimension 3b over GF(2)
+# PSL(2,7)  in dimension 3b over GF(2) -- this is just SL(3,2)
 gap> grp := Group(   [
 >     [ [ 1, 0, 0 ],
 >       [ 0, 1, 0 ],
@@ -635,6 +635,8 @@ gap> grp := Group(
 >       [ 1, 5, 2 ],
 >       [ 2, 4, 2 ] ] ]*Z(7)^0);;
 gap> ri := RecogniseClassical(grp);;
+gap> ri.isSLContained = true;
+false
 gap> ri.possibleNearlySimple;
 [  ]
 gap> ri.isOmegaContained;
