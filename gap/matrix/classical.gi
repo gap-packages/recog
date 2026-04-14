@@ -308,6 +308,10 @@ function(recognise)
 
     if exthint = "unknown" then
         if Length(recognise.ClassicalForms) > 0 then
+            # A trivial form only tells us "linear". We only use that to
+            # delay ruling out extension-field subgroups in the generic linear
+            # cases we debugged here. The d <= 3 linear cases are handled
+            # separately by the non-generic code below.
             if d > 3 and First(recognise.ClassicalForms, IsTrivialForm) <> fail then
                 exthint := "linear";
             elif First(recognise.ClassicalForms, IsHermitianForm) <> fail then
@@ -350,8 +354,13 @@ function(recognise)
 
     if exthint = "linear" then
         if d > 3 then
+            # For generic linear groups, E is built from random elements.
+            # Seeing only part of the expected extension-field pattern is not
+            # enough to rule that case out yet; we only reject when the data is
+            # actually incompatible with a Singer normalizer, and otherwise wait
+            # until we have seen the full [d-1,d] pattern.
             if not IsPrime(d)
-               or ForAny(E, e -> e <> d-1 and e <> d)
+               or not IsSubset([d-1,d], E)
                or d-1 in recognise.LE then
                 recognise.isNotExt := true;
                 return NeverApplicable;
@@ -360,6 +369,8 @@ function(recognise)
                 return TemporaryFailure;
             fi;
         else
+            # d = 2 and the exceptional d = 3 linear cases are handled by the
+            # non-generic recognition code, so keep the original stricter test.
             if not IsPrime(d)
                or E <> [d-1,d]
                or d-1 in recognise.LE then
