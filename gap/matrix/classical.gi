@@ -305,6 +305,32 @@ function(recognise)
 
     b := recognise.currentgcd;
 
+    if hint = "unknown" then
+        if Length(recognise.ClassicalForms) > 0 then
+            # A trivial form only tells us that we are in the linear case.
+            # For generic linear groups, use that to avoid ruling out Singer
+            # normalizers too early. The d <= 3 linear cases are handled by
+            # NonGenericLinear, so there is no need to force isNotExt here.
+            if d > 3 and First(recognise.ClassicalForms, IsTrivialForm) <> fail then
+                hint := "linear";
+            elif First(recognise.ClassicalForms, IsHermitianForm) <> fail then
+                hint := "unitary";
+            elif First(recognise.ClassicalForms, IsSymplecticForm) <> fail then
+                hint := "symplectic";
+            elif First(recognise.ClassicalForms, IsHyperbolicForm) <> fail then
+                hint := "orthogonalplus";
+            elif First(recognise.ClassicalForms, IsEllipticForm) <> fail then
+                hint := "orthogonalminus";
+            elif First(recognise.ClassicalForms, IsParabolicForm) <> fail then
+                hint := "orthogonalcircle";
+            fi;
+        fi;
+    fi;
+
+    if hint = "unknown" and b < 2 then
+        return TemporaryFailure;
+    fi;
+
     if hint in ["linear","unitary","orthogonalcircle"] then
         bx := 1;
     else
@@ -313,7 +339,7 @@ function(recognise)
 
 
     if b < bx then
-        if hint <> "unknown" then
+        if recognise.hint <> "unknown" then
            recognise.hintIsWrong := true;
            # clean up and never come back
            return Success;
@@ -326,11 +352,21 @@ function(recognise)
     fi;
 
     if hint = "linear" then
-        if not IsPrime(d)
-           or E <> [d-1,d]
-           or d-1 in recognise.LE then
-            recognise.isNotExt := true;
-            return NeverApplicable;
+        if d > 3 then
+            # For generic linear groups, E is built from random elements.
+            # Seeing only part of the expected extension-field pattern is not
+            # enough to rule that case out yet; we only reject when the data is
+            # actually incompatible with a Singer normalizer, and otherwise wait
+            # until we have seen the full [d-1,d] pattern.
+            if not IsPrime(d)
+               or not IsSubset([d-1,d], E)
+               or d-1 in recognise.LE then
+                recognise.isNotExt := true;
+                return NeverApplicable;
+            fi;
+            if E <> [d-1,d] then
+                return TemporaryFailure;
+            fi;
         fi;
 
     elif hint = "unitary" then
