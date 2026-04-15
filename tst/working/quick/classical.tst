@@ -18,3 +18,11 @@ gap> SetX(G, G, function(g,h)
 >   return gh = false or (IsEqualProjective(gh[1], g) and IsEqualProjective(gh[2], h));
 > end);
 [ true ]
+
+# issue #345: degree-2 linear groups should still report containment of SL
+gap> ri := RecogniseClassical(SL(2,37));;
+gap> ri.isSLContained;
+true
+gap> ri := RecogniseClassical(SL(2,25));;
+gap> ri.isSLContained;
+true
