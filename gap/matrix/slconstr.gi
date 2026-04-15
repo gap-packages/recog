@@ -1247,7 +1247,11 @@ return fail;
      det := Determinant(mat);
      if not (det = Z(q)^0) then
         gcd := Gcd(d,q-1);
-        exp := (LogFFE(det, Z(q))/gcd) / (d/gcd) mod ((q-1)/gcd);
+        i := LogFFE(det, Z(q));
+        if i mod gcd <> 0 then
+           return fail;
+        fi;
+        exp := QuoInt(i, gcd) / QuoInt(d, gcd) mod QuoInt(q-1, gcd);
         slprog := SLCR.PowerProg(data.sprog[d],exp);
         rightslp := SLCR.ProdProg(rightslp, slprog);
         W := W * ResultOfStraightLineProgram (slprog, List (data.gens, x -> x[1]));
