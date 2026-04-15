@@ -261,6 +261,14 @@ gap> Size(ri);
 gap> ForAll(GeneratorsOfGroup(H), x -> SLPforElement(ri, x) <> fail);
 true
 
+# Issue #313: an unsatisfied determinant congruence in SLConstructive must
+# cause recognition to back out, not raise a ModRat error.
+# See https://github.com/gap-packages/recog/issues/313
+gap> i := 58;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
+gap> ri := RecognizeGroup(ClassicalMaximals("L",4,3)[8]);;
+gap> IsReady(ri);
+true
+
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
 gap> STOP_TEST("bugfix.tst");
