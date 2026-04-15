@@ -24,6 +24,33 @@ gap> for i in [1..30] do
 >   if Size(r) <> Size(g) then ErrorNoReturn("wrong size"); fi;
 > od;
 
+# Issue #33: Generic projective image verification must also accept
+# representatives that differ by scalars after rewriting over a bigger field.
+# See https://github.com/gap-packages/recog/issues/33
+gap> i := 123;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
+gap> ri := RecognizeGroup(ClassicalMaximals("L",4,3)[7]);;
+gap> IsReady(ri);
+true
+
+# Issue #36: a diagonal 7x7 group over GF(9) used to miss one BlockScalar
+# kernel generator, leading to an underestimated size and failed SLPs.
+# See https://github.com/gap-packages/recog/issues/36
+gap> z := Z(3^2);;
+gap> diags := [
+>   [ z^7, z^6, z, z^6, z^3, Z(3)^0, z^5 ],
+>   [ z^3, z^5, z^4, z^3, z^2, z^6, z^3 ],
+>   [ z^2, z, z^3, z^7, z^5, z^0, z^3 ],
+>   [ z, z^7, z^3, z^6, z^4, z^5, z^4 ],
+>   [ z^3, z^2, z^0, z^3, z^7, z, z^6 ]
+> ];;
+gap> g := GroupWithGenerators(List(diags, DiagonalMat));;
+gap> i := 157;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
+gap> ri := RecognizeGroup(g);;
+gap> Size(ri);
+16384
+gap> ForAll(GeneratorsOfGroup(g), x -> SLPforElement(ri, x) <> fail);
+true
+
 # See https://github.com/gap-packages/recog/issues/38
 gap> RECOG.TestGroup(SymmetricGroup(11), false, Factorial(11));
 <recognition node Giant AlmostSimple Size=39916800>
@@ -60,19 +87,6 @@ gap> ri := RecognizeGroup(DirectProduct(SU(3,17), SL(3,17)));;
 gap> IsReady(ri);
 true
 
-# Issue #343: extracting a strict lower block diagonal from an immutable
-# identity matrix over GF(2) must not create phantom ones.
-gap> blocks := [ [ 1 .. 11 ], [ 12 .. 22 ], [ 23 .. 33 ], [ 34 .. 44 ],
->   [ 45 .. 55 ], [ 56 .. 66 ], [ 67 .. 77 ], [ 78 .. 88 ], [ 89 .. 99 ],
->   [ 100 .. 110 ], [ 111 ], [ 112 .. 121 ], [ 122 .. 132 ], [ 133 .. 143 ],
->   [ 144 .. 154 ], [ 155 .. 165 ], [ 166 .. 176 ], [ 177 .. 187 ],
->   [ 188 .. 198 ] ];;
-gap> lens := [ 1946, 1815, 1694, 1573, 1452, 1331, 1210, 1100, 1089, 968,
->   957, 847, 726, 605, 484, 363, 242, 121 ];;
-gap> x := IdentityMat(198, GF(2));;
-gap> IsZero(RECOG.ExtractLowStuff(x, 6, blocks, lens, fail));
-true
-
 # We had a bug where RECOG.IsScalarMat was used incorrectly (return value was
 # assumed to be true or false, but could be an FFE). This example used to
 # trigger the error, which looked like this:
@@ -97,22 +111,31 @@ gap> G:=Group(List(gens, g -> ImmutableMatrix(GF(9), g)));; # ... but compress g
 gap> RECOG.SmallHomomorphicImageProjectiveGroup(G);  # this call used to raise an error
 fail
 
-# Bug in RECOG.ForceToOtherField when working over large, non-internal fields
-# See https://github.com/gap-packages/recog/issues/383
-gap> m:=[[Z(17^4)^290]];;
-gap> RECOG.ForceToOtherField(m,GF(17,2)) = m;
-true
-
-# The semilinear rewrite for NotAbsolutelyIrred must accept genuine
-# semilinear elements, not only E-linear ones. This random seed used to
-# produce a failed recognition node on the branch for issue #399.
-gap> i:=4;; Reset(GlobalRandomSource,i);; Reset(GlobalMersenneTwister,1);;
-gap> ri:=RecognizeGroup(SO(+1,4,3));;
+# Issue #295: the C6 recognizer must reject inconsistent radical block splits
+# instead of raising "what's wrong2?" for this reducible alternating-group
+# factor.
+# See https://github.com/gap-packages/recog/issues/295
+gap> Reset(GlobalMersenneTwister, 220);; Reset(GlobalRandomSource, 220);;
+gap> deg := 10;;
+gap> field := GF(7);;
+gap> g := AlternatingGroup(deg);;
+gap> gens := List([1..5], x -> PseudoRandom(g));;
+gap> mgens := List(gens, x -> PermutationMat(x, deg, field));;
+gap> m := GModuleByMats(mgens, field);;
+gap> cf := MTX.CompositionFactors(m);;
+gap> dims := List(cf, x -> x.dimension);;
+gap> max := Maximum(dims);;
+gap> pos := Position(dims, max);;
+gap> x := PseudoRandom(GL(max, field));;
+gap> mgens := List(cf[pos].generators, y -> y^x);;
+gap> h := Group(mgens);;
+gap> i := 80;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
+gap> ri := RecogniseGroup(h);;
 gap> IsReady(ri);
 true
 
-# A projective tensor-factor image used to miss scalar multiples, so this
-# reproducible seed produced a failed KroneckerProduct node.
+# Issue #302: A projective tensor-factor image used to miss scalar multiples,
+# so this reproducible seed produced a failed KroneckerProduct node.
 # See https://github.com/gap-packages/recog/issues/302
 gap> z := Z(3^2);;
 gap> gens := [ [ [ z^0, z^3, z^7, z^0, z^6, z^5, z^5, z^2 ],
@@ -137,58 +160,35 @@ gap> ri := RecogniseGroup(g);;
 gap> IsReady(ri);
 true
 
-# Issue #33: Generic projective image verification must also accept
-# representatives that differ by scalars after rewriting over a bigger field.
-# See https://github.com/gap-packages/recog/issues/33
-gap> i := 123;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
-gap> ri := RecognizeGroup(ClassicalMaximals("L",4,3)[7]);;
+# Issue #313: an unsatisfied determinant congruence in SLConstructive must
+# cause recognition to back out, not raise a ModRat error.
+# See https://github.com/gap-packages/recog/issues/313
+gap> i := 58;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
+gap> ri := RecognizeGroup(ClassicalMaximals("L",4,3)[8]);;
 gap> IsReady(ri);
 true
 
-# Issue #36: a diagonal 7x7 group over GF(9) used to miss one BlockScalar
-# kernel generator, leading to an underestimated size and failed SLPs.
-# See https://github.com/gap-packages/recog/issues/36
-gap> z := Z(3^2);;
-gap> diags := [
->   [ z^7, z^6, z, z^6, z^3, Z(3)^0, z^5 ],
->   [ z^3, z^5, z^4, z^3, z^2, z^6, z^3 ],
->   [ z^2, z, z^3, z^7, z^5, z^0, z^3 ],
->   [ z, z^7, z^3, z^6, z^4, z^5, z^4 ],
->   [ z^3, z^2, z^0, z^3, z^7, z, z^6 ]
-> ];;
-gap> g := GroupWithGenerators(List(diags, DiagonalMat));;
-gap> i := 157;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
-gap> ri := RecognizeGroup(g);;
-gap> Size(ri);
-16384
-gap> ForAll(GeneratorsOfGroup(g), x -> SLPforElement(ri, x) <> fail);
+# Issue #343: extracting a strict lower block diagonal from an immutable
+# identity matrix over GF(2) must not create phantom ones.
+gap> blocks := [ [ 1 .. 11 ], [ 12 .. 22 ], [ 23 .. 33 ], [ 34 .. 44 ],
+>   [ 45 .. 55 ], [ 56 .. 66 ], [ 67 .. 77 ], [ 78 .. 88 ], [ 89 .. 99 ],
+>   [ 100 .. 110 ], [ 111 ], [ 112 .. 121 ], [ 122 .. 132 ], [ 133 .. 143 ],
+>   [ 144 .. 154 ], [ 155 .. 165 ], [ 166 .. 176 ], [ 177 .. 187 ],
+>   [ 188 .. 198 ] ];;
+gap> lens := [ 1946, 1815, 1694, 1573, 1452, 1331, 1210, 1100, 1089, 968,
+>   957, 847, 726, 605, 484, 363, 242, 121 ];;
+gap> x := IdentityMat(198, GF(2));;
+gap> IsZero(RECOG.ExtractLowStuff(x, 6, blocks, lens, fail));
 true
 
-# Issue #295: the C6 recognizer must reject inconsistent radical block splits
-# instead of raising "what's wrong2?" for this reducible alternating-group
-# factor.
-# See https://github.com/gap-packages/recog/issues/295
-gap> Reset(GlobalMersenneTwister, 220);; Reset(GlobalRandomSource, 220);;
-gap> deg := 10;;
-gap> field := GF(7);;
-gap> g := AlternatingGroup(deg);;
-gap> gens := List([1..5], x -> PseudoRandom(g));;
-gap> mgens := List(gens, x -> PermutationMat(x, deg, field));;
-gap> m := GModuleByMats(mgens, field);;
-gap> cf := MTX.CompositionFactors(m);;
-gap> dims := List(cf, x -> x.dimension);;
-gap> max := Maximum(dims);;
-gap> pos := Position(dims, max);;
-gap> x := PseudoRandom(GL(max, field));;
-gap> mgens := List(cf[pos].generators, y -> y^x);;
-gap> h := Group(mgens);;
-gap> i := 80;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
-gap> ri := RecogniseGroup(h);;
-gap> IsReady(ri);
+# Issue #383: Bug in RECOG.ForceToOtherField when working over large,
+# non-internal fields
+# See https://github.com/gap-packages/recog/issues/383
+gap> m:=[[Z(17^4)^290]];;
+gap> RECOG.ForceToOtherField(m,GF(17,2)) = m;
 true
 
-# Issue #392: a projective TrivialGroup leaf must keep a scalar representative
-# so parent nodes can lift words back through the image.
+# Issue #392: NotAbsolutelyIrred must use immediate verification.
 # See https://github.com/gap-packages/recog/issues/392
 gap> i := 228;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
 gap> G := Group([ [ 0*Z(3), Z(3)^0 ], [ Z(3), 0*Z(3) ] ]);;
@@ -210,18 +210,11 @@ gap> Size(ri);
 gap> ForAll(GeneratorsOfGroup(G), x -> SLPforElement(ri, x) <> fail);
 true
 
-# Issue #392: a projective TrivialGroup leaf must keep a scalar representative
-# so parent nodes can lift words back through the image.
-gap> i := 228;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
-gap> G := Group([ [ 0*Z(3), Z(3)^0 ], [ Z(3), 0*Z(3) ] ]);;
-gap> ri := RecognizeGroup(G);;
-gap> IsReady(ri);
-true
-
-# Issue #423: return of issue #392 with different setup
-gap> i := 1226;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
-gap> G := Group([ [ 0*Z(3), Z(3)^0 ], [ Z(3), 0*Z(3) ] ]);;
-gap> ri := RecognizeGroup(G);;
+# Issue #399: The semilinear rewrite for NotAbsolutelyIrred must accept
+# genuine semilinear elements, not only E-linear ones. This random seed used
+# to produce a failed recognition node on the branch for issue #399.
+gap> i:=4;; Reset(GlobalRandomSource,i);; Reset(GlobalMersenneTwister,1);;
+gap> ri:=RecognizeGroup(SO(+1,4,3));;
 gap> IsReady(ri);
 true
 
@@ -230,6 +223,13 @@ true
 # See https://github.com/gap-packages/recog/issues/417
 gap> i := 138;; Reset(GlobalMersenneTwister, 1);; Reset(GlobalRandomSource, i);;
 gap> ri := RecognizeGroup(SO(+1,4,3));;
+gap> IsReady(ri);
+true
+
+# Issue #423: return of issue #392 with different setup
+gap> i := 1226;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
+gap> G := Group([ [ 0*Z(3), Z(3)^0 ], [ Z(3), 0*Z(3) ] ]);;
+gap> ri := RecognizeGroup(G);;
 gap> IsReady(ri);
 true
 
@@ -259,14 +259,6 @@ gap> ri;
 gap> Size(ri);
 292561
 gap> ForAll(GeneratorsOfGroup(H), x -> SLPforElement(ri, x) <> fail);
-true
-
-# Issue #313: an unsatisfied determinant congruence in SLConstructive must
-# cause recognition to back out, not raise a ModRat error.
-# See https://github.com/gap-packages/recog/issues/313
-gap> i := 58;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
-gap> ri := RecognizeGroup(ClassicalMaximals("L",4,3)[8]);;
-gap> IsReady(ri);
 true
 
 #
