@@ -3,6 +3,8 @@
 # recognition) algorithms implemented in the RecogniseClassical function,
 # focused on testing exceptions.
 #
+gap> oldOrbInfoLevel:=InfoLevel(InfoOrb);;
+gap> SetInfoLevel(InfoOrb, 0); # silence `Have 37776 points` info messages
 
 # Read some helper functions
 gap> ReadPackage("recog", "tst/naming.g");
@@ -739,3 +741,6 @@ gap> ri.isSUContained;
 false
 gap> ri.isSpContained;
 "unknown"
+
+#
+gap> SetInfoLevel(InfoOrb, oldOrbInfoLevel);
