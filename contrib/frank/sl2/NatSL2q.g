@@ -35,10 +35,17 @@
 ##      nicegens:=List(l[1],a->ResultOfStraightLineProgram(a,GeneratorsOfGroup(G)));
 ##      List(last, a->a^l[2]);
 ##  
+##  Note that in this algorithm q must be at least 5. Otherwise we cannot
+##  find an element ym below such that xm and ym have no common eigenspace.
 RecogNaturalSL2 := function(G, q)
   local GM, one, zero, qm1fac, c, m, gens, xm, x, pol, v, z, exp, a, 
         mat, tm, ym, y, ymat, tr, d, cm, r1, r2, r, log, i, trupm, 
         smm, trlowm, F, a2, bas, e, l, emax, tmp;
+
+  if q < 5 then
+    Error("Prime power q must be at least 5.");
+  fi;
+
   GM := GroupWithMemory(G);
   one := OneOfBaseDomain(G.1);
   zero := Zero(one);
@@ -94,9 +101,11 @@ RecogNaturalSL2 := function(G, q)
     tm := tm * Random(gens);
     ym := tm*xm*tm^-1;
     y := StripMemory(ym);
-    ymat := y*mat;
-  until ymat[1,1]*mat[2,1]-ymat[2,1]*mat[1,1] <> zero and
-        ymat[1,2]*mat[2,2]-ymat[2,2]*mat[1,2] <> zero;
+    # in this basis x is diagonal, so different eigenspaces means all
+    # entries non-zero
+    ymat := y^mat;
+  until ymat[1,1] <> zero and ymat[1,2] <> zero and ymat[2,1] <> zero
+        and ymat[2,2] <> zero;
   # now y^(tm * mat) = diag(a, a^-1) 
   tr := tm*mat;
 
@@ -108,20 +117,21 @@ RecogNaturalSL2 := function(G, q)
   d := d[2]/d[1];
   cm := One(GM);
   repeat
-    # look for cm with non-trivial conditions (i <> 0, (q-1)/2)
+    # look for cm such that [1,d] is also eigenvector of (y^i cm)^tr
     repeat 
       cm := cm*Random(gens);
       c := StripMemory(cm)^tr;
       r1 := c[2,1]+d*c[2,2];
       r2 := d^2*c[1,2]+d*c[1,1];
-    until r2 <> zero and r1 <> zero and r1 <> r2 and r1 <> -r2;;
+    until r2 <> zero and r1 <> zero;
     r := r1 / r2;
     log := DLog(a, r, qm1fac);
     i := false;
     if log mod 2 = 0 then
       i := log/2;
     elif q mod 2 = 0 then
-      i := (q-1-log)/2;
+      # in char two r is always a square
+      i := log/2 mod (q-1);
     fi;
     if IsInt(i) then
       # this will in most cases be a transvection normalized by x
@@ -147,20 +157,21 @@ RecogNaturalSL2 := function(G, q)
   d := d[2]/d[1];
   cm := One(GM);
   repeat
-    # look for cm with non-trivial conditions (i <> 0, (q-1)/2)
+    # look for cm such that [1,d] is also eigenvector of (y^i cm)^tr
     repeat 
       cm := cm*Random(gens);
       c := StripMemory(cm)^tr;
       r1 := c[2,1]+d*c[2,2];
       r2 := d^2*c[1,2]+d*c[1,1];
-    until r2 <> zero and r1 <> zero and r1 <> r2 and r1 <> -r2;;
+    until r2 <> zero and r1 <> zero;
     r := r1 / r2;
     log := DLog(a, r, qm1fac);
     i := false;
     if log mod 2 = 0 then
       i := log/2;
     elif q mod 2 = 0 then
-      i := (q-1-log)/2;
+      # in char two r is always a square
+      i := log/2 mod (q-1);
     fi;
     if IsInt(i) then
       # in most cases a transvection which becomes conjugated by mat
@@ -173,6 +184,8 @@ RecogNaturalSL2 := function(G, q)
       fi;
     fi;
   until IsInt(i);
+
+  Assert(3, IsZero((trlowm^mat)[1,2]) and IsOne((trlowm^mat)[1,1]));
 
   # adjust lower left entry of trlowm^mat to one
   # (we use F_p linear algebra in F_q to find the nice element
