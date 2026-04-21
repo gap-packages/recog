@@ -803,7 +803,7 @@ BindRecogMethod("FindHomMethodsPerm", "Giant",
 # FindHomMethodsPerm.NonTransitive; model this better?
 rec(validatesOrAlwaysValidInput := true),
 function(ri)
-    local grp,grpmem,mp,res;
+    local grp,grpmem,mp,res,F,deg;
     grp := Grp(ri);
     if not IsPermGroup(grp) then
         return NeverApplicable;
@@ -832,14 +832,45 @@ function(ri)
     Setslpforelement(ri,SLPforElementFuncsPerm.Giant);
     ri!.giantinfo := res;
     SetFilterObj(ri,IsLeaf);
+    F := FreeGroup(2); # for presentation
+    deg := Size(mp);
+    # We set the presentations of Sn and An from
+    # [CM80] "Generators and relations for discrete groups", (6.21), 6.3.
+    # They coincide with the ones in
+    # [BLN+03] "A black-box group algorithm for recognizing finite symmetric 
+    # and alternating groups, I", (2.1), (2.2), (2.3),
+    # except that one relation in (2.1) and one relation in (2.3) is incorrect.
     if res.stamp = "An" then
         SetSize(ri,Factorial(Length(mp))/2);
         SetIsRecogInfoForSimpleGroup(ri,true);
+        rels := [ F.2^(deg-2), F.1^3 ];
+        if deg mod 2 = 1 then
+            Add(rels, (F.2*F.1)^deg);
+            rels := Concatenation(
+                rels,
+                List([1..QuoInt(n-3, 2)], k -> (F.1*F.2^(-k)*F.1*F.2^k)^2)
+            );
+        else
+            Add(rels, (F.2*F.1)^(deg-1));
+            rels := Concatenation(
+                rels,
+                List([1..QuoInt(n-2, 2)], k -> (F.1^((-1)^k)*F.2^-k*F.1*F.2^k)^2)
+            );
+        fi;
     else
         SetSize(ri,Factorial(Length(mp)));
         SetIsRecogInfoForAlmostSimpleGroup(ri,true);
+        # if deg>2 then
+            # Relations on F.1=(1,2), F.2 = (1,...,deg) from [CM80, (6.21)]
+            # TODO: Is this correct for d=1, 2?
+            rels := [ F.1^2, F.2^deg, (F.1*F.2)^(deg-1), (F.1*(F.1^F.2))^3 ];
+            rels := Concatenation(
+                rels, List([2..QuoInt(deg, 2)], j -> (F.1*(F.1^(F.2^j)))^2)
+            );
+        # fi;
     fi;
     SetNiceGens(ri,StripMemory(res.gens));
+    SetStdPresentation(ri,F / rels);
     return Success;
 end);
 
