@@ -269,7 +269,7 @@ gap> CycleStructurePerm(img2);
 
 # FindHomMethodsGeneric.SnAnUnknownDegree
 # Sn
-gap> for d in [11 .. 14] do
+gap> for d in [11 .. 30] do
 > sets := Combinations([1 .. d], 2);;
 > SdOn2Sets := Action(SymmetricGroup(d), sets, OnSets);;
 > ri := RecogNode(SdOn2Sets);;
@@ -280,7 +280,7 @@ gap> for d in [11 .. 14] do
 > od;
 
 # An
-gap> for d in [11 .. 14] do
+gap> for d in [11 .. 30] do
 > sets := Combinations([1 .. d], 2);;
 > SdOn2Sets := Action(AlternatingGroup(d), sets, OnSets);;
 > ri := RecogNode(SdOn2Sets);;
