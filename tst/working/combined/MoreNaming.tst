@@ -271,8 +271,8 @@ gap> grp := Group( [  [
 >      [0,0,0,0,0,0,0,0,0,0,0,5]
 >      ]*Z(7)] );;
 gap> ri := RecogniseClassical(grp);;
-gap> "6.Suz" in ri.possibleNearlySimple;
-true
+gap> ri.isSLContained;
+"unknown"
 
 #
 # Now come groups of type PSL(2,r)
@@ -725,7 +725,6 @@ gap> Size(grp);
 gap> ri := RecogniseClassical(grp);;
 gap> ri.isSLContained;
 "unknown"
-
 
 # some maximal subgroups of the conformal group CGO^+(8,5)
 gap> ri := RecogniseClassical(maxes_cgo_plus_8_5[1]);;
