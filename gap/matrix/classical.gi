@@ -1136,6 +1136,27 @@ function(recognise)
     fi;
 end);
 
+BindRecogMethod("FindHomMethodsClassical", "Degree2SL",
+"tests whether a degree-2 group contains SL",
+function(recognise)
+    if recognise.d <> 2 then
+        return NeverApplicable;
+    fi;
+
+    if RECOG.IsThisSL2Natural(GeneratorsOfGroup(recognise.grp),
+                              recognise.field) then
+        recognise.isGeneric := false;
+        recognise.isReducible := false;
+        recognise.isNotExt := true;
+        recognise.isSLContained := true;
+        recognise.isSpContained := true;
+        Info(InfoClassical,2,"The group contains SL(2, ", recognise.q, ");");
+        return Success;
+    fi;
+
+    return TemporaryFailure;
+end);
+
 ## Main function to test whether group contains SL
 BindRecogMethod("FindHomMethodsClassical", "IsSLContained",
 "tests whether group contains SL",
@@ -2435,6 +2456,8 @@ AddMethod(ClassicalMethDb, FindHomMethodsClassical.NonGenericOrthogonalPlus, 13)
 AddMethod(ClassicalMethDb, FindHomMethodsClassical.NonGenericOrthogonalMinus, 14);
 
 AddMethod(ClassicalMethDb, FindHomMethodsClassical.NonGenericOrthogonalCircle, 15);
+
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.Degree2SL, 16);
 
 AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsSLContained, 16);
 
