@@ -445,9 +445,9 @@ end);
 #  on the  underlying  vector space and has a ppd(d,q;e_1)-element and a
 #  ppd(d,q;e_2)-element for d/2 < e_1 < e_2 <= d of which at least one is
 #  large and one is basic. The nearly simple groups that can have such
-#  ppd elements are listed in Tables  6 and  7 in [NP98]. These could
+#  ppd elements are listed in Tables 13 and 14 in [NP98]. These could
 #  arise as the commutator  subgroup  of the given group. In these
-#  tables also elements are listed that occur in a classical group put
+#  tables also elements are listed that occur in a classical group but
 #  not in these nearly simple groups. If we find such elements, these
 #  groups are thereby ruled out.
 #
