@@ -239,6 +239,42 @@ gap> "M24" in ri.possibleNearlySimple;
 true
 
 #
+# Group 6.Suz. Source ATLAS: Matrix representation of dim 12 over GF(7)
+# ppd(12,7;e_i)-elements for e1=10, e2=12, p=7, not large ppds
+#
+gap> grp := Group( [  [
+>      [0,2,0,0,0,0,0,0,0,0,0,0],
+>      [5,0,0,0,0,0,0,0,0,0,0,0],
+>      [0,0,0,2,0,0,0,0,0,0,0,0],
+>      [0,0,5,0,0,0,0,0,0,0,0,0],
+>      [0,0,0,0,0,2,0,0,0,0,0,0],
+>      [0,0,0,0,5,0,0,0,0,0,0,0],
+>      [0,0,0,0,0,0,0,0,2,0,0,0],
+>      [0,0,0,0,0,0,0,0,0,2,0,0],
+>      [0,0,0,0,0,0,5,0,0,0,0,0],
+>      [0,0,0,0,0,0,0,5,0,0,0,0],
+>      [0,0,0,0,0,0,0,0,0,0,0,2],
+>      [0,0,0,0,0,0,0,0,0,0,5,0]
+>      ]*Z(7),
+>      [
+>      [5,2,5,0,0,4,0,0,4,0,0,6],
+>      [3,2,0,0,0,3,0,0,0,6,0,5],
+>      [5,0,0,0,0,1,0,0,3,3,0,0],
+>      [0,0,0,0,5,6,0,0,3,2,0,2],
+>      [0,0,0,0,0,3,5,0,1,1,0,3],
+>      [0,0,0,0,0,1,0,5,3,2,0,3],
+>      [0,0,0,5,0,5,0,0,3,4,0,2],
+>      [0,0,0,0,0,4,0,0,4,5,0,4],
+>      [0,0,0,0,0,0,0,0,4,6,5,1],
+>      [0,0,0,0,0,0,0,0,0,5,0,0],
+>      [0,0,0,0,0,0,0,0,1,1,0,6],
+>      [0,0,0,0,0,0,0,0,0,0,0,5]
+>      ]*Z(7)] );;
+gap> ri := RecogniseClassical(grp);;
+gap> "6.Suz" in ri.possibleNearlySimple;
+true
+
+#
 # Now come groups of type PSL(2,r)
 # These groups have ppd(d,q;e_i) elements for e2=e1+1 and are listed in
 # where e2=1/2(r-1).
@@ -689,6 +725,7 @@ gap> Size(grp);
 gap> ri := RecogniseClassical(grp);;
 gap> ri.isSLContained;
 "unknown"
+
 
 # some maximal subgroups of the conformal group CGO^+(8,5)
 gap> ri := RecogniseClassical(maxes_cgo_plus_8_5[1]);;
