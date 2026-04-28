@@ -550,9 +550,14 @@ end;
 # See Corollary 10.2.2 in [Ser03].
 # See also `DoSnAnGiantTest` in the GAP library which seems to be a
 # close variant of this code.
+# This function always returns fail if Size(mp)<=7 because there exists no prime l
+# with n/2<l<n-2 for n<=7
 RECOG.IsGiant:=function(g,mp)
   local bound, i, p, cycles, l, x, n;
   n := Length(mp);
+  if n<=7 then
+    return fail;
+  fi;
   bound:=20*LogInt(n,2);
   i:=0;
   repeat
@@ -789,10 +794,14 @@ RECOG.GiantEpsilon := 1/1024;
 #! @BeginChunk Giant
 #! The method tries to determine whether the input group <A>G</A> is
 #! a giant (that is, <M>A_n</M> or <M>S_n</M> in its natural action on
-#! <M>n</M> points). The output is either a data structure <M>D</M> containing
+#! <M>n</M> points). It can only succeed for permutation groups acting on
+#! at least 8 points.
+#! The output is either a data structure <M>D</M> containing
 #! nice generators for <A>G</A> and a procedure to write an SLP for arbitrary
-#! elements of <A>G</A> from the nice generators; or <K>NeverApplicable</K> if
-#! <A>G</A> is not transitive; or <K>fail</K>, in the case that no
+#! elements of <A>G</A> from the nice generators;
+#! or <K>NeverApplicable</K> if <A>G</A> is not transitive or acts on
+#! at most 7 points; 
+#! or <K>fail</K>, in the case that no
 #! evidence was found that <A>G</A> is a giant, or evidence was found, but
 #! the construction of <M>D</M> was unsuccessful.
 #! If the method constructs <M>D</M> then the calling node becomes a leaf.
@@ -803,7 +812,7 @@ BindRecogMethod("FindHomMethodsPerm", "Giant",
 # FindHomMethodsPerm.NonTransitive; model this better?
 rec(validatesOrAlwaysValidInput := true),
 function(ri)
-    local grp,grpmem,mp,res,F,deg;
+    local grp,grpmem,mp,res,F,deg,rels;
     grp := Grp(ri);
     if not IsPermGroup(grp) then
         return NeverApplicable;
@@ -812,8 +821,12 @@ function(ri)
         return NeverApplicable;
     fi;
     mp := MovedPoints(grp);
+    deg := Size(mp);
     # Decide whether group is a giant
-    if RECOG.IsGiant(grp,mp) = fail then
+    # RECOG.IsGiant can only succeed for deg>7
+    if deg<=7 then
+        return NeverApplicable;
+    elif RECOG.IsGiant(grp,mp) = fail then
         return TemporaryFailure;
     fi;
     grpmem := Group(ri!.gensHmem);
@@ -833,13 +846,13 @@ function(ri)
     ri!.giantinfo := res;
     SetFilterObj(ri,IsLeaf);
     F := FreeGroup(2); # for presentation
-    deg := Size(mp);
     # We set the presentations of Sn and An from
     # [CM80] "Generators and relations for discrete groups", (6.21), 6.3.
     # They coincide with the ones in
     # [BLN+03] "A black-box group algorithm for recognizing finite symmetric 
     # and alternating groups, I", (2.1), (2.2), (2.3),
     # except that one relation in (2.1) and one relation in (2.3) is incorrect.
+    # Since deg>=8, we do not have to worry about small edge cases.
     if res.stamp = "An" then
         SetSize(ri,Factorial(Length(mp))/2);
         SetIsRecogInfoForSimpleGroup(ri,true);
@@ -848,26 +861,23 @@ function(ri)
             Add(rels, (F.2*F.1)^deg);
             rels := Concatenation(
                 rels,
-                List([1..QuoInt(n-3, 2)], k -> (F.1*F.2^(-k)*F.1*F.2^k)^2)
+                List([1..QuoInt(deg-3, 2)], k -> (F.1*F.2^(-k)*F.1*F.2^k)^2)
             );
         else
             Add(rels, (F.2*F.1)^(deg-1));
             rels := Concatenation(
                 rels,
-                List([1..QuoInt(n-2, 2)], k -> (F.1^((-1)^k)*F.2^-k*F.1*F.2^k)^2)
+                List([1..QuoInt(deg-2, 2)], k -> (F.1^((-1)^k)*F.2^-k*F.1*F.2^k)^2)
             );
         fi;
     else
         SetSize(ri,Factorial(Length(mp)));
         SetIsRecogInfoForAlmostSimpleGroup(ri,true);
-        # if deg>2 then
-            # Relations on F.1=(1,2), F.2 = (1,...,deg) from [CM80, (6.21)]
-            # TODO: Is this correct for d=1, 2?
-            rels := [ F.1^2, F.2^deg, (F.1*F.2)^(deg-1), (F.1*(F.1^F.2))^3 ];
-            rels := Concatenation(
-                rels, List([2..QuoInt(deg, 2)], j -> (F.1*(F.1^(F.2^j)))^2)
-            );
-        # fi;
+        # Relations on F.1=(1,2), F.2 = (1,...,deg) from [CM80, (6.21)]
+        rels := [ F.1^2, F.2^deg, (F.1*F.2)^(deg-1), (F.1*(F.1^F.2))^3 ];
+        rels := Concatenation(
+            rels, List([2..QuoInt(deg, 2)], j -> (F.1*(F.1^(F.2^j)))^2)
+        );
     fi;
     SetNiceGens(ri,StripMemory(res.gens));
     SetStdPresentation(ri,F / rels);
