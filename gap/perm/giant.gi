@@ -550,11 +550,13 @@ end;
 # See Corollary 10.2.2 in [Ser03].
 # See also `DoSnAnGiantTest` in the GAP library which seems to be a
 # close variant of this code.
-# This function always returns fail if Size(mp)<=7 because there exists no prime l
-# with n/2<l<n-2 for n<=7
+# Only giants of degree at least 8 can be recognised.
 RECOG.IsGiant:=function(g,mp)
   local bound, i, p, cycles, l, x, n;
   n := Length(mp);
+  # We search a permutation in g with cycle of prime length l
+  # where n/2<l<n-2.
+  # If n<=7, no such prime exists.
   if n<=7 then
     return fail;
   fi;
