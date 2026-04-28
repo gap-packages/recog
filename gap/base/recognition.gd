@@ -233,7 +233,7 @@ DeclareAttribute( "CalcStdPresentation", IsRecogNode, "mutable" );
 
 ## <#GAPDoc Label="IsCorrect">
 ## <ManSection>
-## <Prop Name="IsCorrect"/>
+## <Prop Name="IsCorrect" Arg="ri"/>
 ## <Description>
 ## The recognition procedure may with a small probability produce recognition trees
 ## that are not correct.
@@ -241,18 +241,18 @@ DeclareAttribute( "CalcStdPresentation", IsRecogNode, "mutable" );
 ## is mathematically correct by calling <A>IsCorrect</A>.
 ## However, this is in general expensive.
 ## <P/>
-## A value <A>true</A> of <A>IsCorrect(root)</A> signifies that the subtree rooted at <A>root</A>
+## A value <A>true</A> of <A>IsCorrect(ri)</A> signifies that the subtree rooted at <A>ri</A>
 ## has been verified to be correct.
 ## A value of <A>false</A> signifies that there was an attempt of verification,
-## but that this verification resulted in a proof that the subtree rooted at <A>root</A>
+## but that this verification resulted in a proof that the subtree rooted at <A>ri</A>
 ## is incorrect.
 ## <P/>
-## Here correctness of a subtree means the following: If <A>ri</A> is a node in
+## Here correctness of a subtree means the following: If <A>ri2</A> is a node in
 ## this subtree, <M>H</M> is the group
-## associated to <A>ri</A> and <A>riKer</A> is the left child of <A>ri</A>,
+## associated to <A>ri2</A> and <A>riKer</A> is the left child of <A>ri2</A>,
 ## then the group associated to <A>riKer</A> (or rather, its embedding into <M>H</M>)
 ## equals the kernel of the homomorphism from <M>H</M> to the group associated
-## to the right child of <A>ri</A>.
+## to the right child of <A>ri2</A>.
 ## Without verification, the group of <A>riKer</A> may be smaller than the kernel.
 ## </Description>
 ## </ManSection>
