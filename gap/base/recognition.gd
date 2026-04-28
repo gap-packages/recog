@@ -233,7 +233,7 @@ DeclareAttribute( "CalcStdPresentation", IsRecogNode, "mutable" );
 
 ## <#GAPDoc Label="IsCorrect">
 ## <ManSection>
-## <Attr Name="IsCorrect" Type="Flag"/>
+## <Prop Name="IsCorrect"/>
 ## <Description>
 ## The recognition procedure may with a small probability produce recognition trees
 ## that are not correct.
@@ -257,7 +257,7 @@ DeclareAttribute( "CalcStdPresentation", IsRecogNode, "mutable" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "IsCorrect", IsRecogNode, "mutable" );
+DeclareProperty( "IsCorrect", IsRecogNode );
 
 DeclareProperty( "IsRecogInfoForSimpleGroup", IsRecogNode );
 DeclareProperty( "IsRecogInfoForAlmostSimpleGroup", IsRecogNode );
