@@ -13,7 +13,7 @@ gap> testGroup := function(G)
 >  numTests := 5;
 >  for i in [1..numTests] do
 >    ri := RecogniseGroup(G);
->    if VerifyGroup(ri) = true then
+>    if IsCorrect(ri) = true then
 >      numSuccessful := numSuccessful + 1;
 >    fi;
 >  od;
@@ -112,7 +112,7 @@ gap> homList := [
 > ];;
 
 # Test a few incorrect recog nodes for each element of homList.
-# It would be sufficient to only call VerifyGroup(ri) and not also StdPresentation(ri),
+# It would be sufficient to only call IsCorrect(ri) and not also StdPresentation(ri),
 # but most of the time (in fact, in all examples in our test),
 # an incorrect recog node will already fail the check
 # that all input generators can be rewritten as SLPs in the nice generators.
@@ -125,7 +125,7 @@ gap> homList := [
 gap> for hom in homList do
 >      for i in [1..20] do
 >        ri := createIncorrectRecogNode(hom);
->        if StdPresentation(ri) <> fail and VerifyGroup(ri) <> false then
+>        if StdPresentation(ri) <> fail and IsCorrect(ri) <> false then
 >          Display(Grp(ri));
 >          Display("Incorrect recog node was verified");
 >        fi;

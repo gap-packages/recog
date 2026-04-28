@@ -96,27 +96,6 @@ DeclareFilter( "IsLeaf" );
 ## <#/GAPDoc>
 DeclareFilter( "IsReady" );
 
-## <#GAPDoc Label="IsCorrect">
-## <ManSection>
-## <Filt Name="IsCorrect" Type="Flag"/>
-## <Description>
-## This flag is set for a <Ref Filt="IsRecogNode"/> object <C>node</C> by 
-## <Ref Func="VerifyGroup"/> or <Ref Attr="CalcStdPresentation"/> if verification
-## of the <E>subtree</E> rooted in <C>node</C> finished successfully.
-## Thus, if the <Ref Filt="IsCorrect"/> flag is set, the result of the
-## recognition procedure was verified and proven to be mathematically correct.
-## This means that if <A>ri</A> is a node in this subtree, <M>H</M> is the group
-## associated to <A>ri</A> and <A>riKer</A> is the left child of <A>ri</A>,
-## then the group associated to <A>riKer</A> (or rather, its embedding into <M>H</M>)
-## equals the kernel of the homomorphism from <M>H</M> to the group associated
-## to the right child of <A>ri</A>.
-## Without verification, the group of <A>riKer</A> may be smaller than the kernel.
-## <P/>
-## </Description>
-## </ManSection>
-## <#/GAPDoc>
-DeclareFilter( "IsCorrect" );
-
 ## <#GAPDoc Label="Grp">
 ## <ManSection>
 ## <Attr Name="Grp" Arg="ri"/>
@@ -251,6 +230,34 @@ DeclareAttribute( "StdPresentation", IsRecogNode, "mutable" );
 ## </ManSection>
 ## <#/GAPDoc>
 DeclareAttribute( "CalcStdPresentation", IsRecogNode, "mutable" );
+
+## <#GAPDoc Label="IsCorrect">
+## <ManSection>
+## <Attr Name="IsCorrect" Type="Flag"/>
+## <Description>
+## The recognition procedure may with a small probability produce recognition trees
+## that are not correct.
+## For this reason, it is possible to verify that a recognition tree
+## is mathematically correct by calling <A>IsCorrect</A>.
+## However, this is in general expensive.
+## <P/>
+## A value <A>true</A> of <A>IsCorrect(root)</A> signifies that the subtree rooted at <A>root</A>
+## has been verified to be correct.
+## A value of <A>false</A> signifies that there was an attempt of verification,
+## but that this verification resulted in a proof that the subtree rooted at <A>root</A>
+## is incorrect.
+## <P/>
+## Here correctness of a subtree means the following: If <A>ri</A> is a node in
+## this subtree, <M>H</M> is the group
+## associated to <A>ri</A> and <A>riKer</A> is the left child of <A>ri</A>,
+## then the group associated to <A>riKer</A> (or rather, its embedding into <M>H</M>)
+## equals the kernel of the homomorphism from <M>H</M> to the group associated
+## to the right child of <A>ri</A>.
+## Without verification, the group of <A>riKer</A> may be smaller than the kernel.
+## </Description>
+## </ManSection>
+## <#/GAPDoc>
+DeclareAttribute( "IsCorrect", IsRecogNode, "mutable" );
 
 DeclareProperty( "IsRecogInfoForSimpleGroup", IsRecogNode );
 DeclareProperty( "IsRecogInfoForAlmostSimpleGroup", IsRecogNode );
@@ -698,22 +705,6 @@ DeclareOperation( "RandomOrdersSeen", [ IsRecogNode ] );
 DeclareOperation( "StopStoringRandEls", [ IsRecogNode ] );
 DeclareOperation( "GetElmOrd", [ IsRecogNode, IsRecord ] );
 DeclareOperation( "GetElmPpd", [ IsRecogNode, IsRecord ] );
-
-
-## <#GAPDoc Label="VerifyGroup">
-## <ManSection>
-## <Func Name="VerifyGroup" Arg="ri"/>
-## <Returns><K>true</K> if verification of <A>ri</A> suceeds, and <K>false</K> otherwise.
-## </Returns>
-## <Description>
-##     This function will prove (or disprove) that the recognition tree for
-##     <A>ri</A> is (mathematically) correct.
-##     If everything is correct, it will set <Ref Attr="IsCorrect"/> for <A>ri</A>.
-##     See the documentation of <Ref Attr="IsCorrect"/> for more details.
-## </Description>
-## </ManSection>
-## <#/GAPDoc>
-DeclareGlobalFunction( "VerifyGroup" );
 
 # Some more user functions:
 

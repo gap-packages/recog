@@ -208,7 +208,6 @@ The following filters are defined for recognition nodes:
 
 <#Include Label="IsLeaf">
 <#Include Label="IsReady">
-<#Include Label="IsCorrect">
 
 The following attributes are defined for recognition nodes:
 
@@ -223,7 +222,7 @@ The following attributes are defined for recognition nodes:
 <#Include Label="slpforelement">
 <#Include Label="SLPforElement">
 <#Include Label="StdPresentation">
-<#Include Label="VerifyGroup">
+<#Include Label="IsCorrect">
 <#Include Label="methodsforimage">
 
 <ManSection>
