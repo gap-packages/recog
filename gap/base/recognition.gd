@@ -96,14 +96,14 @@ DeclareFilter( "IsLeaf" );
 ## <#/GAPDoc>
 DeclareFilter( "IsReady" );
 
-## <#GAPDoc Label="IsVerified">
+## <#GAPDoc Label="IsCorrect">
 ## <ManSection>
-## <Filt Name="IsVerified" Type="Flag"/>
+## <Filt Name="IsCorrect" Type="Flag"/>
 ## <Description>
 ## This flag is set for a <Ref Filt="IsRecogNode"/> object <C>node</C> by 
 ## <Ref Func="VerifyGroup"/> or <Ref Attr="CalcStdPresentation"/> if verification
 ## of the <E>subtree</E> rooted in <C>node</C> finished successfully.
-## Thus, if the <Ref Filt="IsVerified"/> flag is set, the result of the
+## Thus, if the <Ref Filt="IsCorrect"/> flag is set, the result of the
 ## recognition procedure was verified and proven to be mathematically correct.
 ## This means that if <A>ri</A> is a node in this subtree, <M>H</M> is the group
 ## associated to <A>ri</A> and <A>riKer</A> is the left child of <A>ri</A>,
@@ -115,7 +115,7 @@ DeclareFilter( "IsReady" );
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareFilter( "IsVerified" );
+DeclareFilter( "IsCorrect" );
 
 ## <#GAPDoc Label="Grp">
 ## <ManSection>
@@ -708,8 +708,8 @@ DeclareOperation( "GetElmPpd", [ IsRecogNode, IsRecord ] );
 ## <Description>
 ##     This function will prove (or disprove) that the recognition tree for
 ##     <A>ri</A> is (mathematically) correct.
-##     If everything is correct, it will set <Ref Attr="IsVerified"/> for <A>ri</A>.
-##     See the documentation of <Ref Attr="IsVerified"/> for more details.
+##     If everything is correct, it will set <Ref Attr="IsCorrect"/> for <A>ri</A>.
+##     See the documentation of <Ref Attr="IsCorrect"/> for more details.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>

@@ -208,7 +208,7 @@ The following filters are defined for recognition nodes:
 
 <#Include Label="IsLeaf">
 <#Include Label="IsReady">
-<#Include Label="IsVerified">
+<#Include Label="IsCorrect">
 
 The following attributes are defined for recognition nodes:
 
