@@ -349,13 +349,14 @@ RECOG.SortOutReducibleSecondNormalSubgroup :=
 #! @BeginChunk D247
 #! TODO
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "D247",
+BindRecogMethod("FindHomMethodsProjective", "D247",
 "play games to find a normal subgroup",
-function(ri, G)
+function(ri)
   # We try to produce an element of a normal subgroup by playing
   # tricks.
-  local CheckNormalClosure,f,i,res,x,ispower;
+  local G,CheckNormalClosure,f,i,res,x,ispower;
 
+  G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"D247");
 
   CheckNormalClosure := function(x)

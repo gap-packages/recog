@@ -398,51 +398,10 @@ find kernel methods.
 The following attributes are used to give a successful find homomorphism
 method further possibilities to transport knowledge about the group
 recognised by the current recognition node to the image or
-kernel of the found homomorphism:
-
-<ManSection>
-<Attr Name="InitialDataForKernelRecogNode" Arg="ri"/>
-<Description>
-    This attribute is initialised to a record with only the component
-    <C>hints</C> bound to an empty list at the beginning of the
-    recursive recognition function. Find homomorphism methods can
-    put acquired knowledge about the group to be recognised (like for
-    example an invariant subspace of a matrix group) into this record.
-    When a homomorphism is found and recognition goes on in its
-    kernel, the value of this attribute is taken as initialisation data
-    for the newly created recognition node for the kernel. Thus,
-    information is transported down to the recognition process for the
-    kernel. The component <C>hints</C> is special insofar as it has to
-    contain records describing find homomorphism methods which might be
-    particularly successful. They are prepended to the find homomorphism
-    method database such that they are called before any other methods.
-    This is a means to give hints to the recognition procedure in the
-    kernel, because often during the finding of a homomorphism knowledge
-    is acquired which might help the recognition of the kernel.
-</Description>
-</ManSection>
-
-<ManSection>
-<Attr Name="InitialDataForImageRecogNode" Arg="ri"/>
-<Description>
-    This attribute is initialised to a record with only the component
-    <C>hints</C> bound to an empty list at the beginning of the
-    recursive recognition function. Find homomorphism methods can
-    put acquired knowledge about the group to be recognised (like for
-    example an invariant subspace of a matrix group) into this record.
-    When a homomorphism is found and recognition goes on in its
-    image, the value of this attribute is taken as initialisation data
-    for the newly created recognition node for the image. Thus,
-    information is transported down to the recognition process for the
-    image. The component <C>hints</C> is special insofar as it has to
-    contain records describing find homomorphism methods which might be
-    particularly successful. They are prepended to the find homomorphism
-    method database such that they are called before any other methods.
-    This is a means to give hints to the recognition procedure in the
-    image, because often during the finding of a homomorphism knowledge
-    is acquired which might help the recognition of the image.
-</Description>
-</ManSection>
+kernel of the found homomorphism. The hint system and the corresponding
+attributes <Ref Attr="InitialDataForKernelRecogNode"/> and
+<Ref Attr="InitialDataForImageRecogNode"/> are documented in Section
+<Ref Sect="hintsystem"/> in Chapter <Ref Chap="methsel"/>.
 
 <ManSection>
 <Attr Name="isone" Arg="ri"/>

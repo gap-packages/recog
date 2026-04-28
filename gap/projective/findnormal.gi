@@ -732,10 +732,11 @@ end );
 #! @BeginChunk FindElmOfEvenNormal
 #! TODO
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "FindElmOfEvenNormal",
+BindRecogMethod("FindHomMethodsProjective", "FindElmOfEvenNormal",
 "find D2, D4 or D7 by finding an element of an even normal subgroup",
-function(ri,G)
-  local cf,count,f,m,mm,r,res,rr;
+function(ri)
+  local G,cf,count,f,m,mm,r,res,rr;
+  G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"FindElmOfEvenNormal");
   r := FindElmOfEvenNormalSubgroup(G,
           rec( Projective := true, SkipTrivAbelian := true ));

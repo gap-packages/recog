@@ -251,7 +251,7 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
               triesinner := triesinner + 1;
               hm := GModuleByMats(gens,fld);
               if MTX.IsIrreducible(hm) then
-                  Unbind(gens[Length(gens)]);
+                  Remove(gens);
               fi;
           od;
       fi;
@@ -264,10 +264,10 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
               s := MTX.ProperSubmoduleBasis(hm);
               Add(bas,s);
           od;
-          Unbind(bas[Length(bas)]);
-          s := bas[Length(bas)];
-          for i in [Length(bas)-1,Length(bas)-2..1] do
-              s := s * bas[i];
+          Remove(bas); # drop last element, which is `fail`
+          s := Remove(bas);
+          while Length(bas) > 0 do
+              s := s * Remove(bas);
           od;
           # Now s is the basis of a minimal submodule, permute that:
           s := MutableCopyMat(s);
@@ -368,7 +368,7 @@ RECOG.ProduceTrivialStabChainHint := function(name,reps,maxes)
               else
                   Add(values,[QuoInt(Length(o)+99,100),Length(o)]);
               fi;
-              Print("value=",values[Length(values)]," time=",t," orblen=",
+              Print("value=",Last(values)," time=",t," orblen=",
                     Length(o)," subspace=");
               ViewObj(x);
               Print("\n");
@@ -694,10 +694,11 @@ end;
 #! computed the function does not need to be called again for this
 #! node and therefore returns <K>NeverApplicable</K>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "ComputeSimpleSocle",
+BindRecogMethod("FindHomMethodsProjective", "ComputeSimpleSocle",
 "compute simple socle of almost simple group",
-function(ri,G)
-  local x;
+function(ri)
+  local G,x;
+  G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"ComputeSimpleSocle");
   ri!.simplesocle := Group(RECOG.simplesocle(ri,G));
   ri!.simplesoclepr := ProductReplacer(ri!.simplesocle);
@@ -748,10 +749,11 @@ end;
 #!
 #! This recognition method is based on the paper <Cite Key="KS09"/>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "ThreeLargeElOrders",
+BindRecogMethod("FindHomMethodsProjective", "ThreeLargeElOrders",
 "recognise Lie type groups and get its characteristic",
-function(ri,G)
-  local hint,name,namecat,p,res;
+function(ri)
+  local G,hint,name,namecat,p,res;
+  G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"ThreeLargeElOrders");
   ri!.simplesoclerandp := 0;
   p := RECOG.findchar(ri,ri!.simplesocle,RECOG.RandElFuncSimpleSocle);
@@ -770,10 +772,10 @@ function(ri,G)
               if hint <> fail then
                   res := DoHintedLowIndex(ri,G,hint);
               else   # we use Pete Brooksbank's methods
-                  return SLCR.FindHom(ri,G,2,name[3]);
+                  res := SLCR.FindHom(ri,G,2,name[3]);
               fi;
           else
-              return SLCR.FindHom(ri,G,name[2],name[3]);
+              res := SLCR.FindHom(ri,G,name[2],name[3]);
           fi;
       else
           if Length(name) = 3 then
@@ -785,7 +787,7 @@ function(ri,G)
           fi;
           res := LookupHintForSimple(ri,G,namecat);
       fi;
-      if res = true then
+      if res = true or res = Success then
           return Success;
       fi;
   od;
@@ -940,11 +942,12 @@ end;
 #! This algorithm is probably based on the paper <Cite Key="BLGN+05"/>.
 #! @EndChunk
 # subroutines are in AnSnOnFDPM.gi and also paper reference
-BindRecogMethod(FindHomMethodsProjective, "AltSymBBByDegree",
+BindRecogMethod("FindHomMethodsProjective", "AltSymBBByDegree",
 "try BB recognition for dim+1 and/or dim+2 if sensible",
-function(ri,G)
-  local GG,Gm,RecSnAnEq,RecSnAnIsOne,d,deg,f,fact,hom,newgens,o,orders,p,primes,
+function(ri)
+  local G,GG,Gm,RecSnAnEq,RecSnAnIsOne,d,deg,f,fact,hom,newgens,o,orders,p,primes,
         r,totry;
+  G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"AltSymBBByDegree");
   d := ri!.dimension;
   orders := RandomOrdersSeen(ri);
@@ -1329,11 +1332,12 @@ end;
 #! Afterwards it creates hints that come out of a table for the sporadic
 #! simple groups.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "SporadicsByOrders",
+BindRecogMethod("FindHomMethodsProjective", "SporadicsByOrders",
 "generate a few random elements and compute the proj. orders",
-function(ri,G)
-  local count,gens,i,j,jj,k,killers,l,limit,o,ordersseen,pp,r,raus,res,x;
+function(ri)
+  local G,count,gens,i,j,jj,k,killers,l,limit,o,ordersseen,pp,r,raus,res,x;
 
+  G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"SporadicsByOrders");
 
   l := [1..Length(RECOG.SporadicsNames)];
@@ -1528,10 +1532,9 @@ RECOG.NameSporadicData := MakeImmutable([
 #! simple groups nor the Monster and the Baby Monster group. It is based on the
 #! Magma v2.24.10 function <C>RecognizeSporadic</C>.
 #! @EndChunk
-# TODO G is unused
-BindRecogMethod(FindHomMethodsProjective, "NameSporadic",
+BindRecogMethod("FindHomMethodsProjective", "NameSporadic",
 "generate maximal orders",
-function(ri, G)
+function(ri)
     local orders, setOfOrders, maximalOrders, isMaximal,
         namesOfPossibleSporadics, res, i, j, data, name;
     orders := [];
@@ -1543,7 +1546,7 @@ function(ri, G)
     # order of another group element.
     setOfOrders := AsSet(orders);
     # All orders we look for are <= 66.
-    if setOfOrders[Length(setOfOrders)] > 67 then
+    if Last(setOfOrders) > 67 then
         return NeverApplicable;
     fi;
     maximalOrders := [];

@@ -777,11 +777,11 @@ end;
 #! not a giant (a giant is Sn or An in natural action).
 #!
 #! @EndChunk
-BindRecogMethod(FindHomMethodsGeneric, "SnAnUnknownDegree",
+BindRecogMethod("FindHomMethodsGeneric", "SnAnUnknownDegree",
 "method groups isomorphic to Sn or An with n >= 11",
-function(ri, G)
-    local eps, N, p, d, recogData, isoData, degree, swapSLP;
-    #G := Grp(ri);
+function(ri)
+    local eps, N, p, d, recogData, isoData, degree, swapSLP, G;
+    G := Grp(ri);
     # TODO find value for eps
     eps := 1 / 10^2;
     # Check magma

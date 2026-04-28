@@ -49,7 +49,7 @@ AutoDoc(rec(
             "recognition.xml",
             "methsel.xml",
             "methods.xml",
-            "renaming.xml",
+            "misc.xml",
             ],
         ),
 ));

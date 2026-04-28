@@ -19,14 +19,14 @@
 #! <Ref Subsect="KnownNilpotent" Style="Text"/>,
 #! otherwise return <K>NeverApplicable</K>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsGeneric, "FewGensAbelian",
+BindRecogMethod("FindHomMethodsGeneric", "FewGensAbelian",
 "if very few generators, check IsAbelian and if yes, do KnownNilpotent",
-function(ri, G)
+function(ri)
   # If the number of generators is less than or equal to 200, then check
   # abelian and if so, hint to KnownNilpotent to write it as a direct
   # product of Sylow subgroups
   local gens, i, j, l;
-  gens := GeneratorsOfGroup(G);
+  gens := GeneratorsOfGroup(Grp(ri));
   l := Length(gens);
   if l > 200 then
       return NeverApplicable;
@@ -39,5 +39,5 @@ function(ri, G)
       od;
   od;
   # We call KnownNilpotent:
-  return FindHomMethodsGeneric.KnownNilpotent(ri, G);
+  return FindHomMethodsGeneric.KnownNilpotent(ri);
 end);

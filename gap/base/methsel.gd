@@ -43,16 +43,13 @@ DeclareGlobalFunction( "AddMethod" );
 
 ## <#GAPDoc Label="CallMethods">
 ## <ManSection>
-## <Func Name="CallMethods" Arg="db, limit [,furtherargs]"/>
+## <Func Name="CallMethods" Arg="db, limit, ri"/>
 ## <Returns>a record <C>ms</C> describing this method selection procedure.
 ## </Returns>
 ## <Description>
 ## The argument <A>db</A> must be a method database in the sense of
 ## Section <Ref Sect="methoddatabases"/>. <A>limit</A> must be a non-negative
-## integer. <A>furtherargs</A> stands for an arbitrary number of additional
-## arguments, which are handed down to the called methods. Of course they
-## must fulfill the conventions defined for the methods in the database
-## <A>db</A>.<P/>
+## integer. Finally <A>ri</A> is a recognition node.<P/>
 ## The function first creates a <Q>method selection</Q> record keeping track
 ## of the things that happened during the method trying procedure,
 ## which is also used during this procedure. Then it calls methods with

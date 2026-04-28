@@ -607,15 +607,14 @@ RECOG.SLn_UpStep := function(w)
       # Clean out the first n entries to go to the fixed space of SL_n:
       zerovec := Zero(newpart[1]);
       for i in [1..w.n-1] do
-          CopySubVector(zerovec,newpart[i],[1..w.n],[1..w.n]);
+          RECOG.CopySubVectorCompat(zerovec,newpart[i],[1..w.n],[1..w.n]);
       od;
       MB := MutableBasis(w.f,[],zerovec);
       i := 1;
       pivots := EmptyPlist(newdim);
       while i <= Length(newpart) and NrBasisVectors(MB) < newdim do
-          if not IsContainedInSpan(MB,newpart[i]) then
+          if CloseMutableBasis(MB,newpart[i]) then
               Add(pivots,i);
-              CloseMutableBasis(MB,newpart[i]);
           fi;
           i := i + 1;
       od;
@@ -647,9 +646,8 @@ RECOG.SLn_UpStep := function(w)
       i := 1;
       pivots2 := EmptyPlist(newdim);
       while i <= Length(cii) and NrBasisVectors(MB) < newdim do
-          if not IsContainedInSpan(MB,cii[i]) then
+          if CloseMutableBasis(MB,cii[i]) then
               Add(pivots2,i);
-              CloseMutableBasis(MB,cii[i]);
           fi;
           i := i + 1;
       od;

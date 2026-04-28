@@ -11,7 +11,7 @@ gap> for d in [11] do
 > sets := Combinations([1 .. d], 2);;
 > SdOn2Sets := Action(SymmetricGroup(d), sets, OnSets);;
 > ri := RecogNode(SdOn2Sets);;
-> success := FindHomMethodsGeneric.SnAnUnknownDegree(ri, SdOn2Sets);
+> success := FindHomMethodsGeneric.SnAnUnknownDegree(ri);
 > if not success or not Size(ri) = Factorial(d) then
 >   Print("wrong result! degree ", d, "\n");
 > fi;
@@ -22,7 +22,7 @@ gap> for d in [11] do
 > sets := Combinations([1 .. d], 2);;
 > SdOn2Sets := Action(AlternatingGroup(d), sets, OnSets);;
 > ri := RecogNode(SdOn2Sets);;
-> success := FindHomMethodsGeneric.SnAnUnknownDegree(ri, SdOn2Sets);
+> success := FindHomMethodsGeneric.SnAnUnknownDegree(ri);
 > if not success or not Size(ri) = Factorial(d)/2 then
 >   Print("wrong result! degree ", d, "\n");
 > fi;
@@ -30,7 +30,7 @@ gap> for d in [11] do
 
 # Check Slp function
 gap> ri := RecogNode(SdOn2Sets);;
-gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri, SdOn2Sets);
+gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri);
 true
 gap> x := PseudoRandom(Grp(ri));;
 gap> slp := SLPforElement(ri, x);;

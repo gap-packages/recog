@@ -57,12 +57,12 @@ RECOG.whichpower:=function(r,n,q,spa,spb,x)
 
     v:=spa[1]*x;
     w:=SolutionMat(spa,v);
-    j:=Position(List(w,y->y<>0*Z(q)),true);
+    j:=PositionNonZero(w);
     j:=Int( (j-1)/r ^(n-1));
 
     v:=spb[1]*x;
     w:=SolutionMat(spb,v);
-    i:=Position(List(w,y->y<>0*Z(q)),true);
+    i:=PositionNonZero(w);
     i:=Int( (i-1)/r ^(n-1));
 
     return [i,j];
@@ -81,7 +81,7 @@ RECOG.ActionOnBlocks := function(r,n,q,blks,x)
     perm:=[];
     for i in [1..ell] do
       w:=blocks[1+(i-1)*(Length(blocks)/ell)];
-      j:=Position(List(w,y->y<>0*Z(q)),true);
+      j:=PositionNonZero(w);
       j:=1+Int( (j-1)/(Length(blocks)/ell));
       perm[i]:=j;
     od;
@@ -164,24 +164,31 @@ RECOG.RadBasis:=function(r,n,q,rad)
          Collected(List(rad,x->IsDiagonalMat(nicebasis*x*niceinv))));
     diagrad:=List(rad,x->DiagonalOfMat(nicebasis*x*niceinv));
 
-    #write each vector in diagrad as scalar times a vector over GF(r)
+    # write each vector in diagrad as scalar times a vector over GF(r)
     action:= [];
     for i in [1..Length(diagrad)] do
         action[i]:=List(diagrad[i],x-> x/diagrad[i][1]);
     od;
-        action := TransposedMatMutable(action);
+    action := TransposedMatMutable(action);
 
-if Length(action) <> Length(nicebasis) then
-    ErrorNoReturn("what's wrong?");
-fi;
+    # CommonDiagonal2 should give one normalized character row for each basis
+    # vector. If that count already disagrees, then this commuting subgroup is
+    # not the kind of uniform radical subgroup that the C6 code expects.
+    if Length(action) <> Length(nicebasis) then
+        return fail;
+    fi;
 
     # The identical rows of action correspond to vectors in
     # a  homogeneous component
     s := Set( action );
 
-if Length(nicebasis) mod Length(s)  <> 0 then
-    ErrorNoReturn("what's wrong2?");
-fi;
+    # rewriteones/ActionOnBlocks treat equal rows as equal-size homogeneous
+    # blocks, so the number of distinct rows must divide the full dimension.
+    # If it does not, BlindDescent found a bad abelian witness rather than a
+    # valid C6 radical, and the caller must reject this attempt.
+    if Length(nicebasis) mod Length(s) <> 0 then
+        return fail;
+    fi;
     # all vectors in nicebasis whose rows in action are
     # identical form a block
     f := function (a, b) return Position(s,a) <= Position(s,b); end;
@@ -299,7 +306,11 @@ RECOG.basis2:=function(r,n,q,g)
     Info(InfoRecog,3,"exit basis2");
 
     if Length(rad) > 0 then
-        return rec( basis := rec(), blocks := RECOG.RadBasis(r,n,q,rad) );
+        rad := RECOG.RadBasis(r,n,q,rad);
+        if rad = fail then
+            return fail;
+        fi;
+        return rec( basis := rec(), blocks := rad );
     else
         return rec( basis := rec(sympl:=list,es:=list2), blocks := [] );
     fi;
@@ -338,23 +349,6 @@ RECOG.check:=function(r,n,q,list,x,exp)
     return (x/y);
 end;
 
-#divides out the radical part of the bottom group
-#should return a scalar matrix
-RECOG.check2 := function(r,n,q,rad,x,coeffs)
-
-    local y,i;
-
-    #Print(List( coeffs, i-> IntFFE(i)), "\n" );
-
-    y := One(x);
-    for i in [1..Length(rad)] do
-      y := y*rad[i]^IntFFE(coeffs[i]);
-    od;
-
-    return (x/y);
-end;
-
-
 # rewrite an element of the normalizer of the extraspecial group
 # as 2n x 2n matrix over GF(r) (or as smaller matrix, if the
 # extraspecial group is just a subgroup of r^(1+2n) )
@@ -387,182 +381,6 @@ RECOG.HomFuncrewriteones := function(da,el)
 end;
 
 
-#   these functions were added by me to help test when
-#   an element of the normaliser powers up to a noncentral
-#   element of R.
-
-#finds the multiplicity of x-1 in x^n-1 factored over GF(p)
-RECOG.multiplicity:=function(p,n)
-    local  f, one, x, facs, l, i;
-
-   f:=GF(p);
-   one:=One(f);
-   x:=X(f);
-   facs:=Collected( Factors(x^n-one) );
-   l:=Length(facs);
-   i:=0;
-   repeat
-      i:=i+1;
-   until facs[i][1]=x-one;
-
-   return facs[i][2];
-end;
-
-# decompose a vector space into a sum of common eigenspaces
-# rad is generator list for an abelian matrix group
-RECOG.commondiagonal:=function(q,rad)
-    local int, es, int2, vs, nicebasis, i, j, k;
-
-    Info(InfoRecog,3,"enter diagonalization");
-
-    int:=Eigenspaces(GF(q^2),rad[1]);
-    for i in [2..Length(rad)] do
-        es:=Eigenspaces(GF(q^2),rad[i]);
-        int2:=[];
-        for j in [1..Length(int)] do
-            for k in [1..Length(es)] do
-                vs:=Intersection(int[j],es[k]);
-                if Dimension(vs)>0 then
-                   Add(int2,vs);
-                fi;
-            od;
-        od;
-        int:=int2;
-    od;
-    nicebasis:=Concatenation(List(int,x->GeneratorsOfVectorSpace(x)));
-    MakeImmutable(nicebasis);
-
-    Info(InfoRecog,3,"exit diagonalization");
-    return nicebasis;
-end;
-
-#creates a basis for a subgroup g of the extraspecial group
-RECOG.basis:=function(r,n,q,g)
-    local xxx,
-    a,b,spa,i,j,k,len,gens,list,list2,spb,ainv,binv,powers,posa,rad,
-          radoutput;
-
-    Info(InfoRecog,3,"enter basis");
-
-
-    list:=[]; #this will contain the generators for the nonsingular part
-    list2:=[]; #this will contain the eigenspace bases for the generators
-    rad:=[]; #this will contain generators for the radical
-    len:=Length(GeneratorsOfGroup(g));
-    gens:=[];
-    for i in [1..len] do
-      Add(gens,GeneratorsOfGroup(g)[i]);
-    od;
-    Add(gens,One(gens[1]));
-    len:=len+1;
-
-    repeat
-      k:=0;
-
-      repeat
-        k:=k+1;
-        a:=gens[k];
-      until a<>a[1,1]*One(a) or k=len;
-      posa:=k;
-      if k<len then
-        repeat
-           k:=k+1;
-           b:=gens[k];
-        until a*b <> b*a or k=len;
-      fi;
-      if k<len then #we found a hyperbolic pair
-        Add(list,a);
-        Add(list,b);
-
-        spa:=Eigenspaces(GF(q^2),a)[1];
-        spa:=List(GeneratorsOfVectorSpace(spa),z->ShallowCopy(z));
-        #list bases for other eigenspaces, in the order b permutes them
-        for i in [1..r-1] do
-          for j in [1..r^(n-1)] do
-            spa[i*r^(n-1)+j]:=spa[(i-1)*r^(n-1)+j]*b;
-          od;
-        od;
-        MakeImmutable(spa);
-        Add(list2,spa);
-
-        spb:=Eigenspaces(GF(q^2),b)[1];
-        spb:=List(GeneratorsOfVectorSpace(spb),z->ShallowCopy(z));
-        for i in [1..r-1] do
-          for j in [1..r^(n-1)] do
-            spb[i*r^(n-1)+j]:=spb[(i-1)*r^(n-1)+j]*a;
-          od;
-        od;
-        MakeImmutable(spb);
-        Add(list2,spb);
-
-        ainv:=a^(-1);
-        binv:=b^(-1);
-
-        for j in [1..len] do
-          powers:=RECOG.whichpower(r,n,q,spa,spb,gens[j]);
-          gens[j]:=gens[j]*(ainv^powers[1])*(binv^powers[2]);
-        od;
-      fi;
-      if k=len and posa<k then #a is in the center, but not scalar
-         Add(rad,a);
-         for i in [posa..len-1] do
-             gens[i]:=gens[i+1];
-         od;
-         len:=len-1;
-         k:=0;
-      fi;
-    until k>=len;
-
-    radoutput := RECOG.RadBasis(r,n,q,rad);
-
-    Info(InfoRecog,3,"exit basis");
-
-    return rec(sympl:=list,es:=list2,nicebasis:=radoutput[1],
-       niceinv:=radoutput[2], vs:=radoutput[3], rad:=radoutput[4]);
-
-end;
-
-
-
-# RECOG.TestAbelianOld := function (n,grp,u)
-# 
-#     local list, x, y, limu, randlist, randgens;
-# 
-#         list := [u];
-#         if Length(GeneratorsOfGroup(grp)) > 3 then
-#             limu := 16 * n;
-#     else
-#         limu := 13 * n;
-#         fi;
-# 
-#     while limu > 0 do
-#             limu := limu - 1;
-#             x  := RandomSubproduct(list);
-#             y  := RandomSubproduct(list);
-#         x  := Comm(x,y);
-#         if x <> x[1,1] * One(x) then
-#         return [false,x];
-#         fi;
-#             randlist:= RandomSubproduct(list);
-#             if randlist <> One(grp) then
-#                 if Length(GeneratorsOfGroup(grp)) > 3 then
-#                     randgens:= RandomSubproduct(grp);
-#                     if randgens <> One(grp) then
-#                         Add(list,randlist^randgens);
-#                     fi;
-#                 else # for short generator lists, conjugate with all gens
-#                     for randgens in GeneratorsOfGroup(grp) do
-#                         Add(list, randlist^randgens);
-#                     od;
-#                 fi;
-#             fi;
-#     od;
-# 
-#     return [true,u,list];
-# 
-# end;
-
-
 #############################################################################
 ##
 #F  TestAbelian(n,grp,u) . . . . . . . . . . . . . . . .
@@ -580,10 +398,10 @@ RECOG.TestAbelian := function (n,grp,u)
         y  := RandomSubproduct(list);
         # check whether y commutes with the element computed
         # in the previous iteration
-        x := list[Length(list)];
+        x := Last(list);
         h := x * y; g := y * x;
         pos := PositionNonZero( h[1] );
-        if g <> g[1][pos]/h[1][pos]   * h then
+        if not IsEqualProjective(g, h) then
             # x and y do not commute
              return [ false, g/h ];
         fi;
@@ -591,7 +409,7 @@ RECOG.TestAbelian := function (n,grp,u)
         x := y^PseudoRandom(grp);
         h := x * y; g := y * x;
         pos := PositionNonZero( h[1] );
-        if g <> g[1][pos]/h[1][pos]   * h then
+        if not IsEqualProjective(g, h) then
             # x and y do not commute
              return [ false, g/h ];
         fi;
@@ -700,6 +518,12 @@ RECOG.New2RecogniseC6 := function(grp)
     rgrp := Group(b[2]);
     ## try to find a set of standard gens for <rgrp>
     grpbasis := RECOG.basis2(r,n,q,rgrp);
+    # BlindDescent is randomized and only tests for an abelian witness. If the
+    # stronger basis construction fails, reject this C6 attempt and let method
+    # selection retry later instead of aborting recognition.
+    if grpbasis = fail then
+        return TemporaryFailure;
+    fi;
 
     ## construct image of <grp> in classical group
     Info(InfoRecog,3,"enter image computation");
@@ -724,11 +548,12 @@ end;
 #! <A>G</A> into <M>Sp(2n,r)</M>, or a homomorphism into the C2 permutation
 #! action of <A>G</A> on a decomposition of <M>GF(q)^d</M>, or <K>fail</K>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "C6",
+BindRecogMethod("FindHomMethodsProjective", "C6",
 "find either an (imprimitive) action or a symplectic one",
-function(ri, G)
-    local r,re,hom;
+function(ri)
+    local G,r,re,hom;
 
+    G := Grp(ri);
     RECOG.SetPseudoRandomStamp(G,"C6");
 
     re := RECOG.New2RecogniseC6(G);

@@ -17,6 +17,11 @@
 ##
 #############################################################################
 
+InstallMethod( Eigenspaces, "for a field and a memory element matrix",
+  [ IsField, IsMatrix and IsObjWithMemory ],
+  function( f, m )
+    return Eigenspaces(f,m!.el);
+  end );
 
 RECOG.FindStdGensUsingBSGS := function(g,stdgens,projective,large)
   # stdgens generators for the matrix group g
@@ -459,8 +464,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
           x := StripMemory(xm);
           xb := bas*x*bas^-1;
           co := Coefficients(can,xb[2,1]);
-      until not IsContainedInSpan(mb,co);
-      CloseMutableBasis(mb,co);
+      until CloseMutableBasis(mb,co);
       Add(tt,x);
       Add(ttm,xm);
       Add(mat,co);
@@ -796,31 +800,6 @@ RECOG.SetupNormalisationListForPSLd := function(f,d)
   return list;
 end;
 
-# el: a field element
-# d: a positive integer (typically ri!.gcd.gcd)
-# f: a galois field (typically ri!.field)
-#
-# Compute a primitive d-th root of el in the field f.
-# TODO: This function copies the code from RootFFE, which will
-# appear in GAP 4.9. Once GAP 4.9 is out, we can switch
-# to using RootFFE directly.
-RECOG.ComputeRootInFiniteField := function(el, d, f)
-    local z, e, m, p, a;
-    if IsZero(el) or IsOne(el)  then
-        return el;
-    fi;
-    z := PrimitiveRoot(f);
-    m := Size(f) - 1;
-    e := LogFFE(el, z);
-    p := GcdInt(m, e);
-    d := d mod m;
-    a := GcdInt(m, d);
-    if p mod a <> 0  then
-        return fail;
-    fi;
-    a := e * (a / d mod (m / p)) / a mod m;
-    return z ^ a;
-end;
 
 # Express an element of PSL_d as an slp in terms of standard generators.
 SLPforElementFuncsProjective.PSLd := function(ri,x)
@@ -838,7 +817,7 @@ SLPforElementFuncsProjective.PSLd := function(ri,x)
       # We thus can compute a d-th root of 1/det, and scale y with it,
       # in order to obtain a matrix with determinant 1 in the same
       # projective class.
-      root := RECOG.ComputeRootInFiniteField(1/det,Length(y),ri!.field);
+      root := RootFFE(ri!.field,1/det,Length(y));
       if root = fail then
           return fail;
       fi;
@@ -860,10 +839,11 @@ end;
 #! @BeginChunk ClassicalNatural
 #! TODO
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "ClassicalNatural",
+BindRecogMethod("FindHomMethodsProjective", "ClassicalNatural",
 "check whether it is a classical group in its natural representation",
-function(ri, g)
-  local changed,classical,d,det,ext,f,gcd,gens,gm,i,p,pr,q,root,std,stdg,z;
+function(ri)
+  local g,changed,classical,d,det,ext,f,gcd,gens,gm,i,p,pr,q,root,std,stdg,z;
+  g := Grp(ri);
   d := ri!.dimension;
   f := ri!.field;
   q := Size(f);
@@ -892,7 +872,7 @@ function(ri, g)
   for i in [1..Length(gens)] do
       det := DeterminantMat(gens[i]);
       if not IsOne(det) then
-          root := RECOG.ComputeRootInFiniteField(det,gcd.gcd,f);
+          root := RootFFE(f, det^-1, d);
           if root = fail then
               ErrorNoReturn("Should not have happened, 15634, tell Max!");
           fi;
@@ -949,7 +929,7 @@ function(ri, g)
                    "case, handing over to Schreier-Sims.");
               ri!.comment := Concatenation("SL(",String(d),",",String(q),")",
                                            "_StabilizerChain");
-              return FindHomMethodsProjective.StabilizerChainProj(ri,g);
+              return FindHomMethodsProjective.StabilizerChainProj(ri);
           fi;
           Info(InfoRecog,2,"ClassicalNatural: this is PSL_n!");
           std := RECOG.FindStdGens_SL(gm);

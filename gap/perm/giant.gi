@@ -614,7 +614,7 @@ RECOG.SLPforSn :=  function( n, pi )
             for k in [ 2 .. Length(ci)-1 ] do
                 Append( cycslp, [ 2,1, 3,ci[k]-ci[k+1] ] );
             od;
-            Append( cycslp, [ 2,1, 3,ci[Length(ci)]-ci[1]-1 ] );
+            Append( cycslp, [ 2,1, 3,Last(ci)-ci[1]-1 ] );
             Append( R, [ [cycslp,4] ]);
         else    # we carry forward cycle product computed so far
             Append( R, [ [[1,1],4] ] );
@@ -797,13 +797,14 @@ RECOG.GiantEpsilon := 1/1024;
 #! the construction of <M>D</M> was unsuccessful.
 #! If the method constructs <M>D</M> then the calling node becomes a leaf.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsPerm, "Giant",
+BindRecogMethod("FindHomMethodsPerm", "Giant",
 "tries to find Sn and An in their natural actions",
 # TODO: expects input to be transitive, so should always be run after
 # FindHomMethodsPerm.NonTransitive; model this better?
 rec(validatesOrAlwaysValidInput := true),
-function(ri, grp)
-    local grpmem,mp,res;
+function(ri)
+    local grp,grpmem,mp,res;
+    grp := Grp(ri);
     if not IsPermGroup(grp) then
         return NeverApplicable;
     fi;

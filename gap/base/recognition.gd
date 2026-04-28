@@ -671,11 +671,11 @@ DeclareGlobalFunction( "CalcStdPresentationGeneric" );
 DeclareGlobalFunction( "SLPforElement" );
 DeclareOperation( "RandomElm", [ IsRecogNode, IsString, IsBool ] );
 DeclareOperation( "RandomElmOrd", [ IsRecogNode, IsString, IsBool ] );
-DeclareOperation( "RandomElmPpd", [ IsRecogNode, IsString, IsBool ] );
+#DeclareOperation( "RandomElmPpd", [ IsRecogNode, IsString, IsBool ] );
 DeclareOperation( "RandomOrdersSeen", [ IsRecogNode ] );
 DeclareOperation( "StopStoringRandEls", [ IsRecogNode ] );
 DeclareOperation( "GetElmOrd", [ IsRecogNode, IsRecord ] );
-DeclareOperation( "GetElmPpd", [ IsRecogNode, IsRecord ] );
+#DeclareOperation( "GetElmPpd", [ IsRecogNode, IsRecord ] );
 
 
 # Finally the generic verification procedure:

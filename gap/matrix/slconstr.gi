@@ -264,7 +264,7 @@ local    r, q, v, primes, collect2s, z, i, a, c, w, phi, psi;
       repeat
         r := PseudoRandom(bbg);
         if (r^12 = One(bbg)) and ( not (r^6 = One(bbg))) then
-Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
+Info(InfoRecog,3,"SLCR.FindGoodElement with i=",i,"  limit=",limit);
            return r^6;
         fi;
         i := i+1;
@@ -275,10 +275,10 @@ Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
         r := PseudoRandom(bbg);
         if r^4 = One(bbg) then
            if r^2 = One(bbg) then
-Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
+Info(InfoRecog,3,"SLCR.FindGoodElement with i=",i,"  limit=",limit);
               return r;
            else
-Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
+Info(InfoRecog,3,"SLCR.FindGoodElement with i=",i,"  limit=",limit);
               return r^2;
            fi;
         fi;
@@ -319,18 +319,18 @@ Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
             if p = 2 and e*(d-2) = 6 then
                if ((not One(bbg) = v^7) and (not One(bbg) = v^9)) or
                   ((not One(bbg) = v^3) and (One(bbg) = v^9)) then
-Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
+Info(InfoRecog,3,"SLCR.FindGoodElement with i=",i,"  limit=",limit);
 return( r );
                fi;
             elif (e*(d-2) = 2) and (p+1 = 2^(Log(p+1,2))) then
                # p is Mersenne prime
                w:=2*z/collect2s( z );
                if not One(bbg) = v^w   then #4/|v|
-Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
+Info(InfoRecog,3,"SLCR.FindGoodElement with i=",i,"  limit=",limit);
 return( r );
                fi;
             elif not One(bbg) = v^psi then
-Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
+Info(InfoRecog,3,"SLCR.FindGoodElement with i=",i,"  limit=",limit);
 return( r );
             fi;
          fi;
@@ -360,7 +360,7 @@ local    r, q, i;
         r := PseudoRandom(bbg);
         if r^6=One(bbg) and ( not (r^3 = One(bbg)))
            and ( not (r^2 = One(bbg)))  then
-Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
+Info(InfoRecog,3,"SLCR.FindGoodElement with i=",i,"  limit=",limit);
 return r;
         fi;
         i := i+1;
@@ -371,7 +371,7 @@ return r;
         r := PseudoRandom(bbg);
         if (r^12=One(bbg)) and ( not (r^4 = One(bbg)) )
                        and ( not SLCR.IS_IN_CENTRE(bbg,r^6) )  then
-Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
+Info(InfoRecog,3,"SLCR.FindGoodElement with i=",i,"  limit=",limit);
 return r;
         fi;
         i := i+1;
@@ -383,7 +383,7 @@ return r;
         r := r^4;
         if (r^15=One(bbg)) and ( not (r^3 = One(bbg)))
                        and ( not (r^5 = One(bbg)))  then
-Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
+Info(InfoRecog,3,"SLCR.FindGoodElement with i=",i,"  limit=",limit);
            return r;
         fi;
         i := i+1;
@@ -395,7 +395,7 @@ Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
         r := r^8;
         if (r^15=One(bbg)) and ( not (r^3 = One(bbg)))
                        and ( not (r^5 = One(bbg)))  then
-Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
+Info(InfoRecog,3,"SLCR.FindGoodElement with i=",i,"  limit=",limit);
 return r;
         fi;
         i := i+1;
@@ -407,7 +407,7 @@ return r;
         r := r^16;
         if r^153=One(bbg) and ( not (r^9 = One(bbg)))
                  and ( not (r^17 = One(bbg)))  then
-Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
+Info(InfoRecog,3,"SLCR.FindGoodElement with i=",i,"  limit=",limit);
 return r;
         fi;
         i := i+1;
@@ -419,7 +419,7 @@ return r;
         if (r^(p*(q^2-1))=One(bbg)) and (not (r^(q^2-1)=One(bbg)))
                 and (not (r^(8*p*(q+1))=One(bbg)))
                 and (not (r^(p*(q-1))=One(bbg))) then
-Print("SLCR.FindGoodElement with i=",i,"  limit=",limit,"\n");
+Info(InfoRecog,3,"SLCR.FindGoodElement with i=",i,"  limit=",limit);
 return r;
         fi;
         i := i+1;
@@ -1247,7 +1247,11 @@ return fail;
      det := Determinant(mat);
      if not (det = Z(q)^0) then
         gcd := Gcd(d,q-1);
-        exp := (LogFFE(det, Z(q))/gcd) / (d/gcd) mod ((q-1)/gcd);
+        i := LogFFE(det, Z(q));
+        if i mod gcd <> 0 then
+           return fail;
+        fi;
+        exp := QuoInt(i, gcd) / QuoInt(d, gcd) mod QuoInt(q-1, gcd);
         slprog := SLCR.PowerProg(data.sprog[d],exp);
         rightslp := SLCR.ProdProg(rightslp, slprog);
         W := W * ResultOfStraightLineProgram (slprog, List (data.gens, x -> x[1]));
@@ -1906,7 +1910,7 @@ local  r, t, rho, data1, T1, t1, t1inv, f, finv, T1finv, T, jgamma, Qgamma,
    rho := Z(p^e);
    r:=SLCR.FindGoodElement( bbg , p , e , 3 , 14*p^e);
    if r = fail then
-Print("SLCR.FindGoodElement could not find r \n");
+Info(InfoRecog,3,"SLCR.FindGoodElement could not find r");
 return fail;
    fi;
    t := r^(p^e -1);
@@ -2036,7 +2040,7 @@ local   i, j, stop, q, limit, tau, tauinv, jgamma, jgammainv, qalpha, Q,
        fi;
      until stop or j=q+1;
      if not stop then
-Print(" failed modifying L \n");
+Info(InfoRecog,3,"failed modifying L");
 return fail;
      else
         pQalpha[i] := pQalpha[i] * u^(-1) ;
@@ -2046,7 +2050,7 @@ return fail;
    for i in [1..Length(Lgen)] do
      u := SLCR.SLConjInQ(bbg, Lgen[i], Qgamma, Q, Tgamma, data1.T, pQ, p, e, false);
      if u = fail then
-Print(" failed modifying L,2 \n");
+Info(InfoRecog,3,"failed modifying L,2");
 return fail;
      else
         Lgen[i] := Lgen[i] * u^(-1) ;
@@ -2111,7 +2115,8 @@ local   i, j, stop, q, r, t, u1, u2, sl3, data1, Q, pQ, Lgen,
                  sl3 := SubgroupNC(bbg,[t,u1,u2]);
                  data1 := SLCR.QuickSL3DataStructure( sl3, p, e );
                  if not data1 = fail then
-Print("constructed L with j=",j,"   i=",i,"  limit=",Int(2*(1- 1/q)^(-5)),"\n");
+Info(InfoRecog,3,"constructed L with j=",j,"   i=",i,
+     "  limit=",Int(2*(1- 1/q)^(-5)));
                     stop := true;
                  fi;
               else
@@ -2130,7 +2135,7 @@ Print("constructed L with j=",j,"   i=",i,"  limit=",Int(2*(1- 1/q)^(-5)),"\n");
         fi; # r = fail
       until stop or j=9;
       if not stop then
-Print("could not construct L \n");
+Info(InfoRecog,3,"could not construct L");
 return fail;
       fi;
    else # d>4 or q is not one of the bad values
@@ -2141,7 +2146,7 @@ return fail;
          r := SLCR.SL4FindGoodElement( bbg , p , e , 16 * q );
       fi;
       if r = fail then
-Print("SLCR.FindGoodElement could not find r \n");
+Info(InfoRecog,3,"SLCR.FindGoodElement could not find r");
 return fail;
       fi;
       t:= r^(p^(e*(d-2)) -1);
@@ -2154,7 +2159,8 @@ return fail;
               sl3 := SubgroupNC(bbg,[t,u1,u2]);
               data1 := SLCR.QuickSL3DataStructure( sl3, p, e );
               if not data1 = fail then
-Print("constructed L with i=",i,"  limit=",Int((1- 1/q)^(-5)* Log(8*d^2,2)),"\n");
+Info(InfoRecog,3,"constructed L with i=",i,"  limit=",
+     Int((1- 1/q)^(-5)* Log(8*d^2,2)));
                  stop := true;
               fi;
         else
@@ -2162,7 +2168,7 @@ Print("constructed L with i=",i,"  limit=",Int((1- 1/q)^(-5)* Log(8*d^2,2)),"\n"
         fi;
       until stop or (i > (1- 1/q)^(-5) * Log(8*d^2,2));
       if not stop then
-Print("could not construct L \n");
+Info(InfoRecog,3,"could not construct L");
 return fail;
       fi;
       genrec := SLCR.SLFindGenerators(bbg,data1,r,p,e,d);
@@ -2431,15 +2437,40 @@ end;
 #! TODO: find a better name.
 #! @EndChunk
 SLCR.FindHom := function(ri,G,d,q)
-  local GM,data,e,genlist,i,j,p;
+  local GM,data,e,genlist,gens,i,j,p,slp,y;
   p := Factors(q);
   e := Length(p);
   p := p[1];
   GM := GroupWithMemory(G);
-  repeat
+  gens := GeneratorsOfGroup(G);
+  if IsEmpty(gens) then
+      gens := [One(G)];
+  fi;
+  for i in [1 .. 10] do
       Info(InfoRecog,2,"Trying constructive recognition...");
       data := SLCR.SLDataStructure(GM,p,e,d);
-  until data <> fail;
+      if data = fail then
+          continue;
+      fi;
+      genlist := List(data.gens,x->x[1]);
+      for y in gens do
+          slp := SLCR.SLSLPbb(data, y, d);
+          if slp = fail or
+             not isequal(ri)(StripMemory(y),
+                             ResultOfStraightLineProgram(slp, genlist)) then
+              data := fail;
+              break;
+          fi;
+      od;
+      if data <> fail then
+          break;
+      fi;
+      Info(InfoRecog,2,
+           "Constructive recognition did not cover all generators.");
+  od;
+  if data = fail then
+      return TemporaryFailure;
+  fi;
   Info(InfoRecog,2,"Constructive recognition: success!");
   genlist := List(data.gens,x->x[1]);
   # Now clean out the memory everywhere in data:
@@ -2474,10 +2505,11 @@ end;
 #! @BeginChunk NaturalSL
 #! TODO
 #! @EndChunk
-BindRecogMethod(FindHomMethodsMatrix, "NaturalSL",
+BindRecogMethod("FindHomMethodsMatrix", "NaturalSL",
 "TODO",
-function(ri,G)
-  local data,e,genlist,grpmem,i,j,n,p,q,r,il;
+function(ri)
+  local G, data,e,genlist,grpmem,i,j,n,p,q,r,il;
+  G := Grp(ri);
 
     if not IsMatrixGroup(G) then
         return NeverApplicable;

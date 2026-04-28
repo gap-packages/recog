@@ -66,7 +66,11 @@ function(stamp, comment, arg...)
         opt := rec();
     fi;
 
-    r := rec(func := func);
+    r := rec(
+        func := func,
+        linenumber := INPUT_LINENUMBER(),
+        filename := INPUT_FILENAME(),
+        );
     if IsBound(opt.validatesOrAlwaysValidInput) then
         # method.validatesOrAlwaysValidInput for now only stores
         # meta-information. It may be used in the future, see github issue
@@ -80,14 +84,20 @@ function(stamp, comment, arg...)
 end);
 
 InstallGlobalFunction(BindRecogMethod,
-function(r, arg...)
+function(rname, arg...)
+    local r, name;
+    r := ValueGlobal(rname);
     r.(arg[1]) := CallFuncList(RecogMethod, arg);
+    name := Concatenation(rname, ".", arg[1]);
+    SetNameFunction(r.(arg[1])!.func, name);
 end);
 
 InstallGlobalFunction(CallRecogMethod,
-function(m, args)
+function(m, ri)
+    local f;
     if not IsRecogMethod(m) then
         ErrorNoReturn("<m> must be a RecogMethod, but is ", m);
     fi;
-    return CallFuncList(UnpackRecogMethod(m), args);
+    f := UnpackRecogMethod(m);
+    return f(ri);
 end);

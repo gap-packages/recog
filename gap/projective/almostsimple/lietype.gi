@@ -819,10 +819,11 @@ end;
 #! Recognise quasi-simple group of Lie type when characteristic is given.
 #! Based on <Cite Key="BKPS02"/> and <Cite Key="AB01"/>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "LieTypeNonConstr",
+BindRecogMethod("FindHomMethodsProjective", "LieTypeNonConstr",
 "do non-constructive recognition of Lie type groups",
-function(ri,G)
-    local count,dim,f,i,ords,p,q,r,res;
+function(ri)
+    local G,count,dim,f,i,ords,p,q,r,res;
+    G := Grp(ri);
     RECOG.SetPseudoRandomStamp(G,"LieTypeNonConstr");
     dim := ri!.dimension;
     f := ri!.field;
