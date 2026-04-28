@@ -2,7 +2,7 @@
 gap> START_TEST("GiantPresentation.tst");
 gap> oldInfoLevel := InfoLevel(InfoRecog);;
 gap> SetInfoLevel(InfoRecog, 0);;
-gap> testGiantPres := function(n, stamp)
+gap> testGiantPres := function(n, stamp, checkSize)
 >  local size, giant, grp, ri, Fp, F, hom, rel;
 >  if stamp = "Sn" then
 >    size := Factorial(n);
@@ -19,7 +19,7 @@ gap> testGiantPres := function(n, stamp)
 >    Display("StdPresentation was not set for ", stamp, ", n=", n);
 >  fi;
 >  Fp := StdPresentation(ri);
->  if Size(Fp) <> size then
+>  if checkSize and Size(Fp) <> size then
 >    Display("StdPresentation for ", stamp, ", n=", n, ", has incorrect size");
 >  fi;
 >  F := FreeGroupOfFpGroup(Fp);
@@ -30,8 +30,10 @@ gap> testGiantPres := function(n, stamp)
 >    fi;
 >  od;
 > end;;
-gap> for n in [8..10] do testGiantPres(n, "Sn"); od;;
-gap> for n in [8..10] do testGiantPres(n, "An"); od;;
+gap> for n in [8..10] do testGiantPres(n, "Sn", true); od;;
+gap> for n in [8..10] do testGiantPres(n, "An", true); od;;
+gap> for n in [11..20] do testGiantPres(n, "Sn", false); od;;
+gap> for n in [11..20] do testGiantPres(n, "An", false); od;;
 
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
