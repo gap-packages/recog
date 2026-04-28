@@ -1,12 +1,8 @@
 gap> START_TEST("sl2.tst");
 gap> testRecogniseSL2Natural := function(q)
->   local G, list, res, f, i, std;
+>   local G, res, f, i, std;
 >   f := GF(q);
->   list := [];
->   for i in [1..10] do
->     Add(list, Random(SL(2,q)));
->   od;
->   G := GroupWithGenerators(list);
+>   G := GroupWithGenerators(List([1..10], i->Random(SL(2,q))));
 >   res := RECOG.RecogniseSL2Natural(G,f);
 >   std := RECOG.MakeSL_StdGens(Characteristic(f),DegreeOverPrimeField(f),2,2);
 >   for i in [1..Length(res.all)] do
