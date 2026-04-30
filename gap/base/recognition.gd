@@ -243,11 +243,11 @@ DeclareAttribute( "CalcStdPresentation", IsRecogNode, "mutable" );
 ## <P/>
 ## A value <A>true</A> of <A>IsCorrect(ri)</A> signifies that the subtree rooted at <A>ri</A>
 ## has been verified to be correct.
-## A value of <A>false</A> signifies that there was an attempt of verification,
+## A value of <K>false</K> signifies that there was an attempt of verification,
 ## but that this verification resulted in a proof that the subtree rooted at <A>ri</A>
 ## is incorrect.
 ## <P/>
-## Here correctness of a subtree means the following: If <A>ri2</A> is a node in
+## Here correctness of a subtree means the following: If <C>ri2</C> is a node in
 ## this subtree, <M>H</M> is the group
 ## associated to <A>ri2</A> and <A>riKer</A> is the left child of <A>ri2</A>,
 ## then the group associated to <A>riKer</A> (or rather, its embedding into <M>H</M>)
