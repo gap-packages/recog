@@ -238,7 +238,7 @@ DeclareAttribute( "CalcStdPresentation", IsRecogNode, "mutable" );
 ## The recognition procedure may with a small probability produce recognition trees
 ## that are not correct.
 ## For this reason, it is possible to verify that a recognition tree
-## is mathematically correct by calling <A>IsCorrect</A>.
+## is mathematically correct by calling <C>IsCorrect</C>.
 ## However, this is in general expensive.
 ## <P/>
 ## A value <A>true</A> of <A>IsCorrect(ri)</A> signifies that the subtree rooted at <A>ri</A>
