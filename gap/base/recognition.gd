@@ -241,7 +241,7 @@ DeclareAttribute( "CalcStdPresentation", IsRecogNode, "mutable" );
 ## is mathematically correct by calling <C>IsCorrect</C>.
 ## However, this is in general expensive.
 ## <P/>
-## A value <A>true</A> of <A>IsCorrect(ri)</A> signifies that the subtree rooted at <A>ri</A>
+## A value <K>true</K> of <C>IsCorrect(<A>ri</A>)</C> signifies that the subtree rooted at <A>ri</A>
 ## has been verified to be correct.
 ## A value of <K>false</K> signifies that there was an attempt of verification,
 ## but that this verification resulted in a proof that the subtree rooted at <A>ri</A>
