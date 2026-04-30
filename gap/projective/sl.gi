@@ -72,11 +72,7 @@ RECOG.FindStdGens_SL := function(sld)
       Info(InfoRecog,2,
            "Recognising this SL2 constructively in 2 dimensions...");
       sl2genss := GeneratorsWithMemory(sl2genss);
-      if IsEvenInt(q) then
-          resl2 := RECOG.RecogniseSL2NaturalEvenChar(Group(sl2genss),f,false);
-      else
-          resl2 := RECOG.RecogniseSL2NaturalOddCharUsingBSGS(Group(sl2genss),f);
-      fi;
+      resl2 := RECOG.RecogniseSL2Natural(Group(sl2genss),f);
       slpsl2std := SLPOfElms(resl2.all);
       bas := resl2.bas * bas;
       # We need the actual transvections:
