@@ -470,12 +470,7 @@ InstallMethod( IsCorrect, [ IsRecogNode ],
     od;
     # StdPresentation will call CalcStdPresentation if no presentation has been computed
     # so far.
-    if StdPresentation(ri) = fail then
-        SetIsCorrect(ri, false);
-    else
-        SetIsCorrect(ri, true);
-    fi;
-    return IsCorrect(ri);
+    return StdPresentation(ri) <> fail;
 end);
 
 InstallGlobalFunction( RecogniseGeneric,
