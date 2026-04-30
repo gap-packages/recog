@@ -266,13 +266,13 @@ PackageDoc := rec(
 ),
 
 Dependencies := rec(
-  GAP := ">=4.12",
+  GAP := ">=4.13",
   NeededOtherPackages := [
-    ["AtlasRep", ">= 1.4.0"],
-    ["FactInt", ">= 1.5.2"],
-    ["Forms", ">= 1.2"],
-    ["genss", ">= 1.3"],
-    ["Orb", ">= 3.4"],
+    ["AtlasRep", ">= 2.1.0"],
+    ["FactInt", ">= 1.6.3"],
+    ["Forms", ">= 1.2.11"],
+    ["genss", ">= 1.6.8"],
+    ["Orb", ">= 4.9.0"],  # really should be 5.1.0 for latest bug fixes
   ],
   SuggestedOtherPackages := [],
   ExternalConditions := []
