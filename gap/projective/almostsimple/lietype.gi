@@ -824,6 +824,9 @@ BindRecogMethod("FindHomMethodsProjective", "LieTypeNonConstr",
 function(ri)
     local G,count,dim,f,i,ords,p,q,r,res;
     G := Grp(ri);
+    if not IsBound(ri!.simplesocle) then
+        return TemporaryFailure;
+    fi;
     RECOG.SetPseudoRandomStamp(G,"LieTypeNonConstr");
     dim := ri!.dimension;
     f := ri!.field;

@@ -111,6 +111,12 @@ gap> G:=Group(List(gens, g -> ImmutableMatrix(GF(9), g)));; # ... but compress g
 gap> RECOG.SmallHomomorphicImageProjectiveGroup(G);  # this call used to raise an error
 fail
 
+# Issue #133: RECOG.simplesocle on an abelian group would get stuck in an infinite loop
+gap> G := Group([DiagonalMatrix(Z(3)*[1,2]), DiagonalMatrix(Z(3)*[2,1])]);;
+gap> ri:=RecogNode(G,true,rec());;
+gap> ForAll([1..100], i -> RECOG.simplesocle(ri,G) = fail);
+true
+
 # Issue #295: the C6 recognizer must reject inconsistent radical block splits
 # instead of raising "what's wrong2?" for this reducible alternating-group
 # factor.
@@ -283,6 +289,30 @@ gap> ri!.comment;
 "D7TensorInduced"
 gap> Size(Image(Homom(ri)));
 2
+
+# Issue #466: ComputeSimpleSocle must give up on non-almost-simple input
+# instead of looping forever in its random search for a nontrivial element
+# of the third derived subgroup.
+# See https://github.com/gap-packages/recog/issues/466
+gap> z:=Z(3^2);; G:=Group(z^0 *
+> [ [ [ z^2, 0, 0, 0 ], [ 0, z^2, 0, 0 ], [ 0, 0, z^2, 0 ], [ 0, 0, 0, z^2 ] ],
+>   [ [ 1, 0, 0, 0 ], [ 0, 2, 0, 0 ], [ 0, 0, 1, 0 ], [ 0, 0, 0, 2 ] ],
+>   [ [ 1, 0, 0, 0 ], [ 0, 1, 0, 0 ], [ 0, 0, 2, 0 ], [ 0, 0, 0, 2 ] ],
+>   [ [ 0, 1, 0, 0 ], [ 1, 0, 0, 0 ], [ 0, 0, 0, 1 ], [ 0, 0, 1, 0 ] ],
+>   [ [ 0, 0, 1, 0 ], [ 0, 0, 0, 1 ], [ 1, 0, 0, 0 ], [ 0, 1, 0, 0 ] ],
+>   [ [ z^7, 0, 0, 0 ], [ 0, z, 0, 0 ], [ 0, 0, z^7, 0 ], [ 0, 0, 0, z ] ],
+>   [ [ z^7, 0, 0, 0 ], [ 0, z^7, 0, 0 ], [ 0, 0, z, 0 ], [ 0, 0, 0, z ] ],
+>   [ [ 1, 1, 0, 0 ], [ 1, 2, 0, 0 ], [ 0, 0, 1, 1 ], [ 0, 0, 1, 2 ] ],
+>   [ [ 1, 0, 1, 0 ], [ 0, 1, 0, 1 ], [ 1, 0, 2, 0 ], [ 0, 1, 0, 2 ] ],
+>   [ [ z^7, 0, 0, 0 ], [ 0, 0, 0, z^7 ], [ 0, 0, z^7, 0 ], [ 0, z^7, 0, 0 ] ],
+> ]);;
+gap> i:=279;; Reset(GlobalRandomSource,i);; Reset(GlobalMersenneTwister,i);;
+gap> ri:=RecognizeGroup(G);;
+gap> IsReady(ri);
+true
+gap> ri:=RecogNode(G,true,rec());;
+gap> CallRecogMethod(FindHomMethodsProjective.ComputeSimpleSocle,ri) <> Success;
+true
 
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
