@@ -27,6 +27,11 @@
 #!
 #! If the input group moves a large point (currently, this means a point
 #! larger than 10), then this method returns <K>NeverApplicable</K>.
+#!
+#! Note that if a permutation group moves only a small number of points, but
+#! the points are large (e.g. the group acts on [100..105]), then
+#! <Ref Func="ThrowAwayFixedPoints"/> may rewrite this group to a group acting
+#! on small points, thereby making <K>MovesOnlySmallPoints</K> applicable.
 #! @EndChunk
 BindRecogMethod("FindHomMethodsPerm", "MovesOnlySmallPoints",
 "calculate a stabilizer chain if only small points are moved",

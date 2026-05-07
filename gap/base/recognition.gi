@@ -131,7 +131,7 @@ InstallGlobalFunction( TryFindHomMethod,
     local result,ri;
     ri := RecogNode(g,projective);
     Unbind(g!.pseudorandomfunc);
-    result := method(ri,g);
+    result := method(ri);
     if result in [TemporaryFailure, NeverApplicable] then
         return result;
     else
