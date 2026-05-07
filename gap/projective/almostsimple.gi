@@ -658,29 +658,50 @@ end;
 # is used in FindHomMethodsProjective.ComputeSimpleSocle
 # it computes the non-abelian simple socle randomly (it might
 # underestimates it)
-# if called for an abelian group (even a group with nilpotence class smaller
-# than 3?) it runs in an infinite loop
+# if it cannot find a suitable witness quickly enough, it returns fail
 RECOG.simplesocle := function(ri,g)
-  local x,y,comm,comm2,comm3,gensH;
+  local x,comm,comm2,comm3,gensH,bound,tries,FindNonTrivial;
 
-  repeat
-    x:=RandomElm(ri,"simplesocle",true).el;
-  until not ri!.isone(x);
+  # If H is almost simple with socle S, then the classification of finite
+  # simple groups implies H''' = S. This is because H / S embeds into Out(S),
+  # which is solvable of derived length at most 3. Thus the normal closure in
+  # H of any non-trivial element of H''' is S. Since both the random search
+  # and FastNormalClosure are only heuristics here, this routine must be
+  # allowed to give up.
+  bound := 5 * ri!.dimension;  # this is an arbitrary bound, could be tuned
+  tries := 0;
+  FindNonTrivial := function(f)
+    local i,el;
+    while tries < bound do
+        tries := tries + 1;
+        el := f(RandomElm(ri,"simplesocle",false).el);
+        if not ri!.isone(el) then
+            return el;
+        fi;
+    od;
+    return fail;
+  end;
 
-  repeat
-    y:=RandomElm(ri,"simplesocle",true).el;
-    comm:=Comm(x,y);
-  until not ri!.isone(comm);
+  # find a non-trivial element of g
+  x := FindNonTrivial(x -> x);
+  if x = fail then
+      return fail;
+  fi;
 
-  repeat
-    y:=RandomElm(ri,"simplesocle",true).el;
-    comm2:=Comm(comm,comm^y);
-  until not ri!.isone(comm2);
+  comm := FindNonTrivial(y -> Comm(x,y));
+  if comm = fail then
+      return fail;
+  fi;
 
-  repeat
-    y:=RandomElm(ri,"simplesocle",true).el;
-    comm3:=Comm(comm2,comm2^y);
-  until not ri!.isone(comm3);
+  comm2 := FindNonTrivial(y -> Comm(comm,comm^y));
+  if comm2 = fail then
+      return fail;
+  fi;
+
+  comm3 := FindNonTrivial(y -> Comm(comm2,comm2^y));
+  if comm3 = fail then
+      return fail;
+  fi;
 
   gensH:=FastNormalClosure(g,[comm3],20);
 
@@ -697,10 +718,15 @@ end;
 BindRecogMethod("FindHomMethodsProjective", "ComputeSimpleSocle",
 "compute simple socle of almost simple group",
 function(ri)
-  local G,x;
+  local G,soclegens,x;
   G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"ComputeSimpleSocle");
-  ri!.simplesocle := Group(RECOG.simplesocle(ri,G));
+  soclegens := RECOG.simplesocle(ri,G);
+  if soclegens = fail then
+      Info(InfoRecog,2,"ComputeSimpleSocle: giving up.");
+      return TemporaryFailure;
+  fi;
+  ri!.simplesocle := Group(soclegens);
   ri!.simplesoclepr := ProductReplacer(ri!.simplesocle);
   ri!.simplesoclerand := EmptyPlist(100);
   Append(ri!.simplesoclerand,GeneratorsOfGroup(ri!.simplesocle));
@@ -754,6 +780,9 @@ BindRecogMethod("FindHomMethodsProjective", "ThreeLargeElOrders",
 function(ri)
   local G,hint,name,namecat,p,res;
   G := Grp(ri);
+  if not IsBound(ri!.simplesocle) then
+      return TemporaryFailure;
+  fi;
   RECOG.SetPseudoRandomStamp(G,"ThreeLargeElOrders");
   ri!.simplesoclerandp := 0;
   p := RECOG.findchar(ri,ri!.simplesocle,RECOG.RandElFuncSimpleSocle);
