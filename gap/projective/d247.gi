@@ -185,6 +185,26 @@ RECOG.DirectFactorsAction := function(data,el)
   return PermList(res);
 end;
 
+RECOG.TryDirectFactorsAction := function(ri,G,facgens,mult)
+  local H,hom,orb;
+
+  orb := RECOG.DirectFactorsFinder(GeneratorsOfGroup(G), facgens, mult,
+                                   ri!.isequal);
+  if orb = fail then
+      return fail;
+  fi;
+
+  H := GroupWithGenerators(orb[2]);
+  hom := GroupHomByFuncWithData(G,H,RECOG.DirectFactorsAction,
+             rec( o := orb[1], eq := ri!.isequal ) );
+  SetHomom(ri,hom);
+  Setmethodsforimage(ri,FindHomDbPerm);
+  Info(InfoRecog,2,"D247: Success, found D7 with action on ",
+       mult," direct factors.");
+  ri!.comment := "D7TensorInduced";
+  return Success;
+end;
+
 RECOG.IsPower := function(d)
   local f, e, g, l, dd;
   # Intended for small d
@@ -208,7 +228,8 @@ RECOG.SortOutReducibleNormalSubgroup :=
     # Only call this with absolutely irreducible G!
     # Only call this if we already know that G is not C3!
 
-    local H,a,basis,collf,conjgensG,f,hom,homcomp,homs,homsimg,kro,o,r,subdim;
+    local H,a,basis,collf,conjgensG,dim,f,hom,homcomp,homs,homsimg,kro,mult,o,
+          r,res,subdim;
 
     f := ri!.field;
     collf := MTX.CollectedFactors(m);
@@ -242,7 +263,15 @@ RECOG.SortOutReducibleNormalSubgroup :=
         if not ForAll(kro, k -> k[1]) then
             Info(InfoRecog,1,"VERY, VERY, STRANGE!");
             Info(InfoRecog,1,"False alarm, was not a tensor decomposition.");
-            ErrorNoReturn("This should never have happened (346), tell Max.");
+            dim := MTX.Dimension(m);
+            mult := First([2..20],i->subdim^i = dim);
+            if mult <> fail then
+                res := RECOG.TryDirectFactorsAction(ri,G,ngens,mult);
+                if res = Success then
+                    return Success;
+                fi;
+            fi;
+            return TemporaryFailure;
         fi;
 
         H := GroupWithGenerators(conjgensG);
@@ -313,7 +342,7 @@ RECOG.SortOutReducibleSecondNormalSubgroup :=
     # Only call this if we already know that G is not C3!
     # Only call this if the upper normal subgroup was still irreducible!
 
-    local H,collf,dim,hom,mult,orb,subdim;
+    local collf,dim,mult,res,subdim;
 
     collf := MTX.CollectedFactors(mm);
     if Length(collf) = 1 then
@@ -321,18 +350,8 @@ RECOG.SortOutReducibleSecondNormalSubgroup :=
         dim := MTX.Dimension(mm);
         mult := First([2..20],i->subdim^i = dim);
         if mult <> fail then
-            orb := RECOG.DirectFactorsFinder(GeneratorsOfGroup(G),
-                                             nngens,mult,ri!.isequal);
-            if orb <> fail then
-                H := GroupWithGenerators(orb[2]);
-                hom := GroupHomByFuncWithData(G,H,
-                           RECOG.DirectFactorsAction,
-                           rec( o := orb[1], eq := ri!.isequal) );
-                SetHomom(ri,hom);
-                Setmethodsforimage(ri,FindHomDbPerm);
-                Info(InfoRecog,2,"D247: Success, found D7 with action",
-                     " on ",mult," direct factors.");
-                ri!.comment := "D7TensorInduced";
+            res := RECOG.TryDirectFactorsAction(ri,G,nngens,mult);
+            if res = Success then
                 return Success;
             else
                 Info(InfoRecog,2,"D247: Did not find direct factors!");
