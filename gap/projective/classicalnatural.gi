@@ -736,7 +736,7 @@ end;
 # Now the code for writing SLPs:
 
 SLPforElementFuncsProjective.PSL2 := function(ri,x)
-  local det,log,slp,y,z,pos,s;
+  local det,pos,root,s,slp,y;
   ri!.fakegens.count := ri!.fakegens.count + 1;
   if ri!.fakegens.count > 1000 then
       ri!.fakegens := RECOG.InitSLfake(ri!.field,2);
@@ -745,9 +745,13 @@ SLPforElementFuncsProjective.PSL2 := function(ri,x)
   y := ri!.nicebas * x * ri!.nicebasi;
   det := DeterminantMat(y);
   if not IsOne(det) then
-      z := PrimitiveRoot(ri!.field);
-      log := LogFFE(det,z);
-      y := y * z^(-log*ri!.gcd.coeff1/ri!.gcd.gcd);
+      # In the projective image, det only has to be a square. If it is not,
+      # then the PSL2 recognition path was too optimistic for this element.
+      root := RootFFE(ri!.field,1/det,2);
+      if root = fail then
+          return fail;
+      fi;
+      y := y * root;
   fi;
   # At this point, y has determinant 1; but we consider it modulo scalars.
   # To make sure that different coset reps behave the same, we scale it
@@ -841,7 +845,7 @@ end;
 BindRecogMethod("FindHomMethodsProjective", "ClassicalNatural",
 "check whether it is a classical group in its natural representation",
 function(ri)
-  local g,changed,classical,d,det,ext,f,gcd,gens,gm,i,p,pr,q,root,std,stdg,z;
+  local g,changed,classical,d,det,ext,f,gcd,gens,gm,i,p,pr,q,root,std,stdg;
   g := Grp(ri);
   d := ri!.dimension;
   f := ri!.field;
@@ -866,14 +870,15 @@ function(ri)
   # Now get rid of nasty determinants:
   gens := ShallowCopy(GeneratorsOfGroup(g));
   changed := false;
-  z := Z(q);
   gcd := Gcdex(d,q-1);
   for i in [1..Length(gens)] do
       det := DeterminantMat(gens[i]);
       if not IsOne(det) then
           root := RootFFE(f, det^-1, d);
           if root = fail then
-              ErrorNoReturn("Should not have happened, 15634, tell Max!");
+              Info(InfoRecog,2,
+                   "ClassicalNatural: determinant cannot be normalized in field.");
+              return fail;
           fi;
           gens[i] := gens[i] * root;
           changed := true;
