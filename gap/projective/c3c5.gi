@@ -866,6 +866,7 @@ function(ri)
       a := OrbActionHomomorphism(G,o);
       SetHomom(ri,a);
       Setmethodsforimage(ri,FindHomDbPerm);
+      Setimmediateverification(ri,true);
 
       return Success;
 

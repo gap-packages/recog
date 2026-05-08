@@ -199,6 +199,7 @@ RECOG.TryDirectFactorsAction := function(ri,G,facgens,mult)
              rec( o := orb[1], eq := ri!.isequal ) );
   SetHomom(ri,hom);
   Setmethodsforimage(ri,FindHomDbPerm);
+  Setimmediateverification(ri,true);
   Info(InfoRecog,2,"D247: Success, found D7 with action on ",
        mult," direct factors.");
   ri!.comment := "D7TensorInduced";
