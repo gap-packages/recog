@@ -148,7 +148,7 @@ RECOG.DirectFactorsFinder := function(gens,facgens,k,eq)
   od;
 
   if Length(o) < k then
-      Info(InfoRecog,1,"Strange, found fewer direct factors than expected!");
+      Info(InfoRecog,2,"Strange, found fewer direct factors than expected!");
       return fail;
   fi;
 
