@@ -58,7 +58,7 @@ gap> for i in [1 .. Length(dataMat)] do
 > od;
 gap> for i in [1 .. Length(nonAltOrSymGroups)] do
 >     ri := RecogNode(nonAltOrSymGroups[i]);
->     if FindHomMethodsGeneric.SnAnUnknownDegree(ri, Grp(ri)) = Success then
+>     if FindHomMethodsGeneric.SnAnUnknownDegree(ri) = Success then
 >         Print("ERROR: Recognised group [", i, "] wrongly as Sn/An!\n");
 >     fi;
 > od;
