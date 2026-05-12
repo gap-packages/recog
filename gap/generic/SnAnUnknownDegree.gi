@@ -1145,6 +1145,8 @@ end;
 # "Fast Constructive Recognition of a Black Box Group Isomorphic to Sn or An using Goldbach’s Conjecture"
 # by Sergey Bratus and Igor Pak,
 # in Chapter 9. "What To Do If n is Not Known?"
+# WARNING: This function is currently UNUSED, we only keep it for the sake of potential
+# future work towards better An/Sn naming, see <https://github.com/gap-packages/recog/issues/348>
 RECOG.GuessSnAnDegree := function(ri, optionlist...)
     local G, r, options, mintries, maxtries, fac, mindego, mindege, ct, proc, g, o, mindeg, o_fact, mindegforg;
     # mindego and mindege will be respectively the smallest possible
