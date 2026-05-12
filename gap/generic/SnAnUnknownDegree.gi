@@ -940,7 +940,9 @@ RECOG.FindImageSnAnSmallDegree := function(ri, n, g, s, t, e)
     return PermList(L);
 end;
 
-# This function is based on the function RECOG.RecogniseSnAn in gap/SnAnBB.gi
+# This function is based on (and uses functions from) the code in gap/SnAnBB.gi
+# which is based on the paper [BLGN+03].
+#
 # ri : recognition node with group G,
 # n : degree
 # stdGensAnWithMemory : standard generators of An < G
@@ -1042,7 +1044,7 @@ end;
 # T : integer, number of iterators
 # N : integer, upper bound for the degree of G
 #
-# This is the main method used by RECOG.RecogniseSnAn and RECOG.RecogniseSnAnLazy.
+# This is the main method used by RECOG.RecogniseSnAnEager and RECOG.RecogniseSnAnLazy.
 #
 # This function returns one of the following:
 # - an isomorphism from G to Sn or An
@@ -1088,13 +1090,13 @@ end;
 
 # This method is an implementation of <Cite Key="JLNP13"/>.
 # From <Cite Key="JLNP13" Where="Theorem 1.1"/>:
-# RECOG.RecogniseSnAn is a one-sided Monte-Carlo algorithm with the following
+# RECOG.RecogniseSnAnEager is a one-sided Monte-Carlo algorithm with the following
 # properties. It takes as input a black-box group <A>G</A>, a natural number
 # <A>N</A> and a real number <A>eps</A> with 0 < <A>eps</A> < 1. If <A>G</A> is
 # isomorphic to An or Sn for some 9 <= <A>n</A> <= <A>N</A>, it returns with
 # probability at least 1 - <A>eps</A> the degree <A>n</A> and an
 # isomorphism from <A>G</A> to An or Sn.
-RECOG.RecogniseSnAn := function(ri, eps, N)
+RECOG.RecogniseSnAnEager := function(ri, eps, N)
     local T, tmp;
     T := Int(Ceil(Log2(1 / Float(eps))));
     tmp := SnAnTryLater;
@@ -1324,7 +1326,7 @@ RECOG.SnAnCacheUpperBoundForDegree := function(ri)
     # fi;
 end;
 
-# See RECOG.RecogniseSnAn. The difference is, that we give up at an earlier
+# Lazy variant of RECOG.RecogniseSnAnEager. The difference is, that we give up at an earlier
 # point, i.e. we try out other recognition methods, before we continue.
 # In order to achieve this, we cache some important values for further
 # computations. It is the main function of SnAnUnknownDegree.
@@ -1339,7 +1341,7 @@ RECOG.RecogniseSnAnLazy := function(ri)
     if N = TemporaryFailure or N = NeverApplicable then
         return N;
     fi;
-    tmp := RECOG.RecogniseSnAnSingleIteration(ri, 1, N);
+    tmp := RECOG.RecogniseSnAnSingleIteration(ri, 1, N);  # TODO: allow varying the 1 ?
     if tmp = TemporaryFailure then
         RECOG.SnAnResetCache(ri);
     elif tmp = SnAnTryLater then
