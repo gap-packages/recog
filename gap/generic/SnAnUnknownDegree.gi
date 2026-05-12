@@ -1144,7 +1144,7 @@ end;
 # by Sergey Bratus and Igor Pak,
 # in Chapter 9. "What To Do If n is Not Known?"
 RECOG.GuessSnAnDegree := function(ri, optionlist...)
-    local G, r, options, mintries, maxtries, fac, mindego, mindege, ct, cto, cte, proc, g, o, mindeg, o_fact, mindegforg;
+    local G, r, options, mintries, maxtries, fac, mindego, mindege, ct, proc, g, o, mindeg, o_fact, mindegforg;
     # mindego and mindege will be respectively the smallest possible
     # degrees of symmetric groups that contain the elements of odd and
     # even orders, in the random sample.
@@ -1181,8 +1181,6 @@ RECOG.GuessSnAnDegree := function(ri, optionlist...)
     # Init Loop
     mindego := 0;
     mindege := 0;
-    cto := 0;
-    cte := 0;
     ct := 0;
     mindeg := 0;
     if mintries < 1 then
@@ -1203,49 +1201,38 @@ RECOG.GuessSnAnDegree := function(ri, optionlist...)
         o_fact := Collected(Factors(o));
         mindegforg := Sum(o_fact, f -> f[1] ^ f[2]); # minimum degree is sum over all prime-powers in factorization
         if o mod 2 = 0 then
-            cte := cte + 1; # counter for even orders
             if mindegforg > mindege then
                 mindege := mindegforg;
                 if mindege > mindeg then
                     mindeg := mindege;
                 fi;
                 ct := 0;
-                # vprintf IsAltsym: "New E, E = %o, O = %o, elt order = %o, Randoms = %o\n", mindege, mindego, o_fact, cte+cto;
             fi;
         else
-            cto := cto + 1; # counter for odd orders
             if mindegforg > mindego then
                 mindego := mindegforg;
                 if mindego > mindeg then
                     mindeg := mindego;
                 fi;
                 ct := 0;
-            # vprintf IsAltsym: "New O, E = %o, O = %o, elt order = %o, Randoms = %o\n", mindege, mindego, o_fact, cte+cto;
             fi;
         fi;
     od;
 
     if ct > maxtries then
-        # vprintf IsAltsym: "maxtries exceeded - giving up!";
         return fail;
     fi;
 
-    # vprintf IsAltsym: "E = %o, O = %o, Randoms = %o\n", mindege, mindego, cte+cto;
-
     if mindego > mindege then
         if mindego <= 6 then
-            # vprintf IsAltsym: "GuessAltsymDegree works only for degree > 6";
             return fail;
         else
-            # vprintf IsAltsym: "Alternating of degree %o\n", mindego;
             return rec(type := "Alternating", degree := mindego);
         fi;
     else
         if mindege <= 6 then
-            # vprintf IsAltsym: "GuessAltsymDegree works only for degree > 6";
             return fail;
         else
-            # vprintf IsAltsym: "Symmetric of degree %o\n", mindege;
             return rec(type := "Symmetric", degree := mindege);
         fi;
     fi;
