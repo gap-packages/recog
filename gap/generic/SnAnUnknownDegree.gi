@@ -253,7 +253,8 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
                 # <Cite Key="JLNP13"/>. The order of r ^ M is a 2-power.
                 # It can be at most 2 ^ logInt2N. Thus, if we find an r such that
                 # (r ^ M) ^ (2 ^ logInt2N) is non-trivial, then we can return
-                # NeverApplicable.
+                # NeverApplicable. I.e. we need one iteration less than in [JLNP13],
+                # which also computes (r ^ M) ^ (2 ^ (longInt2N + 1)).
                 for a in [1 .. logInt2N] do
                     tPowerOld := tPower;
                     tPower := tPower ^ 2;
@@ -283,15 +284,14 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
             # in batches of K conjugates.
             if nrTriedConjugates[curInvolutionPos] >= Ki or nrCommutatingConjugates[curInvolutionPos] >= T then
                 if curInvolutionPos = B then
-                    Li := L;
-                    Li := Minimum(Li, B);
-                    Ki := Ki + K;
-                    Ki := Minimum(Ki, C);
-                    curInvolutionPos := 1;
+                    # Last involution reached. Restart with next batch of conjugates later.
+                    Li := Minimum(L, B); # Reset Li to initial value
+                    Ki := Minimum(Ki+K, C); # Try up to K more conjugates later
+                    curInvolutionPos := 1; # Restart from first involution
                     return SnAnTryLater;
                 elif curInvolutionPos = Li then
-                    Li := Li + L;
-                    Li := Minimum(Li, B);
+                    # End of batch of involutions reached. Try next batch later.
+                    Li := Minimum(Li+L, B);
                     curInvolutionPos := curInvolutionPos + 1;
                     return SnAnTryLater;
                 else
@@ -825,7 +825,10 @@ end;
 # The following two functions RECOG.FindAnElementMappingIToJ and
 # RECOG.FindImageSnAnSmallDegree are used for small degrees, 5 <= n < 11, to
 # compute a monomorphism into Sn based on Jonathan Conder's thesis <Cite
-# Key="C12"/>.
+# Key="C12"/>, Definition 3.2.2.
+#
+# Under that monomorphism s is mapped to a long cycle, t to a three cycle,
+# and the list e (E in Conder's Thesis) to [(1,2,3), (1,2,4), (1,2,5)].
 #
 # In Conder's Thesis: Algorithm 7, ConjugateMap
 # Returns an element c such that under the monomorphism Grp(ri) -> S_n given by
@@ -846,8 +849,6 @@ end;
 # correctness see Theorem 3.5.2.
 # Returns the image of g under the monomorphism Grp(ri) -> S_n given by s and
 # t, for n >= 5.
-# Under that monomorphism s is mapped to a long cycle, t to a three cycle,
-# and the list e (E in Conder's Thesis) to [(1,2,3), (1,2,4), (1,2,5)].
 # Note that the arguments are in a different order than in the thesis, such
 # that they are more consistent with the GAP function FindImageSn.
 RECOG.FindImageSnAnSmallDegree := function(ri, n, g, s, t, e)
@@ -1103,6 +1104,8 @@ RECOG.RecogniseSnAn := function(ri, eps, N)
     return tmp;
 end;
 
+# Returns an integer m such that if the group represented by ri is isomorphic to S_n,
+# then necessarily m <= n
 RECOG.LowerBoundForDegreeOfSnAnViaOrders := function(ri)
     local orders;
     orders := Set(List(
@@ -1145,13 +1148,13 @@ RECOG.GuessSnAnDegree := function(ri, optionlist...)
     # mindego and mindege will be respectively the smallest possible
     # degrees of symmetric groups that contain the elements of odd and
     # even orders, in the random sample.
-    # If mindego > mindege we assume the group is alternating, otherwise
+    # If mindego > mindege we guess that the group is alternating, otherwise
     # that it is symmetric.
 
     G := Grp(ri);
     if  (IsPermGroup(G) and NrMovedPoints(G) <= 6)
-                or (IsMatrixGroup(G) and DimensionOfMatrixGroup(G) < 3) then
-        Print("GuessAltsymDegree works only for degree > 6\n");
+                or (IsMatrixGroup(G) and DimensionOfMatrixGroup(G) <= 2) then
+        Info(InfoRecog, 2, "GuessSnAnDegree works only for permutation degree > 6 or matrix dimension > 2");
         return fail;
     fi;
 
@@ -1206,8 +1209,8 @@ RECOG.GuessSnAnDegree := function(ri, optionlist...)
                 if mindege > mindeg then
                     mindeg := mindege;
                 fi;
-            ct := 0;
-            # vprintf IsAltsym: "New E, E = %o, O = %o, elt order = %o, Randoms = %o\n", mindege, mindego, o_fact, cte+cto;
+                ct := 0;
+                # vprintf IsAltsym: "New E, E = %o, O = %o, elt order = %o, Randoms = %o\n", mindege, mindego, o_fact, cte+cto;
             fi;
         else
             cto := cto + 1; # counter for odd orders
@@ -1318,9 +1321,9 @@ RECOG.SnAnCacheUpperBoundForDegree := function(ri)
     fi;
     N := RECOG.SnAnUpperBoundForDegree(ri);
     cache.N := N;
-    if not IsInt(N) then
-        return;
-    fi;
+    # if not IsInt(N) then
+    #     return;
+    # fi;
     # This is usually much smaller than RECOG.SnAnUpperBoundForDegree.
     # The number to compare N with was chosen arbitrarily as a "large" degree.
     # if N > 20 then
@@ -1346,7 +1349,7 @@ RECOG.RecogniseSnAnLazy := function(ri)
     if N = TemporaryFailure then
         RECOG.SnAnResetCache(ri);
     fi;
-    if not IsInt(N) then
+    if N = TemporaryFailure or N = NeverApplicable then
         return N;
     fi;
     tmp := RECOG.RecogniseSnAnSingleIteration(ri, 1, N);
@@ -1384,8 +1387,7 @@ function(ri, G)
     local recogData, isoData, degree, swapSLP, t;
     # Try to find an isomorphism
     recogData := RECOG.RecogniseSnAnLazy(ri);
-    # RECOG.RecogniseSnAn returned NeverApplicable or TemporaryFailure
-    if not IsRecord(recogData) then
+    if recogData = NeverApplicable or recogData = TemporaryFailure then
         return recogData;
     fi;
     isoData := recogData.isoData;
