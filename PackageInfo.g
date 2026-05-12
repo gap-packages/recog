@@ -18,7 +18,7 @@ SetPackageInfo( rec(
 
 PackageName := "recog",
 Subtitle := "A package for constructive recognition of permutation and matrix groups",
-Version := "1.4.4dev",
+Version := "1.5.0dev",
 Date := "22/01/2025", # dd/mm/yyyy format
 License := "GPL-3.0-or-later",
 
@@ -266,13 +266,13 @@ PackageDoc := rec(
 ),
 
 Dependencies := rec(
-  GAP := ">=4.12",
+  GAP := ">=4.13",
   NeededOtherPackages := [
-    ["AtlasRep", ">= 1.4.0"],
-    ["FactInt", ">= 1.5.2"],
-    ["Forms", ">= 1.2"],
-    ["genss", ">= 1.3"],
-    ["Orb", ">= 3.4"],
+    ["AtlasRep", ">= 2.1.0"],
+    ["FactInt", ">= 1.6.3"],
+    ["Forms", ">= 1.2.11"],
+    ["genss", ">= 1.6.8"],
+    ["Orb", ">= 4.9.0"],  # really should be 5.1.0 for latest bug fixes
   ],
   SuggestedOtherPackages := [],
   ExternalConditions := []
@@ -289,7 +289,7 @@ AutoDoc := rec(
     TitlePage := rec(
         Copyright := Concatenation(
                     "&copyright; 2005-2014 by Max Neunhöffer and Ákos Seress<P/>\n",
-                    "&copyright; 2005-2022 by its authors, see file <F>COPYRIGHT</F> for details.<P/>\n",
+                    "&copyright; 2005-2026 by its authors, see file <F>COPYRIGHT</F> for details.<P/>\n",
                     "\n",
                     "This package may be distributed under the terms and conditions of the\n",
                     "GNU Public License Version 3 or (at your option) any later version.\n"

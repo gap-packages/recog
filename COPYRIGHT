@@ -16,7 +16,7 @@ along with recog; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 
-Copyright (C) 2005-2022 by its authors, which include:
+Copyright (C) 2005-2026 by its authors, which include:
 
 * Ákos Seress
 * Alexander Hulpke
@@ -29,6 +29,7 @@ Copyright (C) 2005-2022 by its authors, which include:
 * Friedrich Rober
 * Gunter Malle
 * Madeleine Whybrow
+* Martin Wagner
 * Maska Law
 * Max Horn
 * Max Neunhöffer
@@ -38,5 +39,7 @@ Copyright (C) 2005-2022 by its authors, which include:
 * Sergio Siccha
 * Stephen Howe
 * Steve Linton
+* Till Müller
+* Torben Wiedemann
 
 and others

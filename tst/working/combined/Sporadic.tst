@@ -6,7 +6,7 @@ gap> TestSporadic := function(name)
 >     g := AtlasGenerators(name,1).generators;
 >     g := Group(g);
 >     ri := RecogNode(g,IsMatrixGroup(g));
->     return FindHomMethodsProjective.NameSporadic(ri, g : DEBUGRECOGSPORADICS);
+>     return FindHomMethodsProjective.NameSporadic(ri : DEBUGRECOGSPORADICS);
 > end;;
 
 #

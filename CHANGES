@@ -1,6 +1,11 @@
 This file describes changes in the recog package.
 
-1.4.4 (2025-01-DD)
+1.5.0 (2026-MM-DD)
+  - Add a first `StdPresentation` implementation (needs further tuning)
+  - Implement verification via a new property `IsCorrect`
+  - Countless bug fixes and other improvements, too many to list individually
+
+1.4.4 (2025-01-22)
   - Fix an unexpected error during recognition when trying to split
     group as direct products (in `RECOG.DirectFactorsFinder`)
   - Fix an unexpected error in `RECOG.SmallHomomorphicImageProjectiveGroup`

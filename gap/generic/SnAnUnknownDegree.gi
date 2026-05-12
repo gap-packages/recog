@@ -1372,9 +1372,9 @@ end;
 #! degrees 5 or 6, then this method might not exit quickly.
 #!
 #! @EndChunk
-BindRecogMethod(FindHomMethodsGeneric, "SnAnUnknownDegree",
+BindRecogMethod("FindHomMethodsGeneric", "SnAnUnknownDegree",
 "method for groups isomorphic to Sn or An with n >= 9",
-function(ri, G)
+function(ri)
     local recogData, isoData, degree, swapSLP, t;
     # Try to find an isomorphism
     recogData := RECOG.RecogniseSnAnLazy(ri);

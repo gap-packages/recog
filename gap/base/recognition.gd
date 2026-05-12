@@ -135,12 +135,12 @@ DeclareAttribute( "Homom", IsRecogNode, "mutable" );
 ##     to set the value of <Ref Attr="NiceGens"/>. By default, the original
 ##     generators of the group at this node are taken. For a homomorphism
 ##     (or isomorphism), the <Ref Attr="NiceGens"/> will be the concatenation
-##     of preimages of the <Ref Attr="NiceGens"/> of the image group
+##     of preimages of the <Ref Attr="NiceGens"/> of the image
 ##     (see <Ref Attr="pregensfac"/>) and
 ##     the <Ref Attr="NiceGens"/> of the kernel. A find homomorphism method
 ##     does not have to set <Ref Attr="NiceGens"/> if it finds a homomorphism.
 ##     Note however, that such a find homomorphism method has to ensure somehow,
-##     that preimages of the <Ref Attr="NiceGens"/> of the image group
+##     that preimages of the <Ref Attr="NiceGens"/> of the image
 ##     can be acquired. See <Ref Attr="calcnicegens"/>, <Ref Func="CalcNiceGens"/>
 ##     and <Ref Attr="slptonice"/>
 ##     for instructions.
@@ -164,8 +164,7 @@ DeclareAttribute( "NiceGens", IsRecogNode, "mutable" );
 ## </ManSection>
 ## <#/GAPDoc>
 DeclareAttribute( "ImageRecogNode", IsRecogNode, "mutable" );
-DeclareSynonymAttr( "RIFac", ImageRecogNode );
-#DeclareObsoleteSynonymAttr( "RIFac", "ImageRecogNode" ); # FIXME: switch this back one
+DeclareObsoleteSynonymAttr( "RIFac", "ImageRecogNode" );
 
 ## <#GAPDoc Label="KernelRecogNode">
 ## <ManSection>
@@ -184,8 +183,7 @@ DeclareSynonymAttr( "RIFac", ImageRecogNode );
 ## </ManSection>
 ## <#/GAPDoc>
 DeclareAttribute( "KernelRecogNode", IsRecogNode, "mutable" );
-DeclareSynonymAttr( "RIKer", KernelRecogNode );
-# DeclareObsoleteSynonymAttr( "RIKer", "KernelRecogNode" ); # FIXME: switch this back one
+DeclareObsoleteSynonymAttr( "RIKer", "KernelRecogNode" );
 
 ## <#GAPDoc Label="ParentRecogNode">
 ## <ManSection>
@@ -204,12 +202,62 @@ DeclareObsoleteSynonymAttr( "RIParent", "ParentRecogNode", 1 );
 ## <ManSection>
 ## <Attr Name="StdPresentation" Arg="ri"/>
 ## <Description>
-##     After the verification phase, the presentation is stored here. Details
-##     have still to be decided upon.
+##     The value of this attribute is an <A>FpGroup</A> <A>P</A> such that the following
+##     holds: The map which maps the generators of <A>P</A> to the nice generators
+##     of <A>ri</A> (in the order prescribed by <A>GeneratorsOfGroup(P)</A>
+##     and <A>NiceGens(ri)</A>, respectively) induces an isomorphism from <A>P</A>
+##     to the group associated to <A>ri</A> (which, in case of a projective node,
+##     is the central quotient of <A>Grp(ri)</A>).
+##     In particular, <A>GeneratorsOfGroup(P)</A> and <A>NiceGens(ri)</A>
+##     have the same size.
+##     This is still work in progress, and details of the implementation may change.
 ## </Description>
 ## </ManSection>
 ## <#/GAPDoc>
-DeclareAttribute( "StdPresentation", IsRecogNode, "mutable" );    # TODO: implement
+DeclareAttribute( "StdPresentation", IsRecogNode, "mutable" );
+
+## <#GAPDoc Label="CalcStdPresentation">
+## <ManSection>
+## <Attr Name="CalcStdPresentation" Arg="ri"/>
+## <Description>
+##     The value of this attribute is a function which takes the recognition node
+##     <A>ri</A> as the first and only argument. Calling this function ensures that
+##     <A>StdPresentation</A> of <A>ri</A> is set. Hence it is usually called as follows:
+##     <Listing>
+##         CalcStdPresentation(ri)(ri);
+##     </Listing>
+## </Description>
+## </ManSection>
+## <#/GAPDoc>
+DeclareAttribute( "CalcStdPresentation", IsRecogNode, "mutable" );
+
+## <#GAPDoc Label="IsCorrect">
+## <ManSection>
+## <Prop Name="IsCorrect" Arg="ri"/>
+## <Description>
+## The recognition procedure may with a small probability produce recognition trees
+## that are not correct.
+## For this reason, it is possible to verify that a recognition tree
+## is mathematically correct by calling <C>IsCorrect</C>.
+## However, this is in general expensive.
+## <P/>
+## A value <K>true</K> of <C>IsCorrect(<A>ri</A>)</C> signifies that the subtree rooted at <A>ri</A>
+## has been verified to be correct.
+## A value of <K>false</K> signifies that there was an attempt of verification,
+## but that this verification resulted in a proof that the subtree rooted at <A>ri</A>
+## is incorrect.
+## <P/>
+## Here correctness of a subtree means the following: If <C>ri2</C> is a node in
+## this subtree, <M>H</M> is the group
+## associated to <A>ri2</A> and <A>riKer</A> is the left child of <A>ri2</A>,
+## then the group associated to <A>riKer</A> (or rather, its embedding into <M>H</M>)
+## equals the kernel of the homomorphism from <M>H</M> to the group associated
+## to the right child of <A>ri2</A>.
+## Without verification, the group of <A>riKer</A> may be smaller than the kernel.
+## </Description>
+## </ManSection>
+## <#/GAPDoc>
+DeclareProperty( "IsCorrect", IsRecogNode );
 
 DeclareProperty( "IsRecogInfoForSimpleGroup", IsRecogNode );
 DeclareProperty( "IsRecogInfoForAlmostSimpleGroup", IsRecogNode );
@@ -220,8 +268,8 @@ InstallTrueMethod( IsRecogInfoForAlmostSimpleGroup, IsRecogInfoForSimpleGroup );
 ## <Attr Name="pregensfac" Arg="ri"/>
 ## <Description>
 ##     The value of this attribute is only set for homomorphism nodes. In that
-##     case it contains preimages of the nice generators in the image group.
-##     This attribute is set automatically by the generic recursive recognition
+##     case it contains preimages of the nice generators in the image. This
+##     attribute is set automatically by the generic recursive recognition
 ##     function using the mechanism described with the attribute
 ##     <Ref Attr="calcnicegens"/> below. A find homomorphism does not have
 ##     to touch this attribute.
@@ -236,17 +284,15 @@ DeclareAttribute( "validatehomominput", IsRecogNode);
 ## <Attr Name="calcnicegens" Arg="ri"/>
 ## <Description>
 ##     To make the recursion work, we have to acquire preimages of the
-##     nice generators in image groups under the homomorphism found.
-##     But we want to keep the information, how the nice generators
-##     were found, locally at the node where they were found. This
-##     attribute solves this problem of acquiring preimages in the following
-##     way: Its value must be a function, taking the recognition
-##     node <A>ri</A> as first argument, and a list <A>origgens</A> of
-##     preimages of the
-##     original generators of the current node, and has to
-##     return corresponding preimages of the nice generators. Usually this
-##     task can be done by storing a straight line program writing the
-##     nice generators in terms of the original generators and executing
+##     nice generators in images under the homomorphism found. But we want to
+##     keep the information, how the nice generators were found, locally at the
+##     node where they were found. This attribute solves this problem of
+##     acquiring preimages in the following way: Its value must be a function,
+##     taking the recognition node <A>ri</A> as first argument, and a list
+##     <A>origgens</A> of preimages of the original generators of the current
+##     node, and has to return corresponding preimages of the nice generators.
+##     Usually this task can be done by storing a straight line program writing
+##     the nice generators in terms of the original generators and executing
 ##     this with inputs <A>origgens</A>. Therefore the default value of
 ##     this attribute is the function <Ref Func="CalcNiceGensGeneric"/>
 ##     described below.
@@ -635,6 +681,10 @@ DeclareGlobalFunction( "CalcNiceGensGeneric" );
 DeclareGlobalFunction( "CalcNiceGensHomNode" );
 DeclareGlobalFunction( "SLPforElementGeneric" );
 
+## TODO: Documentation!
+DeclareGlobalFunction( "CalcStdPresentationGenericLeaf" );
+DeclareGlobalFunction( "CalcStdPresentationGenericNonLeaf" );
+
 ## <#GAPDoc Label="SLPforElement">
 ## <ManSection>
 ## <Func Name="SLPforElement" Arg="ri, x"/>
@@ -650,19 +700,11 @@ DeclareGlobalFunction( "SLPforElementGeneric" );
 DeclareGlobalFunction( "SLPforElement" );
 DeclareOperation( "RandomElm", [ IsRecogNode, IsString, IsBool ] );
 DeclareOperation( "RandomElmOrd", [ IsRecogNode, IsString, IsBool ] );
-DeclareOperation( "RandomElmPpd", [ IsRecogNode, IsString, IsBool ] );
+#DeclareOperation( "RandomElmPpd", [ IsRecogNode, IsString, IsBool ] );
 DeclareOperation( "RandomOrdersSeen", [ IsRecogNode ] );
 DeclareOperation( "StopStoringRandEls", [ IsRecogNode ] );
 DeclareOperation( "GetElmOrd", [ IsRecogNode, IsRecord ] );
-DeclareOperation( "GetElmPpd", [ IsRecogNode, IsRecord ] );
-
-
-# Finally the generic verification procedure:
-
-DeclareGlobalFunction( "VerifyPermGroup" );
-DeclareGlobalFunction( "VerifyMatrixGroup" );
-DeclareGlobalFunction( "VerifyProjectiveGroup" );
-DeclareGlobalFunction( "VerifyGroup" );
+#DeclareOperation( "GetElmPpd", [ IsRecogNode, IsRecord ] );
 
 # Some more user functions:
 

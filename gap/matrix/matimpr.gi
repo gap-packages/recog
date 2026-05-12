@@ -17,44 +17,6 @@
 ##
 #############################################################################
 
-#############################################################################
-##
-#F  OrbitSubspaceWithLimit( <grp>, <U>, <max> ) . . . . . . orbit of subspace
-##
-##  Compute the orbit of a subspace but return fail if the orbit has
-##  more than <max> elements.
-##
-# RECOG.OrbitSubspaceWithLimit := function( grp, U, max )
-# 
-#     local   orb,  orbset, new,  pnt,  img,  gen, gens;
-# 
-#     gens := GeneratorsOfGroup(grp);
-# 
-#     # start with the singleton orbit
-#     orb := [ U ];
-#     orbset := [ U ];
-# 
-#     # loop over all points found
-#     for pnt  in orb  do
-# 
-#         # apply all generators <gen>
-#         for gen  in gens  do
-#             img := OnSubspacesByCanonicalBasis( pnt, gen );
-# 
-#             # add the image <img> to the orbit if it is new
-#             # can perhaps be improved (is now)
-#             if not img in orbset then
-#                 Add( orb, img );
-#                 AddSet( orbset, img );
-#                 if Length(orb) > max then return fail; fi;
-#             fi;
-# 
-#         od;
-# 
-#     od;
-#     return orbset;
-# end;
-
 #
 #  Test if the module hm already has a submodule with a
 #  short enough orbit.
@@ -75,7 +37,6 @@ RECOG.IndexMaxSub := function( hm, grp, d )
     lastorb := fail;
     repeat
         TriangulizeMat(sub); # Find Hermite Normal Form
-        #orb := RECOG.OrbitSubspaceWithLimit(grp, sub, 4 * d );
         orb := Orb(grp,sub,OnSubspacesByCanonicalBasis,
                    rec(storenumbers := true, hashlen := NextPrimeInt(8*d)));
         Enumerate(orb,4*d);
@@ -182,12 +143,12 @@ end;
 #! orbit of subspaces or <K>fail</K>. In the current setup, <Q>short orbit</Q>
 #! is defined to have length at most <M>4d</M>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "LowIndex",
+BindRecogMethod("FindHomMethodsProjective", "LowIndex",
 "find an (imprimitive) action on subspaces",
-function(ri,G)
+function(ri)
   local res;
-  RECOG.SetPseudoRandomStamp(G,"LowIndex");
-  res := RECOG.SmallHomomorphicImageProjectiveGroup(G);
+  RECOG.SetPseudoRandomStamp(Grp(ri),"LowIndex");
+  res := RECOG.SmallHomomorphicImageProjectiveGroup(Grp(ri));
   if res = fail then
       return fail; # FIXME: fail = TemporaryFailure here really correct?
   else
@@ -219,12 +180,13 @@ end);
 #! @BeginChunk DoBaseChangeForBlocks
 #! TODO
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "DoBaseChangeForBlocks",
+BindRecogMethod("FindHomMethodsProjective", "DoBaseChangeForBlocks",
 "Hint TODO",
-function(ri,G)
+function(ri)
   # Do the base change:
-  local H,iso,newgens,ti;
+  local G,H,iso,newgens,ti;
 
+  G := Grp(ri);
   ti := ri!.t^-1;
   newgens := List(GeneratorsOfGroup(G),x->ri!.t*x*ti);
   H := GroupWithGenerators(newgens);
@@ -245,13 +207,13 @@ end);
 #! @BeginChunk Blocks
 #! TODO
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "Blocks",
+BindRecogMethod("FindHomMethodsProjective", "Blocks",
 "Hint TODO",
-function(ri,G)
+function(ri)
   # Here we use BlocksModScalars and then get a kernel of scalar blocks
   # altogether mod scalars.
   local blocks,d,hom,i;
-  hom := IdentityMapping(G);
+  hom := IdentityMapping(Grp(ri));
   SetHomom(ri,hom);
   blocks := [];
   d := ri!.dimension;
@@ -278,12 +240,13 @@ end;
 #! @BeginChunk BlocksBackToMats
 #! TODO
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "BlocksBackToMats",
+BindRecogMethod("FindHomMethodsProjective", "BlocksBackToMats",
 "Hint TODO",
-function(ri,G)
+function(ri)
   # This is only called as hint from Blocks, so we know that we in fact
   # have scalar blocks along the diagonal and nothing else.
-  local H,hom,newgens;
+  local G,H,hom,newgens;
+  G := Grp(ri);
   newgens := List(GeneratorsOfGroup(G),RECOG.HomBackToMats);
   H := Group(newgens);
   hom := GroupHomomorphismByFunction(G,H,RECOG.HomBackToMats);
@@ -299,100 +262,3 @@ function(ri,G)
 
   return Success;
 end);
-
-#FindHomMethodsProjective.BalTreeForBlocks := function(ri,G)
-#  local H,cut,dim,hom,newgens,nrblocks,subdim,gen;
-#  dim := ri!.dimension;
-#  nrblocks := dim / ri!.blocksize;   # this we know from above
-#  if nrblocks = 1 then     # this might happen during the descent into the tree
-#      return false;
-#  fi;
-#  cut := QuoInt(nrblocks,2);  # this is now at least 1
-#  subdim := cut * ri!.blocksize;
-#
-#  # Project onto image:
-#  newgens := List(GeneratorsOfGroup(G),
-#                  x->ExtractSubMatrix(x,[subdim+1..dim],[subdim+1..dim]));
-#  for gen in newgens do
-#      ConvertToMatrixRep(gen);
-#  od;
-#  H := GroupWithGenerators(newgens);
-#  hom := GroupHomByFuncWithData(G,H,RECOG.HomInducedOnFactor,
-#                                rec(subdim := subdim));
-#  SetHomom(ri,hom);
-#
-#  # Create some more kernel generators:
-#  findgensNmeth(ri).args[1] := 20 + nrblocks;
-#
-#  # Pass the block information on to the image:
-#  InitialDataForImageRecogNode(ri).blocksize := ri!.blocksize;
-#  AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsProjective.BalTreeForBlocks, 2000);
-#
-#  # Inform authorities that the kernel can be recognised easily:
-#  InitialDataForKernelRecogNode(ri).subdim := subdim;
-#  InitialDataForKernelRecogNode(ri).blocksize := ri!.blocksize;
-#  AddMethod(InitialDataForKernelRecogNode(ri).hints, FindHomMethodsProjective.BalTreeForBlocksProjKernel, 2000);
-#
-#  # Verify the kernel immediately after its recognition:
-#  Setimmediateverification(ri,true);
-#
-#  return Success;
-#end;
-#
-#RECOG.HomInducedOnSubspace := function(data,el)
-#  local m;
-#  m := ExtractSubMatrix(el,[1..data.subdim],[1..data.subdim]);
-#  # FIXME: no longer necessary, as soon as the new interface is in place
-#  ConvertToMatrixRep(m);
-#  return m;
-#end;
-
-#FindHomMethodsMatrix.InducedOnSubspace := function(ri,G)
-#  local H,dim,gens,hom,newgens,gen,data;
-#  # Are we applicable?
-#  if not IsBound(ri!.subdim) then
-#      return NotEnoughInformation;
-#  fi;
-#
-#  # Project onto subspace:
-#  gens := GeneratorsOfGroup(G);
-#  data := rec(subdim := ri!.subdim);
-#  newgens := List(gens, x->RECOG.HomInducedOnSubspace(data,x));
-#  H := Group(newgens);
-#  hom := GroupHomByFuncWithData(G,H,RECOG.HomInducedOnSubspace,data);
-#
-#  # Now report back:
-#  SetHomom(ri,hom);
-#
-#  # We know that the kernel is a GF(p) vectorspace and thus may need
-#  # quite some generators. Therefore we generate them in a non-standard
-#  # way such that we can be reasonably sure that we got enough:
-#  findgensNmeth(ri).method := FindKernelLowerLeftPGroup;
-#  findgensNmeth(ri).args := [];
-#
-#  # Inform authorities that the kernel can be recognised easily:
-#  InitialDataForKernelRecogNode(ri).subdim := ri!.subdim;
-#  AddMethod(InitialDataForKernelRecogNode(ri).hints, FindHomMethodsMatrix.LowerLeftPGroup, 2000);
-#
-#  return Success;
-#end;
-
-#FindHomMethodsProjective.BalTreeForBlocksProjKernel := function(ri,G)
-#  # We just have to project onto the upper left corner, see
-#  local H,gen,hom,newgens;
-#
-#  newgens := List(GeneratorsOfGroup(G),x->x{[1..ri!.subdim]}{[1..ri!.subdim]});
-#  for gen in newgens do ConvertToMatrixRep(gen); od;
-#  H := Group(newgens);
-#  hom := GroupHomByFuncWithData(G,H,RECOG.HomInducedOnSubspace,
-#                                rec(subdim := ri!.subdim));
-#  SetHomom(ri,hom);
-#
-#  findgensNmeth(ri).method := FindKernelDoNothing;
-#
-#  # But pass on the information on blocks:
-#  InitialDataForImageRecogNode(ri).blocksize := ri!.blocksize;
-#  AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsProjective.BalTreeForBlocks, 2000);
-#
-#  return Success;
-#end;

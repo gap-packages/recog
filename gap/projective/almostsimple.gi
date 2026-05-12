@@ -251,7 +251,7 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
               triesinner := triesinner + 1;
               hm := GModuleByMats(gens,fld);
               if MTX.IsIrreducible(hm) then
-                  Unbind(gens[Length(gens)]);
+                  Remove(gens);
               fi;
           od;
       fi;
@@ -264,10 +264,10 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
               s := MTX.ProperSubmoduleBasis(hm);
               Add(bas,s);
           od;
-          Unbind(bas[Length(bas)]);
-          s := bas[Length(bas)];
-          for i in [Length(bas)-1,Length(bas)-2..1] do
-              s := s * bas[i];
+          Remove(bas); # drop last element, which is `fail`
+          s := Remove(bas);
+          while Length(bas) > 0 do
+              s := s * Remove(bas);
           od;
           # Now s is the basis of a minimal submodule, permute that:
           s := MutableCopyMat(s);
@@ -278,7 +278,6 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
                Length(s),", enumerating orbit...");
           if not IsBound(hint.subspacedims) or
              Length(s) in hint.subspacedims then
-              #orb := RECOG.OrbitSubspaceWithLimit(G,s,orblenlimit);
               orb := Orb(G,s,OnSubspacesByCanonicalBasis,
                          rec(storenumbers := true,
                              hashlen := NextPrimeInt(2*orblenlimit)));
@@ -369,7 +368,7 @@ RECOG.ProduceTrivialStabChainHint := function(name,reps,maxes)
               else
                   Add(values,[QuoInt(Length(o)+99,100),Length(o)]);
               fi;
-              Print("value=",values[Length(values)]," time=",t," orblen=",
+              Print("value=",Last(values)," time=",t," orblen=",
                     Length(o)," subspace=");
               ViewObj(x);
               Print("\n");
@@ -659,29 +658,50 @@ end;
 # is used in FindHomMethodsProjective.ComputeSimpleSocle
 # it computes the non-abelian simple socle randomly (it might
 # underestimates it)
-# if called for an abelian group (even a group with nilpotence class smaller
-# than 3?) it runs in an infinite loop
+# if it cannot find a suitable witness quickly enough, it returns fail
 RECOG.simplesocle := function(ri,g)
-  local x,y,comm,comm2,comm3,gensH;
+  local x,comm,comm2,comm3,gensH,bound,tries,FindNonTrivial;
 
-  repeat
-    x:=RandomElm(ri,"simplesocle",true).el;
-  until not ri!.isone(x);
+  # If H is almost simple with socle S, then the classification of finite
+  # simple groups implies H''' = S. This is because H / S embeds into Out(S),
+  # which is solvable of derived length at most 3. Thus the normal closure in
+  # H of any non-trivial element of H''' is S. Since both the random search
+  # and FastNormalClosure are only heuristics here, this routine must be
+  # allowed to give up.
+  bound := 5 * ri!.dimension;  # this is an arbitrary bound, could be tuned
+  tries := 0;
+  FindNonTrivial := function(f)
+    local i,el;
+    while tries < bound do
+        tries := tries + 1;
+        el := f(RandomElm(ri,"simplesocle",false).el);
+        if not ri!.isone(el) then
+            return el;
+        fi;
+    od;
+    return fail;
+  end;
 
-  repeat
-    y:=RandomElm(ri,"simplesocle",true).el;
-    comm:=Comm(x,y);
-  until not ri!.isone(comm);
+  # find a non-trivial element of g
+  x := FindNonTrivial(x -> x);
+  if x = fail then
+      return fail;
+  fi;
 
-  repeat
-    y:=RandomElm(ri,"simplesocle",true).el;
-    comm2:=Comm(comm,comm^y);
-  until not ri!.isone(comm2);
+  comm := FindNonTrivial(y -> Comm(x,y));
+  if comm = fail then
+      return fail;
+  fi;
 
-  repeat
-    y:=RandomElm(ri,"simplesocle",true).el;
-    comm3:=Comm(comm2,comm2^y);
-  until not ri!.isone(comm3);
+  comm2 := FindNonTrivial(y -> Comm(comm,comm^y));
+  if comm2 = fail then
+      return fail;
+  fi;
+
+  comm3 := FindNonTrivial(y -> Comm(comm2,comm2^y));
+  if comm3 = fail then
+      return fail;
+  fi;
 
   gensH:=FastNormalClosure(g,[comm3],20);
 
@@ -695,12 +715,18 @@ end;
 #! computed the function does not need to be called again for this
 #! node and therefore returns <K>NeverApplicable</K>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "ComputeSimpleSocle",
+BindRecogMethod("FindHomMethodsProjective", "ComputeSimpleSocle",
 "compute simple socle of almost simple group",
-function(ri,G)
-  local x;
+function(ri)
+  local G,soclegens,x;
+  G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"ComputeSimpleSocle");
-  ri!.simplesocle := Group(RECOG.simplesocle(ri,G));
+  soclegens := RECOG.simplesocle(ri,G);
+  if soclegens = fail then
+      Info(InfoRecog,2,"ComputeSimpleSocle: giving up.");
+      return TemporaryFailure;
+  fi;
+  ri!.simplesocle := Group(soclegens);
   ri!.simplesoclepr := ProductReplacer(ri!.simplesocle);
   ri!.simplesoclerand := EmptyPlist(100);
   Append(ri!.simplesoclerand,GeneratorsOfGroup(ri!.simplesocle));
@@ -749,10 +775,14 @@ end;
 #!
 #! This recognition method is based on the paper <Cite Key="KS09"/>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "ThreeLargeElOrders",
+BindRecogMethod("FindHomMethodsProjective", "ThreeLargeElOrders",
 "recognise Lie type groups and get its characteristic",
-function(ri,G)
-  local hint,name,namecat,p,res;
+function(ri)
+  local G,hint,name,namecat,p,res;
+  G := Grp(ri);
+  if not IsBound(ri!.simplesocle) then
+      return TemporaryFailure;
+  fi;
   RECOG.SetPseudoRandomStamp(G,"ThreeLargeElOrders");
   ri!.simplesoclerandp := 0;
   p := RECOG.findchar(ri,ri!.simplesocle,RECOG.RandElFuncSimpleSocle);
@@ -771,10 +801,10 @@ function(ri,G)
               if hint <> fail then
                   res := DoHintedLowIndex(ri,G,hint);
               else   # we use Pete Brooksbank's methods
-                  return SLCR.FindHom(ri,G,2,name[3]);
+                  res := SLCR.FindHom(ri,G,2,name[3]);
               fi;
           else
-              return SLCR.FindHom(ri,G,name[2],name[3]);
+              res := SLCR.FindHom(ri,G,name[2],name[3]);
           fi;
       else
           if Length(name) = 3 then
@@ -786,7 +816,7 @@ function(ri,G)
           fi;
           res := LookupHintForSimple(ri,G,namecat);
       fi;
-      if res = true then
+      if res = true or res = Success then
           return Success;
       fi;
   od;
@@ -941,11 +971,12 @@ end;
 #! This algorithm is probably based on the paper <Cite Key="BLGN+05"/>.
 #! @EndChunk
 # subroutines are in AnSnOnFDPM.gi and also paper reference
-BindRecogMethod(FindHomMethodsProjective, "AltSymBBByDegree",
+BindRecogMethod("FindHomMethodsProjective", "AltSymBBByDegree",
 "try BB recognition for dim+1 and/or dim+2 if sensible",
-function(ri,G)
-  local GG,Gm,RecSnAnEq,RecSnAnIsOne,d,deg,f,fact,hom,newgens,o,orders,p,primes,
+function(ri)
+  local G,GG,Gm,RecSnAnEq,RecSnAnIsOne,d,deg,f,fact,hom,newgens,o,orders,p,primes,
         r,totry;
+  G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"AltSymBBByDegree");
   d := ri!.dimension;
   orders := RandomOrdersSeen(ri);
@@ -1330,11 +1361,12 @@ end;
 #! Afterwards it creates hints that come out of a table for the sporadic
 #! simple groups.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "SporadicsByOrders",
+BindRecogMethod("FindHomMethodsProjective", "SporadicsByOrders",
 "generate a few random elements and compute the proj. orders",
-function(ri,G)
-  local count,gens,i,j,jj,k,killers,l,limit,o,ordersseen,pp,r,raus,res,x;
+function(ri)
+  local G,count,gens,i,j,jj,k,killers,l,limit,o,ordersseen,pp,r,raus,res,x;
 
+  G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"SporadicsByOrders");
 
   l := [1..Length(RECOG.SporadicsNames)];
@@ -1529,10 +1561,9 @@ RECOG.NameSporadicData := MakeImmutable([
 #! simple groups nor the Monster and the Baby Monster group. It is based on the
 #! Magma v2.24.10 function <C>RecognizeSporadic</C>.
 #! @EndChunk
-# TODO G is unused
-BindRecogMethod(FindHomMethodsProjective, "NameSporadic",
+BindRecogMethod("FindHomMethodsProjective", "NameSporadic",
 "generate maximal orders",
-function(ri, G)
+function(ri)
     local orders, setOfOrders, maximalOrders, isMaximal,
         namesOfPossibleSporadics, res, i, j, data, name;
     orders := [];
@@ -1544,7 +1575,7 @@ function(ri, G)
     # order of another group element.
     setOfOrders := AsSet(orders);
     # All orders we look for are <= 66.
-    if setOfOrders[Length(setOfOrders)] > 67 then
+    if Last(setOfOrders) > 67 then
         return NeverApplicable;
     fi;
     maximalOrders := [];

@@ -8,27 +8,36 @@ behind the package.
 <Chapter Label="intro">
 <Heading>Introduction</Heading>
 
-<Section Label="philosophy">
-<Heading>Philosophy</Heading>
+This package is about group recognition.<P/>
 
-This package is about group recognition. It provides a generic
-framework to implement methods of group recognition, regardless of
-what computational representation is used. This means, that the code
-in this package is useful at least for permutation groups, and matrix
-groups and projective groups over finite fields.
-The setup is described in <Cite Key="NS06"/>. <P/>
+In computational group theory, group recognition is the task of identifying a
+given group. The main goal is to determine whether the given group is isomorphic to a
+well-understood group, such as a symmetric group or a classical matrix
+group, and to construct an explicit isomorphism between the two groups. The first
+task is called <Q>naming</Q> or <Q>non-constructive</Q> recognition, the latter
+task is called <Q>constructive</Q> recognition.<P/>
 
-The framework allows to build composition trees and handles the builtup
+The <Package>recog</Package> package is a generic framework that implements
+algorithms to recognise groups, regardless of what computational representation
+is used. This means, that the code in this package is useful at least for
+permutation groups, matrix groups and projective groups over finite fields.
+The setup is described in <Cite Key="NS06"/>.<P/>
+
+The framework allows to build composition trees and handles the built-up
 and usage of these trees in a generic way. It also contains a
 method selection (described in Chapter <Ref Chap="methsel"/>) that allows
 to install recognition methods in a convenient way and that automatically
 tries to try the different available methods in a sensible order.
-</Section>
 
 <Section Label="overview">
 <Heading>Overview over this manual</Heading>
 
 Chapter <Ref Chap="install"/> describes the installation of this package.<P/>
+
+Chapter <Ref Chap="user"/> presents a user-friendly introduction to this
+package. Furthermore, some instructive examples of the usage of this package
+are shown in section <Ref Sect="examples"/> and possible applications of a
+completed recognition tree are explained in section <Ref Sect="application"/>. <P/>
 
 Chapter <Ref Chap="recognition"/> describes the generic, recursive procedure
 used for group recognition throughout this package. At the heart of this
@@ -44,12 +53,6 @@ useful in other circumstances.<P/>
 
 Chapter <Ref Chap="methods"/> describes the available <Q>FindHomomorphism</Q>
 methods.<P/>
-
-Chapter <Ref Chap="afterrecog"/> explains what one can do with a
-completed recognition tree.<P/>
-
-Finally, Chapter <Ref Chap="examples"/> shows some instructive examples of the
-usage of this package.<P/>
 
 </Section>
 

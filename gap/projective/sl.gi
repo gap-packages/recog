@@ -1,12 +1,401 @@
+#############################################################################
+##
+##  This file is part of recog, a package for the GAP computer algebra system
+##  which provides a collection of methods for the constructive recognition
+##  of groups.
+##
+##  This files's authors include Max Neunhöffer, Ákos Seress.
+##
+##  Copyright of recog belongs to its developers whose names are too numerous
+##  to list here. Please refer to the COPYRIGHT file for details.
+##
+##  SPDX-License-Identifier: GPL-3.0-or-later
+##
+##
+##  Constructive recognition of classical groups in their natural
+##  representation.
+##
+##  This is the SL_n code by Ákos and Max, the precursor for Daniel's code.
+##  Thus it will become unused once we switch to Daniel's code.
+##
+#############################################################################
+
+
+# TODO: which algorithm is this? reference?
+RECOG.FindStdGens_SL := function(sld)
+  # gens of sld must be gens for SL(d,q) in its natural rep with memory
+  # This function calls RECOG.SLn_constructsl2 and then extends
+  # the basis to a basis of the full row space and calls
+  # RECOG.SLn_UpStep often enough. Finally it returns an slp such
+  # that the SL(d,q) standard generators with respect to this basis are
+  # expressed by the slp in terms of the original generators of sld.
+  local V,b,bas,basi,basit,d,data,ext,fakegens,id,nu,nu2,p,q,resl2,sl2,sl2gens,
+        sl2gensf,sl2genss,sl2stdf,slp,slpsl2std,slptosl2,st,std,stdgens,i,ex,f;
+
+  # Some setup:
+  f := FieldOfMatrixGroup(sld);
+  p := Characteristic(f);
+  q := Size(f);
+  ext := DegreeOverPrimeField(f);
+  d := DimensionOfMatrixGroup(sld);
+  if not IsObjWithMemory(GeneratorsOfGroup(sld)[1]) then
+      sld := GroupWithMemory(sld);
+  fi;
+
+  # First find an SL2 with the space it acts on:
+  Info(InfoRecog,2,"Finding an SL2...");
+  data := RECOG.SLn_constructsl2(sld,d,q);
+
+  bas := ShallowCopy(BasisVectors(Basis(data[2])));
+  sl2 := data[1];
+  slptosl2 := SLPOfElms(GeneratorsOfGroup(sl2));
+  sl2gens := StripMemory(GeneratorsOfGroup(sl2));
+  V := data[2];
+  b := Basis(V,bas);
+  sl2genss := List(sl2gens,x->RECOG.LinearAction(b,f,x));
+
+  if q in [2,3,4,5,9] then
+      Info(InfoRecog,2,"In fact found an SL4...");
+      stdgens := RECOG.MakeSL_StdGens(p,ext,4,4).all;
+      slpsl2std := RECOG.FindStdGensUsingBSGS(Group(sl2genss),stdgens,
+                                              false,false);
+      nu := List(sl2gens,x->NullspaceMat(x-One(x)));
+      ex := SumIntersectionMat(nu[1],nu[2])[2];
+      for i in [3..Length(nu)] do
+          ex := SumIntersectionMat(nu[3],ex);
+      od;
+      Append(bas,ex);
+      ConvertToMatrixRep(bas,q);
+      basi := bas^-1;
+  else
+      # Now compute the natural SL2 action and run constructive recognition:
+      Info(InfoRecog,2,
+           "Recognising this SL2 constructively in 2 dimensions...");
+      sl2genss := GeneratorsWithMemory(sl2genss);
+      resl2 := RECOG.RecogniseSL2Natural(Group(sl2genss),f);
+      slpsl2std := SLPOfElms(resl2.all);
+      bas := resl2.bas * bas;
+      # We need the actual transvections:
+      slp := SLPOfElms([resl2.s[1],resl2.t[1]]);
+      st := ResultOfStraightLineProgram(slp,
+                                        StripMemory(GeneratorsOfGroup(sl2)));
+
+      # Extend basis by something invariant under SL2:
+      id := IdentityMat(d,f);
+      nu := NullspaceMat(StripMemory(st[1]-id));
+      nu2 := NullspaceMat(StripMemory(st[2]-id));
+      Append(bas,SumIntersectionMat(nu,nu2)[2]);
+      ConvertToMatrixRep(bas,q);
+      basi := bas^-1;
+  fi;
+
+  # Now set up fake generators for keeping track what we do:
+  fakegens := ListWithIdenticalEntries(Length(GeneratorsOfGroup(sld)),1);
+  fakegens := GeneratorsWithMemory(fakegens);
+  sl2gensf := ResultOfStraightLineProgram(slptosl2,fakegens);
+  sl2stdf := ResultOfStraightLineProgram(slpsl2std,sl2gensf);
+  std := rec( f := f, d := d, n := 2, bas := bas, basi := basi,
+              sld := sld, sldf := fakegens, slnstdf := sl2stdf,
+              p := p, ext := ext );
+  Info(InfoRecog,2,"Going up to SL_d again...");
+  while std.n < std.d do
+      RECOG.SLn_UpStep(std);
+  od;
+  return rec( slpstd := SLPOfElms(std.slnstdf),
+              bas := std.bas, basi := std.basi );
+end;
+
+
+
+
+
+# The going down method:
+
+#Version 1.2
+
+# finds first element of a list that is relative prime to all others
+# input: list=[SL(d,q), d, q, SL(n,q)] acting as a subgroup of some big SL(n,q)
+# output: list=[rr, dd] for a ppd(2*dd;q)-element rr
+RECOG.SLn_godown:=function(list)
+  local d, first, q, g, gg, i, r, pol, factors, degrees, newdim, power, rr, ss,
+  newgroup, colldegrees, exp, count;
+
+  first:=function(list)
+  local i;
+
+  for i in [1..Length(list)] do
+      if list[i]>1 and Gcd(list[i],Product(list)/list[i])=1 then
+         return list[i];
+      fi;
+  od;
+
+  return fail;
+  end;
+
+  g:=list[1];
+  d:=list[2];
+  q:=list[3];
+  gg:=list[4];
+
+  Info(InfoRecog,2,"Dimension: ",d);
+  #find an element with irreducible action of relative prime dimension to
+  #all other invariant subspaces
+  #count is just safety, if things go very bad
+  count:=0;
+
+  repeat
+     count:=count+1;
+  if InfoLevel(InfoRecog) >= 3 then Print(".\c"); fi;
+     r:=PseudoRandom(g);
+     pol:=CharacteristicPolynomial(r);
+     factors:=Factors(pol);
+     degrees:=AsSortedList(List(factors,Degree));
+     newdim:=first(degrees);
+  until (count>10) or (newdim <> fail and newdim<=Maximum(2,d/4));
+
+  if count>10 then
+     return fail;
+  fi;
+
+  # raise r to a power so that acting trivially outside one invariant subspace
+  degrees:=Filtered(degrees, x->x<>newdim);
+  colldegrees:=Collected(degrees);
+  power:=Lcm(List(degrees, x->q^x-1))*q;
+  # power further to cancel q-part of element order
+  if degrees[1]=1 then
+     exp:=colldegrees[1][2]-(DimensionOfMatrixGroup(gg)-d);
+     if exp>0 then
+       power:=power*q^exp;
+     fi;
+  fi;
+  rr:=r^power;
+
+  #conjugate rr to hopefully get a smaller dimensional SL
+  #ss:=rr^PseudoRandom(gg);
+  #newgroup:=Group(rr,ss);
+
+  return [rr,newdim];
+end;
+
+# input is (group,dimension,q)
+# output is a group element acting irreducibly in two dimensions, and fixing
+# a (dimension-2)-dimensional subspace
+RECOG.SLn_constructppd2:=function(g,dim,q)
+  local out, list ;
+
+  list:=[g,dim,q,g];
+  repeat
+     out:=RECOG.SLn_godown(list);
+     if out=fail or out[1]*out[1]=One(out[1]) then
+        if InfoLevel(InfoRecog) >= 3 then Print("B\c"); fi;
+        list:=[g,dim,q,g];
+        out:=fail;
+     else
+        if out[2]>2 then
+           list:=[Group(out[1],out[1]^PseudoRandom(g)),2*out[2],q,g];
+        fi;
+     fi;
+  until out<>fail and out[2]=2;
+
+  return out[1];
+
+end;
+
+RECOG.SLn_constructsl4:=function(g,dim,q,r)
+  local s,h,count,readydim4,readydim3,ready,u,orderu,
+        nullr,nulls,nullspacer,nullspaces,int,intbasis,nullintbasis,
+        newu,newbasis,newbasisinv,newr,news,outputu,mat,i,shorts,shortr;
+  nullr:=NullspaceMat(StripMemory(r)-One(StripMemory(r)));
+  nullspacer:=VectorSpace(GF(q),nullr);
+  mat:=One(r);
+  ready:=false;
+  repeat
+    s:=r^PseudoRandom(g);
+    nulls:=NullspaceMat(StripMemory(s)-One(StripMemory(s)));
+    nullspaces:=VectorSpace(GF(q),nulls);
+    int:=Intersection(nullspacer,nullspaces);
+    intbasis:=Basis(int);
+    newbasis:=[];
+    for i in [1..Length(intbasis)] do
+        Add(newbasis,intbasis[i]);
+    od;
+    i:=0;
+    repeat
+       i:=i+1;
+       if not mat[i] in int then
+          Add(newbasis,mat[i]);
+          int:=VectorSpace(GF(q),newbasis);
+       fi;
+    until Dimension(int)=dim;
+    ConvertToMatrixRep(newbasis);
+    newbasisinv:=newbasis^(-1);
+    newr:=newbasis*r*newbasisinv;
+    news:=newbasis*s*newbasisinv;
+
+    #shortr, shorts do not need memory
+    #we shall throw away the computations in h
+    #check that we have SL(4,q), by non-constructive recognition
+    shortr:=newr{[dim-3..dim]}{[dim-3..dim]};
+    shorts:=news{[dim-3..dim]}{[dim-3..dim]};
+    h:=Group(shortr,shorts);
+    count:=0;
+    readydim4:=false;
+    readydim3:=false;
+    repeat
+       u:=PseudoRandom(h);
+       orderu:=Order(u);
+       if orderu mod ((q^4-1)/(q-1)) = 0 then
+          readydim4:=true;
+       elif Gcd(orderu,(q^2+q+1)/Gcd(3,q-1))>1 then
+          readydim3:=true;
+       fi;
+       if readydim4 = true and readydim3 = true then
+          ready:=true;
+          break;
+       fi;
+       count:=count+1;
+    until count=30;
+  until ready=true;
+
+  return Group(r,s);
+end;
+
+
+#g=SL(d,q), given as a subgroup of SL(dim,q)
+#output: [SL(2,q), and a basis for the 2-dimensional subspace where it acts
+RECOG.SLn_godownfromd:=function(g,q,d,dim)
+  local y,yy,ready,order,es,dims,subsp,z,x,a,b,c,h,vec,vec2,
+  pol,factors,degrees,comm1,comm2,comm3,image,basis,action,vs,readyqpl1,
+  readyqm1,count,u,orderu;
+
+  repeat
+    ready:=false;
+    y:=PseudoRandom(g);
+    pol:=CharacteristicPolynomial(y);
+    factors:=Factors(pol);
+    degrees:=List(factors,Degree);
+    if d-1 in degrees then
+       order:=Order(y);
+       if order mod (q-1)=0 then
+          yy:=y^(order/(q-1));
+       else
+          yy:=One(y);
+       fi;
+       if not IsOne(yy) then
+            es:= Eigenspaces(GF(q),yy);
+            dims:=List(es,Dimension);
+            if IsSubset(Set([1,d-1,dim-d]),Set(dims)) and
+               (1 in Set(dims)) then
+               es:=Filtered(es,x->Dimension(x)=1);
+               vec:=Basis(es[1])[1];
+               if vec*yy=vec then
+                  vec:=Basis(es[2])[1];
+               fi;
+               repeat
+                  z:=PseudoRandom(g);
+                  x:=yy^z;
+                  a:=Comm(x,yy);
+                  b:=a^yy;
+                  c:=a^x;
+                  comm1:= Comm(a,c);
+                  comm2:=Comm(a,b);
+                  comm3:=Comm(b,c);
+                  if comm1<>One(a) and comm2<>One(a) and
+                    comm3<>One(a) and Comm(comm1,comm2)<>One(a) then
+                    vec2:=vec*z;
+                    vs:=VectorSpace(GF(q),[vec,vec2]);
+                    basis:=Basis(vs);
+                    #check that the action in 2 dimensions is SL(2,q)
+                    #by non-constructive recognition, finding elements of
+                    #order (q-1) and (q+1)
+                    #we do not need memory in the group image
+                    action:=List([a,b,c],x->RECOG.LinearAction(basis,q,x));
+                    image:=Group(action);
+                    count:=0;
+                    readyqpl1:=false;
+                    readyqm1:=false;
+                    repeat
+                       u:=PseudoRandom(image);
+                       orderu:=Order(u);
+                       if orderu = q-1 then
+                          readyqm1:=true;
+                       elif orderu = q+1 then
+                          readyqpl1:=true;
+                       fi;
+                       if readyqm1 = true and readyqpl1 = true then
+                          ready:=true;
+                          break;
+                       fi;
+                       count:=count+1;
+                     until count=20;
+                  fi;
+               until ready=true;
+            fi;
+       fi;
+    fi;
+  until ready;
+
+  h:=Group(a,b,c);
+  subsp:=VectorSpace(GF(q),[vec,vec2]);
+  return [h,subsp];
+
+end;
+
+#going down from 4 to 2 dimensions, when q=2,3,4,5,9
+#just construct the 4-dimensional invariant space and generators
+#for the group acting on it
+RECOG.SLn_exceptionalgodown:=function(h,q,dim)
+  local basis, v, vs, i, gen;
+
+  vs:=VectorSpace(GF(q),One(h));
+  basis:=[];
+  repeat
+     if InfoLevel(InfoRecog) >= 3 then Print("C"); fi;
+     for i in [1..4] do
+        v:=PseudoRandom(vs);
+        for gen in GeneratorsOfGroup(h) do
+           Add(basis,v*gen-v);
+        od;
+     od;
+     basis:=ShallowCopy(SemiEchelonMat(basis).vectors);
+  until Length(basis)=4;
+  return [h,VectorSpace(GF(q),basis)];
+end;
+
+
+RECOG.SLn_constructsl2:=function(g,d,q)
+  local r,h;
+
+  r:=RECOG.SLn_constructppd2(g,d,q);
+  h:=RECOG.SLn_constructsl4(g,d,q,r);
+  if not (q in [2,3,4,5,9]) then
+     return RECOG.SLn_godownfromd(h,q,4,d);
+  else
+     return RECOG.SLn_exceptionalgodown(h,q,d);
+  #   return ["sorry only SL(4,q)",h];
+  fi;
+end;
+
+# Now the going up code:
+
 RECOG.LinearAction := function(bas,field,el)
   local mat,vecs;
-  vecs := BasisVectors(bas);
+  if IsGroup(el) then
+      return Group(List(GeneratorsOfGroup(el),
+                        x->RECOG.LinearAction(bas,field,x)));
+  fi;
+  if IsBasis(bas) then
+      vecs := BasisVectors(bas);
+  else
+      vecs := bas;
+      bas := Basis(VectorSpace(field,bas),bas);
+  fi;
   mat := List(vecs,v->Coefficients(bas,v*el));
   ConvertToMatrixRep(mat,field);
   return mat;
 end;
 
-SLnUpStep := function(w)
+RECOG.SLn_UpStep := function(w)
   # w has components:
   #   d       : size of big SL
   #   n       : size of small SL
@@ -33,7 +422,10 @@ SLnUpStep := function(w)
   #   bas, basi is a base change to the target base
   #   slnstdf are SLPs to reach standard generators of SL_n from the
   #       generators of sld
-  local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,ci,cii,coeffs,flag,i,id,int1,int3,j,k,lambda,list,mat,newbas,newbasf,newbasfi,newbasi,newdim,newpart,perm,pivots,pivots2,pos,pow,s,sf,slp,std,sum1,tf,trans,transd,transr,v,vals,zerovec;
+  local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
+        ci,cii,coeffs,flag,i,id,int1,int3,j,k,lambda,list,mat,newbas,newbasf,
+        newbasfi,newbasi,newdim,newpart,perm,pivots,pivots2,pos,pow,s,sf,
+        slp,std,sum1,tf,trans,transd,transr,v,vals,zerovec;
 
   Info(InfoRecog,3,"Going up: ",w.n," (",w.d,")...");
 
@@ -96,7 +488,7 @@ SLnUpStep := function(w)
             fi;
         od;
     else
-        Error("either i or j must be equal to n");
+        ErrorNoReturn("either i or j must be equal to n");
     fi;
     return el;
   end;
@@ -126,7 +518,7 @@ SLnUpStep := function(w)
             fi;
         od;
     else
-        Error("either i or j must be equal to n");
+        ErrorNoReturn("either i or j must be equal to n");
     fi;
     return el;
   end;
@@ -155,12 +547,12 @@ SLnUpStep := function(w)
             sf := w.slnstdf[2*w.ext+1];
           fi;
       else
-          Error("this program only works for odd n or n=2");
+          ErrorNoReturn("this program only works for odd n or n=2");
       fi;
   else
       # In this case the n-1-cycle is the identity, so we take a transvection:
       s := MutableCopyMat(id);
-      s[1][2] := One(w.f);
+      s[1,2] := One(w.f);
       sf := w.slnstdf[1];
   fi;
 
@@ -170,7 +562,7 @@ SLnUpStep := function(w)
   newdim := aimdim - w.n;
   while true do   # will be left by break
       while true do    # will be left by break
-          Print(".\c");
+          if InfoLevel(InfoRecog) >= 3 then Print(".\c"); fi;
           w.count := w.count + 1;
           c1 := PseudoRandom(w.sld);
           slp := SLPOfElm(c1);
@@ -191,11 +583,11 @@ SLnUpStep := function(w)
                   if not IsZero(v[w.n]) then break; fi;
               od;
               if IsZero(v[w.n]) then
-                  Print("Ooops: Component n was zero!\n");
+                  Info(InfoRecog,2,"Ooops: Component n was zero!");
                   continue;
               fi;
               v := v / v[w.n];   # normalize to 1 in position n
-              Assert(0,v*c=v);
+              Assert(1,v*c=v);
               ci := c^-1;
               break;
           fi;
@@ -211,7 +603,7 @@ SLnUpStep := function(w)
       # Clean out the first n entries to go to the fixed space of SL_n:
       zerovec := Zero(newpart[1]);
       for i in [1..w.n-1] do
-          CopySubVector(zerovec,newpart[i],[1..w.n],[1..w.n]);
+          RECOG.CopySubVectorCompat(zerovec,newpart[i],[1..w.n],[1..w.n]);
       od;
       MB := MutableBasis(w.f,[],zerovec);
       i := 1;
@@ -226,18 +618,21 @@ SLnUpStep := function(w)
       newbas := Concatenation(id{[1..w.n-1]},[v],newpart);
       if 2*w.n-1 < w.d then
           int3 := Intersection(FixSLn,Fixc);
-          Assert(0,Dimension(int3)=w.d-2*w.n+1);
+          if Dimension(int3) <> w.d-2*w.n+1 then
+              Info(InfoRecog,2,"Ooops, FixSLn \cap Fixc wrong dimension");
+              continue;
+          fi;
           Append(newbas,BasisVectors(Basis(int3)));
       fi;
-      ConvertToMatrixRep(newbas,Size(w.f));
+      ConvertToMatrixRep(newbas,w.f);
       newbasi := newbas^-1;
       if newbasi = fail then
-          Print("Ooops, Fixc intersected too much, we try again\n");
+          Info(InfoRecog,2,"Ooops, Fixc intersected too much, we try again");
           continue;
       fi;
       ci := newbas * ci * newbasi;
       cii := ExtractSubMatrix(ci,[w.n+1..aimdim],[1..w.n-1]);
-      ConvertToMatrixRep(cii,Size(w.f));
+      ConvertToMatrixRep(cii,w.f);
       cii := TransposedMat(cii);
       # The rows of cii are now what used to be the columns,
       # their length is newdim, we need to span the full newdim-dimensional
@@ -260,13 +655,11 @@ SLnUpStep := function(w)
           w.basi := w.basi * newbasi;
           break;
       fi;
-      Print("Ooops, no nice bottom...\n");
+      Info(InfoRecog,2,"Ooops, no nice bottom...");
       # Otherwise simply try again
   od;
-  Print(" found c1 and c.\n");
+  Info(InfoRecog,2," found c1 and c.");
   # Now SL_n has to be repaired according to the base change newbas:
-
-# Error(1);
 
   # Now write this matrix newbas as an SLP in the standard generators
   # of our SL_n. Then we know which generators to take for our new
@@ -282,8 +675,6 @@ SLnUpStep := function(w)
   # Now update caches:
   w.transh := List(w.transh,x->newbasfi * x * newbasf);
   w.transv := List(w.transv,x->newbasfi * x * newbasf);
-
-# Error(2);
 
   # Now consider the transvections t_i:
   # t_i : w.bas[j] -> w.bas[j]        for j <> i and
@@ -301,17 +692,15 @@ SLnUpStep := function(w)
           # Now cleanup in column n above row n, the entries there
           # are lambda times the stuff in column i of ci:
           for j in [1..w.n-1] do
-              tf := DoRowOp_n(tf,j,w.n,-ci[j][i]*lambda,w);
+              tf := DoRowOp_n(tf,j,w.n,-ci[j,i]*lambda,w);
           od;
           Add(trans,tf);
       od;
   od;
 
-# Error(3);
-
   # Now put together the clean ones by our knowledge of c^-1:
   transd := [];
-  for i in pivots2 do
+  for i in [1..Length(pivots2)] do
       for lambda in w.canb do
           tf := w.One;
           vals := BlownUpVector(w.can,cii[i]*lambda);
@@ -330,8 +719,6 @@ SLnUpStep := function(w)
   od;
   Unbind(trans);
 
-# Error(4);
-
   # Now to the "horizontal" transvections, first create them as SLPs:
   transr := [];
   for i in pivots do
@@ -342,11 +729,11 @@ SLnUpStep := function(w)
       tf := cfi*tf*cf;
       # Now cleanup in rows above row n:
       for j in [1..w.n-1] do
-          tf := DoRowOp_n(tf,j,w.n,-ci[j][w.n],w);
+          tf := DoRowOp_n(tf,j,w.n,-ci[j,w.n],w);
       od;
       # Now cleanup in rows below row n:
       for j in [1..newdim] do
-          coeffs := IntVecFFE(Coefficients(w.can,-ci[w.n+j][w.n]));
+          coeffs := IntVecFFE(Coefficients(w.can,-ci[w.n+j,w.n]));
           for k in [1..w.ext] do
               if not IsZero(coeffs[k]) then
                   if IsOne(coeffs[k]) then
@@ -359,15 +746,15 @@ SLnUpStep := function(w)
       od;
       # Now cleanup column n above row n:
       for j in [1..w.n-1] do
-          tf := DoColOp_n(tf,j,w.n,ci[j][w.n],w);
+          tf := DoColOp_n(tf,j,w.n,ci[j,w.n],w);
       od;
       # Now cleanup row n left of column n:
       for j in [1..w.n-1] do
-          tf := DoRowOp_n(tf,w.n,j,-c[i][j],w);
+          tf := DoRowOp_n(tf,w.n,j,-c[i,j],w);
       od;
       # Now cleanup column n below row n:
       for j in [1..newdim] do
-          coeffs := IntVecFFE(Coefficients(w.can,ci[w.n+j][w.n]));
+          coeffs := IntVecFFE(Coefficients(w.can,ci[w.n+j,w.n]));
           for k in [1..w.ext] do
               if not IsZero(coeffs[k]) then
                   if IsOne(coeffs[k]) then
@@ -380,8 +767,6 @@ SLnUpStep := function(w)
       od;
       Add(transr,tf);
   od;
-
-# Error(5);
 
   # From here on we distinguish three cases:
   #   * w.n = 2
@@ -453,6 +838,7 @@ SLnUpStep := function(w)
   list := Concatenation([1..w.n-1],[w.n+1..2*w.n-1],[w.n],[2*w.n..w.d]);
   perm := PermList(list);
   mat := PermutationMat(perm^-1,w.d,w.f);
+  ConvertToMatrixRep(mat,w.f);
   w.bas := w.bas{list};
   ConvertToMatrixRep(w.bas,w.f);
   w.basi := w.basi*mat;
@@ -465,54 +851,3 @@ SLnUpStep := function(w)
   w.n := 2*w.n-1;
   return w;
 end;
-
-MakeSituation := function(p,e,n,d)
-  local a,q,r;
-  q := p^e;
-  a := RECOG.MakeSL_StdGens(p,e,n,d).all;
-  Append(a,GeneratorsOfGroup(SL(d,q)));
-  a := GeneratorsWithMemory(a);
-  r := rec( f := GF(q), d := d, n := n, bas := IdentityMat(d,GF(q)),
-            basi := IdentityMat(d,GF(q)), sld := Group(a),
-            sldf := a, slnstdf := a{[1..2*e+2]}, p := p, ext := e );
-  return r;
-end;
-
-MakeTest := function(p,e,n,d)
-  local a,fake,q,r;
-  q := p^e;
-  a := RECOG.MakeSL_StdGens(p,e,n,d).all;
-  Append(a,GeneratorsOfGroup(SL(d,q)));
-  a := GeneratorsWithMemory(a);
-  fake := GeneratorsWithMemory(List([1..Length(a)],i->()));
-  r := rec( f := GF(q), d := d, n := n, bas := IdentityMat(d,GF(q)),
-            basi := IdentityMat(d,GF(q)), sld := Group(a),
-            sldf := fake, slnstdf := fake{[1..2*e+2]}, p := p, ext := e );
-  return r;
-end;
-
-guck :=
-function ( w )
-    local  i;
-    for i  in w.slnstdf  do
-        Display( w.bas * i * w.basi );
-    od;
-    if IsBound( w.transh )  then
-        for i  in [ 1 .. Length( w.transh ) ]  do
-            Print( i, "\n" );
-            if IsBound(w.transh[i]) then
-                Display( w.bas * w.transh[i] * w.basi );
-            fi;
-        od;
-    fi;
-    if IsBound( w.transv )  then
-        for i  in [ 1 .. Length( w.transv ) ]  do
-            Print( i, "\n" );
-            if IsBound(w.transv[i]) then
-                Display( w.bas * w.transv[i] * w.basi );
-            fi;
-        od;
-    fi;
-    return;
-end;
-

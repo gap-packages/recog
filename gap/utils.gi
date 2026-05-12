@@ -130,3 +130,18 @@ RECOG.CachePrimesUpTo := function(n)
     RECOG.PrimesCacheUpperBound := n;
 end;
 
+RECOG.CopySubVectorCompat := function(src, dst, from, to)
+    if IsGF2VectorRep(src) and IsGF2VectorRep(dst) then
+        # FIXME: Switch back to CopySubVector once GAP supports this reliably
+        # again for immutable compressed vectors; this should be fixed in GAP
+        # 4.16.0, see <https://github.com/gap-system/gap/pull/6303>.
+        # CopySubVector can miscopy immutable compressed vectors over finite
+        # fields, so use slice assignment uniformly here.
+        dst{to} := src{from};
+    elif IsVectorObj(src) and IsVectorObj(dst) then
+        CopySubVector(src, dst, from, to);
+    else
+        dst{to} := src{from};
+    fi;
+    return dst;
+end;
