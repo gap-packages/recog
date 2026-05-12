@@ -1373,7 +1373,7 @@ end;
 #!
 #! @EndChunk
 BindRecogMethod(FindHomMethodsGeneric, "SnAnUnknownDegree",
-"method groups isomorphic to Sn or An with n >= 9",
+"method for groups isomorphic to Sn or An with n >= 9",
 function(ri, G)
     local recogData, isoData, degree, swapSLP, t;
     # Try to find an isomorphism
