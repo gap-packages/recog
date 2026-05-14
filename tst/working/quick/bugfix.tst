@@ -392,6 +392,18 @@ gap> ri:=RecogNode(G,true,rec());;
 gap> CallRecogMethod(FindHomMethodsProjective.ComputeSimpleSocle,ri) <> Success;
 true
 
+# Issue #445: cross-characteristic PSL2 low-index hints must fail quickly
+# and allow recognition to continue, instead of exhausting a huge random
+# search and raising an internal error.
+# See https://github.com/gap-packages/recog/issues/445
+gap> m := ClassicalMaximals("L",6,7);;
+gap> i := 44;; Reset(GlobalRandomSource, i);; Reset(GlobalMersenneTwister, i);;
+gap> ri := RecognizeGroup(m[21]);;
+gap> IsReady(ri);
+true
+gap> ForAll(GeneratorsOfGroup(m[21]), x -> SLPforElement(ri, x) <> fail);
+true
+
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
 gap> STOP_TEST("bugfix.tst");
