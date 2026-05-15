@@ -362,7 +362,7 @@ gap> G := Group(Concatenation(ngens, hgens, [ swap ]));;
 gap> m := GModuleByMats(ngens, f);;
 gap> ri := RecogNode(G, true);;
 gap> RECOG.SortOutReducibleNormalSubgroup(ri, G, ngens, m);
-true
+"Success"
 gap> ri!.comment;
 "D7TensorInduced"
 gap> Size(Image(Homom(ri)));
