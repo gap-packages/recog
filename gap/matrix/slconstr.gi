@@ -1938,6 +1938,9 @@ return fail;
    Qgamma := [t^jgamma];
    Add(Qgamma, Qgamma[1]^data2.c[2]);
    data3 := SLCR.SLConstructBasisQ (bbg, data2, [t,t1], Qgamma, 3, p^e);
+   if data3 = fail then
+return fail;
+   fi;
    data2 := SLCR.SLFinishConstruction (bbg, data2, data3, 3);
 return data2;
 end;
