@@ -210,13 +210,20 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
 
   fld := ri!.field;
   d := ri!.dimension;
+  triesinnerlimit := RECOG.ParseNumber(hint.triesforgens,d,"1d");
+  trieslimit := RECOG.ParseNumber(hint.tries,d,10);
+  numberrandgens := RECOG.ParseNumber(hint.numberrandgens,d,2);
+  orblenlimit := RECOG.ParseNumber(hint.orblenlimit,d,"4d");
   if IsBound(hint.elordersstart) then
       i := 0;
       repeat
           i := i + 1;
-          if i > 10000 then
-              ErrorNoReturn("possible infinite loop in DoHintedLowIndex, ",
-                            "wrong hints?");
+          if i > triesinnerlimit then
+              Info(InfoRecog,2,
+                   "Did not find a start element with one of the hinted ",
+                   "orders ",hint.elordersstart," after ",triesinnerlimit,
+                   " tries.");
+              return fail;
           fi;
           x := PseudoRandom(G);
       until Order(x) in hint.elordersstart;
@@ -226,10 +233,6 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
   fi;
 
   tries := 0;
-  numberrandgens := RECOG.ParseNumber(hint.numberrandgens,d,2);
-  triesinnerlimit := RECOG.ParseNumber(hint.triesforgens,d,"1d");
-  trieslimit := RECOG.ParseNumber(hint.tries,d,10);
-  orblenlimit := RECOG.ParseNumber(hint.orblenlimit,d,"4d");
   Info(InfoRecog,3,"Using numberrandgens=",numberrandgens,
        " triesinnerlimit=",triesinnerlimit," trieslimit=",trieslimit,
        " orblenlimit=",orblenlimit);
