@@ -150,7 +150,7 @@ function(ri)
   RECOG.SetPseudoRandomStamp(Grp(ri),"LowIndex");
   res := RECOG.SmallHomomorphicImageProjectiveGroup(Grp(ri));
   if res = fail then
-      return fail; # FIXME: fail = TemporaryFailure here really correct?
+      return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
   else
       res := res[1];
       # Now distinguish between a block system and just an orbit:

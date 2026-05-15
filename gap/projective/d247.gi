@@ -363,7 +363,7 @@ RECOG.SortOutReducibleSecondNormalSubgroup :=
     else
         Info(InfoRecog,2,"D247: Restriction not homogeneous!");
     fi;
-    return fail; # FIXME: fail = TemporaryFailure here really correct?
+    return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
   end;
 
 #! @BeginChunk D247
@@ -388,7 +388,7 @@ function(ri)
     if MTX.IsIrreducible(m) then
         if not ispower then
             Info(InfoRecog,4,"Dimension is no power!");
-            return fail; # FIXME: fail = TemporaryFailure here really correct?
+            return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
         fi;
         # we want to look for D7 here, using the same trick again:
         count := 0;
@@ -407,7 +407,7 @@ function(ri)
         if not MTX.IsIrreducible(mm) then
             return RECOG.SortOutReducibleSecondNormalSubgroup(ri,G,nngens,mm);
         fi;
-        return fail; # FIXME: fail = TemporaryFailure here really correct?
+        return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
     fi;
     if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;
     Info(InfoRecog,2,"D247: Seem to have found something!");
@@ -426,7 +426,7 @@ function(ri)
   for i in [1..9] do
       if InfoLevel(InfoRecog) >= 2 then Print(".\c"); fi;
       res := CheckNormalClosure(x);
-      if res in [true,false] then
+      if res in [Success,NeverApplicable] then
           return res;
       fi;
       x := RECOG.InvolutionJumper(ri!.pr,RECOG.ProjectiveOrder,x,100,true);
@@ -437,7 +437,7 @@ function(ri)
       fi;
   od;
   res := CheckNormalClosure(x);
-  if res in [true,false] then
+  if res in [Success,NeverApplicable] then
       return res;
   fi;
   if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;

@@ -274,7 +274,7 @@ gap> for d in [11 .. 30] do
 > SdOn2Sets := Action(SymmetricGroup(d), sets, OnSets);;
 > ri := RecogNode(SdOn2Sets);;
 > success := FindHomMethodsGeneric.SnAnUnknownDegree(ri);
-> if not success or not Size(ri) = Factorial(d) then
+> if success <> Success or not Size(ri) = Factorial(d) then
 >   Print("wrong result! degree ", d, "\n");
 > fi;
 > od;
@@ -285,7 +285,7 @@ gap> for d in [11 .. 30] do
 > SdOn2Sets := Action(AlternatingGroup(d), sets, OnSets);;
 > ri := RecogNode(SdOn2Sets);;
 > success := FindHomMethodsGeneric.SnAnUnknownDegree(ri);
-> if not success or not Size(ri) = Factorial(d)/2 then
+> if success <> Success or not Size(ri) = Factorial(d)/2 then
 >   Print("wrong result! degree ", d, "\n");
 > fi;
 > od;

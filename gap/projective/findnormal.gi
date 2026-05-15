@@ -718,7 +718,7 @@ end );
 #                   fi;
 #                   res := RECOG.SortOutReducibleSecondNormalSubgroup(ri,G,
 #                                     rr.Ngens,mm);
-#                   if res = true then return Success; fi;
+#                   if res = Success then return Success; fi;
 #                   r := rr;
 #               else
 #                   return fail; # FIXME: fail = TemporaryFailure here really correct?
@@ -740,8 +740,8 @@ function(ri)
   RECOG.SetPseudoRandomStamp(G,"FindElmOfEvenNormal");
   r := FindElmOfEvenNormalSubgroup(G,
           rec( Projective := true, SkipTrivAbelian := true ));
-  if r.success = fail then # FIXME: fail = TemporaryFailure here really correct?
-      return fail; # FIXME: fail = TemporaryFailure here really correct?
+  if r.success = fail then
+      return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
   fi;
   if not IsBound(r.Nready) or not r.Nready then
       r.Ngens := FastNormalClosure(G,[r.el],20);
@@ -773,16 +773,16 @@ function(ri)
               if MTX.IsIrreducible(mm) then
                   Info(InfoRecog,2,
            "FindElmOfEvenNormal: Second normal subgroup was not reducible.");
-                  return fail; # FIXME: fail = TemporaryFailure here really correct?
+                  return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
               fi;
               res := RECOG.SortOutReducibleSecondNormalSubgroup(
                                       ri,G,rr.Ngens,mm);
-              if res = true then
+              if res = Success then
                   return Success;
               fi;
               r := rr;
           until count >= 2;
       fi;
   fi;
-  return fail; # FIXME: fail = TemporaryFailure here really correct?
+  return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
 end);

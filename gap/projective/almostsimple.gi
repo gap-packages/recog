@@ -115,7 +115,7 @@ InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
         Info(InfoRecog,1,"Expected BBox finder for stdgens of ",hint.name,
              " not availabe!");
         Info(InfoRecog,1,"Check your AtlasRep installation!");
-        return fail;
+        return TemporaryFailure;
     fi;
     gm := Group(ri!.gensHmem);
     gm!.pseudorandomfunc := [rec(
@@ -126,7 +126,7 @@ InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
                               rec( orderfunction := RECOG.ProjectiveOrder ) );
     if stdgens = fail or stdgens = "timeout" then
         Info(InfoRecog,2,"Stdgens finder did not succeed for ",hint.name);
-        return fail;
+        return TemporaryFailure;
     fi;
     stdgens := stdgens.gens;
     #Setslptostd(ri,SLPOfElms(stdgens));
@@ -146,7 +146,7 @@ InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
                 Info(InfoRecog,1,"Expected maximal subgroup slp of ",hint.name,
                      " not available!");
                 Info(InfoRecog,1,"Check your AtlasRep installation!");
-                return fail;
+                return TemporaryFailure;
             fi;
             maxgens := ResultOfStraightLineProgram(s.program,
                                                    StripMemory(stdgens));
@@ -195,11 +195,11 @@ InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
             fi;
             SetIsRecogInfoForAlmostSimpleGroup(ri,true);
             ri!.comment := hint.name;
-            return true;
+            return Success;
         od;
     fi;
     Info( InfoRecog, 2, "Got stab chain hint, not yet implemented!" );
-    return fail;
+    return TemporaryFailure;
   end );
 
 InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
@@ -223,7 +223,7 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
                    "Did not find a start element with one of the hinted ",
                    "orders ",hint.elordersstart," after ",triesinnerlimit,
                    " tries.");
-              return fail;
+              return TemporaryFailure;
           fi;
           x := PseudoRandom(G);
       until Order(x) in hint.elordersstart;
@@ -305,7 +305,7 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
                   fi;
                   SetHomom(ri,hom);
                   Setmethodsforimage(ri,FindHomDbPerm);
-                  return true;
+                  return Success;
               fi;
           else
               Info(InfoRecog,2,"Subspace dimension not as expected, ",
@@ -314,7 +314,7 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
       fi;
       tries := tries + 1;
   until tries > trieslimit;
-  return fail;
+  return TemporaryFailure;
 end );
 
 # We start a database of hints, whenever we discover a certain group, we
@@ -363,7 +363,7 @@ RECOG.ProduceTrivialStabChainHint := function(name,reps,maxes)
           t := Runtime();
           res := DoHintedStabChain(ri,g,hint);
           t := Runtime() - t;
-          if res = true then
+          if res = Success then
               o := ri!.stabilizerchain!.orb;
               x := o[1];
               if IsMatrix(x) then
@@ -791,7 +791,7 @@ function(ri)
   p := RECOG.findchar(ri,ri!.simplesocle,RECOG.RandElFuncSimpleSocle);
   if p = Characteristic(ri!.field) then
       Info(InfoRecog,2,"ThreeLargeElOrders: defining characteristic p=",p);
-      return false; # FIXME: false = NeverApplicable here really correct?
+      return NeverApplicable; # FIXME: NeverApplicable here really correct?
   fi;
   # Try all possibilities:
   Info(InfoRecog,2,"ThreeLargeElOrders: found ",p);
@@ -819,12 +819,12 @@ function(ri)
           fi;
           res := LookupHintForSimple(ri,G,namecat);
       fi;
-      if res = true or res = Success then
+      if res = Success then
           return Success;
       fi;
   od;
   Info(InfoRecog,2,"Did not succeed with hints, giving up...");
-  return fail; # FIXME: fail = TemporaryFailure here really correct?
+  return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
 end);
 
 # RECOG.DegreeAlternating := function (orders)
@@ -1467,20 +1467,20 @@ function(ri)
   for i in [1..Length(l)] do
       Info(InfoRecog,2,"Trying hint for ",RECOG.SporadicsNames[l[i]],"...");
       res := LookupHintForSimple(ri,G,RECOG.SporadicsNames[l[i]]);
-      if res = true then
+      if res = Success then
           return Success;
       fi;
       if IsBound(RECOG.SporadicsWorkers[l[i]]) then
           Info(InfoRecog,2,"Calling its installed worker...");
           res := RECOG.SporadicsWorkers[l[1]](RECOG.SporadicsNames[l[i]],
                                         RECOG.SporadicsSizes[l[i]],ri,G);
-          if res = true then
+          if res = Success then
               return Success;
           fi;
       fi;
       Info(InfoRecog,2,"This did not work.");
   od;
-  return false; # FIXME: false = NeverApplicable here really correct?
+  return NeverApplicable; # FIXME: NeverApplicable here really correct?
 end);
 
 # Data for the function NameSporadic
@@ -1617,7 +1617,7 @@ function(ri)
         Info(InfoRecog, 2, "Trying hint for ", name,
              "...");
         res := LookupHintForSimple(ri, Grp(ri), name);
-        if res = true then return Success; fi;
+        if res = Success then return Success; fi;
         Info(InfoRecog, 2, "This did not work.");
     od;
     return NeverApplicable;
