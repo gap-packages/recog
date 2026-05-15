@@ -282,7 +282,7 @@ RECOG.CleanRow := function( basis, vec, extend, dec)
 
   # Clear dec vector if given:
   if dec <> fail then
-    MultRowVector(dec,Zero(dec[1]));
+    MultVector(dec,Zero(dec[1]));
   fi;
 
   # First a little shortcut:
@@ -301,7 +301,7 @@ RECOG.CleanRow := function( basis, vec, extend, dec)
         if dec <> fail then
           dec[ j ] := c;
         fi;
-        AddRowVector( vec, basis.vectors[ j ], -c );
+        AddVector( vec, basis.vectors[ j ], -c );
       fi;
     fi;
   od;
@@ -312,7 +312,7 @@ RECOG.CleanRow := function( basis, vec, extend, dec)
   else
     if extend then
       c := vec[newpiv]^-1;
-      MultRowVector( vec, vec[ newpiv ]^-1 );
+      MultVector( vec, vec[ newpiv ]^-1 );
       if dec <> fail then
         dec[len+1] := c;
       fi;
@@ -672,7 +672,7 @@ RECOG.FindKernelLowerLeftPGroup := function(ri)
                     # we might have jumped over a layer
                     done := -v[pivots[i][2]];
                     if not IsZero(done) then
-                        AddRowVector(v,lvec[i],done);
+                        AddVector(v,lvec[i],done);
                         x := x * l[i]^IntFFE(done);
                         Assert(1, not IsOne(x) or IsZero(v));  # IsOne(x) should imply IsZero(v)
                     fi;
@@ -694,7 +694,7 @@ RECOG.FindKernelLowerLeftPGroup := function(ri)
             Assert(1, not IsOne(x));
             # Now find a new pivot:
             el := v[pos]^-1;
-            MultRowVector(v,el);
+            MultVector(v,el);
             x := x ^ IntFFE(el);
             Assert(1, not IsOne(x));
             Add(l,x,i);
@@ -741,7 +741,7 @@ SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
       while i <= Length(ri!.gensNvectors) and ri!.gensNpivots[i][1] = layer do
           done := h[ri!.gensNpivots[i][2]];
           if not IsZero(done) then
-              AddRowVector(h,ri!.gensNvectors[i],-done);
+              AddVector(h,ri!.gensNvectors[i],-done);
               pow := IntFFE(done);
               g := NiceGens(ri)[i]^(-pow) * g;
               Add(l,i);
