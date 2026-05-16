@@ -31,7 +31,7 @@ gap> for d in [11] do
 # Check Slp function
 gap> ri := RecogNode(SdOn2Sets);;
 gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri);
-true
+"Success"
 gap> x := PseudoRandom(Grp(ri));;
 gap> slp := SLPforElement(ri, x);;
 gap> x = ResultOfStraightLineProgram(slp, NiceGens(ri));
