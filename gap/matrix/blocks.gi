@@ -140,16 +140,29 @@ end);
 # the set poss contain only zero elements outside of the
 # positions indicated by poss.
 RECOG.IsDiagonalBlockOfMatrix := function(m, poss)
-  local n, outside, z, i, j;
-  Assert(1, NrRows(m) = NrCols(m) and IsSubset([1..NrRows(m)], poss));
-  outside := Difference([1..NrRows(m)], poss);
-  z := ZeroOfBaseDomain(m);
+  local a, b, n, i;
+  a := First(poss);
+  b := Last(poss);
+  n := NrRows(m);
+  Assert(1, poss = [a..b]);
+  Assert(1, NrRows(m) = NrCols(m) and b <= n);
+  # check for zeros above
+  for i in [1..a-1] do
+    if PositionNonZeroInRow(m, i, a-1) <= b then
+      return false;
+    fi;
+  od;
+  # check for zeros left and right
   for i in poss do
-    for j in outside do
-      if m[i,j] <> z or m[j,i] <> z then
-        return false;
-      fi;
-    od;
+    if PositionNonZeroInRow(m, i) < a or PositionNonZeroInRow(m, i, b) <= n then
+      return false;
+    fi;
+  od;
+  # check for zeros below
+  for i in [b+1..n] do
+    if PositionNonZeroInRow(m, i, a-1) <= b then
+      return false;
+    fi;
   od;
   return true;
 end;
@@ -406,17 +419,18 @@ end);
 # verify that the matrix has block lower triangular shape
 # with respect to the given blocks.
 RECOG.IsBlockLowerTriangularWithBlocks := function(mat, blocks)
-  local z, b, col, row;
-  Assert(0, Concatenation(blocks) = [1..Length(mat)]);
-  z := ZeroOfBaseDomain(mat);
+  local a, b, n, row;
+  n := NrRows(mat);
+  Assert(1, NrCols(mat) = n);
+  Assert(1, Concatenation(blocks) = [1..n]);
   for b in blocks do
+    a := First(b);
+    Assert(1, b = [a..Last(b)]);
     # Verify that there are only zeros above each block
-    for row in [1..b[1]-1] do
-      for col in b do
-        if mat[row,col] <> z then
-          return false;
-        fi;
-      od;
+    for row in [1..a-1] do
+      if PositionNonZeroInRow(mat, row, a-1) <= Last(b) then
+        return false;
+      fi;
     od;
   od;
   return true;
