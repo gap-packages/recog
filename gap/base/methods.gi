@@ -86,7 +86,22 @@ end);
 InstallGlobalFunction(BindRecogMethod,
 function(rname, arg...)
     local r, name;
-    r := ValueGlobal(rname);
+    if IsString(rname) then
+      r := ValueGlobal(rname);
+    elif rname = FindHomMethodsMatrix and arg[1] = "Nonfield" and EndsWith(INPUT_FILENAME(), "recograt.gi") then
+      # FIXME/HACK: backwards compatibility for the matgrp package
+      rname := "FindHomMethodsMatrix";
+      r := FindHomMethodsMatrix;
+      arg[Length(arg)] :=
+            function(ri)
+              if IsBound(ri!.ring) and not IsBound(ri!.field) then
+                Error("hereIAm");
+              fi;
+              return NeverApplicable;
+            end;
+    else
+      Error("<rname> must be the name of a global variable containing a record");
+    fi;
     r.(arg[1]) := CallFuncList(RecogMethod, arg);
     name := Concatenation(rname, ".", arg[1]);
     SetNameFunction(r.(arg[1])!.func, name);
