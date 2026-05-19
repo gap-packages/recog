@@ -35,7 +35,7 @@
 ##      - If `M <= 6`, then we return `TemporaryFailure`.
 ##      - TODO: If `N > 20`, use Magma Code `GuessSnAnDegree` to guess the degree by element orders.
 ##      - TODO: If `GuessSnAnDegree` was used, then we check if we can find
-##        an element of order in the interval `[N - m, N + m]`.
+##        an element whose order is in the interval `[N - m, N + m]`.
 ##      - Otherwise, we continue.
 ##  - Now we can assume for the degree `n >= 7`. We need to ensure this, since
 ##    `SnAnUnknownDegree` cannot recognise `A5`, `S5`, `A6`, `S6` and could run
@@ -732,6 +732,7 @@ RECOG.BuildCycle := function(ri, c, x, N)
     return [g, 2 * mDash + 2 * m + 3];
 end;
 
+# Algorithm 4.13 ConstructLongCycle in [JLNP13]
 # ri : recognition node with group G
 # c : element of G,
 #     should be a 3-cycle
@@ -742,7 +743,10 @@ end;
 # - g: element of G,
 #      should be a k-cycle matching c
 # - k: integer,
-#      should be length of cycle g.
+# - g: element of G.
+# - k: integer.
+# If G \in [S_n, A_n] and c is a 3-cycle, then with probability at least 1-eps,
+# g is a k-cycle matching c (and also k >= max(3n/4, 9)).
 #
 # Note that the order of the returned list is reversed with respect to the
 # paper to be consistent with the return values of the other functions.
