@@ -201,12 +201,15 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
     curInvolutionPos := 1;
     Ki := Minimum(K, C);
     Li := Minimum(L, B);
+
     # Entry i of this list counts the elements c in step 4 that we use to conjugate the current
     # involution t_i.
     nrTriedConjugates := [];
-# Entry i of this list counts the size of the set Gamma_i in step 4
-# for the current involution t_i
+
+    # Entry i of this list counts the size of the set Gamma_i in step 4
+    # for the current involution t_i
     nrCommutatingConjugates := [];
+
     # Entry i of this list counts the actual number of three cycle candidates considered
     # which are filtered from the Gamma_i via heuristic order tests.
     nrThreeCycleCandidates := [];
