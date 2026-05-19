@@ -1,103 +1,309 @@
 #############################################################################
-##  
-##  Demo PackageInfo.g for the GitHubPagesForGAP
 ##
+##  This file is part of recog, a package for the GAP computer algebra system
+##  which provides a collection of methods for the constructive recognition
+##  of groups.
+##
+##  Copyright of recog belongs to its developers whose names are too numerous
+##  to list here. Please refer to the COPYRIGHT file for details.
+##
+##  SPDX-License-Identifier: GPL-3.0-or-later
+##
+##
+##  PackageInfo.g for the package `recog'
+##
+#############################################################################
 
 SetPackageInfo( rec(
 
-PackageName := "GitHubPagesForGAP",
+PackageName := "recog",
+Subtitle := "A package for constructive recognition of permutation and matrix groups",
+Version := "1.5.1",
+Date := "19/05/2026", # dd/mm/yyyy format
+License := "GPL-3.0-or-later",
 
-Subtitle := "A GitHub Pages generator for GAP packages",
-Version := "0.4",
-Date := "10/04/2025", # dd/mm/yyyy format
-License := "0BSD",
-
+##  Information about authors and maintainers.
 Persons := [
+  rec(
+    LastName      := "Neunhöffer",
+    FirstNames    := "Max",
+    IsAuthor      := true,
+    IsMaintainer  := false,
+    Email         := "max@9hoeffer.de",
+  ),
+  rec(
+    LastName      := "Seress",
+    FirstNames    := "Ákos",
+    IsAuthor      := true,
+    IsMaintainer  := false,
+  ),
   rec(
     LastName      := "Horn",
     FirstNames    := "Max",
-    IsAuthor      := true,
+    IsAuthor      := false,
     IsMaintainer  := true,
     Email         := "mhorn@rptu.de",
     WWWHome       := "https://www.quendi.de/math",
-    GitHubUsername:= "fingolfin",
-    PostalAddress := Concatenation(
-                       "Fachbereich Mathematik\n",
-                       "RPTU Kaiserslautern-Landau\n",
-                       "Gottlieb-Daimler-Straße 48\n",
-                       "67663 Kaiserslautern\n",
-                       "Germany" ),
-    Place         := "Kaiserslautern, Germany",
+    GitHubUsername := "fingolfin",
+    Place         := "Kaiserslautern",
     Institution   := "RPTU Kaiserslautern-Landau"
   ),
 
   rec(
-    LastName      := "Thor",
-    FirstNames    := "A. U.",
-    IsAuthor      := true,
-    IsMaintainer  := false,
-    #Email         := "author@example.com",
-  ),
-
-  rec(
-    LastName      := "Itor",
-    FirstNames    := "Jan",
+    LastName      := "Ankaralioglu",
+    FirstNames    := "Nurullah",
     IsAuthor      := false,
-    IsMaintainer  := true,
-    #Email         := "janitor@example.com",
+    IsMaintainer  := false,
+    Email         := "ankarali@atauni.edu.tr",
+  ),
+  rec(
+    LastName      := "Bernhardt",
+    FirstNames    := "Dominik",
+    IsAuthor      := false,
+    IsMaintainer  := false, 
+    Email         := "bernhardt@mathb.rwth-aachen.de",
+    Place         := "Aachen",
+    Institution   := "RWTH Aachen University",
+  ),
+  rec(
+    LastName      := "Brooksbank",
+    FirstNames    := "Peter",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "pbrooksb@bucknell.edu",
+    Place         := "Lewisburg",
+    Institution   := "Bucknell University"
+  ),
+  rec(
+    LastName      := "Celler",
+    FirstNames    := "Frank",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "frank@celler.de",
+    Place         := "Aachen",
+    Institution   := "Lehrstuhl D für Mathematik, RWTH Aachen",
+  ),
+rec(
+    LastName      := "Hähndel",
+    FirstNames    := "Paula",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "paula.haehndel@mathematik.uni-halle.de",
+    Place         := "Halle (Saale)",
+    Institution   := "Martin-Luther-Universität Halle-Wittenberg"
+  ),
+  rec(
+    LastName      := "Howe",
+    FirstNames    := "Stephen",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+  ),
+  rec(
+    LastName      := "Hulpke",
+    FirstNames    := "Alexander",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "hulpke@colostate.edu",
+    WWWHome       := "https://www.math.colostate.edu/~hulpke/",
+    Place         := "Fort Collins",
+    Institution   := "Colorado State University"
+  ),
+  rec(
+    LastName      := "Jefferson",
+    FirstNames    := "Christopher",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "caj21@st-andrews.ac.uk",
+    Place         := "St Andrews",
+    Institution   := "University of St Andrews"
+  ),
+  rec(
+    LastName      := "Law",
+    FirstNames    := "Maska",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "maska@maths.uwa.edu.au",
+    Place         := "Perth",
+    Institution   := "University of Western Australia"
+  ),
+  rec(
+    LastName      := "Linton",
+    FirstNames    := "Steve",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "sal@cs.st-andrews.ac.uk",
+    Place         := "St Andrews",
+    Institution   := "University of St Andrews"
+  ),
+  rec(
+    LastName      := "Malle",
+    FirstNames    := "Gunter",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "malle@mathematik.uni-kl.de",
+    WWWHome       := "https://agag-malle.math.rptu.de/~malle/en/",
+    Place         := "Kaiserslautern",
+    Institution   := "RPTU Kaiserslautern-Landau",
+  ),
+  rec(
+    LastName      := "Müller",
+    FirstNames    := "Till",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "t.mueller@math.rptu.de",
+    GitHubUsername := "Till-Eisen",
+    Place         := "Kaiserslautern",
+    Institution   := "RPTU Kaiserslautern-Landau"
+  ),
+  rec(
+    LastName      := "Niemeyer",
+    FirstNames    := "Alice",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "alice.niemeyer@mathb.rwth-aachen.de",
+    WWWHome       := "http://www.math.rwth-aachen.de/~Alice.Niemeyer/",
+    Place         := "Aachen",
+    Institution   := "RWTH Aachen University"
+  ),
+  rec(
+    LastName      := "O'Brien",
+    FirstNames    := "Eamonn",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "e.obrien@auckland.ac.nz",
+    WWWHome       := "https://www.math.auckland.ac.nz/~obrien/",
+    Place         := "Auckland",
+    Institution   := "University of Auckland",
+  ),
+  rec(
+    LastName      := "Roney-Dougal",
+    FirstNames    := "Colva M.",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "colva@mcs.st-and.ac.uk",
+    Place         := "St Andrews",
+    Institution   := "University of St Andrews"
+  ),
+ rec(
+    LastName      := "Siccha",
+    FirstNames    := "Sergio",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "sergio@mathb.rwth-aachen.de",
+    #WWWHome       := "https://www.mathematik.rwth-aachen.de/go/id/bkbg/gguid/0x28CF75713F0B7744BEF1377FB3F6748E/ikz/11/allou/1/lidx/1/",
+    Place         := "Aachen",
+    Institution   := "RWTH Aachen University"
+  ),
+  rec(
+    LastName      := "Wagner",
+    FirstNames    := "Martin",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "marwagne@rptu.de",
+    GitHubUsername := "SoongNoonien",
+    Place         := "Kaiserslautern",
+    Institution   := "RPTU Kaiserslautern-Landau"
+  ),
+  rec(
+    LastName      := "Wiedemann",
+    FirstNames    := "Torben",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "torben.wiedemann@rptu.de",
+    GitHubUsername := "TWiedemann",
+    Place         := "Kaiserslautern",
+    Institution   := "RPTU Kaiserslautern-Landau"
+  ),
+  rec(
+    LastName      := "Wilson",
+    FirstNames    := "Wilf",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "gap@wilf-wilson.net",
+    WWWHome       := "https://wilf.me"
+  ),
+  rec(
+    LastName      := "Whybrow",
+    FirstNames    := "Madeleine",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "madeleine.whybrow@famnit.upr.si",
+    WWWHome       := "https://madeleinewhybrow.wordpress.com/contact/",
+    Place         := "Primorska",
+    Institution   := "University of Primorska"
   ),
 ],
 
-Status := "other",
+Status := "deposited",
 
-# The following are not strictly necessary in your own PackageInfo.g
-# (in the sense that update.g only looks at the usual fields
-# like PackageWWWHome, ArchiveURL etc.). But they are convenient
-# if you use exactly the scheme for your package website that we propose.
-GithubUser := "gap-system",
-GithubRepository := ~.PackageName,
-GithubWWW := Concatenation("https://github.com/", ~.GithubUser, "/", ~.GithubRepository),
-
-PackageWWWHome := Concatenation("https://", ~.GithubUser, ".github.io/", ~.GithubRepository, "/"),
-README_URL     := Concatenation( ~.PackageWWWHome, "README.md" ),
-PackageInfoURL := Concatenation( ~.PackageWWWHome, "PackageInfo.g" ),
-# The following assumes you are using the Github releases system. If not, adjust
-# it accordingly.
-ArchiveURL     := Concatenation(~.GithubWWW,
-                    "/releases/download/v", ~.Version, "/",
-                    ~.GithubRepository, "-", ~.Version),
-
+SourceRepository := rec(
+    Type := "git",
+    URL := Concatenation( "https://github.com/gap-packages/", ~.PackageName ),
+),
+IssueTrackerURL := Concatenation( ~.SourceRepository.URL, "/issues" ),
+PackageWWWHome  := Concatenation( "https://gap-packages.github.io/", ~.PackageName ),
+README_URL      := Concatenation( ~.PackageWWWHome, "/README.md" ),
+PackageInfoURL  := Concatenation( ~.PackageWWWHome, "/PackageInfo.g" ),
+ArchiveURL      := Concatenation( ~.SourceRepository.URL,
+                                 "/releases/download/v", ~.Version,
+                                 "/", ~.PackageName, "-", ~.Version ),
 ArchiveFormats := ".tar.gz .tar.bz2",
 
-AbstractHTML := 
-  "This is a pseudo package that contains no actual\
-  <span class=\"pkgname\">GAP</span> code. Instead, it is a template for other\
-  GAP packages that allows to quickly setup GitHub Pages.",
+##  Here you  must provide a short abstract explaining the package content
+##  in HTML format (used on the package overview Web page) and an URL
+##  for a Webpage with more detailed information about the package
+##  (not more than a few lines, less is ok):
+##  Please, use '<span class="pkgname">GAP</span>' and
+##  '<span class="pkgname">MyPKG</span>' for specifing package names.
+##
+AbstractHTML := """
+    <p><b>Warning:</b> This package is still under development and
+    this version is to be considered a working, but preliminary one.</p>
+
+    <p>This package contains a collection of methods for the
+    constructive recognition of groups. It is mostly intended for
+    permutation groups, matrix groups and projective groups.</p>
+    """,
 
 PackageDoc := rec(
-  BookName  := "GitHubPagesForGAP",
+  BookName  := "recog",
   ArchiveURLSubset := ["doc"],
-  HTMLStart := "doc/chap0.html",
+  HTMLStart := "doc/chap0_mj.html",
   PDFFile   := "doc/manual.pdf",
   SixFile   := "doc/manual.six",
-  LongTitle := "A GitHub Pages generator for GAP packages",
+  LongTitle := "A collection of group recognition methods",
 ),
 
-# The following dependencies are fake and for testing / demo purposes
 Dependencies := rec(
-  GAP := ">=4.8.1",
+  GAP := ">=4.13",
   NeededOtherPackages := [
-    ["GAPDoc", ">= 1.2"],
-    ["IO", ">= 4.1"],
+    ["AtlasRep", ">= 2.1.0"],
+    ["FactInt", ">= 1.6.3"],
+    ["Forms", ">= 1.2.11"],
+    ["genss", ">= 1.6.8"],
+    ["Orb", ">= 4.9.0"],  # really should be 5.1.0 for latest bug fixes
   ],
-  SuggestedOtherPackages := [["orb", ">= 4.2"]],
+  SuggestedOtherPackages := [],
   ExternalConditions := []
 ),
 
 AvailabilityTest := ReturnTrue,
+TestFile := "tst/testquick.g",
 
-Keywords := ["GitHub Pages", "GAP"]
+Keywords := ["group recognition", "matrix group recognition",
+"permutation group", "black box group", "composition tree",
+"Aschbacher classes", "method selection"],
+
+AutoDoc := rec(
+    TitlePage := rec(
+        Copyright := Concatenation(
+                    "&copyright; 2005-2014 by Max Neunhöffer and Ákos Seress<P/>\n",
+                    "&copyright; 2005-2026 by its authors, see file <F>COPYRIGHT</F> for details.<P/>\n",
+                    "\n",
+                    "This package may be distributed under the terms and conditions of the\n",
+                    "GNU Public License Version 3 or (at your option) any later version.\n"
+                ),
+    )
+),
 
 ));
-
-

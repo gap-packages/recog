@@ -1,11 +1,353 @@
-<!DOCTYPE html>
-<html lang="en">
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-	<meta charset="UTF-8" />
-	<title>Placeholder</title>
+<title>GAP (recog) - Contents</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="GAPDoc2HTML" />
+<link rel="stylesheet" type="text/css" href="manual.css" />
+<script src="manual.js" type="text/javascript"></script>
+<script type="text/javascript">overwriteStyle();</script>
 </head>
-<body>
-<h1>Placeholder!</h1>
-<a href="..">Back</a>
+<body class="chap0"  onload="jscontent()">
+
+
+<div class="chlinktop"><span class="chlink1">Goto Chapter: </span><a href="chap0.html">Top</a>  <a href="chap1.html">1</a>  <a href="chap2.html">2</a>  <a href="chap3.html">3</a>  <a href="chap4.html">4</a>  <a href="chap5.html">5</a>  <a href="chap6.html">6</a>  <a href="chap7.html">7</a>  <a href="chap8.html">8</a>  <a href="chapBib.html">Bib</a>  <a href="chapInd.html">Ind</a>  </div>
+
+<div class="chlinkprevnexttop">&nbsp;<a href="chap0.html">[Top of Book]</a>&nbsp;  <a href="chap0.html#contents">[Contents]</a>&nbsp;  &nbsp;<a href="chap1.html">[Next Chapter]</a>&nbsp;  </div>
+
+<p id="mathjaxlink" class="pcenter"><a href="chap0_mj.html">[MathJax on]</a></p>
+<p><a id="X7D2C85EC87DD46E5" name="X7D2C85EC87DD46E5"></a></p>
+<div class="pcenter">
+
+<h1>recog</h1>
+
+
+<h2>A package for constructive recognition of permutation and matrix groups</h2>
+
+<p>
+    1.5.1</p>
+
+<p>
+    19 May 2026
+  </p>
+
+</div>
+<p><b>
+    Max Neunhöffer
+
+  </b>
+<br />Email: <span class="URL"><a href="mailto:max@9hoeffer.de">max@9hoeffer.de</a></span>
+</p><p><b>
+    Ákos Seress
+  </b>
+</p>
+
+<p><a id="X81488B807F2A1CF1" name="X81488B807F2A1CF1"></a></p>
+<h3>Copyright</h3>
+<p>© 2005-2014 by Max Neunhöffer and Ákos Seress</p>
+
+<p>© 2005-2026 by its authors, see file <code class="file">COPYRIGHT</code> for details.</p>
+
+<p>This package may be distributed under the terms and conditions of the GNU Public License Version 3 or (at your option) any later version.</p>
+
+<p><a id="X8537FEB07AF2BEC8" name="X8537FEB07AF2BEC8"></a></p>
+
+<div class="contents">
+<h3>Contents<a id="contents" name="contents"></a></h3>
+
+<div class="ContChap"><a href="chap1.html#X7DFB63A97E67C0A1">1 <span class="Heading">Introduction</span></a>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap1.html#X786BACDB82918A65">1.1 <span class="Heading">Overview over this manual</span></a>
+</span>
+</div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap1.html#X828241117D993F36">1.2 <span class="Heading">Feedback and support</span></a>
+</span>
+</div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap1.html#X807C19CF7C73596F">1.3 <span class="Heading">Literature (selection)</span></a>
+</span>
+</div>
+</div>
+<div class="ContChap"><a href="chap2.html#X7AA0519A7CFE18C2">2 <span class="Heading">Installation of the <strong class="pkg">recog</strong> package</span></a>
+</div>
+<div class="ContChap"><a href="chap3.html#X8617C25C7F38D8C3">3 <span class="Heading">Recog package for user</span></a>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap3.html#X7B6AEBDF7B857E2E">3.1 <span class="Heading">Theoretical background</span></a>
+</span>
+</div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap3.html#X86FA580F8055B274">3.2 <span class="Heading">Functions</span></a>
+</span>
+<div class="ContSSBlock">
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap3.html#X853B4EE27AF57CD3">3.2-1 RecogniseGroup</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap3.html#X84338F037B91CDD0">3.2-2 RecognisePermGroup</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap3.html#X788DCF6A7D9E80BD">3.2-3 RecogniseMatrixGroup</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap3.html#X841176DD7BA1CAA0">3.2-4 RecogniseProjectiveGroup</a></span>
+</div></div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap3.html#X7A489A5D79DA9E5C">3.3 <span class="Heading">Examples</span></a>
+</span>
+</div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap3.html#X7B4BE9B6862F9163">3.4 <span class="Heading">Possible applications</span></a>
+</span>
+<div class="ContSSBlock">
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap3.html#X858ADA3B7A684421">3.4-1 Size</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap3.html#X87BDB89B7AAFE8AD"><code>3.4-2 \in</code></a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap3.html#X82F5B37186B949BF">3.4-3 SLPforNiceGens</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap3.html#X80FFBDCD816690E3">3.4-4 DisplayCompositionFactors</a></span>
+</div></div>
+</div>
+<div class="ContChap"><a href="chap4.html#X7F73983582251807">4 <span class="Heading">Group recognition</span></a>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap4.html#X81E31E377B16CF39">4.1 <span class="Heading">The recursive procedure</span></a>
+</span>
+<div class="ContSSBlock">
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7BFEB34483548A89">4.1-1 RecogniseGeneric</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7AD4A7168016DF8F">4.1-2 TryFindHomMethod</a></span>
+</div></div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap4.html#X83A18ADB8207154F">4.2 <span class="Heading">Recognition nodes</span></a>
+</span>
+<div class="ContSSBlock">
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7D2B419B83CD3BF8">4.2-1 RecogNodeFamily</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X801C44668004C0A0">4.2-2 IsRecogNode</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X8408B8B286312375">4.2-3 RecogNode</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X8469BB658377FD92">4.2-4 IsLeaf</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7D6CEF0178ED73A7">4.2-5 IsReady</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7972380780D99B04">4.2-6 Grp</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X8273C2FC79FB6543">4.2-7 Homom</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X864194958685AAD7">4.2-8 NiceGens</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X808A01AA869115EC">4.2-9 pregensfac</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X78DE5A1782456494">4.2-10 ImageRecogNode</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7DE53FAA782440B2">4.2-11 KernelRecogNode</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X83BA3AE582319312">4.2-12 ParentRecogNode</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7ACD6B4C7982B1E3">4.2-13 fhmethsel</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X83167779869A3BF5">4.2-14 slpforelement</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X83167779869A3BF5">4.2-15 SLPforElement</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7FBE4706828964EB">4.2-16 StdPresentation</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X84E63AC183CF5911">4.2-17 IsCorrect</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X82F234BC853D1323">4.2-18 methodsforimage</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7FEEE37F858F614B">4.2-19 validatehomominput</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7FEEE37F858F614B">4.2-20 ValidateHomomInput</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7EFA298E7E4760A0">4.2-21 calcnicegens</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X78B05A1E78564BBF">4.2-22 CalcNiceGensGeneric</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X80444E4E8501D0B0">4.2-23 CalcNiceGensHomNode</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7EFA298E7E4760A0">4.2-24 CalcNiceGens</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X80C2451F805CA06D">4.2-25 slptonice</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X83C6CCD47C8D3241">4.2-26 CalcStdPresentation</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7B7E9EAC7AACF8D8">4.2-27 gensN</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X81644C3A8064063F">4.2-28 findgensNmeth</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7DC1D16F807D6895">4.2-29 FindKernelRandom</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X8244F0DE86C23ECA">4.2-30 FindKernelDoNothing</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X87E8AB1B78F60112">4.2-31 FindKernelFastNormalClosure</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X82154EA88011654F">4.2-32 gensNslp</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X86A101E17F87F01F">4.2-33 immediateverification</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X814D78347858EC13">4.2-34 isone</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7D0F06047B88E5CD">4.2-35 isequal</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X860CF50D80A4215A">4.2-36 OrderFunc</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7EBE1C5D7C99FA2F">4.2-37 <span class="Heading">Other components of recognition nodes</span></a>
+</span>
+</div></div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap4.html#X8577717D85D631C2">4.3 <span class="Heading">Methods to find homomorphisms</span></a>
+</span>
+<div class="ContSSBlock">
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7FCBB7C686D0B1DF">4.3-1 FindHomomorphism</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap4.html#X7F299344834AAB6E">4.3-2 SLPforElementGeneric</a></span>
+</div></div>
+</div>
+<div class="ContChap"><a href="chap5.html#X8058CC8187162644">5 <span class="Heading">Method selection</span></a>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap5.html#X7F89FF55818F1139">5.1 <span class="Heading">What are methods?</span></a>
+</span>
+<div class="ContSSBlock">
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap5.html#X80EC4782856AAD35">5.1-1 IsRecogMethod</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap5.html#X7E18720E87B4B2DE">5.1-2 RecogMethod</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap5.html#X87AA2A587E4E00C2">5.1-3 BindRecogMethod</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap5.html#X7EF3EAEF78786349">5.1-4 Stamp</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap5.html#X7A2F979E86F77A6F">5.1-5 Comment</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap5.html#X79650A3E79D0E4A3">5.1-6 CallRecogMethod</a></span>
+</div></div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap5.html#X854385507D03A016">5.2 <span class="Heading">Method Databases</span></a>
+</span>
+<div class="ContSSBlock">
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap5.html#X845DB71C806CADDC">5.2-1 AddMethod</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap5.html#X836B50947A46B1A5">5.2-2 FindHomDbPerm</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap5.html#X7CA5F5FA7E850885">5.2-3 FindHomDbMatrix</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap5.html#X7A4F8342854507E3">5.2-4 FindHomDbProjective</a></span>
+</div></div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap5.html#X871C4F617FA73DF6">5.3 <span class="Heading">Hint system</span></a>
+</span>
+<div class="ContSSBlock">
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap5.html#X868D75F87B0F33C5">5.3-1 InitialDataForKernelRecogNode</a></span>
+</div></div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap5.html#X83FCCBCA78F608E1">5.4 <span class="Heading">How methods are called</span></a>
+</span>
+<div class="ContSSBlock">
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap5.html#X7BC2692183B6C4E6">5.4-1 CallMethods</a></span>
+</div></div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap5.html#X852A8E538590BCF3">5.5 <span class="Heading">Global records storing functions</span></a>
+</span>
+<div class="ContSSBlock">
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap5.html#X7A94720080D344DA">5.5-1 FindHomMethodsPerm</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap5.html#X79B60CEF8292F142">5.5-2 FindHomMethodsMatrix</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap5.html#X7D796A2179E9026A">5.5-3 FindHomMethodsProjective</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap5.html#X78B948847D596167">5.5-4 FindHomMethodsGeneric</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap5.html#X7B5561D187242287">5.5-5 SLPforElementFuncsPerm</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap5.html#X7A2E7DF67F4949C8">5.5-6 SLPforElementFuncsMatrix</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap5.html#X7F6FCC4F81ACF20F">5.5-7 SLPforElementFuncsProjective</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap5.html#X795ACFD386A106B8">5.5-8 SLPforElementFuncsGeneric</a></span>
+</div></div>
+</div>
+<div class="ContChap"><a href="chap6.html#X78C5295B86AD0C66">6 <span class="Heading">Methods for recognition</span></a>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap6.html#X79A20FD17F834C70">6.1 <span class="Heading">Methods for generic groups</span></a>
+</span>
+<div class="ContSSBlock">
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X78797CF584658CEC">6.1-1 <span class="Heading"><code class="code">FewGensAbelian</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X7E5E93027A194885">6.1-2 <span class="Heading"><code class="code">KnownNilpotent</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X878C1CED8191506C">6.1-3 <span class="Heading"><code class="code">SnAnUnknownDegree</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X8489BECB78664847">6.1-4 <span class="Heading"><code class="code">TrivialGroup</code></span></a>
+</span>
+</div></div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap6.html#X829A2F96860513F2">6.2 <span class="Heading">Methods for permutation groups</span></a>
+</span>
+<div class="ContSSBlock">
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X80320AF97EF01284">6.2-1 <span class="Heading"><code class="code">BalTreeForBlocks</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X7F46D8727850585D">6.2-2 <span class="Heading"><code class="code">Giant</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X8757E1C37F03A49D">6.2-3 <span class="Heading"><code class="code">Imprimitive</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X836212B6818B60FE">6.2-4 <span class="Heading"><code class="code">LargeBasePrimitive</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X804A913E84B77F97">6.2-5 <span class="Heading"><code class="code">MovesOnlySmallPoints</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X83C651E58239EEAF">6.2-6 <span class="Heading"><code class="code">NonTransitive</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X84C3750C7A4EEC34">6.2-7 <span class="Heading"><code class="code">Pcgs</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X82B9AF9F7A904FE5">6.2-8 <span class="Heading"><code class="code">PcgsForBlocks</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X834E9DFF7DC949DE">6.2-9 <span class="Heading"><code class="code">StabChain</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X7DC0B08B7C73A4F9">6.2-10 <span class="Heading"><code class="code">StabilizerChainPerm</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X8236A4817FA037E2">6.2-11 <span class="Heading"><code class="code">ThrowAwayFixedPoints</code></span></a>
+</span>
+</div></div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap6.html#X829BA50B82FEC109">6.3 <span class="Heading">Methods for matrix groups</span></a>
+</span>
+<div class="ContSSBlock">
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X857BF1317CAAF260">6.3-1 <span class="Heading"><code class="code">BlockDiagonal</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X81F74235823352B5">6.3-2 <span class="Heading"><code class="code">BlockLowerTriangular</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X8795A42285A332BB">6.3-3 <span class="Heading"><code class="code">BlockScalar</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X7A9F8CA181F6412D">6.3-4 <span class="Heading"><code class="code">DiagonalMatrices</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X7A1D99F67E62B1D7">6.3-5 <span class="Heading"><code class="code">GoProjective</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X7B2C182B7898BC45">6.3-6 <span class="Heading"><code class="code">KnownStabilizerChain</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X84E09FCF8527D74A">6.3-7 <span class="Heading"><code class="code">LowerLeftPGroup</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X8007B3DC787D192C">6.3-8 <span class="Heading"><code class="code">NaturalSL</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X811FC944788D9839">6.3-9 <span class="Heading"><code class="code">ReducibleIso</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X8635737086D48AE5">6.3-10 <span class="Heading"><code class="code">Scalar</code></span></a>
+</span>
+</div></div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap6.html#X867550F684F795AE">6.4 <span class="Heading">Methods for projective groups</span></a>
+</span>
+<div class="ContSSBlock">
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X87A53FB6813E2E3C">6.4-1 <span class="Heading"><code class="code">AltSymBBByDegree</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X7F58277E780EEA2E">6.4-2 <span class="Heading"><code class="code">BiggerScalarsOnly</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X863E0A1D7D7FEE04">6.4-3 <span class="Heading"><code class="code">BlockScalarProj</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X84FE699F85371643">6.4-4 <span class="Heading"><code class="code">Blocks</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X84865B2E87FB00CE">6.4-5 <span class="Heading"><code class="code">BlocksBackToMats</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X8605DA5E85DFACDC">6.4-6 <span class="Heading"><code class="code">BlocksModScalars</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X799F4A7A8239D70F">6.4-7 <span class="Heading"><code class="code">C3C5</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X7E484B8F83849B49">6.4-8 <span class="Heading"><code class="code">C6</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X7CE5D3D5876DE816">6.4-9 <span class="Heading"><code class="code">ClassicalNatural</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X7EC8D0FD7DC6B213">6.4-10 <span class="Heading"><code class="code">ComputeSimpleSocle</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X81E155F98671824A">6.4-11 <span class="Heading"><code class="code">D247</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X878ADA8A7CCE93E0">6.4-12 <span class="Heading"><code class="code">DoBaseChangeForBlocks</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X7ED3241F84A98292">6.4-13 <span class="Heading"><code class="code">FindElmOfEvenNormal</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X7845D88F845EC143">6.4-14 <span class="Heading"><code class="code">KroneckerKernel</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X8634C79E7DB22934">6.4-15 <span class="Heading"><code class="code">KroneckerProduct</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X865D3A1B7B6BB49B">6.4-16 <span class="Heading"><code class="code">LieTypeNonConstr</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X810B7F36818D626B">6.4-17 <span class="Heading"><code class="code">LowIndex</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X82B704EF80AE2FBB">6.4-18 <span class="Heading"><code class="code">NameSporadic</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X83E6AD6583DB7080">6.4-19 <span class="Heading"><code class="code">NotAbsolutelyIrred</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X850864887D7F193E">6.4-20 <span class="Heading"><code class="code">ProjDeterminant</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X7B2111968598599F">6.4-21 <span class="Heading"><code class="code">SporadicsByOrders</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X7A46A44F867CFB21">6.4-22 <span class="Heading"><code class="code">StabilizerChainProj</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X7FE1FA217A08DCE5">6.4-23 <span class="Heading"><code class="code">Subfield</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X7DE8D77D7D1E19E3">6.4-24 <span class="Heading"><code class="code">TensorDecomposable</code></span></a>
+</span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap6.html#X7A82C26E78FEF78F">6.4-25 <span class="Heading"><code class="code">ThreeLargeElOrders</code></span></a>
+</span>
+</div></div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap6.html#X7D4A5A9A8266A292">6.5 <span class="Heading">Unused methods</span></a>
+</span>
+</div>
+</div>
+<div class="ContChap"><a href="chap7.html#X7C5563A37D566DA5">7 <span class="Heading">Miscellaneous</span></a>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap7.html#X7DAED77382578278">7.1 <span class="Heading">Naming of groups</span></a>
+</span>
+<div class="ContSSBlock">
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap7.html#X7871DE3B82F068EA">7.1-1 RecogniseClassical</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap7.html#X7CE134688292672A">7.1-2 DisplayRecog</a></span>
+</div></div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap7.html#X8715B7F47F2C95F5">7.2 <span class="Heading">Renaming of <strong class="pkg">recog</strong> functions and operations</span></a>
+</span>
+</div>
+</div>
+<div class="ContChap"><a href="chap8.html#X7E349FA783950EA0">8 <span class="Heading">How to write a recognition method</span></a>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap8.html#X87E1C6E07AA0416D">8.1 <span class="Heading">Leaf methods</span></a>
+</span>
+</div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap8.html#X8072F8B27B55D99D">8.2 <span class="Heading">Elements with memory</span></a>
+</span>
+</div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap8.html#X7A62F30582BDA07D">8.3 <span class="Heading">Splitting methods</span></a>
+</span>
+</div>
+</div>
+<div class="ContChap"><a href="chapBib.html"><span class="Heading">References</span></a></div>
+<div class="ContChap"><a href="chapInd.html"><span class="Heading">Index</span></a></div>
+<br />
+</div>
+
+<div class="chlinkprevnextbot">&nbsp;<a href="chap0.html">[Top of Book]</a>&nbsp;  <a href="chap0.html#contents">[Contents]</a>&nbsp;  &nbsp;<a href="chap1.html">[Next Chapter]</a>&nbsp;  </div>
+
+
+<div class="chlinkbot"><span class="chlink1">Goto Chapter: </span><a href="chap0.html">Top</a>  <a href="chap1.html">1</a>  <a href="chap2.html">2</a>  <a href="chap3.html">3</a>  <a href="chap4.html">4</a>  <a href="chap5.html">5</a>  <a href="chap6.html">6</a>  <a href="chap7.html">7</a>  <a href="chap8.html">8</a>  <a href="chapBib.html">Bib</a>  <a href="chapInd.html">Ind</a>  </div>
+
+<hr />
+<p class="foot">generated by <a href="https://www.math.rwth-aachen.de/~Frank.Luebeck/GAPDoc">GAPDoc2HTML</a></p>
 </body>
 </html>
