@@ -760,7 +760,7 @@ SLPforElementFuncsProjective.PSL2 := function(ri,x)
       ri!.normlist := RECOG.SetupNormalisationListForPSLd(ri!.field,
                                                           ri!.gcd.gcd);
   fi;
-  pos := PositionNonZero(y[1]);
+  pos := PositionNonZeroInRow(y, 1);
   s := RECOG.NormaliseScalarForPSLd(y[1,pos],ri!.normlist);
   slp := RECOG.ExpressInStd_SL2(s * y,ri!.fakegens);
   return slp;
@@ -833,7 +833,7 @@ SLPforElementFuncsProjective.PSLd := function(ri,x)
       ri!.normlist := RECOG.SetupNormalisationListForPSLd(ri!.field,
                                                           ri!.gcd.gcd);
   fi;
-  pos := PositionNonZero(y[1]);
+  pos := PositionNonZeroInRow(y, 1);
   s := RECOG.NormaliseScalarForPSLd(y[1,pos],ri!.normlist);
   slp := RECOG.ExpressInStd_SL(s * y,ri!.fakegens);
   return slp;
@@ -857,13 +857,13 @@ function(ri)
   if d = 2 then
       if not RECOG.IsThisSL2Natural(GeneratorsOfGroup(g),f) then
           Info(InfoRecog,2,"ClassicalNatural: Is not PSL_2.");
-          return fail; # FIXME: fail = TemporaryFailure here really correct?
+          return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
       fi;
   else
       classical := RecogniseClassical(g);
       if classical.isSLContained <> true then
           Info(InfoRecog,2,"ClassicalNatural: Is not PSL.");
-          return fail; # FIXME: fail = TemporaryFailure here really correct?
+          return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
       fi;
   fi;
 
@@ -951,6 +951,6 @@ function(ri)
       fi;
   fi;
 
-  return fail; # FIXME: fail = TemporaryFailure here really correct?
+  return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
 
 end);

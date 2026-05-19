@@ -18,8 +18,8 @@ SetPackageInfo( rec(
 
 PackageName := "recog",
 Subtitle := "A package for constructive recognition of permutation and matrix groups",
-Version := "1.5.0dev",
-Date := "22/01/2025", # dd/mm/yyyy format
+Version := "1.5.0",
+Date := "19/05/2026", # dd/mm/yyyy format
 License := "GPL-3.0-or-later",
 
 ##  Information about authors and maintainers.
@@ -37,6 +37,18 @@ Persons := [
     IsAuthor      := true,
     IsMaintainer  := false,
   ),
+  rec(
+    LastName      := "Horn",
+    FirstNames    := "Max",
+    IsAuthor      := false,
+    IsMaintainer  := true,
+    Email         := "mhorn@rptu.de",
+    WWWHome       := "https://www.quendi.de/math",
+    GitHubUsername := "fingolfin",
+    Place         := "Kaiserslautern",
+    Institution   := "RPTU Kaiserslautern-Landau"
+  ),
+
   rec(
     LastName      := "Bernhardt",
     FirstNames    := "Dominik",
@@ -78,7 +90,6 @@ rec(
     IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "paula.haehndel@mathematik.uni-halle.de",
-    WWWHome       := "https://algebra.mathematik.uni-halle.de/haehndel/",
     Place         := "Halle (Saale)",
     Institution   := "Martin-Luther-Universität Halle-Wittenberg"
   ),
@@ -104,7 +115,6 @@ rec(
     IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "caj21@st-andrews.ac.uk",
-    WWWHome       := "https://caj.host.cs.st-andrews.ac.uk",
     Place         := "St Andrews",
     Institution   := "University of St Andrews"
   ),
@@ -123,7 +133,6 @@ rec(
     IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "sal@cs.st-andrews.ac.uk",
-    WWWHome       := "http://www-groups.mcs.st-and.ac.uk/~sal",
     Place         := "St Andrews",
     Institution   := "University of St Andrews"
   ),
@@ -133,9 +142,19 @@ rec(
     IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "malle@mathematik.uni-kl.de",
-    WWWHome       := "https://www.mathematik.uni-kl.de/~malle/",
+    WWWHome       := "https://agag-malle.math.rptu.de/~malle/en/",
     Place         := "Kaiserslautern",
-    Institution   := "Universität Kaiserslautern",
+    Institution   := "RPTU Kaiserslautern-Landau",
+  ),
+  rec(
+    LastName      := "Müller",
+    FirstNames    := "Till",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "t.mueller@math.rptu.de",
+    GitHubUsername := "Till-Eisen",
+    Place         := "Kaiserslautern",
+    Institution   := "RPTU Kaiserslautern-Landau"
   ),
   rec(
     LastName      := "Niemeyer",
@@ -163,20 +182,8 @@ rec(
     IsAuthor      := false,
     IsMaintainer  := false,
     Email         := "colva@mcs.st-and.ac.uk",
-    WWWHome       := "http://www-groups.mcs.st-and.ac.uk/~colva",
     Place         := "St Andrews",
     Institution   := "University of St Andrews"
-  ),
-  rec(
-    LastName      := "Horn",
-    FirstNames    := "Max",
-    IsAuthor      := false,
-    IsMaintainer  := true,
-    Email         := "mhorn@rptu.de",
-    WWWHome       := "https://www.quendi.de/math",
-    GitHubUsername := "fingolfin",
-    Place         := "Kaiserslautern",
-    Institution   := "RPTU Kaiserslautern-Landau"
   ),
  rec(
     LastName      := "Siccha",
@@ -187,7 +194,27 @@ rec(
     #WWWHome       := "https://www.mathematik.rwth-aachen.de/go/id/bkbg/gguid/0x28CF75713F0B7744BEF1377FB3F6748E/ikz/11/allou/1/lidx/1/",
     Place         := "Aachen",
     Institution   := "RWTH Aachen University"
-  ), 
+  ),
+  rec(
+    LastName      := "Wagner",
+    FirstNames    := "Martin",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "marwagne@rptu.de",
+    GitHubUsername := "SoongNoonien",
+    Place         := "Kaiserslautern",
+    Institution   := "RPTU Kaiserslautern-Landau"
+  ),
+  rec(
+    LastName      := "Wiedemann",
+    FirstNames    := "Torben",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "torben.wiedemann@rptu.de",
+    GitHubUsername := "TWiedemann",
+    Place         := "Kaiserslautern",
+    Institution   := "RPTU Kaiserslautern-Landau"
+  ),
   rec(
     LastName      := "Wilson",
     FirstNames    := "Wilf",
@@ -196,7 +223,7 @@ rec(
     Email         := "gap@wilf-wilson.net",
     WWWHome       := "https://wilf.me"
   ),
-rec(
+  rec(
     LastName      := "Whybrow",
     FirstNames    := "Madeleine",
     IsAuthor      := false,
@@ -208,24 +235,7 @@ rec(
   ),
 ],
 
-##  Status information. Currently the following cases are recognized:
-##    "accepted"      for successfully refereed packages
-##    "deposited"     for packages for which the GAP developers agreed
-##                    to distribute them with the core GAP system
-##    "dev"           for development versions of packages
-##    "other"         for all other packages
-##
-# Status := "accepted",
 Status := "deposited",
-
-##  You must provide the next two entries if and only if the status is
-##  "accepted" because is was successfully refereed:
-# format: 'name (place)'
-# CommunicatedBy := "Mike Atkinson (St. Andrews)",
-#CommunicatedBy := "",
-# format: mm/yyyy
-# AcceptDate := "08/1999",
-#AcceptDate := "",
 
 SourceRepository := rec(
     Type := "git",

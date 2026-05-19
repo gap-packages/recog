@@ -161,7 +161,7 @@ SUBFIELD.addToNNRBasis := function ( nnrbasis , v )
   # check each of the previous 1s to see if need to clear them in temp
   for i in [ 1 .. s ] do
     if not ( IsZero ( temp [ nnrbasis . locOfPivots [ i ] ] ) ) then
-      AddRowVector ( temp , nnrbasis . ans [ i ] ,
+      AddVector ( temp , nnrbasis . ans [ i ] ,
                      - temp [ nnrbasis . locOfPivots [ i ] ] ) ;
     fi ;
   od ;
@@ -176,11 +176,11 @@ SUBFIELD.addToNNRBasis := function ( nnrbasis , v )
   # At this stage, temp has been cleared out by as much as possible
   # but still has something in the position nonzero
   # We scale that position to 1
-  MultRowVector ( temp ,  temp [ nonzero ] ^ ( - 1 ) ) ;
+  MultVector ( temp ,  temp [ nonzero ] ^ ( - 1 ) ) ;
 
   # Now clear all the old stuff
   for i in nnrbasis . ans do
-    AddRowVector ( i , temp , - i [ nonzero ] ) ;
+    AddVector ( i , temp , - i [ nonzero ] ) ;
   od ;
 
   # Finally include temp in our results and exit

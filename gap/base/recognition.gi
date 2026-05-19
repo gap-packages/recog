@@ -581,7 +581,11 @@ InstallGlobalFunction( RecogniseGeneric,
         fi;
         if ForAny(GeneratorsOfGroup(H), x->not ValidateHomomInput(ri, x)) then
             # Our group fails to contain some of the generators of H!
-            return fail;
+            if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
+            Info(InfoRecog, 1,
+                 "error trying to map group generators into image,",
+                 " IsReady(<ri>) is not set, recognition aborts");
+            return ri;
         fi;
 
         Add(depthString,'F');
@@ -604,6 +608,8 @@ InstallGlobalFunction( RecogniseGeneric,
         if not IsReady(rifac) then
             # IsReady was not set, thus abort the whole computation.
             if InfoLevel(InfoRecog) = 1 and depth = 0 then Print("\n"); fi;
+            # A message about this should already have been printed, so we
+            # don't print one here.
             return ri;
         fi;
 

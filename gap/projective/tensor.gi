@@ -173,7 +173,7 @@ RECOG.IsKroneckerProduct := function(m,r)
       return [false];
   fi;
   d := Length(m);
-  pos := PositionNonZero(m[1]);
+  pos := PositionNonZeroInRow(m, 1);
   blockpos := QuoInt(pos-1,blocksize)+1;
   entrypos := ((pos-1) mod blocksize)+1;
   a := ExtractSubMatrix(m,[1..blocksize],
