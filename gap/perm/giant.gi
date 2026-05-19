@@ -581,6 +581,9 @@ RECOG.SLPforSn :=  function( n, pi )
 
     local cycles, initpts, c, newc, i, R, ci, cycslp, k ;
 
+    if pi = fail then
+        return fail;
+    fi;
     if IsOne(pi) then
         return StraightLineProgramNC( [[1,0]], 2 );
     fi;
@@ -651,6 +654,9 @@ RECOG.SLPforAn :=  function( n, pi )
     local cycles, initpts, c, newc,  R, i, nexttrpn, ci, cycslp, k, j,
           nexttau, nextsigma ;
 
+    if pi = fail then
+        return fail;
+    fi;
     if IsOne(pi) then
         return StraightLineProgramNC( [[1,0]], 2 );
     fi;
