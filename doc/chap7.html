@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<title>GAP (recog) - Chapter 7: Miscellaneous</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="GAPDoc2HTML" />
+<link rel="stylesheet" type="text/css" href="manual.css" />
+<script src="manual.js" type="text/javascript"></script>
+<script type="text/javascript">overwriteStyle();</script>
+</head>
+<body class="chap7"  onload="jscontent()">
+
+
+<div class="chlinktop"><span class="chlink1">Goto Chapter: </span><a href="chap0.html">Top</a>  <a href="chap1.html">1</a>  <a href="chap2.html">2</a>  <a href="chap3.html">3</a>  <a href="chap4.html">4</a>  <a href="chap5.html">5</a>  <a href="chap6.html">6</a>  <a href="chap7.html">7</a>  <a href="chap8.html">8</a>  <a href="chapBib.html">Bib</a>  <a href="chapInd.html">Ind</a>  </div>
+
+<div class="chlinkprevnexttop">&nbsp;<a href="chap0.html">[Top of Book]</a>&nbsp;  <a href="chap0.html#contents">[Contents]</a>&nbsp;  &nbsp;<a href="chap6.html">[Previous Chapter]</a>&nbsp;  &nbsp;<a href="chap8.html">[Next Chapter]</a>&nbsp;  </div>
+
+<p id="mathjaxlink" class="pcenter"><a href="chap7_mj.html">[MathJax on]</a></p>
+<p><a id="X7C5563A37D566DA5" name="X7C5563A37D566DA5"></a></p>
+<div class="ChapSects"><a href="chap7.html#X7C5563A37D566DA5">7 <span class="Heading">Miscellaneous</span></a>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap7.html#X7DAED77382578278">7.1 <span class="Heading">Naming of groups</span></a>
+</span>
+<div class="ContSSBlock">
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap7.html#X7871DE3B82F068EA">7.1-1 RecogniseClassical</a></span>
+<span class="ContSS"><br /><span class="nocss">&nbsp;&nbsp;</span><a href="chap7.html#X7CE134688292672A">7.1-2 DisplayRecog</a></span>
+</div></div>
+<div class="ContSect"><span class="tocline"><span class="nocss">&nbsp;</span><a href="chap7.html#X8715B7F47F2C95F5">7.2 <span class="Heading">Renaming of <strong class="pkg">recog</strong> functions and operations</span></a>
+</span>
+</div>
+</div>
+
+<h3>7 <span class="Heading">Miscellaneous</span></h3>
+
+<p>This chapter describes various aspects of <strong class="pkg">recog</strong> that did not fit elsewhere.</p>
+
+<p><a id="X7DAED77382578278" name="X7DAED77382578278"></a></p>
+
+<h4>7.1 <span class="Heading">Naming of groups</span></h4>
+
+<p>For non-constructive recognition of classical matrix groups in their natural representation, the following functions are available.</p>
+
+<p><a id="X7871DE3B82F068EA" name="X7871DE3B82F068EA"></a></p>
+
+<h5>7.1-1 RecogniseClassical</h5>
+
+<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; RecogniseClassical</code>( <var class="Arg">grp</var>[, <var class="Arg">opt</var>] )</td><td class="tdright">(&nbsp;function&nbsp;)</td></tr></table></div>
+<p>Returns: a record describing the outcome of the non-constructive recognition procedure.</p>
+
+<p>This function implements non-constructive recognition, also called naming, for classical groups in their natural matrix representation over finite fields. The implementation is based on the algorithms described in <a href="chapBib.html#biBNP98">[NP98]</a>, <a href="chapBib.html#biBNP97">[NP97]</a>, and <a href="chapBib.html#biBNP99">[NP99]</a>, and uses further ingredients from <a href="chapBib.html#biBCLG97a">[CL97a]</a>, <a href="chapBib.html#biBCLG97b">[CL97b]</a>, and <a href="chapBib.html#biBPra99">[Pra99]</a>.</p>
+
+<p>The input <var class="Arg">grp</var> must be a matrix group over a finite field. The function is intended for groups that are classical, or close to classical, in their natural representation.</p>
+
+<p>The optional record <var class="Arg">opt</var> can be used to guide the computation. Its component <code class="code">case</code> may be one of <code class="code">"unknown"</code>, <code class="code">"linear"</code>, <code class="code">"symplectic"</code>, <code class="code">"unitary"</code>, <code class="code">"orthogonalplus"</code>, or <code class="code">"orthogonalcircle"</code>. Furthermore, <code class="code">nrrandels</code> controls how many random elements are inspected, and <code class="code">infoLevel</code> sets the <code class="code">InfoMethSel</code> level used while running the method selection machinery.</p>
+
+<p>The returned record is currently mostly an internal data structure and its full set of components should not be considered a stable public interface. The most useful documented components are the booleans <code class="code">isReducible</code>, <code class="code">isSLContained</code>, <code class="code">isSpContained</code>, <code class="code">isSUContained</code>, and <code class="code">isOmegaContained</code>. The four <code class="code">is*Contained</code> components indicate whether the given group contains the corresponding quasisimple classical group in the natural representation, namely <span class="SimpleMath">SL(d,q)</span>, <span class="SimpleMath">Sp(d,q)</span>, <span class="SimpleMath">SU(d,q)</span>, and <span class="SimpleMath">Ω</span> of the appropriate type.</p>
+
+<p>To inspect the full internal record for debugging purposes, use <code class="func">DisplayRecog</code> (<a href="chap7.html#X7CE134688292672A"><span class="RefLink">7.1-2</span></a>).</p>
+
+<p><a id="X7CE134688292672A" name="X7CE134688292672A"></a></p>
+
+<h5>7.1-2 DisplayRecog</h5>
+
+<div class="func"><table class="func" width="100%"><tr><td class="tdleft"><code class="func">&#8227; DisplayRecog</code>( <var class="Arg">r</var> )</td><td class="tdright">(&nbsp;function&nbsp;)</td></tr></table></div>
+<p>Returns: nothing</p>
+
+<p>Pretty-print selected information from the record returned by <code class="func">RecogniseClassical</code> (<a href="chap7.html#X7871DE3B82F068EA"><span class="RefLink">7.1-1</span></a>). This is mainly intended as a debugging helper for inspecting the internal state accumulated by the recognition procedure.</p>
+
+<p><a id="X8715B7F47F2C95F5" name="X8715B7F47F2C95F5"></a></p>
+
+<h4>7.2 <span class="Heading">Renaming of <strong class="pkg">recog</strong> functions and operations</span></h4>
+
+<p>Many of the names in the recog package were found to be unintuitive or inconsistent with other names. For these reasons the names were changed to be more descriptive and to follow the internal consistency of <strong class="pkg">GAP</strong>. In this section a dictionary from old to new names is included. The meanings of the old names for components of a recognition node are described in Section 2.6 "Components of the recognition node" of the article <a href="chapBib.html#biBNS06">[NS06]</a>.</p>
+
+<div class="pcenter"><table class="GAPDocTable">
+<caption class="GAPDocTable"><b>Table: </b>Renaming</caption>
+<tr>
+<td class="tdleft"><em>Old Name</em></td>
+<td class="tdleft"><em>New Name</em></td>
+</tr>
+<tr>
+<td class="tdleft"><code class="code">RecognitionInfoFamily</code></td>
+<td class="tdleft"><code class="func">RecogNodeFamily</code> (<a href="chap4.html#X7D2B419B83CD3BF8"><span class="RefLink">4.2-1</span></a>)</td>
+</tr>
+<tr>
+<td class="tdleft"><code class="code">IsRecognitionInfo</code></td>
+<td class="tdleft"><code class="func">IsRecogNode</code> (<a href="chap4.html#X801C44668004C0A0"><span class="RefLink">4.2-2</span></a>)</td>
+</tr>
+<tr>
+<td class="tdleft"><code class="code">RIFac</code></td>
+<td class="tdleft"><code class="func">ImageRecogNode</code> (<a href="chap4.html#X78DE5A1782456494"><span class="RefLink">4.2-10</span></a>)</td>
+</tr>
+<tr>
+<td class="tdleft"><code class="code">RIKer</code></td>
+<td class="tdleft"><code class="func">KernelRecogNode</code> (<a href="chap4.html#X7DE53FAA782440B2"><span class="RefLink">4.2-11</span></a>)</td>
+</tr>
+<tr>
+<td class="tdleft"><code class="code">RIParent</code></td>
+<td class="tdleft"><code class="func">ParentRecogNode</code> (<a href="chap4.html#X83BA3AE582319312"><span class="RefLink">4.2-12</span></a>)</td>
+</tr>
+<tr>
+<td class="tdleft"><code class="code">methodsforfactor</code></td>
+<td class="tdleft"><code class="func">methodsforimage</code> (<a href="chap4.html#X82F234BC853D1323"><span class="RefLink">4.2-18</span></a>)</td>
+</tr>
+<tr>
+<td class="tdleft"><code class="code">forfactor</code></td>
+<td class="tdleft"><code class="func">InitialDataForImageRecogNode</code> (<a href="chap5.html#X868D75F87B0F33C5"><span class="RefLink">5.3-1</span></a>)</td>
+</tr>
+<tr>
+<td class="tdleft"><code class="code">forkernel</code></td>
+<td class="tdleft"><code class="func">InitialDataForKernelRecogNode</code> (<a href="chap5.html#X868D75F87B0F33C5"><span class="RefLink">5.3-1</span></a>)</td>
+</tr>
+</table><br />
+</div>
+
+
+<div class="chlinkprevnextbot">&nbsp;<a href="chap0.html">[Top of Book]</a>&nbsp;  <a href="chap0.html#contents">[Contents]</a>&nbsp;  &nbsp;<a href="chap6.html">[Previous Chapter]</a>&nbsp;  &nbsp;<a href="chap8.html">[Next Chapter]</a>&nbsp;  </div>
+
+
+<div class="chlinkbot"><span class="chlink1">Goto Chapter: </span><a href="chap0.html">Top</a>  <a href="chap1.html">1</a>  <a href="chap2.html">2</a>  <a href="chap3.html">3</a>  <a href="chap4.html">4</a>  <a href="chap5.html">5</a>  <a href="chap6.html">6</a>  <a href="chap7.html">7</a>  <a href="chap8.html">8</a>  <a href="chapBib.html">Bib</a>  <a href="chapInd.html">Ind</a>  </div>
+
+<hr />
+<p class="foot">generated by <a href="https://www.math.rwth-aachen.de/~Frank.Luebeck/GAPDoc">GAPDoc2HTML</a></p>
+</body>
+</html>
