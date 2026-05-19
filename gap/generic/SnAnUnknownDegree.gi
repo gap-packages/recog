@@ -95,7 +95,9 @@ end;
 # eps : real number, the error bound
 # N : integer, upper bound for the degree of G
 #
-# Returns a record of constants used in ThreeCyclesCanditatesIterator.
+# Returns a record of constants used in ThreeCyclesCandidatesIterator. The
+# meaning of these constants is documented under "Changes" at the beginning of
+# this file and their values are from [JLNP13, 4.1].
 RECOG.ThreeCycleCandidatesConstants := function(eps, N)
     local M, p;
     # Constants
