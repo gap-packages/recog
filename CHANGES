@@ -1,6 +1,6 @@
 This file describes changes in the recog package.
 
-1.5.0 (2026-MM-DD)
+1.5.0 (2026-05-17)
   - Add a first `StdPresentation` implementation (needs further tuning)
   - Implement verification via a new property `IsCorrect`
   - Countless bug fixes and other improvements, too many to list individually
