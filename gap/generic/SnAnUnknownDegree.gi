@@ -35,7 +35,7 @@
 ##      - If `M <= 6`, then we return `TemporaryFailure`.
 ##      - TODO: If `N > 20`, use Magma Code `GuessSnAnDegree` to guess the 
 ##        degree by element orders. (In Issue 348, there is code for a GAP function
-##        `GuessSnAnDegree` which can be used a starting point.)
+##        `GuessSnAnDegree` which can be used as a starting point.)
 ##      - TODO: If `GuessSnAnDegree` was used, then we check if we can find
 ##        an element whose order is in the interval `[N - m, N + m]`.
 ##      - Otherwise, we continue.
