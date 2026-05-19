@@ -50,6 +50,13 @@ Persons := [
   ),
 
   rec(
+    LastName      := "Ankaralioglu",
+    FirstNames    := "Nurullah",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+    Email         := "ankarali@atauni.edu.tr",
+  ),
+  rec(
     LastName      := "Bernhardt",
     FirstNames    := "Dominik",
     IsAuthor      := false,
@@ -57,14 +64,6 @@ Persons := [
     Email         := "bernhardt@mathb.rwth-aachen.de",
     Place         := "Aachen",
     Institution   := "RWTH Aachen University",
-    #WWWHome       := "https://www.mathb.rwth-aachen.de/cms/MATHB/Der-Lehrstuhl/Team/Wissenschaftliche-Beschaeftigte/~rnsg/Dominik-Bernhardt/lidx/1/"
-  ),
-  rec(
-    LastName      := "Ankaralioglu",
-    FirstNames    := "Nurullah",
-    IsAuthor      := false,
-    IsMaintainer  := false,
-    Email         := "ankarali@atauni.edu.tr",
   ),
   rec(
     LastName      := "Brooksbank",
@@ -94,6 +93,12 @@ rec(
     Institution   := "Martin-Luther-Universität Halle-Wittenberg"
   ),
   rec(
+    LastName      := "Howe",
+    FirstNames    := "Stephen",
+    IsAuthor      := false,
+    IsMaintainer  := false,
+  ),
+  rec(
     LastName      := "Hulpke",
     FirstNames    := "Alexander",
     IsAuthor      := false,
@@ -102,12 +107,6 @@ rec(
     WWWHome       := "https://www.math.colostate.edu/~hulpke/",
     Place         := "Fort Collins",
     Institution   := "Colorado State University"
-  ),
-  rec(
-    LastName      := "Howe",
-    FirstNames    := "Stephen",
-    IsAuthor      := false,
-    IsMaintainer  := false,
   ),
   rec(
     LastName      := "Jefferson",
