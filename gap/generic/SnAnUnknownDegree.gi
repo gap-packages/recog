@@ -33,7 +33,9 @@
 ##  - Look at some orders and deduce a lower bound `M` for the degree.
 ##      - If `M > N`, then we excluded `An`, `Sn`.
 ##      - If `M <= 6`, then we return `TemporaryFailure`.
-##      - TODO: If `N > 20`, use Magma Code `GuessSnAnDegree` to guess the degree by element orders.
+##      - TODO: If `N > 20`, use Magma Code `GuessSnAnDegree` to guess the 
+##        degree by element orders. (In Issue 348, there is code for a GAP function
+##        `GuessSnAnDegree` which can be used a starting point.)
 ##      - TODO: If `GuessSnAnDegree` was used, then we check if we can find
 ##        an element whose order is in the interval `[N - m, N + m]`.
 ##      - Otherwise, we continue.
@@ -1130,124 +1132,6 @@ RECOG.LowerBoundForDegreeOfSnAnViaOrders := function(ri)
     ));
 end;
 
-# Inspired from Magma Code: GuessAltsymDegree, in magma/package/Group/GrpFin/SimpleRecog/altsym.m
-# Returns a guess at alternating or symmetric and degree n
-# (It won't work for Sym(3) or Sym(6)!)
-#
-# This function samples projective orders of elements, and attempts to guess
-# degree n and whether it is Alternating or Symmetric.
-# Returns a record with entries:
-#   - type   : string "Alternating" or "Symmetric"
-#   - degree : integer n
-# Returns fail if n<=6 or maxtries elements are sampled with
-# no decision made.
-#
-# At least Max(mintries,fac*n*Log(n)) random elements are chosen without
-# the answer changing, where mintries, fac can be given as an optional
-# arguments.
-#
-# TODO: Investigate why Alt(9) and Sym(8) return fail
-# TODO: Might be inspired from
-# "Fast Constructive Recognition of a Black Box Group Isomorphic to Sn or An using Goldbach’s Conjecture"
-# by Sergey Bratus and Igor Pak,
-# in Chapter 9. "What To Do If n is Not Known?"
-# WARNING: This function is currently UNUSED, we only keep it for the sake of potential
-# future work towards better An/Sn naming, see <https://github.com/gap-packages/recog/issues/348>
-RECOG.GuessSnAnDegree := function(ri, optionlist...)
-    local G, r, options, mintries, maxtries, fac, mindego, mindege, ct, proc, g, o, mindeg, o_fact, mindegforg;
-    # mindego and mindege will be respectively the smallest possible
-    # degrees of symmetric groups that contain the elements of odd and
-    # even orders, in the random sample.
-    # If mindego > mindege we guess that the group is alternating, otherwise
-    # that it is symmetric.
-
-    G := Grp(ri);
-    if  (IsPermGroup(G) and NrMovedPoints(G) <= 6)
-                or (IsMatrixGroup(G) and DimensionOfMatrixGroup(G) <= 2) then
-        Info(InfoRecog, 2, "GuessSnAnDegree works only for permutation degree > 6 or matrix dimension > 2");
-        return fail;
-    fi;
-
-    # Set options
-    options := rec(
-        mintries := 100,
-        maxtries := 5000,
-        fac := 4
-    );
-
-    if Length(optionlist) > 0 then
-        for r in RecNames(optionlist[1]) do
-            if not IsBound(options.(r)) then
-                ErrorNoReturn("Invalid option to GuessSnAnDegree: ", r);
-            fi;
-            options.(r) := optionlist[1].(r);
-        od;
-    fi;
-
-    mintries := options.mintries;
-    maxtries := options.maxtries;
-    fac := options.fac;
-
-    # Init Loop
-    mindego := 0;
-    mindege := 0;
-    ct := 0;
-    mindeg := 0;
-    if mintries < 1 then
-        mintries := 1;
-    fi;
-
-    # Main Loop
-    while (ct < Maximum(mintries, fac * mindeg * Int(Ceil(Log(Float(mindeg+1)))))
-                or mindego = mindege+1) and ct <= maxtries do
-        # The situation mindego = mindege+1 was responsible for most errors
-        # in the first version! Alt(n+1) was returned instead of Sym(n).
-        g := RandomElm(ri, "GuessSnAnDegree", false)!.el;;
-        o := OrderFunc(ri)(g);
-        ct := ct + 1; # counter of loop, as long as no new larger degree was detected
-        if o = 1 then
-            continue;
-        fi;
-        o_fact := Collected(Factors(o));
-        mindegforg := Sum(o_fact, f -> f[1] ^ f[2]); # minimum degree is sum over all prime-powers in factorization
-        if o mod 2 = 0 then
-            if mindegforg > mindege then
-                mindege := mindegforg;
-                if mindege > mindeg then
-                    mindeg := mindege;
-                fi;
-                ct := 0;
-            fi;
-        else
-            if mindegforg > mindego then
-                mindego := mindegforg;
-                if mindego > mindeg then
-                    mindeg := mindego;
-                fi;
-                ct := 0;
-            fi;
-        fi;
-    od;
-
-    if ct > maxtries then
-        return fail;
-    fi;
-
-    if mindego > mindege then
-        if mindego <= 6 then
-            return fail;
-        else
-            return rec(type := "Alternating", degree := mindego);
-        fi;
-    else
-        if mindege <= 6 then
-            return fail;
-        else
-            return rec(type := "Symmetric", degree := mindege);
-        fi;
-    fi;
-end;
-
 RECOG.SnAnUpperBoundForDegree := function(ri)
     local G, N, p, d, M;
     G := Grp(ri);
@@ -1318,20 +1202,6 @@ RECOG.SnAnCacheUpperBoundForDegree := function(ri)
     fi;
     N := RECOG.SnAnUpperBoundForDegree(ri);
     cache.N := N;
-    # if not IsInt(N) then
-    #     return;
-    # fi;
-    # This is usually much smaller than RECOG.SnAnUpperBoundForDegree.
-    # The number to compare N with was chosen arbitrarily as a "large" degree.
-    # if N > 20 then
-    #     degreeData := RECOG.GuessSnAnDegree(ri);
-    #     if degreeData = fail then
-    #         cache.N := TemporaryFailure;
-    #         return;
-    #     fi;
-    #     N := Minimum(N, degreeData.degree);
-    #     cache.N := N;
-    # fi;
 end;
 
 # Lazy variant of RECOG.RecogniseSnAnEager. The difference is, that we give up at an earlier
