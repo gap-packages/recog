@@ -32,6 +32,7 @@ jobs:
       - uses: gap-actions/build-pkg-docs@v2
         with:
           use-latex: true
+          warnings-as-errors: 'false'  # disable warnings about chunks that are never inserted
       - uses: gap-actions/release-pkg@v1
         with:
           dry-run: ${{ inputs.dry-run }}
