@@ -74,3 +74,9 @@ In addition, the recog package has a mailing list, at
 sharing information, and asking questions about the package. You can find
 more information, and register to receive the mail sent to this list, at
 <https://mail.gap-system.org/mailman/listinfo/recog>.
+
+## Funding
+
+The development of this GAP package is supported by the
+German Research Foundation (DFG) within the
+[Collaborative Research Center TRR 195](https://www.computeralgebra.de/sfb/).
