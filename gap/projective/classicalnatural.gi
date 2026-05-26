@@ -654,8 +654,7 @@ RECOG.IsThisSL2Natural := function(gens,f)
       Info(InfoRecog,4,"SL2: Computing stabiliser chain.");
       S := StabilizerChain(Group(gens));
       Info(InfoRecog,4,"SL2: size is ",Size(S));
-      # return Size(S) mod (q*(q-1)*(q+1)) = 0;
-      return Size(S) = (q*(q-1)*(q+1));
+      return Size(S) mod (q*(q-1)*(q+1)) = 0;
   fi;
 
   seenqp1 := false;
