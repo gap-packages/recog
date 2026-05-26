@@ -140,16 +140,29 @@ end);
 # the set poss contain only zero elements outside of the
 # positions indicated by poss.
 RECOG.IsDiagonalBlockOfMatrix := function(m, poss)
-  local n, outside, z, i, j;
-  Assert(1, NrRows(m) = NrCols(m) and IsSubset([1..NrRows(m)], poss));
-  outside := Difference([1..NrRows(m)], poss);
-  z := ZeroOfBaseDomain(m);
+  local a, b, n, i;
+  a := First(poss);
+  b := Last(poss);
+  n := NrRows(m);
+  Assert(1, poss = [a..b]);
+  Assert(1, NrRows(m) = NrCols(m) and b <= n);
+  # check for zeros above
+  for i in [1..a-1] do
+    if PositionNonZeroInRow(m, i, a-1) <= b then
+      return false;
+    fi;
+  od;
+  # check for zeros left and right
   for i in poss do
-    for j in outside do
-      if m[i,j] <> z or m[j,i] <> z then
-        return false;
-      fi;
-    od;
+    if PositionNonZeroInRow(m, i) < a or PositionNonZeroInRow(m, i, b) <= n then
+      return false;
+    fi;
+  od;
+  # check for zeros below
+  for i in [b+1..n] do
+    if PositionNonZeroInRow(m, i, a-1) <= b then
+      return false;
+    fi;
   od;
   return true;
 end;
@@ -282,7 +295,7 @@ RECOG.CleanRow := function( basis, vec, extend, dec)
 
   # Clear dec vector if given:
   if dec <> fail then
-    MultRowVector(dec,Zero(dec[1]));
+    MultVector(dec,Zero(dec[1]));
   fi;
 
   # First a little shortcut:
@@ -301,7 +314,7 @@ RECOG.CleanRow := function( basis, vec, extend, dec)
         if dec <> fail then
           dec[ j ] := c;
         fi;
-        AddRowVector( vec, basis.vectors[ j ], -c );
+        AddVector( vec, basis.vectors[ j ], -c );
       fi;
     fi;
   od;
@@ -312,7 +325,7 @@ RECOG.CleanRow := function( basis, vec, extend, dec)
   else
     if extend then
       c := vec[newpiv]^-1;
-      MultRowVector( vec, vec[ newpiv ]^-1 );
+      MultVector( vec, vec[ newpiv ]^-1 );
       if dec <> fail then
         dec[len+1] := c;
       fi;
@@ -406,17 +419,18 @@ end);
 # verify that the matrix has block lower triangular shape
 # with respect to the given blocks.
 RECOG.IsBlockLowerTriangularWithBlocks := function(mat, blocks)
-  local z, b, col, row;
-  Assert(0, Concatenation(blocks) = [1..Length(mat)]);
-  z := ZeroOfBaseDomain(mat);
+  local a, b, n, row;
+  n := NrRows(mat);
+  Assert(1, NrCols(mat) = n);
+  Assert(1, Concatenation(blocks) = [1..n]);
   for b in blocks do
+    a := First(b);
+    Assert(1, b = [a..Last(b)]);
     # Verify that there are only zeros above each block
-    for row in [1..b[1]-1] do
-      for col in b do
-        if mat[row,col] <> z then
-          return false;
-        fi;
-      od;
+    for row in [1..a-1] do
+      if PositionNonZeroInRow(mat, row, a-1) <= Last(b) then
+        return false;
+      fi;
     od;
   od;
   return true;
@@ -672,7 +686,7 @@ RECOG.FindKernelLowerLeftPGroup := function(ri)
                     # we might have jumped over a layer
                     done := -v[pivots[i][2]];
                     if not IsZero(done) then
-                        AddRowVector(v,lvec[i],done);
+                        AddVector(v,lvec[i],done);
                         x := x * l[i]^IntFFE(done);
                         Assert(1, not IsOne(x) or IsZero(v));  # IsOne(x) should imply IsZero(v)
                     fi;
@@ -694,7 +708,7 @@ RECOG.FindKernelLowerLeftPGroup := function(ri)
             Assert(1, not IsOne(x));
             # Now find a new pivot:
             el := v[pos]^-1;
-            MultRowVector(v,el);
+            MultVector(v,el);
             x := x ^ IntFFE(el);
             Assert(1, not IsOne(x));
             Add(l,x,i);
@@ -741,7 +755,7 @@ SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
       while i <= Length(ri!.gensNvectors) and ri!.gensNpivots[i][1] = layer do
           done := h[ri!.gensNpivots[i][2]];
           if not IsZero(done) then
-              AddRowVector(h,ri!.gensNvectors[i],-done);
+              AddVector(h,ri!.gensNvectors[i],-done);
               pow := IntFFE(done);
               g := NiceGens(ri)[i]^(-pow) * g;
               Add(l,i);

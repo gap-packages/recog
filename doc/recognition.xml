@@ -222,6 +222,7 @@ The following attributes are defined for recognition nodes:
 <#Include Label="slpforelement">
 <#Include Label="SLPforElement">
 <#Include Label="StdPresentation">
+<#Include Label="IsCorrect">
 <#Include Label="methodsforimage">
 
 <ManSection>
@@ -273,6 +274,7 @@ homomorphism method up to the recursive recognition function:
 <#Include Label="CalcNiceGensHomNode">
 <#Include Label="CalcNiceGens">
 <#Include Label="slptonice">
+<#Include Label="CalcStdPresentation">
 
 The following three attributes are concerned with the administration of the
 kernel of a found homomorphism. Find homomorphism methods use them to

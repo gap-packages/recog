@@ -231,6 +231,34 @@ DeclareAttribute( "StdPresentation", IsRecogNode, "mutable" );
 ## <#/GAPDoc>
 DeclareAttribute( "CalcStdPresentation", IsRecogNode, "mutable" );
 
+## <#GAPDoc Label="IsCorrect">
+## <ManSection>
+## <Prop Name="IsCorrect" Arg="ri"/>
+## <Description>
+## The recognition procedure may with a small probability produce recognition trees
+## that are not correct.
+## For this reason, it is possible to verify that a recognition tree
+## is mathematically correct by calling <C>IsCorrect</C>.
+## However, this is in general expensive.
+## <P/>
+## A value <K>true</K> of <C>IsCorrect(<A>ri</A>)</C> signifies that the subtree rooted at <A>ri</A>
+## has been verified to be correct.
+## A value of <K>false</K> signifies that there was an attempt of verification,
+## but that this verification resulted in a proof that the subtree rooted at <A>ri</A>
+## is incorrect.
+## <P/>
+## Here correctness of a subtree means the following: If <C>ri2</C> is a node in
+## this subtree, <M>H</M> is the group
+## associated to <A>ri2</A> and <A>riKer</A> is the left child of <A>ri2</A>,
+## then the group associated to <A>riKer</A> (or rather, its embedding into <M>H</M>)
+## equals the kernel of the homomorphism from <M>H</M> to the group associated
+## to the right child of <A>ri2</A>.
+## Without verification, the group of <A>riKer</A> may be smaller than the kernel.
+## </Description>
+## </ManSection>
+## <#/GAPDoc>
+DeclareProperty( "IsCorrect", IsRecogNode );
+
 DeclareProperty( "IsRecogInfoForSimpleGroup", IsRecogNode );
 DeclareProperty( "IsRecogInfoForAlmostSimpleGroup", IsRecogNode );
 InstallTrueMethod( IsRecogInfoForAlmostSimpleGroup, IsRecogInfoForSimpleGroup );
@@ -654,7 +682,8 @@ DeclareGlobalFunction( "CalcNiceGensHomNode" );
 DeclareGlobalFunction( "SLPforElementGeneric" );
 
 ## TODO: Documentation!
-DeclareGlobalFunction( "CalcStdPresentationGeneric" );
+DeclareGlobalFunction( "CalcStdPresentationGenericLeaf" );
+DeclareGlobalFunction( "CalcStdPresentationGenericNonLeaf" );
 
 ## <#GAPDoc Label="SLPforElement">
 ## <ManSection>
@@ -676,14 +705,6 @@ DeclareOperation( "RandomOrdersSeen", [ IsRecogNode ] );
 DeclareOperation( "StopStoringRandEls", [ IsRecogNode ] );
 DeclareOperation( "GetElmOrd", [ IsRecogNode, IsRecord ] );
 #DeclareOperation( "GetElmPpd", [ IsRecogNode, IsRecord ] );
-
-
-# Finally the generic verification procedure:
-
-DeclareGlobalFunction( "VerifyPermGroup" );
-DeclareGlobalFunction( "VerifyMatrixGroup" );
-DeclareGlobalFunction( "VerifyProjectiveGroup" );
-DeclareGlobalFunction( "VerifyGroup" );
 
 # Some more user functions:
 

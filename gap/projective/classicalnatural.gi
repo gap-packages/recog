@@ -737,7 +737,7 @@ end;
 # Now the code for writing SLPs:
 
 SLPforElementFuncsProjective.PSL2 := function(ri,x)
-  local det,log,slp,y,z,pos,s;
+  local det,pos,root,s,slp,y;
   ri!.fakegens.count := ri!.fakegens.count + 1;
   if ri!.fakegens.count > 1000 then
       ri!.fakegens := RECOG.InitSLfake(ri!.field,2);
@@ -746,9 +746,13 @@ SLPforElementFuncsProjective.PSL2 := function(ri,x)
   y := ri!.nicebas * x * ri!.nicebasi;
   det := DeterminantMat(y);
   if not IsOne(det) then
-      z := PrimitiveRoot(ri!.field);
-      log := LogFFE(det,z);
-      y := y * z^(-log*ri!.gcd.coeff1/ri!.gcd.gcd);
+      # In the projective image, det only has to be a square. If it is not,
+      # then the PSL2 recognition path was too optimistic for this element.
+      root := RootFFE(ri!.field,1/det,2);
+      if root = fail then
+          return fail;
+      fi;
+      y := y * root;
   fi;
   # At this point, y has determinant 1; but we consider it modulo scalars.
   # To make sure that different coset reps behave the same, we scale it
@@ -757,7 +761,7 @@ SLPforElementFuncsProjective.PSL2 := function(ri,x)
       ri!.normlist := RECOG.SetupNormalisationListForPSLd(ri!.field,
                                                           ri!.gcd.gcd);
   fi;
-  pos := PositionNonZero(y[1]);
+  pos := PositionNonZeroInRow(y, 1);
   s := RECOG.NormaliseScalarForPSLd(y[1,pos],ri!.normlist);
   slp := RECOG.ExpressInStd_SL2(s * y,ri!.fakegens);
   return slp;
@@ -830,7 +834,7 @@ SLPforElementFuncsProjective.PSLd := function(ri,x)
       ri!.normlist := RECOG.SetupNormalisationListForPSLd(ri!.field,
                                                           ri!.gcd.gcd);
   fi;
-  pos := PositionNonZero(y[1]);
+  pos := PositionNonZeroInRow(y, 1);
   s := RECOG.NormaliseScalarForPSLd(y[1,pos],ri!.normlist);
   slp := RECOG.ExpressInStd_SL(s * y,ri!.fakegens);
   return slp;
@@ -842,7 +846,7 @@ end;
 BindRecogMethod("FindHomMethodsProjective", "ClassicalNatural",
 "check whether it is a classical group in its natural representation",
 function(ri)
-  local g,changed,classical,d,det,ext,f,gcd,gens,gm,i,p,pr,q,root,std,stdg,z;
+  local g,changed,classical,d,det,ext,f,gcd,gens,gm,i,p,pr,q,root,std,stdg;
   g := Grp(ri);
   d := ri!.dimension;
   f := ri!.field;
@@ -854,27 +858,28 @@ function(ri)
   if d = 2 then
       if not RECOG.IsThisSL2Natural(GeneratorsOfGroup(g),f) then
           Info(InfoRecog,2,"ClassicalNatural: Is not PSL_2.");
-          return fail; # FIXME: fail = TemporaryFailure here really correct?
+          return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
       fi;
   else
       classical := RecogniseClassical(g);
       if classical.isSLContained <> true then
           Info(InfoRecog,2,"ClassicalNatural: Is not PSL.");
-          return fail; # FIXME: fail = TemporaryFailure here really correct?
+          return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
       fi;
   fi;
 
   # Now get rid of nasty determinants:
   gens := ShallowCopy(GeneratorsOfGroup(g));
   changed := false;
-  z := Z(q);
   gcd := Gcdex(d,q-1);
   for i in [1..Length(gens)] do
       det := DeterminantMat(gens[i]);
       if not IsOne(det) then
           root := RootFFE(f, det^-1, d);
           if root = fail then
-              ErrorNoReturn("Should not have happened, 15634, tell Max!");
+              Info(InfoRecog,2,
+                   "ClassicalNatural: determinant cannot be normalized in field.");
+              return fail;
           fi;
           gens[i] := gens[i] * root;
           changed := true;
@@ -901,13 +906,8 @@ function(ri)
 
       # This is (P)SL2, lets set up the recognition:
       Info(InfoRecog,2,"ClassicalNatural: this is PSL_2!");
-      if IsEvenInt(q) then
-          std := RECOG.RecogniseSL2NaturalEvenChar(gm,f,false);
-          ri!.comment := "PSL2Even";
-      else
-          std := RECOG.RecogniseSL2NaturalOddCharUsingBSGS(gm,f);
-          ri!.comment := "PSL2Odd";
-      fi;
+      std := RECOG.RecogniseSL2Natural(gm,f);
+      ri!.comment := "PSL2";
       Setslptonice(ri,SLPOfElms(std.all));
       ri!.nicebas := std.bas;
       ri!.nicebasi := std.basi;
@@ -952,6 +952,6 @@ function(ri)
       fi;
   fi;
 
-  return fail; # FIXME: fail = TemporaryFailure here really correct?
+  return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
 
 end);

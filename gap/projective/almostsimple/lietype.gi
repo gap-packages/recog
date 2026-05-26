@@ -824,6 +824,9 @@ BindRecogMethod("FindHomMethodsProjective", "LieTypeNonConstr",
 function(ri)
     local G,count,dim,f,i,ords,p,q,r,res;
     G := Grp(ri);
+    if not IsBound(ri!.simplesocle) then
+        return TemporaryFailure;
+    fi;
     RECOG.SetPseudoRandomStamp(G,"LieTypeNonConstr");
     dim := ri!.dimension;
     f := ri!.field;
@@ -841,11 +844,11 @@ function(ri)
             ri!.comment := r;
             res := LookupHintForSimple(ri,G,r);
             # FIXME: LookupHintForSimple is for sporadics... So why do we use it here?
-            if res = true then
+            if res = Success then
                 return Success;
             fi;
             Info(InfoRecog,2,"LieTypeNonConstr: giving up.");
-            return fail;
+            return TemporaryFailure;
         fi;
         count := count + 1;
         if count > 3 then

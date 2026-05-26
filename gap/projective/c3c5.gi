@@ -45,7 +45,7 @@ RECOG.WriteOverBiggerFieldWithSmallerDegree :=
     # field -- in that case, we scale the matrix so that the first non-zero entry
     # is in the right field; then either all entries are, or else the input matrix
     # is not valid and we later return `fail`
-    i := PositionNonZero(gen[1]);
+    i := PositionNonZeroInRow(gen, 1);
     if not gen[1,i] in GF(inforec.q) then
       gen := gen / gen[1,i];
     fi;
@@ -358,7 +358,7 @@ RECOG.ScalarToMultiplyIntoSmallerField := function(m,k)
   if IsPrimeField(k) then
       return fail;
   fi;
-  pos := PositionNonZero(m[1]);
+  pos := PositionNonZeroInRow(m, 1);
   s := m[1,pos]^-1;
   mm := s * m;
   f := FieldOfMatrixList([mm]);
@@ -514,7 +514,7 @@ end;
 RECOG.HomDoBaseAndFieldChangeWithScalarFinding := function(data,el)
   local m,p;
   m := data.t * el * data.ti;
-  p := PositionNonZero(m[1]);
+  p := PositionNonZeroInRow(m, 1);
   m := (m[1,p]^-1) * m;     # this gets rid of any possible scalar
                              # from some bigger field
   return RECOG.ForceToOtherField(m,data.field);
@@ -866,6 +866,7 @@ function(ri)
       a := OrbActionHomomorphism(G,o);
       SetHomom(ri,a);
       Setmethodsforimage(ri,FindHomDbPerm);
+      Setimmediateverification(ri,true);
 
       return Success;
 

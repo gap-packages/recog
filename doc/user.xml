@@ -62,6 +62,10 @@ part of the solution is providing this representation, and <Package>recog</Packa
 further computations. Solving this problem efficiently is fundamental to many
 other group algorithms.
 
+For more general information, see e.g. <Cite Key="BHLGO15"/>.
+For more information specific to this package, see <Cite Key="NS06"/>
+and <Cite Key="Neu09"/>.
+
 </Section>
 
 <Section Label="functions">

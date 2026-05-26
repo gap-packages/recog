@@ -628,8 +628,8 @@ RECOG.SubspaceIntersection := function(basisA, basisB)
   else
     # calculate vector in subspace intersection
     ConvertToVectorRep(mat[1]);
-    MultRowVector(mat[1], nullv[1][1]);
-    AddRowVector(mat[1], mat[2], nullv[1][2]);
+    MultVector(mat[1], nullv[1][1]);
+    AddVector(mat[1], mat[2], nullv[1][2]);
     return mat[1];
   fi;
 end;
@@ -932,7 +932,7 @@ RECOG.RowSpaceBasis  := function(mat)
       # if row does not already have a zero in this
       # column
       if not IsZero(x) then
-        AddRowVector(row, vectors[c], -x);
+        AddVector(row, vectors[c], -x);
       fi;
     od;
 
@@ -940,7 +940,7 @@ RECOG.RowSpaceBasis  := function(mat)
     c := PositionNonZero(row);
     if c <= ncols then
       # mult row by row[c]^-1 so leading coeff. is 1
-      MultRowVector(row, row[c]^-1);
+      MultVector(row, row[c]^-1);
       Add(vectors, row);
       Add(nzheads, c);
       # add mat[r] to basis
@@ -1066,7 +1066,7 @@ RECOG.FindBasis := function(x, vs, us, fdpm)
     # find j s.t. vi*x + ... + vj*x is an interval vector in
     # span of vs
     for j in [i+1..s] do
-      AddRowVector(vsum, vsx[j]);
+      AddVector(vsum, vsx[j]);
 
       # find interval (if any) of vsum
       ints := RECOG.IsIntervalVector(vsum, s);
@@ -1094,7 +1094,7 @@ RECOG.FindBasis := function(x, vs, us, fdpm)
       ConvertToVectorRep(vsum);
       # find j s.t. vj*x + ... + vi*x is an interval vector
       for j in [i-1,i-2..1] do
-        AddRowVector(vsum, vsx[j]);
+        AddVector(vsum, vsx[j]);
         # find interval (if any) of vsum
         ints := RECOG.IsIntervalVector(vsum, s);
         if ints <> fail then # we can find (i+1)^h and so i^h and b
@@ -1121,13 +1121,13 @@ RECOG.FindBasis := function(x, vs, us, fdpm)
     i := 1;
     temp := ShallowCopy(vsx[i]);
     ConvertToVectorRep(temp);
-    AddRowVector(temp, vsx[i+1]);
+    AddVector(temp, vsx[i+1]);
     inti := RECOG.IsIntervalVector(temp, s);
     while inti = fail and i < s - 1 do
       i := i + 1;
       temp := ShallowCopy(vsx[i]);
       ConvertToVectorRep(temp);
-      AddRowVector(temp, vsx[i+1]);
+      AddVector(temp, vsx[i+1]);
       inti := RECOG.IsIntervalVector(temp, s);
     od;
     # check whether we found an i
@@ -1138,10 +1138,10 @@ RECOG.FindBasis := function(x, vs, us, fdpm)
       if i = s - 1 then
         vsum := ShallowCopy(vsx[i]);
         ConvertToVectorRep(vsum);
-        AddRowVector(vsum, vsx[i+1]);
+        AddVector(vsum, vsx[i+1]);
         # find j s.t. vi*x + v(i+1)^x + ... + vj*x is an interval vector
         for j in [i+2..s] do
-          AddRowVector(vsum, vsx[j]);
+          AddVector(vsum, vsx[j]);
           # find interval (if any) of vsum
           ints := RECOG.IsIntervalVector(vsum, s);
           if ints <> fail then # we can find i^h and b
@@ -1165,10 +1165,10 @@ RECOG.FindBasis := function(x, vs, us, fdpm)
       if ih = fail then
         vsum := ShallowCopy(vsx[i]);
         ConvertToVectorRep(vsum);
-        AddRowVector(vsum, vsx[i+1]);
+        AddVector(vsum, vsx[i+1]);
         # find j s.t. vj*x + ... + vi*x + v(i+1)*x is an interval vector
         for j in [i-1,i-2..1] do
-          AddRowVector(vsum, vsx[j]);
+          AddVector(vsum, vsx[j]);
           # find interval (if any) of vsum
           ints := RECOG.IsIntervalVector(vsum, s);
           if ints <> fail then # we can find (i+1)^h and so i^h and b
@@ -1197,7 +1197,7 @@ RECOG.FindBasis := function(x, vs, us, fdpm)
   fi;
   # found ih and b
 
-  # calc -1 in field, for use with AddRowVector
+  # calc -1 in field, for use with AddVector
   mone := -One(fdpm.field);
 
   # calc vi*h w.r.t. basis vs
@@ -1213,20 +1213,20 @@ RECOG.FindBasis := function(x, vs, us, fdpm)
   ConvertToVectorRep(vsumh);
   for j in [i+1..s] do
     # calc vi*h + v(i+1)*h + ... + vj*h w.r.t to basis vs
-    AddRowVector(vsum, vsx[j]);
+    AddVector(vsum, vsx[j]);
     # calc vi*h + v(i+1)*h + ... + vj*h w.r.t. to standard basis
-    AddRowVector(vsumh, vsh[j]);
+    AddVector(vsumh, vsh[j]);
     if RECOG.IsIntervalVector(vsum,s) = fail then
       # vsum is not an interval vector so vsumh is an interval
       # vector not in the span of vs
       temp := ShallowCopy(vsumh);
       ConvertToVectorRep(temp);
-      AddRowVector(temp, us[ih]);
+      AddVector(temp, us[ih]);
       Add(us, temp); # us[s+2] := vi*h + ... + vj*h + us[ih]
 
       temp := ShallowCopy(us[s+2]);
       ConvertToVectorRep(temp);
-      AddRowVector(temp, us[s+1], mone);
+      AddVector(temp, us[s+1], mone);
       Add(vs, temp); # vs[s+1] := us[s+2] - us[s+1]
 
       s := s + 1;
@@ -1242,13 +1242,13 @@ RECOG.FindBasis := function(x, vs, us, fdpm)
     vsum := ShallowCopy(vsx[1]);
     ConvertToVectorRep(vsum);
     for temp in [2..i-1] do
-      AddRowVector(vsum, vsx[temp]);
+      AddVector(vsum, vsx[temp]);
     od;
 
     vsumh := ShallowCopy(vsh[1]);
     ConvertToVectorRep(vsumh);
     for temp in [2..i-1] do
-      AddRowVector(vsumh, vsh[temp]);
+      AddVector(vsumh, vsh[temp]);
     od;
 
     j := 0;
@@ -1257,12 +1257,12 @@ RECOG.FindBasis := function(x, vs, us, fdpm)
         # vsum is an interval vector not in the span of vs
         temp := ShallowCopy(us[ih]);
         ConvertToVectorRep(temp);
-        AddRowVector(temp, vsumh, mone);
+        AddVector(temp, vsumh, mone);
         Add(us, temp);
 
         temp := ShallowCopy(us[s+2]);
         ConvertToVectorRep(temp);
-        AddRowVector(temp, us[s+1], mone);
+        AddVector(temp, us[s+1], mone);
         Add(vs, temp);
         s := s + 1;
         if s = fdpm.dim then
@@ -1274,8 +1274,8 @@ RECOG.FindBasis := function(x, vs, us, fdpm)
       fi;
       j := j + 1;
       # calc vj*h + ... + v(i-1)*h
-      AddRowVector(vsum, vsx[j], mone);
-      AddRowVector(vsumh, vsh[j], mone);
+      AddVector(vsum, vsx[j], mone);
+      AddVector(vsumh, vsh[j], mone);
     until j = i - 1;
   fi;
 

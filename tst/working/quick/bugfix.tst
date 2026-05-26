@@ -58,25 +58,25 @@ gap> RECOG.TestGroup(SymmetricGroup(11), false, Factorial(11));
 # See https://github.com/gap-packages/recog/issues/65
 gap> RecogniseGroup(SL(2,2));
 <recognition node GoProjective Dim=2 Field=2
- F:<recognition node (projective) ClassicalNatural Comment=PSL2Even Size=
-6 Dim=2 Field=2>
+ F:<recognition node (projective) ClassicalNatural Comment=PSL2 Size=6 Dim=
+2 Field=2>
  K:<trivial kernel>
 gap> RecogniseGroup(SL(2,3));
 <recognition node GoProjective Dim=2 Field=3
- F:<recognition node (projective) ClassicalNatural Comment=PSL2Odd Size=
-12 Dim=2 Field=3>
+ F:<recognition node (projective) ClassicalNatural Comment=PSL2 Size=12 Dim=
+2 Field=3>
  K:<recognition node DiagonalMatrices Dim=2 Field=3
     F:<recognition node Scalar Dim=1 Field=3>
     K:<trivial kernel>>
 gap> RecogniseGroup(SL(2,4));
 <recognition node GoProjective Dim=2 Field=4
- F:<recognition node (projective) ClassicalNatural Comment=PSL2Even Simple Siz\
-e=60 Dim=2 Field=4>
+ F:<recognition node (projective) ClassicalNatural Comment=PSL2 Simple Size=
+60 Dim=2 Field=4>
  K:<trivial kernel>
 gap> RecogniseGroup(SL(2,5));
 <recognition node GoProjective Dim=2 Field=5
- F:<recognition node (projective) ClassicalNatural Comment=PSL2Odd Simple Size\
-=60 Dim=2 Field=5>
+ F:<recognition node (projective) ClassicalNatural Comment=PSL2 Simple Size=
+60 Dim=2 Field=5>
  K:<recognition node DiagonalMatrices Dim=2 Field=5
     F:<recognition node Scalar Dim=1 Field=5>
     K:<trivial kernel>>
@@ -110,6 +110,12 @@ gap> gens:=Z(3)^0*[   # all generators over GF(3)
 gap> G:=Group(List(gens, g -> ImmutableMatrix(GF(9), g)));; # ... but compress generators over GF(9)
 gap> RECOG.SmallHomomorphicImageProjectiveGroup(G);  # this call used to raise an error
 fail
+
+# Issue #133: RECOG.simplesocle on an abelian group would get stuck in an infinite loop
+gap> G := Group([DiagonalMatrix(Z(3)*[1,2]), DiagonalMatrix(Z(3)*[2,1])]);;
+gap> ri:=RecogNode(G,true,rec());;
+gap> ForAll([1..100], i -> RECOG.simplesocle(ri,G) = fail);
+true
 
 # Issue #295: the C6 recognizer must reject inconsistent radical block splits
 # instead of raising "what's wrong2?" for this reducible alternating-group
@@ -166,6 +172,30 @@ true
 gap> i := 58;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
 gap> ri := RecognizeGroup(ClassicalMaximals("L",4,3)[8]);;
 gap> IsReady(ri);
+true
+
+# Issue #317: false PSL2 recognition must fall back cleanly instead of
+# reaching invalid determinant-root normalization or late verification errors.
+# See https://github.com/gap-packages/recog/issues/317
+gap> G := Group(Z(5)^0*[
+>   [ [ 0, 2, 0, 2 ], [ 1, 4, 4, 4 ], [ 0, 4, 0, 0 ], [ 3, 2, 0, 0 ] ],
+>   [ [ 0, 2, 0, 2 ], [ 4, 4, 1, 4 ], [ 0, 1, 0, 0 ], [ 3, 3, 0, 0 ] ],
+>   [ [ 1, 0, 0, 0 ], [ 0, 4, 0, 0 ], [ 0, 0, 4, 0 ], [ 0, 0, 0, 1 ] ],
+>   [ [ 2, 0, 0, 0 ], [ 0, 2, 0, 0 ], [ 0, 0, 2, 0 ], [ 0, 0, 0, 2 ] ],
+>   [ [ 0, 0, 0, 1 ], [ 0, 2, 0, 0 ], [ 0, 0, 1, 0 ], [ 2, 0, 0, 0 ] ]
+> ]);;
+gap> i := 115;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
+gap> ri := RecognizeGroup(G);;
+gap> IsReady(ri);
+true
+gap> ForAll(GeneratorsOfGroup(G), x -> SLPforElement(ri, x) <> fail);
+true
+gap> i := 9;; Reset(GlobalRandomSource, i);; Reset(GlobalMersenneTwister, i);;
+gap> H := ClassicalMaximals("L",4,7)[4];;
+gap> ri := RecognizeGroup(H);;
+gap> IsReady(ri);
+true
+gap> ForAll(GeneratorsOfGroup(H), x -> SLPforElement(ri, x) <> fail);
 true
 
 # Issue #343: extracting a strict lower block diagonal from an immutable
@@ -259,6 +289,138 @@ gap> ri;
 gap> Size(ri);
 292561
 gap> ForAll(GeneratorsOfGroup(H), x -> SLPforElement(ri, x) <> fail);
+true
+
+# Issue #444: a projective C6 block kernel must keep the full scalar-block
+# size when passing through DoBaseChangeForBlocks and BlocksBackToMats.
+# See https://github.com/gap-packages/recog/issues/444
+gap> i := 1;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
+gap> m := ClassicalMaximals("L",8,7);;
+gap> g := m[10];;
+gap> re := RECOG.New2RecogniseC6(g);;
+gap> hom := GroupHomByFuncWithData(g, GroupWithGenerators(re.igens),
+>   RECOG.HomFuncActionOnBlocks,
+>   rec(r := re.r, n := re.n, q := re.q, blks := re.basis.blocks));;
+gap> k := KernelOfMultiplicativeGeneralMapping(hom);;
+gap> data := rec(hints := []);;
+gap> data.t := re.basis.blocks.blocks;;
+gap> data.blocksize := 8 / re.basis.blocks.ell;;
+gap> AddMethod(data.hints, FindHomMethodsProjective.DoBaseChangeForBlocks, 2000);;
+gap> ri := RecogniseGeneric(k, FindHomDbProjective, "", data);;
+gap> IsReady(ri);
+true
+gap> h := Group(List(GeneratorsOfGroup(k), RECOG.HomBackToMats));;
+gap> Size(h);
+139968
+gap> Size(ri);
+139968
+
+# Issue #471: projective Blocks below the C6 path must collect enough
+# scalar-block kernel generators for the final SLP coverage check.
+# See https://github.com/gap-packages/recog/issues/471
+gap> i := 21;; Reset(GlobalMersenneTwister, i);; Reset(GlobalRandomSource, i);;
+gap> G:=Group(Z(5)^0 * [
+> [ [ 0,0,1,0,0,0,0,0 ], [ 0,1,0,0,0,0,0,0 ], [ 0,0,0,0,1,0,0,0 ],
+>     [ 0,0,0,0,0,0,0,1 ], [ 1,0,0,0,0,0,0,0 ], [ 0,0,0,1,0,0,0,0 ],
+>     [ 0,0,0,0,0,0,1,0 ], [ 0,0,0,0,0,1,0,0 ] ],
+>   [ [ 1,0,0,0,0,0,0,0 ], [ 0,0,0,0,0,1,0,0 ], [ 0,0,0,0,1,0,0,0 ],
+>     [ 0,1,0,0,0,0,0,0 ], [ 0,0,0,0,0,0,1,0 ], [ 0,0,0,1,0,0,0,0 ],
+>     [ 0,0,1,0,0,0,0,0 ], [ 0,0,0,0,0,0,0,1 ] ],
+>   [ [ 0,0,1,0,0,0,0,0 ], [ 0,1,0,0,0,0,0,0 ], [ 1,0,0,0,0,0,0,0 ],
+>     [ 0,0,0,1,0,0,0,0 ], [ 0,0,0,0,1,0,0,0 ], [ 0,0,0,0,0,0,0,1 ],
+>     [ 0,0,0,0,0,0,1,0 ], [ 0,0,0,0,0,1,0,0 ] ],
+>   [ [ 0,0,0,0,0,0,0,1 ], [ 0,1,0,0,0,0,0,0 ], [ 0,0,0,0,0,1,0,0 ],
+>     [ 0,0,0,1,0,0,0,0 ], [ 0,0,0,0,1,0,0,0 ], [ 0,0,1,0,0,0,0,0 ],
+>     [ 0,0,0,0,0,0,1,0 ], [ 1,0,0,0,0,0,0,0 ] ],
+>   [ [ 4,0,0,0,0,0,0,0 ], [ 0,1,0,0,0,0,0,0 ], [ 0,0,1,0,0,0,0,0 ],
+>     [ 0,0,0,1,0,0,0,0 ], [ 0,0,0,0,1,0,0,0 ], [ 0,0,0,0,0,1,0,0 ],
+>     [ 0,0,0,0,0,0,1,0 ], [ 0,0,0,0,0,0,0,4 ] ],
+>   [ [ 3,0,0,0,0,0,0,0 ], [ 0,1,0,0,0,0,0,0 ], [ 0,0,2,0,0,0,0,0 ],
+>     [ 0,0,0,1,0,0,0,0 ], [ 0,0,0,0,1,0,0,0 ], [ 0,0,0,0,0,3,0,0 ],
+>     [ 0,0,0,0,0,0,1,0 ], [ 0,0,0,0,0,0,0,2 ] ]
+> ]);;
+gap> ri := RecognizeGroup(G);;
+gap> IsReady(ri);
+true
+gap> ForAll(GeneratorsOfGroup(G), x -> SLPforElement(ri, x) <> fail);
+true
+
+# Issue #450: a D247 tensor witness contradicted by a tensor-factor swap
+# must not raise an internal error.
+# See https://github.com/gap-packages/recog/issues/450
+gap> f := GF(3);;
+gap> g1 := [ [ Z(3)^0, Z(3)^0 ], [ 0*Z(3), Z(3)^0 ] ];;
+gap> g2 := [ [ 0*Z(3), Z(3)^0 ], [ Z(3)^0, 0*Z(3) ] ];;
+gap> i2 := IdentityMat(2, f);;
+gap> ngens := [ KroneckerProduct(g1, i2), KroneckerProduct(g2, i2) ];;
+gap> hgens := [ KroneckerProduct(i2, g1), KroneckerProduct(i2, g2) ];;
+gap> swap := [ [ Z(3)^0, 0*Z(3), 0*Z(3), 0*Z(3) ],
+>   [ 0*Z(3), 0*Z(3), Z(3)^0, 0*Z(3) ],
+>   [ 0*Z(3), Z(3)^0, 0*Z(3), 0*Z(3) ],
+>   [ 0*Z(3), 0*Z(3), 0*Z(3), Z(3)^0 ] ];;
+gap> G := Group(Concatenation(ngens, hgens, [ swap ]));;
+gap> m := GModuleByMats(ngens, f);;
+gap> ri := RecogNode(G, true);;
+gap> RECOG.SortOutReducibleNormalSubgroup(ri, G, ngens, m);
+"Success"
+gap> ri!.comment;
+"D7TensorInduced"
+gap> Size(Image(Homom(ri)));
+2
+
+# Issue #466: ComputeSimpleSocle must give up on non-almost-simple input
+# instead of looping forever in its random search for a nontrivial element
+# of the third derived subgroup.
+# See https://github.com/gap-packages/recog/issues/466
+gap> z:=Z(3^2);; G:=Group(z^0 *
+> [ [ [ z^2, 0, 0, 0 ], [ 0, z^2, 0, 0 ], [ 0, 0, z^2, 0 ], [ 0, 0, 0, z^2 ] ],
+>   [ [ 1, 0, 0, 0 ], [ 0, 2, 0, 0 ], [ 0, 0, 1, 0 ], [ 0, 0, 0, 2 ] ],
+>   [ [ 1, 0, 0, 0 ], [ 0, 1, 0, 0 ], [ 0, 0, 2, 0 ], [ 0, 0, 0, 2 ] ],
+>   [ [ 0, 1, 0, 0 ], [ 1, 0, 0, 0 ], [ 0, 0, 0, 1 ], [ 0, 0, 1, 0 ] ],
+>   [ [ 0, 0, 1, 0 ], [ 0, 0, 0, 1 ], [ 1, 0, 0, 0 ], [ 0, 1, 0, 0 ] ],
+>   [ [ z^7, 0, 0, 0 ], [ 0, z, 0, 0 ], [ 0, 0, z^7, 0 ], [ 0, 0, 0, z ] ],
+>   [ [ z^7, 0, 0, 0 ], [ 0, z^7, 0, 0 ], [ 0, 0, z, 0 ], [ 0, 0, 0, z ] ],
+>   [ [ 1, 1, 0, 0 ], [ 1, 2, 0, 0 ], [ 0, 0, 1, 1 ], [ 0, 0, 1, 2 ] ],
+>   [ [ 1, 0, 1, 0 ], [ 0, 1, 0, 1 ], [ 1, 0, 2, 0 ], [ 0, 1, 0, 2 ] ],
+>   [ [ z^7, 0, 0, 0 ], [ 0, 0, 0, z^7 ], [ 0, 0, z^7, 0 ], [ 0, z^7, 0, 0 ] ],
+> ]);;
+gap> i:=279;; Reset(GlobalRandomSource,i);; Reset(GlobalMersenneTwister,i);;
+gap> ri:=RecognizeGroup(G);;
+gap> IsReady(ri);
+true
+gap> ri:=RecogNode(G,true,rec());;
+gap> CallRecogMethod(FindHomMethodsProjective.ComputeSimpleSocle,ri) <> Success;
+true
+
+# Issue #445: cross-characteristic PSL2 low-index hints must fail quickly
+# and allow recognition to continue, instead of exhausting a huge random
+# search and raising an internal error.
+# See https://github.com/gap-packages/recog/issues/445
+gap> G:=Group(Z(7)^0*[   # this group is ClassicalMaximals("L",6,7)[21];
+> [[2,5,0,2,1,0],
+>  [1,4,0,4,3,0],
+>  [6,5,1,2,3,0],
+>  [5,0,0,1,2,0],
+>  [3,5,0,2,0,0],
+>  [2,6,0,1,6,1]],
+> [[3,6,5,3,6,1],
+>  [0,3,4,1,2,0],
+>  [6,3,0,6,6,0],
+>  [4,3,0,4,0,0],
+>  [0,6,5,3,0,0],
+>  [0,0,4,1,1,6]],
+> [[3,0,0,0,0,0],
+>  [0,3,0,0,0,0],
+>  [0,0,3,0,0,0],
+>  [0,0,0,3,0,0],
+>  [0,0,0,0,3,0],
+>  [0,0,0,0,0,3]]
+> ]);;
+gap> i := 44;; Reset(GlobalRandomSource, i);; Reset(GlobalMersenneTwister, i);;
+gap> ri := RecognizeGroup(G);;
+gap> IsReady(ri);
+true
+gap> ForAll(GeneratorsOfGroup(G), x -> SLPforElement(ri, x) <> fail);
 true
 
 #
