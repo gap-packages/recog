@@ -647,9 +647,6 @@ RECOG.IsThisSL2Natural := function(gens,f)
   q := Size(f);
   p := Characteristic(f);
   # For small q, compute the order of the group via a stabilizer chain.
-  # Note that at this point we are usually working projective, and thus
-  # scalars are factored out "implicitly". Thus the generators we are
-  # looking at may generate a group which only contains SL2 as a subgroup.
   if q <= 11 then    # this could be increased if needed
       Info(InfoRecog,4,"SL2: Computing stabiliser chain.");
       S := StabilizerChain(Group(gens));
