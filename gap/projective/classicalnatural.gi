@@ -854,6 +854,9 @@ function(ri)
   RECOG.SetPseudoRandomStamp(g,"ClassicalNatural");
 
   # First check whether we are applicable:
+  # check if this group contains SL_d -- for d > 2 we can use RecogniseClassical;
+  # for d = 2, we can use RECOG.IsThisSL2Natural, but only after adjusting
+  # the determinants of the generators (comes next)
   if d <> 2 then
       classical := RecogniseClassical(g);
       if classical.isSLContained <> true then
