@@ -854,12 +854,7 @@ function(ri)
   RECOG.SetPseudoRandomStamp(g,"ClassicalNatural");
 
   # First check whether we are applicable:
-  if d = 2 then
-      if not RECOG.IsThisSL2Natural(GeneratorsOfGroup(g),f) then
-          Info(InfoRecog,2,"ClassicalNatural: Is not PSL_2.");
-          return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
-      fi;
-  else
+  if d <> 2 then
       classical := RecogniseClassical(g);
       if classical.isSLContained <> true then
           Info(InfoRecog,2,"ClassicalNatural: Is not PSL.");
@@ -884,6 +879,15 @@ function(ri)
           changed := true;
       fi;
   od;
+
+  # Now check whether the normalized matrices generate an SL_2:
+  if d = 2 then
+      if not RECOG.IsThisSL2Natural(gens,f) then
+          Info(InfoRecog,2,"ClassicalNatural: Is not PSL_2.");
+          return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
+      fi;
+  fi;
+
   if changed then
       gm := GroupWithMemory(gens);
       pr := ProductReplacer(GeneratorsOfGroup(gm),rec(maxdepth := 500));
