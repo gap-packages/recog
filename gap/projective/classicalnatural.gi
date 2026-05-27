@@ -854,17 +854,10 @@ function(ri)
   RECOG.SetPseudoRandomStamp(g,"ClassicalNatural");
 
   # First check whether we are applicable:
-  if d = 2 then
-      if not RECOG.IsThisSL2Natural(GeneratorsOfGroup(g),f) then
-          Info(InfoRecog,2,"ClassicalNatural: Is not PSL_2.");
-          return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
-      fi;
-  else
-      classical := RecogniseClassical(g);
-      if classical.isSLContained <> true then
-          Info(InfoRecog,2,"ClassicalNatural: Is not PSL.");
-          return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
-      fi;
+  classical := RecogniseClassical(g);
+  if classical.isSLContained <> true then
+      Info(InfoRecog,2,"ClassicalNatural: Is not PSL.");
+      return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
   fi;
 
   # Now get rid of nasty determinants:
