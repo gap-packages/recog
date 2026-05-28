@@ -647,14 +647,11 @@ RECOG.IsThisSL2Natural := function(gens,f)
   q := Size(f);
   p := Characteristic(f);
   # For small q, compute the order of the group via a stabilizer chain.
-  # Note that at this point we are usually working projective, and thus
-  # scalars are factored out "implicitly". Thus the generators we are
-  # looking at may generate a group which only contains SL2 as a subgroup.
   if q <= 11 then    # this could be increased if needed
       Info(InfoRecog,4,"SL2: Computing stabiliser chain.");
       S := StabilizerChain(Group(gens));
       Info(InfoRecog,4,"SL2: size is ",Size(S));
-      return Size(S) mod (q*(q-1)*(q+1)) = 0;
+      return Size(S) = (q*(q-1)*(q+1));
   fi;
 
   seenqp1 := false;
@@ -854,12 +851,10 @@ function(ri)
   RECOG.SetPseudoRandomStamp(g,"ClassicalNatural");
 
   # First check whether we are applicable:
-  if d = 2 then
-      if not RECOG.IsThisSL2Natural(GeneratorsOfGroup(g),f) then
-          Info(InfoRecog,2,"ClassicalNatural: Is not PSL_2.");
-          return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
-      fi;
-  else
+  # check if this group contains SL_d -- for d > 2 we can use RecogniseClassical;
+  # for d = 2, we can use RECOG.IsThisSL2Natural, but only after adjusting
+  # the determinants of the generators (comes next)
+  if d <> 2 then
       classical := RecogniseClassical(g);
       if classical.isSLContained <> true then
           Info(InfoRecog,2,"ClassicalNatural: Is not PSL.");
@@ -884,6 +879,15 @@ function(ri)
           changed := true;
       fi;
   od;
+
+  # Now check whether the normalized matrices generate an SL_2:
+  if d = 2 then
+      if not RECOG.IsThisSL2Natural(gens,f) then
+          Info(InfoRecog,2,"ClassicalNatural: Is not PSL_2.");
+          return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
+      fi;
+  fi;
+
   if changed then
       gm := GroupWithMemory(gens);
       pr := ProductReplacer(GeneratorsOfGroup(gm),rec(maxdepth := 500));
