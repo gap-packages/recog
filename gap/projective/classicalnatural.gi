@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Max Neunhöffer, Ákos Seress.
+##  This files's authors include Daniel Rademacher, Max Neunhöffer, Ákos Seress.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
 ##  to list here. Please refer to the COPYRIGHT file for details.
@@ -16,45 +16,6 @@
 ##  representation.
 ##
 #############################################################################
-
-InstallMethod( Eigenspaces, "for a field and a memory element matrix",
-  [ IsField, IsMatrix and IsObjWithMemory ],
-  function( f, m )
-    return Eigenspaces(f,m!.el);
-  end );
-
-RECOG.FindStdGensUsingBSGS := function(g,stdgens,projective,large)
-  # stdgens generators for the matrix group g
-  # returns an SLP expressing stdgens in the generators of g
-  # set projective to true for projective mode
-  # set large to true if we should not bother finding nice base points!
-  local S,dim,gens,gm,i,l,strong;
-  dim := DimensionOfMatrixGroup(g);
-  if IsObjWithMemory(GeneratorsOfGroup(g)[1]) then
-      gm := GroupWithMemory(StripMemory(GeneratorsOfGroup(g)));
-  else
-      gm := GroupWithMemory(g);
-  fi;
-  if HasSize(g) then SetSize(gm,Size(g)); fi;
-  if large then
-      S := StabilizerChain(gm,rec( Projective := projective,
-        Cand := rec( points := One(g),
-                     ops := ListWithIdenticalEntries(dim, OnLines) ) ) );
-  else
-      S := StabilizerChain(gm,rec( Projective := projective ) );
-  fi;
-  strong := ShallowCopy(StrongGenerators(S));
-  ForgetMemory(S);
-  l := List(stdgens,x->SiftGroupElementSLP(S,x));
-  gens := EmptyPlist(Length(stdgens));
-  for i in [1..Length(stdgens)] do
-      if not l[i].isone then
-          return fail;
-      fi;
-      Add(gens,ResultOfStraightLineProgram(l[i].slp,strong));
-  od;
-  return SLPOfElms(gens);
-end;
 
 RECOG.ResetSLstd := function(r)
   r.left := One(r.a);
@@ -352,27 +313,6 @@ end;
 
 
 
-RECOG.RecogniseSL2NaturalOddCharUsingBSGS := function(g,f)
-  local ext,p,q,res,slp,std;
-  p := Characteristic(f);
-  ext := DegreeOverPrimeField(f);
-  q := Size(f);
-  std := RECOG.MakeSL_StdGens(p,ext,2,2);
-  slp := RECOG.FindStdGensUsingBSGS(g,std.all,false,true);
-  if slp = fail then
-      return fail;
-  fi;
-  res := rec( g := g, one := One(f), One := One(g), f := f, q := q,
-              p := p, ext := ext, d := 2, bas := IdentityMat(2,f),
-              basi := IdentityMat(2,f) );
-  res.all := ResultOfStraightLineProgram(slp,GeneratorsOfGroup(g));
-  res.s := res.all{[1..ext]};
-  res.t := res.all{[ext+1..2*ext]};
-  res.a := res.all[2*ext+1];
-  res.b := res.all[2*ext+2];
-  return res;
-end;
-
 RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   # f a finite field, g equal to SL(2,Size(f)), t either an involution
   # or false.
@@ -394,7 +334,8 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   fi;
   if torig = false then
     # if no involution t has been given, compute one, using Proposition 4 from
-    # [KK15].
+    # "Black box groups isomorphic to PGL(2,2^e)" by Kantor & Kassabov,
+    # Journal of Algebra, 421 (2015) 16–26.
     repeat
         am:=PseudoRandom(g);
     until not IsOneProjective(am);
