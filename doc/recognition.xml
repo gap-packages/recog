@@ -94,7 +94,7 @@ we first summarise it in steps:
     calls itself with the image of the homomorphism. Note that this
     might use another database of recognition methods because the
     homomorphism might change the representation of the group.</Item>
-<Item>After successful recognition of the image group the procedure has
+<Item>After successful recognition of the image the procedure has
     to recognise the kernel of the homomorphism. The first step for this
     is to find generators. If they are not already known from the
     <C>FindHomomorphism</C> method, they are created by producing random
@@ -119,8 +119,8 @@ group as a straight line program in the generators as follows:
 
 <Enum>
 <Item>Map the element through the homomorphism.</Item>
-<Item>Write the element in the image group as a product of the nice
-    generators in the image group.</Item>
+<Item>Write the element in the image as a product of the nice
+    generators in the image.</Item>
 <Item>Apply the resulting straight line program to the preimages of those
     nice generators and calculate the quotient, which will now lie in
     the kernel.</Item>
@@ -147,12 +147,7 @@ recognition function:
 <#Include Label="RecogniseGeneric">
 
 The user will usually not call this function directly, but will use the
-following convenience functions:
-
-<#Include Label="RecognisePermGroup">
-<#Include Label="RecogniseMatrixGroup">
-<#Include Label="RecogniseProjectiveGroup">
-<#Include Label="RecogniseGroup">
+convenience functions that are described in <Ref Sect="functions"/>.
 
 <ManSection>
 <Func Name="TryFindHomMethod" Arg="H, method, projective"/>
@@ -227,6 +222,7 @@ The following attributes are defined for recognition nodes:
 <#Include Label="slpforelement">
 <#Include Label="SLPforElement">
 <#Include Label="StdPresentation">
+<#Include Label="IsCorrect">
 <#Include Label="methodsforimage">
 
 <ManSection>
@@ -278,6 +274,7 @@ homomorphism method up to the recursive recognition function:
 <#Include Label="CalcNiceGensHomNode">
 <#Include Label="CalcNiceGens">
 <#Include Label="slptonice">
+<#Include Label="CalcStdPresentation">
 
 The following three attributes are concerned with the administration of the
 kernel of a found homomorphism. Find homomorphism methods use them to
@@ -403,51 +400,10 @@ find kernel methods.
 The following attributes are used to give a successful find homomorphism
 method further possibilities to transport knowledge about the group
 recognised by the current recognition node to the image or
-kernel of the found homomorphism:
-
-<ManSection>
-<Attr Name="InitialDataForKernelRecogNode" Arg="ri"/>
-<Description>
-    This attribute is initialised to a record with only the component
-    <C>hints</C> bound to an empty list at the beginning of the
-    recursive recognition function. Find homomorphism methods can
-    put acquired knowledge about the group to be recognised (like for
-    example an invariant subspace of a matrix group) into this record.
-    When a homomorphism is found and recognition goes on in its
-    kernel, the value of this attribute is taken as initialisation data
-    for the newly created recognition node for the kernel. Thus,
-    information is transported down to the recognition process for the
-    kernel. The component <C>hints</C> is special insofar as it has to
-    contain records describing find homomorphism methods which might be
-    particularly successful. They are prepended to the find homomorphism
-    method database such that they are called before any other methods.
-    This is a means to give hints to the recognition procedure in the
-    kernel, because often during the finding of a homomorphism knowledge
-    is acquired which might help the recognition of the kernel.
-</Description>
-</ManSection>
-
-<ManSection>
-<Attr Name="InitialDataForImageRecogNode" Arg="ri"/>
-<Description>
-    This attribute is initialised to a record with only the component
-    <C>hints</C> bound to an empty list at the beginning of the
-    recursive recognition function. Find homomorphism methods can
-    put acquired knowledge about the group to be recognised (like for
-    example an invariant subspace of a matrix group) into this record.
-    When a homomorphism is found and recognition goes on in its
-    image, the value of this attribute is taken as initialisation data
-    for the newly created recognition node for the image. Thus,
-    information is transported down to the recognition process for the
-    image. The component <C>hints</C> is special insofar as it has to
-    contain records describing find homomorphism methods which might be
-    particularly successful. They are prepended to the find homomorphism
-    method database such that they are called before any other methods.
-    This is a means to give hints to the recognition procedure in the
-    image, because often during the finding of a homomorphism knowledge
-    is acquired which might help the recognition of the image.
-</Description>
-</ManSection>
+kernel of the found homomorphism. The hint system and the corresponding
+attributes <Ref Attr="InitialDataForKernelRecogNode"/> and
+<Ref Attr="InitialDataForImageRecogNode"/> are documented in Section
+<Ref Sect="hintsystem"/> in Chapter <Ref Chap="methsel"/>.
 
 <ManSection>
 <Attr Name="isone" Arg="ri"/>

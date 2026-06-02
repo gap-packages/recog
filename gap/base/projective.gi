@@ -21,7 +21,7 @@
 InstallGlobalFunction( IsOneProjective,
   function(m)
     Assert(1, NrRows(m) > 0 and NrRows(m) = NrCols(m));
-    return not IsZero(m[1,1]) and RECOG.IsScalarMat(m) <> false;
+    return not IsZero(m[1,1]) and RECOG.IsScalarMat(m);
   end );
 
 # Assumes <a> and <b> are non-empty equal-dimension square matrices over equal
@@ -34,7 +34,7 @@ InstallGlobalFunction( IsEqualProjective,
     local n, p, s;
     n := NrRows(a);
     Assert(1, n > 0 and n = NrRows(b) and n = NrCols(a) and n = NrCols(b));
-    p := First([1..n], i -> not IsZero(a[1,i])); # Find non-zero entry in <a[1]>
+    p := PositionNonZeroInRow(a, 1); # Find non-zero entry in <a[1]>
     Assert(1, p <> fail);
     s := b[1,p] / a[1,p]; # The unique scalar <s> with <s * a[1,p] = b[1,p]>.
     if IsZero(s) then
@@ -55,14 +55,11 @@ RECOG.ProjectiveOrder := m -> ProjectiveOrder(m)[1];
 # <m> is a scalar matrix iff it is a scalar multiple of the identity matrix,
 # i.e. a diagonal square matrix with the same value along its main diagonal.
 #
-# If <m> is a scalar matrix, then this function returns the scalar that appears
-# on its main diagonal. Otherwise, this function returns <false>.
+# If <m> is a scalar matrix, then this function returns <true>. Otherwise, this
+# function returns <false>.
 RECOG.IsScalarMat := function(m)
   local x;
   Assert(1, NrRows(m) > 0 and NrRows(m) = NrCols(m));
   x := m[1,1];
-  if ForAny([2..NrRows(m)], i -> m[i,i] <> x) or not IsDiagonalMat(m) then
-    return false;
-  fi;
-  return x;
+  return ForAll([2..NrRows(m)], i -> m[i,i] = x) and IsDiagonalMat(m);
 end;

@@ -56,10 +56,6 @@ InstallOtherMethod( Randomize, "for a mutable FFE vector",
   [ IsFFECollection and IsPlistRep and IsMutable ],
   v -> Randomize(GlobalMersenneTwister, v));
 
-InstallOtherMethod( Randomize, "for a mutable FFE vector and a random source",
-  [ IsFFECollection and IsPlistRep and IsMutable, IsRandomSource ],
-  { v, rs } -> Randomize(rs, v) );
-
 InstallOtherMethod( Randomize, "for a random source and a mutable FFE vector",
   [ IsRandomSource, IsFFECollection and IsPlistRep and IsMutable ],
   function( rs, v )

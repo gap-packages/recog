@@ -143,14 +143,14 @@ end;
 #! orbit of subspaces or <K>fail</K>. In the current setup, <Q>short orbit</Q>
 #! is defined to have length at most <M>4d</M>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "LowIndex",
+BindRecogMethod("FindHomMethodsProjective", "LowIndex",
 "find an (imprimitive) action on subspaces",
-function(ri,G)
+function(ri)
   local res;
-  RECOG.SetPseudoRandomStamp(G,"LowIndex");
-  res := RECOG.SmallHomomorphicImageProjectiveGroup(G);
+  RECOG.SetPseudoRandomStamp(Grp(ri),"LowIndex");
+  res := RECOG.SmallHomomorphicImageProjectiveGroup(Grp(ri));
   if res = fail then
-      return fail; # FIXME: fail = TemporaryFailure here really correct?
+      return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
   else
       res := res[1];
       # Now distinguish between a block system and just an orbit:
@@ -180,12 +180,13 @@ end);
 #! @BeginChunk DoBaseChangeForBlocks
 #! TODO
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "DoBaseChangeForBlocks",
+BindRecogMethod("FindHomMethodsProjective", "DoBaseChangeForBlocks",
 "Hint TODO",
-function(ri,G)
+function(ri)
   # Do the base change:
-  local H,iso,newgens,ti;
+  local G,H,iso,newgens,ti;
 
+  G := Grp(ri);
   ti := ri!.t^-1;
   newgens := List(GeneratorsOfGroup(G),x->ri!.t*x*ti);
   H := GroupWithGenerators(newgens);
@@ -206,13 +207,13 @@ end);
 #! @BeginChunk Blocks
 #! TODO
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "Blocks",
+BindRecogMethod("FindHomMethodsProjective", "Blocks",
 "Hint TODO",
-function(ri,G)
+function(ri)
   # Here we use BlocksModScalars and then get a kernel of scalar blocks
   # altogether mod scalars.
   local blocks,d,hom,i;
-  hom := IdentityMapping(G);
+  hom := IdentityMapping(Grp(ri));
   SetHomom(ri,hom);
   blocks := [];
   d := ri!.dimension;
@@ -223,8 +224,22 @@ function(ri,G)
   InitialDataForImageRecogNode(ri).blocks := blocks;
   AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsProjective.BlocksModScalars, 2000);
   # For the kernel:
+  # The scalar-block kernel is abelian, so random kernel sampling is enough
+  # and avoids under-generating it via the default normal-closure path.
+  findgensNmeth(ri).method := FindKernelRandom;
+  findgensNmeth(ri).args := [Length(blocks)+10];
+  if ri!.blocksize = 1 then
+      # BlocksModScalars is trivial in this case, so the whole group is the
+      # kernel that must be passed on to BlocksBackToMats.
+      findgensNmeth(ri).method := function(ri)
+        SetgensN(ri, ShallowCopy(ri!.gensHmem));
+        return true;
+      end;
+      findgensNmeth(ri).args := [];
+  fi;
   InitialDataForKernelRecogNode(ri).blocks := blocks;
   AddMethod(InitialDataForKernelRecogNode(ri).hints, FindHomMethodsProjective.BlocksBackToMats, 2000);
+  Setimmediateverification(ri, true);
   return Success;
 end);
 
@@ -239,12 +254,13 @@ end;
 #! @BeginChunk BlocksBackToMats
 #! TODO
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "BlocksBackToMats",
+BindRecogMethod("FindHomMethodsProjective", "BlocksBackToMats",
 "Hint TODO",
-function(ri,G)
+function(ri)
   # This is only called as hint from Blocks, so we know that we in fact
   # have scalar blocks along the diagonal and nothing else.
-  local H,hom,newgens;
+  local G,H,hom,newgens;
+  G := Grp(ri);
   newgens := List(GeneratorsOfGroup(G),RECOG.HomBackToMats);
   H := Group(newgens);
   hom := GroupHomomorphismByFunction(G,H,RECOG.HomBackToMats);

@@ -28,7 +28,6 @@ ReadPackage("recog","gap/utils.gi");
 ReadPackage("recog","gap/generic/TrivialGroup.gi");
 ReadPackage("recog","gap/generic/FewGensAbelian.gi");
 ReadPackage("recog","gap/generic/KnownNilpotent.gi");
-ReadPackage("recog","gap/generic/slconstr.gi");
 
 # Permutation groups
 ReadPackage("recog","gap/perm/giant.gi");
@@ -41,6 +40,7 @@ ReadPackage("recog","gap/matrix/matimpr.gi");
 ReadPackage("recog","gap/matrix/blocks.gi");
 ReadPackage("recog","gap/matrix/ppd.gi");
 ReadPackage("recog","gap/matrix/classical.gi");
+ReadPackage("recog","gap/matrix/slconstr.gi");
 
 # Projective groups
 ReadPackage("recog","gap/projective/findnormal.gi");
@@ -54,6 +54,7 @@ ReadPackage("recog","gap/projective/almostsimple/lietype.gi");
 ReadPackage("recog","gap/projective/naming/ClassicalNamingAndUtils.gi");
 ReadPackage("recog","gap/projective/almostsimple/hints.gi");
 ReadPackage("recog","gap/projective/classicalnatural.gi");
+
 ReadPackage("recog","gap/projective/constructive_recognition/utils/utils.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/SL/BaseCase.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/SL/GoingDown.gi");
@@ -73,6 +74,10 @@ ReadPackage("recog","gap/projective/constructive_recognition/O/GoingDown.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/O/GoingUp.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/O/main.gi");
 ReadPackage("recog","gap/projective/blackbox/blackboxClassical.gi");
+
+ReadPackage("recog","gap/projective/sl2_natural.gi");
+ReadPackage("recog","gap/projective/sl.gi");
+
 ReadPackage("recog","gap/projective/AnSnOnFDPM.gi");
 
 # All the method installations are now here:

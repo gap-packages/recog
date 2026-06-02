@@ -43,16 +43,13 @@ DeclareGlobalFunction( "AddMethod" );
 
 ## <#GAPDoc Label="CallMethods">
 ## <ManSection>
-## <Func Name="CallMethods" Arg="db, limit [,furtherargs]"/>
+## <Func Name="CallMethods" Arg="db, limit, ri"/>
 ## <Returns>a record <C>ms</C> describing this method selection procedure.
 ## </Returns>
 ## <Description>
 ## The argument <A>db</A> must be a method database in the sense of
 ## Section <Ref Sect="methoddatabases"/>. <A>limit</A> must be a non-negative
-## integer. <A>furtherargs</A> stands for an arbitrary number of additional
-## arguments, which are handed down to the called methods. Of course they
-## must fulfill the conventions defined for the methods in the database
-## <A>db</A>.<P/>
+## integer. Finally <A>ri</A> is a recognition node.<P/>
 ## The function first creates a <Q>method selection</Q> record keeping track
 ## of the things that happened during the method trying procedure,
 ## which is also used during this procedure. Then it calls methods with
@@ -134,22 +131,19 @@ DeclareGlobalFunction( "CallMethods" );
 # Possible return values for recognition methods:
 #
 # The method successfully computed a homomorphism (used to be 'true').
-#BindGlobal("Success", MakeImmutable("Success"));
-BindGlobal("Success", true);    # HACK: use old value for now, to ease transition
+BindGlobal("Success", MakeImmutable("Success"));
 
 # The method is never applicable to this kind of group (e.g. input is
 # non-solvable, but method is only applicable to solvable groups; or method
 # only applies to permutation groups, but input is a matrix group). so don't
 # bother to try it again (used to be 'false').
-#BindGlobal("NeverApplicable", MakeImmutable("NeverApplicable"));
-BindGlobal("NeverApplicable", false);    # HACK: use old value for now, to ease transition
+BindGlobal("NeverApplicable", MakeImmutable("NeverApplicable"));
 
 # The method temporarily failed, but it could be sensible to call it again in
 # this situation at a later stage. This value is typical for a Las Vegas
 # algorithm using randomised methods, which has failed, but which may succeed
 # when called again (used to be 'fail').
-#BindGlobal("TemporaryFailure", MakeImmutable("TemporaryFailure"));
-BindGlobal("TemporaryFailure", fail);    # HACK: use old value for now, to ease transition
+BindGlobal("TemporaryFailure", MakeImmutable("TemporaryFailure"));
 
 # The method needs more information (e.g. things like whether group is
 # solvable; transitive; etc.) -> try again later if new information becomes

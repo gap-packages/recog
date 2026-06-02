@@ -147,7 +147,7 @@ FindHomMethodsMatrix.BlockLowerTriangular := function(ri, G)
   Assert(0, not fail in newgens);
 
   # now that we have the images of the generators, we can
-  # defined the image group
+  # defined the image
   H := Group(newgens);
 
   # finally, we define the homomorphism
@@ -158,13 +158,12 @@ FindHomMethodsMatrix.BlockLowerTriangular := function(ri, G)
 
   # since we know exactly what kind of group we are looking
   # at, we don't want to run generic recognition on the
-  # image group and the kernel. So we provide "hints" to
-  # ensure more appropriate recognition methods are applied
-  # first.
+  # image and the kernel. So we provide "hints" to ensure
+  # more appropriate recognition methods are applied first.
 
   # Give hint to image
   InitialDataForImageRecogNode(ri).blocks := ri!.blocks;
-  Add(InitialDataForImageRecogNode(ri).hints,
+  AddMethod(InitialDataForImageRecogNode(ri).hints,
       rec( method := FindHomMethodsMatrix.BlockDiagonal,
            rank := 2000,
            stamp := "BlockDiagonal" ) );
@@ -174,7 +173,7 @@ FindHomMethodsMatrix.BlockLowerTriangular := function(ri, G)
   findgensNmeth(ri).args := [];
 
   # Give hint to kernel N
-  Add(InitialDataForKernelRecogNode(ri).hints,
+  AddMethod(InitialDataForKernelRecogNode(ri).hints,
       rec( method := FindHomMethodsMatrix.LowerLeftPGroup,
            rank := 2000,
            stamp := “LowerLeftPGroup" ));

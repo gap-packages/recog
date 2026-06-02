@@ -11,8 +11,8 @@ gap> for d in [11] do
 > sets := Combinations([1 .. d], 2);;
 > SdOn2Sets := Action(SymmetricGroup(d), sets, OnSets);;
 > ri := RecogNode(SdOn2Sets);;
-> success := FindHomMethodsGeneric.SnAnUnknownDegree(ri, SdOn2Sets);
-> if not success or not Size(ri) = Factorial(d) then
+> success := FindHomMethodsGeneric.SnAnUnknownDegree(ri);
+> if success <> Success or not Size(ri) = Factorial(d) then
 >   Print("wrong result! degree ", d, "\n");
 > fi;
 > od;
@@ -22,16 +22,16 @@ gap> for d in [11] do
 > sets := Combinations([1 .. d], 2);;
 > SdOn2Sets := Action(AlternatingGroup(d), sets, OnSets);;
 > ri := RecogNode(SdOn2Sets);;
-> success := FindHomMethodsGeneric.SnAnUnknownDegree(ri, SdOn2Sets);
-> if not success or not Size(ri) = Factorial(d)/2 then
+> success := FindHomMethodsGeneric.SnAnUnknownDegree(ri);
+> if success <> Success or not Size(ri) = Factorial(d)/2 then
 >   Print("wrong result! degree ", d, "\n");
 > fi;
 > od;
 
 # Check Slp function
 gap> ri := RecogNode(SdOn2Sets);;
-gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri, SdOn2Sets);
-true
+gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri);
+"Success"
 gap> x := PseudoRandom(Grp(ri));;
 gap> slp := SLPforElement(ri, x);;
 gap> x = ResultOfStraightLineProgram(slp, NiceGens(ri));

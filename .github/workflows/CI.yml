@@ -29,7 +29,6 @@ jobs:
           - '4.15'
           - '4.14'
           - '4.13'
-          - '4.12'
 
     steps:
       - uses: actions/checkout@v6
@@ -39,12 +38,14 @@ jobs:
       - run: |
           cd $GAPROOT/pkg
           ../bin/BuildPackages.sh --strict cvec io orb
-      - uses: gap-actions/build-pkg@v2
+      - uses: gap-actions/build-pkg@v3
       - uses: gap-actions/run-pkg-tests@v4
+        with:
+          testfile: tst/testall.g
       - uses: gap-actions/run-pkg-tests@v4
         with:
           mode: onlyneeded
       - uses: gap-actions/process-coverage@v3
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

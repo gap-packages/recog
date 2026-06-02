@@ -819,10 +819,14 @@ end;
 #! Recognise quasi-simple group of Lie type when characteristic is given.
 #! Based on <Cite Key="BKPS02"/> and <Cite Key="AB01"/>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "LieTypeNonConstr",
+BindRecogMethod("FindHomMethodsProjective", "LieTypeNonConstr",
 "do non-constructive recognition of Lie type groups",
-function(ri,G)
-    local count,dim,f,i,ords,p,q,r,res;
+function(ri)
+    local G,count,dim,f,i,ords,p,q,r,res;
+    G := Grp(ri);
+    if not IsBound(ri!.simplesocle) then
+        return TemporaryFailure;
+    fi;
     RECOG.SetPseudoRandomStamp(G,"LieTypeNonConstr");
     dim := ri!.dimension;
     f := ri!.field;
@@ -840,11 +844,11 @@ function(ri,G)
             ri!.comment := r;
             res := LookupHintForSimple(ri,G,r);
             # FIXME: LookupHintForSimple is for sporadics... So why do we use it here?
-            if res = true then
+            if res = Success then
                 return Success;
             fi;
             Info(InfoRecog,2,"LieTypeNonConstr: giving up.");
-            return fail;
+            return TemporaryFailure;
         fi;
         count := count + 1;
         if count > 3 then

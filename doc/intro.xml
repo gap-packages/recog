@@ -8,27 +8,36 @@ behind the package.
 <Chapter Label="intro">
 <Heading>Introduction</Heading>
 
-<Section Label="philosophy">
-<Heading>Philosophy</Heading>
+This package is about group recognition.<P/>
 
-This package is about group recognition. It provides a generic
-framework to implement methods of group recognition, regardless of
-what computational representation is used. This means, that the code
-in this package is useful at least for permutation groups, and matrix
-groups and projective groups over finite fields.
-The setup is described in <Cite Key="NS06"/>. <P/>
+In computational group theory, group recognition is the task of identifying a
+given group. The main goal is to determine whether the given group is isomorphic to a
+well-understood group, such as a symmetric group or a classical matrix
+group, and to construct an explicit isomorphism between the two groups. The first
+task is called <Q>naming</Q> or <Q>non-constructive</Q> recognition, the latter
+task is called <Q>constructive</Q> recognition.<P/>
 
-The framework allows to build composition trees and handles the builtup
+The <Package>recog</Package> package is a generic framework that implements
+algorithms to recognise groups, regardless of what computational representation
+is used. This means, that the code in this package is useful at least for
+permutation groups, matrix groups and projective groups over finite fields.
+The setup is described in <Cite Key="NS06"/>.<P/>
+
+The framework allows to build composition trees and handles the built-up
 and usage of these trees in a generic way. It also contains a
 method selection (described in Chapter <Ref Chap="methsel"/>) that allows
 to install recognition methods in a convenient way and that automatically
 tries to try the different available methods in a sensible order.
-</Section>
 
 <Section Label="overview">
 <Heading>Overview over this manual</Heading>
 
 Chapter <Ref Chap="install"/> describes the installation of this package.<P/>
+
+Chapter <Ref Chap="user"/> presents a user-friendly introduction to this
+package. Furthermore, some instructive examples of the usage of this package
+are shown in section <Ref Sect="examples"/> and possible applications of a
+completed recognition tree are explained in section <Ref Sect="application"/>. <P/>
 
 Chapter <Ref Chap="recognition"/> describes the generic, recursive procedure
 used for group recognition throughout this package. At the heart of this
@@ -44,12 +53,6 @@ useful in other circumstances.<P/>
 
 Chapter <Ref Chap="methods"/> describes the available <Q>FindHomomorphism</Q>
 methods.<P/>
-
-Chapter <Ref Chap="afterrecog"/> explains what one can do with a
-completed recognition tree.<P/>
-
-Finally, Chapter <Ref Chap="examples"/> shows some instructive examples of the
-usage of this package.<P/>
 
 </Section>
 
@@ -70,65 +73,55 @@ receive the mail sent to this list, at
 </Section>
 
 <Section Label="literature">
-<Heading>Literature (temporary)</Heading>
+<Heading>Literature (selection)</Heading>
 
-TODO Find the appropriate place to put these references, so that they appear
-in the bibliography:
-<Cite Key="LNPS06"/>
-<Cite Key="BLS97"/>
-<Cite Key="JLNP13"/>
-<Cite Key="DLGLO13"/>
-<Cite Key="LGO09"/>
-<Cite Key="BLGN+05"/>
-<Cite Key="BLGN+03"/>
-<Cite Key="NP98"/>
-<Cite Key="NP99"/>
-<Cite Key="NP97"/>
-<Cite Key="Pra99"/>
-<Cite Key="CLG97a"/>
-<Cite Key="CLG97b"/>
-<Cite Key="CLGM+95"/>
-<Cite Key="BNS06"/>
-<Cite Key="CNRD09"/>
-<Cite Key="BHLGO15"/>
-<Cite Key="Neu09"/>
-<Cite Key="Ser03"/>
-<Cite Key="KK15"/>
-<Cite Key="LO16"/>
-<Cite Key="LO07"/>
-<Cite Key="HLO+08"/>
+There is a lot of relevant literature on the mathematics behind this package.
+We are working on enhancing this manual to cite it in appropriate places. In
+the meantime, here is a list of references not currently cited elsewhere:
 <Cite Key="BB99"/>
 <Cite Key="BBS09"/>
+<Cite Key="BK01"/>
+<Cite Key="BK06"/>
+<Cite Key="BLGN+03"/>
+<Cite Key="BLGN+05"/>
+<Cite Key="BLS97"/>
+<Cite Key="BNS06"/>
 <Cite Key="BS01"/>
 <Cite Key="Bro01"/>
-<Cite Key="Bro08"/>
 <Cite Key="Bro03"/>
-<Cite Key="BK06"/>
-<Cite Key="BK01"/>
-<Cite Key="CLG98"/>
-<Cite Key="CLGO06"/>
-<Cite Key="CLG01"/>
+<Cite Key="Bro08"/>
 <Cite Key="CFL97"/>
+<Cite Key="CLG01"/>
+<Cite Key="CLG98"/>
+<Cite Key="CLGM+95"/>
+<Cite Key="CLGO06"/>
+<Cite Key="DLGLO13"/>
 <Cite Key="DLGO15"/>
 <Cite Key="GH97"/>
 <Cite Key="GLGO06"/>
 <Cite Key="HLGOR96a"/>
 <Cite Key="HLGOR96b"/>
+<Cite Key="HLO+08"/>
 <Cite Key="HR94"/>
 <Cite Key="IL00"/>
+<Cite Key="KK15"/>
 <Cite Key="KM13"/>
 <Cite Key="KM15"/>
-<Cite Key="LGO97a"/>
-<Cite Key="LGO02"/>
-<Cite Key="LGO97b"/>
 <Cite Key="LG01"/>
+<Cite Key="LGO02"/>
+<Cite Key="LGO09"/>
+<Cite Key="LGO97a"/>
+<Cite Key="LGO97b"/>
 <Cite Key="LMO07"/>
+<Cite Key="LO07"/>
+<Cite Key="LO16"/>
 <Cite Key="NP92"/>
 <Cite Key="Nie05"/>
-<Cite Key="O'B11"/>
 <Cite Key="O'B06"/>
+<Cite Key="O'B11"/>
 <Cite Key="Pak00"/>
 <Cite Key="Par84"/>
+<Cite Key="Ser03"/>
 
 </Section>
 

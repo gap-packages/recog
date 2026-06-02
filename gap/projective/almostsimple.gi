@@ -115,7 +115,7 @@ InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
         Info(InfoRecog,1,"Expected BBox finder for stdgens of ",hint.name,
              " not availabe!");
         Info(InfoRecog,1,"Check your AtlasRep installation!");
-        return fail;
+        return TemporaryFailure;
     fi;
     gm := Group(ri!.gensHmem);
     gm!.pseudorandomfunc := [rec(
@@ -126,7 +126,7 @@ InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
                               rec( orderfunction := RECOG.ProjectiveOrder ) );
     if stdgens = fail or stdgens = "timeout" then
         Info(InfoRecog,2,"Stdgens finder did not succeed for ",hint.name);
-        return fail;
+        return TemporaryFailure;
     fi;
     stdgens := stdgens.gens;
     #Setslptostd(ri,SLPOfElms(stdgens));
@@ -146,7 +146,7 @@ InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
                 Info(InfoRecog,1,"Expected maximal subgroup slp of ",hint.name,
                      " not available!");
                 Info(InfoRecog,1,"Check your AtlasRep installation!");
-                return fail;
+                return TemporaryFailure;
             fi;
             maxgens := ResultOfStraightLineProgram(s.program,
                                                    StripMemory(stdgens));
@@ -195,11 +195,11 @@ InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
             fi;
             SetIsRecogInfoForAlmostSimpleGroup(ri,true);
             ri!.comment := hint.name;
-            return true;
+            return Success;
         od;
     fi;
     Info( InfoRecog, 2, "Got stab chain hint, not yet implemented!" );
-    return fail;
+    return TemporaryFailure;
   end );
 
 InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
@@ -210,13 +210,20 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
 
   fld := ri!.field;
   d := ri!.dimension;
+  triesinnerlimit := RECOG.ParseNumber(hint.triesforgens,d,"1d");
+  trieslimit := RECOG.ParseNumber(hint.tries,d,10);
+  numberrandgens := RECOG.ParseNumber(hint.numberrandgens,d,2);
+  orblenlimit := RECOG.ParseNumber(hint.orblenlimit,d,"4d");
   if IsBound(hint.elordersstart) then
       i := 0;
       repeat
           i := i + 1;
-          if i > 10000 then
-              ErrorNoReturn("possible infinite loop in DoHintedLowIndex, ",
-                            "wrong hints?");
+          if i > triesinnerlimit then
+              Info(InfoRecog,2,
+                   "Did not find a start element with one of the hinted ",
+                   "orders ",hint.elordersstart," after ",triesinnerlimit,
+                   " tries.");
+              return TemporaryFailure;
           fi;
           x := PseudoRandom(G);
       until Order(x) in hint.elordersstart;
@@ -226,10 +233,6 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
   fi;
 
   tries := 0;
-  numberrandgens := RECOG.ParseNumber(hint.numberrandgens,d,2);
-  triesinnerlimit := RECOG.ParseNumber(hint.triesforgens,d,"1d");
-  trieslimit := RECOG.ParseNumber(hint.tries,d,10);
-  orblenlimit := RECOG.ParseNumber(hint.orblenlimit,d,"4d");
   Info(InfoRecog,3,"Using numberrandgens=",numberrandgens,
        " triesinnerlimit=",triesinnerlimit," trieslimit=",trieslimit,
        " orblenlimit=",orblenlimit);
@@ -251,7 +254,7 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
               triesinner := triesinner + 1;
               hm := GModuleByMats(gens,fld);
               if MTX.IsIrreducible(hm) then
-                  Unbind(gens[Length(gens)]);
+                  Remove(gens);
               fi;
           od;
       fi;
@@ -264,10 +267,10 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
               s := MTX.ProperSubmoduleBasis(hm);
               Add(bas,s);
           od;
-          Unbind(bas[Length(bas)]);
-          s := bas[Length(bas)];
-          for i in [Length(bas)-1,Length(bas)-2..1] do
-              s := s * bas[i];
+          Remove(bas); # drop last element, which is `fail`
+          s := Remove(bas);
+          while Length(bas) > 0 do
+              s := s * Remove(bas);
           od;
           # Now s is the basis of a minimal submodule, permute that:
           s := MutableCopyMat(s);
@@ -302,7 +305,7 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
                   fi;
                   SetHomom(ri,hom);
                   Setmethodsforimage(ri,FindHomDbPerm);
-                  return true;
+                  return Success;
               fi;
           else
               Info(InfoRecog,2,"Subspace dimension not as expected, ",
@@ -311,7 +314,7 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
       fi;
       tries := tries + 1;
   until tries > trieslimit;
-  return fail;
+  return TemporaryFailure;
 end );
 
 # We start a database of hints, whenever we discover a certain group, we
@@ -360,7 +363,7 @@ RECOG.ProduceTrivialStabChainHint := function(name,reps,maxes)
           t := Runtime();
           res := DoHintedStabChain(ri,g,hint);
           t := Runtime() - t;
-          if res = true then
+          if res = Success then
               o := ri!.stabilizerchain!.orb;
               x := o[1];
               if IsMatrix(x) then
@@ -368,7 +371,7 @@ RECOG.ProduceTrivialStabChainHint := function(name,reps,maxes)
               else
                   Add(values,[QuoInt(Length(o)+99,100),Length(o)]);
               fi;
-              Print("value=",values[Length(values)]," time=",t," orblen=",
+              Print("value=",Last(values)," time=",t," orblen=",
                     Length(o)," subspace=");
               ViewObj(x);
               Print("\n");
@@ -658,29 +661,50 @@ end;
 # is used in FindHomMethodsProjective.ComputeSimpleSocle
 # it computes the non-abelian simple socle randomly (it might
 # underestimates it)
-# if called for an abelian group (even a group with nilpotence class smaller
-# than 3?) it runs in an infinite loop
+# if it cannot find a suitable witness quickly enough, it returns fail
 RECOG.simplesocle := function(ri,g)
-  local x,y,comm,comm2,comm3,gensH;
+  local x,comm,comm2,comm3,gensH,bound,tries,FindNonTrivial;
 
-  repeat
-    x:=RandomElm(ri,"simplesocle",true).el;
-  until not ri!.isone(x);
+  # If H is almost simple with socle S, then the classification of finite
+  # simple groups implies H''' = S. This is because H / S embeds into Out(S),
+  # which is solvable of derived length at most 3. Thus the normal closure in
+  # H of any non-trivial element of H''' is S. Since both the random search
+  # and FastNormalClosure are only heuristics here, this routine must be
+  # allowed to give up.
+  bound := 5 * ri!.dimension;  # this is an arbitrary bound, could be tuned
+  tries := 0;
+  FindNonTrivial := function(f)
+    local i,el;
+    while tries < bound do
+        tries := tries + 1;
+        el := f(RandomElm(ri,"simplesocle",false).el);
+        if not ri!.isone(el) then
+            return el;
+        fi;
+    od;
+    return fail;
+  end;
 
-  repeat
-    y:=RandomElm(ri,"simplesocle",true).el;
-    comm:=Comm(x,y);
-  until not ri!.isone(comm);
+  # find a non-trivial element of g
+  x := FindNonTrivial(x -> x);
+  if x = fail then
+      return fail;
+  fi;
 
-  repeat
-    y:=RandomElm(ri,"simplesocle",true).el;
-    comm2:=Comm(comm,comm^y);
-  until not ri!.isone(comm2);
+  comm := FindNonTrivial(y -> Comm(x,y));
+  if comm = fail then
+      return fail;
+  fi;
 
-  repeat
-    y:=RandomElm(ri,"simplesocle",true).el;
-    comm3:=Comm(comm2,comm2^y);
-  until not ri!.isone(comm3);
+  comm2 := FindNonTrivial(y -> Comm(comm,comm^y));
+  if comm2 = fail then
+      return fail;
+  fi;
+
+  comm3 := FindNonTrivial(y -> Comm(comm2,comm2^y));
+  if comm3 = fail then
+      return fail;
+  fi;
 
   gensH:=FastNormalClosure(g,[comm3],20);
 
@@ -694,12 +718,18 @@ end;
 #! computed the function does not need to be called again for this
 #! node and therefore returns <K>NeverApplicable</K>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "ComputeSimpleSocle",
+BindRecogMethod("FindHomMethodsProjective", "ComputeSimpleSocle",
 "compute simple socle of almost simple group",
-function(ri,G)
-  local x;
+function(ri)
+  local G,soclegens,x;
+  G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"ComputeSimpleSocle");
-  ri!.simplesocle := Group(RECOG.simplesocle(ri,G));
+  soclegens := RECOG.simplesocle(ri,G);
+  if soclegens = fail then
+      Info(InfoRecog,2,"ComputeSimpleSocle: giving up.");
+      return TemporaryFailure;
+  fi;
+  ri!.simplesocle := Group(soclegens);
   ri!.simplesoclepr := ProductReplacer(ri!.simplesocle);
   ri!.simplesoclerand := EmptyPlist(100);
   Append(ri!.simplesoclerand,GeneratorsOfGroup(ri!.simplesocle));
@@ -748,16 +778,20 @@ end;
 #!
 #! This recognition method is based on the paper <Cite Key="KS09"/>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "ThreeLargeElOrders",
+BindRecogMethod("FindHomMethodsProjective", "ThreeLargeElOrders",
 "recognise Lie type groups and get its characteristic",
-function(ri,G)
-  local hint,name,namecat,p,res;
+function(ri)
+  local G,hint,name,namecat,p,res;
+  G := Grp(ri);
+  if not IsBound(ri!.simplesocle) then
+      return TemporaryFailure;
+  fi;
   RECOG.SetPseudoRandomStamp(G,"ThreeLargeElOrders");
   ri!.simplesoclerandp := 0;
   p := RECOG.findchar(ri,ri!.simplesocle,RECOG.RandElFuncSimpleSocle);
   if p = Characteristic(ri!.field) then
       Info(InfoRecog,2,"ThreeLargeElOrders: defining characteristic p=",p);
-      return false; # FIXME: false = NeverApplicable here really correct?
+      return NeverApplicable; # FIXME: NeverApplicable here really correct?
   fi;
   # Try all possibilities:
   Info(InfoRecog,2,"ThreeLargeElOrders: found ",p);
@@ -770,10 +804,10 @@ function(ri,G)
               if hint <> fail then
                   res := DoHintedLowIndex(ri,G,hint);
               else   # we use Pete Brooksbank's methods
-                  return SLCR.FindHom(ri,G,2,name[3]);
+                  res := SLCR.FindHom(ri,G,2,name[3]);
               fi;
           else
-              return SLCR.FindHom(ri,G,name[2],name[3]);
+              res := SLCR.FindHom(ri,G,name[2],name[3]);
           fi;
       else
           if Length(name) = 3 then
@@ -785,12 +819,12 @@ function(ri,G)
           fi;
           res := LookupHintForSimple(ri,G,namecat);
       fi;
-      if res = true then
+      if res = Success then
           return Success;
       fi;
   od;
   Info(InfoRecog,2,"Did not succeed with hints, giving up...");
-  return fail; # FIXME: fail = TemporaryFailure here really correct?
+  return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
 end);
 
 # RECOG.DegreeAlternating := function (orders)
@@ -940,11 +974,12 @@ end;
 #! This algorithm is probably based on the paper <Cite Key="BLGN+05"/>.
 #! @EndChunk
 # subroutines are in AnSnOnFDPM.gi and also paper reference
-BindRecogMethod(FindHomMethodsProjective, "AltSymBBByDegree",
+BindRecogMethod("FindHomMethodsProjective", "AltSymBBByDegree",
 "try BB recognition for dim+1 and/or dim+2 if sensible",
-function(ri,G)
-  local GG,Gm,RecSnAnEq,RecSnAnIsOne,d,deg,f,fact,hom,newgens,o,orders,p,primes,
+function(ri)
+  local G,GG,Gm,RecSnAnEq,RecSnAnIsOne,d,deg,f,fact,hom,newgens,o,orders,p,primes,
         r,totry;
+  G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"AltSymBBByDegree");
   d := ri!.dimension;
   orders := RandomOrdersSeen(ri);
@@ -1329,11 +1364,12 @@ end;
 #! Afterwards it creates hints that come out of a table for the sporadic
 #! simple groups.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "SporadicsByOrders",
+BindRecogMethod("FindHomMethodsProjective", "SporadicsByOrders",
 "generate a few random elements and compute the proj. orders",
-function(ri,G)
-  local count,gens,i,j,jj,k,killers,l,limit,o,ordersseen,pp,r,raus,res,x;
+function(ri)
+  local G,count,gens,i,j,jj,k,killers,l,limit,o,ordersseen,pp,r,raus,res,x;
 
+  G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"SporadicsByOrders");
 
   l := [1..Length(RECOG.SporadicsNames)];
@@ -1431,20 +1467,20 @@ function(ri,G)
   for i in [1..Length(l)] do
       Info(InfoRecog,2,"Trying hint for ",RECOG.SporadicsNames[l[i]],"...");
       res := LookupHintForSimple(ri,G,RECOG.SporadicsNames[l[i]]);
-      if res = true then
+      if res = Success then
           return Success;
       fi;
       if IsBound(RECOG.SporadicsWorkers[l[i]]) then
           Info(InfoRecog,2,"Calling its installed worker...");
           res := RECOG.SporadicsWorkers[l[1]](RECOG.SporadicsNames[l[i]],
                                         RECOG.SporadicsSizes[l[i]],ri,G);
-          if res = true then
+          if res = Success then
               return Success;
           fi;
       fi;
       Info(InfoRecog,2,"This did not work.");
   od;
-  return false; # FIXME: false = NeverApplicable here really correct?
+  return NeverApplicable; # FIXME: NeverApplicable here really correct?
 end);
 
 # Data for the function NameSporadic
@@ -1528,10 +1564,9 @@ RECOG.NameSporadicData := MakeImmutable([
 #! simple groups nor the Monster and the Baby Monster group. It is based on the
 #! Magma v2.24.10 function <C>RecognizeSporadic</C>.
 #! @EndChunk
-# TODO G is unused
-BindRecogMethod(FindHomMethodsProjective, "NameSporadic",
+BindRecogMethod("FindHomMethodsProjective", "NameSporadic",
 "generate maximal orders",
-function(ri, G)
+function(ri)
     local orders, setOfOrders, maximalOrders, isMaximal,
         namesOfPossibleSporadics, res, i, j, data, name;
     orders := [];
@@ -1542,8 +1577,8 @@ function(ri, G)
     # Compute maximal orders. Maximal in the sense that it does not divide the
     # order of another group element.
     setOfOrders := AsSet(orders);
-    # All orders we look for are <= 66.
-    if setOfOrders[Length(setOfOrders)] > 67 then
+    # All orders we look for are <= 67.
+    if Last(setOfOrders) > 67 then
         return NeverApplicable;
     fi;
     maximalOrders := [];
@@ -1582,7 +1617,7 @@ function(ri, G)
         Info(InfoRecog, 2, "Trying hint for ", name,
              "...");
         res := LookupHintForSimple(ri, Grp(ri), name);
-        if res = true then return Success; fi;
+        if res = Success then return Success; fi;
         Info(InfoRecog, 2, "This did not work.");
     od;
     return NeverApplicable;

@@ -1,6 +1,6 @@
 # PrintObj
 gap> FindHomMethodsGeneric.TrivialGroup;
-<RecogMethod "TrivialGroup": function( ri, G ) ... end>
+<RecogMethod "TrivialGroup": function( ri ) ... end>
 
 # Error messages
 gap> RecogMethod("", "", "", "", x -> x);
@@ -13,7 +13,7 @@ gap> UnpackRecogMethod(x -> x);
 Error, <m> must be a RecogMethod, but is function ( x )
     return x;
 end
-gap> CallRecogMethod(x -> x, []);
+gap> CallRecogMethod(x -> x, 1);
 Error, <m> must be a RecogMethod, but is function ( x )
     return x;
 end

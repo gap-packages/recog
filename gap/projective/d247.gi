@@ -148,7 +148,7 @@ RECOG.DirectFactorsFinder := function(gens,facgens,k,eq)
   od;
 
   if Length(o) < k then
-      Info(InfoRecog,1,"Strange, found fewer direct factors than expected!");
+      Info(InfoRecog,2,"Strange, found fewer direct factors than expected!");
       return fail;
   fi;
 
@@ -185,6 +185,27 @@ RECOG.DirectFactorsAction := function(data,el)
   return PermList(res);
 end;
 
+RECOG.TryDirectFactorsAction := function(ri,G,facgens,mult)
+  local H,hom,orb;
+
+  orb := RECOG.DirectFactorsFinder(GeneratorsOfGroup(G), facgens, mult,
+                                   ri!.isequal);
+  if orb = fail then
+      return fail;
+  fi;
+
+  H := GroupWithGenerators(orb[2]);
+  hom := GroupHomByFuncWithData(G,H,RECOG.DirectFactorsAction,
+             rec( o := orb[1], eq := ri!.isequal ) );
+  SetHomom(ri,hom);
+  Setmethodsforimage(ri,FindHomDbPerm);
+  Setimmediateverification(ri,true);
+  Info(InfoRecog,2,"D247: Success, found D7 with action on ",
+       mult," direct factors.");
+  ri!.comment := "D7TensorInduced";
+  return Success;
+end;
+
 RECOG.IsPower := function(d)
   local f, e, g, l, dd;
   # Intended for small d
@@ -208,7 +229,8 @@ RECOG.SortOutReducibleNormalSubgroup :=
     # Only call this with absolutely irreducible G!
     # Only call this if we already know that G is not C3!
 
-    local H,a,basis,collf,conjgensG,f,hom,homcomp,homs,homsimg,kro,o,r,subdim;
+    local H,a,basis,collf,conjgensG,dim,f,hom,homcomp,homs,homsimg,kro,mult,o,
+          r,res,subdim;
 
     f := ri!.field;
     collf := MTX.CollectedFactors(m);
@@ -242,7 +264,15 @@ RECOG.SortOutReducibleNormalSubgroup :=
         if not ForAll(kro, k -> k[1]) then
             Info(InfoRecog,1,"VERY, VERY, STRANGE!");
             Info(InfoRecog,1,"False alarm, was not a tensor decomposition.");
-            ErrorNoReturn("This should never have happened (346), tell Max.");
+            dim := MTX.Dimension(m);
+            mult := First([2..20],i->subdim^i = dim);
+            if mult <> fail then
+                res := RECOG.TryDirectFactorsAction(ri,G,ngens,mult);
+                if res = Success then
+                    return Success;
+                fi;
+            fi;
+            return TemporaryFailure;
         fi;
 
         H := GroupWithGenerators(conjgensG);
@@ -313,7 +343,7 @@ RECOG.SortOutReducibleSecondNormalSubgroup :=
     # Only call this if we already know that G is not C3!
     # Only call this if the upper normal subgroup was still irreducible!
 
-    local H,collf,dim,hom,mult,orb,subdim;
+    local collf,dim,mult,res,subdim;
 
     collf := MTX.CollectedFactors(mm);
     if Length(collf) = 1 then
@@ -321,18 +351,8 @@ RECOG.SortOutReducibleSecondNormalSubgroup :=
         dim := MTX.Dimension(mm);
         mult := First([2..20],i->subdim^i = dim);
         if mult <> fail then
-            orb := RECOG.DirectFactorsFinder(GeneratorsOfGroup(G),
-                                             nngens,mult,ri!.isequal);
-            if orb <> fail then
-                H := GroupWithGenerators(orb[2]);
-                hom := GroupHomByFuncWithData(G,H,
-                           RECOG.DirectFactorsAction,
-                           rec( o := orb[1], eq := ri!.isequal) );
-                SetHomom(ri,hom);
-                Setmethodsforimage(ri,FindHomDbPerm);
-                Info(InfoRecog,2,"D247: Success, found D7 with action",
-                     " on ",mult," direct factors.");
-                ri!.comment := "D7TensorInduced";
+            res := RECOG.TryDirectFactorsAction(ri,G,nngens,mult);
+            if res = Success then
                 return Success;
             else
                 Info(InfoRecog,2,"D247: Did not find direct factors!");
@@ -343,19 +363,20 @@ RECOG.SortOutReducibleSecondNormalSubgroup :=
     else
         Info(InfoRecog,2,"D247: Restriction not homogeneous!");
     fi;
-    return fail; # FIXME: fail = TemporaryFailure here really correct?
+    return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
   end;
 
 #! @BeginChunk D247
 #! TODO
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "D247",
+BindRecogMethod("FindHomMethodsProjective", "D247",
 "play games to find a normal subgroup",
-function(ri, G)
+function(ri)
   # We try to produce an element of a normal subgroup by playing
   # tricks.
-  local CheckNormalClosure,f,i,res,x,ispower;
+  local G,CheckNormalClosure,f,i,res,x,ispower;
 
+  G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"D247");
 
   CheckNormalClosure := function(x)
@@ -367,7 +388,7 @@ function(ri, G)
     if MTX.IsIrreducible(m) then
         if not ispower then
             Info(InfoRecog,4,"Dimension is no power!");
-            return fail; # FIXME: fail = TemporaryFailure here really correct?
+            return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
         fi;
         # we want to look for D7 here, using the same trick again:
         count := 0;
@@ -386,7 +407,7 @@ function(ri, G)
         if not MTX.IsIrreducible(mm) then
             return RECOG.SortOutReducibleSecondNormalSubgroup(ri,G,nngens,mm);
         fi;
-        return fail; # FIXME: fail = TemporaryFailure here really correct?
+        return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
     fi;
     if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;
     Info(InfoRecog,2,"D247: Seem to have found something!");
@@ -405,7 +426,7 @@ function(ri, G)
   for i in [1..9] do
       if InfoLevel(InfoRecog) >= 2 then Print(".\c"); fi;
       res := CheckNormalClosure(x);
-      if res in [true,false] then
+      if res in [Success,NeverApplicable] then
           return res;
       fi;
       x := RECOG.InvolutionJumper(ri!.pr,RECOG.ProjectiveOrder,x,100,true);
@@ -416,7 +437,7 @@ function(ri, G)
       fi;
   od;
   res := CheckNormalClosure(x);
-  if res in [true,false] then
+  if res in [Success,NeverApplicable] then
       return res;
   fi;
   if InfoLevel(InfoRecog) >= 2 then Print("\n"); fi;

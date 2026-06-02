@@ -7,6 +7,9 @@
 <Chapter Label="methsel">
 <Heading>Method selection</Heading>
 
+This chapter describes the method selection framework introduced in
+<Cite Key="NS06"/>.<P/>
+
 The setup described in this chapter is intended for situations, in which
 lots of different methods are available to fulfill a certain task, but
 in which it is not possible in the beginning to decide, which one to use.
@@ -82,6 +85,46 @@ homomorphisms for permutation, matrix, and projective groups.
 <#Include Label="FindHomDbMatrix">
 <#Include Label="FindHomDbProjective">
 <P/>
+
+</Section>
+
+<Section Label="hintsystem">
+<Heading>Hint system</Heading>
+
+The hint system described in <Cite Key="NS06"/> lets a successful
+find homomorphism method transport information to the recognition
+processes for the image and kernel of the found homomorphism.<P/>
+
+This information is stored in records attached to the current recognition
+node. Components bound in these records are copied into the corresponding
+new recognition nodes when recursion continues in the image or kernel.
+In particular, the component <C>hints</C> may contain a list of records
+describing find homomorphism methods that should be tried first there.<P/>
+
+<ManSection>
+<Attr Name="InitialDataForKernelRecogNode" Arg="ri"/>
+<Attr Name="InitialDataForImageRecogNode" Arg="ri"/>
+<Description>
+    These attributes are initialised to records with only the component
+    <C>hints</C> bound to an empty list at the beginning of the
+    recursive recognition function. Find homomorphism methods can
+    put acquired knowledge about the group to be recognised (like for
+    example an invariant subspace of a matrix group) into these records.
+    When a homomorphism is found and recognition goes on in its image
+    or kernel, the value of the corresponding attribute is taken as initialisation
+    data for the newly created recognition node for the image or kernel.
+    Thus,
+    information is transported down to the recognition process for the
+    image or kernel. The component <C>hints</C> is special insofar as it has to
+    contain records describing find homomorphism methods which might be
+    particularly successful. They are prepended to the find homomorphism
+    method database such that they are called before any other methods.
+    This is a means to give hints to the recognition procedure in the
+    image or kernel, because often during the finding of a homomorphism
+    knowledge is acquired which might help the recognition of the image
+    or kernel.
+</Description>
+</ManSection>
 
 </Section>
 
