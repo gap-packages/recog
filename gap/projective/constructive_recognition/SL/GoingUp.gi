@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Daniel Rademacher.
+##  This files's authors include Max Neunhöffer, Ákos Seress, Daniel Rademacher.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
 ##  to list here. Please refer to the COPYRIGHT file for details.
@@ -24,64 +24,63 @@
 
 
 RECOG.SLn_UpStep := function(w)
-# w has components:
-#   d       : size of big SL
-#   n       : size of small SL
-#   slnstdf : fakegens for SL_n standard generators
-#   bas     : current base change, first n vectors are where SL_n acts
-#             rest of vecs are invariant under SL_n
-#   basi    : current inverse of bas
-#   sld     : original group with memory generators, PseudoRandom
-#             delivers random elements
-#   sldf    : fake generators to keep track of what we are doing
-#   f       : field
-# The following are filled in automatically if not already there:
-#   p       : characteristic
-#   ext     : q=p^ext
-#   One     : One(slnstdf[1])
-#   can     : CanonicalBasis(f)
-#   canb    : BasisVectors(can)
-#   transh  : fakegens for the "horizontal" transvections n,i for 1<=i<=n-1
-#             entries can be unbound in which case they are made from slnstdf
-#   transv  : fakegens for the "vertical" transvections i,n for 1<=i<=n-1
-#             entries can be unbound in which case they are made from slnstdf
-#
-# We keep the following invariants (going from n -> n':=2n-1)
-#   bas, basi is a base change to the target base
-#   slnstdf are SLPs to reach standard generators of SL_n from the
-#       generators of sld
-local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
-    ci,cii,coeffs,flag,i,id,int1,int3,j,k,lambda,list,mat,newbas,newbasf,
-    newbasfi,newbasi,newdim,newpart,perm,pivots,pivots2,pos,pow,s,sf,
-    slp,std,sum1,tf,trans,transd,transr,v,vals,zerovec,counter;
+    # w has components:
+    #   d       : size of big SL
+    #   n       : size of small SL
+    #   slnstdf : fakegens for SL_n standard generators
+    #   bas     : current base change, first n vectors are where SL_n acts
+    #             rest of vecs are invariant under SL_n
+    #   basi    : current inverse of bas
+    #   sld     : original group with memory generators, PseudoRandom
+    #             delivers random elements
+    #   sldf    : fake generators to keep track of what we are doing
+    #   f       : field
+    # The following are filled in automatically if not already there:
+    #   p       : characteristic
+    #   ext     : q=p^ext
+    #   One     : One(slnstdf[1])
+    #   can     : CanonicalBasis(f)
+    #   canb    : BasisVectors(can)
+    #   transh  : fakegens for the "horizontal" transvections n,i for 1<=i<=n-1
+    #             entries can be unbound in which case they are made from slnstdf
+    #   transv  : fakegens for the "vertical" transvections i,n for 1<=i<=n-1
+    #             entries can be unbound in which case they are made from slnstdf
+    #
+    # We keep the following invariants (going from n -> n':=2n-1)
+    #   bas, basi is a base change to the target base
+    #   slnstdf are SLPs to reach standard generators of SL_n from the
+    #       generators of sld
+    local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
+          ci,cii,coeffs,flag,i,id,int1,int3,j,k,lambda,list,mat,newbas,newbasf,
+          newbasfi,newbasi,newdim,newpart,perm,pivots,pivots2,pos,pow,s,sf,
+          slp,std,sum1,tf,trans,transd,transr,v,vals,zerovec,counter;
 
-    Info(InfoRecog,3,"-----------");
     Info(InfoRecog,3,"Going up: ",w.n," (",w.d,")...");
 
     # Before we begin, we upgrade the data structure with a few internal
     # things:
 
-    if not(IsBound(w.can)) then w.can := CanonicalBasis(w.f); fi;
-    if not(IsBound(w.canb)) then w.canb := BasisVectors(w.can); fi;
-    if not(IsBound(w.One)) then w.One := One(w.slnstdf[1]); fi;
-    if not(IsBound(w.transh)) then w.transh := []; fi;
-    if not(IsBound(w.transv)) then w.transv := []; fi;
+    if not IsBound(w.can) then w.can := CanonicalBasis(w.f); fi;
+    if not IsBound(w.canb) then w.canb := BasisVectors(w.can); fi;
+    if not IsBound(w.One) then w.One := One(w.slnstdf[1]); fi;
+    if not IsBound(w.transh) then w.transh := []; fi;
+    if not IsBound(w.transv) then w.transv := []; fi;
     # Update our cache of *,n and n,* transvections because we need them
     # all over the place:
     std := RECOG.InitSLstd(w.f,w.n,
-                            w.slnstdf{[1..w.ext]},
-                            w.slnstdf{[w.ext+1..2*w.ext]},
-                            w.slnstdf[2*w.ext+1],
-                            w.slnstdf[2*w.ext+2]);
+                           w.slnstdf{[1..w.ext]},
+                           w.slnstdf{[w.ext+1..2*w.ext]},
+                           w.slnstdf[2*w.ext+1],
+                           w.slnstdf[2*w.ext+2]);
     for i in [1..w.n-1] do
         for k in [1..w.ext] do
             pos := (i-1)*w.ext + k;
-            if not(IsBound(w.transh[pos])) then
+            if not IsBound(w.transh[pos]) then
                 RECOG.ResetSLstd(std);
                 RECOG.DoColOp_SL(false,w.n,i,w.canb[k],std);
                 w.transh[pos] := std.right;
             fi;
-            if not(IsBound(w.transv[pos])) then
+            if not IsBound(w.transv[pos]) then
                 RECOG.ResetSLstd(std);
                 RECOG.DoRowOp_SL(false,i,w.n,w.canb[k],std);
                 w.transv[pos] := std.left;
@@ -93,48 +92,48 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
 
     # Now we can define two helper functions:
     DoColOp_n := function(el,i,j,lambda,w)
-    # This adds lambda times the i-th column to the j-th column.
-    # Note that either i or j must be equal to n!
-    local coeffs,k;
-    coeffs := IntVecFFE(Coefficients(w.can,lambda));
-    if i = w.n then
-        for k in [1..w.ext] do
-            if not IsZero(coeffs[k]) then
-                el := el * w.transh[(j-1)*w.ext+k]^coeffs[k];
-            fi;
-        od;
-    elif j = w.n then
-        for k in [1..w.ext] do
-            if not IsZero(coeffs[k]) then
-                el := el * w.transv[(i-1)*w.ext+k]^coeffs[k];
-            fi;
-        od;
-    else
-        Error("either i or j must be equal to n");
-    fi;
-    return el;
+      # This adds lambda times the i-th column to the j-th column.
+      # Note that either i or j must be equal to n!
+      local coeffs,k;
+      coeffs := IntVecFFE(Coefficients(w.can,lambda));
+      if i = w.n then
+          for k in [1..w.ext] do
+              if not IsZero(coeffs[k]) then
+                  el := el * w.transh[(j-1)*w.ext+k]^coeffs[k];
+              fi;
+          od;
+      elif j = w.n then
+          for k in [1..w.ext] do
+              if not IsZero(coeffs[k]) then
+                  el := el * w.transv[(i-1)*w.ext+k]^coeffs[k];
+              fi;
+          od;
+      else
+          ErrorNoReturn("either i or j must be equal to n");
+      fi;
+      return el;
     end;
     DoRowOp_n := function(el,i,j,lambda,w)
-    # This adds lambda times the j-th row to the i-th row.
-    # Note that either i or j must be equal to n!
-    local coeffs,k;
-    coeffs := IntVecFFE(Coefficients(w.can,lambda));
-    if j = w.n then
-        for k in [1..w.ext] do
-            if not IsZero(coeffs[k]) then
-                el := w.transv[(i-1)*w.ext+k]^coeffs[k] * el;
-            fi;
-        od;
-    elif i = w.n then
-        for k in [1..w.ext] do
-            if not IsZero(coeffs[k]) then
-                el := w.transh[(j-1)*w.ext+k]^coeffs[k] * el;
-            fi;
-        od;
-    else
-        Error("either i or j must be equal to n");
-    fi;
-    return el;
+      # This adds lambda times the j-th row to the i-th row.
+      # Note that either i or j must be equal to n!
+      local coeffs,k;
+      coeffs := IntVecFFE(Coefficients(w.can,lambda));
+      if j = w.n then
+          for k in [1..w.ext] do
+              if not IsZero(coeffs[k]) then
+                  el := w.transv[(i-1)*w.ext+k]^coeffs[k] * el;
+              fi;
+          od;
+      elif i = w.n then
+          for k in [1..w.ext] do
+              if not IsZero(coeffs[k]) then
+                  el := w.transh[(j-1)*w.ext+k]^coeffs[k] * el;
+              fi;
+          od;
+      else
+          ErrorNoReturn("either i or j must be equal to n");
+      fi;
+      return el;
     end;
 
     # Here everything starts, some more preparations:
@@ -161,7 +160,7 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
             ConvertToMatrixRepNC(s,w.f);
             sf := w.slnstdf[2*w.ext+1];
         else
-            Error("this program only works for odd n or n=2");
+            ErrorNoReturn("this program only works for odd n or n=2");
         fi;
     else
         # In this case the n-1-cycle is the identity, so we take a transvection:
@@ -250,19 +249,18 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
 # .... and I think this is why we run into the "Ooops, Fixc intersected" message down below... ???
 
         # Change basis:
-        newpart := ExtractSubMatrix(c,[1..(w.n-1)],[1..(w.d)]);
+        newpart := ExtractSubMatrix(c,[1..w.n-1],[1..w.d]);
         # Clean out the first n entries to go to the fixed space of SL_n:
         zerovec := Zero(newpart[1]);
-        for i in [1..(w.n-1)] do
-            CopySubVector(zerovec,newpart[i],[1..w.n],[1..w.n]);
+        for i in [1..w.n-1] do
+            RECOG.CopySubVectorCompat(zerovec,newpart[i],[1..w.n],[1..w.n]);
         od;
         MB := MutableBasis(w.f,[],zerovec);
         i := 1;
         pivots := EmptyPlist(newdim);
         while i <= Length(newpart) and NrBasisVectors(MB) < newdim do
-            if not(IsContainedInSpan(MB,newpart[i])) then
+            if CloseMutableBasis(MB,newpart[i]) then
                 Add(pivots,i);
-                CloseMutableBasis(MB,newpart[i]);
             fi;
             i := i + 1;
         od;
@@ -301,9 +299,8 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
         i := 1;
         pivots2 := EmptyPlist(newdim);
         while i <= Length(cii) and NrBasisVectors(MB) < newdim do
-            if not(IsContainedInSpan(MB,cii[i])) then
+            if CloseMutableBasis(MB,cii[i]) then
                 Add(pivots2,i);
-                CloseMutableBasis(MB,cii[i]);
             fi;
             i := i + 1;
         od;
@@ -332,7 +329,7 @@ local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
 
     newbasf := w.One;
     for i in [1..w.n-1] do
-        if not(IsZero(v[i])) then
+        if not IsZero(v[i]) then
             newbasf := DoColOp_n(newbasf,w.n,i,v[i],w);
         fi;
     od;

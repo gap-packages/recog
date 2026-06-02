@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Daniel Rademacher.
+##  This files's authors include Max Neunhöffer, Ákos Seress, Daniel Rademacher.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
 ##  to list here. Please refer to the COPYRIGHT file for details.
@@ -92,7 +92,6 @@ RECOG.SLn_constructsl4:=function(g,dim,q,r)
 end;
 
 
-
 #g=SL(d,q), given as a subgroup of SL(dim,q)
 #output: [SL(2,q), and a basis for the 2-dimensional subspace where it acts
 RECOG.SLn_godownfromd:=function(g,q,d,dim)
@@ -174,8 +173,6 @@ RECOG.SLn_godownfromd:=function(g,q,d,dim)
 
 end;
 
-
-
 #going down from 4 to 2 dimensions, when q=2,3,4,5,9
 #just construct the 4-dimensional invariant space and generators
 #for the group acting on it
@@ -197,7 +194,6 @@ RECOG.SLn_exceptionalgodown:=function(h,q,dim)
   Info(InfoRecog,2,"New Dimension: 2");
   return [h,VectorSpace(GF(q),basis)];
 end;
-
 
 
 RECOG.SLn_constructsl2:=function(g,d,q)
