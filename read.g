@@ -45,7 +45,7 @@ ReadPackage("recog","gap/matrix/classical.gi");
 # Projective groups
 ReadPackage("recog","gap/projective/findnormal.gi");
 ReadPackage("recog","gap/projective/c6.gi");
-ReadPackage("recog","gap/projective/tensor/tensor.gi");
+ReadPackage("recog","gap/projective/tensor.gi");
 ReadPackage("recog","gap/projective/c3c5.gi");
 ReadPackage("recog","gap/projective/d247.gi");
 ReadPackage("recog","gap/projective/almostsimple/threeelorders.gi");
@@ -73,7 +73,7 @@ ReadPackage("recog","gap/projective/constructive_recognition/O/GoingDown.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/O/GoingUp.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/O/main.gi");
 ReadPackage("recog","gap/projective/blackbox/blackboxClassical.gi");
-ReadPackage("recog","gap/projective/AnSn/AnSnOnFDPM.gi");
+ReadPackage("recog","gap/projective/AnSnOnFDPM.gi");
 
 # All the method installations are now here:
 ReadPackage("recog","gap/perm.gi");
