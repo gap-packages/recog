@@ -53,7 +53,7 @@ ReadPackage("recog","gap/projective/almostsimple.gi");
 ReadPackage("recog","gap/projective/almostsimple/lietype.gi");
 ReadPackage("recog","gap/projective/naming/ClassicalNamingAndUtils.gi");
 ReadPackage("recog","gap/projective/almostsimple/hints.gi");
-ReadPackage("recog","gap/projective/constructive_recognition/utils/achieve.gi");
+ReadPackage("recog","gap/projective/classicalnatural.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/utils/utils.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/SL/BaseCase.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/SL/GoingDown.gi");
