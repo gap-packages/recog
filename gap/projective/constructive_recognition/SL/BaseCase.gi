@@ -28,7 +28,7 @@
 # "Fast Recognition of Classical Groups over Large Fields"
 # by Marston Conder and Charles Leedham-Green
 RECOG.ConstructiveRecognitionSL2NaturalRepresentation := function(G, q, epsilon)  # TODO: never called
-local F, factors, counter, one, factor, foundEle, passed, max, eigenvalues, eigenvalues2, eigenvectors, eigenvectors2, A, B, rand, foundConjugate, test, BDiag, C, basechange, v, d, CC, check, i, j, D, DD, T, S, o, t1, t2, zero, slp;
+local F, factors, counter, factor, foundEle, passed, max, eigenvalues, eigenvalues2, eigenvectors, eigenvectors2, A, B, rand, foundConjugate, test, BDiag, C, basechange, v, d, CC, check, i, j, D, DD, T, S, o, t1, t2, zero, slp;
 
     factors := PrimeDivisors(q-1);
     counter := 1;
@@ -38,7 +38,6 @@ local F, factors, counter, one, factor, foundEle, passed, max, eigenvalues, eige
         G := GroupWithMemory(G);
     fi;
 
-    one := One(G);
     zero := Zero(F);
     max := Int(1/epsilon);
     while counter < max do
@@ -47,10 +46,10 @@ local F, factors, counter, one, factor, foundEle, passed, max, eigenvalues, eige
         # foundEle := false;
         # while not(foundEle) do
         #    A := PseudoRandom(G);
-        #    if A^(q-1) = one then
+        #    if IsOne(A^(q-1)) then
         #        passed := true;
         #        for factor in factors do
-        #            if A^((q-1)/factor) = one then
+        #            if IsOne(A^((q-1)/factor)) then
         #                passed := false;
         #                break;
         #            fi;
@@ -135,7 +134,7 @@ local F, factors, counter, one, factor, foundEle, passed, max, eigenvalues, eige
         d := v[2] * v[1]^-1;
 
         S := IdentityMat(2,F);
-        while S = one do
+        while IsOne(S) do
             foundEle := false;
             while not(foundEle) do
                 C := PseudoRandom(G);
@@ -164,7 +163,7 @@ local F, factors, counter, one, factor, foundEle, passed, max, eigenvalues, eige
         d := v[2] * v[1]^-1;
 
         T := IdentityMat(2,F);
-        while T = one do
+        while IsOne(T) do
             foundEle := false;
             while not(foundEle) do
                 D := PseudoRandom(G);
