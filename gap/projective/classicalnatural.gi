@@ -17,6 +17,12 @@
 ##
 #############################################################################
 
+InstallMethod( CharacteristicPolynomial, "for a memory element matrix",
+  [ IsMatrix and IsObjWithMemory ],
+  function(m)
+    return CharacteristicPolynomial(m!.el);
+  end );
+
 InstallMethod( Eigenspaces, "for a field and a memory element matrix",
   [ IsField, IsMatrix and IsObjWithMemory ],
   function( f, m )
