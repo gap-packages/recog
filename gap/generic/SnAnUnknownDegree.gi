@@ -960,25 +960,25 @@ end;
 #
 # Returns either fail or a record with components type, isoData and slpToStdGens, where:
 # - type: the isomorphism type, that is either the string "Sn" or "An".
-# - isoData: a list [stdGens, filter, n] where
+# - isoData: a list [stdGens, sieve, n] where
 #   - stdGens are the standard generators of G. They do not have memory.
-#   - filter implicitly defines the isomorphism. It is used by
+#   - sieve implicitly defines the isomorphism. It is used by
 #     RECOG.FindImageSn, RECOG.FindImageAn, and RECOG.FindImageSnAnSmallDegree
 #     to compute the isomorphism.
 #   - n is the degree of the group.
 # - slpToStdGens: an SLP from the generators of G to stdGens.
 RECOG.ConstructSnAnIsomorphism := function(ri, n, stdGensAnWithMemory)
-    local stdGensAn, filter, filterPart, gImage, foundOddPermutation, slp, eval,
+    local stdGensAn, sieve, sievePart, gImage, foundOddPermutation, slp, eval,
         hWithMemory, bWithMemory, stdGensSnWithMemory, b, h, g;
     stdGensAn := StripMemory(stdGensAnWithMemory);
-    # Construct filter. In <Cite Key="C12"/> filter is called E.
-    # In <Cite Key="JLNP13"/> filter is called `xi`.
+    # Construct sieve. In <Cite Key="C12"/>, Section 3.4, sieve is called E.
+    # In <Cite Key="JLNP13"/> sieve is called `xi`.
     if n < 11 then
-        filterPart := [stdGensAn[2], (~[1] ^ stdGensAn[1]) ^ (2 * (n mod 2) - 1),
+        sievePart := [stdGensAn[2], (~[1] ^ stdGensAn[1]) ^ (2 * (n mod 2) - 1),
                        (~[2] ^ stdGensAn[1]) ^ (2 * (n mod 2) - 1)];
-        filter := [[stdGensAn[1], stdGensAn[2]], filterPart];
+        sieve := [[stdGensAn[1], stdGensAn[2]], sievePart];
     else
-        filter := RECOG.ConstructXiAn(n, stdGensAn[1], stdGensAn[2]);
+        sieve := RECOG.ConstructXiAn(n, stdGensAn[1], stdGensAn[2]);
     fi;
     foundOddPermutation := false;
     # For each generator, check whether its image under the monomorphism into the
@@ -988,12 +988,12 @@ RECOG.ConstructSnAnIsomorphism := function(ri, n, stdGensAnWithMemory)
     for g in ri!.gensHmem do
         if n < 11 then
             gImage := RECOG.FindImageSnAnSmallDegree(ri, n, StripMemory(g),
-                                                     filter[1][1], filter[1][2],
-                                                     filter[2]);
+                                                     sieve[1][1], sieve[1][2],
+                                                     sieve[2]);
         else
             gImage := RECOG.FindImageAn(ri, n, StripMemory(g),
                                         stdGensAn[1], stdGensAn[2],
-                                        filter[1], filter[2]);
+                                        sieve[1], sieve[2]);
         fi;
         if gImage = fail then return fail; fi;
         if SignPerm(gImage) = -1 then
@@ -1009,7 +1009,7 @@ RECOG.ConstructSnAnIsomorphism := function(ri, n, stdGensAnWithMemory)
     od;
     if not foundOddPermutation then
         return rec(type := "An",
-                   isoData := [[stdGensAn[1], stdGensAn[2]], filter, n],
+                   isoData := [[stdGensAn[1], stdGensAn[2]], sieve, n],
                    slpToStdGens := SLPOfElms(stdGensAnWithMemory));
     fi;
     # Construct standard generators for Sn: [bWithMemory, hWithMemory].
@@ -1029,17 +1029,17 @@ RECOG.ConstructSnAnIsomorphism := function(ri, n, stdGensAnWithMemory)
         return fail;
     fi;
     if n >= 11 then
-        filter := RECOG.ConstructXiSn(n, b, h);
+        sieve := RECOG.ConstructXiSn(n, b, h);
     fi;
     for g in ri!.gensHmem do
         if n < 11 then
             gImage := RECOG.FindImageSnAnSmallDegree(ri, n, StripMemory(g),
-                                                     filter[1][1], filter[1][2],
-                                                     filter[2]);
+                                                     sieve[1][1], sieve[1][2],
+                                                     sieve[2]);
         else
             gImage := RECOG.FindImageSn(ri, n, StripMemory(g),
                                         b, h,
-                                        filter[1], filter[2]);
+                                        sieve[1], sieve[2]);
         fi;
         if gImage = fail then return fail; fi;
         slp := RECOG.SLPforSn(n, gImage);
@@ -1047,7 +1047,7 @@ RECOG.ConstructSnAnIsomorphism := function(ri, n, stdGensAnWithMemory)
         if not isequal(ri)(eval, StripMemory(g)) then return fail; fi;
     od;
     return rec(type := "Sn",
-               isoData := [[b, h], filter, n],
+               isoData := [[b, h], sieve, n],
                slpToStdGens := SLPOfElms(stdGensSnWithMemory));
 end;
 
