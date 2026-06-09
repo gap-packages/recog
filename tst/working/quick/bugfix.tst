@@ -423,6 +423,12 @@ true
 gap> ForAll(GeneratorsOfGroup(G), x -> SLPforElement(ri, x) <> fail);
 true
 
+# Issue: generic linear recognition over large prime fields should not get
+# stuck in the classical-form check when there is no preserved form.
+gap> i := 2;; Reset(GlobalRandomSource, i);; Reset(GlobalMersenneTwister, i);;
+gap> RecogniseClassical(SL(6,257)).isSLContained;
+true
+
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
 gap> STOP_TEST("bugfix.tst");

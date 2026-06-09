@@ -64,6 +64,77 @@ BindGlobal( "FindHomMethodsClassical", rec() );
 # Test whether <n> (assumed integer) is a power of 2
 IsPowerOfTwo := n -> IsInt(n) and n > 1 and 2 ^ Log2Int(n) = n;
 
+# Use the current random element to rule out invariant dual or Frobenius forms.
+# For such a form, the characteristic polynomial of g is constrained by a
+# scalar lambda relating g to g^-T or to its Frobenius twist. If the trace is
+# nonzero then this lambda is visible immediately as trace(g) / trace(g^-1)
+# (or the Frobenius-twisted version), so we can test the coefficient relations
+# directly on the current random element. This complements PossibleClassicalForms,
+# which often leaves maybeDual or maybeFrobenius undecided in large-prime linear
+# cases because its later scalar-removal step rarely succeeds there.
+RecogClassicalCheckTraceForms := function(recognise)
+    local c, d, f, z, I, a, tM, tMiDual, tMiFrob, qq, lambda;
+
+    if recognise.g = fail or recognise.cpol = fail then
+        return;
+    fi;
+    if not recognise.maybeDual and not recognise.maybeFrobenius then
+        return;
+    fi;
+
+    f := recognise.field;
+    d := recognise.d;
+    z := Zero(f);
+    c := CoefficientsOfUnivariatePolynomial(recognise.cpol);
+    I := Filtered([0 .. d], x -> not IsZero(c[x+1]));
+
+    # For a preserved dual or Frobenius form, nonzero coefficients occur in
+    # symmetric positions i and d-i. A missing partner immediately rules out
+    # both possibilities.
+    if ForAny(I, x -> IsZero(c[d-x+1])) then
+        recognise.maybeDual := false;
+        recognise.maybeFrobenius := false;
+        return;
+    fi;
+
+    tM := Trace(recognise.g);
+    tMiDual := Trace(recognise.g^-1);
+    if recognise.maybeFrobenius then
+        qq := Characteristic(f)^(DegreeOverPrimeField(f)/2);
+        tMiFrob := tMiDual^qq;
+    else
+        tMiFrob := fail;
+    fi;
+
+    # If one trace vanishes and the matching trace does not, then no scalar
+    # multiple can identify g with the relevant inverse-transpose variant.
+    if IsZero(tM) <> IsZero(tMiDual) then
+        recognise.maybeDual := false;
+    fi;
+    if recognise.maybeFrobenius and (IsZero(tM) <> IsZero(tMiFrob)) then
+        recognise.maybeFrobenius := false;
+    fi;
+
+    # With nonzero trace, lambda is determined by the trace ratio. The
+    # remaining coefficient identities must then hold for every nonzero term
+    # of the characteristic polynomial.
+    if recognise.maybeDual and not IsZero(tM) and not IsZero(tMiDual) then
+        a := c[1];
+        lambda := tM / tMiDual;
+        if ForAny(I, i -> a * c[d-i+1] / c[i+1] <> lambda^i) then
+            recognise.maybeDual := false;
+        fi;
+    fi;
+
+    if recognise.maybeFrobenius and not IsZero(tM) and not IsZero(tMiFrob) then
+        a := c[1];
+        lambda := tM / tMiFrob;
+        if ForAny(I, i -> a * c[d-i+1]^qq / c[i+1] <> lambda^i) then
+            recognise.maybeFrobenius := false;
+        fi;
+    fi;
+end;
+
 
 # Check if m > 5 and the order of a basic lppd(d,q;e) element
 
@@ -1003,6 +1074,7 @@ BindRecogMethod("FindHomMethodsClassical", "NoClassicalForms",
 function(recognise)
     local d,field;
     PossibleClassicalForms( recognise.grp, recognise.g, recognise );
+    RecogClassicalCheckTraceForms(recognise);
 
     d := recognise.d;
     field := recognise.field;
