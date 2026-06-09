@@ -1248,13 +1248,12 @@ function(recognise)
     f := recognise.field;
 
     # if size of field not a square, the group cannot be unitary
-    if LogInt(Size(f),Characteristic(f)) mod 2 <> 0 then
+    if DegreeOverPrimeField(f) mod 2 <> 0 then
         recognise.isSUContained := false;
         return NeverApplicable;
     fi;
 
-    q0 := Characteristic(recognise.field)^
-         (LogInt(recognise.q,Characteristic(recognise.field))/2);
+    q0 := Characteristic(recognise.field)^(DegreeOverPrimeField(recognise.field)/2);
 
 
 
@@ -2383,12 +2382,12 @@ function(recognise)
             return TemporaryFailure;
         fi;
     else
-       Info(InfoClassical, 2, "NonGenericOo: d and q must be generic" );
+        Info(InfoClassical, 2, "NonGenericOo: d and q must be generic" );
         return NeverApplicable;
     fi;
 
 
-     return CheckFlag();
+    return CheckFlag();
 
 end);
 
@@ -2532,7 +2531,7 @@ function( grp, arg... )
                    needLB := false,
                    needE2 := false,
                    maybeDual := true,
-                   maybeFrobenius := (LogInt(Size(f),Characteristic(f)) mod 2=0),
+                   maybeFrobenius := (DegreeOverPrimeField(f) mod 2=0),
                    ClassicalForms := [],
                    QuadraticForm := false,
                    QuadraticFormType := "unknown",
@@ -2625,8 +2624,7 @@ InstallGlobalFunction( DisplayRecog, function( r )
 
 
             if r.isSUContained = true then
-                q0 := Characteristic(r.field)^
-               (LogInt(r.q,Characteristic(r.field))/2);
+                q0 := Characteristic(r.field)^(DegreeOverPrimeField(r.field)/2);
                 Print("--------> contains SU(", r.d, ",", q0, ")\n");
             fi;
 
