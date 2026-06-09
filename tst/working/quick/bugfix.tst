@@ -423,6 +423,12 @@ true
 gap> ForAll(GeneratorsOfGroup(G), x -> SLPforElement(ri, x) <> fail);
 true
 
+# Issue #492: generic linear recognition over large prime fields should not get
+# stuck in the classical-form check when there is no preserved form.
+gap> i := 2;; Reset(GlobalRandomSource, i);; Reset(GlobalMersenneTwister, i);;
+gap> RecogniseClassical(SL(6,257)).isSLContained;
+true
+
 # Issue #503: the C3/C5 semilinear branch must seed generators with trivial
 # field-automorphism action into the kernel, otherwise kernel recognition can
 # settle on a proper subgroup and fail final verification.
