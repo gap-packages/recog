@@ -1821,7 +1821,7 @@ function(recognise)
              if not ForAny(recognise.porders, i -> i[1] > 3 and q mod i[1] = 1) then
                  return TemporaryFailure;
              fi;
-             recognise.hasSpeccialEle := true;
+             recognise.hasSpecialEle := true;
              return CheckFlag();
          else
              return CheckFlag();
