@@ -176,42 +176,77 @@ RECOG.SLn_UpStep := function(w)
     aimdim := Minimum(2*w.n-1,w.d);
     newdim := aimdim - w.n;
     while true do   # will be left by break
-        while true do    # will be left by break
-            if InfoLevel(InfoRecog) >= 3 then Print(".\c"); fi;
+        Info(InfoRecog,2," SLn_UpStep: starting new round");
+
+        ##
+        ## Step 2
+        ##
+        counter := 0;
+        v := fail;
+        repeat
+            counter := counter + 1;
+            #if InfoLevel(InfoRecog) >= 3 then Print(".\c"); fi;
             w.count := w.count + 1;
             c1 := PseudoRandom(w.sld);
-            slp := SLPOfElm(c1);
-            c1f := ResultOfStraightLineProgram(slp,w.sldf);
+            
             # Do the base change into our basis:
-            c1 := w.bas * c1 * w.basi;
-            c := s^c1;
-            cf := sf^c1f;
-            cfi := cf^-1;
+            #c1 := w.bas * c1 * w.basi;
+            c := s^(w.bas * c1 * w.basi);
+            
+            # Check how these elements look like. Where is the SLP and what elements do we really use
+            
             # Now check that Vn + Vn*s^c1 has dimension 2n-1:
-            Vnc := VectorSpace(w.f,c{[1..w.n]});
-            sum1 := ClosureLeftModule(Vn,Vnc);
-            if Dimension(sum1) = aimdim then
-                Fixc := VectorSpace(w.f,RECOG.FixspaceMat(c));
-                int1 := Intersection(Fixc,Vn);
-                for i in [1..Dimension(int1)] do
-                    v := Basis(int1)[i];
-                    if not IsZero(v[w.n]) then break; fi;
-                od;
-                if IsZero(v[w.n]) then
+            sum1 := SumIntersectionMat(id{[1..w.n]}, c{[1..w.n]});
+            if Size(sum1[1]) = aimdim then
+                # intersect Fix(c) = Nullspace(c-id) with V_n in order to
+                # find a suitable vector which we can later to our basis
+                int1 := SumIntersectionMat(RECOG.FixspaceMat(c),id{[1..w.n]})[2];
+                v := First(int1, v -> not IsZero(v[w.n]));
+                if v = fail then
                     Info(InfoRecog,2,"Ooops: Component n was zero!");
-                    continue;
                 fi;
-                v := v / v[w.n];   # normalize to 1 in position n
-                Assert(1,v*c=v);
-                ci := c^-1;
-                break;
+
+                # TODO: if aimdim = 2*w.n-1 then actually at this point sum1[2] = [v] = int1
+                # which we should use to avoid one more gaussian elimination.
+                # When aimdim = w.d < 2*w.n - 1 then sum1[2] will be too big and then
+                # we do need to do something here. But we can do better than SumIntersectionMat,
+                # something like this should do it:    RECOG.FixspaceMat(id{[1..w.n]}*c)*id{[1..w.n]}
+                if aimdim < w.d then
+                    Assert(0, sum1[2] = int1);
+                    Assert(0, v = fail or sum1[2] = [v]);
+                else
+                    # TODO: the following multiplication is an expensive way of adding
+                    # zero columns ...
+                    Assert(0, RREF(int1) = RREF(RECOG.FixspaceMat(c{[1..w.n]})*id{[1..w.n]}));
+                fi;
             fi;
-        od;
+        until v <> fail;
+        Info(InfoRecog,2," SLn_UpStep: found good conjugate after ", counter, " tries");
+
+        v := v / v[w.n];   # normalize to 1 in position n
+        Assert(1,v*c=v);
+
+        # now that we have our c and c1, compute some associated
+        # values for later use
+        ci := c^-1;
+        slp := SLPOfElm(c1);
+        c1f := ResultOfStraightLineProgram(slp,w.sldf);
+        cf := sf^c1f;
+        cfi := cf^-1;
+        
+        Info(InfoRecog,2,"Step 2 done.");
+
+        ##
+        ## Steps 3 and 4
+        ##
 
         # Now we found our aimdim-dimensional space W. Since SL_n
         # has a d-n-dimensional fixed space W_{d-n} and W contains a complement
         # of that fixed space, the intersection of W and W_{d-n} has dimension
         # newdim.
+# TODO: but that alone does not mean that we have enough vectors in there to
+# be able to extend a basis of V_n + V_n*c  to a basis of V...
+# .... and I think this is why we run into the "Ooops, Fixc intersected" message down below... ???
 
         # Change basis:
         newpart := ExtractSubMatrix(c,[1..w.n-1],[1..w.d]);
@@ -232,12 +267,18 @@ RECOG.SLn_UpStep := function(w)
         newpart := newpart{pivots};
         newbas := Concatenation(id{[1..w.n-1]},[v],newpart);
         if 2*w.n-1 < w.d then
-            int3 := Intersection(FixSLn,Fixc);
-            if Dimension(int3) <> w.d-2*w.n+1 then
+            
+#            if w.n > 3 then Error("breakpoint"); fi;
+
+            # intersect Fix(c) with F_{d-n}
+            int3 := SumIntersectionMat(RECOG.FixspaceMat(c),id{[w.n+1..w.d]})[2];
+#            Assert(0, int3 = RECOG.FixspaceMat(c{[w.n+1..w.d]})*id{[w.n+1..w.d]});
+            if Size(int3) <> w.d - aimdim then
+
                 Info(InfoRecog,2,"Ooops, FixSLn \cap Fixc wrong dimension");
                 continue;
             fi;
-            Append(newbas,BasisVectors(Basis(int3)));
+            Append(newbas,int3);
         fi;
         ConvertToMatrixRep(newbas,w.f);
         newbasi := newbas^-1;
@@ -264,16 +305,19 @@ RECOG.SLn_UpStep := function(w)
             i := i + 1;
         od;
         if Length(pivots2) = newdim then
-            cii := cii{pivots2}^-1;
-            ConvertToMatrixRep(cii,w.f);
-            c := newbas * c * newbasi;
-            w.bas := newbas * w.bas;
-            w.basi := w.basi * newbasi;
             break;
         fi;
         Info(InfoRecog,2,"Ooops, no nice bottom...");
         # Otherwise simply try again
     od;
+
+    cii := cii{pivots2}^-1;
+    ConvertToMatrixRep(cii,w.f);
+    c := newbas * c * newbasi;
+    w.bas := newbas * w.bas;
+    w.basi := w.basi * newbasi;
+
+
     Info(InfoRecog,2," found c1 and c.");
     # Now SL_n has to be repaired according to the base change newbas:
 
@@ -391,6 +435,12 @@ RECOG.SLn_UpStep := function(w)
         Add(transr,tf);
     od;
 
+    Info(InfoRecog,2,"Step 6 done");
+
+    ##
+    ## Step 7
+    ##
+
     # From here on we distinguish three cases:
     #   * w.n = 2
     #   * we finish off the constructive recognition
@@ -402,6 +452,7 @@ RECOG.SLn_UpStep := function(w)
         Unbind(w.transh);
         Unbind(w.transv);
         w.n := 3;
+        Info(InfoRecog,2,"Step 7 done");
         return w;
     fi;
     # We can finish off:
@@ -421,7 +472,7 @@ RECOG.SLn_UpStep := function(w)
                 tf:=transd[(i-1)*w.ext+1]^-1*transr[i]*transd[(i-1)*w.ext+1]^-1;
             fi;
             s := s * tf;
-            flag := not flag;
+            flag := not(flag);
         od;
 
         # Finally put together the new 2n-1-cycle and 2n-2-cycle:
@@ -431,6 +482,7 @@ RECOG.SLn_UpStep := function(w)
         Unbind(w.transv);
         Unbind(w.transh);
         w.n := aimdim;
+        Info(InfoRecog,2,"Step 7 done");
         return w;
     fi;
 
@@ -451,7 +503,7 @@ RECOG.SLn_UpStep := function(w)
             tf := transd[(i-1)*w.ext+1]^-1*transr[i]*transd[(i-1)*w.ext+1]^-1;
         fi;
         s := s * tf;
-        flag := not flag;
+        flag := not(flag);
     od;
 
     # Finally put together the new 2n-1-cycle and 2n-2-cycle:
@@ -472,5 +524,7 @@ RECOG.SLn_UpStep := function(w)
     od;
     Append(w.transv,transd);
     w.n := 2*w.n-1;
+
+    Info(InfoRecog,2,"Step 7 done");
     return w;
 end;
