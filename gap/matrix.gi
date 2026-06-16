@@ -40,14 +40,6 @@ RECOG.IsIrreducible := function(ri)
   return ri!.isirreducible;
 end;
 
-RECOG.SetIsIrreducible := function(ri, flag)
-  Assert(0, flag = true or flag = false);
-  if IsBound(ri!.isirreducible) and ri!.isirreducible <> flag then
-    Error("must not change ri!.isirreducible from ", ri!.isirreducible, " to ", flag);
-  fi;
-  ri!.isirreducible := flag;
-end;
-
 # helper for recognition nodes for a matrix group: test if the group
 # acts absolutely irreducibly.
 #
@@ -67,7 +59,8 @@ RECOG.SetIsAbsolutelyIrreducible := function(ri, flag)
   fi;
   ri!.isabsolutelyirred := flag;
   if flag = true then  # absolutely irreducible implies irreducible
-    RECOG.SetIsIrreducible(ri, flag);
+    Assert(0, not (IsBound(ri!.isirreducible) and ri!.isirreducible <> true));
+    ri!.isirreducible := true;
   fi;
 end;
 

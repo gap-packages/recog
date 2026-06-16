@@ -381,11 +381,6 @@ function(ri)
   G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"ReducibleIso");
 
-  if IsBound(ri!.isabsolutelyirred) and ri!.isabsolutelyirred then
-      # this information is coming from above
-      return NeverApplicable;
-  fi;
-
   # Report enduring failure if irreducible:
   if RECOG.IsIrreducible(ri) then
       return NeverApplicable;
