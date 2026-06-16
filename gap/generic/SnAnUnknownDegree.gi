@@ -1234,15 +1234,11 @@ end;
 #! @BeginChunk SnAnUnknownDegree
 #! This method tries to determine whether the input group given by <A>ri</A> is
 #! isomorphic to a symmetric group Sn or alternating group An with
-#! <M>9 \leq n</M>.
+#! <M>n \geq 7</M>. For <M>n \geq 9</M> the probability of success is high.
 #! It is an implementation of <Cite Key="JLNP13"/>.
 #!
 #! If <A>Grp(ri)</A> is a permutation group, we assume that it is primitive and
 #! not a giant (a giant is Sn or An in natural action).
-#!
-#! This method can also recognise a symmetric group Sn or alternating group An with
-#! <M>n = 7</M> or <M>n = 8</M>, but is not required to return a result with
-#! the specified error probability.
 #!
 #! This method cannot recognise a symmetric group Sn or alternating group An with
 #! <M>n = 5</M> or <M>n = 6</M>, since it uses pre-bolstering elements,
@@ -1252,7 +1248,7 @@ end;
 #!
 #! @EndChunk
 BindRecogMethod("FindHomMethodsGeneric", "SnAnUnknownDegree",
-"method for groups isomorphic to Sn or An with n >= 9",
+"method for groups isomorphic to Sn or An with n >= 7",
 function(ri)
     local recogData, isoData, degree, swapSLP, t;
     # Try to find an isomorphism
