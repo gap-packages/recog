@@ -118,7 +118,7 @@ gap> altPermGroups := List(dataPerm, entry -> AltOnKSets(entry[1], entry[2]));;
 gap> symPermGroups := List(dataPerm, entry -> SymOnKSets(entry[1], entry[2]));;
 
 #
-gap> dataMat := [[5, 4], [7, 3], [8, 5], [11, 7]];;
+gap> dataMat := [[5, 2], [7, 3], [8, 5], [11, 7]];;
 
 #
 # Permutation Matrix Group
