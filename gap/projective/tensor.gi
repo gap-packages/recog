@@ -369,6 +369,7 @@ function(ri)
   fi;
 
   H := GroupWithGenerators(conjgensG);
+  r.stamp := "TensorDecomposable";
   hom := GroupHomByFuncWithData(G,H,RECOG.HomDoBaseChange,r);
   SetHomom(ri,hom);
 

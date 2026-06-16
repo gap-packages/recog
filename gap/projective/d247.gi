@@ -276,6 +276,7 @@ RECOG.SortOutReducibleNormalSubgroup :=
         fi;
 
         H := GroupWithGenerators(conjgensG);
+        r.stamp := "D247";
         hom := GroupHomByFuncWithData(G,H,RECOG.HomDoBaseChange,r);
         SetHomom(ri,hom);
 
