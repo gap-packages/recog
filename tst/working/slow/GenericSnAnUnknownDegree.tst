@@ -7,12 +7,6 @@
 gap> START_TEST("GenericSnAnUnknownDegree.tst");
 
 #
-# HACK to insert the method
-gap> AddMethod(FindHomDbPerm, FindHomMethodsGeneric.SnAnUnknownDegree, 58);;
-gap> AddMethod(FindHomDbMatrix, FindHomMethodsGeneric.SnAnUnknownDegree, 1070);;
-gap> AddMethod(FindHomDbProjective, FindHomMethodsGeneric.SnAnUnknownDegree, 1220);;
-
-#
 # testing matrix:
 # - isomorphic: yes, no
 # different representations:
@@ -298,13 +292,6 @@ gap> x := PseudoRandom(Grp(ri));;
 gap> slp := SLPforElement(ri, x);;
 gap> x = ResultOfStraightLineProgram(slp, NiceGens(ri));
 true
-
-#
-# Remove Hacky injection of our method
-gap> for db in [FindHomDbPerm, FindHomDbMatrix, FindHomDbProjective] do
->       Remove(db,
->              PositionProperty(db, x -> Stamp(x.method) = "SnAnUnknownDegree"));;
-> od;
 
 #
 gap> STOP_TEST("GenericSnAnUnknownDegree.tst");
