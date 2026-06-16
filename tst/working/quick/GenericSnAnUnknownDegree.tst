@@ -284,7 +284,7 @@ gap> for d in [11 .. 30] do
 > if success = Success and Size(ri) <> Factorial(d) then
 >   Print("wrong size ", Size(ri), " for degree ", d, "\n");
 > elif success <> TemporaryFailure then
->   Print("wrong result!\n")
+>   Print("wrong result!\n");
 > fi;
 > od;
 
@@ -297,7 +297,7 @@ gap> for d in [11 .. 30] do
 > if success = Success and Size(ri) <> Factorial(d)/2 then
 >   Print("wrong size ", Size(ri), " for degree ", d, "\n");
 > elif success <> TemporaryFailure then
->   Print("wrong result!\n")
+>   Print("wrong result!\n");
 > fi;
 > od;
 
