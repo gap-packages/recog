@@ -1,4 +1,4 @@
-#@local testFunction, IsBolsteringElement, data
+#@local testFunction, IsBolsteringElement, dataPerm
 #@local altGroups, symGroups, permMatGroup, altMatGroups, nonAltOrSymGroups
 #@local ri, g, c, r, i, x, slp
 #@local S11On2Sets, d, sets, SdOn2Sets, success, res, isoData, gens, g1, img1, g2, img2
