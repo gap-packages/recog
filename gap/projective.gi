@@ -48,7 +48,7 @@ function(ri)
   # be recognised as a matrix group *nor* as a projective group. Rather,
   # all "block-scalars" shall be ignored. This method is only used when
   # used as a hint by FindHomMethodsMatrix.BlockDiagonal!
-  local G,H,data,hom,middle,newgens,nrblocks,topblock;
+  local G,H,data,hom,middle,newgens,nrblocks;
   G := Grp(ri);
   nrblocks := Length(ri!.blocks);  # this is always >= 1
   if ForAll(ri!.blocks,b->Length(b)=1) then
@@ -62,31 +62,25 @@ function(ri)
       return Success;
   fi;
 
-  if nrblocks = 1 then   # in this case the block is everything!
-      # no hints for the image, will run into diagonal and notice scalar
-      data := rec(poss := ri!.blocks[1]);
-      newgens := List(GeneratorsOfGroup(G),x->RECOG.HomToDiagonalBlock(data,x));
-      H := GroupWithGenerators(newgens);
-      hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
-      SetHomom(ri,hom);
-      # The following is already be set, but make it explicit here:
-      Setmethodsforimage(ri,FindHomDbProjective);
-      # no kernel:
-      findgensNmeth(ri).method := FindKernelDoNothing;
-      return Success;
-  fi;
-  # Otherwise more than one block, cut in half:
+  # Cut blocks in half
   middle := QuoInt(nrblocks,2)+1;   # the first one taken
-  topblock := ri!.blocks[nrblocks];
-  data := rec(poss := [ri!.blocks[middle][1]..Last(topblock)]);
+  data := rec(poss := [ri!.blocks[middle][1]..Last(ri!.blocks[nrblocks])]);
   newgens := List(GeneratorsOfGroup(G),x->RECOG.HomToDiagonalBlock(data,x));
   H := GroupWithGenerators(newgens);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
   SetHomom(ri,hom);
 
-  # the image are the last few blocks:
-  # The following is already be set, but make it explicit here:
+  # The following should already be set, but make it explicit here:
   Setmethodsforimage(ri,FindHomDbProjective);
+
+  if nrblocks = 1 then   # in this case the block is everything!
+      # no hints for the image, will run into diagonal and notice scalar
+      # no kernel:
+      findgensNmeth(ri).method := FindKernelDoNothing;
+      return Success;
+  fi;
+
+  # the image are the last few blocks:
   if middle < nrblocks then   # more than one block in image:
       InitialDataForImageRecogNode(ri).blocks := List(ri!.blocks{[middle..nrblocks]},
                                    x->x - (ri!.blocks[middle][1]-1));
@@ -98,7 +92,6 @@ function(ri)
   # the kernel is the first few blocks:
   findgensNmeth(ri).args[1] := 10 + nrblocks;
   findgensNmeth(ri).args[2] := 5 + middle - 1;
-  # The following is already set, but make it explicit here:
   InitialDataForKernelRecogNode(ri).blocks := ri!.blocks{[1..middle-1]};
   AddMethod(InitialDataForKernelRecogNode(ri).hints, FindHomMethodsProjective.BlocksModScalars, 2000);
   Setimmediateverification(ri,true);
