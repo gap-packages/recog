@@ -1248,13 +1248,12 @@ function(recognise)
     f := recognise.field;
 
     # if size of field not a square, the group cannot be unitary
-    if LogInt(Size(f),Characteristic(f)) mod 2 <> 0 then
+    if DegreeOverPrimeField(f) mod 2 <> 0 then
         recognise.isSUContained := false;
         return NeverApplicable;
     fi;
 
-    q0 := Characteristic(recognise.field)^
-         (LogInt(recognise.q,Characteristic(recognise.field))/2);
+    q0 := Characteristic(recognise.field)^(DegreeOverPrimeField(recognise.field)/2);
 
 
 
@@ -1822,7 +1821,7 @@ function(recognise)
              if not ForAny(recognise.porders, i -> i[1] > 3 and q mod i[1] = 1) then
                  return TemporaryFailure;
              fi;
-             recognise.hasSpeccialEle := true;
+             recognise.hasSpecialEle := true;
              return CheckFlag();
          else
              return CheckFlag();
@@ -1962,7 +1961,16 @@ function(recognise)
         # the size of resulting stabilizer chain to the size of POmega(+1,8,5).
         #
         # Note: Size(POmega(+1,8,5)) = 8911539000000000000
-        if RECOG.EstimateProjOrder(grp) mod 8911539000000000000 = 0 then
+
+        # HACK to avoid info message by orb of the form 'Have 38376 points'
+        # (in general one shouldn't ignore this kind of warning but here
+        # we know which groups are input, and it is acceptable)
+        ol := InfoLevel(InfoOrb);
+        SetInfoLevel(InfoOrb, 0);
+        ord := RECOG.EstimateProjOrder(grp);
+        SetInfoLevel(InfoOrb, ol);
+
+        if ord mod 8911539000000000000 = 0 then
              return CheckFlag();
         else
              recognise.isOmegaContained := false;
@@ -2043,14 +2051,15 @@ function(recognise)
             return NeverApplicable;
         fi;
 
-        # avoid warnings 'Giving up, Schreier tree is not shallow' (in general
-        # one shouldn't ignore this kind of warning but here we know which
-        # groups are input, and it is acceptable)
+        # HACK to avoid warnings 'Giving up, Schreier tree is not shallow'
+        # (in general one shouldn't ignore this kind of warning but here
+        # we know which groups are input, and it is acceptable)
         ol := InfoLevel(InfoOrb);
         SetInfoLevel(InfoOrb, 0);
         ord := RECOG.EstimateProjOrder(grp);
         SetInfoLevel(InfoOrb, ol);
-        if ord mod 3600 <> 0 then  # FIXME: Giving up, Schreier tree is not shallow
+
+        if ord mod 3600 <> 0 then
             recognise.isOmegaContained := false;
              return NeverApplicable;
         fi;
@@ -2383,12 +2392,12 @@ function(recognise)
             return TemporaryFailure;
         fi;
     else
-       Info(InfoClassical, 2, "NonGenericOo: d and q must be generic" );
+        Info(InfoClassical, 2, "NonGenericOo: d and q must be generic" );
         return NeverApplicable;
     fi;
 
 
-     return CheckFlag();
+    return CheckFlag();
 
 end);
 
@@ -2532,7 +2541,7 @@ function( grp, arg... )
                    needLB := false,
                    needE2 := false,
                    maybeDual := true,
-                   maybeFrobenius := (LogInt(Size(f),Characteristic(f)) mod 2=0),
+                   maybeFrobenius := (DegreeOverPrimeField(f) mod 2=0),
                    ClassicalForms := [],
                    QuadraticForm := false,
                    QuadraticFormType := "unknown",
@@ -2625,8 +2634,7 @@ InstallGlobalFunction( DisplayRecog, function( r )
 
 
             if r.isSUContained = true then
-                q0 := Characteristic(r.field)^
-               (LogInt(r.q,Characteristic(r.field))/2);
+                q0 := Characteristic(r.field)^(DegreeOverPrimeField(r.field)/2);
                 Print("--------> contains SU(", r.d, ",", q0, ")\n");
             fi;
 

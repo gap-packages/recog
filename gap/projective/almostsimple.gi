@@ -1577,7 +1577,7 @@ function(ri)
     # Compute maximal orders. Maximal in the sense that it does not divide the
     # order of another group element.
     setOfOrders := AsSet(orders);
-    # All orders we look for are <= 66.
+    # All orders we look for are <= 67.
     if Last(setOfOrders) > 67 then
         return NeverApplicable;
     fi;

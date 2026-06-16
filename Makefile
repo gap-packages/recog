@@ -1,4 +1,4 @@
-.PHONY: run doc html clean check
+.PHONY: run doc html clean check check-quick check-slow check-veryslow
 
 GAP ?= gap
 GAP_ARGS = -q --quitonbreak --packagedirs $(abspath .)
