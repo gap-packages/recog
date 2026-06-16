@@ -1961,7 +1961,16 @@ function(recognise)
         # the size of resulting stabilizer chain to the size of POmega(+1,8,5).
         #
         # Note: Size(POmega(+1,8,5)) = 8911539000000000000
-        if RECOG.EstimateProjOrder(grp) mod 8911539000000000000 = 0 then
+
+        # HACK to avoid info message by orb of the form 'Have 38376 points'
+        # (in general one shouldn't ignore this kind of warning but here
+        # we know which groups are input, and it is acceptable)
+        ol := InfoLevel(InfoOrb);
+        SetInfoLevel(InfoOrb, 0);
+        ord := RECOG.EstimateProjOrder(grp);
+        SetInfoLevel(InfoOrb, ol);
+
+        if ord mod 8911539000000000000 = 0 then
              return CheckFlag();
         else
              recognise.isOmegaContained := false;
@@ -2042,14 +2051,15 @@ function(recognise)
             return NeverApplicable;
         fi;
 
-        # avoid warnings 'Giving up, Schreier tree is not shallow' (in general
-        # one shouldn't ignore this kind of warning but here we know which
-        # groups are input, and it is acceptable)
+        # HACK to avoid warnings 'Giving up, Schreier tree is not shallow'
+        # (in general one shouldn't ignore this kind of warning but here
+        # we know which groups are input, and it is acceptable)
         ol := InfoLevel(InfoOrb);
         SetInfoLevel(InfoOrb, 0);
         ord := RECOG.EstimateProjOrder(grp);
         SetInfoLevel(InfoOrb, ol);
-        if ord mod 3600 <> 0 then  # FIXME: Giving up, Schreier tree is not shallow
+
+        if ord mod 3600 <> 0 then
             recognise.isOmegaContained := false;
              return NeverApplicable;
         fi;
