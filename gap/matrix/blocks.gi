@@ -222,45 +222,34 @@ function(ri)
   # We assume that ri!.blocks is a list of ranges where the non-trivial
   # scalar blocks are. Note that their length does not have to sum up to
   # the dimension, because some blocks at the end might already be trivial.
-  local G,H,data,hom,middle,newgens,nrblocks,topblock;
+  local G,H,data,hom,middle,newgens,nrblocks;
   G := Grp(ri);
   nrblocks := Length(ri!.blocks);  # this is always >= 1
-  if nrblocks <= 2 then   # the image is only one block
-      # go directly to scalars in that case:
-      data := rec(poss := ri!.blocks[nrblocks]);
-      newgens := List(GeneratorsOfGroup(G),x->RECOG.HomToDiagonalBlock(data,x));
-      H := GroupWithGenerators(newgens);
-      hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
-      SetHomom(ri,hom);
-      AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsMatrix.Scalar, 2000);
 
-      if nrblocks = 1 then     # no kernel:
-          findgensNmeth(ri).method := FindKernelDoNothing;
-      else   # exactly two blocks:
-          findgensNmeth(ri).method := RECOG.FindKernelBlockScalar;
-          findgensNmeth(ri).args := [];
-          InitialDataForKernelRecogNode(ri).blocks := ri!.blocks{[1]};
-          # We have to go to BlockScalar with 1 block because the one block
-          # is only a part of the whole matrix:
-          AddMethod(InitialDataForKernelRecogNode(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
-          Setimmediateverification(ri,true);
-      fi;
-      return Success;
-  fi;
-
-  # We hack away at least two blocks and leave at least one:
+  # Cut blocks in half
   middle := QuoInt(nrblocks,2)+1;   # the first one taken
-  topblock := ri!.blocks[nrblocks];
-  data := rec(poss := [ri!.blocks[middle][1]..Last(topblock)]);
+  data := rec(poss := [ri!.blocks[middle][1]..Last(ri!.blocks[nrblocks])]);
   newgens := List(GeneratorsOfGroup(G),x->RECOG.HomToDiagonalBlock(data,x));
   H := GroupWithGenerators(newgens);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
   SetHomom(ri,hom);
 
-  # the image are the last few blocks:
-  InitialDataForImageRecogNode(ri).blocks := List(ri!.blocks{[middle..nrblocks]},
-                               x->x - (ri!.blocks[middle][1]-1));
-  AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
+
+  if nrblocks <= 2 then   # the image is only one block
+      # go directly to scalars in that case:
+      Assert(0, data.poss = ri!.blocks[nrblocks]);
+      AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsMatrix.Scalar, 2000);
+
+      if nrblocks = 1 then     # no kernel:
+          findgensNmeth(ri).method := FindKernelDoNothing;
+          return Success;
+      fi;
+  else
+      # the image are the last few blocks:
+      InitialDataForImageRecogNode(ri).blocks := List(ri!.blocks{[middle..nrblocks]},
+                                   x->x - (ri!.blocks[middle][1]-1));
+      AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
+  fi;
 
   # the kernel is the first few blocks (can be only one!):
   findgensNmeth(ri).method := RECOG.FindKernelBlockScalar;
