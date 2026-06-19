@@ -22,7 +22,7 @@
 ##  ----------------
 ##
 ##  Here we describe the general strategy that is used to recognise if a group
-##  is ismorphic to `An` or `Sn` for `n >= 7`.
+##  is isomorphic to `An` or `Sn` for `n >= 7`.
 ##
 ##  We have to be careful what we do for small degrees.
 ##  If we pass an `A5`, `S5`, `A6`, `S6` into `SnAnUnknownDegree`, then it will not recognize it.
