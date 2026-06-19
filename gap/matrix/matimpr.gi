@@ -191,7 +191,7 @@ function(ri)
   newgens := List(GeneratorsOfGroup(G),x->ri!.t*x*ti);
   H := GroupWithGenerators(newgens);
   iso := GroupHomByFuncWithData(G,H,RECOG.HomDoBaseChange,
-                                rec(t := ri!.t,ti := ti));
+                                rec(t := ri!.t,ti := ti, stamp := "DoBaseChangeForBlocks"));
 
   # Now report back:
   SetHomom(ri,iso);

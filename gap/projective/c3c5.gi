@@ -838,6 +838,7 @@ function(ri)
           fi;
 
           H := GroupWithGenerators(conjgensG);
+          r.stamp := "C3C5";
           hom := GroupHomByFuncWithData(G,H,RECOG.HomDoBaseChange,r);
           SetHomom(ri,hom);
 

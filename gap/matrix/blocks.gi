@@ -386,7 +386,7 @@ function(ri)
   newgens := List(GeneratorsOfGroup(G),x->bc.base*x*bc.baseinv);
   H := GroupWithGenerators(newgens);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomDoBaseChange,
-                                rec(t := bc.base,ti := bc.baseinv));
+                                rec(t := bc.base,ti := bc.baseinv, stamp := "ReducibleIso"));
 
   # Now report back:
   SetHomom(ri,hom);
