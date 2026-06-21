@@ -186,11 +186,11 @@ AddMethod(FindHomDbMatrix, FindHomMethodsMatrix.DiagonalMatrices, 1100);
 
 AddMethod(FindHomDbMatrix, FindHomMethodsMatrix.KnownStabilizerChain, 1175);
 
-AddMethod(FindHomDbMatrix, FindHomMethodsGeneric.SnAnUnknownDegree, 1070);;
-
 AddMethod(FindHomDbMatrix, FindHomMethodsGeneric.FewGensAbelian, 1050);
 
 AddMethod(FindHomDbMatrix, FindHomMethodsMatrix.ReducibleIso, 1000);
+
+AddMethod(FindHomDbMatrix, FindHomMethodsGeneric.SnAnUnknownDegree, 950);
 
 AddMethod(FindHomDbMatrix, FindHomMethodsMatrix.GoProjective, 900);
 
