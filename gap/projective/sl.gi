@@ -29,7 +29,7 @@ RECOG.FindStdGens_SL := function(sld)
   # RECOG.SLn_UpStep often enough. Finally it returns an slp such
   # that the SL(d,q) standard generators with respect to this basis are
   # expressed by the slp in terms of the original generators of sld.
-  local V,b,bas,basi,basit,d,data,ext,fakegens,id,nu,nu2,p,q,resl2,sl2,sl2gens,
+  local V,b,bas,basi,basit,d,data,ext,fakegens,nu,nu2,p,q,resl2,sl2,sl2gens,
         sl2gensf,sl2genss,sl2stdf,slp,slpsl2std,slptosl2,st,std,stdgens,i,ex,f;
 
   # Some setup:
@@ -59,7 +59,7 @@ RECOG.FindStdGens_SL := function(sld)
       stdgens := RECOG.MakeSL_StdGens(p,ext,4,4).all;
       slpsl2std := RECOG.FindStdGensUsingBSGS(Group(sl2genss),stdgens,
                                               false,false);
-      nu := List(sl2gens,x->NullspaceMat(x-One(x)));
+      nu := List(sl2gens, RECOG.FixspaceMat);
       ex := SumIntersectionMat(nu[1],nu[2])[2];
       for i in [3..Length(nu)] do
           ex := SumIntersectionMat(nu[3],ex);
@@ -81,9 +81,8 @@ RECOG.FindStdGens_SL := function(sld)
                                         StripMemory(GeneratorsOfGroup(sl2)));
 
       # Extend basis by something invariant under SL2:
-      id := IdentityMat(d,f);
-      nu := NullspaceMat(StripMemory(st[1]-id));
-      nu2 := NullspaceMat(StripMemory(st[2]-id));
+      nu := RECOG.FixspaceMat(StripMemory(st[1]));
+      nu2 := RECOG.FixspaceMat(StripMemory(st[2]));
       Append(bas,SumIntersectionMat(nu,nu2)[2]);
       ConvertToMatrixRep(bas,q);
       basi := bas^-1;
@@ -205,13 +204,13 @@ RECOG.SLn_constructsl4:=function(g,dim,q,r)
   local s,h,count,readydim4,readydim3,ready,u,orderu,
         nullr,nulls,nullspacer,nullspaces,int,intbasis,nullintbasis,
         newu,newbasis,newbasisinv,newr,news,outputu,mat,i,shorts,shortr;
-  nullr:=NullspaceMat(StripMemory(r)-One(StripMemory(r)));
+  nullr:=RECOG.FixspaceMat(StripMemory(r));
   nullspacer:=VectorSpace(GF(q),nullr);
   mat:=One(r);
   ready:=false;
   repeat
     s:=r^PseudoRandom(g);
-    nulls:=NullspaceMat(StripMemory(s)-One(StripMemory(s)));
+    nulls:=RECOG.FixspaceMat(StripMemory(s));
     nullspaces:=VectorSpace(GF(q),nulls);
     int:=Intersection(nullspacer,nullspaces);
     intbasis:=Basis(int);
@@ -576,7 +575,7 @@ RECOG.SLn_UpStep := function(w)
           Vnc := VectorSpace(w.f,c{[1..w.n]});
           sum1 := ClosureLeftModule(Vn,Vnc);
           if Dimension(sum1) = aimdim then
-              Fixc := VectorSpace(w.f,NullspaceMat(c-One(c)));
+              Fixc := VectorSpace(w.f,RECOG.FixspaceMat(c));
               int1 := Intersection(Fixc,Vn);
               for i in [1..Dimension(int1)] do
                   v := Basis(int1)[i];
