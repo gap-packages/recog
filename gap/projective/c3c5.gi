@@ -684,6 +684,8 @@ function(ri)
           hom := GroupHomByFuncWithData(G,H,RECOG.HomCommutator,r);
           SetHomom(ri,hom);
           Setmethodsforimage(ri,FindHomDbMatrix);
+          # Generators mapping trivially into the image already lie in the
+          # kernel and should be handed to kernel recognition immediately.
           poss := Filtered([1..Length(gensim)],i->IsOne(gensim[i]));
           Append(gensN(ri),ri!.gensHmem{poss});
           findgensNmeth(ri).args[1] := 5;
@@ -784,6 +786,10 @@ function(ri)
           fi;
           Add(gensim,cyc^cc[pos]);
       od;
+      # Generators with trivial field-automorphism action are kernel elements
+      # and help avoid recognizing only a proper subgroup of that kernel.
+      poss := Filtered([1..Length(gensim)], i -> IsOne(gensim[i]));
+      Append(gensN(ri), ri!.gensHmem{poss});
       Info(InfoRecog, 2, StringFormatted(
            "G is C3, found action as field auts of size {}.", deg));
       HH := GroupWithGenerators(gensim);
