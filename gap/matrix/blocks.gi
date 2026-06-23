@@ -21,7 +21,7 @@ end;
 #! This method is successful if and only if all generators of a matrix group
 #! <A>G</A> are diagonal matrices. Otherwise, it returns <K>NeverApplicable</K>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsMatrix, "DiagonalMatrices",
+BindRecogMethod("FindHomMethodsMatrix", "DiagonalMatrices",
 "check whether all generators are diagonal matrices",
 function(ri)
   local G,H,d,f,gens,hom,i,isscalars,j,newgens,upperleft;
@@ -87,7 +87,7 @@ end;
 #! @BeginChunk Scalar
 #! TODO
 #! @EndChunk
-BindRecogMethod(FindHomMethodsMatrix, "Scalar",
+BindRecogMethod("FindHomMethodsMatrix", "Scalar",
 "Hint TODO",
 function(ri)
   local G,f,gcd,generator,gens,i,l,o,pows,q,rep,slp,subset,z;
@@ -117,12 +117,12 @@ function(ri)
       gcd := Gcd(Integers,pows);
       i := i + 1;
   od;
-  rep := GcdRepresentation(Integers,pows);
+  rep := GcdRepresentation(Integers, pows);
   l := [];
   for i in [1..Length(pows)-1] do
       if rep[i] <> 0 then
-          Add(l,subset[i]);
-          Add(l,rep[i]);
+          Add(l, subset[i]);
+          Add(l, rep[i]);
       fi;
   od;
   slp := StraightLineProgramNC([[l]],Length(GeneratorsOfGroup(G)));
@@ -140,16 +140,29 @@ end);
 # the set poss contain only zero elements outside of the
 # positions indicated by poss.
 RECOG.IsDiagonalBlockOfMatrix := function(m, poss)
-  local n, outside, z, i, j;
-  Assert(1, NrRows(m) = NrCols(m) and IsSubset([1..NrRows(m)], poss));
-  outside := Difference([1..NrRows(m)], poss);
-  z := ZeroOfBaseDomain(m);
+  local a, b, n, i;
+  a := First(poss);
+  b := Last(poss);
+  n := NrRows(m);
+  Assert(1, poss = [a..b]);
+  Assert(1, NrRows(m) = NrCols(m) and b <= n);
+  # check for zeros above
+  for i in [1..a-1] do
+    if PositionNonZeroInRow(m, i, a-1) <= b then
+      return false;
+    fi;
+  od;
+  # check for zeros left and right
   for i in poss do
-    for j in outside do
-      if m[i,j] <> z or m[j,i] <> z then
-        return false;
-      fi;
-    od;
+    if PositionNonZeroInRow(m, i) < a or PositionNonZeroInRow(m, i, b) <= n then
+      return false;
+    fi;
+  od;
+  # check for zeros below
+  for i in [b+1..n] do
+    if PositionNonZeroInRow(m, i, a-1) <= b then
+      return false;
+    fi;
   od;
   return true;
 end;
@@ -203,51 +216,40 @@ end;
 #! will only be scalar matrices. This method recursively builds a balanced tree
 #! and does scalar recognition in each leaf.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsMatrix, "BlockScalar",
+BindRecogMethod("FindHomMethodsMatrix", "BlockScalar",
 "Hint TODO",
 function(ri)
   # We assume that ri!.blocks is a list of ranges where the non-trivial
   # scalar blocks are. Note that their length does not have to sum up to
   # the dimension, because some blocks at the end might already be trivial.
-  local G,H,data,hom,middle,newgens,nrblocks,topblock;
+  local G,H,data,hom,middle,newgens,nrblocks;
   G := Grp(ri);
   nrblocks := Length(ri!.blocks);  # this is always >= 1
-  if nrblocks <= 2 then   # the image is only one block
-      # go directly to scalars in that case:
-      data := rec(poss := ri!.blocks[nrblocks]);
-      newgens := List(GeneratorsOfGroup(G),x->RECOG.HomToDiagonalBlock(data,x));
-      H := GroupWithGenerators(newgens);
-      hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
-      SetHomom(ri,hom);
-      AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsMatrix.Scalar, 2000);
 
-      if nrblocks = 1 then     # no kernel:
-          findgensNmeth(ri).method := FindKernelDoNothing;
-      else   # exactly two blocks:
-          findgensNmeth(ri).method := RECOG.FindKernelBlockScalar;
-          findgensNmeth(ri).args := [];
-          InitialDataForKernelRecogNode(ri).blocks := ri!.blocks{[1]};
-          # We have to go to BlockScalar with 1 block because the one block
-          # is only a part of the whole matrix:
-          AddMethod(InitialDataForKernelRecogNode(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
-          Setimmediateverification(ri,true);
-      fi;
-      return Success;
-  fi;
-
-  # We hack away at least two blocks and leave at least one:
+  # Cut blocks in half
   middle := QuoInt(nrblocks,2)+1;   # the first one taken
-  topblock := ri!.blocks[nrblocks];
-  data := rec(poss := [ri!.blocks[middle][1]..Last(topblock)]);
+  data := rec(poss := [ri!.blocks[middle][1]..Last(ri!.blocks[nrblocks])]);
   newgens := List(GeneratorsOfGroup(G),x->RECOG.HomToDiagonalBlock(data,x));
   H := GroupWithGenerators(newgens);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
   SetHomom(ri,hom);
 
-  # the image are the last few blocks:
-  InitialDataForImageRecogNode(ri).blocks := List(ri!.blocks{[middle..nrblocks]},
-                               x->x - (ri!.blocks[middle][1]-1));
-  AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
+
+  if nrblocks <= 2 then   # the image is only one block
+      # go directly to scalars in that case:
+      Assert(0, data.poss = ri!.blocks[nrblocks]);
+      AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsMatrix.Scalar, 2000);
+
+      if nrblocks = 1 then     # no kernel:
+          findgensNmeth(ri).method := FindKernelDoNothing;
+          return Success;
+      fi;
+  else
+      # the image are the last few blocks:
+      InitialDataForImageRecogNode(ri).blocks := List(ri!.blocks{[middle..nrblocks]},
+                                   x->x - (ri!.blocks[middle][1]-1));
+      AddMethod(InitialDataForImageRecogNode(ri).hints, FindHomMethodsMatrix.BlockScalar, 2000);
+  fi;
 
   # the kernel is the first few blocks (can be only one!):
   findgensNmeth(ri).method := RECOG.FindKernelBlockScalar;
@@ -282,7 +284,7 @@ RECOG.CleanRow := function( basis, vec, extend, dec)
 
   # Clear dec vector if given:
   if dec <> fail then
-    MultRowVector(dec,Zero(dec[1]));
+    MultVector(dec,Zero(dec[1]));
   fi;
 
   # First a little shortcut:
@@ -301,7 +303,7 @@ RECOG.CleanRow := function( basis, vec, extend, dec)
         if dec <> fail then
           dec[ j ] := c;
         fi;
-        AddRowVector( vec, basis.vectors[ j ], -c );
+        AddVector( vec, basis.vectors[ j ], -c );
       fi;
     fi;
   od;
@@ -312,7 +314,7 @@ RECOG.CleanRow := function( basis, vec, extend, dec)
   else
     if extend then
       c := vec[newpiv]^-1;
-      MultRowVector( vec, vec[ newpiv ]^-1 );
+      MultVector( vec, vec[ newpiv ]^-1 );
       if dec <> fail then
         dec[len+1] := c;
       fi;
@@ -325,6 +327,9 @@ end;
 
 RECOG.FindAdjustedBasis := function(l)
   # l must be a list of matrices coming from MTX.BasesCompositionSeries.
+  # The returned block ranges are the coordinate ranges of the successive
+  # composition factors in the adjusted basis. They are contiguous, disjoint,
+  # increasing, and together cover the whole new basis.
   local blocks,i,pos,seb,v;
   blocks := [];
   seb := rec( vectors := [], pivots := [] );
@@ -354,7 +359,7 @@ end;
 #! recognition node has the <C>!.projective</C> component bound
 #! to <K>true</K> and this information is passed down to image and kernel.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsMatrix, "ReducibleIso",
+BindRecogMethod("FindHomMethodsMatrix", "ReducibleIso",
 "use the MeatAxe to find invariant subspaces",
 # alternative comment:
 #"use MeatAxe to find a composition series, do base change",
@@ -364,11 +369,6 @@ function(ri)
 
   G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"ReducibleIso");
-
-  if IsBound(ri!.isabsolutelyirred) and ri!.isabsolutelyirred then
-      # this information is coming from above
-      return NeverApplicable;
-  fi;
 
   # Report enduring failure if irreducible:
   if RECOG.IsIrreducible(ri) then
@@ -386,7 +386,7 @@ function(ri)
   newgens := List(GeneratorsOfGroup(G),x->bc.base*x*bc.baseinv);
   H := GroupWithGenerators(newgens);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomDoBaseChange,
-                                rec(t := bc.base,ti := bc.baseinv));
+                                rec(t := bc.base,ti := bc.baseinv, stamp := "ReducibleIso"));
 
   # Now report back:
   SetHomom(ri,hom);
@@ -403,17 +403,18 @@ end);
 # verify that the matrix has block lower triangular shape
 # with respect to the given blocks.
 RECOG.IsBlockLowerTriangularWithBlocks := function(mat, blocks)
-  local z, b, col, row;
-  Assert(0, Concatenation(blocks) = [1..Length(mat)]);
-  z := ZeroOfBaseDomain(mat);
+  local a, b, n, row;
+  n := NrRows(mat);
+  Assert(1, NrCols(mat) = n);
+  Assert(1, Concatenation(blocks) = [1..n]);
   for b in blocks do
+    a := First(b);
+    Assert(1, b = [a..Last(b)]);
     # Verify that there are only zeros above each block
-    for row in [1..b[1]-1] do
-      for col in b do
-        if mat[row,col] <> z then
-          return false;
-        fi;
-      od;
+    for row in [1..a-1] do
+      if PositionNonZeroInRow(mat, row, a-1) <= Last(b) then
+        return false;
+      fi;
     od;
   od;
   return true;
@@ -453,7 +454,7 @@ end;
 #! recognition node has the <C>!.projective</C> component bound
 #! to <K>true</K> and this information is passed down to image and kernel.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsMatrix, "BlockLowerTriangular",
+BindRecogMethod("FindHomMethodsMatrix", "BlockLowerTriangular",
 "for a group generated by block lower triangular matrices",
 function(ri)
   # This is only used coming from a hint, we know what to do:
@@ -499,7 +500,7 @@ end);
 #! recognition node has the <C>!.projective</C> component bound
 #! to <K>true</K> and this information is passed down to image and kernel.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsMatrix, "BlockDiagonal",
+BindRecogMethod("FindHomMethodsMatrix", "BlockDiagonal",
 "for groups generated by block diagonal matrices",
 function(ri)
   # This is only called by a hint, so we know what we have to do:
@@ -533,8 +534,35 @@ function(ri)
   return Success;
 end);
 
+# Extract one strict lower block diagonal from a matrix that is written in the
+# basis described by `blocks`, and flatten the extracted entries into a single
+# row vector.
+#
+# Arguments:
+#   `m`: matrix in the adjusted basis used by `ReducibleIso`; it may carry
+#        memory, but row access must behave exactly like for an ordinary matrix.
+#   `layer`: 1-based index of the strict lower block diagonal to extract.
+#        `layer = 1` means block positions `(2,1),(3,2),...`;
+#        `layer = 2` means `(3,1),(4,2),...`; and so on.
+#   `blocks`: increasing list of disjoint contiguous index ranges describing
+#        the diagonal blocks. The intended invariant is
+#        `Concatenation(blocks) = [1..Length(m)]`.
+#   `lens`: layer lengths as returned by `RECOG.ComputeExtractionLayerLengths`.
+#        If `basisOfFieldExtension <> fail`, then the caller must already have
+#        multiplied these lengths by `Length(basisOfFieldExtension)`.
+#   `basisOfFieldExtension`: either `fail` for prime fields, or a basis of the
+#        coefficient field over its prime field. In the latter case the result
+#        is expanded to prime-field coordinates via `BlownUpVector`.
+#
+# This helper does not do any row reduction and does not modify `m`; the
+# callers perform the linear algebra and mirror it by multiplying group
+# elements. In particular, if `m` is the identity matrix and `blocks` really do
+# describe a partition of the basis, then the result must be the zero vector.
 RECOG.ExtractLowStuff := function(m,layer,blocks,lens,basisOfFieldExtension)
   local block,i,j,k,l,pos,v,what,where;
+  Assert(1, ForAll(blocks, b -> Length(b) > 0 and b = [b[1]..Last(b)]));
+  Assert(1, Concatenation(blocks) = [1..Length(m)]);
+  Assert(1, layer in [1..Length(lens)]);
   v := ZeroVector(lens[layer],m[1]);
   pos := 0;
   i := layer+1;
@@ -558,8 +586,15 @@ RECOG.ExtractLowStuff := function(m,layer,blocks,lens,basisOfFieldExtension)
   return v;
 end;
 
+# For a block decomposition as above, compute the number of field entries on
+# each strict lower block diagonal. Entry `i` corresponds to `layer = i`, i.e.
+# to block positions `(i+1,1),(i+2,2),...`.
 RECOG.ComputeExtractionLayerLengths := function(blocks)
   local block,i,j,l,len,lens;
+  Assert(1, ForAll(blocks, b -> Length(b) > 0 and b = [b[1]..Last(b)]));
+  if Length(blocks) > 0 then
+      Assert(1, Concatenation(blocks) = [1..Last(Last(blocks))]);
+  fi;
   lens := [];
   l := Length(blocks);
   for i in [2..Length(blocks)] do
@@ -586,6 +621,9 @@ RECOG.FindKernelLowerLeftPGroup := function(ri)
     lens := RECOG.ComputeExtractionLayerLengths(ri!.blocks);
 
     if not IsPrimeField(f) then
+        # The p-group routines below work over the prime field, so each entry
+        # in an extracted layer contributes one coordinate per basis vector of
+        # the field extension.
         basisOfFieldExtension := CanonicalBasis(f);  # a basis over the prime field
         lens := lens * Length(basisOfFieldExtension);
     else
@@ -605,6 +643,7 @@ RECOG.FindKernelLowerLeftPGroup := function(ri)
         # Now clean out this vector and remember what we did:
         curlay := 1;
         v := RECOG.ExtractLowStuff(x,curlay,ri!.blocks,lens,basisOfFieldExtension);
+        Assert(1, not IsOne(x) or IsZero(v));
         pos := PositionNonZero(v);
         i := 1;
         done := 0*[1..Length(lvec)];   # this refers to the current gens
@@ -615,6 +654,7 @@ RECOG.FindKernelLowerLeftPGroup := function(ri)
                 curlay := curlay + 1;
                 if curlay <= Length(lens) then
                     v := RECOG.ExtractLowStuff(x,curlay,ri!.blocks,lens,basisOfFieldExtension);
+                    Assert(1, not IsOne(x) or IsZero(v));  # IsOne(x) should imply IsZero(v)
                     pos := PositionNonZero(v);
                 else
                     ready := true;   # x is now equal to the identity!
@@ -630,8 +670,9 @@ RECOG.FindKernelLowerLeftPGroup := function(ri)
                     # we might have jumped over a layer
                     done := -v[pivots[i][2]];
                     if not IsZero(done) then
-                        AddRowVector(v,lvec[i],done);
+                        AddVector(v,lvec[i],done);
                         x := x * l[i]^IntFFE(done);
+                        Assert(1, not IsOne(x) or IsZero(v));  # IsOne(x) should imply IsZero(v)
                     fi;
                 fi;
                 i := i + 1;
@@ -648,10 +689,12 @@ RECOG.FindKernelLowerLeftPGroup := function(ri)
         #     then a power of x will be a new generator in that layer and
         #     has to be added in position i in the list of generators
         if curlay <= Length(lens) then   # a new generator
+            Assert(1, not IsOne(x));
             # Now find a new pivot:
             el := v[pos]^-1;
-            MultRowVector(v,el);
+            MultVector(v,el);
             x := x ^ IntFFE(el);
+            Assert(1, not IsOne(x));
             Add(l,x,i);
             Add(lvec,v,i);
             Add(pivots,[curlay,pos],i);
@@ -696,7 +739,7 @@ SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
       while i <= Length(ri!.gensNvectors) and ri!.gensNpivots[i][1] = layer do
           done := h[ri!.gensNpivots[i][2]];
           if not IsZero(done) then
-              AddRowVector(h,ri!.gensNvectors[i],-done);
+              AddVector(h,ri!.gensNvectors[i],-done);
               pow := IntFFE(done);
               g := NiceGens(ri)[i]^(-pow) * g;
               Add(l,i);
@@ -714,15 +757,52 @@ SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
   return StraightLineProgramNC([l], Length(ri!.gensNvectors));
 end;
 
+BindGlobal("CalcStdPresentationLowerLeftPGroup",
+function(ri)
+  local f, fgens, i, ng, p, rels, rhs, slp, rank, pres, j;
+
+  ng := NiceGens(ri);
+  rank := Length(ng);
+  f := FreeGroup(rank);
+  fgens := GeneratorsOfGroup(f);
+  p := Characteristic(ri!.field);
+  rels := [];
+
+  for i in [1..rank] do
+      slp := SLPforElement(ri, ng[i]^p);
+      if slp = fail then
+          ErrorNoReturn("LowerLeftPGroup power relation rewrite failed");
+      fi;
+      rhs := ResultOfStraightLineProgram(slp, fgens);
+      Add(rels, fgens[i]^p * rhs^-1);
+
+      for j in [1..i-1] do
+          slp := SLPforElement(ri, ng[i]^ng[j]);
+          if slp = fail then
+              ErrorNoReturn("LowerLeftPGroup conjugation rewrite failed");
+          fi;
+          rhs := ResultOfStraightLineProgram(slp, fgens);
+          Add(rels, (fgens[i]^fgens[j]) * rhs^-1);
+      od;
+  od;
+
+  pres := f / rels;
+  SetStdPresentation(ri, pres);
+end);
+
 #! @BeginChunk LowerLeftPGroup
 #! This method is only called by a hint from <Ref Subsect="BlockLowerTriangular" Style="Text"/>
 #! as the kernel of the homomorphism mapping to the diagonal blocks.
 #! The method uses the fact that this kernel is a <M>p</M>-group where
 #! <M>p</M> is the characteristic of the underlying field. It exploits
 #! this fact and uses this special structure to find nice generators
-#! and a method to express group elements in terms of these.
+#! and a method to express group elements in terms of these. Internally it
+#! works layer-by-layer with the strict lower block diagonals determined by
+#! <C>ri!.blocks</C>; the auxiliary data <C>ri!.lens</C> records the length of
+#! each extracted layer, measured over the prime field if
+#! <C>ri!.basisOfFieldExtension</C> is bound to a non-<K>fail</K> value.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsMatrix, "LowerLeftPGroup",
+BindRecogMethod("FindHomMethodsMatrix", "LowerLeftPGroup",
 "Hint TODO",
 function(ri)
   local f,p;
@@ -739,6 +819,7 @@ function(ri)
   p := Characteristic(f);
   SetFilterObj(ri,IsLeaf);
   Setslpforelement(ri,SLPforElementFuncsMatrix.LowerLeftPGroup);
+  SetCalcStdPresentation(ri, CalcStdPresentationLowerLeftPGroup);
   SetSize(ri,p^Length(ri!.gensNvectors));
   return Success;
 end);

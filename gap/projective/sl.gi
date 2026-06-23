@@ -72,11 +72,7 @@ RECOG.FindStdGens_SL := function(sld)
       Info(InfoRecog,2,
            "Recognising this SL2 constructively in 2 dimensions...");
       sl2genss := GeneratorsWithMemory(sl2genss);
-      if IsEvenInt(q) then
-          resl2 := RECOG.RecogniseSL2NaturalEvenChar(Group(sl2genss),f,false);
-      else
-          resl2 := RECOG.RecogniseSL2NaturalOddCharUsingBSGS(Group(sl2genss),f);
-      fi;
+      resl2 := RECOG.RecogniseSL2Natural(Group(sl2genss),f);
       slpsl2std := SLPOfElms(resl2.all);
       bas := resl2.bas * bas;
       # We need the actual transvections:
@@ -613,9 +609,8 @@ RECOG.SLn_UpStep := function(w)
       i := 1;
       pivots := EmptyPlist(newdim);
       while i <= Length(newpart) and NrBasisVectors(MB) < newdim do
-          if not IsContainedInSpan(MB,newpart[i]) then
+          if CloseMutableBasis(MB,newpart[i]) then
               Add(pivots,i);
-              CloseMutableBasis(MB,newpart[i]);
           fi;
           i := i + 1;
       od;
@@ -647,9 +642,8 @@ RECOG.SLn_UpStep := function(w)
       i := 1;
       pivots2 := EmptyPlist(newdim);
       while i <= Length(cii) and NrBasisVectors(MB) < newdim do
-          if not IsContainedInSpan(MB,cii[i]) then
+          if CloseMutableBasis(MB,cii[i]) then
               Add(pivots2,i);
-              CloseMutableBasis(MB,cii[i]);
           fi;
           i := i + 1;
       od;

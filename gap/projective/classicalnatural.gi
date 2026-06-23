@@ -17,6 +17,12 @@
 ##
 #############################################################################
 
+InstallMethod( CharacteristicPolynomial, "for a memory element matrix",
+  [ IsMatrix and IsObjWithMemory ],
+  function(m)
+    return CharacteristicPolynomial(m!.el);
+  end );
+
 InstallMethod( Eigenspaces, "for a field and a memory element matrix",
   [ IsField, IsMatrix and IsObjWithMemory ],
   function( f, m )
@@ -464,8 +470,7 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
           x := StripMemory(xm);
           xb := bas*x*bas^-1;
           co := Coefficients(can,xb[2,1]);
-      until not IsContainedInSpan(mb,co);
-      CloseMutableBasis(mb,co);
+      until CloseMutableBasis(mb,co);
       Add(tt,x);
       Add(ttm,xm);
       Add(mat,co);
@@ -648,14 +653,11 @@ RECOG.IsThisSL2Natural := function(gens,f)
   q := Size(f);
   p := Characteristic(f);
   # For small q, compute the order of the group via a stabilizer chain.
-  # Note that at this point we are usually working projective, and thus
-  # scalars are factored out "implicitly". Thus the generators we are
-  # looking at may generate a group which only contains SL2 as a subgroup.
   if q <= 11 then    # this could be increased if needed
       Info(InfoRecog,4,"SL2: Computing stabiliser chain.");
       S := StabilizerChain(Group(gens));
       Info(InfoRecog,4,"SL2: size is ",Size(S));
-      return Size(S) mod (q*(q-1)*(q+1)) = 0;
+      return Size(S) = (q*(q-1)*(q+1));
   fi;
 
   seenqp1 := false;
@@ -737,7 +739,7 @@ end;
 # Now the code for writing SLPs:
 
 SLPforElementFuncsProjective.PSL2 := function(ri,x)
-  local det,log,slp,y,z,pos,s;
+  local det,pos,root,s,slp,y;
   ri!.fakegens.count := ri!.fakegens.count + 1;
   if ri!.fakegens.count > 1000 then
       ri!.fakegens := RECOG.InitSLfake(ri!.field,2);
@@ -746,9 +748,13 @@ SLPforElementFuncsProjective.PSL2 := function(ri,x)
   y := ri!.nicebas * x * ri!.nicebasi;
   det := DeterminantMat(y);
   if not IsOne(det) then
-      z := PrimitiveRoot(ri!.field);
-      log := LogFFE(det,z);
-      y := y * z^(-log*ri!.gcd.coeff1/ri!.gcd.gcd);
+      # In the projective image, det only has to be a square. If it is not,
+      # then the PSL2 recognition path was too optimistic for this element.
+      root := RootFFE(ri!.field,1/det,2);
+      if root = fail then
+          return fail;
+      fi;
+      y := y * root;
   fi;
   # At this point, y has determinant 1; but we consider it modulo scalars.
   # To make sure that different coset reps behave the same, we scale it
@@ -757,7 +763,7 @@ SLPforElementFuncsProjective.PSL2 := function(ri,x)
       ri!.normlist := RECOG.SetupNormalisationListForPSLd(ri!.field,
                                                           ri!.gcd.gcd);
   fi;
-  pos := PositionNonZero(y[1]);
+  pos := PositionNonZeroInRow(y, 1);
   s := RECOG.NormaliseScalarForPSLd(y[1,pos],ri!.normlist);
   slp := RECOG.ExpressInStd_SL2(s * y,ri!.fakegens);
   return slp;
@@ -800,31 +806,6 @@ RECOG.SetupNormalisationListForPSLd := function(f,d)
   return list;
 end;
 
-# el: a field element
-# d: a positive integer (typically ri!.gcd.gcd)
-# f: a galois field (typically ri!.field)
-#
-# Compute a primitive d-th root of el in the field f.
-# TODO: This function copies the code from RootFFE, which will
-# appear in GAP 4.9. Once GAP 4.9 is out, we can switch
-# to using RootFFE directly.
-RECOG.ComputeRootInFiniteField := function(el, d, f)
-    local z, e, m, p, a;
-    if IsZero(el) or IsOne(el)  then
-        return el;
-    fi;
-    z := PrimitiveRoot(f);
-    m := Size(f) - 1;
-    e := LogFFE(el, z);
-    p := GcdInt(m, e);
-    d := d mod m;
-    a := GcdInt(m, d);
-    if p mod a <> 0  then
-        return fail;
-    fi;
-    a := e * (a / d mod (m / p)) / a mod m;
-    return z ^ a;
-end;
 
 # Express an element of PSL_d as an slp in terms of standard generators.
 SLPforElementFuncsProjective.PSLd := function(ri,x)
@@ -842,7 +823,7 @@ SLPforElementFuncsProjective.PSLd := function(ri,x)
       # We thus can compute a d-th root of 1/det, and scale y with it,
       # in order to obtain a matrix with determinant 1 in the same
       # projective class.
-      root := RECOG.ComputeRootInFiniteField(1/det,Length(y),ri!.field);
+      root := RootFFE(ri!.field,1/det,Length(y));
       if root = fail then
           return fail;
       fi;
@@ -855,7 +836,7 @@ SLPforElementFuncsProjective.PSLd := function(ri,x)
       ri!.normlist := RECOG.SetupNormalisationListForPSLd(ri!.field,
                                                           ri!.gcd.gcd);
   fi;
-  pos := PositionNonZero(y[1]);
+  pos := PositionNonZeroInRow(y, 1);
   s := RECOG.NormaliseScalarForPSLd(y[1,pos],ri!.normlist);
   slp := RECOG.ExpressInStd_SL(s * y,ri!.fakegens);
   return slp;
@@ -864,10 +845,10 @@ end;
 #! @BeginChunk ClassicalNatural
 #! TODO
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "ClassicalNatural",
+BindRecogMethod("FindHomMethodsProjective", "ClassicalNatural",
 "check whether it is a classical group in its natural representation",
 function(ri)
-  local g,changed,classical,d,det,ext,f,gcd,gens,gm,i,p,pr,q,root,std,stdg,z;
+  local g,changed,classical,d,det,ext,f,gcd,gens,gm,i,p,pr,q,root,std,stdg;
   g := Grp(ri);
   d := ri!.dimension;
   f := ri!.field;
@@ -876,35 +857,43 @@ function(ri)
   RECOG.SetPseudoRandomStamp(g,"ClassicalNatural");
 
   # First check whether we are applicable:
-  if d = 2 then
-      if not RECOG.IsThisSL2Natural(GeneratorsOfGroup(g),f) then
-          Info(InfoRecog,2,"ClassicalNatural: Is not PSL_2.");
-          return fail; # FIXME: fail = TemporaryFailure here really correct?
-      fi;
-  else
+  # check if this group contains SL_d -- for d > 2 we can use RecogniseClassical;
+  # for d = 2, we can use RECOG.IsThisSL2Natural, but only after adjusting
+  # the determinants of the generators (comes next)
+  if d <> 2 then
       classical := RecogniseClassical(g);
       if classical.isSLContained <> true then
           Info(InfoRecog,2,"ClassicalNatural: Is not PSL.");
-          return fail; # FIXME: fail = TemporaryFailure here really correct?
+          return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
       fi;
   fi;
 
   # Now get rid of nasty determinants:
   gens := ShallowCopy(GeneratorsOfGroup(g));
   changed := false;
-  z := Z(q);
   gcd := Gcdex(d,q-1);
   for i in [1..Length(gens)] do
       det := DeterminantMat(gens[i]);
       if not IsOne(det) then
-          root := RECOG.ComputeRootInFiniteField(det,gcd.gcd,f);
+          root := RootFFE(f, det^-1, d);
           if root = fail then
-              ErrorNoReturn("Should not have happened, 15634, tell Max!");
+              Info(InfoRecog,2,
+                   "ClassicalNatural: determinant cannot be normalized in field.");
+              return fail;
           fi;
           gens[i] := gens[i] * root;
           changed := true;
       fi;
   od;
+
+  # Now check whether the normalized matrices generate an SL_2:
+  if d = 2 then
+      if not RECOG.IsThisSL2Natural(gens,f) then
+          Info(InfoRecog,2,"ClassicalNatural: Is not PSL_2.");
+          return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
+      fi;
+  fi;
+
   if changed then
       gm := GroupWithMemory(gens);
       pr := ProductReplacer(GeneratorsOfGroup(gm),rec(maxdepth := 500));
@@ -926,13 +915,8 @@ function(ri)
 
       # This is (P)SL2, lets set up the recognition:
       Info(InfoRecog,2,"ClassicalNatural: this is PSL_2!");
-      if IsEvenInt(q) then
-          std := RECOG.RecogniseSL2NaturalEvenChar(gm,f,false);
-          ri!.comment := "PSL2Even";
-      else
-          std := RECOG.RecogniseSL2NaturalOddCharUsingBSGS(gm,f);
-          ri!.comment := "PSL2Odd";
-      fi;
+      std := RECOG.RecogniseSL2Natural(gm,f);
+      ri!.comment := "PSL2";
       Setslptonice(ri,SLPOfElms(std.all));
       ri!.nicebas := std.bas;
       ri!.nicebasi := std.basi;
@@ -977,6 +961,6 @@ function(ri)
       fi;
   fi;
 
-  return fail; # FIXME: fail = TemporaryFailure here really correct?
+  return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
 
 end);

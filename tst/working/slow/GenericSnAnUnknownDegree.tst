@@ -269,23 +269,23 @@ gap> CycleStructurePerm(img2);
 
 # FindHomMethodsGeneric.SnAnUnknownDegree
 # Sn
-gap> for d in [11 .. 14] do
+gap> for d in [11 .. 30] do
 > sets := Combinations([1 .. d], 2);;
 > SdOn2Sets := Action(SymmetricGroup(d), sets, OnSets);;
 > ri := RecogNode(SdOn2Sets);;
 > success := FindHomMethodsGeneric.SnAnUnknownDegree(ri);
-> if not success or not Size(ri) = Factorial(d) then
+> if success <> Success or not Size(ri) = Factorial(d) then
 >   Print("wrong result! degree ", d, "\n");
 > fi;
 > od;
 
 # An
-gap> for d in [11 .. 14] do
+gap> for d in [11 .. 30] do
 > sets := Combinations([1 .. d], 2);;
 > SdOn2Sets := Action(AlternatingGroup(d), sets, OnSets);;
 > ri := RecogNode(SdOn2Sets);;
 > success := FindHomMethodsGeneric.SnAnUnknownDegree(ri);
-> if not success or not Size(ri) = Factorial(d)/2 then
+> if success <> Success or not Size(ri) = Factorial(d)/2 then
 >   Print("wrong result! degree ", d, "\n");
 > fi;
 > od;
@@ -293,7 +293,7 @@ gap> for d in [11 .. 14] do
 # Check Slp function
 gap> ri := RecogNode(S11On2Sets);;
 gap> FindHomMethodsGeneric.SnAnUnknownDegree(ri);
-true
+"Success"
 gap> x := PseudoRandom(Grp(ri));;
 gap> slp := SLPforElement(ri, x);;
 gap> x = ResultOfStraightLineProgram(slp, NiceGens(ri));

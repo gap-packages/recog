@@ -38,7 +38,7 @@ end;
 #! diagonal blocks and finally using projective recognition to recognise
 #! single diagonal block groups.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "BlocksModScalars",
+BindRecogMethod("FindHomMethodsProjective", "BlocksModScalars",
 "TODO",
 function(ri)
   # We assume that ri!.blocks is a list of ranges where the diagonal
@@ -48,7 +48,7 @@ function(ri)
   # be recognised as a matrix group *nor* as a projective group. Rather,
   # all "block-scalars" shall be ignored. This method is only used when
   # used as a hint by FindHomMethodsMatrix.BlockDiagonal!
-  local G,H,data,hom,middle,newgens,nrblocks,topblock;
+  local G,H,data,hom,middle,newgens,nrblocks;
   G := Grp(ri);
   nrblocks := Length(ri!.blocks);  # this is always >= 1
   if ForAll(ri!.blocks,b->Length(b)=1) then
@@ -62,31 +62,25 @@ function(ri)
       return Success;
   fi;
 
-  if nrblocks = 1 then   # in this case the block is everything!
-      # no hints for the image, will run into diagonal and notice scalar
-      data := rec(poss := ri!.blocks[1]);
-      newgens := List(GeneratorsOfGroup(G),x->RECOG.HomToDiagonalBlock(data,x));
-      H := GroupWithGenerators(newgens);
-      hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
-      SetHomom(ri,hom);
-      # The following is already be set, but make it explicit here:
-      Setmethodsforimage(ri,FindHomDbProjective);
-      # no kernel:
-      findgensNmeth(ri).method := FindKernelDoNothing;
-      return Success;
-  fi;
-  # Otherwise more than one block, cut in half:
+  # Cut blocks in half
   middle := QuoInt(nrblocks,2)+1;   # the first one taken
-  topblock := ri!.blocks[nrblocks];
-  data := rec(poss := [ri!.blocks[middle][1]..Last(topblock)]);
+  data := rec(poss := [ri!.blocks[middle][1]..Last(ri!.blocks[nrblocks])]);
   newgens := List(GeneratorsOfGroup(G),x->RECOG.HomToDiagonalBlock(data,x));
   H := GroupWithGenerators(newgens);
   hom := GroupHomByFuncWithData(G,H,RECOG.HomToDiagonalBlock,data);
   SetHomom(ri,hom);
 
-  # the image are the last few blocks:
-  # The following is already be set, but make it explicit here:
+  # The following should already be set, but make it explicit here:
   Setmethodsforimage(ri,FindHomDbProjective);
+
+  if nrblocks = 1 then   # in this case the block is everything!
+      # no hints for the image, will run into diagonal and notice scalar
+      # no kernel:
+      findgensNmeth(ri).method := FindKernelDoNothing;
+      return Success;
+  fi;
+
+  # the image are the last few blocks:
   if middle < nrblocks then   # more than one block in image:
       InitialDataForImageRecogNode(ri).blocks := List(ri!.blocks{[middle..nrblocks]},
                                    x->x - (ri!.blocks[middle][1]-1));
@@ -98,7 +92,6 @@ function(ri)
   # the kernel is the first few blocks:
   findgensNmeth(ri).args[1] := 10 + nrblocks;
   findgensNmeth(ri).args[2] := 5 + middle - 1;
-  # The following is already set, but make it explicit here:
   InitialDataForKernelRecogNode(ri).blocks := ri!.blocks{[1..middle-1]};
   AddMethod(InitialDataForKernelRecogNode(ri).hints, FindHomMethodsProjective.BlocksModScalars, 2000);
   Setimmediateverification(ri,true);
@@ -106,13 +99,14 @@ function(ri)
 end);
 
 SLPforElementFuncsProjective.StabilizerChainProj := function(ri,x)
-  local z, r;
+  local i, z, r;
   # Over GF(2), genss uses OnPoints as an optimization even in projective
   # stabilizer chains. In that case we must normalize extension-field scalar
   # multiples back to a representative over ri!.field before sifting, or else
   # orb hashes the resulting point as the wrong type.
   if IsIdenticalObj(ri!.stabilizerchain!.orb!.op, OnPoints) then
-      z := x[1,PositionNonZero(x[1])];
+      i := PositionNonZeroInRow(x, 1);
+      z := x[1,i];
       if not IsOne(z) then
           x := x / z;
       fi;
@@ -130,7 +124,7 @@ end;
 #! the stabiliser chain.
 #! @EndChunk
 # TODO: merge FindHomMethodsPerm.StabilizerChainPerm and  FindHomMethodsProjective.StabilizerChainProj ?
-BindRecogMethod(FindHomMethodsProjective, "StabilizerChainProj",
+BindRecogMethod("FindHomMethodsProjective", "StabilizerChainProj",
 "last resort: compute a stabilizer chain (projectively)",
 function(ri)
   local Gm,S,SS,d,f,fu,opt,perms,q;
@@ -164,7 +158,7 @@ RECOG.HomProjDet := function(data,m)
   # Since the input is projective, it may be scaled out of the node's base
   # field. Normalize by the first non-zero entry in the first row; then either
   # all entries lie in the base field, or else the input is invalid.
-  i := PositionNonZero(m[1]);
+  i := PositionNonZeroInRow(m, 1);
   mm := m;
   if not mm[1,i] in data.field then
       mm := mm / mm[1,i];
@@ -187,7 +181,7 @@ end;
 #! element <M>g \in <A>G</A></M> is the determinant of a matrix representative of
 #! <M>g</M>, modulo <M>D</M>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "ProjDeterminant",
+BindRecogMethod("FindHomMethodsProjective", "ProjDeterminant",
 "find homomorphism to non-zero scalars mod d-th powers",
 function(ri)
   local G,H,c,d,data,detsadd,f,gcd,hom,newgens,q,z;
@@ -259,7 +253,7 @@ end;
 #! delegates to <C>BlockScalar</C> (see <Ref Subsect="BlockScalar"/>)
 #! and matrix group mode to do the recognition.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "BlockScalarProj",
+BindRecogMethod("FindHomMethodsProjective", "BlockScalarProj",
 "TODO",
 function(ri)
   # We just norm the last block and go to matrix methods.

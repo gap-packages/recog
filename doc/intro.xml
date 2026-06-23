@@ -73,65 +73,55 @@ receive the mail sent to this list, at
 </Section>
 
 <Section Label="literature">
-<Heading>Literature (temporary)</Heading>
+<Heading>Literature (selection)</Heading>
 
-TODO Find the appropriate place to put these references, so that they appear
-in the bibliography:
-<Cite Key="LNPS06"/>
-<Cite Key="BLS97"/>
-<Cite Key="JLNP13"/>
-<Cite Key="DLGLO13"/>
-<Cite Key="LGO09"/>
-<Cite Key="BLGN+05"/>
-<Cite Key="BLGN+03"/>
-<Cite Key="NP98"/>
-<Cite Key="NP99"/>
-<Cite Key="NP97"/>
-<Cite Key="Pra99"/>
-<Cite Key="CLG97a"/>
-<Cite Key="CLG97b"/>
-<Cite Key="CLGM+95"/>
-<Cite Key="BNS06"/>
-<Cite Key="CNRD09"/>
-<Cite Key="BHLGO15"/>
-<Cite Key="Neu09"/>
-<Cite Key="Ser03"/>
-<Cite Key="KK15"/>
-<Cite Key="LO16"/>
-<Cite Key="LO07"/>
-<Cite Key="HLO+08"/>
+There is a lot of relevant literature on the mathematics behind this package.
+We are working on enhancing this manual to cite it in appropriate places. In
+the meantime, here is a list of references not currently cited elsewhere:
 <Cite Key="BB99"/>
 <Cite Key="BBS09"/>
+<Cite Key="BK01"/>
+<Cite Key="BK06"/>
+<Cite Key="BLGN+03"/>
+<Cite Key="BLGN+05"/>
+<Cite Key="BLS97"/>
+<Cite Key="BNS06"/>
 <Cite Key="BS01"/>
 <Cite Key="Bro01"/>
-<Cite Key="Bro08"/>
 <Cite Key="Bro03"/>
-<Cite Key="BK06"/>
-<Cite Key="BK01"/>
-<Cite Key="CLG98"/>
-<Cite Key="CLGO06"/>
-<Cite Key="CLG01"/>
+<Cite Key="Bro08"/>
 <Cite Key="CFL97"/>
+<Cite Key="CLG01"/>
+<Cite Key="CLG98"/>
+<Cite Key="CLGM+95"/>
+<Cite Key="CLGO06"/>
+<Cite Key="DLGLO13"/>
 <Cite Key="DLGO15"/>
 <Cite Key="GH97"/>
 <Cite Key="GLGO06"/>
 <Cite Key="HLGOR96a"/>
 <Cite Key="HLGOR96b"/>
+<Cite Key="HLO+08"/>
 <Cite Key="HR94"/>
 <Cite Key="IL00"/>
+<Cite Key="KK15"/>
 <Cite Key="KM13"/>
 <Cite Key="KM15"/>
-<Cite Key="LGO97a"/>
-<Cite Key="LGO02"/>
-<Cite Key="LGO97b"/>
 <Cite Key="LG01"/>
+<Cite Key="LGO02"/>
+<Cite Key="LGO09"/>
+<Cite Key="LGO97a"/>
+<Cite Key="LGO97b"/>
 <Cite Key="LMO07"/>
+<Cite Key="LO07"/>
+<Cite Key="LO16"/>
 <Cite Key="NP92"/>
 <Cite Key="Nie05"/>
-<Cite Key="O'B11"/>
 <Cite Key="O'B06"/>
+<Cite Key="O'B11"/>
 <Cite Key="Pak00"/>
 <Cite Key="Par84"/>
+<Cite Key="Ser03"/>
 
 </Section>
 

@@ -45,7 +45,7 @@ RECOG.WriteOverBiggerFieldWithSmallerDegree :=
     # field -- in that case, we scale the matrix so that the first non-zero entry
     # is in the right field; then either all entries are, or else the input matrix
     # is not valid and we later return `fail`
-    i := PositionNonZero(gen[1]);
+    i := PositionNonZeroInRow(gen, 1);
     if not gen[1,i] in GF(inforec.q) then
       gen := gen / gen[1,i];
     fi;
@@ -137,9 +137,8 @@ RECOG.WriteOverBiggerFieldWithSmallerDegreeFinder := function(m)
       for j in [1..Length(gens)] do
           new := bas[i] * gens[j];
           if not RECOG.CleanRow(mu, ShallowCopy(new), true, fail) then
-          #if not IsContainedInSpan(mu, new) then
+          #if CloseMutableBasis(mu, new) then
               Add(bas,new);
-              #CloseMutableBasis(mu,new);
               for k in [1..d-1] do
                   new := new * e;
                   RECOG.CleanRow(mu,ShallowCopy(new),true,fail);
@@ -209,7 +208,7 @@ end;
 #!
 #! The method returns only <K>Success</K> or <K>NeverApplicable</K>.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "NotAbsolutelyIrred",
+BindRecogMethod("FindHomMethodsProjective", "NotAbsolutelyIrred",
 "write over a bigger field with smaller degree",
 function(ri)
   local G,H,hom,m,r;
@@ -257,16 +256,32 @@ function(ri)
             2000);
   InitialDataForKernelRecogNode(ri).degsplittingfield := MTX.DegreeSplittingField(m)
                                    / DegreeOverPrimeField(ri!.field);
-  InitialDataForKernelRecogNode(ri).biggerscalarsbas := r.inforec.bas;
-  InitialDataForKernelRecogNode(ri).biggerscalarsbasi := r.inforec.basi;
+  InitialDataForKernelRecogNode(ri).biggerscalarsrewrite := r.inforec;
 
   return Success;
 end);
 
-RECOG.HomBCToDiagonalBlock := function(data,x)
-  local el;
-  el := data.bas * x * data.basi;
-  return ExtractSubMatrix(el,data.poss,data.poss);
+RECOG.BiggerScalarsExponent := function(data, x)
+  local el, exp;
+  el := RECOG.WriteOverBiggerFieldWithSmallerDegree(data.rewrite, x);
+  if el = fail or not RECOG.IsScalarMat(el) then
+      return fail;
+  fi;
+  exp := LogFFE(el[1,1], data.generator);
+  if exp = fail then
+      return fail;
+  fi;
+  return exp mod data.modulus;
+end;
+
+SLPforElementFuncsProjective.BiggerScalarsOnly := function(ri, x)
+  local exp;
+  exp := RECOG.BiggerScalarsExponent(ri!.biggerscalarsdata, x);
+  if exp = fail or exp mod ri!.biggerscalarsgcd <> 0 then
+      return fail;
+  fi;
+  return StraightLineProgramNC(
+      [[1, (exp / ri!.biggerscalarsgcd) mod ri!.biggerscalarsorder]], 1);
 end;
 
 #! @BeginChunk BiggerScalarsOnly
@@ -275,31 +290,56 @@ end;
 #! of <Cite Key="CNRD09" Where="Theorem 6.5"/>, rewriting over
 #! <M>GF(q^e)</M> leaves a second kernel consisting only of
 #! <M>GF(q^e)</M>-scalars modulo <M>GF(q)</M>-scalars.
-#! Using the <M>E</M>-adapted basis prepared by
+#! Using the rewrite data prepared by
 #! <Ref Subsect="NotAbsolutelyIrred" Style="Text"/>, the method
-#! extracts one diagonal <M>e\times e</M> block. For such scalar elements this
-#! block determines the whole matrix, so this yields a faithful reduction of
-#! that kernel.
+#! rewrites kernel elements over <M>GF(q^e)</M>, verifies that they are scalar
+#! matrices there, and identifies their exponents modulo the
+#! <M>GF(q)</M>-scalars. The resulting quotient is cyclic of order dividing
+#! <M>(q^e-1)/(q-1)</M>, so the method recognizes it directly as a cyclic
+#! projective leaf.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "BiggerScalarsOnly",
+BindRecogMethod("FindHomMethodsProjective", "BiggerScalarsOnly",
 "handle extension-field scalars left by the C3 rewrite",
 function(ri)
-  # We come here only hinted, we project to a little square block in the
-  # upper left corner and know that there is no kernel:
-  local G, H, data, hom;
+  # We come here only hinted. The projective quotient of the remaining
+  # extension-field scalars is cyclic, so we recognize it directly by
+  # discrete logs modulo the base-field scalars.
+  local G, data, exps, gcd, i, l, pows, rep, subset;
   G := Grp(ri);
-  data := rec(poss := [1..ri!.degsplittingfield],
-              bas  := ri!.biggerscalarsbas,
-              basi := ri!.biggerscalarsbasi);
-  H := List(GeneratorsOfGroup(G), x-> RECOG.HomBCToDiagonalBlock(data, x));
-  hom := GroupHomByFuncWithData(G, Group(H), RECOG.HomBCToDiagonalBlock, data);
-  SetHomom(ri,hom);
+  data := rec(
+      rewrite := ri!.biggerscalarsrewrite,
+      modulus := (ri!.biggerscalarsrewrite.qd - 1)
+                 / (ri!.biggerscalarsrewrite.q - 1),
+      generator := Z(ri!.biggerscalarsrewrite.qd)
+  );
+  exps := List(GeneratorsOfGroup(G), x -> RECOG.BiggerScalarsExponent(data, x));
+  if fail in exps then
+      return NeverApplicable;
+  fi;
+  subset := Filtered([1..Length(exps)], i -> exps[i] <> 0);
+  if subset = [] then
+      return FindHomMethodsGeneric.TrivialGroup(ri);
+  fi;
 
-  AddMethod(InitialDataForImageRecogNode(ri).hints,
-            FindHomMethodsProjective.StabilizerChainProj,
-            4000);
+  pows := exps{subset};
+  Add(pows, data.modulus);
+  gcd := Gcd(Integers, pows);
+  rep := GcdRepresentation(Integers, pows);
+  l := [];
+  for i in [1..Length(pows)-1] do
+      if rep[i] <> 0 then
+          Add(l, subset[i]);
+          Add(l, rep[i]);
+      fi;
+  od;
 
-  findgensNmeth(ri).method := FindKernelDoNothing;
+  Setslptonice(ri, StraightLineProgramNC([[l]], Length(GeneratorsOfGroup(G))));
+  Setslpforelement(ri, SLPforElementFuncsProjective.BiggerScalarsOnly);
+  ri!.biggerscalarsdata := data;
+  ri!.biggerscalarsgcd := gcd;
+  ri!.biggerscalarsorder := data.modulus / gcd;
+  SetSize(ri, ri!.biggerscalarsorder);
+  SetFilterObj(ri, IsLeaf);
 
   return Success;
 end);
@@ -318,7 +358,7 @@ RECOG.ScalarToMultiplyIntoSmallerField := function(m,k)
   if IsPrimeField(k) then
       return fail;
   fi;
-  pos := PositionNonZero(m[1]);
+  pos := PositionNonZeroInRow(m, 1);
   s := m[1,pos]^-1;
   mm := s * m;
   f := FieldOfMatrixList([mm]);
@@ -474,7 +514,7 @@ end;
 RECOG.HomDoBaseAndFieldChangeWithScalarFinding := function(data,el)
   local m,p;
   m := data.t * el * data.ti;
-  p := PositionNonZero(m[1]);
+  p := PositionNonZeroInRow(m, 1);
   m := (m[1,p]^-1) * m;     # this gets rid of any possible scalar
                              # from some bigger field
   return RECOG.ForceToOtherField(m,data.field);
@@ -492,7 +532,7 @@ end;
 #! <Cite Key="CNRD09" Where="Section 6.3, Theorem 6.3"/>, using the
 #! smallest-field base change described earlier there.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "Subfield",
+BindRecogMethod("FindHomMethodsProjective", "Subfield",
 "write over a smaller field with same degree",
 function(ri)
     # We assume G to be absolutely irreducible, although this is not
@@ -577,7 +617,7 @@ end;
 #! exceptional situation discussed at the end of Section 6.4 where the sampled
 #! subgroup is too small to expose the correct endomorphism ring.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsProjective, "C3C5",
+BindRecogMethod("FindHomMethodsProjective", "C3C5",
 "compute a normal subgroup of derived and resolve C3 and C5",
 function(ri)
   # We assume that G acts absolutely irreducibly and that the matrix group
@@ -775,7 +815,10 @@ function(ri)
           fi;
           Info(InfoRecog, 2, "Restriction to H is homogeneous.");
           if not MTX.IsAbsolutelyIrreducible(collf[1][1]) then
-              ErrorNoReturn("Is this really possible? G acts absolutely irred!");
+              # This random normalizer witness is  inconsistent, so C3C5 gives up for now.
+              Info(InfoRecog, 1, "C3C5 found a homogeneous restriction whose ",
+                                 "factor is not absolutely irreducible.");
+              return TemporaryFailure;
           fi;
           homs := MTX.Homomorphisms(collf[1][1],m);
           basis := Concatenation(homs);
@@ -795,6 +838,7 @@ function(ri)
           fi;
 
           H := GroupWithGenerators(conjgensG);
+          r.stamp := "C3C5";
           hom := GroupHomByFuncWithData(G,H,RECOG.HomDoBaseChange,r);
           SetHomom(ri,hom);
 
@@ -823,6 +867,7 @@ function(ri)
       a := OrbActionHomomorphism(G,o);
       SetHomom(ri,a);
       Setmethodsforimage(ri,FindHomDbPerm);
+      Setimmediateverification(ri,true);
 
       return Success;
 

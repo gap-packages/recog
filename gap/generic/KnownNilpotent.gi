@@ -76,7 +76,7 @@ end;
 #! p-group for some prime p. Make sure that the !.projective component is set
 #! correctly such that we can set the right Order method.
 #! @EndChunk
-BindRecogMethod(FindHomMethodsGeneric, "KnownNilpotent",
+BindRecogMethod("FindHomMethodsGeneric", "KnownNilpotent",
 "method for nilpotent groups which are not p-groups",
 function(ri)
   local H,cut,data,gens,decompositionData,gensfac,gensker,gensm,hom,ords,primes;
