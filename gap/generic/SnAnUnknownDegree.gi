@@ -1253,8 +1253,8 @@ BindRecogMethod("FindHomMethodsGeneric", "SnAnUnknownDegree",
 "method for groups isomorphic to Sn or An with n >= 7",
 function(ri)
     local recogData, isoData, degree, swapSLP, t;
-    # If the representation is not irreducible, we should try something else
-    if not RECOG.IsIrreducible(ri) then
+    # If the representation is a reducible matrix group, we should try something else
+    if IsMatrixGroup(Grp(ri)) and not RECOG.IsIrreducible(ri) then
         return NeverApplicable;
     fi;
     # Try to find an isomorphism
