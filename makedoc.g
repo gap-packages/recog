@@ -17,8 +17,8 @@
 ##
 #############################################################################
 
-if fail = LoadPackage("AutoDoc", ">= 2019.07.03") then
-    ErrorNoReturn("AutoDoc 2019.07.03 or newer is required");
+if fail = LoadPackage("AutoDoc", ">= 2026.03.17") then
+    ErrorNoReturn("AutoDoc 2026.03.17 or newer is required");
 fi;
 
 Read("regen_doc.g");
@@ -26,12 +26,6 @@ Read("regen_doc.g");
 scan_dirs := [
     "doc",
     "gap",
-    "gap/base",
-    "gap/generic",
-    "gap/matrix",
-    "gap/perm",
-    "gap/projective",
-    "gap/projective/almostsimple",
     ];
 
 AutoDoc(rec(
