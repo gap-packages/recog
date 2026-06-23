@@ -437,7 +437,7 @@ gap> IsReady(ri);
 true
 gap> Size(ri);
 24
-gap> ForAll(GeneratorsOfGroup(G), x -> SLPforElement(ri, x) <> fail);
+gap> IsCorrect(ri);
 true
 
 #
