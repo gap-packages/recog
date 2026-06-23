@@ -145,3 +145,20 @@ RECOG.CopySubVectorCompat := function(src, dst, from, to)
     fi;
     return dst;
 end;
+
+# compute the eigenspace of `mat` for the given eigenvalue lambda`
+RECOG.EigenspaceMat := function(mat, lambda)
+    local i;
+    mat := MutableCopyMat( mat );
+    # since mat is a copy, we can efficiently "subtract an identity matrix"
+    for i in [1..NrRows(mat)] do
+        mat[i,i] := mat[i,i] - lambda;
+    od;
+    # since mat is a copy we can use NullspaceMatDestructive instead of NullspaceMat
+    return NullspaceMatDestructive(mat);
+end;
+
+# compute fixed space of mat, i.e. eigenspace for eigenvalue 1
+RECOG.FixspaceMat := function(mat)
+    return RECOG.EigenspaceMat(mat, 1);
+end;
