@@ -28,7 +28,9 @@
 ##  If we pass an `A5`, `S5`, `A6`, `S6` into `SnAnUnknownDegree`, then it will not recognize it.
 ##  If the input acts on a space with a large dimension, then this can take forever.
 ##
-##  - We assume that our input group `G` is a projective irreducible matrix group.
+##  - We assume that our input group `G` is a (possibly projective) irreducible matrix group.
+##  - The algorithm is also correct if `G` is not irreducible, but in this case,
+##    it should be cheaper to first run the meat-axe.
 ##  - Deduce an upper bound `N` for the degree of `An`, `Sn` by using bounds provided in [KL90].
 ##  - Look at some orders and deduce a lower bound `M` for the degree.
 ##      - If `M > N`, then we excluded `An`, `Sn`.
@@ -1251,6 +1253,10 @@ BindRecogMethod("FindHomMethodsGeneric", "SnAnUnknownDegree",
 "method for groups isomorphic to Sn or An with n >= 7",
 function(ri)
     local recogData, isoData, degree, swapSLP, t;
+    # If the representation is not irreducible, we should try something else
+    if not RECOG.IsIrreducible(ri) then
+        return NeverApplicable;
+    fi;
     # Try to find an isomorphism
     recogData := RECOG.RecogniseSnAnLazy(ri);
     if recogData = NeverApplicable or recogData = TemporaryFailure then
