@@ -511,7 +511,7 @@ AddMethod(FindHomDbPerm, FindHomMethodsPerm.Imprimitive, 70);
 
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.LargeBasePrimitive, 60);
 
-AddMethod(FindHomDbPerm, FindHomMethodsGeneric.SnAnUnknownDegree, 58);;
+AddMethod(FindHomDbPerm, FindHomMethodsGeneric.SnAnUnknownDegree, 58);
 
 AddMethod(FindHomDbPerm, FindHomMethodsPerm.StabilizerChainPerm, 55);
 
