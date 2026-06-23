@@ -34,8 +34,7 @@
 ##  Input:
 ##    G  -- a matrix group equal to SL(4,q) for some odd prime power q,
 ##           given by 4x4 matrices over GF(q).
-##    N  -- positive integer: random-element budget (number of allowed
-##           calls to the product replacer / Bray trick).
+##    N  -- positive integer: random-element budget.
 ##
 ##  Returns:
 ##    "fail"  if the budget N is exhausted before success, OR a record with
@@ -43,13 +42,10 @@
 ##
 ##      .U     -- a subgroup of G with U isomorphic to SL(2,q), stingray
 ##                embedded in G with respect to the base change bas.
-##
 ##      .bas   -- the 4x4 base change matrix bas such that  u^bas
 ##                is block-diagonal diag(A, I_2) for every u in U.
-##
 ##      .gens  -- list of generators of U as elements of G (i.e. 4x4
 ##                matrices over GF(q)).
-##
 ##      .Nout  -- remaining budget after completion  (N - number of random
 ##                selections actually used).
 ##
@@ -133,7 +129,6 @@ RECOG.FindSL2inSL4 := function(G, N)
             # to avoid calling RecognizeGroup on trivial/cyclic groups.
             if Size(gens_bas) >l then
                 K := Group(gens_bas);
-                count := 0;
                 # Non-constructive recognition: check whether the collected
                 # 2x2 generators already span SL(2,q).
                 if Size(RecognizeGroup(K)) = Size(SL(2, q)) then
