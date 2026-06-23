@@ -962,23 +962,24 @@ end;
 #
 # Returns either fail or a record with components type, isoData and slpToStdGens, where:
 # - type: the isomorphism type, that is either the string "Sn" or "An".
-# - isoData: a list [stdGens, sieve, n] where
-#   - stdGens are the standard generators of G. They do not have memory.
-#   - sieve implicitly defines the isomorphism. It is used by
+# - isoData: a record with the following entries
+#   - `stdGens` are the standard generators of G. They do not have memory.
+#   - `sieve` implicitly defines the isomorphism. It is used by
 #     RECOG.FindImageSn, RECOG.FindImageAn, and RECOG.FindImageSnAnSmallDegree
 #     to compute the isomorphism.
-#   - n is the degree of the group.
+#   - `degree` is the degree of the group.
 # - slpToStdGens: an SLP from the generators of G to stdGens.
 RECOG.ConstructSnAnIsomorphism := function(ri, n, stdGensAnWithMemory)
     local stdGensAn, sieve, sievePart, gImage, foundOddPermutation, slp, eval,
         hWithMemory, bWithMemory, stdGensSnWithMemory, b, h, g;
     stdGensAn := StripMemory(stdGensAnWithMemory);
+    Assert(0, Length(stdGensAn) = 2);
     # Construct sieve. In <Cite Key="C12"/>, Section 3.4, sieve is called E.
     # In <Cite Key="JLNP13"/> sieve is called `xi`.
     if n < 11 then
         sievePart := [stdGensAn[2], (~[1] ^ stdGensAn[1]) ^ (2 * (n mod 2) - 1),
                        (~[2] ^ stdGensAn[1]) ^ (2 * (n mod 2) - 1)];
-        sieve := [[stdGensAn[1], stdGensAn[2]], sievePart];
+        sieve := [stdGensAn, sievePart];
     else
         sieve := RECOG.ConstructXiAn(n, stdGensAn[1], stdGensAn[2]);
     fi;
@@ -1011,7 +1012,7 @@ RECOG.ConstructSnAnIsomorphism := function(ri, n, stdGensAnWithMemory)
     od;
     if not foundOddPermutation then
         return rec(type := "An",
-                   isoData := [[stdGensAn[1], stdGensAn[2]], sieve, n],
+                   isoData := rec(stdGens:=stdGensAn, sieve:=sieve, degree:=n),
                    slpToStdGens := SLPOfElms(stdGensAnWithMemory));
     fi;
     # Construct standard generators for Sn: [bWithMemory, hWithMemory].
@@ -1049,7 +1050,7 @@ RECOG.ConstructSnAnIsomorphism := function(ri, n, stdGensAnWithMemory)
         if not isequal(ri)(eval, StripMemory(g)) then return fail; fi;
     od;
     return rec(type := "Sn",
-               isoData := [[b, h], sieve, n],
+               isoData := rec(stdGens:=[b, h], sieve:=sieve, degree:=n),
                slpToStdGens := SLPOfElms(stdGensSnWithMemory));
 end;
 
@@ -1264,7 +1265,7 @@ function(ri)
     isoData := recogData.isoData;
     ri!.SnAnUnknownDegreeIsoData := isoData;
     SetFilterObj(ri, IsLeaf);
-    degree := isoData[3];
+    degree := isoData.degree;
     if recogData.type = "Sn" then
         SetSize(ri, Factorial(degree));
         SetIsRecogInfoForAlmostSimpleGroup(ri, true);
@@ -1274,7 +1275,7 @@ function(ri)
     fi;
     # Note that when setting the nice generators we reverse their order, such
     # that it fits to the SLPforSn/SLPforAn function!
-    SetNiceGens(ri, Reversed(isoData[1]));
+    SetNiceGens(ri, Reversed(isoData.stdGens));
     swapSLP := StraightLineProgram([[[2, 1], [1, 1]]], 2);
     Setslptonice(ri,
                  CompositionOfStraightLinePrograms(swapSLP,
@@ -1299,9 +1300,9 @@ end);
 SLPforElementFuncsGeneric.SnSmallDegree := function(ri, g)
     local isoData, degree, image;
     isoData := ri!.SnAnUnknownDegreeIsoData;
-    degree := isoData[3];
-    image := RECOG.FindImageSnAnSmallDegree(ri, degree, g, isoData[2][1][1], isoData[2][1][2],
-                       isoData[2][2]);
+    degree := isoData.degree;
+    image := RECOG.FindImageSnAnSmallDegree(ri, degree, g, isoData.sieve[1][1], isoData.sieve[1][2],
+                       isoData.sieve[2]);
     return RECOG.SLPforSn(degree, image);
 end;
 
@@ -1309,9 +1310,9 @@ end;
 SLPforElementFuncsGeneric.AnSmallDegree := function(ri, g)
     local isoData, degree, image;
     isoData := ri!.SnAnUnknownDegreeIsoData;
-    degree := isoData[3];
-    image := RECOG.FindImageSnAnSmallDegree(ri, degree, g, isoData[2][1][1], isoData[2][1][2],
-                       isoData[2][2]);
+    degree := isoData.degree;
+    image := RECOG.FindImageSnAnSmallDegree(ri, degree, g, isoData.sieve[1][1], isoData.sieve[1][2],
+                       isoData.sieve[2]);
     return RECOG.SLPforAn(degree, image);
 end;
 
@@ -1319,9 +1320,9 @@ end;
 SLPforElementFuncsGeneric.SnUnknownDegree := function(ri, g)
     local isoData, degree, image;
     isoData := ri!.SnAnUnknownDegreeIsoData;
-    degree := isoData[3];
-    image := RECOG.FindImageSn(ri, degree, g, isoData[1][1], isoData[1][2],
-                       isoData[2][1], isoData[2][2]);
+    degree := isoData.degree;
+    image := RECOG.FindImageSn(ri, degree, g, isoData.stdGens[1], isoData.stdGens[2],
+                       isoData.sieve[1], isoData.sieve[2]);
     return RECOG.SLPforSn(degree, image);
 end;
 
@@ -1329,8 +1330,8 @@ end;
 SLPforElementFuncsGeneric.AnUnknownDegree := function(ri, g)
     local isoData, degree, image;
     isoData := ri!.SnAnUnknownDegreeIsoData;
-    degree := isoData[3];
-    image := RECOG.FindImageAn(ri, degree, g, isoData[1][1], isoData[1][2],
-                       isoData[2][1], isoData[2][2]);
+    degree := isoData.degree;
+    image := RECOG.FindImageAn(ri, degree, g, isoData.stdGens[1], isoData.stdGens[2],
+                       isoData.sieve[1], isoData.sieve[2]);
     return RECOG.SLPforAn(degree, image);
 end;
