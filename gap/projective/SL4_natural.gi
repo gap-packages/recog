@@ -56,7 +56,7 @@
 #############################################################################
 
 
-RECOG.GoingDownFinalStepSL := function(G, N)
+RECOG.FindSL2inSL4 := function(G, N)
     local n, F, q, one, Eigenspace, gens_group, gens_bas, l,
           pr, t, basis1, basism1, bas, basInv,
           h, hb, topLeft, bottomRight, ordr, K, slp, Nstart, U;
