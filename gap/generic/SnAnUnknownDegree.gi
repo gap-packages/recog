@@ -1123,17 +1123,16 @@ end;
 # then necessarily m <= n
 RECOG.LowerBoundForDegreeOfSnAnViaOrders := function(ri)
     local orders;
-    orders := Set(List(
+    orders := Set(
         [1..30],
         i -> RandomElmOrd(ri, "LowerBoundForDegreeOfSnAnViaOrders", false).order
-    ));
+    );
+    # For a given order, the sum over its factorisation into prime powers
+    # is a precise lower bound on the degree of a symmetric group that can
+    # contain an element of such an order.
     return Maximum(List(
         orders,
-        # For a given order, the sum over its factorisation into prime powers,
-        # gives a lower bound for the degree of the smallest symmetric group,
-        # that can contain an element of such an order.
-        o -> Sum(Collected(FactorsInt(o)),
-                 tup -> tup[1] ^ tup[2])
+        o -> Sum(Collected(FactorsInt(o)), tup -> tup[1] ^ tup[2])
     ));
 end;
 
@@ -1153,7 +1152,7 @@ RECOG.SnAnUpperBoundForDegree := function(ri)
     elif IsMatrixGroup(G) then
         p := Characteristic(DefaultFieldOfMatrixGroup(G));
         d := DimensionOfMatrixGroup(G);
-        # Let N be the largest integer such that A_N has a representation of
+        # Let N be the largest integer such that A_N has a faithful representation of
         # dimension d.
         if ri!.projective then
             # If n >= 9, then the smallest irreducible projective An-module has
