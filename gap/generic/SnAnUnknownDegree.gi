@@ -1139,8 +1139,7 @@ end;
 RECOG.SnAnUpperBoundForDegree := function(ri)
     local G, N, p, d, M;
     G := Grp(ri);
-    # N = upper bound for degree
-    # Check magma
+    # Compute an upper bound N for the degree n of the candidate An or Sn.
     if IsPermGroup(G) then
         # We assume that G is primitive and not a giant in natural representation.
         # The smallest non-natural primitive action of Sn or An induces
@@ -1153,13 +1152,12 @@ RECOG.SnAnUpperBoundForDegree := function(ri)
     elif IsMatrixGroup(G) then
         p := Characteristic(DefaultFieldOfMatrixGroup(G));
         d := DimensionOfMatrixGroup(G);
-        # Let N be the largest integer such that A_N has a faithful representation of
-        # dimension d.
+        # Bound n by the minimal dimension of a faithful representation of An.
         if ri!.projective then
             # If n >= 9, then the smallest irreducible projective An-module has
             # dimension n-2, see [KL90], Proposition 5.3.7.
-            # Turning things around, this means d+2 is an upper bound for the degree,
-            # at least if d+2 >= 9. Otherwise n < 9 and so then 9 is an upper bound.
+            # Hence d + 2 is an upper bound for n, at least when d + 2 >= 9.
+            # Otherwise n < 9, and 8 is still a valid upper bound.
             #
             # TODO: The table in [KL90], Proposition 5.3.7. has more detailed
             # values for 5 <= n < 9. Do we want to use that?
@@ -1168,9 +1166,9 @@ RECOG.SnAnUpperBoundForDegree := function(ri)
             # If n >= 10, then the smallest irreducible An-module is the
             # fully deleted permutation module, see [KL90], Proposition 5.3.5.
             # It has dimension n-2 if p|n and dimension n-1 otherwise.
-            # Assume N >= 10 and use the comment above to compute N. If we
-            # arrive at a value < 10 for N, then we must have been in the case
-            # N < 10.
+            # Under the assumption n >= 10, invert these formulas to obtain
+            # an upper bound for n. If the resulting bound is < 10, then the
+            # assumption failed and 9 remains a valid upper bound.
             if (d + 2) mod p = 0 then
                 N := d + 2;
             else
@@ -1183,13 +1181,13 @@ RECOG.SnAnUpperBoundForDegree := function(ri)
                            " <N>, Grp(<ri>) must be an IsPermGroup or an",
                            " IsMatrixGroup");
     fi;
-    # N = lower bound for degree
+    # Compute a lower bound M for the degree n of the candidate An or Sn.
     M := RECOG.LowerBoundForDegreeOfSnAnViaOrders(ri);
-    # Our upper bound is smaller than our lower bound.
+    # Incompatible bounds rule out An and Sn.
     if N < M then
         return NeverApplicable;
     fi;
-    # Lower bound does not exclude A5, S5, A6 or S6
+    # The lower bound alone does not exclude A5, S5, A6 or S6.
     # If the input group is isomorphic to a symmetric or alternating group of
     # degrees 5 or 6, then this method might not exit quickly.
     if M <= 6 then
