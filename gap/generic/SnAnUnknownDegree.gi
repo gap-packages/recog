@@ -1264,7 +1264,7 @@ function(ri)
     # should normally be the case here, as the `Imprimitive` recognition
     # method normally has a higher rank than this one and thus runs first.
     # But better safe than sorry, and enforce this here
-    if IsPermGroup(Grp(ri)) and not IsPrimitive(ri) then
+    if IsPermGroup(Grp(ri)) and not IsPrimitive(Grp(ri)) then
         return NeverApplicable;
     fi;
 
