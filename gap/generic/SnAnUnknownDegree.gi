@@ -12,44 +12,46 @@
 ##  SPDX-License-Identifier: GPL-3.0-or-later
 ##
 ##
-##  This file provides code for recognising whether a group
-##  is isomorphic to an alternating or symmetric group. It implements
-##  <Cite Key="JLNP13"/>.
+##  This file provides code for recognising whether a black box group is
+##  isomorphic to an alternating or symmetric group. It implements
+##  <Cite Key="JLNP13"/> together with surrounding bound computations.
 ##
 #############################################################################
 
 ##  General Strategy
 ##  ----------------
 ##
-##  Here we describe the general strategy that is used to recognise if a group
+##  Here we describe the general strategy used to recognise whether a group
 ##  is isomorphic to `An` or `Sn` for `n >= 7`.
 ##
-##  We have to be careful what we do for small degrees.
-##  If we pass an `A5`, `S5`, `A6`, `S6` into `SnAnUnknownDegree`, then it will not recognize it.
-##  If the input acts on a space with a large dimension, then this can take forever.
+##  We have to be careful in small degrees.
+##  `SnAnUnknownDegree` does not recognise `A5`, `S5`, `A6`, or `S6`.
+##  If the input acts on a space of large dimension, then failing on such
+##  groups can take a long time.
 ##
 ##  - We assume that our input group `G` is a (possibly projective) irreducible matrix group
 ##    or a primitive permutation group.
-##  - The algorithm is also correct if `G` is a non-irreducible matrix group, but in this case,
-##    it should be cheaper to first run the meat-axe.
-##  - Deduce an upper bound `N` for the degree of `An`, `Sn` by using bounds provided in [KL90].
-##  - Look at some orders and deduce a lower bound `M` for the degree.
+##  - The core algorithm is also correct for reducible matrix groups, but in
+##    that case it should be cheaper to run the meat-axe first.
+##  - Deduce an upper bound `N` for the degree of the candidate `An` or `Sn`
+##    using bounds from [KL90].
+##  - Look at some element orders and deduce a lower bound `M` for the degree.
 ##      - If `M > N`, then we excluded `An`, `Sn`.
 ##      - If `M <= 6`, then we return `TemporaryFailure`.
-##      - TODO: If `N > 20`, use Magma Code `GuessSnAnDegree` to guess the 
+##      - TODO: If `N > 20`, use Magma code `GuessSnAnDegree` to guess the
 ##        degree by element orders. (In Issue 348, there is code for a GAP function
 ##        `GuessSnAnDegree` which can be used as a starting point.)
 ##      - TODO: If `GuessSnAnDegree` was used, then we check if we can find
 ##        an element whose order is in the interval `[N - m, N + m]`.
 ##      - Otherwise, we continue.
-##  - Now we can assume for the degree `n >= 7`. We need to ensure this, since
+##  - Now we may assume `n >= 7`. We need this, since
 ##    `SnAnUnknownDegree` cannot recognise `A5`, `S5`, `A6`, `S6` and could run
 ##    for a considerable time.
 ##  - Monte-Carlo: Try to compute standard generators and degree `n` of
-##    largest `An < G` via the algorithm in [JLNP13].
+##    the largest `An < G` via the algorithm in [JLNP13].
 ##  - Try to compute an isomorphism from `G` to `An` or `Sn`.
-##      - If `n < 11`, then use methods from [C12]
-##      - Otherwise, we have `n >= 11` and use methods from `SnAnKnownDegree` in [BLGN+03]
+##      - If `n < 11`, then use methods from [C12].
+##      - Otherwise, use methods from `SnAnKnownDegree` in [BLGN+03].
 ##
 ##  Changes
 ##  -------
@@ -58,14 +60,14 @@
 ##
 ##  - Computation of upper bound `N` done as in `[L84]` and `[KL90]`.
 ##  - Computation of lower bound `M` by element orders.
-##  - For each ThreeCycleCandidate `c` we check if `c^3 = 1` and we check for
+##  - For each `ThreeCycleCandidate` `c` we check whether `c^3 = 1`, and for
 ##    some random elements `r` if for the element `x := c * c^r` either `x^5 = 1`
-##    or `x^6 = 1` holds (The element `x` needs to have order `1`, `2`, `3` or `5`).
+##    or `x^6 = 1` holds. Then `x` has order `1`, `2`, `3`, or `5`.
 ##  - Use `RecogniseSnAnLazy` that caches iterators constructed by
 ##    `ThreeCycleCandidatesIterator` and returns `TemporaryFailure` more
 ##    quickly.
-##  - `ThreeCycleCandidatesIterator` uses a similar approach to that from the
-##    Magma Code `GetNextThreeCycle` and thus computes the elements in a
+##  - `ThreeCycleCandidatesIterator` uses a similar approach to that in the
+##    Magma code `GetNextThreeCycle` and thus computes the elements in a
 ##    different ordering to the paper.
 ##    - We work in batches of at most `L = 10` involutions in a linear manner.
 ##      We save all involutions considered so far.
@@ -77,7 +79,7 @@
 ##      `SnAnTryLater` and exit the recognition method in the lazy variant.
 ##    - However, as in the vanilla implementation, we return
 ##      `TemporaryFailure` if for all `B` involutions either `C` conjugates have
-##      been tested in total or `T` conjugates were proven to commutate with the
+##      been tested in total or `T` conjugates were proven not to commute with the
 ##      involution.
 ##  - Use Conder's Thesis to compute images for degree `n <= 10`.
 
@@ -98,7 +100,7 @@ RECOG.SnAnResetCache := function(ri)
 end;
 
 # eps : real number, the error bound
-# N : integer, upper bound for the degree of G
+# N : integer, upper bound for the candidate degree n
 #
 # Returns a record of constants used in ThreeCyclesCandidatesIterator. The
 # meaning of these constants is documented under "Changes" at the beginning of
@@ -124,9 +126,9 @@ RECOG.ThreeCycleCandidatesConstants := function(eps, N)
     );
 end;
 
-# Return false if c can not be a three cycle. This uses cheap tests to
-# determine this. It is based on the Magma function heuristicThreeCycleTest.
-# R is a list of logInt2N+1 many random elements of the group of ri.
+# Return `false` if `c` cannot be a 3-cycle, using cheap one-sided tests.
+# This is based on the Magma function `heuristicThreeCycleTest`.
+# `R` is a list of `logInt2N + 1` random elements of `Grp(ri)`.
 RECOG.HeuristicThreeCycleTest := function(ri, c, logInt2N, R)
     local r, y, y2, y3, yTo5, k;
     c := StripMemory(c);
@@ -159,13 +161,13 @@ end;
 #
 # Creates and returns a function, here called oneThreeCycleCandidate. The
 # function oneThreeCycleCandidate returns one of the following:
-# - a three cycle candidate, i.e. an element of G
+# - a 3-cycle candidate, i.e. an element of G
 # - SnAnTryLater, if we tried a batch of at most L involutions,
 #                 and for each of these we tried K conjugates
 # - TemporaryFailure, if we exhausted all attempts
-# - NeverApplicable, if we found out that G can't be an Sn or An
+# - NeverApplicable, if we found out that G cannot be an Sn or An
 #
-# Lower Bounds need n >= 9.
+# These lower-bound arguments require n >= 9.
 RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
     local
         # involution
@@ -174,12 +176,12 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
         M, B, T, C, logInt2N,
         # integers, making the algorithm give up quicker during iterations
         K, L,
-        # list of random elements for heuristic three cycle test
+        # random elements used by the heuristic 3-cycle test
         R,
         # list of involution candidates
         involutions,
         # counters
-        nrTriedConjugates, nrCommutatingConjugates, nrThreeCycleCandidates,
+        nrTriedConjugates, nrNonCommutingConjugates, nrThreeCycleCandidates,
         # counters
         Ki, Li, curInvolutionPos,
         # helper functions
@@ -209,15 +211,15 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
     # involution t_i.
     nrTriedConjugates := [];
 
-    # Entry i of this list counts the size of the set Gamma_i in step 4
-    # for the current involution t_i
-    nrCommutatingConjugates := [];
+    # Entry i counts the conjugates considered in step 4 that do not commute
+    # with the current involution t_i, i.e. the size of Gamma_i in the paper.
+    nrNonCommutingConjugates := [];
 
-    # Entry i of this list counts the actual number of three cycle candidates considered
-    # which are filtered from the Gamma_i via heuristic order tests.
+    # Entry i counts the actual number of 3-cycle candidates that survive
+    # the heuristic order tests among those elements of Gamma_i.
     nrThreeCycleCandidates := [];
 
-    # Used for Debugging
+    # Used for debugging.
     if RECOG.SnAnDebug then
         cache := RECOG.SnAnGetCache(ri);
         if not IsBound(cache.iteratorsLocalVars) then
@@ -226,17 +228,17 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
         Add(cache.iteratorsLocalVars, rec(
             involutions := involutions,
             nrTriedConjugates := nrTriedConjugates,
-            nrCommutatingConjugates := nrCommutatingConjugates,
+            nrNonCommutingConjugates := nrNonCommutingConjugates,
             nrThreeCycleCandidates := nrThreeCycleCandidates
         ));
     fi;
 
     # Helper functions
     # oneThreeCycleCandidate returns one of the following:
-    # - a three cycle candidate, i.e. an element of G
+    # - a 3-cycle candidate, i.e. an element of G
     # - TemporaryFailure, if we exhausted all attempts
     # - SnAnTryLater, if we tried all involution candidates K times
-    # - NeverApplicable, if G can not be an Sn or An
+    # - NeverApplicable, if G cannot be an Sn or An
     oneThreeCycleCandidate := function()
         local
             # integer, loop variable
@@ -275,24 +277,25 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
                 fi;
                 involutions[curInvolutionPos] := tPowerOld;
                 nrTriedConjugates[curInvolutionPos] := 0;
-                nrCommutatingConjugates[curInvolutionPos] := 0;
+                nrNonCommutingConjugates[curInvolutionPos] := 0;
                 nrThreeCycleCandidates[curInvolutionPos] := 0;
             fi;
-            # Check if we either tried enough conjugates or already found enough
-            # commutating conjugates for all involutions t.
+            # Check whether we either tried enough conjugates or already found
+            # enough non-commuting conjugates for all involutions t.
             # If this is the case, then we have exhausted all attempts.
             if curInvolutionPos = B
-                and ForAll([1 .. B], i -> nrTriedConjugates[i] >= C or nrCommutatingConjugates[i] >= T)
+                and ForAll([1 .. B], i -> nrTriedConjugates[i] >= C or nrNonCommutingConjugates[i] >= T)
             then
                 return TemporaryFailure;
             fi;
             # If we either considered enough conjugates or already found enough
-            # commutating conjugates for the current involution t,
-            # we need to consider the next involution, or reached the end of our batch of involutions.
-            # Recall, that we work in batches for the lazy version.
+            # non-commuting conjugates for the current involution t, then we
+            # need to consider the next involution or have reached the end of
+            # our current batch of involutions. Recall that we work in batches
+            # for the lazy version.
             # We work in batches of at most L involutions and for these,
             # in batches of K conjugates.
-            if nrTriedConjugates[curInvolutionPos] >= Ki or nrCommutatingConjugates[curInvolutionPos] >= T then
+            if nrTriedConjugates[curInvolutionPos] >= Ki or nrNonCommutingConjugates[curInvolutionPos] >= T then
                 if curInvolutionPos = B then
                     # Last involution reached. Restart with next batch of conjugates later.
                     Li := Minimum(L, B); # Reset Li to initial value
@@ -310,9 +313,9 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
                 fi;
             fi;
 
-            # Steps 4 & 5: new three cycle candidate
+            # Steps 4 & 5: a new 3-cycle candidate
             #########################################################################
-            # Try to construct a three cycle candidate via a conjugate of t. See
+            # Try to construct a 3-cycle candidate via a conjugate of t. See
             # the comment above this function.
             t := involutions[curInvolutionPos];
             nrTriedConjugates[curInvolutionPos] := nrTriedConjugates[curInvolutionPos] + 1;
@@ -320,11 +323,12 @@ RECOG.ThreeCycleCandidatesIterator := function(ri, constants)
             if isequal(ri)(t * c, c * t) then
                 continue;  # we have to start over
             fi;
-            nrCommutatingConjugates[curInvolutionPos] := nrCommutatingConjugates[curInvolutionPos] + 1;
+            nrNonCommutingConjugates[curInvolutionPos] := nrNonCommutingConjugates[curInvolutionPos] + 1;
             candidate := (t * c) ^ 2;
-            # We now use a one-sided heuristic to test whether candidate can be a
-            # three cycle, that is the heuristic can detect whether candidate can
-            # not be a three cycle, e.g. if it does not have order three.
+            # We now use a one-sided heuristic to test whether `candidate`
+            # could be a 3-cycle. The heuristic may rule out candidates, for
+            # example if they do not have order 3, but it never rejects a
+            # genuine 3-cycle.
             if RECOG.HeuristicThreeCycleTest(ri, candidate, logInt2N, R) then
                 nrThreeCycleCandidates[curInvolutionPos] := nrThreeCycleCandidates[curInvolutionPos] + 1;
                 return candidate;
@@ -353,15 +357,15 @@ end;
 # c : element of G,
 #     should be a 3-cycle
 # eps : real number, the error bound
-# N : integer, upper bound for the degree of G
+# N : integer, upper bound for the candidate degree n
 #
 # Returns a list of elements of G.
 #
 # If the input is as assumed, then this function returns a list of bolstering
 # elements with respect to c.
 #
-# Lower Bounds need n >= 9.
-# Bolstering Elements are only defined for n >= 7.
+# These lower-bound arguments require n >= 9.
+# Bolstering elements are only defined for n >= 7.
 RECOG.BolsteringElements := function(ri, cWithMem, eps, N)
     local result, R, S, nrPrebolsteringElms, i, c, rWithMem, r, cr, cr2;
     result := [];
@@ -442,7 +446,7 @@ RECOG.IsFixedPoint := function(ri, g, c, r)
     if not commutesWithAtMostOne(ri, x2, H1) then return false; fi;
     x3 := ((cg2 ^ cg3) ^ cg4) ^ r;
     if not commutesWithAtMostOne(ri, x3, H1) then return false; fi;
-    # Test whether an elm of the set X commutes with at least
+    # Test whether an element of the set X commutes with at least
     # two elements of H2.
     H2 := [c, cg, ~[2] ^ cg3, ~[3] ^ cg3, ~[4] ^ cg4];
     if not commutesWithAtMostOne(ri, x1, H2) then return false; fi;
@@ -464,7 +468,7 @@ end;
 #
 # Returns fail or a conjugate of r.
 #
-# W.l.o.g. let g = (1, ..., k) and c = (1, 2, 3).
+# Without loss of generality, let g = (1, ..., k) and c = (1, 2, 3).
 # If the input is as assumed, then the algorithm returns a conjugate r ^ x such
 # that r ^ x fixes the points 1, 2 but not the point 3.
 RECOG.AdjustCycle := function(ri, g, c, r, k)
@@ -646,7 +650,7 @@ end;
 # x : bolstering element with respect to c
 # N : integer, upper bound for the degree of G
 #
-# returns either fail or a list consisting of:
+# Returns either `fail` or a list consisting of:
 # - g, cycle matching c
 # - k, length of cycle g.
 #
@@ -747,12 +751,10 @@ end;
 # eps : real number, the error bound
 # N : integer, upper bound for the degree of G
 #
-# Returns fail or a list [g, k] consisting of:
+# Returns `fail` or a list `[g, k]` consisting of:
 # - g: element of G,
 #      should be a k-cycle matching c
 # - k: integer,
-# - g: element of G.
-# - k: integer.
 # If G \in [S_n, A_n] and c is a 3-cycle, then with probability at least 1-eps,
 # g is a k-cycle matching c (and also k >= max(3n/4, 9)).
 #
@@ -792,7 +794,7 @@ end;
 # eps : real number, the error bound
 # N : integer, upper bound for the degree of G
 #
-# Returns fail or a list consisting of:
+# Returns `fail` or a list consisting of:
 # - gTilde : element of G,
 #            long cycle, a standard generator of An < G
 # - cTilde : element of G,
@@ -1308,7 +1310,7 @@ function(ri)
     return Success;
 end);
 
-# The SLP function if G is isomorphic to Sn with small degree.
+# The SLP function for the case that G is isomorphic to Sn of small degree.
 SLPforElementFuncsGeneric.SnSmallDegree := function(ri, g)
     local isoData, degree, image;
     isoData := ri!.SnAnUnknownDegreeIsoData;
@@ -1319,7 +1321,7 @@ SLPforElementFuncsGeneric.SnSmallDegree := function(ri, g)
     return RECOG.SLPforSn(degree, image);
 end;
 
-# The SLP function if G is isomorphic to An with small degree.
+# The SLP function for the case that G is isomorphic to An of small degree.
 SLPforElementFuncsGeneric.AnSmallDegree := function(ri, g)
     local isoData, degree, image;
     isoData := ri!.SnAnUnknownDegreeIsoData;
@@ -1329,7 +1331,7 @@ SLPforElementFuncsGeneric.AnSmallDegree := function(ri, g)
     return RECOG.SLPforAn(degree, image);
 end;
 
-# The SLP function if G is isomorphic to Sn.
+# The SLP function for the case that G is isomorphic to Sn.
 SLPforElementFuncsGeneric.SnUnknownDegree := function(ri, g)
     local isoData, degree, image;
     isoData := ri!.SnAnUnknownDegreeIsoData;
@@ -1339,7 +1341,7 @@ SLPforElementFuncsGeneric.SnUnknownDegree := function(ri, g)
     return RECOG.SLPforSn(degree, image);
 end;
 
-# The SLP function if G is isomorphic to An.
+# The SLP function for the case that G is isomorphic to An.
 SLPforElementFuncsGeneric.AnUnknownDegree := function(ri, g)
     local isoData, degree, image;
     isoData := ri!.SnAnUnknownDegreeIsoData;
