@@ -1144,10 +1144,11 @@ RECOG.SnAnUpperBoundForDegree := function(ri)
     if IsPermGroup(G) then
         # We assume that G is primitive and not a giant in natural representation.
         # The smallest non-natural primitive action of Sn or An induces
-        # a large base group. Thus by [L84] its degree is smallest, when the
-        # action is on 2-subsets. Thus its degree is at least n * (n-1) / 2.
-        # Thus for a given degree k, we have
-        # n >= 1/2 + Sqrt(1/4 + 2*k).
+        # a large base group. Thus by [L84] its degree is smallest when the
+        # action is on 2-subsets, so it has degree n * (n - 1) / 2.
+        # Hence, if the input action has degree k, then any candidate degree n
+        # must satisfy n * (n - 1) / 2 <= k, equivalently
+        # n <= 1/2 + Sqrt(1/4 + 2 * k).
         N := Int(Ceil(1/2 + Sqrt(Float(1/4 + 2 * NrMovedPoints(G)))));
     elif IsMatrixGroup(G) then
         p := Characteristic(DefaultFieldOfMatrixGroup(G));
