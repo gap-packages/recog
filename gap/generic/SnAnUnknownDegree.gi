@@ -1158,12 +1158,9 @@ RECOG.SnAnUpperBoundForDegree := function(ri)
         if ri!.projective then
             # If n >= 9, then the smallest irreducible projective An-module has
             # dimension n-2, see [KL90], Proposition 5.3.7.
-            # Assume N >= 9 and use the comment above to compute N. If we
-            # arrive at a value < 9 for N, then we must have been in the case N
-# If n >= 9, then the smallest irreducible projective An-module has
-# dimension n-2, see [KL90], Proposition 5.3.7.
-# Turning things around, this means d+2 is an upper bound for the degree,
-# at least if d+2 >= 9. Otherwise n < 9 and so then 9 is an upper bound.
+            # Turning things around, this means d+2 is an upper bound for the degree,
+            # at least if d+2 >= 9. Otherwise n < 9 and so then 9 is an upper bound.
+            #
             # TODO: The table in [KL90], Proposition 5.3.7. has more detailed
             # values for 5 <= n < 9. Do we want to use that?
             N := Maximum(8, d + 2);
