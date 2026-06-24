@@ -1252,10 +1252,23 @@ BindRecogMethod("FindHomMethodsGeneric", "SnAnUnknownDegree",
 "method for groups isomorphic to Sn or An with n >= 7",
 function(ri)
     local recogData, isoData, degree, swapSLP, t;
-    # If the representation is a reducible matrix group, we should try something else
+
+    # For matrix groups, our degree bounds assume irreducibility. Which
+    # should normally be the case here, as the `ReducibleIso` recognition
+    # method normally has a higher rank than this one and thus runs first.
+    # But better safe than sorry, and enforce this here
     if IsMatrixGroup(Grp(ri)) and not RECOG.IsIrreducible(ri) then
         return NeverApplicable;
     fi;
+
+    # For permutation groups, our degree bounds assume primitivity. Which
+    # should normally be the case here, as the `Imprimitive` recognition
+    # method normally has a higher rank than this one and thus runs first.
+    # But better safe than sorry, and enforce this here
+    if IsPermGroup(Grp(ri)) and not IsPrimitive(ri) then
+        return NeverApplicable;
+    fi;
+
     # Try to find an isomorphism
     recogData := RECOG.RecogniseSnAnLazy(ri);
     if recogData = NeverApplicable or recogData = TemporaryFailure then
