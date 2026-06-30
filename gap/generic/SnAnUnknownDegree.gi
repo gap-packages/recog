@@ -12,7 +12,7 @@
 ##  SPDX-License-Identifier: GPL-3.0-or-later
 ##
 ##
-##  This file provides code for recognising whether a permutation group
+##  This file provides code for recognising whether a group
 ##  is isomorphic to an alternating or symmetric group. It implements
 ##  <Cite Key="JLNP13"/>.
 ##
@@ -28,8 +28,9 @@
 ##  If we pass an `A5`, `S5`, `A6`, `S6` into `SnAnUnknownDegree`, then it will not recognize it.
 ##  If the input acts on a space with a large dimension, then this can take forever.
 ##
-##  - We assume that our input group `G` is a (possibly projective) irreducible matrix group.
-##  - The algorithm is also correct if `G` is not irreducible, but in this case,
+##  - We assume that our input group `G` is a (possibly projective) irreducible matrix group
+##    or a primitive permutation group.
+##  - The algorithm is also correct if `G` is a non-irreducible matrix group, but in this case,
 ##    it should be cheaper to first run the meat-axe.
 ##  - Deduce an upper bound `N` for the degree of `An`, `Sn` by using bounds provided in [KL90].
 ##  - Look at some orders and deduce a lower bound `M` for the degree.
