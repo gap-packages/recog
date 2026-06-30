@@ -14,6 +14,8 @@
 ##  Order. Hence these functions work for G given as a black box
 ##  group isomorphic to SL(3,q); this is also why the field size q is
 ##  passed explicitly rather than being extracted from G.
+##  
+##      
 ##
 #############################################################################
 
@@ -72,7 +74,8 @@ end;
 # RECOG.FindSL2inSL3( G, q )
 #
 # Main entry point. Dispatches to SL3GoingDown_SmallQ for small odd q,
-# and to SL3GoingDown otherwise.
+# and to SL3GoingDown otherwise. Note that this function may falsely return 
+# a subgroup which is not isomorphic to SL(2,q).
 RECOG.FindSL2inSL3 := function(G, q)
     if q mod 2 = 0 then
         Error("RECOG.FindSL2inSL3: q must be odd");
