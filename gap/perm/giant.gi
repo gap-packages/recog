@@ -94,7 +94,7 @@ end;
 #F  NiceGeneratorsSn(<grp>,<N>) ...... find n-cycle, transposition
 ##
 ## For a permutation group grp on n points, this function returns either fail
-## or a list [ fullCycle, transp ] such that the following hold:
+## or a list [ transp, fullCycle ] such that the following hold:
 ## - n > 2.
 ## - fullCycle is an n-cycle.
 ## - transp is a transposition, i.e., a 2-cycle.
@@ -142,7 +142,7 @@ RECOG.NiceGeneratorsSn := function ( grp, N )
         if suppNew[1]^fullCycle = suppNew[2]
             or suppNew[2]^fullCycle = suppNew[1]
         then
-            return [ fullCycle, transp^rand ];
+            return [ transp^rand, fullCycle ];
         fi;
     od;
 
@@ -161,7 +161,7 @@ end;
 ## fullCycle^conj = (1,...,n) and transp^conj=(1,2).
 ## The permutation conj lies in SymmetricGroup(la) where la is the largest moved point
 ## of grp. However, conj need not lie in grp (e.g. if 1 is not a moved point of grp).
-RECOG.ConjEltSn :=  function( grp, fullCycle, transp )
+RECOG.ConjEltSn :=  function( grp, transp, fullCycle )
 
     local c,i,la,n,rest,pos1,nextPos,suppTransp,mp;
 
@@ -207,14 +207,14 @@ end;
 ##
 ##
 ## For a permutation group grp on n points, this function returns either fail
-## or a list [ longPerm, cyc3 ] such that the following hold:
+## or a list [ cyc3, longPerm ] such that the following hold:
 ## - n > 3 and n is even.
 ## - longPerm is the product of a 2-cycle and an (n-2)-cycle that are disjoint.
 ## - cyc3 is a 3-cycle.
 ## - The support of the 2-cycle in longPerm is contained in the support of cyc3.
 ##   In other words, longPerm = (1,2)(3,...,n) and cyc3=(1,2,3) up to renaming
 ##   the n points.
-## The conditions on [ longPerm, cyc3 ] imply that grp contains the full alternating
+## The conditions on [ cyc3, longPerm ] imply that grp contains the full alternating
 ## group on n points. Thus the function always returns fail if grp does not contain the
 ## full alternating group, and also if n <= 3.
 ## long, cyc3 are found by a random search, drawing at most N random
@@ -263,7 +263,7 @@ RECOG.NiceGeneratorsAnEven := function ( grp, N )
             fi;
             # Rename points so that fp=1, c=2, d=3, cycNm1=(2,...,n). Then
             # cyc3New = (1,2,3), cycNm1*cyc3New=(2,...,n)*(1,2,3)=(1,2)(3,...,n).
-            return [ cycNm1 * cyc3New, cyc3New ];
+            return [ cyc3New, cycNm1 * cyc3New ];
         fi;
     od;
     return fail;
@@ -275,14 +275,14 @@ end;
 ##
 ##
 ## For a permutation group grp on n points, this function returns either fail
-## or a list [ longCycle, shortCycle ] such that the following hold:
+## or a list [ shortCycle, longCycle ] such that the following hold:
 ## - n > 4 and n is odd.
 ## - longCycle is an (n-2)-cycle.
 ## - shortCycle is a 3-cycle.
 ## - The supports of longCycle and shortCycle intersect in a single point. In
 ##   other words, longCycle = (3,...,n) and shortCycle=(1,2,3) up to renaming
 ##   the n points.
-## The conditions on [ longCycle, shortCycle ] imply that grp contains the full alternating
+## The conditions on [ shortCycle, longCycle ] imply that grp contains the full alternating
 ## group on n points. Thus the function always returns fail if grp does not contain the
 ## full alternating group, and also if n <= 4.
 ## longCycle, shortCycle are found by a random search, drawing at most N random
@@ -355,7 +355,7 @@ RECOG.NiceGeneratorsAnOdd := function ( grp, N )
     if cyc3Cons <> fail then
         # cycN * cyc3Cons^2 = (1,...,n)*(p,p+2,p+1)=(1,...,p-1,p+2,p+3,...,n)
         # = (n-2)-cycle whose support intersects [p,p+1,p+2] in one point.
-        return [ cycN * cyc3Cons^2, cyc3Cons];
+        return [ cyc3Cons, cycN * cyc3Cons^2 ];
     else
         return fail;
     fi;
@@ -373,7 +373,7 @@ end;
 ## The permutation conj lies in SymmetricGroup(la) where la is the largest moved point
 ## of grp. However, conj need not lie in grp (e.g. if 1 is not a moved point of grp).
 
-RECOG.ConjEltAnEven := function( grp, longPerm, cyc3 )
+RECOG.ConjEltAnEven := function( grp, cyc3, longPerm )
     local c,i,la,n,rest,pos,s1,s1lo,supp3,mp,p1,p2,p3;
 
     mp := MovedPoints(grp);
@@ -439,7 +439,7 @@ end;
 ## The permutation conj lies in SymmetricGroup(la) where la is the largest moved point
 ## of grp. However, conj need not lie in grp (e.g. if 1 is not a moved point of grp).
 
-RECOG.ConjEltAnOdd := function( grp, longCycle, shortCycle )
+RECOG.ConjEltAnOdd := function( grp, shortCycle, longCycle )
     local c,compt,i,la,n,rest,pos,mp;
 
     mp := MovedPoints(grp);
@@ -485,8 +485,8 @@ end;
 ##    S_degree if stamp="Sn" and to A_degree if stamp="An"
 ##  - conjPerm: A permutation such that x -> x^conj is an isomorphism from grp to
 ##    S_degree or A_degree
-##  - gens: Nice generators of grp. That is, the images of the following permutations
-##    under the isomorphisms described above:
+##  - gens: Nice generators of grp. That is, a list the images of the following permutations
+##    under the isomorphisms described above, in the given order:
 ##    - (1,2), (1,...,degree) if stamp="Sn"
 ##    - (1,2,3), (1,2)(3,...,degree) if stamp="An" and degree is even
 ##    - (1,2,3), (3,...,degree) if stamp="An" and degree is odd
@@ -538,7 +538,7 @@ RECOG.RecogniseGiant :=  function( grp, eps )
     conj := conjFunc( grp, gens[1], gens[2] );
 
     return rec( stamp := grpName, degree := n,
-                gens := Reversed(gens),  conjperm := conj );
+                gens := gens,  conjperm := conj );
 end;
 
 
@@ -848,8 +848,6 @@ function(ri)
         return TemporaryFailure;
     fi;
     Setslptonice(ri, SLPOfElms(res.gens));
-    # Note that when putting the generators into the record, we reverse
-    # their order, such that it fits to the SLPforSn/SLPforAn function!
     Setslpforelement(ri,SLPforElementFuncsPerm.Giant);
     ri!.giantinfo := res;
     SetFilterObj(ri,IsLeaf);
