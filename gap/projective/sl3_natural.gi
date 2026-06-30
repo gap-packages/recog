@@ -6,9 +6,9 @@
 ##
 ##  Main function:  RECOG.FindSL2inSL3(G, q)
 ##
-##  Given G = SL(3,q) for an odd prime power q, finds an embedded copy of
-##  SL(2,q) inside G, using one of two strategies depending on the size
-##  of q (see comments below for details).
+##  Given G isomorphic to SL(3,q) for an odd prime power q, finds an
+##  embedded copy of SL(2,q) inside G, using one of two strategies 
+##  depending on the size of q (see comments below for details).
 ##
 ##  Note: G is only ever accessed via PseudoRandom, ProductReplacer, and
 ##  Order. Hence these functions work for G given as a black box
