@@ -22,7 +22,7 @@ gap> testFindSL2inSL4 := function(q)
 >   od;
 >   return true;
 > end;;
-gap> list := Filtered([3..100], q -> IsPrimePowerInt(q) and q mod 2 = 1);;
+gap> list := Filtered([3..100], q -> IsOddInt(q) and IsPrimePowerInt(q));;
 gap> for q in list do
 >   if not testFindSL2inSL4(q) then
 >     Print("FAILED for q = ", q, "\n");

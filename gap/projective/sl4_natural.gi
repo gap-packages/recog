@@ -9,7 +9,7 @@
 ##
 ##  This file provides the function:
 ##
-##    RECOG.GoingDownFinalStepSL(G, N)
+##    RECOG.FindSL2inSL4(G, N)
 ##
 ##  Purpose:
 ##    Given G = SL(4,q) (q odd), this function finds an embedded copy of
@@ -53,7 +53,7 @@
 
 
 RECOG.FindSL2inSL4 := function(G, N)
-    local n, F, q, one, Eigenspace, gens_group, gens_bas, l,
+    local n, F, q, one, gens_group, gens_bas, 
           pr, t, basis1, basism1, bas, basInv,
           h, hb, topLeft, bottomRight, ordr, K, slp, Nstart, U;
 
@@ -64,22 +64,12 @@ RECOG.FindSL2inSL4 := function(G, N)
     Nstart := N;
     slp := [];
 
-    if q <10 then
-        l := 3;
-    else 
-        l := 3;
-    fi;
-
     if n <> 4 then
-        Error("GoingDownFinalStepSL: <G> must act in dimension 4");
+        Error("FindSL2inSL4: <G> must act in dimension 4");
     fi;
     if q mod 2 = 0 then
-        Error("GoingDownFinalStepSL: q must be odd");
+        Error("FindSL2inSL4: q must be odd");
     fi;
-
-    Eigenspace := function(M, lambda)
-        return NullspaceMat(M - lambda * one);
-    end;
 
     pr := ProductReplacer(GeneratorsOfGroup(G));
 
@@ -89,19 +79,19 @@ RECOG.FindSL2inSL4 := function(G, N)
     while N > 0 do
         t := RECOG.InvolutionSearcher(pr, Order, 0);
         N := N - 1;
-        if t <> fail and Length(Eigenspace(t, One(F))) = 2 then
+        if t <> fail and Length(RECOG.FixspaceMat(t)) = 2 then
             break;
         fi;
         t := fail;
     od;
 
     if t = fail then
-        Print("GoingDownFinalStepSL: out of budget while looking for a strong pre-involution\n");
-        return "fail";
+        Print("FindSL2inSL4: out of budget while looking for a strong pre-involution\n");
+        return fail;
     fi;
 
-    basis1 := Eigenspace(t, One(F));
-    basism1 := Eigenspace(t, -One(F));
+    basis1 := RECOG.FixspaceMat(t);
+    basism1 := RECOG.EigenspaceMat(t, -One(F));
     basInv := Concatenation(basis1, basism1);
     bas := basInv^-1;
 
@@ -124,17 +114,11 @@ RECOG.FindSL2inSL4 := function(G, N)
         if topLeft^ordr <> IdentityMat(2, F) then
             Add(gens_bas, topLeft^ordr);
             Add(gens_group, h^ordr);
-            
-            # Wait until we have enough generators before testing,
-            # to avoid calling RecognizeGroup on trivial/cyclic groups.
-            if Size(gens_bas) >l then
-                K := Group(gens_bas);
-                # Non-constructive recognition: check whether the collected
-                # 2x2 generators already span SL(2,q).
-                if Size(RecognizeGroup(K)) = Size(SL(2, q)) then
-                    U := Group(gens_group);
-                    return rec(U := U, bas := bas, gens := gens_group, Nout := N);
-                fi;
+            # Non-constructive recognition: check whether the collected
+            # 2x2 generators already span SL(2,q).
+            if RECOG.IsThisSL2Natural(gens_bas,GF(q)) then
+                U := Group(gens_group);
+                return rec(U := U, bas := bas, gens := gens_group, Nout := N);
             fi;
         fi;
     od;
