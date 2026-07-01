@@ -1,5 +1,10 @@
 This file describes changes in the recog package.
 
+1.X.Y (2026-MM-DD)
+  - Implement extensions for SnAnUnknownDegree by Conder and Holt (PR #265)
+  - Fix a bug in the `C3C5` method, where recognizing certain subgroups of
+    e.g. SL(2,11) produced a failed recognition node (issue #503, PR #505)
+
 1.5.1 (2026-05-19)
   - Add a small workaround for compatibility with the matgrp package
 
