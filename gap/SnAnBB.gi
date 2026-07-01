@@ -309,6 +309,7 @@ RECOG.FindImageSn := function(ri, n, z, g, h, xis, xisl)
     return PermList(zim);
 end;
 
+# See [BLN+03], Lemma 5.3 and the paragraphs preceding it
 RECOG.ConstructXiAn := function( n, g, h )
     local a, c, xis, xisl, k, m, b, i, j, cyc5, cyc, cyc10,
           a1, b1, a2, b2, aux, a3, b3, anew;
