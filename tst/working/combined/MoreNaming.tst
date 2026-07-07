@@ -4,7 +4,9 @@
 # focused on testing exceptions.
 #
 gap> oldOrbInfoLevel:=InfoLevel(InfoOrb);;
+gap> oldRecogInfoLevel := InfoLevel(InfoRecog);;
 gap> SetInfoLevel(InfoOrb, 0); # silence `Have 37776 points` info messages
+gap> SetInfoLevel(InfoRecog, 0); # silence RecognizeGroup
 
 # Read some helper functions
 gap> ReadPackage("recog", "tst/naming.g");
@@ -719,7 +721,7 @@ gap> ri := RecogniseClassical(grp);;
 gap> ri.isSLContained;
 "unknown"
 gap> grp := ClassicalMaximals("L",7,5)[8];;
-gap> Size(grp);
+gap> Size(RecognizeGroup(grp));
 136717
 gap> ri := RecogniseClassical(grp);;
 gap> ri.isSLContained;
@@ -779,3 +781,4 @@ gap> ri.isSpContained;
 
 #
 gap> SetInfoLevel(InfoOrb, oldOrbInfoLevel);
+gap> SetInfoLevel(InfoOrb, oldRecogInfoLevel);
