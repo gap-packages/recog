@@ -9,7 +9,7 @@
 ##
 ##  This file provides the function:
 ##
-##    RECOG.FindSL2inSL4(G, N)
+##    RECOG.FindSL2inSL4_natural(G, N)
 ##
 ##  Purpose:
 ##    Given G = SL(4,q) (q odd), this function finds an embedded copy of
@@ -52,19 +52,19 @@
 #############################################################################
 
 
-RECOG.FindSL2inSL4 := function(G, N)
-    local n, F, q, one, gens_group, gens_bas, 
+RECOG.FindSL2inSL4_natural := function(G, N)
+    local F, q, one, gens_group, gens_bas, 
           pr, t, basis1, basism1, bas, basInv,
-          h, hb, topLeft, bottomRight, ordr, K, slp, Nstart, U;
+          h, hb, topLeft, bottomRight, ordr, ordu, K, Nstart,
+          U, readyqm1, readyqpl1, count, image, u;
 
-    n := DimensionOfMatrixGroup(G);
+    
     F := FieldOfMatrixGroup(G);
     q := Size(F);
-    one := IdentityMat(n, F);
+    one := IdentityMat(4, F);
     Nstart := N;
-    slp := [];
 
-    if n <> 4 then
+    if DimensionOfMatrixGroup(G) <> 4 then
         Error("FindSL2inSL4: <G> must act in dimension 4");
     fi;
     if q mod 2 = 0 then
@@ -75,22 +75,22 @@ RECOG.FindSL2inSL4 := function(G, N)
 
     # find a strong pre-involution: t = x^(|x|/2) of type 2+2.
     # RECOG.InvolutionSearcher(pr,ord,0) uses exactly one Next(pr).
-    t := fail;
     while N > 0 do
         t := RECOG.InvolutionSearcher(pr, Order, 0);
         N := N - 1;
-        if t <> fail and Length(RECOG.FixspaceMat(t)) = 2 then
-            break;
+        if t <> fail then
+            basis1 := RECOG.FixspaceMat(t); # note that RECOG.FixspaceMat works with elements with memory too
+            if Length(basis1) = 2 then
+                break;
+            fi;
         fi;
-        t := fail;
     od;
 
-    if t = fail then
-        Print("FindSL2inSL4: out of budget while looking for a strong pre-involution\n");
+    if N = 0 then
+        Info(InfoRecog, 2, "FindSL2inSL4: out of budget while looking for a strong pre-involution");
         return fail;
     fi;
 
-    basis1 := RECOG.FixspaceMat(t);
     basism1 := RECOG.EigenspaceMat(t, -One(F));
     basInv := Concatenation(basis1, basism1);
     bas := basInv^-1;
@@ -102,23 +102,34 @@ RECOG.FindSL2inSL4 := function(G, N)
         h := RECOG.CentralisingElementOfInvolution(pr, Order, t);
         N := N - 1;
 
-        # Conjugate h into the eigenbasis of t; in this basis C_G(t)
-        # is block-diagonal diag(A, B) with A,B in GL(2,q).
         hb := basInv * h * bas;
         topLeft := hb{[1,2]}{[1,2]};
         bottomRight := hb{[3,4]}{[3,4]};
 
-        # h^ordr kills the lower block (bottomRight^ordr = I_2) while
-        # potentially leaving a non-trivial upper block.
         ordr := Order(bottomRight);
-        if topLeft^ordr <> IdentityMat(2, F) then
-            Add(gens_bas, topLeft^ordr);
+        topLeft := topLeft^ordr;
+        if not IsOne(topLeft) then
+            Add(gens_bas, topLeft);
             Add(gens_group, h^ordr);
-            # Non-constructive recognition: check whether the collected
-            # 2x2 generators already span SL(2,q).
-            if RECOG.IsThisSL2Natural(gens_bas,GF(q)) then
-                U := Group(gens_group);
-                return rec(U := U, bas := bas, gens := gens_group, Nout := N);
+
+            # nur die letzten k Erzeuger zum Testen benutzen
+            if Length(gens_bas) > 2 then
+                image := Group(gens_bas);
+                readyqm1 := false;
+                readyqpl1 := false;
+                count := 0;
+                repeat
+                    u := PseudoRandom(image);
+                    ordu := Order(u);
+                    if ordu = q-1 then readyqm1 := true; fi;
+                    if ordu = q+1 then readyqpl1 := true; fi;
+                    count := count + 1;
+                until (readyqm1 and readyqpl1) or count = 20;
+
+                if readyqm1 and readyqpl1 then
+                    U := Group(gens_group);
+                    return rec(U := U, bas := bas, gens := gens_group, Nout := N);
+                fi;
             fi;
         fi;
     od;

@@ -4,7 +4,7 @@ gap> testFindSL2inSL4 := function(q)
 >   local G, res, h, hb, F;
 >   F := GF(q);
 >   G := SL(4, q);
->   res := RECOG.FindSL2inSL4(G, 2000);
+>   res := RECOG.FindSL2inSL4_natural(G, 2000);
 >   if res = fail then
 >     return false;
 >   fi;
