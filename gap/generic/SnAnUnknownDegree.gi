@@ -1255,6 +1255,13 @@ BindRecogMethod("FindHomMethodsGeneric", "SnAnUnknownDegree",
 function(ri)
     local recogData, isoData, degree, swapSLP, t;
 
+    # For matrix groups, run this method only after passing to the projective
+    # image. Otherwise hidden scalar kernels can make a non-projective group
+    # non-isomorphic to Sn/An while still looking like one modulo scalars.
+    if IsMatrixGroup(Grp(ri)) and not ri!.projective then
+        return NeverApplicable;
+    fi;
+
     # For matrix groups, our degree bounds assume irreducibility. Which
     # should normally be the case here, as the `ReducibleIso` recognition
     # method normally has a higher rank than this one and thus runs first.
