@@ -26,6 +26,17 @@ gap> for i in [1..50] do
 >     ri := RECOG.TestGroup(GL(8,27), false, Size(GL(8,27)));
 > od;
 
+# The following test used to run into an error because SLn_godownfromd
+# accepted eigenspace dimensions which did not include the expected
+# fixed-space dimension.
+gap> seed:=1;;
+gap> Reset(GlobalMersenneTwister, seed);;
+gap> Reset(GlobalRandomSource, seed);;
+gap> h := GL(6,8);;
+gap> gens := List([1..10], x -> PseudoRandom(h));;
+gap> g := GroupWithGenerators(gens);;
+gap> ri := RECOG.TestGroup(g, false, Size(h));;
+
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
 gap> STOP_TEST("bugfix.tst");

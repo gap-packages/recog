@@ -265,7 +265,7 @@ end;
 RECOG.SLn_godownfromd:=function(g,q,d,dim)
   local y,yy,ready,order,es,dims,subsp,z,x,a,b,c,h,vec,vec2,
   pol,factors,degrees,comm1,comm2,comm3,image,basis,action,vs,readyqpl1,
-  readyqm1,count,u,orderu;
+  readyqm1,count,u,orderu,expecteddims;
 
   repeat
     ready:=false;
@@ -283,7 +283,11 @@ RECOG.SLn_godownfromd:=function(g,q,d,dim)
        if not IsOne(yy) then
             es:= Eigenspaces(GF(q),yy);
             dims:=List(es,Dimension);
-            if IsSubset(Set([1,d-1,dim-d]),Set(dims)) and
+            # Since yy^(q-1)=1, yy is semisimple over GF(q).  We want
+            # one 1-space, one (d-1)-space, and the fixed outside space
+            # of dimension dim-d; the last one is absent when dim=d.
+            expecteddims:=Filtered([1,d-1,dim-d], x -> x > 0);
+            if AsSortedList(dims)=AsSortedList(expecteddims) and
                (1 in Set(dims)) then
                es:=Filtered(es,x->Dimension(x)=1);
                vec:=Basis(es[1])[1];
