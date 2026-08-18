@@ -476,7 +476,7 @@ end);
 InstallGlobalFunction( RecogniseGeneric,
   function(H, methoddb, depthString, knowledge)
     # Assume all the generators have no memory!
-    local N,depth,done,i,l,ll,allmethods,
+    local N,abort,depth,done,i,l,ll,allmethods,
           hint,
           proj1,proj2,ri,rifac,riker,s,x,y,z,h,succ,counter;
 
@@ -704,11 +704,13 @@ InstallGlobalFunction( RecogniseGeneric,
             for i in [1..Length(GeneratorsOfGroup( H ))] do
                 h := GeneratorsOfGroup( H )[i];
                 if SLPforElement(ri, h) = fail then
+                    abort := false;
                     x := ImageElm(Homom(ri), h);
                     if x <> fail then
                         s := SLPforElement(ImageRecogNode(ri), x);
                     else
                         s := fail;
+                        abort := true;
                     fi;
                     if s <> fail then
                         y := ResultOfStraightLineProgram(s, ri!.pregensfacwithmem);
@@ -720,9 +722,14 @@ InstallGlobalFunction( RecogniseGeneric,
                                  "Final verification found extra kernel ",
                                  "element (depth=", depth, ").");
                             done := false;
+                        else
+                            # This should be impossible: h should then have an SLP.
+                            abort := true;
                         fi;
+                    else
+                        abort := true;
                     fi;
-                    if done then
+                    if abort then
                         # NiceGens(ri) is too small, abort
                         if InfoLevel(InfoRecog) = 1 and depth = 0 then
                             Print("\n");
