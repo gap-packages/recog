@@ -14,6 +14,9 @@
 ##  Order. Hence these functions work for G given as a black box
 ##  group isomorphic to SL(3,q); this is also why the field size q is
 ##  passed explicitly rather than being extracted from G.
+##  Additionally, the output is a group that SHOULD be isomorphic to SL(2,q). 
+##  The probability that the function RECOG.FindSL2inSL3 succeeds is > 0.95 
+##  according to benchmarks.
 ##  
 ##      
 ##
@@ -27,20 +30,70 @@
 # and its derived subgroup is often isomorphic to SL(2,q). Here the
 # derived subgroup is approximated via random commutators.
 RECOG.SL3GoingDown := function(G, q)
-    local t, rand, u, s, list, x, y, i;
+    local t, rand, u, s, list, x, y, i, order, count, attempt,
+          isSL3, hasElementOfOrderQPlus1, hasElementOfOrderQMinus1,
+          ppds2, ppds3, p, foundSL2, MAX_ATTEMPTS, INNER_ATTEMPTS;
 
-    t := PseudoRandom(G)^(q+1);
-    rand := PseudoRandom(G);
-    u := Subgroup(G, [t, t^rand]);
+    MAX_ATTEMPTS := 20;
+    INNER_ATTEMPTS := 20;
 
-    list := [];
-    for i in [1 .. 10] do
-        x := PseudoRandom(u);
-        y := PseudoRandom(u);
-        Add(list, Comm(x, y));
-    od;
+    ppds3 := Factors(PrimitivePrimeDivisors(3, q).ppds);
 
-    s := Subgroup(G, list);
+    attempt := 0;
+    repeat
+        foundSL2 := false;
+        attempt := attempt + 1;
+
+        # Construct a candidate subgroup u, then approximate its derived
+        # subgroup s via random commutators.
+        t := PseudoRandom(G)^(q+1);
+        rand := PseudoRandom(G);
+        u := Subgroup(G, [t, t^rand]);
+
+        list := [];
+        for i in [1 .. 10] do
+            x := PseudoRandom(u);
+            y := PseudoRandom(u);
+            Add(list, Comm(x, y));
+        od;
+        s := Subgroup(G, list);
+
+        # Check (1): rule out that s is (isomorphic to) SL(3,q) rather
+        # than SL(2,q), by searching for an element whose order is
+        # divisible by a primitive prime divisor of q^3-1.
+        isSL3 := false;
+        count := 0;
+        repeat
+            count := count + 1;
+            order := Order(PseudoRandom(s));
+            for p in ppds3 do
+                if 0 = order mod p then
+                    isSL3 := true;
+                fi;
+            od;
+        until isSL3 or count > INNER_ATTEMPTS;
+
+        # Check (2): if s does not look like SL(3,q), look for elements
+        # of order q+1 and q-1, both of which occur in SL(2,q).
+        if not isSL3 then
+            hasElementOfOrderQPlus1 := false;
+            hasElementOfOrderQMinus1 := false;
+            count := 0;
+            repeat
+                count := count + 1;
+                order := Order(PseudoRandom(s));
+                if order = q + 1 then
+                    hasElementOfOrderQPlus1 := true;
+                elif order = q - 1 then
+                    hasElementOfOrderQMinus1 := true;
+                fi;
+                if hasElementOfOrderQPlus1 and hasElementOfOrderQMinus1 then 
+                    foundSL2 := true;
+                fi;
+            until foundSL2 or count > INNER_ATTEMPTS;
+        fi;
+
+    until foundSL2 or attempt > MAX_ATTEMPTS;
     return s;
 end;
 
@@ -77,6 +130,10 @@ end;
 # and to SL3GoingDown otherwise. Note that this function may falsely return 
 # a subgroup which is not isomorphic to SL(2,q).
 RECOG.FindSL2inSL3 := function(G, q)
+
+    if not IsPrimePowerInt(q) or q mod 2 = 0 then
+        Error("RECOG.FindSL2inSL3: <q> must be a prime power");
+    fi;
     if q mod 2 = 0 then
         Error("RECOG.FindSL2inSL3: q must be odd");
     fi;
