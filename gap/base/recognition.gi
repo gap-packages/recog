@@ -705,12 +705,10 @@ InstallGlobalFunction( RecogniseGeneric,
                 h := GeneratorsOfGroup( H )[i];
                 if SLPforElement(ri, h) = fail then
                     abort := false;
+                    s := fail;
                     x := ImageElm(Homom(ri), h);
                     if x <> fail then
-                        s := SLPforElement(ImageRecogNode(ri), x);
-                    else
-                        s := fail;
-                        abort := true;
+                        s := SLPforElement(ImageRecogNode(ri), x); # might return fail
                     fi;
                     if s <> fail then
                         y := ResultOfStraightLineProgram(s, ri!.pregensfacwithmem);
