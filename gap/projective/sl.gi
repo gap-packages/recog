@@ -265,7 +265,7 @@ end;
 RECOG.SLn_godownfromd:=function(g,q,d,dim)
   local y,yy,ready,order,es,dims,subsp,z,x,a,b,c,h,vec,vec2,
   pol,factors,degrees,comm1,comm2,comm3,image,basis,action,vs,readyqpl1,
-  readyqm1,count,u,orderu;
+  readyqm1,count,u,orderu,expecteddims;
 
   repeat
     ready:=false;
@@ -283,8 +283,11 @@ RECOG.SLn_godownfromd:=function(g,q,d,dim)
        if not IsOne(yy) then
             es:= Eigenspaces(GF(q),yy);
             dims:=List(es,Dimension);
-            if IsSubset(Set([1,d-1,dim-d]),Set(dims)) and
-               (1 in Set(dims)) then
+            # Since yy^(q-1)=1, yy is semisimple over GF(q).  We want
+            # one 1-space, one (d-1)-space, and the fixed outside space
+            # of dimension dim-d; the last one is absent when dim=d.
+            expecteddims:=Filtered([1,d-1,dim-d], x -> x > 0);
+            if AsSortedList(dims)=AsSortedList(expecteddims) then
                # yy is conjugated to diag(a,...,a,b,I_{dim-d}) with 
                # |a| = q-1 and b = a^(d-1).
                es:=Filtered(es,x->Dimension(x)=1);
@@ -304,7 +307,7 @@ RECOG.SLn_godownfromd:=function(g,q,d,dim)
                   comm2:=Comm(a,b);
                   comm3:=Comm(b,c);
                   # Given v in F_q^d with v*yy= b*v. Then (v*z)*x= v*z =: w.
-                  # Let u\in F_q^d. Note that yy is diagonizable, to verify the 
+                  # Let u \in F_q^d. Note that yy is diagonizable, to verify the 
                   # following just write u as lin. comb. of eigenvectors of yy (or x
                   # respectively). We have u*yy-a*u \in <v> and thus 
                   # w*yy = a*w +(w*yy-a*w) \in <w> + <v>. Therefore U*yy=U with
@@ -315,10 +318,9 @@ RECOG.SLn_godownfromd:=function(g,q,d,dim)
                   if comm1<>One(a) and comm2<>One(a) and
                     comm3<>One(a) and Comm(comm1,comm2)<>One(a) then
                     # The latter conditions check whether <a,b,c> is not abelean,
-                    # not metabelian, etc.. This combined with the checks below 
+                    # not metabelian, etc. This combined with the checks below 
                     # should be verifying that <a,b,c> is isomorphic to SL(2,q).
-                    # For a more detailed analysis, see Huppert (1967), 
-                    # Endliche Gruppen I, Chapter II, Section 8.
+                    # For a more detailed analysis, see Hup25 Chapter II, Section 8.
                     vec2:=vec*z;
                     vs:=VectorSpace(GF(q),[vec,vec2]);
                     basis:=Basis(vs);

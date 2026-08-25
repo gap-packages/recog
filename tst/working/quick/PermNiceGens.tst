@@ -14,12 +14,12 @@ gap> testNiceGeneratorsSn := function(grp)
 >      Display("NiceGeneratorsSn should return fail for n<=2");
 >    fi;
 >  elif niceGens <> fail then
->    fullCycle := niceGens[1];
->    transp := niceGens[2];
+>    fullCycle := niceGens[2];
+>    transp := niceGens[1];
 >    if Size(MovedPoints(transp)) <> 2 then
 >      Display("Second generator is not a transposition");
 >    fi;
->    cyclen1 := CycleStructurePerm(niceGens[1]);
+>    cyclen1 := CycleStructurePerm(fullCycle);
 >    for i in [1..m-2] do
 >      if IsBound(cyclen1[i]) then
 >        Display("First generator is not a full cycle");
@@ -30,7 +30,7 @@ gap> testNiceGeneratorsSn := function(grp)
 >    if not (x^fullCycle = y or y^fullCycle = x) then
 >      Display("Transposition does not interchange successive points of full cycle");
 >    fi;
->    conj := RECOG.ConjEltSn(grp, fullCycle, transp);
+>    conj := RECOG.ConjEltSn(grp, transp, fullCycle);
 >    if fullCycle^conj <> CycleFromList([1..m]) then
 >      Display("ConjEltSn does not behave as expected on full cycle");
 >    fi;
@@ -68,8 +68,8 @@ gap> testNiceGeneratorsAn := function(grp)
 >  fi;
 >  if niceGens <> fail then
 >    # Up to renaming points, the following permutations should be...
->    longPerm := niceGens[1]; # =(1,2)(3,...,m) for even m and =(3,...,m) for odd m
->    shortPerm := niceGens[2]; # =(1,2,3)
+>    longPerm := niceGens[2]; # =(1,2)(3,...,m) for even m and =(3,...,m) for odd m
+>    shortPerm := niceGens[1]; # =(1,2,3)
 >    cyclenShort := CycleStructurePerm(shortPerm);
 >    cyclenLong := CycleStructurePerm(longPerm);
 >    if ForAny(Union([1], [3..m]), i->IsBound(cyclenShort[i])) or cyclenShort[2] <> 1 then
@@ -82,7 +82,7 @@ gap> testNiceGeneratorsAn := function(grp)
 >      if Size(Intersection(MovedPoints(longPerm), MovedPoints(shortPerm))) <> 1 then
 >        Display("Supports of 3-cycle and (m-2)-cycle do not intersect in one point for m odd");
 >      fi;
->      conj := RECOG.ConjEltAnOdd(grp, longPerm, shortPerm);
+>      conj := RECOG.ConjEltAnOdd(grp, shortPerm, longPerm);
 >      if longPerm^conj <> CycleFromList([3..m]) or shortPerm^conj <> CycleFromList([1,2,3]) then
 >        Display("ConjEltAnOdd does not behave as expected");
 >      fi;
@@ -95,7 +95,7 @@ gap> testNiceGeneratorsAn := function(grp)
 >        Display(Concatenation("Support of 2-cycle in long permutation is not ",
 >                                "contained in support of short permutation"));
 >      fi;
->      conj := RECOG.ConjEltAnEven(grp, longPerm, shortPerm);
+>      conj := RECOG.ConjEltAnEven(grp, shortPerm, longPerm);
 >      if longPerm^conj <> CycleFromList([1,2])*CycleFromList([3..m]) then
 >        Display("ConjEltAnEven does not behave as expected on long permutation");
 >      fi;

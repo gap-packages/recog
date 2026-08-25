@@ -2434,7 +2434,7 @@ end;
 
 # Here comes the code linking all this to the recog package:
 #! @BeginChunk SLCR.FindHom
-#! Given two integers d and g and a group G which must be isomorphic to SL(d,q),
+#! Given two integers d and q and a group G which must be isomorphic to SL(d,q),
 #! this function recognises G constructively and stores the result in ri.
 #!
 #! TODO: find a better name.
