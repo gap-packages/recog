@@ -14,9 +14,9 @@ TestNaming := function(grpname, param...)
         isSUContained := false,
     );
 
-    if grpname = "SL" then
+    if grpname = "SL" or grpname = "GL" then
         expected.isSLContained := true;
-    elif grpname = "SO" then
+    elif grpname = "SO" or grpname = "GO" or grpname = "Omega" then
         if Length(param) = 2 and IsEvenInt(param[2]) then
             Assert(0, IsOddInt(param[1]));
             expected.isReducible := true;
@@ -25,7 +25,7 @@ TestNaming := function(grpname, param...)
         fi;
     elif grpname = "Sp" then
         expected.isSpContained := true;
-    elif grpname = "SU" then
+    elif grpname = "SU" or grpname = "GU" then
         expected.isSUContained := true;
     else
         Error("unsupported group type ", grpname);
