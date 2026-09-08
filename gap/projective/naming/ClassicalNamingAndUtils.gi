@@ -24,7 +24,7 @@
 ###
 ## Test whether n is a power of the prime p
 ##
-IsPowerOfPrime := function( n, p )
+RECOG.IsPowerOfPrime := function( n, p )
 
     local x;
 
@@ -60,7 +60,7 @@ RECOG.IsGenericParameters := function( recognise, grp )
         
     elif hint = "linear" and d = 3 then
         #q = 2^s-1
-        if IsPowerOfPrime( q+1, 2 ) then 
+        if RECOG.IsPowerOfPrime( q+1, 2 ) then 
             recognise.isGeneric := false;
         fi;
         return NeverApplicable;
@@ -444,7 +444,7 @@ RECOG.IsNotPSL := function (recognise, grp)
    if d = 3 then
        # q = 3*2^s-1 and q^2-1 has no large ppd.
        # TODO recheck this 
-       if (q = 2 or ((q+1) mod 3 = 0 and IsPowerOfPrime((q+1)/3,2))) then
+       if (q = 2 or ((q+1) mod 3 = 0 and RECOG.IsPowerOfPrime((q+1)/3,2))) then
             ord := Order(recognise.g);
             if (ord mod 8 <> 0 or (p^(2*a)-1) mod ord = 0) then
                 Info( InfoClassical, 2, "G' not PSL(2,7);");
@@ -1067,19 +1067,6 @@ RECOG.IsSOContained := function( recognise, grp )
 end;
 
 
-HasElementsMultipleOf := function(orders, ord )
-
-    local o;
-
-    for o in ord do
-       if PositionProperty(orders, i->(i mod o = 0 )) = fail then
-           return NeverApplicable;
-       fi;
-    od;
-
-    return Success;
-
-end;
 
 ############################################################################/
 ##
@@ -1226,19 +1213,19 @@ RECOG.NonGenericSymplectic := function(recognise, grp)
         if not HasElementsMultipleOf(recognise.orders, [13,15]) then
             return TemporaryFailure; 
         fi;
-    elif d = 4 and not IsPowerOfPrime(q+1,2) and not ((q+1) mod 3 = 0 and
-                   IsPowerOfPrime((q+1)/3, 2)) and q<>2 then
+    elif d = 4 and not RECOG.IsPowerOfPrime(q+1,2) and not ((q+1) mod 3 = 0 and
+                   RECOG.IsPowerOfPrime((q+1)/3, 2)) and q<>2 then
         if not 4 in recognise.LB then 
             return TemporaryFailure; 
         fi;
         if not 2 in  recognise.LS then return TemporaryFailure; fi;
-    elif d = 4  and q >= 7 and IsPowerOfPrime(q+1,2) then
+    elif d = 4  and q >= 7 and RECOG.IsPowerOfPrime(q+1,2) then
         if not 4 in recognise.LB then return TemporaryFailure; fi;
         if not HasElementsMultipleOf(recognise.orders, [4]) then
             return TemporaryFailure; 
         fi;
 
-    elif d = 4 and q >= 11 and IsPowerOfPrime((q+1)/3, 2) then
+    elif d = 4 and q >= 11 and RECOG.IsPowerOfPrime((q+1)/3, 2) then
         if not HasElementsMultipleOf(recognise.orders, [3,4]) then
             return TemporaryFailure; 
         fi;
@@ -1837,7 +1824,7 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
         if not HasElementsMultipleOf( recognise.orders, [5,9,19])  then
             return TemporaryFailure; 
         fi; 
-    elif d = 3 and q >=31 and IsPowerOfPrime(q+1,2) then 
+    elif d = 3 and q >=31 and RECOG.IsPowerOfPrime(q+1,2) then 
         s := LogInt(q+1,2);
         if PositionProperty(recognise.orders,
             i->(i > 2 and (q-1) mod i = 0))=fail then 
@@ -1848,7 +1835,7 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
             return TemporaryFailure; 
         fi; 
     elif d = 3 and q>11 and ((q+1) mod 3=0 and
-        IsPowerOfPrime((q+1)/3,2)) then 
+        RECOG.IsPowerOfPrime((q+1)/3,2)) then 
         # TO DO Check this in Magma
         s := LogInt( (q+1)/3, 2);
         if PositionProperty(recognise.orders, 
@@ -1859,8 +1846,8 @@ RECOG.NonGenericOrthogonalCircle := function( recognise, grp )
             i->(i > 2 and (q-1) mod i = 0))=fail then 
             return TemporaryFailure; 
         fi; 
-    elif d = 3 and ((q+1) mod 3 <> 0 or not IsPowerOfPrime((q+1)/3,2)) and
-                   not IsPowerOfPrime(q+1,2) then 
+    elif d = 3 and ((q+1) mod 3 <> 0 or not RECOG.IsPowerOfPrime((q+1)/3,2)) and
+                   not RECOG.IsPowerOfPrime(q+1,2) then 
         if not 2 in recognise.LB then return TemporaryFailure; fi;
         if PositionProperty(recognise.orders,
             i->(i > 2 and (q-1) mod i = 0))=fail then 
