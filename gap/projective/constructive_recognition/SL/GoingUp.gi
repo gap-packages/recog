@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Max Neunhöffer, Ákos Seress.
+##  This files's authors include Max Neunhöffer, Ákos Seress, Daniel Rademacher.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
 ##  to list here. Please refer to the COPYRIGHT file for details.
@@ -53,7 +53,7 @@ RECOG.SLn_UpStep := function(w)
     local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
           ci,cii,coeffs,flag,i,id,int1,int3,j,k,lambda,list,mat,newbas,newbasf,
           newbasfi,newbasi,newdim,newpart,perm,pivots,pivots2,pos,pow,s,sf,
-        slp,std,sum1,tf,trans,transd,transr,v,vals,zerovec;
+          slp,std,sum1,tf,trans,transd,transr,v,vals,zerovec,counter;
 
     Info(InfoRecog,3,"Going up: ",w.n," (",w.d,")...");
 
@@ -87,6 +87,7 @@ RECOG.SLn_UpStep := function(w)
             fi;
         od;
     od;
+
     Unbind(std);
 
     # Now we can define two helper functions:
@@ -98,22 +99,14 @@ RECOG.SLn_UpStep := function(w)
       if i = w.n then
           for k in [1..w.ext] do
               if not IsZero(coeffs[k]) then
-                if IsOne(coeffs[k]) then
-                    el := el * w.transh[(j-1)*w.ext+k];
-                else
                   el := el * w.transh[(j-1)*w.ext+k]^coeffs[k];
               fi;
-            fi;
           od;
       elif j = w.n then
           for k in [1..w.ext] do
               if not IsZero(coeffs[k]) then
-                if IsOne(coeffs[k]) then
-                    el := el * w.transv[(i-1)*w.ext+k];
-                else
                   el := el * w.transv[(i-1)*w.ext+k]^coeffs[k];
               fi;
-            fi;
           od;
       else
           ErrorNoReturn("either i or j must be equal to n");
@@ -128,22 +121,14 @@ RECOG.SLn_UpStep := function(w)
       if j = w.n then
           for k in [1..w.ext] do
               if not IsZero(coeffs[k]) then
-                if IsOne(coeffs[k]) then
-                    el := w.transv[(i-1)*w.ext+k] * el;
-                else
                   el := w.transv[(i-1)*w.ext+k]^coeffs[k] * el;
               fi;
-            fi;
           od;
       elif i = w.n then
           for k in [1..w.ext] do
               if not IsZero(coeffs[k]) then
-                if IsOne(coeffs[k]) then
-                    el := w.transh[(j-1)*w.ext+k] * el;
-                else
                   el := w.transh[(j-1)*w.ext+k]^coeffs[k] * el;
               fi;
-            fi;
           od;
       else
           ErrorNoReturn("either i or j must be equal to n");
@@ -159,21 +144,21 @@ RECOG.SLn_UpStep := function(w)
     FixSLn := VectorSpace(w.f,id{[w.n+1..w.d]});
     Vn := VectorSpace(w.f,id{[1..w.n]});
 
+    Info(InfoRecog,2,"Current dimension: ", w.n, "\n");
+    Info(InfoRecog,2,"Target dimension: ", Minimum(2*w.n-1,w.d), "\n");
+
+    ##
+    ## Step 1
+    ##
+
     # First pick an element in SL_n with fixed space of dimension d-n+1:
     # We already have an SLP for an n-1-cycle: it is one of the std gens.
     # For n=2 we use a transvection for this purpose.
     if w.n > 2 then
         if IsOddInt(w.n) then
-          if w.p > 2 then
-            s := id{Concatenation([1,w.n],[2..w.n-1],[w.n+1..w.d])};
-            ConvertToMatrixRepNC(s,w.f);
-            if IsOddInt(w.n) then s[2] := -s[2]; fi;
-            sf := w.slnstdf[2*w.ext+2];
-          else   # in even characteristic we take the n-cycle:
             s := id{Concatenation([w.n],[1..w.n-1],[w.n+1..w.d])};
             ConvertToMatrixRepNC(s,w.f);
             sf := w.slnstdf[2*w.ext+1];
-          fi;
         else
             ErrorNoReturn("this program only works for odd n or n=2");
         fi;
@@ -184,47 +169,84 @@ RECOG.SLn_UpStep := function(w)
         sf := w.slnstdf[1];
     fi;
 
+    Info(InfoRecog,2,"Step 1 done.");
+
     # Find a good random element:
     w.count := 0;
     aimdim := Minimum(2*w.n-1,w.d);
     newdim := aimdim - w.n;
     while true do   # will be left by break
-      while true do    # will be left by break
-          if InfoLevel(InfoRecog) >= 3 then Print(".\c"); fi;
+        Info(InfoRecog,2," SLn_UpStep: starting new round");
+
+        ##
+        ## Step 2
+        ##
+        counter := 0;
+        v := fail;
+        repeat
+            counter := counter + 1;
+            #if InfoLevel(InfoRecog) >= 3 then Print(".\c"); fi;
             w.count := w.count + 1;
             c1 := PseudoRandom(w.sld);
-          slp := SLPOfElm(c1);
-          c1f := ResultOfStraightLineProgram(slp,w.sldf);
+            
             # Do the base change into our basis:
-          c1 := w.bas * c1 * w.basi;
-          c := s^c1;
-          cf := sf^c1f;
-          cfi := cf^-1;
+            #c1 := w.bas * c1 * w.basi;
+            c := s^(w.bas * c1 * w.basi);
+            
+            # Check how these elements look like. Where is the SLP and what elements do we really use
+            
             # Now check that Vn + Vn*s^c1 has dimension 2n-1:
-          Vnc := VectorSpace(w.f,c{[1..w.n]});
-          sum1 := ClosureLeftModule(Vn,Vnc);
-          if Dimension(sum1) = aimdim then
-              Fixc := VectorSpace(w.f,RECOG.FixspaceMat(c));
-              int1 := Intersection(Fixc,Vn);
-              for i in [1..Dimension(int1)] do
-                  v := Basis(int1)[i];
-                  if not IsZero(v[w.n]) then break; fi;
-              od;
-              if IsZero(v[w.n]) then
+            sum1 := SumIntersectionMat(id{[1..w.n]}, c{[1..w.n]});
+            if Size(sum1[1]) = aimdim then
+                # intersect Fix(c) = Nullspace(c-id) with V_n in order to
+                # find a suitable vector which we can later to our basis
+                int1 := SumIntersectionMat(RECOG.FixspaceMat(c),id{[1..w.n]})[2];
+                v := First(int1, v -> not IsZero(v[w.n]));
+                if v = fail then
                     Info(InfoRecog,2,"Ooops: Component n was zero!");
-                  continue;
                 fi;
+
+                # TODO: if aimdim = 2*w.n-1 then actually at this point sum1[2] = [v] = int1
+                # which we should use to avoid one more gaussian elimination.
+                # When aimdim = w.d < 2*w.n - 1 then sum1[2] will be too big and then
+                # we do need to do something here. But we can do better than SumIntersectionMat,
+                # something like this should do it:    RECOG.FixspaceMat(id{[1..w.n]}*c)*id{[1..w.n]}
+                if aimdim < w.d then
+                    Assert(0, sum1[2] = int1);
+                    Assert(0, v = fail or sum1[2] = [v]);
+                else
+                    # TODO: the following multiplication is an expensive way of adding
+                    # zero columns ...
+                    Assert(0, RREF(int1) = RREF(RECOG.FixspaceMat(c{[1..w.n]})*id{[1..w.n]}));
+                fi;
+            fi;
+        until v <> fail;
+        Info(InfoRecog,2," SLn_UpStep: found good conjugate after ", counter, " tries");
+
         v := v / v[w.n];   # normalize to 1 in position n
         Assert(1,v*c=v);
+
+        # now that we have our c and c1, compute some associated
+        # values for later use
         ci := c^-1;
-              break;
-          fi;
-      od;
+        slp := SLPOfElm(c1);
+        c1f := ResultOfStraightLineProgram(slp,w.sldf);
+        cf := sf^c1f;
+        cfi := cf^-1;
+        
+        Info(InfoRecog,2,"Step 2 done.");
+
+        ##
+        ## Steps 3 and 4
+        ##
 
         # Now we found our aimdim-dimensional space W. Since SL_n
         # has a d-n-dimensional fixed space W_{d-n} and W contains a complement
         # of that fixed space, the intersection of W and W_{d-n} has dimension
         # newdim.
+# TODO: but that alone does not mean that we have enough vectors in there to
+# be able to extend a basis of V_n + V_n*c  to a basis of V...
+# .... and I think this is why we run into the "Ooops, Fixc intersected" message down below... ???
 
         # Change basis:
         newpart := ExtractSubMatrix(c,[1..w.n-1],[1..w.d]);
@@ -245,12 +267,18 @@ RECOG.SLn_UpStep := function(w)
         newpart := newpart{pivots};
         newbas := Concatenation(id{[1..w.n-1]},[v],newpart);
         if 2*w.n-1 < w.d then
-          int3 := Intersection(FixSLn,Fixc);
-          if Dimension(int3) <> w.d-2*w.n+1 then
+            
+#            if w.n > 3 then Error("breakpoint"); fi;
+
+            # intersect Fix(c) with F_{d-n}
+            int3 := SumIntersectionMat(RECOG.FixspaceMat(c),id{[w.n+1..w.d]})[2];
+#            Assert(0, int3 = RECOG.FixspaceMat(c{[w.n+1..w.d]})*id{[w.n+1..w.d]});
+            if Size(int3) <> w.d - aimdim then
+
                 Info(InfoRecog,2,"Ooops, FixSLn \cap Fixc wrong dimension");
                 continue;
             fi;
-          Append(newbas,BasisVectors(Basis(int3)));
+            Append(newbas,int3);
         fi;
         ConvertToMatrixRep(newbas,w.f);
         newbasi := newbas^-1;
@@ -258,6 +286,7 @@ RECOG.SLn_UpStep := function(w)
             Info(InfoRecog,2,"Ooops, Fixc intersected too much, we try again");
             continue;
         fi;
+        
         ci := newbas * ci * newbasi;
         cii := ExtractSubMatrix(ci,[w.n+1..aimdim],[1..w.n-1]);
         ConvertToMatrixRep(cii,w.f);
@@ -276,22 +305,28 @@ RECOG.SLn_UpStep := function(w)
             i := i + 1;
         od;
         if Length(pivots2) = newdim then
-          cii := cii{pivots2}^-1;
-          ConvertToMatrixRep(cii,w.f);
-          c := newbas * c * newbasi;
-          w.bas := newbas * w.bas;
-          w.basi := w.basi * newbasi;
             break;
         fi;
         Info(InfoRecog,2,"Ooops, no nice bottom...");
         # Otherwise simply try again
     od;
+
+    cii := cii{pivots2}^-1;
+    ConvertToMatrixRep(cii,w.f);
+    c := newbas * c * newbasi;
+    w.bas := newbas * w.bas;
+    w.basi := w.basi * newbasi;
+
+
     Info(InfoRecog,2," found c1 and c.");
     # Now SL_n has to be repaired according to the base change newbas:
 
     # Now write this matrix newbas as an SLP in the standard generators
     # of our SL_n. Then we know which generators to take for our new
     # standard generators, namely newbas^-1 * std * newbas.
+
+# TODO: why do we do this?????
+
     newbasf := w.One;
     for i in [1..w.n-1] do
         if not IsZero(v[i]) then
@@ -303,6 +338,12 @@ RECOG.SLn_UpStep := function(w)
     # Now update caches:
     w.transh := List(w.transh,x->newbasfi * x * newbasf);
     w.transv := List(w.transv,x->newbasfi * x * newbasf);
+
+    Info(InfoRecog,2,"Step 3 and 4 done");
+
+    ##
+    ## Step 5
+    ##
 
     # Now consider the transvections t_i:
     # t_i : w.bas[j] -> w.bas[j]        for j <> i and
@@ -335,17 +376,20 @@ RECOG.SLn_UpStep := function(w)
             for j in [1..w.ext * newdim] do
                 pow := IntFFE(vals[j]);
                 if not IsZero(pow) then
-                  if IsOne(pow) then
-                      tf := tf * trans[j];
-                  else
                     tf := tf * trans[j]^pow;
                 fi;
-              fi;
             od;
             Add(transd,tf);
         od;
     od;
+# TODO: trans consists of fake gens, for debugging I'd like to see the *real* matrices for once...
     Unbind(trans);
+
+    Info(InfoRecog,2,"Step 5 done");
+
+    ##
+    ## Step 6
+    ##
 
     # Now to the "horizontal" transvections, first create them as SLPs:
     transr := [];
@@ -364,37 +408,38 @@ RECOG.SLn_UpStep := function(w)
             coeffs := IntVecFFE(Coefficients(w.can,-ci[w.n+j,w.n]));
             for k in [1..w.ext] do
                 if not IsZero(coeffs[k]) then
-                  if IsOne(coeffs[k]) then
-                      tf := transd[(j-1)*w.ext + k] * tf;
-                  else
                     tf := transd[(j-1)*w.ext + k]^coeffs[k] * tf;
                 fi;
-              fi;
             od;
         od;
+        
         # Now cleanup column n above row n:
         for j in [1..w.n-1] do
             tf := DoColOp_n(tf,j,w.n,ci[j,w.n],w);
         od;
+        
         # Now cleanup row n left of column n:
         for j in [1..w.n-1] do
             tf := DoRowOp_n(tf,w.n,j,-c[i,j],w);
         od;
+        
         # Now cleanup column n below row n:
         for j in [1..newdim] do
             coeffs := IntVecFFE(Coefficients(w.can,ci[w.n+j,w.n]));
             for k in [1..w.ext] do
                 if not IsZero(coeffs[k]) then
-                  if IsOne(coeffs[k]) then
-                      tf := tf * transd[(j-1)*w.ext + k];
-                  else
                     tf := tf * transd[(j-1)*w.ext + k]^coeffs[k];
                 fi;
-              fi;
             od;
         od;
         Add(transr,tf);
     od;
+
+    Info(InfoRecog,2,"Step 6 done");
+
+    ##
+    ## Step 7
+    ##
 
     # From here on we distinguish three cases:
     #   * w.n = 2
@@ -407,6 +452,7 @@ RECOG.SLn_UpStep := function(w)
         Unbind(w.transh);
         Unbind(w.transv);
         w.n := 3;
+        Info(InfoRecog,2,"Step 7 done");
         return w;
     fi;
     # We can finish off:
@@ -426,7 +472,7 @@ RECOG.SLn_UpStep := function(w)
                 tf:=transd[(i-1)*w.ext+1]^-1*transr[i]*transd[(i-1)*w.ext+1]^-1;
             fi;
             s := s * tf;
-          flag := not flag;
+            flag := not(flag);
         od;
 
         # Finally put together the new 2n-1-cycle and 2n-2-cycle:
@@ -436,6 +482,7 @@ RECOG.SLn_UpStep := function(w)
         Unbind(w.transv);
         Unbind(w.transh);
         w.n := aimdim;
+        Info(InfoRecog,2,"Step 7 done");
         return w;
     fi;
 
@@ -456,7 +503,7 @@ RECOG.SLn_UpStep := function(w)
             tf := transd[(i-1)*w.ext+1]^-1*transr[i]*transd[(i-1)*w.ext+1]^-1;
         fi;
         s := s * tf;
-      flag := not flag;
+        flag := not(flag);
     od;
 
     # Finally put together the new 2n-1-cycle and 2n-2-cycle:
@@ -477,5 +524,7 @@ RECOG.SLn_UpStep := function(w)
     od;
     Append(w.transv,transd);
     w.n := 2*w.n-1;
+
+    Info(InfoRecog,2,"Step 7 done");
     return w;
 end;
