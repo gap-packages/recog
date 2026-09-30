@@ -9,5 +9,9 @@ FlushCaches(  );
 Reset(GlobalRandomSource, 1);
 Reset( GlobalMersenneTwister, 1 );
 
-TestDirectory(DirectoriesPackageLibrary("recog", "tst/working"), rec(exitGAP := true));
+TestDirectory(
+    Concatenation(DirectoriesPackageLibrary("recog", "tst/working"),
+                  DirectoriesPackageLibrary("recog", "tst/bugfix")),
+    rec(exitGAP := true)
+);
 FORCE_QUIT_GAP(1);
