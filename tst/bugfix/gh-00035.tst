@@ -1,13 +1,6 @@
-#
-gap> START_TEST("bugfix.tst");
+gap> START_TEST("gh-00035.tst");
 gap> oldInfoLevel := InfoLevel(InfoRecog);;
 gap> SetInfoLevel(InfoRecog, 0);
-
-# Issue #11.
-gap> G1 := Group(Z(3)^0 * [ [[1,0,0],[0,1,0],[0,0,-1]], [[1,-1,-1],[0,0,1],[0,-1,0]] ]);;
-gap> for i in [1..50] do
->     ri := RECOG.TestGroup(G1, false, 72);
-> od;
 
 # The following test used to run into an error
 # See https://github.com/gap-packages/recog/issues/35
@@ -18,25 +11,6 @@ gap> Reset(GlobalRandomSource, seedRS);;
 gap> G:=ClassicalMaximals("L",3,3)[4];;
 gap> ri:=RECOG.TestGroup(G, false, 24);;
 
-# Issue #37
-gap> for i in [1..50] do
->     ri := RECOG.TestGroup(GL(9,5), false, Size(GL(9,5)));
-> od;
-gap> for i in [1..50] do
->     ri := RECOG.TestGroup(GL(8,27), false, Size(GL(8,27)));
-> od;
-
-# The following test used to run into an error because SLn_godownfromd
-# accepted eigenspace dimensions which did not include the expected
-# fixed-space dimension.
-gap> seed:=1;;
-gap> Reset(GlobalMersenneTwister, seed);;
-gap> Reset(GlobalRandomSource, seed);;
-gap> h := GL(6,8);;
-gap> gens := List([1..10], x -> PseudoRandom(h));;
-gap> g := GroupWithGenerators(gens);;
-gap> ri := RECOG.TestGroup(g, false, Size(h));;
-
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
-gap> STOP_TEST("bugfix.tst");
+gap> STOP_TEST("gh-00035.tst");
