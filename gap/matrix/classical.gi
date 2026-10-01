@@ -64,6 +64,74 @@ BindGlobal( "FindHomMethodsClassical", rec() );
 # Test whether <n> (assumed integer) is a power of 2
 IsPowerOfTwo := n -> IsInt(n) and n > 1 and 2 ^ Log2Int(n) = n;
 
+# Use the current random element g to rule out that the group preserves,
+# up to scalars, a bilinear form (maybeDual) or a sesquilinear form
+# (maybeFrobenius). If g preserves a form up to the scalar lambda, then g^-1
+# is similar to lambda^-1 * g, respectively to lambda^-1 * g^sigma for the
+# field automorphism sigma of order 2. So for the coefficients c_i of the
+# characteristic polynomial of g
+#
+#     c_0 * c_(d-i) = lambda^i * c_i     (with c_(d-i)^sigma for sesquilinear)
+#
+#     trace(g) = lambda * trace(g^-1)    (with trace(g)^sigma for sesquilinear)
+#
+# Nonzero traces determine lambda, and the identities are checked with it.
+# Otherwise the identities only determine lambda^i0, where i0 is the gcd of
+# q-1 and the exponents i with c_i (and hence c_(d-i)) nonzero, and
+# consistency with that is checked instead.
+RECOG.RuleOutFormsByCharPoly := function(recognise)
+    local d, q, c, I, a, tM, tMi, qq, l, consistent;
+
+    d := recognise.d;
+    q := recognise.q;
+    c := CoefficientsOfUnivariatePolynomial(recognise.cpol);
+    I := Filtered([0 .. d], i -> not IsZero(c[i+1]));
+    tM := Trace(recognise.g);
+    tMi := Trace(recognise.g^-1);
+
+    # traces vanish together; nonzero coefficients occur in pairs i, d-i
+    if IsZero(tM) <> IsZero(tMi) or Reversed(d - I) <> I then
+        recognise.maybeDual := false;
+        recognise.maybeFrobenius := false;
+        return;
+    fi;
+
+    # Test whether l[k] = lambda^I[k] for all k, where tr = lambda * tri
+    # determines lambda if nonzero
+    consistent := function(l, tr, tri)
+        local Iq, t, i0, lambda;
+
+        if IsZero(tr) then
+            # lambda^(q-1) = 1, so q-1 may join the gcd without a factor in l
+            Iq := Concatenation(I, [q - 1]);
+            t := GcdRepresentation(Iq);
+            i0 := Iq * t;
+            lambda := Product([1 .. Length(I)], k -> l[k]^t[k]); # = lambda^i0
+        else
+            i0 := 1;  # lambda is known exactly, not just lambda^i0
+            lambda := tr / tri;
+        fi;
+        return ForAll([1 .. Length(I)], k -> l[k] = lambda^(I[k] / i0));
+    end;
+
+    a := c[1];
+
+    if recognise.maybeDual then
+        l := List(I, i -> a * c[d-i+1] / c[i+1]);
+        if not consistent(l, tM, tMi) then
+            recognise.maybeDual := false;
+        fi;
+    fi;
+
+    if recognise.maybeFrobenius then
+        qq := recognise.p^(recognise.a / 2);
+        l := List(I, i -> a * c[d-i+1]^qq / c[i+1]);
+        if not consistent(l, tM^qq, tMi) then
+            recognise.maybeFrobenius := false;
+        fi;
+    fi;
+end;
+
 
 # Check if m > 5 and the order of a basic lppd(d,q;e) element
 
@@ -1002,7 +1070,7 @@ BindRecogMethod("FindHomMethodsClassical", "NoClassicalForms",
 "tests whether we can rule out certain forms",
 function(recognise)
     local d,field;
-    PossibleClassicalForms( recognise.grp, recognise.g, recognise );
+    RECOG.RuleOutFormsByCharPoly(recognise);
 
     d := recognise.d;
     field := recognise.field;
