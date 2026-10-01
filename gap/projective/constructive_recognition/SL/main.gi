@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Max Neunhöffer, Ákos Seress.
+##  This files's authors include Max Neunhöffer, Ákos Seress, Daniel Rademacher.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
 ##  to list here. Please refer to the COPYRIGHT file for details.
@@ -23,7 +23,6 @@
 
 
 
-# TODO: which algorithm is this? reference?
 RECOG.FindStdGens_SL := function(sld)
   # gens of sld must be gens for SL(d,q) in its natural rep with memory
   # This function calls RECOG.SLn_constructsl2 and then extends
@@ -46,7 +45,11 @@ RECOG.FindStdGens_SL := function(sld)
 
   # First find an SL2 with the space it acts on:
   Info(InfoRecog,2,"Finding an SL2...");
+  Info(InfoRecog,2,"-----");
+  Info(InfoRecog,2,"Start of the GoingDown Algorithm.");
   data := RECOG.SLn_constructsl2(sld,d,q);
+  Info(InfoRecog,2,"The GoingDown Algorithm was successful.");
+  Info(InfoRecog,2,"-----");
 
   bas := ShallowCopy(BasisVectors(Basis(data[2])));
   sl2 := data[1];
@@ -56,8 +59,10 @@ RECOG.FindStdGens_SL := function(sld)
   b := Basis(V,bas);
   sl2genss := List(sl2gens,x->RECOG.LinearAction(b,f,x));
 
+  Info(InfoRecog,2,"-----");
+  Info(InfoRecog,2,"Solving the base case");
   if q in [2,3,4,5,9] then
-      Info(InfoRecog,2,"In fact found an SL4...");
+      Info(InfoRecog,2,"Small q=",q,", searching for SL4 instead...");
       stdgens := RECOG.MakeSL_StdGens(p,ext,4,4).all;
       slpsl2std := RECOG.FindStdGensUsingBSGS(Group(sl2genss),stdgens,
                                               false,false);
@@ -89,9 +94,11 @@ RECOG.FindStdGens_SL := function(sld)
       ConvertToMatrixRep(bas,q);
       basi := bas^-1;
   fi;
+  Info(InfoRecog,2,"Finished the base case.");
+  Info(InfoRecog,2,"-----");
 
   # Now set up fake generators for keeping track what we do:
-  fakegens := ListWithIdenticalEntries(Length(GeneratorsOfGroup(sld)),1);
+  fakegens := ListWithIdenticalEntries(Length(GeneratorsOfGroup(sld)),());
   fakegens := GeneratorsWithMemory(fakegens);
   sl2gensf := ResultOfStraightLineProgram(slptosl2,fakegens);
   sl2stdf := ResultOfStraightLineProgram(slpsl2std,sl2gensf);
@@ -99,9 +106,13 @@ RECOG.FindStdGens_SL := function(sld)
               sld := sld, sldf := fakegens, slnstdf := sl2stdf,
               p := p, ext := ext );
   Info(InfoRecog,2,"Going up to SL_d again...");
+  Info(InfoRecog,2,"-----");
+  Info(InfoRecog,2,"Start of the GoingUp Algorithm");
   while std.n < std.d do
       RECOG.SLn_UpStep(std);
   od;
+  Info(InfoRecog,2,"The GoingUp Algorithm was successful.");
+  Info(InfoRecog,2,"-----");
   return rec( slpstd := SLPOfElms(std.slnstdf),
               bas := std.bas, basi := std.basi );
 end;

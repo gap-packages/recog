@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Max Neunhöffer, Ákos Seress.
+##  This files's authors include Max Neunhöffer, Ákos Seress, Daniel Rademacher.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
 ##  to list here. Please refer to the COPYRIGHT file for details.
@@ -23,98 +23,12 @@
 
 
 
-# The going down method:
+# TODO: Work on comments and documentation
 
-#Version 1.2
 
-# finds first element of a list that is relative prime to all others
-# input: list=[SL(d,q), d, q, SL(n,q)] acting as a subgroup of some big SL(n,q)
-# output: list=[rr, dd] for a ppd(2*dd;q)-element rr
-RECOG.SLn_godown:=function(list)
-  local d, first, q, g, gg, i, r, pol, factors, degrees, newdim, power, rr, ss,
-  newgroup, colldegrees, exp, count;
 
-  first:=function(list)
-  local i;
-
-  for i in [1..Length(list)] do
-      if list[i]>1 and Gcd(list[i],Product(list)/list[i])=1 then
-         return list[i];
-      fi;
-  od;
-
-  return fail;
-  end;
-
-  g:=list[1];
-  d:=list[2];
-  q:=list[3];
-  gg:=list[4];
-
-  Info(InfoRecog,2,"Dimension: ",d);
-  #find an element with irreducible action of relative prime dimension to
-  #all other invariant subspaces
-  #count is just safety, if things go very bad
-  count:=0;
-
-  repeat
-     count:=count+1;
-  if InfoLevel(InfoRecog) >= 3 then Print(".\c"); fi;
-     r:=PseudoRandom(g);
-     pol:=CharacteristicPolynomial(r);
-     factors:=Factors(pol);
-     degrees:=AsSortedList(List(factors,Degree));
-     newdim:=first(degrees);
-  until (count>10) or (newdim <> fail and newdim<=Maximum(2,d/4));
-
-  if count>10 then
-     return fail;
-  fi;
-
-  # raise r to a power so that acting trivially outside one invariant subspace
-  degrees:=Filtered(degrees, x->x<>newdim);
-  colldegrees:=Collected(degrees);
-  power:=Lcm(List(degrees, x->q^x-1))*q;
-  # power further to cancel q-part of element order
-  if degrees[1]=1 then
-     exp:=colldegrees[1][2]-(DimensionOfMatrixGroup(gg)-d);
-     if exp>0 then
-       power:=power*q^exp;
-     fi;
-  fi;
-  rr:=r^power;
-
-  #conjugate rr to hopefully get a smaller dimensional SL
-  #ss:=rr^PseudoRandom(gg);
-  #newgroup:=Group(rr,ss);
-
-  return [rr,newdim];
-end;
-
-# input is (group,dimension,q)
-# output is a group element acting irreducibly in two dimensions, and fixing
-# a (dimension-2)-dimensional subspace
-RECOG.SLn_constructppd2:=function(g,dim,q)
-  local out, list ;
-
-  list:=[g,dim,q,g];
-  repeat
-     out:=RECOG.SLn_godown(list);
-     if out=fail or out[1]*out[1]=One(out[1]) then
-        if InfoLevel(InfoRecog) >= 3 then Print("B\c"); fi;
-        list:=[g,dim,q,g];
-        out:=fail;
-     else
-        if out[2]>2 then
-           list:=[Group(out[1],out[1]^PseudoRandom(g)),2*out[2],q,g];
-        fi;
-     fi;
-  until out<>fail and out[2]=2;
-
-  return out[1];
-
-end;
-
+# Find random element s = r^PseudRandom(g) such that <r,s> is isomorphic to SL(4,q)
+# and check whether they are isomorphic
 RECOG.SLn_constructsl4:=function(g,dim,q,r)
   local s,h,count,readydim4,readydim3,ready,u,orderu,
         nullr,nulls,nullspacer,nullspaces,int,intbasis,nullintbasis,
@@ -149,6 +63,9 @@ RECOG.SLn_constructsl4:=function(g,dim,q,r)
     #shortr, shorts do not need memory
     #we shall throw away the computations in h
     #check that we have SL(4,q), by non-constructive recognition
+    
+    # Remark D.R.: Tries to reduce matrix multiplications
+    #               by working with 4 dimensional matrices
     shortr:=newr{[dim-3..dim]}{[dim-3..dim]};
     shorts:=news{[dim-3..dim]}{[dim-3..dim]};
     h:=Group(shortr,shorts);
@@ -254,6 +171,7 @@ RECOG.SLn_godownfromd:=function(g,q,d,dim)
 
   h:=Group(a,b,c);
   subsp:=VectorSpace(GF(q),[vec,vec2]);
+  Info(InfoRecog,2,"New Dimension: 2");
   return [h,subsp];
 
 end;
@@ -276,6 +194,7 @@ RECOG.SLn_exceptionalgodown:=function(h,q,dim)
      od;
      basis:=ShallowCopy(SemiEchelonMat(basis).vectors);
   until Length(basis)=4;
+  Info(InfoRecog,2,"New Dimension: 2");
   return [h,VectorSpace(GF(q),basis)];
 end;
 
@@ -283,12 +202,17 @@ end;
 RECOG.SLn_constructsl2:=function(g,d,q)
   local r,h;
 
-  r:=RECOG.SLn_constructppd2(g,d,q);
-  h:=RECOG.SLn_constructsl4(g,d,q,r);
+  r := RECOG.constructppdTwoStingray(g,d,q,"SL",fail);
+  Info(InfoRecog,2,"Finished main GoingDown, i.e. we found a stringray element which operates irreducible on a 2 dimensional subspace. \n");
+  Info(InfoRecog,2,"Next goal: Find an random element s.t. the two elements generate SL(4,q). \n");
+  h := RECOG.SLn_constructsl4(g,d,q,r);
+  # Remark D.R.: at this point we know that h is isomorphic to SL(4,q)
+  Info(InfoRecog,2,"Succesful. ");
+  Info(InfoRecog,2,"Current Dimension: 4\n");
+  Info(InfoRecog,2,"Next goal: Generate SL(2,q). \n");
   if not (q in [2,3,4,5,9]) then
      return RECOG.SLn_godownfromd(h,q,4,d);
   else
      return RECOG.SLn_exceptionalgodown(h,q,d);
-  #   return ["sorry only SL(4,q)",h];
   fi;
 end;
