@@ -1,128 +1,147 @@
 This file describes changes in the recog package.
 
-1.X.Y (2026-MM-DD)
-  - Implement extensions for SnAnUnknownDegree by Conder and Holt (PR #265)
-  - Fix a bug in the `C3C5` method, where recognizing certain subgroups of
-    e.g. SL(2,11) produced a failed recognition node (issue #503, PR #505)
-  - Fix `RecogniseClassical` frequently returning "unknown" for SL(d,q)
-    with large q, because the characteristic polynomial test almost never
-    ruled out an invariant form (issue #492, PR #496)
+## Unreleased
 
-1.5.1 (2026-05-19)
-  - Add a small workaround for compatibility with the matgrp package
+- Implement extensions for SnAnUnknownDegree by Conder and Holt (PR #265)
+- Fix a bug in the `C3C5` method, where recognizing certain subgroups of
+  e.g. SL(2,11) produced a failed recognition node (issue #503, PR #505)
+- Fix `RecogniseClassical` frequently returning "unknown" for SL(d,q)
+  with large q, because the characteristic polynomial test almost never
+  ruled out an invariant form (issue #492, PR #496)
 
-1.5.0 (2026-05-19)
-  - Add a first `StdPresentation` implementation (needs further tuning)
-  - Implement verification via a new property `IsCorrect`
-  - Countless bug fixes and other improvements, too many to list individually
+## 1.5.1 (2026-05-19)
 
-1.4.4 (2025-01-22)
-  - Fix an unexpected error during recognition when trying to split
-    group as direct products (in `RECOG.DirectFactorsFinder`)
-  - Fix an unexpected error in `RECOG.SmallHomomorphicImageProjectiveGroup`
-  - Fix an unexpected error in the C6 recognition code (a call to
-    `ConvertToMatrixRep` was missing)
-  - Remove left-over debug message which sometimes printed "With 2" or
-    similar messages during recognition
+- Add a small workaround for compatibility with the matgrp package
 
-1.4.3 (2024-10-16)
-  - Stop overriding the system library function `MTX.InvariantBilinearForm`
-    with an old version (this was meant to fix a bug in GAP but has been
-    unnecessary for a couple years, and now impedes improvements for this
-    function in GAP)
-  - Various internal and janitorial changes
+## 1.5.0 (2026-05-19)
 
-1.4.2 (2022-09-27)
-  - Fix more compatibility issues with matgrp <= 0.70
-  - Rename `order` to `OrderFunc` to avoid clashes with existing code
-  - Speed up default test suite
+- Add a first `StdPresentation` implementation (needs further tuning)
+- Implement verification via a new property `IsCorrect`
+- Countless bug fixes and other improvements, too many to list individually
 
-1.4.1 (2022-09-26)
-  - Fix compatibility with matgrp <= 0.70
+## 1.4.4 (2025-01-22)
 
-1.4.0 (2022-09-26)
-  - A huge number of changes (over 388 commits since the previous release)
-    were made, with many bug fixes and improvements, but also renamed APIs
-    and more. Unfortunately this may break some code using recog. If this
-    happens to, you, please let us know about it via our issue tracker
-    <https://github.com/gap-packages/recog/issues> or by sending and email
-    to Max Horn <mhorn@rptu.de>.
+- Fix an unexpected error during recognition when trying to split
+  group as direct products (in `RECOG.DirectFactorsFinder`)
+- Fix an unexpected error in `RECOG.SmallHomomorphicImageProjectiveGroup`
+- Fix an unexpected error in the C6 recognition code (a call to
+  `ConvertToMatrixRep` was missing)
+- Remove left-over debug message which sometimes printed "With 2" or
+  similar messages during recognition
 
-1.3.2 (2019-04-15)
-  - Many janitorial changes
+## 1.4.3 (2024-10-16)
 
-1.3.1 (2018-09-18)
-  - Fix some test cases
-  - Disable more dead code
-  - More minor changes
+- Stop overriding the system library function `MTX.InvariantBilinearForm`
+  with an old version (this was meant to fix a bug in GAP but has been
+  unnecessary for a couple years, and now impedes improvements for this
+  function in GAP)
+- Various internal and janitorial changes
 
-1.3 (2018-09-16)
-  - Requires GAP >= 4.9
-  - Merge the recogbase package into recog
-  - Remove tons of unused code & files
-  - Add many comments throughout the codebase (e.g. notes on the origin
-    of some algorithms; FIXME and TODO remarks; ...)
-  - Fix many bugs in the recognition code leading to errors or incorrect recognitions
-  - Replace involution finder for SL_2 in even characteristic (faster & less buggy)
-  - Add more tests
-  - Set up continuous integration using Travis CI, to ensure new code changes
-    are immediately tested for regressions
-  - Introduce self-explanatory names for recognition method results
-    (true -> Success, false -> NeverApplicable, fail -> TemporaryFailure,
-    NotApplicable -> NotEnoughInformation); this revealed various bugs where
-    the wrong values were returned
-  - Refactor CallMethods, to make it easier to understand and work on
-  - Improve the documentation; in particular, the tables of recognition methods
-    with their rankings are now generated from the code, and thus are always
-    up-to-date (previously, they were from that)
-  - Add Randomize methods for non-compressed vectors to support fields with more than 256 elements (fixes issue #15)
-  - Many other small changes, cleanups, etc.
+## 1.4.2 (2022-09-27)
 
-1.2.5 (2016-03-08)
-  - Maintenance release
+- Fix more compatibility issues with matgrp <= 0.70
+- Rename `order` to `OrderFunc` to avoid clashes with existing code
+- Speed up default test suite
 
-1.2.4 (2016-01-07)
-  - Fix bugs with handling of scalars in projective matrix groups (see issues #2 and #4)
-  - Fix misdetection of SL(2,q), odd q (see issue #3)
-  - Fix bug leading to "Error: Group() called with empty list of generators" (see issue #5)
-  - Workaround for problem with L2(31) (see issue #6)
-  - Fix endless loop when recognizing GL(2,q) with q <= 32 (see issue #9)
-  - Detect if DoHintedLowIndex runs into an infinite loop
-  - Add various source code comments
-  - Move FindKernelLowerLeftPGroup from recogbase to recog
-  - Move website to https://gap-packages.github.io/recog/
-  - Update documentation
-  - Splits some large source files into multiple
-  - Remove lots of unused code and files
-  - Remove GAP 4.4 compatibility code
+## 1.4.1 (2022-09-26)
 
-1.2.3 (2014-09-24)
-  - Update Max Neunhöffer's contact data
-  - Use AutoDoc to generate title page of the manual from PackageInfo.g
-  - Remove Ákos' contact data
-  - Add Max Horn as a maintainer
+- Fix compatibility with matgrp <= 0.70
 
-1.2.2 (2014-04-04)
-  - Previous release had an invalid release date in
-    PackageInfo.g (2014-04-31 instead of 2014-03-31).
-  - Merge HISTORY and CHANGES files.
+## 1.4.0 (2022-09-26)
 
-1.2.1 (2014-03-31)
-  - Move package repository and website to GitHub
+- A huge number of changes (over 388 commits since the previous release)
+  were made, with many bug fixes and improvements, but also renamed APIs
+  and more. Unfortunately this may break some code using recog. If this
+  happens to, you, please let us know about it via our issue tracker
+  <https://github.com/gap-packages/recog/issues> or by sending and email
+  to Max Horn <mhorn@rptu.de>.
 
-1.2 (2012-05-28)
-  - ???
+## 1.3.2 (2019-04-15)
 
-1.1 (2011-07-29)
-  - Fixed some bugs in nonconstructive classical natural recognition.
-  - Added method for known stabilizer chain.
-  - Adapt to forms package.
-  - Fixed global namespace polution.
-  - Fixed too lazy generation of kernel.
-  - New SL_n natural rep method.
-  - Note IsSimpleGroup and IsAlmostSimpleGroup whenever known.
-  - Guarantee that StabilizerChain leaf method has a faithful
-    action on the first orbit.
+- Many janitorial changes
 
-1.0 (2009-11-05)
-  - Initial release
+## 1.3.1 (2018-09-18)
+
+- Fix some test cases
+- Disable more dead code
+- More minor changes
+
+## 1.3 (2018-09-16)
+
+- Requires GAP >= 4.9
+- Merge the recogbase package into recog
+- Remove tons of unused code & files
+- Add many comments throughout the codebase (e.g. notes on the origin
+  of some algorithms; FIXME and TODO remarks; ...)
+- Fix many bugs in the recognition code leading to errors or incorrect recognitions
+- Replace involution finder for SL_2 in even characteristic (faster & less buggy)
+- Add more tests
+- Set up continuous integration using Travis CI, to ensure new code changes
+  are immediately tested for regressions
+- Introduce self-explanatory names for recognition method results
+  (true -> Success, false -> NeverApplicable, fail -> TemporaryFailure,
+  NotApplicable -> NotEnoughInformation); this revealed various bugs where
+  the wrong values were returned
+- Refactor CallMethods, to make it easier to understand and work on
+- Improve the documentation; in particular, the tables of recognition methods
+  with their rankings are now generated from the code, and thus are always
+  up-to-date (previously, they were from that)
+- Add Randomize methods for non-compressed vectors to support fields with more than 256 elements (fixes issue #15)
+- Many other small changes, cleanups, etc.
+
+## 1.2.5 (2016-03-08)
+
+- Maintenance release
+
+## 1.2.4 (2016-01-07)
+
+- Fix bugs with handling of scalars in projective matrix groups (see issues #2 and #4)
+- Fix misdetection of SL(2,q), odd q (see issue #3)
+- Fix bug leading to "Error: Group() called with empty list of generators" (see issue #5)
+- Workaround for problem with L2(31) (see issue #6)
+- Fix endless loop when recognizing GL(2,q) with q <= 32 (see issue #9)
+- Detect if DoHintedLowIndex runs into an infinite loop
+- Add various source code comments
+- Move FindKernelLowerLeftPGroup from recogbase to recog
+- Move website to https://gap-packages.github.io/recog/
+- Update documentation
+- Splits some large source files into multiple
+- Remove lots of unused code and files
+- Remove GAP 4.4 compatibility code
+
+## 1.2.3 (2014-09-24)
+
+- Update Max Neunhöffer's contact data
+- Use AutoDoc to generate title page of the manual from PackageInfo.g
+- Remove Ákos' contact data
+- Add Max Horn as a maintainer
+
+## 1.2.2 (2014-04-04)
+
+- Previous release had an invalid release date in
+  PackageInfo.g (2014-04-31 instead of 2014-03-31).
+- Merge HISTORY and CHANGES files.
+
+## 1.2.1 (2014-03-31)
+
+- Move package repository and website to GitHub
+
+## 1.2 (2012-05-28)
+
+- ???
+
+## 1.1 (2011-07-29)
+
+- Fixed some bugs in nonconstructive classical natural recognition.
+- Added method for known stabilizer chain.
+- Adapt to forms package.
+- Fixed global namespace polution.
+- Fixed too lazy generation of kernel.
+- New SL_n natural rep method.
+- Note IsSimpleGroup and IsAlmostSimpleGroup whenever known.
+- Guarantee that StabilizerChain leaf method has a faithful
+  action on the first orbit.
+
+## 1.0 (2009-11-05)
+
+- Initial release
