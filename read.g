@@ -55,6 +55,7 @@ ReadPackage("recog","gap/projective/almostsimple/lietype.gi");
 ReadPackage("recog","gap/projective/almostsimple/hints.gi");
 ReadPackage("recog","gap/projective/classicalnatural.gi");
 ReadPackage("recog","gap/projective/sl2_natural.gi");
+ReadPackage("recog","gap/projective/sl3_natural.gi");
 ReadPackage("recog","gap/projective/sl.gi");
 ReadPackage("recog","gap/projective/AnSnOnFDPM.gi");
 
