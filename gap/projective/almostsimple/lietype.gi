@@ -140,12 +140,12 @@ RECOG.VerifyOrders := function (type, n, q, orders)
           maxprime := LargestPrimeOccurs (q^(n/2)+1, orders) and
                       LargestPrimeOccurs (q^(n/2)-1, orders);
       fi;
-  elif type = "O^+" and n = 8 and q = 2 then
+  elif type = "O+" and n = 8 and q = 2 then
       allowed := Set([ 7, 8, 9, 10, 12, 15 ]);
       maxprime := 8 in orders and 15 in orders;
-  elif type = "O^+" and n = 10 and q = 2 then
+  elif type = "O+" and n = 10 and q = 2 then
       allowed := Set([ 18, 24, 31, 42, 45, 51, 60]);
-  elif type = "O^-" then
+  elif type = "O-" then
       maxprime := LargestPrimeOccurs (q^(n/2)+1, orders) and
                   LargestPrimeOccurs (q^(n/2 -1)-1, orders);
   elif type = "2B" then
@@ -422,7 +422,7 @@ RECOG.OPlus82vsS62 := function (G, orders, SampleSize)
     prob := prob[1];
 #"prob is ", prob;
     if AbsoluteValue (1/5 - prob) < AbsoluteValue (1/15 - prob) then
-        return RECOG.VerifyOrders ("O^+",8, 2, orders );
+        return RECOG.VerifyOrders ("O+",8, 2, orders );
     else
         return RECOG.VerifyOrders ("S",6, 2, orders );
     fi;
@@ -436,7 +436,7 @@ RECOG.OPlus83vsO73vsSP63 := function (G, orders, SampleSize)
     orders := temp[2];
     prob := prob[1];
     if AbsoluteValue (3/20 - prob) < AbsoluteValue (1/20 - prob) then
-        return "O^+_8(3)";
+        return "O+8(3)";
     else
         return RECOG.DistinguishSpO (G, 3, 3, 1, orders);
     fi;
@@ -451,7 +451,7 @@ RECOG.OPlus8vsO7vsSP6 := function (G, orders, p, e, SampleSize)
        o := RECOG.LieTypeOrderFunc (g);
        list := RECOG.ComputeArtin (o, p);
        if IsSubset(list, [e, 2 * e, 4 * e]) then
-           return RECOG.VerifyOrders ("O^+",8, p^e , orders);
+           return RECOG.VerifyOrders ("O+",8, p^e , orders);
        fi;
    od;
    if p = 2 then
@@ -475,7 +475,7 @@ RECOG.OMinus8vsSPvsO := function (G, v1, p, e, orders, SampleSize, NmrTrials)
 #"prob is ", prob;
         prob := prob[1];
         if prob >= 1/5 - epsilon and prob < 1/4 + epsilon then
-            return RECOG.VerifyOrders ("O^-",8, p^(v1/8), orders);
+            return RECOG.VerifyOrders ("O-",8, p^(v1/8), orders);
         elif prob >= 1/10 - epsilon and prob < 1/8 + epsilon then
             if p = 2 then
                 return RECOG.VerifyOrders ("S",8, 2^e, orders);
@@ -785,7 +785,7 @@ RECOG.LieType := function (G, p, orders, Nmr)
    orders := Union(orders, orders2);
    if m mod 2 = 0 then
       if [m * e, (m + 2) * e] in combs then
-          return RECOG.VerifyOrders ("O^+", 2 * m + 2, p^e, orders);
+          return RECOG.VerifyOrders ("O+", 2 * m + 2, p^e, orders);
       elif m = 4 then
          return RECOG.OMinus8vsSPvsO(G,v1,p,e,orders,RECOG.LieTypeSampleSize,
                                      RECOG.LieTypeNmrTrials);
@@ -797,11 +797,11 @@ RECOG.LieType := function (G, p, orders, Nmr)
                return RECOG.DistinguishSpO (G, m, p, e, orders);
             fi;
          else
-            return RECOG.VerifyOrders ("O^-", 2*m, p^e, orders);
+            return RECOG.VerifyOrders ("O-", 2*m, p^e, orders);
          fi;
       fi;  # m even
    elif [(m - 1) * e, (m + 3) * e] in combs then
-      return RECOG.VerifyOrders ("O^+", 2 * m + 2, p^e, orders);
+      return RECOG.VerifyOrders ("O+", 2 * m + 2, p^e, orders);
    elif [(m - 1) * e, (m + 1) * e] in combs then
       if p = 2 then
          return RECOG.VerifyOrders ("S", 2 * m, 2^e, orders);
@@ -809,7 +809,7 @@ RECOG.LieType := function (G, p, orders, Nmr)
       # p <> 2 case
       return RECOG.DistinguishSpO (G, m, p, e, orders);
    else
-      return RECOG.VerifyOrders ("O^-", 2 * m, p^e, orders);
+      return RECOG.VerifyOrders ("O-", 2 * m, p^e, orders);
    fi;
 
    return "RO_undecided";
