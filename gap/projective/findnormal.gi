@@ -334,24 +334,13 @@ BindGlobal( "FINDEVENNORMALOPTS", rec(
 #   return res;
 # end );
 
-# All powers that can be done with at most 5 multiplications/inversion:
-RECOG.MYRANDOMSUBPRODUCTPOWERS :=
-  [1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,20,24,32,
-   -1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-12,-16];
-  # (without undue and unimplemented tricks)!
-
 RECOG.RandomSubproduct := function(a,opt)
-    local allone,dopowers,g,isone,power,prod,rs;
+    local allone,g,isone,prod,rs;
 
     if IsBound(opt.RandomSource) then
         rs := opt.RandomSource;
     else
         rs := GlobalMersenneTwister;
-    fi;
-    if IsBound(opt.DoPowers) then
-        dopowers := opt.DoPowers;
-    else
-        dopowers := false;
     fi;
     if IsBound(opt.IsOne) then
         isone := opt.IsOne;
@@ -366,15 +355,10 @@ RECOG.RandomSubproduct := function(a,opt)
             if not isone(g) then
                 allone := false;
                 if Random( rs, [ true, false ] )  then
-                    if dopowers then
-                        power := Random(rs,RECOG.RANDOMSUBPRODUCTPOWERS);
-                    else
-                        power := 1;
-                    fi;
                     if Random( rs, [ true, false ] )  then
-                        prod := prod * g^power;
+                        prod := prod * g;
                     else
-                        prod := g^power * prod;
+                        prod := g * prod;
                     fi;
                 fi;
             fi;
