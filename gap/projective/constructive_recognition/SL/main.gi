@@ -81,7 +81,7 @@ RECOG.FindStdGens_SL := function(sld)
   fi;
 
   # Now set up fake generators for keeping track what we do:
-  fakegens := ListWithIdenticalEntries(Length(GeneratorsOfGroup(sld)),1);
+  fakegens := ListWithIdenticalEntries(Length(GeneratorsOfGroup(sld)),());
   fakegens := GeneratorsWithMemory(fakegens);
   sl2gensf := ResultOfStraightLineProgram(slptosl2,fakegens);
   sl2stdf := ResultOfStraightLineProgram(slpsl2std,sl2gensf);
