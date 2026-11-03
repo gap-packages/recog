@@ -652,12 +652,14 @@ RECOG.IsThisSL2Natural := function(gens,f)
 
   q := Size(f);
   p := Characteristic(f);
-  # For small q, compute the order of the group via a stabilizer chain.
+  # For small q the certificate below is unavailable, so decide it outright.
+  # Adjoining the scalars first makes this the same question the q > 11 case
+  # answers, namely whether the group contains SL(2,q) modulo scalars.
   if q <= 11 then    # this could be increased if needed
       Info(InfoRecog,4,"SL2: Computing stabiliser chain.");
-      S := StabilizerChain(Group(gens));
+      S := ClosureGroup(Group(gens), Z(q) * One(gens[1]));
       Info(InfoRecog,4,"SL2: size is ",Size(S));
-      return Size(S) = (q*(q-1)*(q+1));
+      return IsSubset(S, SL(2,q));
   fi;
 
   seenqp1 := false;
