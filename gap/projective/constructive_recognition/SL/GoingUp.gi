@@ -49,7 +49,8 @@ RECOG.SLn_UpStep := function(w)
         newbasfi,newbasi,newdim,newpart,perm,pivots,pivots2,pos,pow,s,sf,
         slp,std,sum1,tf,trans,transd,transr,v,vals,zerovec;
 
-  Info(InfoRecog,3,"Going up: ",w.n," (",w.d,")...");
+  Info(InfoClassicalNatural,2,"  SL_n GoingUp: degree ",w.n," -> ",
+       Minimum(2*w.n-1,w.d));
 
   # Before we begin, we upgrade the data structure with a few internal
   # things:
@@ -161,7 +162,7 @@ RECOG.SLn_UpStep := function(w)
   newdim := aimdim - w.n;
   while true do   # will be left by break
       while true do    # will be left by break
-          if InfoLevel(InfoRecog) >= 3 then Print(".\c"); fi;
+          if InfoLevel(InfoClassicalNatural) >= 3 then Print(".\c"); fi;
           w.count := w.count + 1;
           c1 := PseudoRandom(w.sld);
           slp := SLPOfElm(c1);
@@ -182,7 +183,7 @@ RECOG.SLn_UpStep := function(w)
                   if not IsZero(v[w.n]) then break; fi;
               od;
               if IsZero(v[w.n]) then
-                  Info(InfoRecog,2,"Ooops: Component n was zero!");
+                  Info(InfoClassicalNatural,3,"    SL_n GoingUp: fixed vector has n-th coordinate 0, retry");
                   continue;
               fi;
               v := v / v[w.n];   # normalize to 1 in position n
@@ -218,7 +219,7 @@ RECOG.SLn_UpStep := function(w)
       if 2*w.n-1 < w.d then
           int3 := Intersection(FixSLn,Fixc);
           if Dimension(int3) <> w.d-2*w.n+1 then
-              Info(InfoRecog,2,"Ooops, FixSLn \\cap Fixc wrong dimension");
+              Info(InfoClassicalNatural,3,"    SL_n GoingUp: FixSLn \\cap Fixc has the wrong dimension, retry");
               continue;
           fi;
           Append(newbas,BasisVectors(Basis(int3)));
@@ -226,7 +227,7 @@ RECOG.SLn_UpStep := function(w)
       ConvertToMatrixRep(newbas,w.f);
       newbasi := newbas^-1;
       if newbasi = fail then
-          Info(InfoRecog,2,"Ooops, Fixc intersected too much, we try again");
+          Info(InfoClassicalNatural,3,"    SL_n GoingUp: new basis is singular, retry");
           continue;
       fi;
       ci := newbas * ci * newbasi;
@@ -254,10 +255,10 @@ RECOG.SLn_UpStep := function(w)
           w.basi := w.basi * newbasi;
           break;
       fi;
-      Info(InfoRecog,2,"Ooops, no nice bottom...");
+      Info(InfoClassicalNatural,3,"    SL_n GoingUp: no nice bottom, retry");
       # Otherwise simply try again
   od;
-  Info(InfoRecog,2," found c1 and c.");
+  Info(InfoClassicalNatural,2,"  SL_n GoingUp: found c, tries: ",w.count);
   # Now SL_n has to be repaired according to the base change newbas:
 
   # Now write this matrix newbas as an SLP in the standard generators

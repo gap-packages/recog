@@ -13,6 +13,11 @@
 ##
 #############################################################################
 
+# For the constructive recognition of classical groups in their natural
+# representation: level 1 reports the phases, 2 each step, 3 each rejected
+# random element.
+DeclareInfoClass( "InfoClassicalNatural" );
+
 RECOG.LinearAction := function(bas,field,el)
   local mat,vecs;
   if IsGroup(el) then
