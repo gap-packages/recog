@@ -326,6 +326,7 @@ RECOG.SLn_UpStep := function(w)
       for j in [1..w.n-1] do
           tf := DoRowOp_n(tf,j,w.n,-ci[j,w.n],w);
       od;
+
       # Now cleanup in rows below row n:
       for j in [1..newdim] do
           coeffs := IntVecFFE(Coefficients(w.can,-ci[w.n+j,w.n]));
@@ -335,14 +336,17 @@ RECOG.SLn_UpStep := function(w)
               fi;
           od;
       od;
+
       # Now cleanup column n above row n:
       for j in [1..w.n-1] do
           tf := DoColOp_n(tf,j,w.n,ci[j,w.n],w);
       od;
+
       # Now cleanup row n left of column n:
       for j in [1..w.n-1] do
           tf := DoRowOp_n(tf,w.n,j,-c[i,j],w);
       od;
+
       # Now cleanup column n below row n:
       for j in [1..newdim] do
           coeffs := IntVecFFE(Coefficients(w.can,ci[w.n+j,w.n]));
