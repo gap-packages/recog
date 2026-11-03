@@ -56,9 +56,11 @@ ReadPackage("recog","gap/projective/almostsimple/hints.gi");
 ReadPackage("recog","gap/projective/classicalnatural.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/utils/utils.gi");
 ReadPackage("recog","gap/projective/blackbox/blackboxClassical.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/SL/BaseCase.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/SL/GoingDown.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/SL/GoingUp.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/SL/main.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/SL/sl2_BlackBox.gi");
 ReadPackage("recog","gap/projective/sl2_natural.gi");
 ReadPackage("recog","gap/projective/AnSnOnFDPM.gi");
 
