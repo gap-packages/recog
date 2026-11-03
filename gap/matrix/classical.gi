@@ -2640,8 +2640,11 @@ function(recognise)
         return NeverApplicable;
     fi;
 
-    # h^2 must be a ppd(2,q;2)-element; if it is not, ask for another h
-    if not Order(h^2) in Factors(q^2-1) or Order(h^2) in Factors(q-1) then
+    # h^2 must be a ppd(2,q;2)-element, i.e. its order must be divisible by a
+    # prime dividing q^2-1 but not q-1; only then does the centraliser
+    # argument below place G inside the normaliser of a Singer torus
+    if not ForAny(Set(Factors(q^2-1)),
+                  r -> (q-1) mod r <> 0 and Order(h^2) mod r = 0) then
         recognise.h := fail;
         recognise.needPOrders := true;
         return TemporaryFailure;
