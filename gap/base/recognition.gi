@@ -863,6 +863,17 @@ InstallGlobalFunction( SLPforElementGeneric,
     return s;
   end);
 
+InstallGlobalFunction( CalcStdPresentationFromRelationsSLP,
+  function(ri)
+    local slp, numGens, F, rels;
+    slp := RelationsSLP(ri);
+    numGens := NrInputsOfStraightLineProgram(slp);
+    F := FreeGroup(numGens);
+    rels := ResultOfStraightLineProgram(slp, GeneratorsOfGroup(F));
+    return F / rels;
+   end
+);
+
 InstallGlobalFunction( CalcStdPresentationGenericLeaf,
   # generic (and bad!) method for a leaf node
   function(ri)
