@@ -138,25 +138,18 @@ RECOG.SLn_UpStep := function(w)
   Vn := VectorSpace(w.f,id{[1..w.n]});
 
   # First pick an element in SL_n with fixed space of dimension d-n+1:
-  # We already have an SLP for an n-1-cycle: it is one of the std gens.
+  # We already have an SLP for an n-cycle: it is one of the std gens.
   # For n=2 we use a transvection for this purpose.
   if w.n > 2 then
       if IsOddInt(w.n) then
-          if w.p > 2 then
-            s := id{Concatenation([1,w.n],[2..w.n-1],[w.n+1..w.d])};
-            ConvertToMatrixRepNC(s,w.f);
-            if IsOddInt(w.n) then s[2] := -s[2]; fi;
-            sf := w.slnstdf[2*w.ext+2];
-          else   # in even characteristic we take the n-cycle:
-            s := id{Concatenation([w.n],[1..w.n-1],[w.n+1..w.d])};
-            ConvertToMatrixRepNC(s,w.f);
-            sf := w.slnstdf[2*w.ext+1];
-          fi;
+          s := id{Concatenation([w.n],[1..w.n-1],[w.n+1..w.d])};
+          ConvertToMatrixRepNC(s,w.f);
+          sf := w.slnstdf[2*w.ext+1];
       else
           ErrorNoReturn("this program only works for odd n or n=2");
       fi;
   else
-      # In this case the n-1-cycle is the identity, so we take a transvection:
+      # A transvection fixes a line of V_2, as required:
       s := MutableCopyMat(id);
       s[1,2] := One(w.f);
       sf := w.slnstdf[1];
