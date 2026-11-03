@@ -53,6 +53,41 @@ local baseSum, module;
     return MTX.IsIrreducible(module);
 end;
 
+# Two random elements of <product> whose blocks r1, relative to <newbasis>,
+# satisfy <detectFun>, powered so that they act trivially on the blocks r2.
+RECOG.ConstructSmallSub := function(r1, r2, product, newbasis, detectFun)
+    local gens, pseudoorderlist, Hsub, productEle, ele, ele2, H, cord1, cord2;
+
+    gens := [];
+    pseudoorderlist := [];
+    Hsub := [];
+    repeat
+        productEle := PseudoRandom(product);
+        Add(Hsub, productEle);
+        ele := (productEle)^(newbasis^(-1));
+        ele2 := ele{r2}{r2};
+        ele := ele{r1}{r1};
+        Add(pseudoorderlist, RECOG.EstimateOrder(ele2)[1]);
+        Add(gens,ele);
+    until Size(gens) = 2;
+    H := GroupByGenerators(gens);
+    if detectFun(H) = true then
+        cord1 := Order(gens[1]);
+        cord2 := Order(gens[2]);
+        if (Gcd(cord1,pseudoorderlist[1]) <> pseudoorderlist[1]) and (Gcd(cord2,pseudoorderlist[2]) <> pseudoorderlist[2]) then
+            gens[1] := gens[1]^pseudoorderlist[1];
+            gens[2] := gens[2]^pseudoorderlist[2];
+            H := GroupByGenerators(gens);
+            if detectFun(H) = true then
+                Hsub[1] := Hsub[1]^pseudoorderlist[1];
+                Hsub[2] := Hsub[2]^pseudoorderlist[2];
+                return [Hsub,H,newbasis];
+            fi;
+        fi;
+    fi;
+    return fail;
+end;
+
 # Whether a root of the irreducible factor <irrfact>, of degree <k>, of a
 # characteristic polynomial over GF(p^f) has order divisible by a
 # primitive prime divisor of p^(f*k)-1.
