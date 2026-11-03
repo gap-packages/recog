@@ -525,7 +525,7 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
               o := opt.Order(z);
               if IsEvenInt(o) then
                   z := z^(o/2);
-                  if AddList(centinvols,z^(o/2)) then
+                  if AddList(centinvols,z) then
                       UseElement(z);
                       if blindr.isknownproper then
                       if InfoLevel(InfoRecog_FindEvenNormal)>=3 then Print("\n"); fi;
