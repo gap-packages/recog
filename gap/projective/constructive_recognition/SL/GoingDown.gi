@@ -24,7 +24,6 @@
 
 
 # The going down method:
-
 #Version 1.2
 
 # finds first element of a list that is relative prime to all others
