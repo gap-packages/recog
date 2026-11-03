@@ -1061,9 +1061,185 @@ InstallGlobalFunction( CalcStdPresentationGenericNonLeaf,
   end);
 
 InstallGlobalFunction( CalcRelationsSLPGenericNonLeaf,
-  # generic method for a non-leaf node
+  # generic method for a non-leaf node:
+  # builds an SLP which evaluates the defining relators of Grp(ri)
+  # in NiceGens(ri), from the relation SLPs of the kernel and image nodes.
+  # RelationsSLP(ri) is either
+  #  - [] (no relations), or
+  #  - an SLP returning a list of relators, or
+  #  - an SLP returning a single relator (e.g. SLPOfElm for S_2, A_3), or
+  #  - fail.
   function(ri)
-    return;
+    local riKer, riFac, slpKer, slpFac, nicegens, rankKer, rankFac, n,
+          lines, nr, inline, presAbort, facInputs, kerInputs,
+          relRegs, res, valsFac, i, j, slp, w, conjReg;
+
+    # Child nodes
+    riKer := KernelRecogNode(ri); # might be fail
+    riFac := ImageRecogNode(ri);
+
+    # If riKer = fail, then Homom(ri) is an isomorphism (or, in the projective case,
+    # induces an isomorphism between the central quotients) and hence there is
+    # nothing to do: We just take the presentation from riFac.
+    if riKer = fail then
+        SetRelationsSLP(ri, RelationsSLP(riFac));
+        return;
+    fi;
+
+    # This function is called in case of failure to construct an SLP
+    slpAbort := function()
+        Info(
+            InfoRecog, 1,
+            "Construction of relations SLP for RecogNode <ri> failed: ",
+            "Something went wrong earlier, reset IsReady(<ri>)"
+        );
+        ResetFilterObj(ri, IsReady);
+        SetRelationsSLP(ri, fail);
+    end;
+
+    slpKer := RelationsSLP(riKer);
+    slpFac := RelationsSLP(riFac);
+    if slpKer = fail or slpFac = fail then
+        slpAbort();
+        return;
+    fi;
+
+    rankKer := NrInputsOfStraightLineProgram(slpKer);
+    rankFac := NrInputsOfStraightLineProgram(slpFac);
+    rankTot := rankFac + rankKer;
+    nicegens := NiceGens(ri);
+    if Length(nicegens) <> rankTot then
+        ErrorNoReturn("CalcRelationsSLPGenericNonLeaf: number of nice ",
+                      "generators does not match the children");
+    fi;
+    # Inputs 1..rankFac belong to the factor, the remaining ones to the kernel
+    facInputs := [1..rankFac];
+    kerInputs := [rankFac+1..rankTot];
+
+    # State of the SLP under construction: lines and number of used registers
+    # (registers 1..rankTot are the inputs).
+    lines := [];
+    nr := rankTot;
+
+    # inline(s, inputRegs): appends the lines of s to <lines>, where input k
+    # of s is taken from register inputRegs[k]. Returns a record with
+    #   regs:   registers holding the result(s) of s ([] if there are none)
+    #   isList: true if s returns a list of elements, false if a single one.
+    inline := function(s, inputRegs)
+        local sLines, nrIn, c0, shift, line, regs, isList, l, k;
+        if not IsStraightLineProgram(s) then
+            # [] : no relations
+            return rec(regs := [], isList := true);
+        fi;
+        sLines := LinesOfStraightLineProgram(s);
+        nrIn := NrInputsOfStraightLineProgram(s);
+        # Copy the inputs to fresh registers c0+1..c0+nrIn, so that assignment
+        # lines of s can never overwrite registers of the enclosing program.
+        c0 := nr;
+        for k in [1..nrIn] do
+            Add(lines, [inputRegs[k], 1]);
+        od;
+        nr := nr + nrIn;
+        # Register k of s corresponds to register k+c0 here. In a flat line
+        # [i1,e1,i2,e2,...] the registers are at the odd positions.
+        shift := l -> List([1..Length(l)], p -> l[p] + c0 * (p mod 2));
+        regs := [];
+        isList := false;
+        for line in sLines do
+            if IsInt(line[1]) then
+                # flat line: defines a new register
+                Add(lines, shift(line));
+                nr := nr + 1;
+                regs := [nr];
+                isList := false;
+            elif Length(line) = 2 and IsInt(line[2]) then
+                # assignment line [ flat line, k ]
+                Add(lines, [shift(line[1]), line[2] + c0]);
+                regs := [line[2] + c0];
+                isList := false;
+            else
+                # (last) line returning a list of flat lines
+                regs := [];
+                for l in line do
+                    Add(lines, shift(l));
+                    nr := nr + 1;
+                    Add(regs, nr);
+                od;
+                isList := true;
+            fi;
+        od;
+        return rec(regs := regs, isList := isList);
+    end;
+
+    relRegs := [];
+
+    # A. Relations from the subgroup riKer
+    res := inline(slpKer, kerInputs);
+    Append(relRegs, res.regs);
+
+    # B. Relations from the factor group riFac
+    # The values of the factor relators in the preimages lie in the kernel.
+    res := inline(slpFac, facInputs);
+    if IsStraightLineProgram(slpFac) then
+        valsFac := ResultOfStraightLineProgram(slpFac, nicegens{facInputs});
+        if not res.isList then
+            valsFac := [valsFac];
+        fi;
+    else
+        valsFac := [];
+    fi;
+    for i in [1..Length(res.regs)] do
+        slp := SLPforElement(riKer, valsFac[i]);
+        if slp = fail then
+            slpAbort();
+            return;
+        fi;
+        w := inline(slp, kerInputs);
+        if Length(w.regs) = 0 then
+            # w_r is the identity: the relator is r itself
+            Add(lines, [res.regs[i], 1]);
+        else
+            # relator r * w_r^-1
+            Add(lines, [res.regs[i], 1, w.regs[1], -1]);
+        fi;
+        nr := nr + 1;
+        Add(relRegs, nr);
+    od;
+
+    # C. Relations which encode that riKer is normal in ri
+    # (order as in CalcStdPresentationGenericNonLeaf: x0 outer, x inner)
+    for j in kerInputs do
+        for i in facInputs do
+            # conj = x^-1 * x0 * x with x = input i, x0 = input j
+            Add(lines, [i, -1, j, 1, i, 1]);
+            nr := nr + 1;
+            conjReg := nr;
+            slp := SLPforElement(riKer,
+                       nicegens[i]^-1 * nicegens[j] * nicegens[i]);
+            if slp = fail then
+                slpAbort();
+                return;
+            fi;
+            w := inline(slp, kerInputs);
+            if Length(w.regs) = 0 then
+                Add(lines, [conjReg, 1]);
+            else
+                Add(lines, [conjReg, 1, w.regs[1], -1]);
+            fi;
+            nr := nr + 1;
+            Add(relRegs, nr);
+        od;
+    od;
+
+    if Length(relRegs) = 0 then
+        SetRelationsSLP(ri, []);   # no relations at all
+        return;
+    fi;
+
+    # The last line returns the list of all relators
+    Add(lines, List(relRegs, r -> [r, 1]));
+    SetRelationsSLP(ri, StraightLineProgram(lines, rankTot));
+    # As in CalcStdPresentationGenericNonLeaf, we do not set IsCorrect(ri).
   end);
 
 # Some helper functions for generic code:
