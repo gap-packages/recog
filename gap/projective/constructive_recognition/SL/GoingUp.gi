@@ -196,6 +196,9 @@ RECOG.SLn_UpStep := function(w)
       # has a d-n-dimensional fixed space W_{d-n} and W contains a complement
       # of that fixed space, the intersection of W and W_{d-n} has dimension
       # newdim.
+      # This does not ensure that W and the fixed vectors of c in W_{d-n}
+      # together span the whole space; the first two retries below check
+      # that.
 
       # Change basis:
       newpart := ExtractSubMatrix(c,[1..w.n-1],[1..w.d]);
