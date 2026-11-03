@@ -40,7 +40,6 @@ RECOG.SLn_godown:=function(list)
   q:=list[3];
   gg:=list[4];
 
-  Info(InfoRecog,2,"Dimension: ",d);
   #find an element with irreducible action of relative prime dimension to
   #all other invariant subspaces
   #count is just safety, if things go very bad
@@ -48,7 +47,6 @@ RECOG.SLn_godown:=function(list)
 
   repeat
      count:=count+1;
-  if InfoLevel(InfoRecog) >= 3 then Print(".\c"); fi;
      r:=PseudoRandom(g);
      pol:=CharacteristicPolynomial(r);
      factors:=Factors(pol);
@@ -86,11 +84,12 @@ end;
 RECOG.SLn_constructppd2:=function(g,dim,q)
   local out, list ;
 
+  Info(InfoClassicalNatural,2,"  SL_n GoingDown: degree ",dim);
   list:=[g,dim,q,g];
   repeat
      out:=RECOG.SLn_godown(list);
      if out=fail or out[1]*out[1]=One(out[1]) then
-        if InfoLevel(InfoRecog) >= 3 then Print("B\c"); fi;
+        Info(InfoClassicalNatural,3,"    SL_n GoingDown: no ppd element, restart");
         list:=[g,dim,q,g];
         out:=fail;
      else
@@ -256,7 +255,7 @@ RECOG.SLn_exceptionalgodown:=function(h,q,dim)
   vs:=VectorSpace(GF(q),One(h));
   basis:=[];
   repeat
-     if InfoLevel(InfoRecog) >= 3 then Print("C"); fi;
+     Info(InfoClassicalNatural,3,"    SL_n GoingDown: looking for the SL(4,",q,") space");
      for i in [1..4] do
         v:=PseudoRandom(vs);
         for gen in GeneratorsOfGroup(h) do
