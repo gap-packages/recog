@@ -18,6 +18,12 @@
 # random element.
 DeclareInfoClass( "InfoClassicalNatural" );
 
+InstallOtherMethod( \-, "for two memory elements",
+  [ IsMatrix and IsObjWithMemory, IsMatrix and IsObjWithMemory ],
+  function(m,n)
+    return m!.el - n!.el;
+  end );
+
 RECOG.LinearAction := function(bas,field,el)
   local mat,vecs;
   if IsGroup(el) then
@@ -154,6 +160,26 @@ RECOG.IsPpdStingrayElement := function( p, f, k, irrfact )
         return true;
     fi;
 
+end;
+
+# Whether the polynomial <f> is self-reciprocal up to a scalar.
+RECOG.CheckPolynomialForSelfConjugate := function (f)
+local ind, coeff, a0, i, deg, pol;
+    # TODO: this function could be optimized: no need to construct the new
+    # polynomial, just directly work with coeff
+    ind := IndeterminateOfLaurentPolynomial(f);
+    coeff := CoefficientsOfUnivariatePolynomial(f);
+    deg := Length(coeff);
+    a0 := coeff[1];
+
+    pol := ind * 0;
+    for i in [1..deg] do
+        pol := pol + ind^(deg-i)*coeff[i];
+    od;
+    
+    pol := a0 * pol;
+
+    return pol = f;
 end;
 
 RECOG.ComputeBlockBaseChangeMatrix := function(list,d,q)
