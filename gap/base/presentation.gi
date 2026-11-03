@@ -57,9 +57,13 @@ RECOG.AnNiceGens := function(n)
     return gens;
 end;
 
-# Returns a presentation Fp (i.e. an FpGroup) of S_n
+# Returns an SLP `slp` which encodes a set of defining relations of S_n
 # on the generators RECOG.SnNiceGens(n) (respecting the order of these generators).
-# For n>2, the presentation is taken from
+# Thus if F is a free group of rank |RECOG.SnNiceGens(n)| and
+# rels := ResultOfStraightLineProgram(slp, GeneratorsOfGroup(F)),
+# then there is an isomorphism F / rels -> S_n which maps GeneratorsOfGroup(F)
+# to RECOG.SnNiceGens(n) (respecting the order of the generators).
+# For n>2, the relations are taken from
 # [BLN+03] "A black-box group algorithm for recognizing finite symmetric 
 # and alternating groups, I", (2.1).
 # For n<=2, an "obvious" presentation of S_n is used.
@@ -71,8 +75,34 @@ end;
 # s^n = (t*s)^(n-1) appears. Since this presentation defines S_n by [CM80], we
 # can add additional relations that are satisfied in S_n without changing the
 # presented group, so the presentation in [BLN+03, (2.1)] is correct.
+RECOG.SnRelationsSLP := function(n)
+    local F, t, s, rels, j;
+    # Edge cases for small n
+    if n<1 then
+        return fail;
+    elif n=1 then
+        return []; # no relations necessary
+    elif n=2 then
+        F := GroupWithMemory(FreeGroup(1));
+        return SLPOfElm(F.1^2);
+    else
+        F := GroupWithMemory(FreeGroup(2));
+        t := F.1; # Notation for s and t as in [BLN+03]
+        s := F.2;
+        rels := [ s^n, t^2, (s*t)^(n-1) ];
+        for j in [2..QuoInt(n,2)] do
+            Add(rels, (t*s^-j*t*s^j)^2);
+        od;
+        return SLPOfElms(rels);
+    fi;
+end;
+
+# Returns a presentation Fp (i.e. an FpGroup) of S_n
+# on the generators RECOG.SnNiceGens(n) (respecting the order of these generators)
+# using the relations RECOG.SnRelationsSLP.
 RECOG.SnPresentation := function(n)
-    local F, rels, s, t, j;
+    local F, rels, rel, slp, gens;# s, t, j;
+    slp := RECOG.SnRelationsSLP(n); # can be `fail`
     # Edge cases for small n
     if n<1 then
         return fail;
@@ -80,22 +110,25 @@ RECOG.SnPresentation := function(n)
         return FreeGroup(0);
     elif n=2 then
         F := FreeGroup(1);
-        return F / [ F.1^2 ];
+        gens := GeneratorsOfGroup(F);
+        rel := ResultOfStraightLineProgram(slp, gens);
+        return F / [rel];
+    else
+        # Generic case
+        F := FreeGroup(2);
+        gens := GeneratorsOfGroup(F);
+        rels := ResultOfStraightLineProgram(slp, gens);
+        return F / rels;
     fi;
-    # Generic case
-    F := FreeGroup(2);
-    t := F.1; # Notation for s and t as in [BLN+03]
-    s := F.2;
-    rels := [ s^n, t^2, (s*t)^(n-1) ];
-    for j in [2..QuoInt(n,2)] do
-        Add(rels, (t*s^-j*t*s^j)^2);
-    od;
-    return F / rels;
 end;
 
-# Returns a presentation Fp (i.e. an FpGroup) of A_n
+# Returns an SLP `slp` which encodes a set of defining relations of A_n
 # on the generators RECOG.AnNiceGens(n) (respecting the order of these generators).
-# For n>3, the presentation is taken from
+# Thus if F is a free group of rank |RECOG.AnNiceGens(n)| and
+# rels := ResultOfStraightLineProgram(slp, GeneratorsOfGroup(F)),
+# then there is an isomorphism F / rels -> A_n which maps GeneratorsOfGroup(F)
+# to RECOG.AnNiceGens(n) (respecting the order of the generators).
+# For n>3, the relations are taken from
 # [CM] "Generators and Relations for Discrete Groups", Fourth Edition, 1980,
 # Coxeter-Moser, section 6.4, relations cited from Carmichael 1923, p. 262.
 # For n<=3, an "obvious" presentation of A_n is used.
@@ -104,8 +137,45 @@ end;
 # and alternating groups, I", (2.2).
 # For even n, it is nearly the same presentation as in [BLN+03], (2.3), but some
 # relations are erronously missing in [BLN+03], (2.3).
-RECOG.AnPresentation := function(n)
+RECOG.AnRelationsSLP := function(n)
     local F, rels, s, t, k;
+    # Edge cases for small n
+    if n<1 then
+        return fail;
+    elif n=1 or n=2 then
+        return []; # no relations
+    elif n=3 then
+        F := GroupWithMemory(FreeGroup(1));
+        return SLPOfElm(F.1^3);
+    else
+        # Generic case
+        F := GroupWithMemory(FreeGroup(2));
+        t := F.1; # Notation for s and t as in [BLN+03]
+        s := F.2;
+        rels := [ s^(n-2), t^3 ];
+        if IsOddInt(n) then
+            Add(rels, (s*t)^n);
+            for k in [1..QuoInt(n-3, 2)] do
+                Add(rels, (t*s^(-k)*t*s^k)^2);
+            od;
+        else
+            Add(rels, (s*t)^(n-1));
+            # The following relations appear in [CM80], but not in [BLN+03]
+            # (except for the case k=1, which appears in [BLN+03])
+            for k in [1..QuoInt(n-2, 2)] do
+                Add(rels, (t^((-1)^k)*s^(-k)*t*s^k)^2);
+            od;
+        fi;
+        return SLPOfElms(rels);
+    fi;
+end;
+
+# Returns a presentation Fp (i.e. an FpGroup) of A_n
+# on the generators RECOG.AnNiceGens(n) (respecting the order of these generators)
+# using the relations RECOG.AnRelationsSLP.
+RECOG.AnPresentation := function(n)
+    local F, rels, rel, slp, gens;
+    slp := RECOG.AnRelationsSLP(n); # can be `fail`
     # Edge cases for small n
     if n<1 then
         return fail;
@@ -113,25 +183,14 @@ RECOG.AnPresentation := function(n)
         return FreeGroup(0);
     elif n=3 then
         F := FreeGroup(1);
-        return F / [F.1^3];
-    fi;
-    # Generic case
-    F := FreeGroup(2);
-    t := F.1; # Notation for s and t as in [BLN+03]
-    s := F.2;
-    rels := [ s^(n-2), t^3 ];
-    if IsOddInt(n) then
-        Add(rels, (s*t)^n);
-        for k in [1..QuoInt(n-3, 2)] do
-            Add(rels, (t*s^(-k)*t*s^k)^2);
-        od;
+        gens := GeneratorsOfGroup(F);
+        rel := ResultOfStraightLineProgram(slp, gens);
+        return F / [rel];
     else
-        Add(rels, (s*t)^(n-1));
-        # The following relations appear in [CM80], but not in [BLN+03]
-        # (except for the case k=1, which appears in [BLN+03])
-        for k in [1..QuoInt(n-2, 2)] do
-            Add(rels, (t^((-1)^k)*s^(-k)*t*s^k)^2);
-        od;
+        # Generic case
+        F := FreeGroup(2);
+        gens := GeneratorsOfGroup(F);
+        rels := ResultOfStraightLineProgram(slp, gens);
+        return F / rels;
     fi;
-    return F / rels;
 end;
