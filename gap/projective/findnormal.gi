@@ -372,17 +372,12 @@ RECOG.BlindDescentStep := function(G,x,y,opt)
   # be and it will be nontrivial:
   # Only use for non-abelian groups and for non-trivial x and y!
 
-  local c,i,isone,l,usepseudo,xx;
+  local c,i,isone,l,xx;
 
   if IsBound(opt.IsOne) then
       isone := opt.IsOne;
   else
       isone := IsOne;
-  fi;
-  if IsBound(opt.UsePseudoRandom) then
-      usepseudo := opt.UsePseudoRandom;
-  else
-      usepseudo := false;
   fi;
 
   c := Comm(x,y);
@@ -398,12 +393,7 @@ RECOG.BlindDescentStep := function(G,x,y,opt)
   # Now try generators for the normal closure of x:
   l := [x];
   for i in [1..18] do
-    if usepseudo then
-        xx := RECOG.RandomSubproduct(l,opt)^PseudoRandom(G);
-    else
-        xx := RECOG.RandomSubproduct(l,opt)^
-              RECOG.RandomSubproduct(GeneratorsOfGroup(G),opt);
-    fi;
+    xx := RECOG.RandomSubproduct(l,opt)^PseudoRandom(G);
     Add(l,xx);
     c := Comm(xx,y);
     if not isone(c) then
@@ -657,8 +647,6 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
                       el := gens[pos] );
       fi;
   fi;
-
-  opt.UsePseudoRandom := true;   # This is for the blind descent
 
   # First make sure we have an involution list:
   if IsBound(opt.invols) then
