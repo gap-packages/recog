@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Max Neunhöffer, Ákos Seress.
+##  This files's authors include Max Neunhöffer, Ákos Seress, Daniel Rademacher.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
 ##  to list here. Please refer to the COPYRIGHT file for details.
@@ -16,91 +16,159 @@
 ##
 #############################################################################
 
-# finds first element of a list that is relative prime to all others
-# input: list=[SL(d,q), d, q, SL(n,q)] acting as a subgroup of some big SL(n,q)
-# output: list=[rr, dd] for a ppd(2*dd;q)-element rr
-RECOG.SLn_godown:=function(list)
-  local d, first, q, g, gg, i, r, pol, factors, degrees, newdim, power, rr, ss,
-  newgroup, colldegrees, exp, count;
+# finds a stingray element with a body of small dimension
+# input: list=[SL(d,q), d, q, ...] acting as a subgroup of some big SL(n,q)
+# output: list=[rr, dd, B] for a stingray element rr whose body B has
+#   dimension dd
+RECOG.godownStingraySL := function(list)
+  local d, q, p, g, i, r, pol, factors, degrees, newdim, power, rr, max,
+        colldegrees, count, check, ocount, beta, NiList, Maxi, qFactors,
+        irrfact, invbase, firstSL;
 
-  first:=function(list)
-  local i;
-
-  for i in [1..Length(list)] do
-      if list[i]>1 and Gcd(list[i],Product(list)/list[i])=1 then
-         return list[i];
-      fi;
-  od;
-
-  return fail;
+  firstSL := function(list)
+  local i, j, goodElement;
+      for i in [1..Length(list)] do
+          if list[i]>1 then
+              if Gcd(list[i],Product(list)/list[i]) < list[i] then
+                  return i;
+              else
+                  goodElement := true;
+                  for j in [1..Length(list)] do
+                      if not(j = i) and Gcd(list[i],list[j]) = list[i] then
+                          goodElement := false;
+                          break;
+                      fi;
+                  od;
+                  if goodElement then
+                      return i;
+                  fi;
+              fi;
+          fi;
+      od;
+      return fail;
   end;
 
   g:=list[1];
   d:=list[2];
   q:=list[3];
-  gg:=list[4];
+  qFactors:=Factors(q);
+  p := qFactors[1];
 
-  #find an element with irreducible action of relative prime dimension to
-  #all other invariant subspaces
-  #count is just safety, if things go very bad
-  count:=0;
+  max := Maximum([Log2Int(d),3]);
 
-  repeat
-     count:=count+1;
-     if InfoLevel(InfoRecog_ClassicalNatural) >= 3 then Print(".\c"); fi;
-     r:=PseudoRandom(g);
-     pol:=CharacteristicPolynomial(r);
-     factors:=Factors(pol);
-     degrees:=AsSortedList(List(factors,Degree));
-     newdim:=first(degrees);
-  until (count>10) or (newdim <> fail and newdim<=Maximum(2,d/4));
+  # Overall count. Replace by formula and unequality
+  ocount := 0;
+  while ocount < 100 do
 
-  if count>10 then
-     return fail;
-  fi;
+      #find an element with irreducible action of relative prime dimension to
+      #all other invariant subspaces
+      #count is just safety, if things go very bad
+      count:=0;
 
-  # raise r to a power so that acting trivially outside one invariant subspace
-  degrees:=Filtered(degrees, x->x<>newdim);
-  colldegrees:=Collected(degrees);
-  power:=Lcm(List(degrees, x->q^x-1))*q;
-  # power further to cancel q-part of element order
-  if degrees[1]=1 then
-     exp:=colldegrees[1][2]-(DimensionOfMatrixGroup(gg)-d);
-     if exp>0 then
-       power:=power*q^exp;
-     fi;
-  fi;
-  rr:=r^power;
+      repeat
+          count:=count+1;
+          if InfoLevel(InfoRecog_ClassicalNatural) >= 3 then Print(".\c"); fi;
+          r:=PseudoRandom(g);
+          pol:=CharacteristicPolynomial(r);
+          factors:=Factors(pol);
+          degrees:=List(factors,Degree);
+          newdim := firstSL(degrees);
+      until (count>100) or (newdim <> fail and (degrees[newdim] < max));
+      # Be careful if Log2Int(d) = 2! In this case we search for stingray elements with k < 2. Hence use newdim < Maximum([Log2Int(d),3])
 
-  #conjugate rr to hopefully get a smaller dimensional SL
-  #ss:=rr^PseudoRandom(gg);
-  #newgroup:=Group(rr,ss);
+      if count>100 then
+          return fail;
+      fi;
 
-  return [rr,newdim];
+      # Split result from first:
+      irrfact := factors[newdim];
+      newdim := degrees[newdim];
+
+      if newdim = 2 then
+          check := true;
+      else
+          # Check whether the stingray candidate is a ppd-stingray element
+          check := RECOG.IsPpdStingrayElement(p,Length(qFactors),newdim,irrfact);
+      fi;
+
+      if check then
+
+          # raise r to a power so that acting trivially outside one invariant irreducible subspace
+          NiList := Collected(degrees);
+          NiList := Filtered(NiList,x->not(x[1] = newdim));
+          colldegrees := List(NiList,x->x[1]);
+          NiList := List(NiList,x->x[2]);
+          Maxi := Maximum(NiList);
+          beta := LogInt(Maxi,p);
+          if not(p^beta = Maxi) then
+              beta := beta + 1;
+          fi;
+
+          # power further to cancel q-part of element order
+          power := Lcm(List(colldegrees, x->q^x-1))*p^beta;
+          rr:=r^power;
+
+          invbase := NullspaceMat(TransposedMat(RECOG.FixspaceMat(StripMemory(rr))));
+
+          if newdim = 2 then
+              if Size(invbase) = 2 then
+                  return [rr,newdim,invbase];
+              fi;
+          else
+              return [rr,newdim,invbase];
+          fi;
+      fi;
+
+      ocount := ocount + 1;
+  od;
+
+  return fail;
+
 end;
 
 # input is (group,dimension,q)
 # output is a group element acting irreducibly in two dimensions, and fixing
 # a (dimension-2)-dimensional subspace
-RECOG.SLn_constructppd2:=function(g,dim,q)
-  local out, list ;
+RECOG.constructppdTwoStingraySL := function(g,dim,q)
+  local out, list, out2;
 
   Info(InfoRecog_ClassicalNatural,2,"  SL_n GoingDown: degree ",dim);
-  list:=[g,dim,q,g];
+
+  list:=[g,dim,q];
+  # exits only via the two returns: a stingray element of dimension 2
   repeat
-     out:=RECOG.SLn_godown(list);
-     if out=fail or out[1]*out[1]=One(out[1]) then
-        Info(InfoRecog_ClassicalNatural,3,"    SL_n GoingDown: no ppd element, restart");
-        list:=[g,dim,q,g];
+     out:=RECOG.godownStingraySL(list);
+     if out=fail or IsOne(out[1]^2) then
+        Info(InfoRecog_ClassicalNatural,3,"    SL_n GoingDown: no stingray element, restart");
+        list:=[g,dim,q];
         out:=fail;
      else
-        if out[2]>2 then
-           list:=[Group(out[1],out[1]^PseudoRandom(g)),2*out[2],q,g];
+        if out[2] = 2 then
+          return out[1];
+        fi;
+        Assert(1, out[2] >= 2);
+        repeat
+             out2:=RECOG.godownStingraySL(list);
+             if out2=fail or IsOne(out2[1]^2) then
+                 Info(InfoRecog_ClassicalNatural,3,"    SL_n GoingDown: no second stingray element, retry");
+                 list:=[g,dim,q];
+                 out2:=fail;
+             fi;
+        until out2<>fail and out2[2] >= 2;
+        if out2[2] = 2 then
+            return out2[1];
+        fi;
+        if RECOG.CheckNewStingrayGroup(out[1],out[3],out2[1],out2[3],q) then
+             list:=[Group(out[1],out2[1]),out[2]+out2[2],q];
+             Info(InfoRecog_ClassicalNatural,2,"  SL_n GoingDown: bodies of dimension ",
+                  out[2]," and ",out2[2],", degree ",out[2]+out2[2]);
+        else
+             Info(InfoRecog_ClassicalNatural,3,"    SL_n GoingDown: stingray elements do not fit, restart");
+             list:=[g,dim,q];
+             out:=fail;
         fi;
      fi;
-  until out<>fail and out[2]=2;
-
-  return out[1];
+  until false;
 
 end;
 
@@ -272,7 +340,7 @@ end;
 RECOG.SLn_constructsl2:=function(g,d,q)
   local r,h;
 
-  r:=RECOG.SLn_constructppd2(g,d,q);
+  r:=RECOG.constructppdTwoStingraySL(g,d,q);
   h:=RECOG.SLn_constructsl4(g,d,q,r);
   if not (q in [2,3,4,5,9]) then
      return RECOG.SLn_godownfromd(h,q,4,d);
