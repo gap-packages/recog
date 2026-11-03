@@ -16,7 +16,7 @@
 # guarantee that a representation of dimension N exists for that group.
 #
 # Mathematical reference:
-# F. Luebeck, Small degree representations of finite Chevalley groups in
+# F. Lübeck, Small degree representations of finite Chevalley groups in
 # defining characteristic, LMS Journal of Computation and Mathematics 4
 # (2001), 135--169, revised preprint 2016.
 # https://www.math.rwth-aachen.de/~Frank.Luebeck/preprints/smdegdefchar_v2.pdf
@@ -57,7 +57,7 @@
 # Here it returns [] because DEFREPDATA ends at dimension 300.
 # RECOG.CheckCandidate then calls RECOG.CheckType for steps 5 to 7.
 #
-# 5. RECOG.AddSmallDegrees supplements the tables with Luebeck's formulae.
+# 5. RECOG.AddSmallDegrees supplements the tables with Lübeck's formulae.
 # First, RECOG.CheckType calls RECOG.InitialiseCatalogueEntry to create an
 # entry if needed. The A34 entry already exists, so its list [35] is kept.
 # For A34 at p=3, the four smallest distinct nontrivial degrees of
@@ -66,7 +66,7 @@
 #   symmetric square: 35*36/2=630, adjoint: 35^2-1=1224.
 # Both 35 and 595 divide N. The stored 35 is kept and 595 is added once.
 # Thus catalogue.A[34].degrees changes from [35] to [35,595].
-# Luebeck's theorem guarantees that these formulae omit no nontrivial
+# Lübeck's theorem guarantees that these formulae omit no nontrivial
 # restricted degree up to floor(34^3/8)=4913. Since 595<=4913, all possible
 # building-block degrees needed for N=595 have now been considered for A34.
 #
@@ -306,7 +306,7 @@ RECOG.Catalogue := function(N, p, divisors)
 end;
 
 
-# Add Luebeck's small-degree formulae for one fixed type and rank l.
+# Add Lübeck's small-degree formulae for one fixed type and rank l.
 # The natural degree is l+1 for type A and 2*l for types C and D.
 # The variable names identify natural, exterior-square, symmetric-square and
 # adjoint formulae. Their values need not equal the full module dimensions.
@@ -325,7 +325,7 @@ RECOG.AddSmallDegrees := function(catalogue, dataType, N, p, divisors)
     degrees := [];
 
     if base = "A" and l = 1 then
-        # Luebeck, Remark 4.5: all restricted A1 degrees are 1,2,...,p.
+        # Lübeck, Remark 4.5: all restricted A1 degrees are 1,2,...,p.
         # Degree 1 is omitted because it does not change a product.
         for b in divisors do
             if b > 1 and b <= p then
@@ -498,7 +498,7 @@ RECOG.CheckType := function(N, p, maxFactors, dataType, catalogue, cases, diviso
         # completeThrough is the dimension up to which the source data cover all
         # building-block degrees. RECOG.Catalogue takes the bounds from DEFREPDATA
         # and SmallDegreeTables. The stored degrees keep only divisors of N.
-        # RECOG.AddSmallDegrees may extend it using Luebeck's degree formulae.
+        # RECOG.AddSmallDegrees may extend it using Lübeck's degree formulae.
         # With N within this bound, the failed product search excludes this type.
         status := "excluded";
     else

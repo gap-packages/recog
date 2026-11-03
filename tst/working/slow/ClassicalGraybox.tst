@@ -246,25 +246,25 @@ gap> grayboxName("Sp", 8, 5);
 gap> grayboxName("O+", 6, 2);
 "L4(2)"
 gap> grayboxName("O+", 8, 2);
-"O+8(2)"
+"O^+8(2)"
 
 # q=3
 gap> grayboxName("O+", 6, 3);
 "L4(3)"
 gap> grayboxName("O+", 8, 3);
-"O+8(3)"
+"O^+8(3)"
 
 # q=4
 gap> grayboxName("O+", 6, 4);
 "L4(4)"
 gap> grayboxName("O+", 8, 4);
-"O+8(4)"
+"O^+8(4)"
 
 # q=5
 gap> grayboxName("O+", 6, 5);
 "L4(5)"
 gap> grayboxName("O+", 8, 5);
-"O+8(5)"
+"O^+8(5)"
 
 # O-: small natural dimensions.
 
@@ -274,7 +274,7 @@ gap> grayboxName("O-", 4, 2);
 gap> grayboxName("O-", 6, 2);
 "U4(2)"
 gap> grayboxName("O-", 8, 2);
-"O-8(2)"
+"O^-8(2)"
 
 # q=3
 gap> grayboxName("O-", 4, 3);
@@ -282,7 +282,7 @@ gap> grayboxName("O-", 4, 3);
 gap> grayboxName("O-", 6, 3);
 "U4(3)"
 gap> grayboxName("O-", 8, 3);
-"O-8(3)"
+"O^-8(3)"
 
 # q=4
 gap> grayboxName("O-", 4, 4);
@@ -290,7 +290,7 @@ gap> grayboxName("O-", 4, 4);
 gap> grayboxName("O-", 6, 4);
 "U4(4)"
 gap> grayboxName("O-", 8, 4);
-"O-8(4)"
+"O^-8(4)"
 
 # q=5
 gap> grayboxName("O-", 4, 5);
@@ -298,7 +298,7 @@ gap> grayboxName("O-", 4, 5);
 gap> grayboxName("O-", 6, 5);
 "U4(5)"
 gap> grayboxName("O-", 8, 5);
-"O-8(5)"
+"O^-8(5)"
 
 # O: small natural dimensions.
 
@@ -375,33 +375,33 @@ gap> grayboxName("Sp", 20, 16);
 
 # q=11
 gap> grayboxName("O+", 10, 11);
-"O+10(11)"
+"O^+10(11)"
 gap> grayboxName("O+", 20, 11);
-"O+20(11)"
+"O^+20(11)"
 gap> grayboxName("O+", 60, 11);
-"O+60(11)"
+"O^+60(11)"
 
 # q=16
 gap> grayboxName("O+", 10, 16);
-"O+10(16)"
+"O^+10(16)"
 gap> grayboxName("O+", 20, 16);
-"O+20(16)"
+"O^+20(16)"
 gap> grayboxName("O+", 60, 16);
-"O+60(16)"
+"O^+60(16)"
 
 # O-: larger natural dimensions.
 
 # q=11
 gap> grayboxName("O-", 10, 11);
-"O-10(11)"
+"O^-10(11)"
 gap> grayboxName("O-", 20, 11);
-"O-20(11)"
+"O^-20(11)"
 
 # q=16
 gap> grayboxName("O-", 10, 16);
-"O-10(16)"
+"O^-10(16)"
 gap> grayboxName("O-", 20, 16);
-"O-20(16)"
+"O^-20(16)"
 
 # Three non-natural modules per family: exterior square, symmetric square,
 # and a Frobenius tensor. Squares use q=11, avoiding small-characteristic issues;
@@ -442,19 +442,19 @@ gap> grayboxResult(grayboxModule("O", 7, 11^2, "frobenius", 49), 11^2);
 
 # O+: resulting module dimensions 28, 35, 64.
 gap> grayboxResult(grayboxModule("O+", 8, 11, "exterior", 28), 11);
-"O+8(11)"
+"O^+8(11)"
 gap> grayboxResult(grayboxModule("O+", 8, 11, "symmetric", 35), 11);
-"O+8(11)"
+"O^+8(11)"
 gap> grayboxResult(grayboxModule("O+", 8, 11^2, "frobenius", 64), 11^2);
-"O+8(121)"
+"O^+8(121)"
 
 # O-: resulting module dimensions 28, 35, 64.
 gap> grayboxResult(grayboxModule("O-", 8, 11, "exterior", 28), 11);
-"O-8(11)"
+"O^-8(11)"
 gap> grayboxResult(grayboxModule("O-", 8, 11, "symmetric", 35), 11);
-"O-8(11)"
+"O^-8(11)"
 gap> grayboxResult(grayboxModule("O-", 8, 11^2, "frobenius", 64), 11^2);
-"O-8(121)"
+"O^-8(121)"
 
 # Extend scalars and change basis so the entries generate the larger field.
 # The group parameter q stays unchanged; absolute irreducibility must survive.

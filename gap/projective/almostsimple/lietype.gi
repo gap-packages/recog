@@ -140,12 +140,12 @@ RECOG.VerifyOrders := function (type, n, q, orders)
           maxprime := LargestPrimeOccurs (q^(n/2)+1, orders) and
                       LargestPrimeOccurs (q^(n/2)-1, orders);
       fi;
-  elif type = "O+" and n = 8 and q = 2 then
+  elif type = "O^+" and n = 8 and q = 2 then
       allowed := Set([ 7, 8, 9, 10, 12, 15 ]);
       maxprime := 8 in orders and 15 in orders;
-  elif type = "O+" and n = 10 and q = 2 then
+  elif type = "O^+" and n = 10 and q = 2 then
       allowed := Set([ 18, 24, 31, 42, 45, 51, 60]);
-  elif type = "O-" then
+  elif type = "O^-" then
       maxprime := LargestPrimeOccurs (q^(n/2)+1, orders) and
                   LargestPrimeOccurs (q^(n/2 -1)-1, orders);
   elif type = "2B" then
@@ -191,6 +191,18 @@ RECOG.VerifyOrders := function (type, n, q, orders)
   fi;
 end;  #  VerifyOrders
 
+# Store one witness for each set of genuine projective PPD indices.
+RECOG.AddPPDWitness := function(elements, g, p)
+    local projectiveOrder, primes, ppds;
+    projectiveOrder := RECOG.ProjectiveOrder(StripMemory(g));
+    primes := Filtered(PrimeDivisors(projectiveOrder), r -> r <> 2 and r <> p);
+    ppds := Set(primes, r -> OrderMod(p,r));
+    if IsEmpty(ppds) or ForAny(elements, e -> IsBound(e.ppds) and e.ppds = ppds) then
+        return;
+    fi;
+    Add(elements, rec(el := g, projectiveOrder := projectiveOrder, ppds := ppds));
+end;
+
 #/*  P random process for group;
 #    distinguish PSp (2n, p^e) from Omega (2n + 1, p^e);
 #    orders are orders of elements */
@@ -198,7 +210,10 @@ end;  #  VerifyOrders
 
 RECOG.DistinguishSpO := function (G, n, p, e, orders)
     local   twopart,   q,  goodtorus,  t1,  tp,  t2,
-            found,  tf,  ttf,  g,  o,  mp,  i,  x,  z,  po,  h;
+            found,  tf,  ttf,  g,  o,  mp,  i,  x,  z,  po,  h,
+            elements, witness;
+
+    elements := ValueOption("recogElements");
 
     twopart := function (n)
         local k;
@@ -234,6 +249,9 @@ RECOG.DistinguishSpO := function (G, n, p, e, orders)
 
             if 2*o = t1 then
                 tf := tf+1;
+                if elements <> fail then
+                    RECOG.AddPPDWitness(elements,g,p);
+                fi;
                 g := g^(o / 2);
                 found := n mod 2 = 1;
                 i := 0;
@@ -243,7 +261,8 @@ RECOG.DistinguishSpO := function (G, n, p, e, orders)
                     z := g * g^x;
                     o := RECOG.LieTypeOrderFunc (z);
                     if o mod 2 = 1 then
-                        po := RECOG.LieTypeOrderFunc (z^((o + 1) / 2) / x);
+                        witness := z^((o + 1) / 2) / x;
+                        po := RECOG.LieTypeOrderFunc (witness);
                         mp := RECOG.OMppdset (p, po);
                         if (q - 1) mod 4 = 0 and (n - 1) * e in mp or
                            (q + 1) mod 4 = 0 and 2 * (n - 1) * e in mp or
@@ -252,6 +271,9 @@ RECOG.DistinguishSpO := function (G, n, p, e, orders)
 #                              or (n = 4 and 6 in mp)
                            then
                             found := true;
+                            if elements <> fail then
+                                RECOG.AddPPDWitness(elements,witness,p);
+                            fi;
                   #printf"mp= %o, o (z)= %o\n", mp, Factorization (oo);
                         fi;
                     fi;
@@ -306,7 +328,9 @@ end;
 #   at most NmrTries elements; P is a random process */
 
 RECOG.ppdSample := function (G, ppd, p, values, SampleSize)
-    local   Bins,  x,  j,  original,  NmrTries,  g,  o,  list;
+    local   Bins,  x,  j,  original,  NmrTries,  g,  o,  list,  elements;
+
+    elements := ValueOption("recogElements");
 
     Bins := ListWithIdenticalEntries(Length(values),0);
 
@@ -328,6 +352,9 @@ RECOG.ppdSample := function (G, ppd, p, values, SampleSize)
        o := Order (g);
        list := RECOG.ComputeArtin (o, p);
        Add (ppd, list);
+       if elements <> fail and ForAny(values, k -> k in list) then
+           RECOG.AddPPDWitness(elements,g,p);
+       fi;
        for j in [1..Length(values)] do
            if values[j] in list then
                Bins[j] := Bins[j]+1;
@@ -422,7 +449,7 @@ RECOG.OPlus82vsS62 := function (G, orders, SampleSize)
     prob := prob[1];
 #"prob is ", prob;
     if AbsoluteValue (1/5 - prob) < AbsoluteValue (1/15 - prob) then
-        return RECOG.VerifyOrders ("O+",8, 2, orders );
+        return RECOG.VerifyOrders ("O^+",8, 2, orders );
     else
         return RECOG.VerifyOrders ("S",6, 2, orders );
     fi;
@@ -436,7 +463,7 @@ RECOG.OPlus83vsO73vsSP63 := function (G, orders, SampleSize)
     orders := temp[2];
     prob := prob[1];
     if AbsoluteValue (3/20 - prob) < AbsoluteValue (1/20 - prob) then
-        return "O+8(3)";
+        return "O^+_8(3)";
     else
         return RECOG.DistinguishSpO (G, 3, 3, 1, orders);
     fi;
@@ -451,7 +478,7 @@ RECOG.OPlus8vsO7vsSP6 := function (G, orders, p, e, SampleSize)
        o := RECOG.LieTypeOrderFunc (g);
        list := RECOG.ComputeArtin (o, p);
        if IsSubset(list, [e, 2 * e, 4 * e]) then
-           return RECOG.VerifyOrders ("O+",8, p^e , orders);
+           return RECOG.VerifyOrders ("O^+",8, p^e , orders);
        fi;
    od;
    if p = 2 then
@@ -475,7 +502,7 @@ RECOG.OMinus8vsSPvsO := function (G, v1, p, e, orders, SampleSize, NmrTrials)
 #"prob is ", prob;
         prob := prob[1];
         if prob >= 1/5 - epsilon and prob < 1/4 + epsilon then
-            return RECOG.VerifyOrders ("O-",8, p^(v1/8), orders);
+            return RECOG.VerifyOrders ("O^-",8, p^(v1/8), orders);
         elif prob >= 1/10 - epsilon and prob < 1/8 + epsilon then
             if p = 2 then
                 return RECOG.VerifyOrders ("S",8, 2^e, orders);
@@ -531,6 +558,8 @@ RECOG.ArtinInvariants := function (G, p, Nmr)
 end; # ArtinInvariants
 
 
+# TODO: This function is currently unused. Keep it for future black-box naming;
+# it uses element orders and needs a suitable order function for black-box input.
 RECOG.LieType := function (G, p, orders, Nmr)
     local   temp,  invar,  combs,  orders2,  v1,  v2,  w,  v3,  e,  m,
             bound,  combs2;
@@ -785,7 +814,7 @@ RECOG.LieType := function (G, p, orders, Nmr)
    orders := Union(orders, orders2);
    if m mod 2 = 0 then
       if [m * e, (m + 2) * e] in combs then
-          return RECOG.VerifyOrders ("O+", 2 * m + 2, p^e, orders);
+          return RECOG.VerifyOrders ("O^+", 2 * m + 2, p^e, orders);
       elif m = 4 then
          return RECOG.OMinus8vsSPvsO(G,v1,p,e,orders,RECOG.LieTypeSampleSize,
                                      RECOG.LieTypeNmrTrials);
@@ -797,11 +826,11 @@ RECOG.LieType := function (G, p, orders, Nmr)
                return RECOG.DistinguishSpO (G, m, p, e, orders);
             fi;
          else
-            return RECOG.VerifyOrders ("O-", 2*m, p^e, orders);
+            return RECOG.VerifyOrders ("O^-", 2*m, p^e, orders);
          fi;
       fi;  # m even
    elif [(m - 1) * e, (m + 3) * e] in combs then
-      return RECOG.VerifyOrders ("O+", 2 * m + 2, p^e, orders);
+      return RECOG.VerifyOrders ("O^+", 2 * m + 2, p^e, orders);
    elif [(m - 1) * e, (m + 1) * e] in combs then
       if p = 2 then
          return RECOG.VerifyOrders ("S", 2 * m, 2^e, orders);
@@ -809,7 +838,7 @@ RECOG.LieType := function (G, p, orders, Nmr)
       # p <> 2 case
       return RECOG.DistinguishSpO (G, m, p, e, orders);
    else
-      return RECOG.VerifyOrders ("O-", 2 * m, p^e, orders);
+      return RECOG.VerifyOrders ("O^-", 2 * m, p^e, orders);
    fi;
 
    return "RO_undecided";
@@ -822,32 +851,26 @@ end;
 BindRecogMethod("FindHomMethodsProjective", "LieTypeNonConstr",
 "do non-constructive recognition of Lie type groups",
 function(ri)
-    local G,count,dim,f,i,ords,p,q,r,res;
+    local G,count,q,r;
     G := Grp(ri);
     if not IsBound(ri!.simplesocle) then
         return TemporaryFailure;
     fi;
     RECOG.SetPseudoRandomStamp(G,"LieTypeNonConstr");
-    dim := ri!.dimension;
-    f := ri!.field;
-    q := Size(f);
-    p := Characteristic(f);
+    # TODO: Determine the group parameter q; it may differ from the size of
+    # the matrix field, which the graybox method can also handle.
+    q := Size(ri!.field);
 
     count := 0;
-    ords := Set(ri!.simplesoclerando);
     while true do   # will be left by return
-        r := RECOG.LieType(ri!.simplesocle,p,ords,30+10*dim);
-        if not IsString(r) or r{[1..3]} <> "RO_" then
+        r := RECOG.RecogniseClassicalGraybox(ri!.simplesocle,q);
+        ri!.classicalGraybox := rec(q := q, result := r);
+        if r.status = "probable" then
             # We found something:
-            Info(InfoRecog,2,"LieTypeNonConstr: found ",r,
-                 ", lookup up hints...");
-            ri!.comment := r;
-            res := LookupHintForSimple(ri,G,r);
+            Info(InfoRecog,2,"LieTypeNonConstr: probable name ",r.name);
+            ri!.comment := r.name;
+            # res := LookupHintForSimple(ri,G,r.name);
             # FIXME: LookupHintForSimple is for sporadics... So why do we use it here?
-            if res = Success then
-                return Success;
-            fi;
-            Info(InfoRecog,2,"LieTypeNonConstr: giving up.");
             return TemporaryFailure;
         fi;
         count := count + 1;
@@ -855,9 +878,6 @@ function(ri)
             Info(InfoRecog,2,"LieTypeNonConstr: giving up...");
             return TemporaryFailure;
         fi;
-        Info(InfoRecog,2,"LieTypeNonConstr: need more element orders...");
-        for i in [1..dim] do
-            AddSet(ords,RandomElmOrd(ri,"LieTypeNonConstr",false).order);
-        od;
+        Info(InfoRecog,2,"LieTypeNonConstr: trying again...");
     od;
 end);

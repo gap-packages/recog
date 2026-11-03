@@ -1,19 +1,19 @@
 # Small-degree representations in defining characteristic
 #
 # Dimensions and highest weights of irreducible representations of simple,
-# simply connected algebraic groups, from Frank Luebeck's tables.
+# simply connected algebraic groups, from Frank Lübeck's tables.
 # The data reproduce the overview tables with their stated degree bounds.
 # Detailed weight multiplicities and the separately published supplementary
 # data sets are not included. The only changes to the overview entries are
 # conversion to GAP syntax and the characteristic encoding specified below.
 #
-# Source: Frank Luebeck, RWTH Aachen University,
+# Source: Frank Lübeck, RWTH Aachen University,
 # Tables of Weight Multiplicities
 # https://www.math.rwth-aachen.de/~Frank.Luebeck/chev/WMSmall/index.html
 # Imported from the overview tables on 01-10-2026.
 #
 # Reference:
-# F. Luebeck, Small degree representations of finite Chevalley groups in
+# F. Lübeck, Small degree representations of finite Chevalley groups in
 # defining characteristic, LMS Journal of Computation and Mathematics 4
 # (2001), 135--169, with subsequent extensions published on the website.
 #

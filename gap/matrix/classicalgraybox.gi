@@ -22,7 +22,7 @@
 # When computed, it also contains charpoly (characteristic polynomial),
 # factors (irreducible factors with multiplicities) and projectiveOrder
 # (order modulo scalar matrices).
-# Names L, U, S, O, O+, O- denote simple quotients.
+# Names L, U, S, O, O^+, O^- denote simple quotients.
 #
 #
 # Reference:
@@ -34,7 +34,7 @@
 #  - Use the concept of "large PPDs" and further ideas from classical group
 #    recognition in the natural representation in GAP.
 #  - Use the orders of a few random elements to restrict the possible natural
-#    degrees, as suggested by Frank Luebeck.
+#    degrees, as suggested by Frank Lübeck.
 #  - Extend the reuse of computed information, including characteristic
 #    polynomials, irreducible factors and projective orders.
 #  - Derive sample budgets from a requested error bound rather than choosing
@@ -291,9 +291,9 @@ RECOG.ClassicalCandidates := function(N, q)
                 rank := n/2; h := 2*rank-2; multiplier := 2;
                 exponents := [2,4..2*rank-2];
                 if kind = "Oplus" then
-                    Add(exponents,rank); prefix := "O+";
+                    Add(exponents,rank); prefix := "O^+";
                 else
-                    Add(exponents,-rank); prefix := "O-";
+                    Add(exponents,-rank); prefix := "O^-";
                 fi;
             fi;
             # Collect possible PPD indices from the factors q^i-1 or q^(-i)+1.
@@ -426,6 +426,7 @@ end;
 #   status="probable" and name is a group name if one witnessed candidate remains;
 #   otherwise status="inconclusive" and name=fail. candidates lists the remaining
 #   names. The recognition uses statistical exclusions.
+# TODO: Add exceptional Lie type groups, following RECOG.LieType.
 RECOG.RecogniseClassicalGraybox := function(G, q)
     local N, F, p, f, data, candidates, candidate, required, k,
           answer, result, m, plus, middle, minus, tests, test, remove, u, has,
@@ -476,8 +477,8 @@ RECOG.RecogniseClassicalGraybox := function(G, q)
         od;
     od;
 
-    # Compare simple quotients: plus=O+(2m+2,q), middle=Sp(2m,q) or O(2m+1,q),
-    # minus=O-(2m,q). The two middle families are not separated here.
+    # Compare simple quotients: plus=O^+(2m+2,q), middle=Sp(2m,q) or O(2m+1,q),
+    # minus=O^-(2m,q). The two middle families are not separated here.
     # BKPS 4.3/Table 3 distinguishes them by possible combinations in maximal tori.
     for m in Set(candidates,c -> c.rank) do
         plus := Filtered(candidates,c -> c.family = "Oplus" and c.rank = m+1);
@@ -499,7 +500,7 @@ RECOG.RecogniseClassicalGraybox := function(G, q)
                 Add(tests,[[(m-1)*f,(m+1)*f],middle,minus]);
             fi;
         elif m = 3 and q > 3 then
-            # O+(8,q) versus Sp(6,q) or O(7,q) needs three simultaneous PPDs.
+            # O^+(8,q) versus Sp(6,q) or O(7,q) needs three simultaneous PPDs.
             Add(tests,[[f,2*f,4*f],plus,middle]);
         fi;
         for test in tests do
@@ -512,7 +513,7 @@ RECOG.RecogniseClassicalGraybox := function(G, q)
             power := fail;
             if p = 2 and 6 in indices then
                 # No PPD of 2^6-1: require 9 instead. For m=4,q=2 this asks for
-                # 5*9 | ord(g), possible in O+(10,2), not Sp(8,2) or O-(8,2).
+                # 5*9 | ord(g), possible in O^+(10,2), not Sp(8,2) or O^-(8,2).
                 power := 9; indices := Difference(indices,[6]);
             elif p > 3 and 1 in indices and IsPrimePowerInt(p-1) then
                 # Fermat p: p-1 is a power of 2, so replace index 1 by 4.
@@ -606,8 +607,8 @@ RECOG.RecogniseClassicalGraybox := function(G, q)
     if q = 2 and has("Sp",6,q) and has("Oplus",8,q) then
         answer := RECOG.OPlus82vsS62(G,orders,count);
         if answer = "S6(2)" then
-            candidates := Filtered(candidates,c -> c.name <> "O+8(2)");
-        elif answer = "O+8(2)" then
+            candidates := Filtered(candidates,c -> c.name <> "O^+8(2)");
+        elif answer = "O^+8(2)" then
             candidates := Filtered(candidates,c -> c.name <> "S6(2)");
         fi;
     fi;
@@ -615,19 +616,19 @@ RECOG.RecogniseClassicalGraybox := function(G, q)
     if q = 3 and has("Oplus",8,q) and (has("Sp",6,q) or has("Oodd",7,q)) then
         answer := RECOG.OPlus83vsO73vsSP63(helperGroup,orders,count
             : recogElements := elements);
-        if answer = "O+8(3)" then
+        if answer = "O^+_8(3)" then
             candidates := Filtered(candidates,c -> not c.name in ["S6(3)","O7(3)"]);
         elif answer = "S6(3)" and has("Sp",6,q) then
-            candidates := Filtered(candidates,c -> not c.name in ["O7(3)","O+8(3)"]);
+            candidates := Filtered(candidates,c -> not c.name in ["O7(3)","O^+8(3)"]);
         elif answer = "O7(3)" and has("Oodd",7,q) then
-            candidates := Filtered(candidates,c -> not c.name in ["S6(3)","O+8(3)"]);
+            candidates := Filtered(candidates,c -> not c.name in ["S6(3)","O^+8(3)"]);
         fi;
     fi;
 
     if has("Ominus",8,q) and (has("Sp",8,q) or has("Oodd",9,q)) then
         s8 := Concatenation("S8",suffix);
         o9 := Concatenation("O9",suffix);
-        ominus8 := Concatenation("O-8",suffix);
+        ominus8 := Concatenation("O^-8",suffix);
         # Collect projective orders for the final verification in lietype.gi.
         if IsEmpty(orders) then
             orders := Set(List([1..count],
