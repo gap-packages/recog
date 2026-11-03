@@ -638,7 +638,7 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
       gens := GeneratorsOfGroup(g);
       pos := First([1..Length(gens)],i->not opt.IsOne(gens[i]));
       if pos = fail then
-          res := rec( success := fail, msg := "Group is trivial" );
+          return rec( success := fail, msg := "Group is trivial" );
       fi;
       i := 1;
       abelian := true;
@@ -653,7 +653,7 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
           i := i + 1;
       od;
       if abelian then
-          res := rec( success := true, msg := "Group is abelian",
+          return rec( success := true, msg := "Group is abelian",
                       el := gens[pos] );
       fi;
   fi;

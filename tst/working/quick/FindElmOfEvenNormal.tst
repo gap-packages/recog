@@ -34,5 +34,14 @@ gap> for i in [1..20] do
 gap> bad;
 0
 
+# Trivial and abelian groups are answered directly; blind descent needs a
+# non-abelian group.
+gap> r := FindElmOfEvenNormalSubgroup(Group(()));;
+gap> [r.success, r.msg];
+[ fail, "Group is trivial" ]
+gap> r := FindElmOfEvenNormalSubgroup(CyclicGroup(IsPermGroup, 3));;
+gap> [r.success, r.msg];
+[ true, "Group is abelian" ]
+
 #
 gap> STOP_TEST("FindElmOfEvenNormal.tst");
