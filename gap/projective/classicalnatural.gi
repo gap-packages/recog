@@ -859,15 +859,10 @@ function(ri)
   RECOG.SetPseudoRandomStamp(g,"ClassicalNatural");
 
   # First check whether we are applicable:
-  # check if this group contains SL_d -- for d > 2 we can use RecogniseClassical;
-  # for d = 2, we can use RECOG.IsThisSL2Natural, but only after adjusting
-  # the determinants of the generators (comes next)
-  if d <> 2 then
-      classical := RecogniseClassical(g);
-      if classical.isSLContained <> true then
-          Info(InfoRecog,2,"ClassicalNatural: Is not PSL.");
-          return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
-      fi;
+  classical := RecogniseClassical(g);
+  if classical.isSLContained <> true then
+      Info(InfoRecog,2,"ClassicalNatural: Is not PSL.");
+      return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
   fi;
 
   # Now get rid of nasty determinants:
@@ -887,14 +882,6 @@ function(ri)
           changed := true;
       fi;
   od;
-
-  # Now check whether the normalized matrices generate an SL_2:
-  if d = 2 then
-      if not RECOG.IsThisSL2Natural(gens,f) then
-          Info(InfoRecog,2,"ClassicalNatural: Is not PSL_2.");
-          return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
-      fi;
-  fi;
 
   if changed then
       gm := GroupWithMemory(gens);
