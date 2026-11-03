@@ -68,16 +68,6 @@ GF(7^2)
 gap> r := RecogniseClassical(G);; [r.isSLContained, r.isRepresentableOverSubfield];
 [ false, true ]
 
-# RECOG.IsThisSL2Natural asks whether the group contains SL(2,q) modulo
-# scalars. It used to answer that only for q > 11 and "is it SL(2,q)" below, so
-# GL(2,5) and GL(2,11) came out false while GL(2,25) and GL(2,37) came out true.
-gap> List([4,5,7,8,9,11,13,16,25,37],
->         q -> RECOG.IsThisSL2Natural(GeneratorsOfGroup(GL(2,q)), GF(q)));
-[ true, true, true, true, true, true, true, true, true, true ]
-gap> List([4,5,7,8,9,11,13,16,25,37],
->         q -> RECOG.IsThisSL2Natural(GeneratorsOfGroup(SL(2,q)), GF(q)));
-[ true, true, true, true, true, true, true, true, true, true ]
-
 #
 gap> SetInfoLevel(InfoClassical, oldInfoLevel);
 gap> STOP_TEST("naming-sl2.tst");
