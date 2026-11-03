@@ -11,20 +11,10 @@
 ##
 ##  SPDX-License-Identifier: GPL-3.0-or-later
 ##
+##
+##  GoingDown method for special linear groups
+##
 #############################################################################
-
-
-
-#############################################################################
-#############################################################################
-######## GoingDown method for special linear groups #########################
-#############################################################################
-#############################################################################
-
-
-
-# The going down method:
-#Version 1.2
 
 # finds first element of a list that is relative prime to all others
 # input: list=[SL(d,q), d, q, SL(n,q)] acting as a subgroup of some big SL(n,q)
