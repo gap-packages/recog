@@ -2617,6 +2617,16 @@ function( grp, arg... )
                    isSpContained := "unknown",
                    isSUContained := "unknown",
                    isOmegaContained := "unknown",
+                   # only used for d = 2, see the methods guarded by d = 2 below
+                   generators := GeneratorsOfGroup(grp),
+                   h := fail,          # element with projective order > 2
+                   pgrp := fail,       # action on the q+1 points of PG(1,q)
+                   isAbelian := "unknown",
+                   hasExp2 := "unknown",
+                   isSubgroupOfGammaL := "unknown",
+                   isImprimitive := "unknown",
+                   isAlt5Alt4Sym4 := "unknown",
+                   isRepresentableOverSubfield := "unknown",
                   );
   originalInfoLevel := InfoLevel(InfoMethSel);
   SetInfoLevel(InfoMethSel,opt.infoLevel);
