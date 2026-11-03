@@ -327,6 +327,13 @@ end);
 BindRecogMethod("FindHomMethodsClassical", "IsGeneric",
 "tests whether group is generic",
 function(recognise)
+    # at d = 2 every ppd exponent is 2, so Length(E) >= 2 below can never
+    # hold; IsSL2Contained decides this case instead
+    if recognise.d = 2 then
+        recognise.isGeneric := false;
+        return NeverApplicable;
+    fi;
+
     if recognise.isGeneric = false then
         return NeverApplicable;
     fi;
@@ -820,6 +827,11 @@ function(recognise)
     local g, ppd, bppd, d, q, cpol, f, deg, facs, r, s, h, gmod,
     ord, bc, phi, kf, o1, o2, cf, i, found, p;
 
+    # TestRandomElementCase2 draws the random elements at d = 2
+    if recognise.d = 2 then
+        return NeverApplicable;
+    fi;
+
     recognise.g := PseudoRandom(recognise.grp);
     recognise.cpol := CharacteristicPolynomial(recognise.g);
     recognise.n := recognise.n + 1;
@@ -1208,6 +1220,10 @@ end);
 BindRecogMethod("FindHomMethodsClassical", "IsSLContained",
 "tests whether group contains SL",
 function(recognise)
+    if recognise.d = 2 then
+        return NeverApplicable;
+    fi;
+
     if recognise.isGeneric <> true or
        recognise.isNotExt <> true or
        recognise.isNotPSL <> true or
@@ -1252,6 +1268,11 @@ BindRecogMethod("FindHomMethodsClassical", "IsSpContained",
 "tests whether group contains Sp",
 function(recognise)
     local isSpForm;
+
+    # Sp(2,q) = SL(2,q), so IsSL2Contained sets isSpContained too
+    if recognise.d = 2 then
+        return NeverApplicable;
+    fi;
 
     isSpForm := f -> IsSesquilinearForm(f) and IsSymplecticForm(f);
 
@@ -1494,6 +1515,14 @@ BindRecogMethod("FindHomMethodsClassical", "NonGenericLinear",
 "tests whether group is non-generic Linear",
 function(recognise)
     local CheckFlag;
+
+    # the criterion below needs 3 in LB, but at d = 2 every basic ppd
+    # exponent is 2; hand over to the d = 2 methods, which need projective
+    # orders to find their witness
+    if recognise.d = 2 then
+        recognise.needPOrders := true;
+        return NeverApplicable;
+    fi;
 
     # We know that grp has non-generic parameters. Do we know whether the other
     # prerequisites of Theorem 5.1, [NP99] are fulfilled? If one of them is
@@ -2469,6 +2498,280 @@ function(recognise)
 
 end);
 
+#############################################################################
+##
+##  Dimension 2.
+##
+##  The generic machinery above is driven by ppd elements, and at d = 2 every
+##  ppd exponent equals 2, so it can conclude nothing.  The methods below take
+##  over instead: they rule out the subgroups of GL(2,q) that do not contain
+##  SL(2,q), class by class, and whatever survives contains it.
+##
+#############################################################################
+
+BindRecogMethod("FindHomMethodsClassical", "TestRandomElementCase2",
+"makes new random element and stores it, its char poly and projective order",
+function(recognise)
+    local g, porder;
+
+    if recognise.d <> 2 then
+        return NeverApplicable;
+    fi;
+
+    recognise.g := PseudoRandom(recognise.grp);
+    recognise.cpol := CharacteristicPolynomial(recognise.g);
+    recognise.n := recognise.n + 1;
+    g := recognise.g;
+
+    if recognise.needPOrders then
+        porder := ProjectiveOrder(g);
+        AddSet(recognise.porders, porder);
+
+        # IsSubgroupOfGammaL and IsImprimitive both need an h with h^2 outside
+        # the centre
+        if porder[1] > 2 then
+            recognise.h := g;
+            recognise.hasExp2 := false;
+            recognise.needPOrders := false;
+        fi;
+    fi;
+
+    return TemporaryFailure;
+end);
+
+BindRecogMethod("FindHomMethodsClassical", "Degree2SmallField",
+"decides a degree-2 group over GF(2) or GF(3) by direct computation",
+function(recognise)
+    local q;
+
+    q := recognise.q;
+    if recognise.d <> 2 or q > 3 then
+        return NeverApplicable;
+    fi;
+
+    # PSL(2,2) = Sym(3) = GammaL(1,4) and PSL(2,3) = Alt(4): here the classes
+    # the methods below rule out coincide with the group we are looking for.
+    # |GL(2,3)| = 48, so just decide it.
+    if IsSubset(recognise.grp, SL(2, q)) then
+        recognise.isSLContained := true;
+        recognise.isSpContained := true;
+        Info(InfoClassical, 2, "The group contains SL(2, ", q, ");");
+    else
+        recognise.isSLContained := false;
+        Info(InfoClassical, 2, "The group does not contain SL(2, ", q, ");");
+    fi;
+    return Success;
+end);
+
+BindRecogMethod("FindHomMethodsClassical", "IsAbelian",
+"tests whether a degree-2 group is abelian",
+function(recognise)
+    if recognise.d <> 2 then
+        return NeverApplicable;
+    fi;
+
+    if IsAbelian(recognise.grp) then
+        recognise.isAbelian := true;
+        recognise.isSLContained := false;
+        Info(InfoClassical, 2,
+             "The group is abelian and thus does not contain SL(2, ",
+             recognise.q, ");");
+        return Success;
+    fi;
+
+    recognise.isAbelian := false;
+    return NeverApplicable;
+end);
+
+BindRecogMethod("FindHomMethodsClassical", "HasExp2",
+"tests whether a degree-2 group modulo scalars has exponent 2",
+function(recognise)
+    local gen, porder;
+
+    if recognise.d <> 2 then
+        return NeverApplicable;
+    fi;
+    if recognise.hasExp2 <> "unknown" then
+        return NeverApplicable;
+    fi;
+
+    # random elements have had their chance by now; fall back on the generators
+    if recognise.n <= 15 then
+        return TemporaryFailure;
+    fi;
+
+    for gen in recognise.generators do
+        porder := ProjectiveOrder(gen);
+        if porder[1] > 2 then
+            recognise.h := gen;
+            recognise.hasExp2 := false;
+            return NeverApplicable;
+        fi;
+    od;
+
+    # every generator squares into the centre, hence so does every element
+    recognise.hasExp2 := true;
+    recognise.isSLContained := false;
+    Info(InfoClassical, 2,
+         "The group modulo scalars has exponent 2 and thus does not contain ",
+         "SL(2, ", recognise.q, ");");
+    return Success;
+end);
+
+BindRecogMethod("FindHomMethodsClassical", "IsSubgroupOfGammaL",
+"tests whether a degree-2 group lies in GammaL(1,q^2)",
+function(recognise)
+    local h, q, gen, x, x2, charPol;
+
+    if recognise.d <> 2 then
+        return NeverApplicable;
+    fi;
+    if recognise.h = fail then
+        return TemporaryFailure;
+    fi;
+
+    h := recognise.h;
+    q := recognise.q;
+    charPol := CharacteristicPolynomial(h^2);
+    x := h^4;
+
+    if not IsIrreducible(charPol) then
+        recognise.isSubgroupOfGammaL := false;
+        return NeverApplicable;
+    fi;
+
+    # h^2 must be a ppd(2,q;2)-element; if it is not, ask for another h
+    if not Order(h^2) in Factors(q^2-1) or Order(h^2) in Factors(q-1) then
+        recognise.h := fail;
+        recognise.needPOrders := true;
+        return TemporaryFailure;
+    fi;
+
+    for gen in recognise.generators do
+        x2 := x^gen;
+        if x2 * x <> x * x2 then
+            recognise.isSubgroupOfGammaL := false;
+            return NeverApplicable;
+        fi;
+    od;
+
+    recognise.isSubgroupOfGammaL := true;
+    recognise.isSLContained := false;
+    Info(InfoClassical, 2,
+         "The group is conjugate to a subgroup of GammaL(1, ", q^2,
+         ") and thus does not contain SL(2, ", q, ");");
+    return Success;
+end);
+
+BindRecogMethod("FindHomMethodsClassical", "IsImprimitive",
+"tests whether a degree-2 group preserves a pair of 1-spaces",
+function(recognise)
+    local h, gen, genNew, eigenvectors;
+
+    if recognise.d <> 2 then
+        return NeverApplicable;
+    fi;
+    if recognise.h = fail then
+        return TemporaryFailure;
+    fi;
+
+    h := recognise.h;
+    eigenvectors := Eigenvectors(recognise.field, h^2);
+
+    # fewer than two eigenspaces leaves nothing to permute
+    if Length(eigenvectors) <> 2 then
+        recognise.isImprimitive := false;
+        return NeverApplicable;
+    fi;
+
+    for gen in recognise.generators do
+        genNew := gen^eigenvectors;
+        if not IsMonomialMatrix(genNew) then
+            recognise.isImprimitive := false;
+            return NeverApplicable;
+        fi;
+    od;
+
+    recognise.isImprimitive := true;
+    recognise.isSLContained := false;
+    Info(InfoClassical, 2,
+         "The group is imprimitive and thus does not contain SL(2, ",
+         recognise.q, ");");
+    return Success;
+end);
+
+BindRecogMethod("FindHomMethodsClassical", "IsAlt5Alt4Sym4",
+"tests whether a degree-2 group modulo scalars is Alt(4), Sym(4) or Alt(5)",
+function(recognise)
+    local pgrp, q;
+
+    if recognise.d <> 2 then
+        return NeverApplicable;
+    fi;
+
+    pgrp := ProjectiveActionOnFullSpace(recognise.grp, recognise.field, 2);
+    recognise.pgrp := pgrp;
+    q := recognise.q;
+
+    # the exceptions are the q where Alt(4), Sym(4), Alt(5) do contain SL(2,q)
+    # modulo scalars: SL(2,3) and GL(2,3) for q = 3, SL(2,4) = Alt(5) for
+    # q = 4, SL(2,5) for q = 5
+    # Do not test NrMovedPoints here: pgrp acts on the q+1 points of the
+    # projective line, so Alt(5) inside PSL(2,11) moves 12 of them.
+    if (Size(pgrp) = 12 and q <> 3) or
+       (Size(pgrp) = 24 and q <> 3) or
+       (Size(pgrp) = 60 and q <> 4 and q <> 5) then
+        if IsAlternatingGroup(pgrp) or IsSymmetricGroup(pgrp) then
+            recognise.isAlt5Alt4Sym4 := true;
+            recognise.isSLContained := false;
+            Info(InfoClassical, 2,
+                 "The group modulo scalars is Alt(4), Sym(4) or Alt(5) ",
+                 "and thus does not contain SL(2, ", q, ");");
+            return Success;
+        fi;
+    fi;
+
+    recognise.isAlt5Alt4Sym4 := false;
+    return NeverApplicable;
+end);
+
+BindRecogMethod("FindHomMethodsClassical", "IsSL2Contained",
+"tests whether a degree-2 group contains SL",
+function(recognise)
+    if recognise.d <> 2 or recognise.isReducible = true then
+        return NeverApplicable;
+    fi;
+
+    if recognise.isReducible <> false or
+       recognise.isAbelian <> false or
+       recognise.hasExp2 <> false or
+       recognise.isSubgroupOfGammaL <> false or
+       recognise.isImprimitive <> false or
+       recognise.isAlt5Alt4Sym4 <> false then
+        return TemporaryFailure;
+    fi;
+
+    # every other class is ruled out, so the group either contains SL(2,q) or
+    # is representable over a proper subfield; transitivity on the q+1 points
+    # of the projective line separates the two
+    if not IsTransitive(recognise.pgrp) then
+        recognise.isRepresentableOverSubfield := true;
+        recognise.isSLContained := false;
+        Info(InfoClassical, 2,
+             "The group is representable over a proper subfield and thus ",
+             "does not contain SL(2, ", recognise.q, ");");
+        return Success;
+    fi;
+
+    recognise.isRepresentableOverSubfield := false;
+    # Sp(2,q) = SL(2,q)
+    recognise.isSLContained := true;
+    recognise.isSpContained := true;
+    Info(InfoClassical, 2, "The group contains SL(2, ", recognise.q, ");");
+    return Success;
+end);
+
+
 ########
 
 # 100 Test Random
@@ -2480,6 +2783,7 @@ end);
 # 1 - 10 Workers
 
 AddMethod(ClassicalMethDb, FindHomMethodsClassical.TestRandomElement, 100);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.TestRandomElementCase2, 100);
 
 AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsGenericParameters, 90);
 
@@ -2514,6 +2818,20 @@ AddMethod(ClassicalMethDb, FindHomMethodsClassical.NonGenericOrthogonalMinus, 14
 AddMethod(ClassicalMethDb, FindHomMethodsClassical.NonGenericOrthogonalCircle, 15);
 
 AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsSLContained, 16);
+
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.Degree2SmallField, 21);
+
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.HasExp2, 20);
+
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsSubgroupOfGammaL, 19);
+
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsImprimitive, 18);
+
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsSL2Contained, 16);
+
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsAbelian, 7);
+
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsAlt5Alt4Sym4, 6);
 
 AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsSpContained, 17);
 
