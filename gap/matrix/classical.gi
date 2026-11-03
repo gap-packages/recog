@@ -2583,7 +2583,7 @@ function(recognise)
     return NeverApplicable;
 end);
 
-BindRecogMethod("FindHomMethodsClassical", "HasExp2",
+BindRecogMethod("FindHomMethodsClassical", "ExponentTwoModScalars",
 "tests whether a degree-2 group modulo scalars has exponent 2",
 function(recognise)
     local gen, porder;
@@ -2824,7 +2824,7 @@ AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsSLContained, 16);
 
 AddMethod(ClassicalMethDb, FindHomMethodsClassical.Degree2SmallField, 21);
 
-AddMethod(ClassicalMethDb, FindHomMethodsClassical.HasExp2, 20);
+AddMethod(ClassicalMethDb, FindHomMethodsClassical.ExponentTwoModScalars, 20);
 
 AddMethod(ClassicalMethDb, FindHomMethodsClassical.IsSubgroupOfGammaL, 19);
 
