@@ -218,7 +218,7 @@ RECOG.SLn_UpStep := function(w)
       if 2*w.n-1 < w.d then
           int3 := Intersection(FixSLn,Fixc);
           if Dimension(int3) <> w.d-2*w.n+1 then
-              Info(InfoRecog,2,"Ooops, FixSLn \cap Fixc wrong dimension");
+              Info(InfoRecog,2,"Ooops, FixSLn \\cap Fixc wrong dimension");
               continue;
           fi;
           Append(newbas,BasisVectors(Basis(int3)));
