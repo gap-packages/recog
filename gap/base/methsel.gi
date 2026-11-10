@@ -67,7 +67,7 @@ InstallGlobalFunction( "CallMethods", function(db, tolerancelimit, ri)
         while i <= Length(db) do
             # skip methods which are known to be inapplicableMethods
             if IsBound(ms.inapplicableMethods.(Stamp(db[i].method))) then
-                Info(InfoMethSel, 4, "Skipping inapplicable rank ", db[i].rank,
+                Info(InfoRecog_MethSel, 4, "Skipping inapplicable rank ", db[i].rank,
                      " method \"", Stamp(db[i].method), "\".");
                 i := i + 1;
                 continue;
@@ -77,20 +77,20 @@ InstallGlobalFunction( "CallMethods", function(db, tolerancelimit, ri)
             # (tolerance + 1) times.
             if IsBound(ms.failedMethods.(Stamp(db[i].method))) and
                 ms.failedMethods.(Stamp(db[i].method)) > tolerance then
-                Info(InfoMethSel, 4, "Skipping temporarily rank ", db[i].rank,
+                Info(InfoRecog_MethSel, 4, "Skipping temporarily rank ", db[i].rank,
                      " method \"", Stamp(db[i].method), "\".");
                 i := i + 1;
                 continue;
             fi;
 
             # apply the method
-            Info(InfoMethSel, 3, "Calling rank ", db[i].rank,
+            Info(InfoRecog_MethSel, 3, "Calling rank ", db[i].rank,
                      " method \"", Stamp(db[i].method), "\"...");
             result := CallRecogMethod(db[i].method, ri);
 
             # evaluate the result
             if result = NeverApplicable then
-                Info(InfoMethSel, 3, "Finished rank ", db[i].rank,
+                Info(InfoRecog_MethSel, 3, "Finished rank ", db[i].rank,
                      " method \"", Stamp(db[i].method), "\": NeverApplicable.");
                 ms.inapplicableMethods.(Stamp(db[i].method)) := 1;
                 # method turned out to be inapplicable, but it may have computed
@@ -100,7 +100,7 @@ InstallGlobalFunction( "CallMethods", function(db, tolerancelimit, ri)
                 i := 1;
 
             elif result = TemporaryFailure then
-                Info(InfoMethSel, 2, "Finished rank ", db[i].rank,
+                Info(InfoRecog_MethSel, 2, "Finished rank ", db[i].rank,
                      " method \"", Stamp(db[i].method), "\": TemporaryFailure.");
                 if IsBound(ms.failedMethods.(Stamp(db[i].method))) then
                     ms.failedMethods.(Stamp(db[i].method)) :=
@@ -113,12 +113,12 @@ InstallGlobalFunction( "CallMethods", function(db, tolerancelimit, ri)
                 i := 1;
 
             elif result = NotEnoughInformation then
-                Info(InfoMethSel, 3, "Finished rank ", db[i].rank,
+                Info(InfoRecog_MethSel, 3, "Finished rank ", db[i].rank,
                      " method \"", Stamp(db[i].method), "\": not currently applicable.");
                 i := i + 1;   # just try the next one
 
             elif result = Success then    # we have a result
-                Info(InfoMethSel, 2, "Finished rank ", db[i].rank,
+                Info(InfoRecog_MethSel, 2, "Finished rank ", db[i].rank,
                      " method \"", Stamp(db[i].method), "\": success.");
                 ms.successMethod := Stamp(db[i].method);
                 ms.result := result;
@@ -130,11 +130,11 @@ InstallGlobalFunction( "CallMethods", function(db, tolerancelimit, ri)
             fi;
         od;
         # Nothing worked, increase tolerance:
-        Info(InfoMethSel, 1, "Increasing tolerance to ",tolerance);
+        Info(InfoRecog_MethSel, 1, "Increasing tolerance to ",tolerance);
         tolerance := tolerance + 1;
     until tolerance > tolerancelimit;
 
-    Info(InfoMethSel, 1, "Giving up!");
+    Info(InfoRecog_MethSel, 1, "Giving up!");
     ms.result := TemporaryFailure;
     ms.tolerance := tolerance;
     return ms;

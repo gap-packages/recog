@@ -168,7 +168,7 @@ by setting a so-called <C>InfoLevel</C>:
 
 <Log><![CDATA[
 gap> SetInfoLevel(InfoRecog, 2);
-gap> SetInfoLevel(InfoMethSel, 2);
+gap> SetInfoLevel(InfoRecog_MethSel, 2);
 gap> G := DirectProduct(SymmetricGroup(12),SymmetricGroup(5));;
 gap> ri := RecogniseGroup(G);
 #I  Finished rank 90 method "NonTransitive": success.

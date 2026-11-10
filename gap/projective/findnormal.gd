@@ -17,8 +17,9 @@
 ##
 #############################################################################
 
-DeclareInfoClass("InfoFindEvenNormal");
-SetInfoLevel(InfoFindEvenNormal,0);
+DeclareInfoClass("InfoRecog_FindEvenNormal");
+SetInfoLevel(InfoRecog_FindEvenNormal,0);
+DeclareSynonym("InfoFindEvenNormal", InfoRecog_FindEvenNormal);  # old name
 
 # DeclareGlobalFunction("RECOG_IsNormal");
 

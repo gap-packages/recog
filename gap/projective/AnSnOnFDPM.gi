@@ -1483,7 +1483,7 @@ RECOG.RecogniseFDPM := function(group, field, eps)
     return fail;
   fi;
 
-  Info(InfoFDPM, 2, "Searching for 3-cycle or double-transposition.");
+  Info(InfoRecog_FDPM, 2, "Searching for 3-cycle or double-transposition.");
 
   # find 3-cycle or double transposition
   if fdpm.fieldChar = 3 then
@@ -1524,24 +1524,24 @@ RECOG.RecogniseFDPM := function(group, field, eps)
 
   # check we found a 3-cycle or double transposition
   if g = fail then
-    Info(InfoFDPM, 2, "Could not find 3-cycle or double-transposition.");
+    Info(InfoRecog_FDPM, 2, "Could not find 3-cycle or double-transposition.");
     return fail;
   fi;
 
   if g.order = 3 then
-    Info(InfoFDPM, 2, "Found 3-cycle.");
+    Info(InfoRecog_FDPM, 2, "Found 3-cycle.");
   else
-    Info(InfoFDPM, 2, "Found double-transposition.");
+    Info(InfoRecog_FDPM, 2, "Found double-transposition.");
   fi;
 
   # find first basis vector
   v := RECOG.FindBasisElement(g, group, eps, fdpm);
   if v = fail then
-    Info(InfoFDPM, 2, "Could not find basis element.");
+    Info(InfoRecog_FDPM, 2, "Could not find basis element.");
     return fail;
   fi;
 
-  Info(InfoFDPM, 2, "Found first basis element.");
+  Info(InfoRecog_FDPM, 2, "Found first basis element.");
 
   # extend basis
   if g.order = 3 then
@@ -1558,11 +1558,11 @@ RECOG.RecogniseFDPM := function(group, field, eps)
   fi;
 
   if vs = fail then
-    Info(InfoFDPM, 2, "Could not find linked sequence of vectors.");
+    Info(InfoRecog_FDPM, 2, "Could not find linked sequence of vectors.");
     return fail;
   fi;
 
-  Info(InfoFDPM, 2, "Found linked sequence of vectors.");
+  Info(InfoRecog_FDPM, 2, "Found linked sequence of vectors.");
 
   # complete basis
 
@@ -1580,11 +1580,11 @@ RECOG.RecogniseFDPM := function(group, field, eps)
              group);
 
   if uvs = fail then
-    Info(InfoFDPM, 2, "Could not complete basis.");
+    Info(InfoRecog_FDPM, 2, "Could not complete basis.");
     return fail;
   fi;
 
-  Info(InfoFDPM, 2, "Found change of basis matrix.");
+  Info(InfoRecog_FDPM, 2, "Found change of basis matrix.");
 
   # determine permutations and scalars: uvs[2] contains the
   # change of basis matrix that takes group elements into

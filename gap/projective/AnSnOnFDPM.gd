@@ -17,5 +17,6 @@
 ##
 #############################################################################
 
-DeclareInfoClass("InfoFDPM");
-SetInfoLevel(InfoFDPM, 0);
+DeclareInfoClass("InfoRecog_FDPM");
+SetInfoLevel(InfoRecog_FDPM, 0);
+DeclareSynonym("InfoFDPM", InfoRecog_FDPM);  # old name

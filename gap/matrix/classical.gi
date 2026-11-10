@@ -454,7 +454,7 @@ function(recognise)
         elif d mod 4 = 2 and q mod 2 = 0 then
             recognise.isNotExt := (Length(E) > 0);
         else
-           Info( InfoClassical, 2, "d cannot be odd in hint Sp");
+           Info( InfoRecog_ClassicalNaming, 2, "d cannot be odd in hint Sp");
            recognise.hintIsWrong := true;
            # clean up and never come back
            return Success;
@@ -472,7 +472,7 @@ function(recognise)
             fi;
             recognise.isNotExt := differmodfour(E);
         else
-           Info( InfoClassical, 2, "d cannot be odd in hint O+");
+           Info( InfoRecog_ClassicalNaming, 2, "d cannot be odd in hint O+");
            recognise.hintIsWrong := true;
            # clean up and never come back
            return Success;
@@ -488,7 +488,7 @@ function(recognise)
             fi;
             recognise.isNotExt := differmodfour(E);
         else
-           Info( InfoClassical, 2, "d cannot be odd in hint O-");
+           Info( InfoRecog_ClassicalNaming, 2, "d cannot be odd in hint O-");
            recognise.hintIsWrong := true;
            # clean up and never come back
            return Success;
@@ -527,7 +527,7 @@ function(recognise)
     q := recognise.q;
 
 #   if recognise.hint <> "unknown" and recognise.hint <> "linear" then
-#       Info( InfoClassical, 2, "G' not an AlternatingGroup;");
+#       Info( InfoRecog_ClassicalNaming, 2, "G' not an AlternatingGroup;");
 #       recognise.isNotAlternating := true;
 #       return NeverApplicable;
 #   fi;
@@ -539,18 +539,18 @@ function(recognise)
     fi;
 
     if recognise.d <> 4 or q <> recognise.p or (3 <= q and q < 23) then
-       Info( InfoClassical, 2, "G is not an alternating group" );
+       Info( InfoRecog_ClassicalNaming, 2, "G is not an alternating group" );
        recognise.isNotAlternating := true;
        return NeverApplicable;
     fi;
 
     if q = 2 then
        if Size(recognise.grp) <> 2520 then  # 2520 = 3*4*5*6*7 = |A7|
-           Info( InfoClassical, 2, "G is not an alternating group" );
+           Info( InfoRecog_ClassicalNaming, 2, "G is not an alternating group" );
            recognise.isNotAlternating := true;
            return NeverApplicable;
        else
-           Info( InfoClassical, 2, "G' might be A7;");
+           Info( InfoRecog_ClassicalNaming, 2, "G' might be A7;");
            AddSet(recognise.possibleNearlySimple,"A7");
            return Success;
        fi;
@@ -558,14 +558,14 @@ function(recognise)
 
     if q >= 23 then
        if 4 in recognise.LE then
-           Info( InfoClassical, 2, "G' not alternating;");
+           Info( InfoRecog_ClassicalNaming, 2, "G' not alternating;");
            recognise.isNotAlternating := true;
            return NeverApplicable;
        fi;
 
        if recognise.n > 15 then
            AddSet (recognise.possibleNearlySimple, "2.A7");
-           Info( InfoClassical, 2, "G' might be 2.A7;");
+           Info( InfoRecog_ClassicalNaming, 2, "G' might be 2.A7;");
            return TemporaryFailure;
        fi;
    fi;
@@ -587,7 +587,7 @@ function(recognise)
    g := recognise.g;
 
 #   if recognise.hint <> "unknown" and recognise.hint <> "linear" then
-#       Info( InfoClassical, 2, "G' not a Mathieu Group;");
+#       Info( InfoRecog_ClassicalNaming, 2, "G' not a Mathieu Group;");
 #       recognise.isNotMathieu := true;
 #       return NeverApplicable;
 #   fi;
@@ -599,7 +599,7 @@ function(recognise)
     fi;
 
    if not [d, q] in [ [5, 3], [6,3], [11, 2] ] then
-       Info( InfoClassical, 2, "G' is not a Mathieu group;");
+       Info( InfoRecog_ClassicalNaming, 2, "G' is not a Mathieu group;");
        recognise.isNotMathieu := true;
        return NeverApplicable;
    fi;
@@ -607,13 +607,13 @@ function(recognise)
    if d = 5 or d = 6 then
        ord := Order(g);
        if (ord mod 121=0 or (d=5 and ord=13) or (d=6 and ord=7)) then
-          Info( InfoClassical, 2, "G' is not a Mathieu group.;");
+          Info( InfoRecog_ClassicalNaming, 2, "G' is not a Mathieu group.;");
           recognise.isNotMathieu := true;
           return NeverApplicable;
        fi;
    else
        if ForAny([6,7,8,9], m -> m in E) then
-          Info( InfoClassical, 2, "G' is not a Mathieu group;");
+          Info( InfoRecog_ClassicalNaming, 2, "G' is not a Mathieu group;");
            recognise.isNotMathieu := true;
            return NeverApplicable;
        fi;
@@ -626,20 +626,20 @@ function(recognise)
     if d = 5 then
         if recognise.n > 15 then
             AddSet(recognise.possibleNearlySimple, "M11" );
-            Info( InfoClassical, 2, "G' might be M11;");
+            Info( InfoRecog_ClassicalNaming, 2, "G' might be M11;");
             return TemporaryFailure;
         fi;
     elif d = 6 then
         if recognise.n > 15 then
             AddSet(recognise.possibleNearlySimple, "2.M12" );
-            Info( InfoClassical, 2, "G' might be 2.M12;");
+            Info( InfoRecog_ClassicalNaming, 2, "G' might be 2.M12;");
             return TemporaryFailure;
         fi;
     else
         if recognise.n > 15 then
             AddSet(recognise.possibleNearlySimple, "M23" );
             AddSet(recognise.possibleNearlySimple, "M24" );
-            Info( InfoClassical, 2, "G' might be M23 or M24;");
+            Info( InfoRecog_ClassicalNaming, 2, "G' might be M23 or M24;");
             return TemporaryFailure;
         fi;
     fi;
@@ -666,7 +666,7 @@ function(recognise)
     p := recognise.p;
 
 #    if recognise.hint <> "unknown" and recognise.hint <> "linear" then
-#        Info( InfoClassical, 2, "G' not PSL(2,r);");
+#        Info( InfoRecog_ClassicalNaming, 2, "G' not PSL(2,r);");
 #        recognise.isNotPSL := true;
 #        return NeverApplicable;
 #    fi;
@@ -681,7 +681,7 @@ function(recognise)
     # By [NP98, Section 8.4], if we are in that situation then G
     # contains ppd(d,q;e) elements for only two values of e
     if Length(E) > 2 then
-        Info(InfoClassical, 2, "G' is not PSL(2,r)");
+        Info(InfoRecog_ClassicalNaming, 2, "G' is not PSL(2,r)");
         recognise.isNotPSL := true;
         return NeverApplicable;
     fi;
@@ -694,7 +694,7 @@ function(recognise)
     if Length(E) = 2 then
         r := 2 * E[2] + 1;
         if not (E[2] = E[1] + 1 and r in [2*d-1, 2*d+1] and IsPrimeInt(E[1]+1) and IsPrimeInt(r)) then
-            Info(InfoClassical, 2, "G' is not PSL(2,r)");
+            Info(InfoRecog_ClassicalNaming, 2, "G' is not PSL(2,r)");
             recognise.isNotPSL := true;
             return NeverApplicable;
         fi;
@@ -707,7 +707,7 @@ function(recognise)
             # Note PSL(2,7) is isomorphic to SL(3,2), so don't print the
             # message if q = 2
             if q = 5 then
-                Info( InfoClassical, 2, "G' is not PSL(2,7)");
+                Info( InfoRecog_ClassicalNaming, 2, "G' is not PSL(2,7)");
             fi;
             recognise.isNotPSL := true;
             return NeverApplicable;
@@ -716,7 +716,7 @@ function(recognise)
             # TODO recheck this
              ord := Order(recognise.g);
              if (ord mod 8 <> 0 or (p^(2*a)-1) mod ord = 0) then
-                 Info( InfoClassical, 2, "G' is not PSL(2,7)");
+                 Info( InfoRecog_ClassicalNaming, 2, "G' is not PSL(2,7)");
                  recognise.isNotPSL := true;
                  return NeverApplicable;
             fi;
@@ -724,7 +724,7 @@ function(recognise)
              # we are only certain that PSL(2,7) is ruled if 2 in LE
              # and the cases p=3 or p=7 cannot have the required ppds
              if 2 in LE then
-                 Info( InfoClassical, 2, "G' is not PSL(2,7)");
+                 Info( InfoRecog_ClassicalNaming, 2, "G' is not PSL(2,7)");
              fi;
              recognise.isNotPSL := true;
              return NeverApplicable;
@@ -732,19 +732,19 @@ function(recognise)
     elif d = 5 then
         # Try to rule out PSL(2,11)
         if q = 5 or q = 11 then
-            Info( InfoClassical, 2, "G' is not PSL(2,11)");
+            Info( InfoRecog_ClassicalNaming, 2, "G' is not PSL(2,11)");
             recognise.isNotPSL := true;
             return NeverApplicable;
         elif q = 3 then
             ord := Order(recognise.g);
             if (ord mod 11^2 = 0 or ord mod 20 = 0) then
-                Info( InfoClassical, 2, "G' is not PSL(2,11)");
+                Info( InfoRecog_ClassicalNaming, 2, "G' is not PSL(2,11)");
                 recognise.isNotPSL := true;
                 return NeverApplicable;
             fi;
         elif p <> 5 and p <> 11 then
             if (3 in LE or 4 in LE) then
-                Info( InfoClassical, 2, "G' is not PSL(2,11)");
+                Info( InfoRecog_ClassicalNaming, 2, "G' is not PSL(2,11)");
                 recognise.isNotPSL := true;
                 return NeverApplicable;
             fi;
@@ -752,19 +752,19 @@ function(recognise)
     elif d = 6 then
         # Try to rule out PSL(2,11)
         if q = 2 then
-            Info( InfoClassical, 2, "G' is not PSL(2,11)");
+            Info( InfoRecog_ClassicalNaming, 2, "G' is not PSL(2,11)");
             recognise.isNotPSL := true;
             return NeverApplicable;
         elif q = 3 then
             ord := Order(recognise.g);
             if (ord mod (11^2)=0 or 6 in E) then
-                Info( InfoClassical, 2, "G' is not PSL(2,11)");
+                Info( InfoRecog_ClassicalNaming, 2, "G' is not PSL(2,11)");
                 recognise.isNotPSL := true;
                 return NeverApplicable;
             fi;
         elif p <> 5 and p <> 11 then
             if (6 in E or 4 in LE) then
-                Info( InfoClassical, 2, "G' is not PSL(2,11)");
+                Info( InfoRecog_ClassicalNaming, 2, "G' is not PSL(2,11)");
                 recognise.isNotPSL := true;
                 return NeverApplicable;
             fi;
@@ -773,7 +773,7 @@ function(recognise)
 
     if recognise.n > 15 and Length(recognise.E) = 2 then
         str := Concatenation("PSL(2,", String(r), ")");
-        Info( InfoClassical, 2, "G' might be ", str);
+        Info( InfoRecog_ClassicalNaming, 2, "G' might be ", str);
         AddSet( recognise.possibleNearlySimple, str );
         return TemporaryFailure;
     fi;
@@ -892,7 +892,7 @@ function(recognise)
               cf := MTX.CollectedFactors(gmod);
               if Length(cf) = 2 and cf[1][2] = cf[2][2] then
                 # we have two non-isomorphic composition factors
-                Info(InfoClassical, 2, "Found a large and special ppd(",d,", ",q,"; ",ppd[1],")-element" );
+                Info(InfoRecog_ClassicalNaming, 2, "Found a large and special ppd(",d,", ",q,"; ",ppd[1],")-element" );
                 AddSet(recognise.LS, ppd[1] );
               fi;
 
@@ -921,16 +921,16 @@ function(recognise)
            phi := recognise.ClassicalForms[i];
            if IsSesquilinearForm(phi) then
                 if IsOddInt (q) and IsHyperbolicForm(phi) then
-                    Info(InfoClassical, 2,"Performing base change");
+                    Info(InfoRecog_ClassicalNaming, 2,"Performing base change");
                     found := true;
                     bc := FindBase (f, phi);
-                    Info(InfoClassical, 2,"Computed base change matrix");
+                    Info(InfoRecog_ClassicalNaming, 2,"Computed base change matrix");
                     bc := bc^-1;
                     recognise.bc := bc;
                 elif IsEvenInt(q) and recognise.QuadraticForm <> false then
                     bc := FindBaseC2 (f, recognise.QuadraticForm);
                     found := true;
-                    Info(InfoClassical,2,
+                    Info(InfoRecog_ClassicalNaming,2,
                      "Computed base change matrix for char 2");
                     bc := bc^-1;
                     recognise.bc := bc;
@@ -939,7 +939,7 @@ function(recognise)
             i := i + 1;
         od;
         if not found then
-            Info(InfoClassical, 2, "need basechange only in O+");
+            Info(InfoRecog_ClassicalNaming, 2, "need basechange only in O+");
             return TemporaryFailure;
         fi;
      fi;
@@ -969,7 +969,7 @@ function(recognise)
             o2 := ProjectiveOrder( kf[2] )[1];
             #o1 := Order( kf[1] );
             #o2 := Order( kf[2] );
-            Info(InfoClassical,2,o1, " ", o2);
+            Info(InfoRecog_ClassicalNaming,2,o1, " ", o2);
             ### ACN March 2007 needed Projective order
             if q mod 2 = 0 and (o1 <= 2 or o2 <= 2) then
                 return TemporaryFailure;
@@ -1193,7 +1193,7 @@ function(recognise)
         recognise.isReducible := false;
         return NeverApplicable;
     else
-        Info( InfoClassical, 2,
+        Info( InfoRecog_ClassicalNaming, 2,
         "The group acts reducibly and thus doesn't contain a classical group");
         recognise.isReducible := true;
         recognise.isSLContained := false;
@@ -1235,12 +1235,12 @@ function(recognise)
 
     if First(recognise.ClassicalForms, IsTrivialForm) <> fail then
         recognise.isSLContained := true;
-        Info(InfoClassical,2,"The group contains SL(", recognise.d, ", ",
+        Info(InfoRecog_ClassicalNaming,2,"The group contains SL(", recognise.d, ", ",
              recognise.q, ");");
         return Success;
     else
         recognise.isSLContained := false;
-        Info(InfoClassical,2,"The group does not contain SL(",
+        Info(InfoRecog_ClassicalNaming,2,"The group does not contain SL(",
              recognise.d, ", ", recognise.q, ");");
         return NeverApplicable;
     fi;
@@ -1293,12 +1293,12 @@ function(recognise)
         # symplectic form
         recognise.isNotExt := true;
         recognise.isSpContained := true;
-        Info(InfoClassical,2,"The group contains Sp(", recognise.d, ", ",
+        Info(InfoRecog_ClassicalNaming,2,"The group contains Sp(", recognise.d, ", ",
              recognise.q, ");");
         return Success;
     else
         recognise.isSpContained := false;
-        Info(InfoClassical,2,"The group does not contain Sp(",
+        Info(InfoRecog_ClassicalNaming,2,"The group does not contain Sp(",
              recognise.d, ", ", recognise.q, ");");
         return NeverApplicable;
     fi;
@@ -1356,12 +1356,12 @@ function(recognise)
 
     if First(recognise.ClassicalForms,isHermForm)<> fail then
         recognise.isSUContained := true;
-        Info(InfoClassical,2,"The group contains SU(", recognise.d, ", ",
+        Info(InfoRecog_ClassicalNaming,2,"The group contains SU(", recognise.d, ", ",
              q0, ");");
         return Success;
     else
         recognise.isSUContained := false;
-        Info(InfoClassical,2,"The group does not contain SU(",
+        Info(InfoRecog_ClassicalNaming,2,"The group does not contain SU(",
              recognise.d, ", ", q0, ");");
         return NeverApplicable;
     fi;
@@ -1423,7 +1423,7 @@ function(recognise)
         fi;
         recognise.isNotExt := true;
         recognise.isOmegaContained := true;
-        Info(InfoClassical,2,"The group contains SO^o(", recognise.d, ", ",
+        Info(InfoRecog_ClassicalNaming,2,"The group contains SO^o(", recognise.d, ", ",
              recognise.q, ");");
         return Success;
 
@@ -1439,7 +1439,7 @@ function(recognise)
         fi;
         recognise.isNotExt := true;
         recognise.isOmegaContained := true;
-        Info(InfoClassical,2,"The group contains SO+(", recognise.d, ", ",
+        Info(InfoRecog_ClassicalNaming,2,"The group contains SO+(", recognise.d, ", ",
              recognise.q, ");");
         return Success;
 
@@ -1455,12 +1455,12 @@ function(recognise)
         fi;
         recognise.isNotExt := true;
         recognise.isOmegaContained := true;
-        Info(InfoClassical,2,"The group contains SO-(", recognise.d, ", ",
+        Info(InfoRecog_ClassicalNaming,2,"The group contains SO-(", recognise.d, ", ",
              recognise.q, ");");
         return Success;
     else
         recognise.isOmegaContained := false;
-        Info(InfoClassical,2,"The group does not contain SO(",
+        Info(InfoRecog_ClassicalNaming,2,"The group does not contain SO(",
              recognise.d, ", ", recognise.q, ");");
         return NeverApplicable;
     fi;
@@ -1507,7 +1507,7 @@ function(recognise)
             recognise.needForms := true;
             return TemporaryFailure;
         fi;
-        Info(InfoClassical,2,"The group is not generic and contains SL(",
+        Info(InfoRecog_ClassicalNaming,2,"The group is not generic and contains SL(",
              recognise.d, ", ", recognise.q, ");");
         recognise.isGeneric := false;
         recognise.isNotExt := true;
@@ -1573,7 +1573,7 @@ function(recognise)
             recognise.needForms := true;
             return TemporaryFailure;
         fi;
-        Info(InfoClassical,2,"The group is not generic and contains Sp(",
+        Info(InfoRecog_ClassicalNaming,2,"The group is not generic and contains Sp(",
              recognise.d, ", ", recognise.q, ");");
         recognise.isGeneric := false;
         recognise.isNotExt := true;
@@ -1632,7 +1632,7 @@ function(recognise)
         fi;
     elif d = 4 and q = 2 then
         if Size(recognise.grp) mod 720 <> 0 then
-            Info(InfoClassical,2,"group does not contain Sp(",
+            Info(InfoRecog_ClassicalNaming,2,"group does not contain Sp(",
                  recognise.d, ", ", recognise.q, ");");
            recognise.isSpContained := false;
            return NeverApplicable;
@@ -1665,7 +1665,7 @@ function(recognise)
             return TemporaryFailure;
         fi;
     else
-        Info(InfoClassical,2,
+        Info(InfoRecog_ClassicalNaming,2,
              "NonGenericSymplectic: d and q must have been generic");
         return NeverApplicable;
     fi;
@@ -1695,7 +1695,7 @@ function(recognise)
             recognise.needForms := true;
             return TemporaryFailure;
         fi;
-        Info(InfoClassical,2,"The group is not generic and contains SU(",
+        Info(InfoRecog_ClassicalNaming,2,"The group is not generic and contains SU(",
              recognise.d, ", ", recognise.q, ");");
         recognise.isGeneric := false;
         recognise.isNotExt := true;
@@ -1822,7 +1822,7 @@ function(recognise)
                 return TemporaryFailure;
             fi;
             if not IsCentral(grp, recognise.g ^ (order / 2)) then
-                Info( InfoClassical,2,
+                Info( InfoRecog_ClassicalNaming,2,
                       "Found an element of order divisible by 6 such",
                       " that the corresponding involution is not central." );
                 recognise.hasSpecialEle := true;
@@ -1843,7 +1843,7 @@ function(recognise)
                 return TemporaryFailure;
             fi;
             if not IsCentral(grp, recognise.g ^ (order / 5)) then
-                Info( InfoClassical,2,
+                Info( InfoRecog_ClassicalNaming,2,
                       "The element of order equal 5 is not central" );
                 recognise.hasSpecialEle := true;
                 return CheckFlag();
@@ -1863,7 +1863,7 @@ function(recognise)
                 return TemporaryFailure;
             fi;
             if not IsCentral(grp, recognise.g ^ (order / 2)) then
-                Info( InfoClassical,2,
+                Info( InfoRecog_ClassicalNaming,2,
                       "Found an element of order divisible by 8 which powers",
                       " to a non-central involution." );
                 recognise.hasSpecialEle := true;
@@ -1883,7 +1883,7 @@ function(recognise)
             return TemporaryFailure;
         fi;
         if recognise.hasSpecialEle = false then
-             Info(InfoClassical,2,
+             Info(InfoRecog_ClassicalNaming,2,
                   "Searching for elements of order > 3 mod scalars",
                   " and dividing ", String(q-1));
              if not ForAny(recognise.porders, i -> i[1] > 3 and q mod i[1] = 1) then
@@ -1895,7 +1895,7 @@ function(recognise)
              return CheckFlag();
          fi;
     else
-        Info(InfoClassical,2,
+        Info(InfoRecog_ClassicalNaming,2,
             "NonGenericUnitary: d and q must have been be generic");
         return NeverApplicable;
     fi;
@@ -1921,7 +1921,7 @@ function(recognise)
             recognise.needForms := true;
             return TemporaryFailure;
         fi;
-        Info(InfoClassical,2,"The group is not generic and contains SO+(",
+        Info(InfoRecog_ClassicalNaming,2,"The group is not generic and contains SO+(",
              recognise.d, ", ", recognise.q, ");");
         recognise.isGeneric := false;
         recognise.isNotExt := true;
@@ -2088,7 +2088,7 @@ function(recognise)
         fi;
         gp1 := Group(recognise.sq1);
         gp2 := Group(recognise.sq2);
-        Info(InfoClassical,2,"Group projects to group of order ",
+        Info(InfoRecog_ClassicalNaming,2,"Group projects to group of order ",
              Size(gp1/recognise.scalars), "x", Size(gp2/recognise.scalars));
         if Size(gp1/recognise.scalars) mod 6 = 0 and
            Size(gp2/recognise.scalars) mod 6 = 0 then
@@ -2105,7 +2105,7 @@ function(recognise)
         fi;
         gp1 := Group(recognise.sq1);
         gp2 := Group(recognise.sq2);
-        Info(InfoClassical,2,"Group projects to group of order ",
+        Info(InfoRecog_ClassicalNaming,2,"Group projects to group of order ",
              Size(gp1/recognise.scalars), "x", Size(gp2/recognise.scalars));
         if Size(gp1/recognise.scalars) mod 12 = 0 and
            Size(gp2/recognise.scalars) mod 12 = 0 then
@@ -2137,7 +2137,7 @@ function(recognise)
         fi;
         gp1 := Group(recognise.sq1);
         gp2 := Group(recognise.sq2);
-        Info(InfoClassical,2,"Group projects to group of order ",
+        Info(InfoRecog_ClassicalNaming,2,"Group projects to group of order ",
              Size(gp1/recognise.scalars), "x", Size(gp2/recognise.scalars));
         if Size(gp1/recognise.scalars) mod 3 = 0 and
            Size(gp2/recognise.scalars) mod 3 = 0 then
@@ -2179,7 +2179,7 @@ function(recognise)
         fi;
         gp1 := Group(recognise.sq1);
         gp2 := Group(recognise.sq2);
-        Info(InfoClassical,2,"Group projects to group of order ",
+        Info(InfoRecog_ClassicalNaming,2,"Group projects to group of order ",
              Size(gp1/recognise.scalars), "x", Size(gp2/recognise.scalars));
         if Size(gp1/recognise.scalars) mod 168 = 0 and
            Size(gp2/recognise.scalars) mod 168 = 0 then
@@ -2201,7 +2201,7 @@ function(recognise)
             return CheckFlag();
         fi;
     else
-        Info(InfoClassical, 2,
+        Info(InfoRecog_ClassicalNaming, 2,
              "NonGenericO+: d and q must have been be generic");
         return NeverApplicable;
     fi;
@@ -2227,7 +2227,7 @@ function(recognise)
             recognise.needForms := true;
             return TemporaryFailure;
         fi;
-        Info(InfoClassical,2,"The group is not generic and contains SO-(",
+        Info(InfoRecog_ClassicalNaming,2,"The group is not generic and contains SO-(",
              recognise.d, ", ", recognise.q, ");");
         recognise.isGeneric := false;
         recognise.isNotExt := true;
@@ -2307,12 +2307,12 @@ function(recognise)
                 fi;
             fi;
         od;
-        Info(InfoClassical, 2, "grp contained in O-(2,", q, "^2)" );
+        Info(InfoRecog_ClassicalNaming, 2, "grp contained in O-(2,", q, "^2)" );
         recognise.isNotExt := false;
         recognise.isOmegaContained := false;
         return NeverApplicable;
     else
-      Info(InfoClassical, 2, "NonGenericO-: d and q must be generic" );
+      Info(InfoRecog_ClassicalNaming, 2, "NonGenericO-: d and q must be generic" );
         return NeverApplicable;
     fi;
 
@@ -2343,7 +2343,7 @@ function(recognise)
             recognise.needForms := true;
             return TemporaryFailure;
         fi;
-        Info(InfoClassical,2,"The group is not generic and contains Omega(",
+        Info(InfoRecog_ClassicalNaming,2,"The group is not generic and contains Omega(",
              recognise.d, ", ", recognise.q, ");");
         recognise.isGeneric := false;
         recognise.isNotExt := true;
@@ -2460,7 +2460,7 @@ function(recognise)
             return TemporaryFailure;
         fi;
     else
-        Info(InfoClassical, 2, "NonGenericOo: d and q must be generic" );
+        Info(InfoRecog_ClassicalNaming, 2, "NonGenericOo: d and q must be generic" );
         return NeverApplicable;
     fi;
 
@@ -2618,10 +2618,10 @@ function( grp, arg... )
                    isSUContained := "unknown",
                    isOmegaContained := "unknown",
                   );
-  originalInfoLevel := InfoLevel(InfoMethSel);
-  SetInfoLevel(InfoMethSel,opt.infoLevel);
+  originalInfoLevel := InfoLevel(InfoRecog_MethSel);
+  SetInfoLevel(InfoRecog_MethSel,opt.infoLevel);
   ret := CallMethods( ClassicalMethDb, opt.nrrandels, recognise );
-  SetInfoLevel(InfoMethSel,originalInfoLevel);
+  SetInfoLevel(InfoRecog_MethSel,originalInfoLevel);
   # TODO: honor ret in some way?
 
   return recognise;

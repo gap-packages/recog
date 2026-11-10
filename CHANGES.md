@@ -8,6 +8,10 @@ This file describes changes in the recog package.
 - Fix `RecogniseClassical` frequently returning "unknown" for SL(d,q)
   with large q, because the characteristic polynomial test almost never
   ruled out an invariant form (issue #492, PR #496)
+- Rename the Info classes other than `InfoRecog` to start with
+  `InfoRecog_`, so that tab completion on `InfoRecog` finds them; e.g.
+  `InfoClassical` is now `InfoRecog_ClassicalNaming`. The old names
+  still work
 
 ## 1.5.1 (2026-05-19)
 

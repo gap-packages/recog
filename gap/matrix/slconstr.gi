@@ -2518,10 +2518,10 @@ function(ri)
         return NeverApplicable;
     fi;
 
-    il := InfoLevel(InfoMethSel);
-    SetInfoLevel(InfoMethSel,0);
+    il := InfoLevel(InfoRecog_MethSel);
+    SetInfoLevel(InfoRecog_MethSel,0);
     r:=RecogniseClassical(G,rec(case:="linear"));
-    SetInfoLevel(InfoMethSel,il);
+    SetInfoLevel(InfoRecog_MethSel,il);
     if not( (IsBound(r.isSLContained) and r.isSLContained = true) ) then
         return TemporaryFailure;
     fi;
