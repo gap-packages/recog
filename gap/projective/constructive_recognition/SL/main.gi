@@ -13,16 +13,14 @@
 ##
 #############################################################################
 
-# TODO: which algorithm is this? reference?
+# StandardGenerators of [EHNPR] (see ../GoingDown.gi) for SL(d,q)
 RECOG.FindStdGens_SL := function(sld)
   # gens of sld must be gens for SL(d,q) in its natural rep with memory
-  # This function calls RECOG.SLn_constructsl2 and then extends
-  # the basis to a basis of the full row space and calls
-  # RECOG.SLn_UpStep often enough. Finally it returns an slp such
-  # that the SL(d,q) standard generators with respect to this basis are
-  # expressed by the slp in terms of the original generators of sld.
-  local V,b,bas,basi,basit,d,data,ext,fakegens,nu,nu2,p,q,resl2,sl2,sl2gens,
-        sl2gensf,sl2genss,sl2stdf,slp,slpsl2std,slptosl2,st,std,stdgens,i,ex,f;
+  # This function runs GoingDown to SL(4,q) and FinalDescent to SL(2,q),
+  # and then calls RECOG.SLn_UpStep often enough. Finally it returns an slp
+  # such that the SL(d,q) standard generators with respect to the basis
+  # bas are expressed by the slp in terms of the original generators of sld.
+  local bas,basi,d,down,ext,f,fakegens,init,p,q,sl2stdf,std;
 
   # Some setup:
   f := FieldOfMatrixGroup(sld);
@@ -34,56 +32,20 @@ RECOG.FindStdGens_SL := function(sld)
       sld := GroupWithMemory(sld);
   fi;
 
-  # First find an SL2 with the space it acts on:
+  # First find an SL4, then an SL2 with the space it acts on:
   Info(InfoRecog_ClassicalNatural,1,"SL_n: going down in SL(",d,",",q,")");
-  data := RECOG.SLn_constructsl2(sld,d,q);
-
-  bas := ShallowCopy(BasisVectors(Basis(data[2])));
-  sl2 := data[1];
-  slptosl2 := SLPOfElms(GeneratorsOfGroup(sl2));
-  sl2gens := StripMemory(GeneratorsOfGroup(sl2));
-  V := data[2];
-  b := Basis(V,bas);
-  sl2genss := List(sl2gens,x->RECOG.LinearAction(b,f,x));
-
-  if q in [2,3,4,5,9] then
-      Info(InfoRecog_ClassicalNatural,1,"SL_n: base case SL(4,",q,")");
-      stdgens := RECOG.MakeSL_StdGens(p,ext,4,4).all;
-      slpsl2std := RECOG.FindStdGensUsingBSGS(Group(sl2genss),stdgens,
-                                              false,false);
-      nu := List(sl2gens, RECOG.FixspaceMat);
-      ex := SumIntersectionMat(nu[1],nu[2])[2];
-      for i in [3..Length(nu)] do
-          ex := SumIntersectionMat(nu[3],ex);
-      od;
-      Append(bas,ex);
-      ConvertToMatrixRep(bas,q);
-      basi := bas^-1;
-  else
-      # Now compute the natural SL2 action and run constructive recognition:
-      Info(InfoRecog_ClassicalNatural,1,"SL_n: base case SL(2,",q,")");
-      sl2genss := GeneratorsWithMemory(sl2genss);
-      resl2 := RECOG.RecogniseSL2Natural(Group(sl2genss),f);
-      slpsl2std := SLPOfElms(resl2.all);
-      bas := resl2.bas * bas;
-      # We need the actual transvections:
-      slp := SLPOfElms([resl2.s[1],resl2.t[1]]);
-      st := ResultOfStraightLineProgram(slp,
-                                        StripMemory(GeneratorsOfGroup(sl2)));
-
-      # Extend basis by something invariant under SL2:
-      nu := RECOG.FixspaceMat(StripMemory(st[1]));
-      nu2 := RECOG.FixspaceMat(StripMemory(st[2]));
-      Append(bas,SumIntersectionMat(nu,nu2)[2]);
-      ConvertToMatrixRep(bas,q);
-      basi := bas^-1;
-  fi;
+  down := RECOG.GoingDown(sld,"SL",RECOG.GoingDownRandomBound);
+  init := RECOG.SLn_FinalDescent(down.gens,f);
+  bas := Concatenation(init.bas * down.bas{[1..4]}, down.bas{[5..d]});
+  ConvertToMatrixRep(bas,q);
+  basi := bas^-1;
 
   # Now set up fake generators for keeping track what we do:
   fakegens := ListWithIdenticalEntries(Length(GeneratorsOfGroup(sld)),());
   fakegens := GeneratorsWithMemory(fakegens);
-  sl2gensf := ResultOfStraightLineProgram(slptosl2,fakegens);
-  sl2stdf := ResultOfStraightLineProgram(slpsl2std,sl2gensf);
+  sl2stdf := ResultOfStraightLineProgram(
+                 CompositionOfStraightLinePrograms(init.slp,down.slp),
+                 fakegens);
   std := rec( f := f, d := d, n := 2, bas := bas, basi := basi,
               sld := sld, sldf := fakegens, slnstdf := sl2stdf,
               p := p, ext := ext );
