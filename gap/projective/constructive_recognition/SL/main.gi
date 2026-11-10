@@ -35,7 +35,7 @@ RECOG.FindStdGens_SL := function(sld)
   fi;
 
   # First find an SL2 with the space it acts on:
-  Info(InfoRecog,2,"Finding an SL2...");
+  Info(InfoRecog_ClassicalNatural,1,"SL_n: going down in SL(",d,",",q,")");
   data := RECOG.SLn_constructsl2(sld,d,q);
 
   bas := ShallowCopy(BasisVectors(Basis(data[2])));
@@ -47,7 +47,7 @@ RECOG.FindStdGens_SL := function(sld)
   sl2genss := List(sl2gens,x->RECOG.LinearAction(b,f,x));
 
   if q in [2,3,4,5,9] then
-      Info(InfoRecog,2,"In fact found an SL4...");
+      Info(InfoRecog_ClassicalNatural,1,"SL_n: base case SL(4,",q,")");
       stdgens := RECOG.MakeSL_StdGens(p,ext,4,4).all;
       slpsl2std := RECOG.FindStdGensUsingBSGS(Group(sl2genss),stdgens,
                                               false,false);
@@ -61,8 +61,7 @@ RECOG.FindStdGens_SL := function(sld)
       basi := bas^-1;
   else
       # Now compute the natural SL2 action and run constructive recognition:
-      Info(InfoRecog,2,
-           "Recognising this SL2 constructively in 2 dimensions...");
+      Info(InfoRecog_ClassicalNatural,1,"SL_n: base case SL(2,",q,")");
       sl2genss := GeneratorsWithMemory(sl2genss);
       resl2 := RECOG.RecogniseSL2Natural(Group(sl2genss),f);
       slpsl2std := SLPOfElms(resl2.all);
@@ -88,7 +87,7 @@ RECOG.FindStdGens_SL := function(sld)
   std := rec( f := f, d := d, n := 2, bas := bas, basi := basi,
               sld := sld, sldf := fakegens, slnstdf := sl2stdf,
               p := p, ext := ext );
-  Info(InfoRecog,2,"Going up to SL_d again...");
+  Info(InfoRecog_ClassicalNatural,1,"SL_n: going up");
   while std.n < std.d do
       RECOG.SLn_UpStep(std);
   od;
