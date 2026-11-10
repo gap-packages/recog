@@ -1140,14 +1140,17 @@ InstallGlobalFunction( CalcRelationsSLPGenericNonLeaf,
             Add(lines, [inputRegs[k], 1]);
         od;
         nr := nr + nrIn;
-        # Register k of s corresponds to register k+c0 here. In a flat line
-        # [i1,e1,i2,e2,...] the registers are at the odd positions.
+        # `shift` maps an external representation `rep` of an associative word that
+        # appears in a line of s to the corresponding ext. rep. in the new SLP.
+        # Namely, the any entry k of `rep` at an odd position (which represents the k-th register)
+        # is mapped to k+c0 and any entry of `rep` at an even position
+        # (which represents the power to which an element is raised) stays the same.
         shift := l -> List([1..Length(l)], p -> l[p] + c0 * (p mod 2));
         regs := [];
         isList := false;
         for line in sLines do
             if IsInt(line[1]) then
-                # flat line: defines a new register
+                # `line` is the external representation of an associative word
                 Add(lines, shift(line));
                 nr := nr + 1;
                 regs := [nr];
