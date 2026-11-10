@@ -16,8 +16,9 @@
 ##
 #############################################################################
 
-DeclareInfoClass( "InfoClassical" );
-SetInfoLevel(InfoClassical,1);
+DeclareInfoClass( "InfoRecog_ClassicalNaming" );
+SetInfoLevel(InfoRecog_ClassicalNaming,1);
+DeclareSynonym("InfoClassical", InfoRecog_ClassicalNaming);  # old name
 
 ## <#GAPDoc Label="RecogniseClassical">
 ## <ManSection>
@@ -43,7 +44,7 @@ SetInfoLevel(InfoClassical,1);
 ## <C>"symplectic"</C>, <C>"unitary"</C>, <C>"orthogonalplus"</C>, or
 ## <C>"orthogonalcircle"</C>. Furthermore, <C>nrrandels</C> controls how many
 ## random elements are inspected, and <C>infoLevel</C> sets the
-## <C>InfoMethSel</C> level used while running the method selection
+## <C>InfoRecog_MethSel</C> level used while running the method selection
 ## machinery.
 ## <P/>
 ## The returned record is currently mostly an internal data structure and its

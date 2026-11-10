@@ -17,8 +17,9 @@
 ##
 #############################################################################
 
-DeclareInfoClass( "InfoGiants" );
-SetInfoLevel( InfoGiants, 1 );
+DeclareInfoClass( "InfoRecog_Giants" );
+SetInfoLevel( InfoRecog_Giants, 1 );
+DeclareSynonym("InfoGiants", InfoRecog_Giants);  # old name
 
 #########################################################################
 ## For a permutation group grp on n points and a list lenList of integers,
@@ -531,7 +532,7 @@ RECOG.RecogniseGiant :=  function( grp, eps )
 
     if gens = fail then
         infoString := Concatenation("couldn't find nice generators for ", grpName);
-        Info(InfoGiants,1,infoString);
+        Info(InfoRecog_Giants,1,infoString);
         return fail;
     fi;
 
