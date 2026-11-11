@@ -236,9 +236,28 @@ end;
 # treated as a projective group. The result may be too small, but it
 # will divide the actual order.
 RECOG.EstimateProjOrder := function(G)
-  local S;
+  local S, base, gens, size, i, o;
   S := StabilizerChain(G,rec( Projective := true ));
-  return Size(S);
+
+  # genss enumerates each basic orbit under the generators of its own layer
+  # only, so Size(S) need not divide the order. Enumerate the i-th orbit
+  # under all strong generators fixing the first i-1 base points instead;
+  # the product of these orbit lengths divides the order of G.
+  base := BaseStabilizerChain(S);
+  gens := GeneratorsOfGroup(G);
+  size := 1;
+  for i in [1 .. Length(base.points)] do
+    o := Orb(gens, base.points[i], base.ops[i]);
+    Enumerate(o);
+    size := size * Length(o);
+
+    gens := Filtered(StrongGenerators(S), g -> ForAll([1 .. i],
+                j -> base.ops[j](base.points[j], g) = base.points[j]));
+    if IsEmpty(gens) then
+      break;
+    fi;
+  od;
+  return size;
 end;
 
 # The naming algorithm for classical groups is divided into two
