@@ -91,7 +91,8 @@ RECOG.SL_RootElements := function(Y, n, f)
 end;
 
 # The elementary matrix E(<i>, <j>, <lambda>) of RECOG.SL_RootElements, as
-# a word in R.Y. R.words[i][j] keeps the E(i, j, b) for b in R.basis.
+# a word in R.Y. R.words[i][j][k] keeps the powers of E(i, j, b), b the
+# k-th vector of R.basis, for RECOG.GoingUpRootWord.
 RECOG.SL_ElementaryMatrix := function(R, i, j, lambda)
   local words, signed, y;
 
@@ -113,7 +114,7 @@ RECOG.SL_ElementaryMatrix := function(R, i, j, lambda)
       words := List([1 .. Length(R.E12)], k -> Comm(
           RECOG.SL_ElementaryMatrix(R, i, 1, BasisVectors(R.basis)[k]), y));
     fi;
-    R.words[i][j] := words;
+    R.words[i][j] := List(words, y -> [y]);
   fi;
   return RECOG.GoingUpRootWord(R.words[i][j], R.basis, lambda, R.one);
 end;
@@ -409,8 +410,8 @@ RECOG.SL_GoingUpNewGenerators := function(std, Y, R, g)
     return Comm(elementary(i, n, lambda), elementary(n, j, One(f)));
   end;
 
-  # E(i, j, lambda) = E(i, j, 1)^lambda for lambda in GF(p), so E(i, j, 1)
-  # is kept
+  # E(i, j, lambda) = E(i, j, 1)^lambda for lambda in GF(p), so the powers
+  # of E(i, j, 1) are kept
   unit := List([1 .. nn], i -> []);
   elementary := function(i, j, lambda)
     if i <= n and j <= n then
@@ -418,9 +419,9 @@ RECOG.SL_GoingUpNewGenerators := function(std, Y, R, g)
     elif not lambda in GF(Characteristic(f)) then
       return compute(i, j, lambda);
     elif not IsBound(unit[i][j]) then
-      unit[i][j] := compute(i, j, One(f));
+      unit[i][j] := [compute(i, j, One(f))];
     fi;
-    return unit[i][j]^IntFFE(lambda);
+    return RECOG.GoingUpPower(unit[i][j], IntFFE(lambda));
   end;
 
   new := RECOG.ClassicalStandardGenerators("SL", nn, f);
