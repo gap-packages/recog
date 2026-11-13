@@ -19,6 +19,32 @@
 ##
 #############################################################################
 
+# The Gram matrix, relative to a standard basis, of the standard form of
+# type <type> on GF(q)^<d>, q = Size(<f>): diag(J, ..., J) with
+# J = [[0,1],[-1,0]] for "Sp". Type "SL" has no form; its standard
+# scalar product has Gram matrix the identity.
+RECOG.ClassicalStandardForm := function(type, d, f)
+  local J, i;
+
+  if type = "SL" then
+    return IdentityMat(d, f);
+  fi;
+  if type <> "Sp" then
+    ErrorNoReturn("RECOG.ClassicalStandardForm: unsupported type ", type);
+  fi;
+  if IsOddInt(d) then
+    ErrorNoReturn("RECOG.ClassicalStandardForm: <d> must be even");
+  fi;
+
+  J := NullMat(d, d, f);
+  for i in [1, 3 .. d - 1] do
+    J[i, i + 1] := One(f);
+    J[i + 1, i] := -One(f);
+  od;
+  ConvertToMatrixRep(J, f);
+  return J;
+end;
+
 # The matrix which acts as <M> on the basis vectors with indices <idx> and
 # fixes the other basis vectors of GF(q)^<d>
 RECOG.EmbedBlock := function(d, f, idx, M)
@@ -47,13 +73,15 @@ end;
 
 # The standard generators of CL(<d>, q) of type <type> relative to the
 # standard basis of GF(q)^<d>, q = Size(<f>), with gamma = Z(q) ([EHNPR],
-# Definition of standard generators). For SL, they are those of
-# Leedham-Green and O'Brien, J. Algebra 322 (2009), Section 3, Table 1,
-# except u and y, which are the identity there.
+# Definition of standard generators). For SL, and for Sp with q odd, they
+# are those of Leedham-Green and O'Brien, J. Algebra 322 (2009), Section 3,
+# Table 1, except u for SL and y, which are the identity there.
 # Returns a record with the following components:
 #  - `s`, `t`, `delta`: [[0,1],[-1,0]], [[1,1],[0,1]] and
 #    diag(gamma, gamma^-1) on (e_1, f_1)
-#  - `x`: for "SL" and d even, the signed cycle
+#  - `u` (not "SL"): (e_1, e_2)(f_1, f_2), the identity for d = 2
+#  - `x`: for "Sp", the matrix [[1,0,0,0],[0,1,1,0],[0,0,1,0],[1,0,0,1]]
+#    on (e_1, f_1, e_2, f_2); for "SL" and d even, the signed cycle
 #    (e_1, f_1, e_2, f_2)^-; the identity if it does not fit
 #  - `v`: (e_1, ..., e_m)(f_1, ..., f_m); for "SL" and d odd, the map
 #    v_1 -> v_d, v_i -> -v_(i-1)
@@ -62,9 +90,12 @@ end;
 RECOG.ClassicalStandardGenerators := function(type, d, f)
   local gamma, m, odd, e, res, i;
 
-  if type <> "SL" then
+  if not type in ["SL", "Sp"] then
     ErrorNoReturn("RECOG.ClassicalStandardGenerators: unsupported type ",
                   type);
+  fi;
+  if type = "Sp" and IsOddInt(d) then
+    ErrorNoReturn("RECOG.ClassicalStandardGenerators: <d> must be even");
   fi;
 
   gamma := Z(Size(f));
@@ -78,7 +109,17 @@ RECOG.ClassicalStandardGenerators := function(type, d, f)
     delta := RECOG.EmbedBlock(d, f, [1, 2], [[gamma, 0], [0, gamma^-1]]),
   );
 
-  if IsEvenInt(d) then
+  if type = "Sp" then
+    res.u := IdentityMat(d, f);
+    res.x := IdentityMat(d, f);
+    if m >= 2 then
+      res.u := RECOG.SignedCycle(d, f, [1, 3], 1)
+               * RECOG.SignedCycle(d, f, [2, 4], 1);
+      res.x := RECOG.EmbedBlock(d, f, [1 .. 4],
+                   [[1, 0, 0, 0], [0, 1, 1, 0], [0, 0, 1, 0], [1, 0, 0, 1]]);
+    fi;
+    res.v := RECOG.SignedCycle(d, f, odd, 1) * RECOG.SignedCycle(d, f, e, 1);
+  elif IsEvenInt(d) then
     if d >= 4 then
       res.x := RECOG.SignedCycle(d, f, [1 .. 4], -1);
     else
@@ -107,6 +148,8 @@ end;
 RECOG.ClassicalStandardGeneratorNames := function(type)
   if type = "SL" then
     return ["s", "t", "delta", "v", "x"];
+  elif type = "Sp" then
+    return ["s", "t", "delta", "u", "x", "v"];
   fi;
   ErrorNoReturn("RECOG.ClassicalStandardGeneratorNames: unsupported type ",
                 type);
