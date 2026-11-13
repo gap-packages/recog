@@ -21,25 +21,31 @@
 
 # The Gram matrix, relative to a standard basis, of the standard form of
 # type <type> on GF(q)^<d>, q = Size(<f>): diag(J, ..., J) with
-# J = [[0,1],[-1,0]] for "Sp". Type "SL" has no form; its standard
-# scalar product has Gram matrix the identity.
+# J = [[0,1],[-1,0]] for "Sp" and J = [[0,1],[1,0]] for "SU". Type "SL"
+# has no form; its standard scalar product has Gram matrix the identity.
 RECOG.ClassicalStandardForm := function(type, d, f)
-  local J, i;
+  local eps, J, i;
 
   if type = "SL" then
     return IdentityMat(d, f);
   fi;
-  if type <> "Sp" then
+  if not type in ["Sp", "SU"] then
     ErrorNoReturn("RECOG.ClassicalStandardForm: unsupported type ", type);
   fi;
   if IsOddInt(d) then
     ErrorNoReturn("RECOG.ClassicalStandardForm: <d> must be even");
   fi;
 
+  # beta(f_i, e_i)
+  if type = "Sp" then
+    eps := -One(f);
+  else
+    eps := One(f);
+  fi;
   J := NullMat(d, d, f);
   for i in [1, 3 .. d - 1] do
     J[i, i + 1] := One(f);
-    J[i + 1, i] := -One(f);
+    J[i + 1, i] := eps;
   od;
   ConvertToMatrixRep(J, f);
   return J;
@@ -53,11 +59,17 @@ end;
 # All forms here are reflexive, beta(y, x) = eps * beta(x, y)^frob with
 # eps = 1 or -1, as alternating and hermitian forms are.
 
-# The standard form of type <type>, "Sp", on GF(q)^<d>,
+# The standard form of type <type>, "Sp" or "SU", on GF(q)^<d>,
 # q = Size(<f>), as a form record
 RECOG.ClassicalForm := function(type, d, f)
+  local frob;
+
+  frob := 1;
+  if type = "SU" then
+    frob := RootInt(Size(f), 2);
+  fi;
   return rec( gram := RECOG.ClassicalStandardForm(type, d, f),
-              frob := 1, field := f );
+              frob := frob, field := f );
 end;
 
 # The vector or matrix <v> with its entries raised to the power form.frob,
@@ -203,18 +215,33 @@ RECOG.FormStandardBasis := function(form, vecs)
   return res;
 end;
 
-# The form, as a form record, of type <type>, "Sp", which the
+# The form, as a form record, of type <type>, "Sp" or "SU", which the
 # matrices <gens> over <f> preserve, and which is unique up to a scalar:
-# g * gram * (g^frob)^T = gram for g in gens.
+# g * gram * (g^frob)^T = gram for g in gens. For "SU" it is hermitian.
 RECOG.ClassicalInvariantForm := function(type, gens, f)
-  local M;
+  local M, frob, F, Fq;
 
   M := GModuleByMats(gens, f);
   if type = "Sp" then
     return rec( gram := MTX.InvariantBilinearForm(M), frob := 1,
                 field := f );
   fi;
-  ErrorNoReturn("RECOG.ClassicalInvariantForm: unsupported type ", type);
+  if type <> "SU" then
+    ErrorNoReturn("RECOG.ClassicalInvariantForm: unsupported type ", type);
+  fi;
+
+  # (F^frob)^T = c*F with c^(frob+1) = 1, so F + (F^frob)^T is hermitian
+  # unless c = -1; then alpha*F is, for alpha^frob = -alpha
+  frob := RootInt(Size(f), 2);
+  F := MTX.InvariantSesquilinearForm(M);
+  Fq := TransposedMat(List(F, r -> List(r, x -> x^frob)));
+  if IsZero(F + Fq) then
+    F := PrimitiveRoot(f)^((frob + 1) / 2) * F;
+  else
+    F := F + Fq;
+  fi;
+  ConvertToMatrixRep(F, f);
+  return rec( gram := F, frob := frob, field := f );
 end;
 
 # The matrix which acts as <M> on the basis vectors with indices <idx> and
@@ -245,28 +272,34 @@ end;
 
 # The standard generators of CL(<d>, q) of type <type> relative to the
 # standard basis of GF(q)^<d>, q = Size(<f>), with gamma = Z(q) ([EHNPR],
-# Definition of standard generators). For SL, and for Sp with q odd, they
-# are those of Leedham-Green and O'Brien, J. Algebra 322 (2009), Section 3,
-# Table 1, except u for SL and y, which are the identity there.
+# Definition of standard generators). For SL, for Sp with q odd, and for SU
+# with q odd and d even, they are those of Leedham-Green and O'Brien, J.
+# Algebra 322 (2009), Section 3, Table 1, relative to the basis order of
+# [EHNPR], except u for SL and y, which are the identity there. For SU,
+# q = q0^2, alpha = gamma^((q0+1)/2) and gamma0 = gamma^(q0+1).
 # Returns a record with the following components:
 #  - `s`, `t`, `delta`: [[0,1],[-1,0]], [[1,1],[0,1]] and
-#    diag(gamma, gamma^-1) on (e_1, f_1)
+#    diag(gamma, gamma^-1) on (e_1, f_1); for "SU", [[0,alpha],
+#    [alpha^-q0,0]], [[1,alpha],[0,1]] and diag(gamma0, gamma0^-1)
 #  - `u` (not "SL"): (e_1, e_2)(f_1, f_2), the identity for d = 2
 #  - `x`: for "Sp", the matrix [[1,0,0,0],[0,1,1,0],[0,0,1,0],[1,0,0,1]]
-#    on (e_1, f_1, e_2, f_2); for "SL" and d even, the signed cycle
+#    on (e_1, f_1, e_2, f_2); for "SU", [[1,0,1,0],[0,1,0,0],[0,0,1,0],
+#    [0,-1,0,1]]; for "SL" and d even, the signed cycle
 #    (e_1, f_1, e_2, f_2)^-; the identity if it does not fit
+#  - `y` (only "SU"): diag(gamma, gamma^-q0, gamma^-1, gamma^q0) on
+#    (e_1, f_1, e_2, f_2), the identity for d = 2
 #  - `v`: (e_1, ..., e_m)(f_1, ..., f_m); for "SL" and d odd, the map
 #    v_1 -> v_d, v_i -> -v_(i-1)
 #  - `all`: the list of these, in the order of
 #    RECOG.ClassicalStandardGeneratorNames
 RECOG.ClassicalStandardGenerators := function(type, d, f)
-  local gamma, m, odd, e, res, i;
+  local gamma, m, odd, e, q0, alpha, gamma0, res, i;
 
-  if not type in ["SL", "Sp"] then
+  if not type in ["SL", "Sp", "SU"] then
     ErrorNoReturn("RECOG.ClassicalStandardGenerators: unsupported type ",
                   type);
   fi;
-  if type = "Sp" and IsOddInt(d) then
+  if type in ["Sp", "SU"] and IsOddInt(d) then
     ErrorNoReturn("RECOG.ClassicalStandardGenerators: <d> must be even");
   fi;
 
@@ -275,20 +308,40 @@ RECOG.ClassicalStandardGenerators := function(type, d, f)
   odd := [1, 3 .. 2 * m - 1];
   e := [2, 4 .. 2 * m];
 
-  res := rec(
-    s := RECOG.EmbedBlock(d, f, [1, 2], [[0, 1], [-1, 0]]),
-    t := RECOG.EmbedBlock(d, f, [1, 2], [[1, 1], [0, 1]]),
-    delta := RECOG.EmbedBlock(d, f, [1, 2], [[gamma, 0], [0, gamma^-1]]),
-  );
+  if type = "SU" then
+    q0 := RootInt(Size(f), 2);
+    alpha := gamma^((q0 + 1) / 2);
+    gamma0 := gamma^(q0 + 1);
+    res := rec(
+      s := RECOG.EmbedBlock(d, f, [1, 2], [[0, alpha], [alpha^-q0, 0]]),
+      t := RECOG.EmbedBlock(d, f, [1, 2], [[1, alpha], [0, 1]]),
+      delta := RECOG.EmbedBlock(d, f, [1, 2],
+                                [[gamma0, 0], [0, gamma0^-1]]),
+    );
+  else
+    res := rec(
+      s := RECOG.EmbedBlock(d, f, [1, 2], [[0, 1], [-1, 0]]),
+      t := RECOG.EmbedBlock(d, f, [1, 2], [[1, 1], [0, 1]]),
+      delta := RECOG.EmbedBlock(d, f, [1, 2], [[gamma, 0], [0, gamma^-1]]),
+    );
+  fi;
 
-  if type = "Sp" then
+  if type in ["Sp", "SU"] then
     res.u := IdentityMat(d, f);
     res.x := IdentityMat(d, f);
+    res.y := IdentityMat(d, f);
     if m >= 2 then
       res.u := RECOG.SignedCycle(d, f, [1, 3], 1)
                * RECOG.SignedCycle(d, f, [2, 4], 1);
+    fi;
+    if m >= 2 and type = "Sp" then
       res.x := RECOG.EmbedBlock(d, f, [1 .. 4],
                    [[1, 0, 0, 0], [0, 1, 1, 0], [0, 0, 1, 0], [1, 0, 0, 1]]);
+    elif m >= 2 then
+      res.x := RECOG.EmbedBlock(d, f, [1 .. 4],
+                   [[1, 0, 1, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, -1, 0, 1]]);
+      res.y := RECOG.EmbedBlock(d, f, [1 .. 4],
+                   DiagonalMat([gamma, gamma^-q0, gamma^-1, gamma^q0]));
     fi;
     res.v := RECOG.SignedCycle(d, f, odd, 1) * RECOG.SignedCycle(d, f, e, 1);
   elif IsEvenInt(d) then
@@ -322,6 +375,8 @@ RECOG.ClassicalStandardGeneratorNames := function(type)
     return ["s", "t", "delta", "v", "x"];
   elif type = "Sp" then
     return ["s", "t", "delta", "u", "x", "v"];
+  elif type = "SU" then
+    return ["s", "t", "delta", "u", "v", "x", "y"];
   fi;
   ErrorNoReturn("RECOG.ClassicalStandardGeneratorNames: unsupported type ",
                 type);
