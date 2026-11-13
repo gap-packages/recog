@@ -26,16 +26,18 @@ gap> ForAll([1..10], function(i)
 true
 
 # RECOG.GoingDown returns SLPs for generators of the terminal group, SL(4,q),
-# Sp(8,q), SU(6,q) or SU(10,2), and a basis in which their lifts are block
-# diagonal with an identity block.
+# Sp(8,q), SU(6,q), SU(10,2) or Omega^+-(8,q), and a basis in which their
+# lifts are block diagonal with an identity block.
 gap> CheckGoingDown := function(type, d, q)
 >     local G, F, t, down, x;
 >     if type = "SL" then
 >         G := SL(d, q);
 >     elif type = "Sp" then
 >         G := Sp(d, q);
->     else
+>     elif type = "SU" then
 >         G := SU(d, q);
+>     else
+>         G := Omega([1, -1, 0][Position(RECOG.OrthogonalTypes, type)], d, q);
 >     fi;
 >     F := DefaultFieldOfMatrixGroup(G);
 >     t := RECOG.GoingDownParameters(type, Size(F)).terminal;
@@ -55,6 +57,10 @@ gap> List([["SU", 7, 3], ["SU", 12, 4], ["SU", 15, 5], ["SU", 11, 2],
 >          ["SU", 20, 9]],
 >         args -> CallFuncList(CheckGoingDown, args));
 [ true, true, true, true, true ]
+gap> List([["O+", 10, 3], ["O-", 12, 5], ["O", 9, 3], ["O", 13, 7],
+>          ["O+", 20, 9], ["O-", 30, 3]],
+>         args -> CallFuncList(CheckGoingDown, args));
+[ true, true, true, true, true, true ]
 
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
