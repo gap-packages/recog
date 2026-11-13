@@ -203,6 +203,20 @@ RECOG.FormStandardBasis := function(form, vecs)
   return res;
 end;
 
+# The form, as a form record, of type <type>, "Sp", which the
+# matrices <gens> over <f> preserve, and which is unique up to a scalar:
+# g * gram * (g^frob)^T = gram for g in gens.
+RECOG.ClassicalInvariantForm := function(type, gens, f)
+  local M;
+
+  M := GModuleByMats(gens, f);
+  if type = "Sp" then
+    return rec( gram := MTX.InvariantBilinearForm(M), frob := 1,
+                field := f );
+  fi;
+  ErrorNoReturn("RECOG.ClassicalInvariantForm: unsupported type ", type);
+end;
+
 # The matrix which acts as <M> on the basis vectors with indices <idx> and
 # fixes the other basis vectors of GF(q)^<d>
 RECOG.EmbedBlock := function(d, f, idx, M)
