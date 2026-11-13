@@ -654,3 +654,23 @@ RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g)
   res[vpos] := v;
   return res;
 end;
+
+# The basis <bas> with its rows n+1, ..., d replaced by a standard basis of
+# their span, for the multiple of the form of <G> of type <type> ("Sp")
+# for which the first <n> rows are a standard basis, as at the end of
+# the final descent of [EHNPR] ('Terminal groups and initial groups'). The
+# last d-n rows of <bas> must span the orthogonal complement of the first n.
+RECOG.Form_CompleteStandardBasis := function(G, type, bas, n)
+  local f, form;
+
+  f := DefaultFieldOfMatrixGroup(G);
+  form := RECOG.ClassicalInvariantForm(type,
+              StripMemory(GeneratorsOfGroup(G)), f);
+  form.gram := form.gram / RECOG.FormValue(form, bas[1], bas[2]);
+  Assert(1, RECOG.FormGram(form, bas{[1 .. n]})
+            = RECOG.ClassicalStandardForm(type, n, f));
+  bas := Concatenation(bas{[1 .. n]},
+             RECOG.FormStandardBasis(form, bas{[n + 1 .. NrRows(bas)]}));
+  ConvertToMatrixRep(bas, f);
+  return bas;
+end;
