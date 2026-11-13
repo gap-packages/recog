@@ -2,9 +2,9 @@ gap> START_TEST("goingup.tst");
 gap> Reset(GlobalMersenneTwister, 1);;
 gap> Reset(GlobalRandomSource, 1);;
 
-# The root elements of RECOG.SL_RootElements, RECOG.Sp_RootElements and
-# RECOG.SU_RootElements are the elementary matrices resp. the root elements
-# they name.
+# The root elements of RECOG.SL_RootElements, RECOG.Sp_RootElements,
+# RECOG.SU_RootElements and RECOG.O_RootElements are the elementary
+# matrices resp. the root elements they name.
 gap> CheckSLRoots := function(n, q)
 >     local f, Y, R, i, j, lambda, M;
 >     f := GF(q);
@@ -58,7 +58,8 @@ gap> CheckFormRoots := function(type, n, q)
 >              RECOG.ClassicalStandardGenerators(type, n, f).all);
 >     R := RECOG.GoingUpParameters(type).rootElementsOf(Y, n, f);
 >     form := RECOG.ClassicalForm(type, n, f);
->     for kind in ["Lf", "Le", "See", "Sff", "M1j", "Mj1"] do
+>     for kind in Filtered(["Lf", "Le", "See", "Sff", "M1j", "Mj1"],
+>                          k -> IsBound(R.(k))) do
 >         for j in [2 .. n / 2] do
 >             # the parameters of Lf and Le satisfy lambda^sigma = -eps lambda
 >             c := Random(f);
@@ -77,7 +78,8 @@ gap> CheckFormRoots := function(type, n, q)
 >     return true;
 > end;;
 gap> ForAll([["Sp", 4, 3], ["Sp", 6, 5], ["Sp", 8, 9], ["Sp", 10, 27],
->            ["SU", 4, 9], ["SU", 6, 25], ["SU", 8, 81], ["SU", 4, 729]],
+>            ["SU", 4, 9], ["SU", 6, 25], ["SU", 8, 81], ["SU", 4, 729],
+>            ["O+", 6, 3], ["O+", 10, 5], ["O+", 10, 9], ["O+", 18, 27]],
 >           c -> CallFuncList(CheckFormRoots, c) = true);
 true
 
@@ -101,7 +103,7 @@ gap> CheckEliminations := function(n, q)
 >     if IsOddInt(n) or IsEvenInt(q) then
 >         return true;
 >     fi;
->     for type in ["Sp", "SU"] do
+>     for type in ["Sp", "SU", "O+"] do
 >         if type = "SU" and not IsInt(Sqrt(q)) then
 >             continue;
 >         fi;
@@ -149,13 +151,14 @@ gap> ForAll([[2, 5], [3, 2], [5, 9]], c -> CheckExpress(c[1], c[2]));
 true
 
 # RECOG.GoingUp, started from the standard generators of an embedded
-# CL(n,q), returns words for the standard generators of CL(d,q) relative
-# to the basis it returns.
+# CL(n,q), of type + for orthogonal groups, returns words for the standard
+# generators of CL(d,q) relative to the basis it returns.
 gap> CheckGoingUp := function(type, n, d, q)
 >     local f, B, init, std, gens, G, res;
 >     f := GF(q);
 >     B := RandomInvertibleMat(d, f);
->     init := List(RECOG.ClassicalStandardGenerators(type, n, f).all,
+>     init := List(RECOG.ClassicalStandardGenerators(
+>                      RECOG.ClassicalPrefixType(type), n, f).all,
 >                  x -> B^-1 * RECOG.GoingUpEmbed(x, d, f) * B);
 >     std := RECOG.ClassicalStandardGenerators(type, d, f).all;
 >     gens := Concatenation(init, List(std, x -> B^-1 * x * B));
@@ -171,7 +174,10 @@ gap> CheckGoingUp := function(type, n, d, q)
 gap> ForAll([["SL", 2, 3, 7], ["SL", 2, 8, 4], ["SL", 2, 17, 5],
 >            ["SL", 2, 12, 9], ["Sp", 4, 6, 3], ["Sp", 4, 14, 5],
 >            ["Sp", 4, 20, 9], ["SU", 4, 6, 9], ["SU", 4, 14, 25],
->            ["SU", 4, 20, 9]],
+>            ["SU", 4, 20, 9], ["O+", 6, 8, 3], ["O-", 6, 8, 3],
+>            ["O", 6, 9, 3], ["O-", 6, 10, 5], ["O", 6, 11, 7],
+>            ["O+", 6, 12, 9], ["O-", 6, 14, 3], ["O", 6, 15, 5],
+>            ["O+", 6, 20, 3], ["O-", 6, 22, 7], ["O", 6, 21, 9]],
 >           c -> CallFuncList(CheckGoingUp, c));
 true
 
