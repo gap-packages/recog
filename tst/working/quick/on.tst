@@ -61,5 +61,65 @@ gap> pair := RECOG.FormHyperbolicPair(form,
 gap> RECOG.FormGram(form, pair) = [[0, 1], [1, 0]] * One(f);
 true
 
+# Lambda^2 of RECOG.O_KleinStandardPreimages are the standard generators of
+# Omega^+(6,q), relative to the basis b_ij of the exterior square, and
+# RECOG.O_KleinPreimage inverts Lambda^2 up to sign.
+gap> CheckKlein := function(q)
+>     local f, K, std, A, M;
+>     f := GF(q);
+>     K := RECOG.O_KleinBasis(IdentityMat(6, f));
+>     std := RECOG.ClassicalStandardGenerators("O+", 6, f).all;
+>     A := RECOG.O_KleinStandardPreimages(f);
+>     if List(A, x -> RECOG.O_Wedge2(x, f)) <> List(std, x -> K * x * K^-1)
+>        or not ForAll(A, x -> IsOne(DeterminantMat(x))) then
+>         return false;
+>     fi;
+>     return ForAll([1 .. 5], function(i)
+>         M := PseudoRandom(SL(4, q));
+>         return RECOG.O_KleinPreimage(RECOG.O_Wedge2(M, f), f) in [M, -M];
+>     end);
+> end;;
+gap> Filtered([3, 5, 7, 9, 25, 27], q -> not CheckKlein(q));
+[  ]
+
+# RECOG.O_FindStdGensOmega6 returns SLPs for the standard generators of
+# Omega^+(6,q) relative to a standard basis of the given form, and
+# RECOG.O_FinalDescent those of an Omega^+(6,q) in Omega^+-(8,q), whose
+# basis starts with a standard basis of the restricted form, also for
+# q = 3 mod 4, where no involution centraliser has the type it needs.
+gap> CheckOmega6 := function(q)
+>     local f, G, form, res, gens;
+>     f := GF(q);
+>     G := Omega(1, 6, q)^PseudoRandom(GL(6, f));
+>     form := RECOG.ClassicalInvariantForm("O+", GeneratorsOfGroup(G), f);
+>     res := RECOG.O_FindStdGensOmega6(GeneratorsOfGroup(G), form, f);
+>     gens := ResultOfStraightLineProgram(res.slp, GeneratorsOfGroup(G));
+>     return List(gens, g -> res.bas * g * res.bas^-1)
+>            = RECOG.ClassicalStandardGenerators("O+", 6, f).all
+>            and RECOG.FormGram(form, res.bas)
+>                = RECOG.ClassicalStandardForm("O+", 6, f);
+> end;;
+gap> Filtered([3, 5, 7, 9, 11, 25, 27, 81], q -> not CheckOmega6(q));
+[  ]
+gap> CheckFinalDescent := function(e, q)
+>     local f, G, form, res, gens, std;
+>     f := GF(q);
+>     G := Omega(e, 8, q)^PseudoRandom(GL(8, f));
+>     form := RECOG.ClassicalInvariantForm("O+", GeneratorsOfGroup(G), f);
+>     repeat
+>         res := RECOG.O_FinalDescent(GeneratorsOfGroup(G), f, form,
+>                                     RECOG.GoingDownRandomBound);
+>     until res <> fail;
+>     gens := ResultOfStraightLineProgram(res.slp, GeneratorsOfGroup(G));
+>     std := RECOG.ClassicalStandardGenerators("O+", 6, f).all;
+>     return List(gens, g -> res.bas * g * res.bas^-1)
+>            = List(std, g -> DirectSumMat(g, IdentityMat(2, f)))
+>            and RECOG.FormGram(form, res.bas{[1 .. 6]})
+>                = RECOG.ClassicalStandardForm("O+", 6, f);
+> end;;
+gap> Filtered([[1, 3], [-1, 3], [1, 5], [-1, 5], [1, 7], [-1, 7], [1, 9],
+>              [-1, 11], [1, 27]], c -> not CallFuncList(CheckFinalDescent, c));
+[  ]
+
 #
 gap> STOP_TEST("on.tst");
