@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Max Neunhöffer, Ákos Seress.
+##  This files's authors include Max Horn.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
 ##  to list here. Please refer to the COPYRIGHT file for details.
@@ -12,434 +12,419 @@
 ##  SPDX-License-Identifier: GPL-3.0-or-later
 ##
 ##
-##  GoingUp method for special linear groups
+##  The parts of the GoingUp of [EHNPR] (see ../GoingUp.gi), Section
+##  'GoingUp algorithm', specific to special linear groups.
+##
+##  Vectors are rows of coordinates relative to a basis (v_1, ..., v_d),
+##  and <x|y> = x y^T is the standard scalar product, relative to which the
+##  adjoint g^-* of g is the transposed inverse. E(i, j, lambda) denotes
+##  the elementary matrix v_i -> v_i + lambda v_j, which is the
+##  transvection T(lambda v_i, v_j): x -> x + <x|lambda v_i> v_j.
 ##
 #############################################################################
 
+# Elementary matrices of SL(<n>,q), q = Size(<f>), as words in the
+# standard generators. <Y> are elements with memory standing for the
+# standard generators of SL(n,q) relative to the basis, in the order of
+# RECOG.ClassicalStandardGenerators; only their words are used, so they
+# may be generators with memory of any group. RECOG.SL_ElementaryMatrix
+# combines the words returned here.
+# E(1, 2, gamma^(2k)) is t^(delta^-k), gamma = Z(q), and these gamma^(2k),
+# 0 <= k < [GF(q):GF(p)], are a basis of GF(q) over GF(p); E(2, 1, lambda)
+# is E(1, 2, -lambda)^s. The element c = s v (n odd) or s v x (n even) maps
+# v_1 to -v_1 and permutes the lines <v_2>, ..., <v_n> in one cycle, so
+# conjugating by its powers gives E(1, j, .) and E(j, 1, .); the others are
+# commutators [E(i, 1, lambda), E(1, j, 1)] = E(i, j, lambda).
+# This follows [EHNPR], 'Standard generators and stingray embeddings',
+# with the words of 'Constructing the enlarged group', except for c:
+# there c = v or v x cycles all of v_1, ..., v_n, and E(i, j, .) is a
+# chain of commutators along the cycle; fixing <v_1> makes it a single
+# commutator.
+RECOG.SL_RootElements := function(Y, n, f)
+  local s, t, delta, v, x, ext, gamma, res, std, c, cmat, h, images, j, k;
 
-RECOG.SLn_UpStep := function(w)
-  # w has components:
-  #   d       : size of big SL
-  #   n       : size of small SL
-  #   slnstdf : fakegens for SL_n standard generators
-  #   bas     : current base change, first n vectors are where SL_n acts
-  #             rest of vecs are invariant under SL_n
-  #   basi    : current inverse of bas
-  #   sld     : original group with memory generators, PseudoRandom
-  #             delivers random elements
-  #   sldf    : fake generators to keep track of what we are doing
-  #   f       : field
-  # The following are filled in automatically if not already there:
-  #   p       : characteristic
-  #   ext     : q=p^ext
-  #   One     : One(slnstdf[1])
-  #   can     : CanonicalBasis(f)
-  #   canb    : BasisVectors(can)
-  #   transh  : fakegens for the "horizontal" transvections n,i for 1<=i<=n-1
-  #             entries can be unbound in which case they are made from slnstdf
-  #   transv  : fakegens for the "vertical" transvections i,n for 1<=i<=n-1
-  #             entries can be unbound in which case they are made from slnstdf
-  #
-  # We keep the following invariants (going from n -> n':=2n-1)
-  #   bas, basi is a base change to the target base
-  #   slnstdf are SLPs to reach standard generators of SL_n from the
-  #       generators of sld
-  local DoColOp_n,DoRowOp_n,FixSLn,Fixc,MB,Vn,Vnc,aimdim,c,c1,c1f,cf,cfi,
-        ci,cii,coeffs,flag,i,id,int1,int3,j,k,lambda,list,mat,newbas,newbasf,
-        newbasfi,newbasi,newdim,newpart,perm,pivots,pivots2,pos,pow,s,sf,
-        slp,std,sum1,tf,trans,transd,transr,v,vals,zerovec;
+  s := Y[1];
+  t := Y[2];
+  delta := Y[3];
+  v := Y[4];
+  x := Y[5];
+  ext := DegreeOverPrimeField(f);
+  gamma := Z(Size(f));
 
-  Info(InfoRecog_ClassicalNatural,2,"  SL_n GoingUp: degree ",w.n," -> ",
-       Minimum(2*w.n-1,w.d));
+  res := rec(
+    f := f,
+    Y := Y,
+    one := s^0,
+    basis := Basis(f, List([0 .. ext - 1], k -> gamma^(2 * k))),
+    E12 := List([0 .. ext - 1], k -> t^(delta^-k)),
+    conjugator := [],
+    sign := [],
+    words := List([1 .. n], i -> []),
+  );
+  res.E21 := List(res.E12, y -> (y^-1)^s);
 
-  # Before we begin, we upgrade the data structure with a few internal
-  # things:
-
-  if not IsBound(w.can) then w.can := CanonicalBasis(w.f); fi;
-  if not IsBound(w.canb) then w.canb := BasisVectors(w.can); fi;
-  if not IsBound(w.One) then w.One := One(w.slnstdf[1]); fi;
-  if not IsBound(w.transh) then w.transh := []; fi;
-  if not IsBound(w.transv) then w.transv := []; fi;
-  # Update our cache of *,n and n,* transvections because we need them
-  # all over the place:
-  std := RECOG.InitSLstd(w.f,w.n,
-                         w.slnstdf{[1..w.ext]},
-                         w.slnstdf{[w.ext+1..2*w.ext]},
-                         w.slnstdf[2*w.ext+1],
-                         w.slnstdf[2*w.ext+2]);
-  for i in [1..w.n-1] do
-      for k in [1..w.ext] do
-          pos := (i-1)*w.ext + k;
-          if not IsBound(w.transh[pos]) then
-              RECOG.ResetSLstd(std);
-              RECOG.DoColOp_SL(false,w.n,i,w.canb[k],std);
-              w.transh[pos] := std.right;
-          fi;
-          if not IsBound(w.transv[pos]) then
-              RECOG.ResetSLstd(std);
-              RECOG.DoRowOp_SL(false,i,w.n,w.canb[k],std);
-              w.transv[pos] := std.left;
-          fi;
-      od;
-  od;
-  Unbind(std);
-
-  # Now we can define two helper functions:
-  DoColOp_n := function(el,i,j,lambda,w)
-    # This adds lambda times the i-th column to the j-th column.
-    # Note that either i or j must be equal to n!
-    local coeffs,k;
-    coeffs := IntVecFFE(Coefficients(w.can,lambda));
-    if i = w.n then
-        for k in [1..w.ext] do
-            if not IsZero(coeffs[k]) then
-                el := el * w.transh[(j-1)*w.ext+k]^coeffs[k];
-            fi;
-        od;
-    elif j = w.n then
-        for k in [1..w.ext] do
-            if not IsZero(coeffs[k]) then
-                el := el * w.transv[(i-1)*w.ext+k]^coeffs[k];
-            fi;
-        od;
+  # conjugator[j] = c^k maps v_1 to +-v_1 and v_2 to +-v_j; for a signed
+  # permutation matrix h, E(1, 2, lambda)^h = E(1, j, lambda * sign), with
+  # sign the product of these two signs
+  res.conjugator[2] := res.one;
+  res.sign[2] := One(f);
+  if n >= 3 then
+    std := RECOG.ClassicalStandardGenerators("SL", n, f);
+    if IsOddInt(n) then
+      c := s * v;
+      cmat := std.s * std.v;
     else
-        ErrorNoReturn("either i or j must be equal to n");
+      c := s * v * x;
+      cmat := std.s * std.v * std.x;
     fi;
-    return el;
-  end;
-  DoRowOp_n := function(el,i,j,lambda,w)
-    # This adds lambda times the j-th row to the i-th row.
-    # Note that either i or j must be equal to n!
-    local coeffs,k;
-    coeffs := IntVecFFE(Coefficients(w.can,lambda));
-    if j = w.n then
-        for k in [1..w.ext] do
-            if not IsZero(coeffs[k]) then
-                el := w.transv[(i-1)*w.ext+k]^coeffs[k] * el;
-            fi;
-        od;
-    elif i = w.n then
-        for k in [1..w.ext] do
-            if not IsZero(coeffs[k]) then
-                el := w.transh[(j-1)*w.ext+k]^coeffs[k] * el;
-            fi;
-        od;
-    else
-        ErrorNoReturn("either i or j must be equal to n");
-    fi;
-    return el;
-  end;
+    h := res.one;
+    images := IdentityMat(n, f){[1, 2]};
+    for k in [1 .. n - 2] do
+      h := h * c;
+      images := images * cmat;
+      j := PositionNonZero(images[2]);
+      res.conjugator[j] := h;
+      res.sign[j] := images[2, j] * images[1, 1];
+    od;
+  fi;
+  return res;
+end;
 
-  # Here everything starts, some more preparations:
+# The elementary matrix E(<i>, <j>, <lambda>) of RECOG.SL_RootElements, as
+# a word in R.Y. R.words[i][j] keeps the E(i, j, b) for b in R.basis.
+RECOG.SL_ElementaryMatrix := function(R, i, j, lambda)
+  local words, signed, y;
 
-  # We compute exclusively in our basis, so we occasionally need an
-  # identity matrix:
-  id := IdentityMat(w.d,w.f);
-  FixSLn := VectorSpace(w.f,id{[w.n+1..w.d]});
-  Vn := VectorSpace(w.f,id{[1..w.n]});
-
-  # First pick an element in SL_n with fixed space of dimension d-n+1:
-  # We already have an SLP for an n-cycle: it is one of the std gens.
-  # For n=2 we use a transvection for this purpose.
-  if w.n > 2 then
-      if IsOddInt(w.n) then
-          s := id{Concatenation([w.n],[1..w.n-1],[w.n+1..w.d])};
-          ConvertToMatrixRepNC(s,w.f);
-          sf := w.slnstdf[2*w.ext+1];
-      else
-          ErrorNoReturn("this program only works for odd n or n=2");
+  if not IsBound(R.words[i][j]) then
+    # E(1, 2, b)^(+-1)
+    signed := function(y, sign)
+      if IsOne(sign) then
+        return y;
       fi;
+      return y^-1;
+    end;
+    if i = 1 then
+      words := List(R.E12, y -> signed(y, R.sign[j])^R.conjugator[j]);
+    elif j = 1 then
+      words := List(R.E21, y -> signed(y, R.sign[i])^R.conjugator[i]);
+    else
+      # R.basis starts with 1
+      y := RECOG.SL_ElementaryMatrix(R, 1, j, One(R.f));
+      words := List([1 .. Length(R.E12)], k -> Comm(
+          RECOG.SL_ElementaryMatrix(R, i, 1, BasisVectors(R.basis)[k]), y));
+    fi;
+    R.words[i][j] := words;
+  fi;
+  return RECOG.GoingUpRootWord(R.words[i][j], R.basis, lambda, R.one);
+end;
+
+# A word for the matrix <M> in SL(n,q), as a product of the elementary
+# matrices E(i, j, lambda) = <E>(i, j, lambda), which may be words in
+# anything; <one> is the identity among them. Row reduction of M^-1 by
+# adding multiples of rows only, as in RECOG.ExpressInStd_SL: each row
+# operation multiplies by an elementary matrix from the left, and their
+# product is M. Clearing below the diagonal first and above it last keeps
+# rows sparse: a signed permutation matrix takes O(n) row operations,
+# instead of O(n^2) when each column is cleared completely at once.
+RECOG.SL_ExpressByElementary := function(M, E, one)
+  local n, X, word, rowOp, i, pos, j;
+
+  n := NrRows(M);
+  X := MutableCopyMat(M^-1);
+  word := one;
+  # row i := row i + lambda * row j
+  rowOp := function(i, j, lambda)
+    X[i] := X[i] + lambda * X[j];
+    word := E(i, j, lambda) * word;
+  end;
+
+  for i in [1 .. n] do
+    if not IsOne(X[i, i]) then
+      pos := First([i + 1 .. n], k -> not IsZero(X[k, i]));
+      if pos = fail then
+        # then X[i,i] is the only nonzero entry of column i in rows >= i
+        pos := i + 1;
+        rowOp(pos, i, One(X[i, i]));
+      fi;
+      rowOp(i, pos, (1 - X[i, i]) / X[pos, i]);
+    fi;
+    for j in [i + 1 .. n] do
+      if not IsZero(X[j, i]) then
+        rowOp(j, i, -X[j, i]);
+      fi;
+    od;
+  od;
+
+  # X is upper unitriangular; row i is v_i once the columns after i are
+  # cleared
+  for i in [n, n - 1 .. 2] do
+    for j in [1 .. i - 1] do
+      if not IsZero(X[j, i]) then
+        rowOp(j, i, -X[j, i]);
+      fi;
+    od;
+  od;
+  return word;
+end;
+
+# An element b of SL(n,q) which maps the nonzero vector <u> to v_n, by
+# Gaussian elimination on u with elementary matrices, as in Step 3 of the
+# GoingUp step of [EHNPR].
+# Returns a record with the following components:
+#  - `word`: b, as a word in R.Y
+#  - `mat`: the matrix of b
+RECOG.SL_MapToLast := function(R, u)
+  local n, word, mat, apply, i, r;
+
+  n := Length(u);
+  word := R.one;
+  mat := MutableCopyMat(IdentityMat(n, R.f));
+  # u E(i, j, lambda) = u + lambda u_i v_j, and M E(i, j, lambda) adds
+  # lambda times column i of M to column j
+  apply := function(i, j, lambda)
+    word := word * RECOG.SL_ElementaryMatrix(R, i, j, lambda);
+    u[j] := u[j] + lambda * u[i];
+    for r in [1 .. n] do
+      mat[r, j] := mat[r, j] + lambda * mat[r, i];
+    od;
+  end;
+
+  u := ShallowCopy(u);
+  if IsZero(u[n]) then
+    i := PositionNonZero(u);
+    apply(i, n, One(u[i]));
+  fi;
+  if not IsOne(u[n]) then
+    i := PositionNonZero(u);
+    if i = n then
+      apply(n, 1, One(u[n]));
+      i := 1;
+    fi;
+    apply(i, n, (1 - u[n]) / u[i]);
+  fi;
+  for i in [1 .. n - 1] do
+    if not IsZero(u[i]) then
+      apply(n, i, -u[i]);
+    fi;
+  od;
+
+  Assert(1, u = IdentityMat(n, R.f)[n]);
+  return rec( word := word, mat := mat );
+end;
+
+# The seed t of the GoingUp step ([EHNPR], Step 1 (Constructing the seed
+# element)): a word in the standard generators <Y> of SL(n,q), q a power
+# of <p>, with a fixed space of dimension 1; <Y> may be words or the
+# matrices. For n odd, the signed cycle v has the characteristic
+# polynomial x^n - 1, in which 1 is a simple root if p does not divide n;
+# otherwise s v, with (x + 1)(x^(n-1) - 1). For n even, t v fixes only
+# f_1 + ... + f_m.
+RECOG.SL_GoingUpSeed := function(Y, n, p)
+  if IsEvenInt(n) then
+    return Y[2] * Y[4];
+  elif n mod p <> 0 then
+    return Y[4];
+  fi;
+  return Y[1] * Y[4];
+end;
+
+# Steps 1 to 3 of the GoingUp step of [EHNPR] (see ../GoingUp.gi), 'The
+# random part' and 'The deterministic part', for SL: search at most <N>
+# random elements a of std.G for g = t^a such that U + Ug has
+# dimension n' = min(2n - 1, d), U + Ug and the fixed vectors of g in T
+# span V, and, for a fixed vector u of g in U and the hyperplane H of the
+# vectors of U orthogonal to u, U + H g^-* has dimension n'; then
+# conjugate g by b in <Y> mapping u to v_n. <Y> and <R> are the standard
+# generators of SL(n,q) with memory and their root elements. Returns
+# either fail, or else a record with the following components:
+#  - `a`: the random element, with memory in the generators of std.G
+#  - `t`: the seed, as a word with memory in <Y>
+#  - `b`: as a word with memory in <Y>
+#  - `g`: the matrix of g~ = (t^a)^b relative to std.bas
+RECOG.SL_GoingUpDoublingElement := function(std, Y, R, N)
+  local f, d, n, nn, e, Ubasis, Tbasis, t, tmat, a, amat, g, Ug, fix, u, H,
+        accepted, b;
+
+  f := std.f;
+  d := std.d;
+  n := std.n;
+  nn := Minimum(2 * n - 1, d);
+  e := IdentityMat(d, f);
+  Ubasis := e{[1 .. n]};
+  Tbasis := e{[n + 1 .. d]};
+  t := RECOG.SL_GoingUpSeed(Y, n, Characteristic(f));
+  tmat := RECOG.GoingUpEmbed(RECOG.SL_GoingUpSeed(
+              RECOG.ClassicalStandardGenerators("SL", n, f).all, n,
+              Characteristic(f)), d, f);
+
+  repeat
+    if N = 0 then
+      return fail;
+    fi;
+    N := N - 1;
+    accepted := false;
+    a := PseudoRandom(std.G);
+    amat := std.bas * StripMemory(a) * std.basi;
+    g := amat^-1 * tmat * amat;
+
+    Ug := SemiEchelonMat(Concatenation(Ubasis, g{[1 .. n]})).vectors;
+    if Length(Ug) <> nn then
+      continue;
+    fi;
+    fix := RECOG.FixspaceMat(g);
+    if RankMat(Concatenation(Ug, SumIntersectionMat(fix, Tbasis)[2])) <> d
+       then
+      continue;
+    fi;
+
+    u := SumIntersectionMat(fix, Ubasis)[2][1];
+    H := List(NullspaceMat(TransposedMat([u{[1 .. n]}])),
+              h -> Concatenation(h, Zero(e[1]){[n + 1 .. d]}));
+    ConvertToMatrixRep(H, f);
+    accepted := RankMat(Concatenation(Ubasis, H * TransposedMat(g^-1))) = nn;
+  until accepted;
+
+  b := RECOG.SL_MapToLast(R, u{[1 .. n]});
+  amat := RECOG.GoingUpEmbed(b.mat, d, f);
+  g := amat^-1 * g * amat;
+  Assert(1, g[n] = e[n]);
+  return rec( a := a, t := t, b := b.word, g := g );
+end;
+
+# Step 4 (Adapting the basis) of the GoingUp step of [EHNPR] for SL: the
+# matrix C of the basis change which keeps the first n vectors of
+# std.bas, replaces the next n'-n by a basis of N, the projection to T of
+# A <g> (rows 1 to n-1 of <g>), and the last d-n' by fixed vectors of <g>
+# in T which complement N. The new basis is C * std.bas; for n' = d,
+# N = T and C is the identity.
+RECOG.SL_GoingUpAdaptBasis := function(std, g)
+  local f, d, n, N, fix, k, T, rest;
+
+  f := std.f;
+  d := std.d;
+  n := std.n;
+  if 2 * n - 1 >= d then
+    return IdentityMat(d, f);
+  fi;
+
+  N := SemiEchelonMat(g{[1 .. n - 1]}{[n + 1 .. d]}).vectors;
+  fix := SumIntersectionMat(RECOG.FixspaceMat(g),
+                            IdentityMat(d, f){[n + 1 .. d]})[2];
+  fix := fix{[1 .. Length(fix)]}{[n + 1 .. d]};
+
+  # The semi-echelon basis of the rows of N and fix, found in this order,
+  # extends one of N by vectors independent modulo N. Their parts in the
+  # span of fix are fixed vectors congruent to them modulo N.
+  k := Length(N);
+  T := SemiEchelonMatTransformation(Concatenation(N, fix));
+  rest := T.coeffs{[k + 1 .. Length(T.coeffs)]}{[k + 1 .. k + Length(fix)]}
+          * fix;
+  return DirectSumMat(IdentityMat(n, f), Concatenation(N, rest));
+end;
+
+# Step 5 of the GoingUp step for SL ([EHNPR], 'Constructing the enlarged
+# group'): the standard generators of SL(W), W = <v_1, ..., v_n'>,
+# relative to the adapted basis, as words in the standard generators <Y>
+# of SL(U) and g~, whose matrix relative to the adapted basis is <g>. s, t
+# and delta are those of SL(U); v and x are products of elementary
+# matrices of W, found by RECOG.SL_ExpressByElementary ([EHNPR] names
+# Gaussian elimination but gives no words):
+#  - E(i, j, .) with i, j <= n lies in SL(U);
+#  - E(i, n, .) = T(w, v_n), w = lambda v_i, for i > n: write
+#    w = a + b g^-* with a, b in <v_1, ..., v_(n-1)>; as g fixes v_n,
+#    T(w, v_n) = T(a, v_n) T(b, v_n)^g;
+#  - E(n, j, .) = T(v_n, w), w = lambda v_j, for j > n: for z in
+#    <v_1, ..., v_(n-1)> with w the projection of zg to the new basis
+#    vectors, and h the element T(r - v_n, v_n), r = v_n g^-*, of the
+#    previous case, T(v_n, z)^(g h) = T(v_n, a + w) with a the part of zg
+#    in <v_1, ..., v_(n-1)>;
+#  - the others are commutators [E(i, n, lambda), E(n, j, 1)].
+# Returns the list of words, as elements with memory in generators standing
+# for Y and g~.
+RECOG.SL_GoingUpNewGenerators := function(std, Y, R, g)
+  local f, d, n, nn, F, G, RF, e, gis, toVnSolver, fromVnSolver, product,
+        toVn, r, h, fromVn, compute, unit, elementary, new;
+
+  f := std.f;
+  d := std.d;
+  n := std.n;
+  nn := Minimum(2 * n - 1, d);
+  F := GeneratorsWithMemory(ListWithIdenticalEntries(Length(Y) + 1, ()));
+  G := F[Length(F)];
+  # elementary matrices of SL(U) as words in the first generators of F
+  RF := RECOG.SL_RootElements(F{[1 .. Length(Y)]}, n, f);
+  e := IdentityMat(d, f);
+  gis := TransposedMat(g^-1);
+  toVnSolver := RECOG.GoingUpSolver(
+      Concatenation(e{[1 .. n - 1]}, gis{[1 .. n - 1]}){[1 .. 2 * n - 2]}
+      {[1 .. nn]});
+  fromVnSolver := RECOG.GoingUpSolver(g{[1 .. n - 1]}{[n + 1 .. nn]});
+
+  # the product of the E(i, j, c[i]) or E(j, i, c[i]), i < n, as a word in Y
+  product := function(c, j, toJ)
+    local res, i;
+    res := RF.one;
+    for i in [1 .. n - 1] do
+      if IsZero(c[i]) then
+        continue;
+      elif toJ then
+        res := res * RECOG.SL_ElementaryMatrix(RF, i, j, c[i]);
+      else
+        res := res * RECOG.SL_ElementaryMatrix(RF, j, i, c[i]);
+      fi;
+    od;
+    return res;
+  end;
+
+  # T(w, v_n) for w in <v_1, ..., v_(n-1), v_(n+1), ..., v_n'>
+  toVn := function(w)
+    local c;
+    c := toVnSolver(w{[1 .. nn]});
+    return product(c{[1 .. n - 1]}, n, true)
+           * product(c{[n .. 2 * n - 2]}, n, true)^G;
+  end;
+
+  r := e[n] * gis;
+  if r = e[n] then
+    h := F[1]^0;
   else
-      # A transvection fixes a line of V_2, as required:
-      s := MutableCopyMat(id);
-      s[1,2] := One(w.f);
-      sf := w.slnstdf[1];
+    h := toVn(r - e[n]);
   fi;
 
-  # Find a good random element:
-  w.count := 0;
-  aimdim := Minimum(2*w.n-1,w.d);
-  newdim := aimdim - w.n;
-  while true do   # will be left by break
-      while true do    # will be left by break
-          if InfoLevel(InfoRecog_ClassicalNatural) >= 3 then Print(".\c"); fi;
-          w.count := w.count + 1;
-          c1 := PseudoRandom(w.sld);
-          slp := SLPOfElm(c1);
-          c1f := ResultOfStraightLineProgram(slp,w.sldf);
-          # Do the base change into our basis:
-          c1 := w.bas * c1 * w.basi;
-          c := s^c1;
-          cf := sf^c1f;
-          cfi := cf^-1;
-          # Now check that Vn + Vn*s^c1 has dimension 2n-1:
-          Vnc := VectorSpace(w.f,c{[1..w.n]});
-          sum1 := ClosureLeftModule(Vn,Vnc);
-          if Dimension(sum1) = aimdim then
-              Fixc := VectorSpace(w.f,RECOG.FixspaceMat(c));
-              int1 := Intersection(Fixc,Vn);
-              for i in [1..Dimension(int1)] do
-                  v := Basis(int1)[i];
-                  if not IsZero(v[w.n]) then break; fi;
-              od;
-              if IsZero(v[w.n]) then
-                  Info(InfoRecog_ClassicalNatural,3,"    SL_n GoingUp: fixed vector has n-th coordinate 0, retry");
-                  continue;
-              fi;
-              v := v / v[w.n];   # normalize to 1 in position n
-              Assert(1,v*c=v);
-              ci := c^-1;
-              break;
-          fi;
-      od;
+  # T(v_n, w) for w in <v_(n+1), ..., v_n'>
+  fromVn := function(w)
+    local z, a;
+    z := fromVnSolver(w{[n + 1 .. nn]});
+    a := (Concatenation(z, Zero(e[1]){[n .. d]}) * g){[1 .. n - 1]};
+    return product(a, n, false)^-1 * product(z, n, false)^(G * h);
+  end;
 
-      # Now we found our aimdim-dimensional space W. Since SL_n
-      # has a d-n-dimensional fixed space W_{d-n} and W contains a complement
-      # of that fixed space, the intersection of W and W_{d-n} has dimension
-      # newdim.
+  # E(i, j, lambda) for i > n or j > n
+  compute := function(i, j, lambda)
+    if j = n then
+      return toVn(lambda * e[i]);
+    elif i = n then
+      return fromVn(lambda * e[j]);
+    fi;
+    return Comm(elementary(i, n, lambda), elementary(n, j, One(f)));
+  end;
 
-      # Change basis:
-      newpart := ExtractSubMatrix(c,[1..w.n-1],[1..w.d]);
-      # Clean out the first n entries to go to the fixed space of SL_n:
-      zerovec := Zero(newpart[1]);
-      for i in [1..w.n-1] do
-          RECOG.CopySubVectorCompat(zerovec,newpart[i],[1..w.n],[1..w.n]);
-      od;
-      MB := MutableBasis(w.f,[],zerovec);
-      i := 1;
-      pivots := EmptyPlist(newdim);
-      while i <= Length(newpart) and NrBasisVectors(MB) < newdim do
-          if CloseMutableBasis(MB,newpart[i]) then
-              Add(pivots,i);
-          fi;
-          i := i + 1;
-      od;
-      newpart := newpart{pivots};
-      newbas := Concatenation(id{[1..w.n-1]},[v],newpart);
-      if 2*w.n-1 < w.d then
-          int3 := Intersection(FixSLn,Fixc);
-          if Dimension(int3) <> w.d-2*w.n+1 then
-              Info(InfoRecog_ClassicalNatural,3,"    SL_n GoingUp: FixSLn \\cap Fixc has the wrong dimension, retry");
-              continue;
-          fi;
-          Append(newbas,BasisVectors(Basis(int3)));
-      fi;
-      ConvertToMatrixRep(newbas,w.f);
-      newbasi := newbas^-1;
-      if newbasi = fail then
-          Info(InfoRecog_ClassicalNatural,3,"    SL_n GoingUp: new basis is singular, retry");
-          continue;
-      fi;
-      ci := newbas * ci * newbasi;
-      cii := ExtractSubMatrix(ci,[w.n+1..aimdim],[1..w.n-1]);
-      ConvertToMatrixRep(cii,w.f);
-      cii := TransposedMat(cii);
-      # The rows of cii are now what used to be the columns,
-      # their length is newdim, we need to span the full newdim-dimensional
-      # row space and need to remember how:
-      zerovec := Zero(cii[1]);
-      MB := MutableBasis(w.f,[],zerovec);
-      i := 1;
-      pivots2 := EmptyPlist(newdim);
-      while i <= Length(cii) and NrBasisVectors(MB) < newdim do
-          if CloseMutableBasis(MB,cii[i]) then
-              Add(pivots2,i);
-          fi;
-          i := i + 1;
-      od;
-      if Length(pivots2) = newdim then
-          cii := cii{pivots2}^-1;
-          ConvertToMatrixRep(cii,w.f);
-          c := newbas * c * newbasi;
-          w.bas := newbas * w.bas;
-          w.basi := w.basi * newbasi;
-          break;
-      fi;
-      Info(InfoRecog_ClassicalNatural,3,"    SL_n GoingUp: no nice bottom, retry");
-      # Otherwise simply try again
-  od;
-  Info(InfoRecog_ClassicalNatural,2,"  SL_n GoingUp: found c, tries: ",w.count);
-  # Now SL_n has to be repaired according to the base change newbas:
+  # E(i, j, lambda) = E(i, j, 1)^lambda for lambda in GF(p), so E(i, j, 1)
+  # is kept
+  unit := List([1 .. nn], i -> []);
+  elementary := function(i, j, lambda)
+    if i <= n and j <= n then
+      return RECOG.SL_ElementaryMatrix(RF, i, j, lambda);
+    elif not lambda in GF(Characteristic(f)) then
+      return compute(i, j, lambda);
+    elif not IsBound(unit[i][j]) then
+      unit[i][j] := compute(i, j, One(f));
+    fi;
+    return unit[i][j]^IntFFE(lambda);
+  end;
 
-  # Now write this matrix newbas as an SLP in the standard generators
-  # of our SL_n. Then we know which generators to take for our new
-  # standard generators, namely newbas^-1 * std * newbas.
-  newbasf := w.One;
-  for i in [1..w.n-1] do
-      if not IsZero(v[i]) then
-          newbasf := DoColOp_n(newbasf,w.n,i,v[i],w);
-      fi;
-  od;
-  newbasfi := newbasf^-1;
-  w.slnstdf := List(w.slnstdf,x->newbasfi * x * newbasf);
-  # Now update caches:
-  w.transh := List(w.transh,x->newbasfi * x * newbasf);
-  w.transv := List(w.transv,x->newbasfi * x * newbasf);
-
-  # Now consider the transvections t_i:
-  # t_i : w.bas[j] -> w.bas[j]        for j <> i and
-  # t_i : w.bas[i] -> w.bas[i] + ww
-  # We want to modify (t_i)^c such that it fixes w.bas{[1..w.n]}:
-  trans := [];
-  for i in pivots2 do
-      # This does t_i
-      for lambda in w.canb do
-          # This does t_i : v_j -> v_j + lambda * v_n
-          tf := w.One;
-          tf := DoRowOp_n(tf,i,w.n,lambda,w);
-          # Now conjugate with c:
-          tf := cfi*tf*cf;
-          # Now cleanup in column n above row n, the entries there
-          # are lambda times the stuff in column i of ci:
-          for j in [1..w.n-1] do
-              tf := DoRowOp_n(tf,j,w.n,-ci[j,i]*lambda,w);
-          od;
-          Add(trans,tf);
-      od;
-  od;
-
-  # Now put together the clean ones by our knowledge of c^-1:
-  transd := [];
-  for i in [1..Length(pivots2)] do
-      for lambda in w.canb do
-          tf := w.One;
-          vals := BlownUpVector(w.can,cii[i]*lambda);
-          for j in [1..w.ext * newdim] do
-              pow := IntFFE(vals[j]);
-              if not IsZero(pow) then
-                  tf := tf * trans[j]^pow;
-              fi;
-          od;
-          Add(transd,tf);
-      od;
-  od;
-  Unbind(trans);
-
-  # Now to the "horizontal" transvections, first create them as SLPs:
-  transr := [];
-  for i in pivots do
-      # This does u_i : v_i -> v_i + v_n
-      tf := w.One;
-      tf := DoColOp_n(tf,w.n,i,One(w.f),w);
-      # Now conjugate with c:
-      tf := cfi*tf*cf;
-      # Now cleanup in rows above row n:
-      for j in [1..w.n-1] do
-          tf := DoRowOp_n(tf,j,w.n,-ci[j,w.n],w);
-      od;
-
-      # Now cleanup in rows below row n:
-      for j in [1..newdim] do
-          coeffs := IntVecFFE(Coefficients(w.can,-ci[w.n+j,w.n]));
-          for k in [1..w.ext] do
-              if not IsZero(coeffs[k]) then
-                  tf := transd[(j-1)*w.ext + k]^coeffs[k] * tf;
-              fi;
-          od;
-      od;
-
-      # Now cleanup column n above row n:
-      for j in [1..w.n-1] do
-          tf := DoColOp_n(tf,j,w.n,ci[j,w.n],w);
-      od;
-
-      # Now cleanup row n left of column n:
-      for j in [1..w.n-1] do
-          tf := DoRowOp_n(tf,w.n,j,-c[i,j],w);
-      od;
-
-      # Now cleanup column n below row n:
-      for j in [1..newdim] do
-          coeffs := IntVecFFE(Coefficients(w.can,ci[w.n+j,w.n]));
-          for k in [1..w.ext] do
-              if not IsZero(coeffs[k]) then
-                  tf := tf * transd[(j-1)*w.ext + k]^coeffs[k];
-              fi;
-          od;
-      od;
-      Add(transr,tf);
-  od;
-
-  # From here on we distinguish three cases:
-  #   * w.n = 2
-  #   * we finish off the constructive recognition
-  #   * we have to do another step as the next thing
-  if w.n = 2 then
-      w.slnstdf[2*w.ext+2] := transd[1]*transr[1]^-1*transd[1];
-      w.slnstdf[2*w.ext+1] := w.transh[1]*w.transv[1]^-1*w.transh[1]
-                              *w.slnstdf[2*w.ext+2];
-      Unbind(w.transh);
-      Unbind(w.transv);
-      w.n := 3;
-      return w;
-  fi;
-  # We can finish off:
-  if aimdim = w.d then
-      # In this case we just finish off and do not bother with
-      # the transvections, we will only need the standard gens:
-      # Now put together the (newdim+1)-cycle:
-      # n+newdim -> n+newdim-1 -> ... -> n+1 -> n -> n+newdim
-      flag := false;
-      s := w.One;
-      for i in [1..newdim] do
-          if flag then
-              # Make [[0,-1],[1,0]] in coordinates w.n and w.n+i:
-              tf:=transd[(i-1)*w.ext+1]*transr[i]^-1*transd[(i-1)*w.ext+1];
-          else
-              # Make [[0,1],[-1,0]] in coordinates w.n and w.n+i:
-              tf:=transd[(i-1)*w.ext+1]^-1*transr[i]*transd[(i-1)*w.ext+1]^-1;
-          fi;
-          s := s * tf;
-          flag := not flag;
-      od;
-
-      # Finally put together the new 2n-1-cycle and 2n-2-cycle:
-      s := s^-1;
-      w.slnstdf[2*w.ext+1] := w.slnstdf[2*w.ext+1] * s;
-      w.slnstdf[2*w.ext+2] := w.slnstdf[2*w.ext+2] * s;
-      Unbind(w.transv);
-      Unbind(w.transh);
-      w.n := aimdim;
-      return w;
-  fi;
-
-  # Otherwise we do want to go on as the next thing, so we want to
-  # keep our transvections. This is easily done if we change the
-  # basis one more time. Note that we know that n is odd here!
-
-  # Put together the n-cycle:
-  # 2n-1 -> 2n-2 -> ... -> n+1 -> n -> 2n-1
-  flag := false;
-  s := w.One;
-  for i in [w.n-1,w.n-2..1] do
-      if flag then
-          # Make [[0,-1],[1,0]] in coordinates w.n and w.n+i:
-          tf := transd[(i-1)*w.ext+1]*transr[i]^-1*transd[(i-1)*w.ext+1];
-      else
-          # Make [[0,1],[-1,0]] in coordinates w.n and w.n+i:
-          tf := transd[(i-1)*w.ext+1]^-1*transr[i]*transd[(i-1)*w.ext+1]^-1;
-      fi;
-      s := s * tf;
-      flag := not flag;
-  od;
-
-  # Finally put together the new 2n-1-cycle and 2n-2-cycle:
-  w.slnstdf[2*w.ext+1] := s * w.slnstdf[2*w.ext+1];
-  w.slnstdf[2*w.ext+2] := s * w.slnstdf[2*w.ext+2];
-
-  list := Concatenation([1..w.n-1],[w.n+1..2*w.n-1],[w.n],[2*w.n..w.d]);
-  perm := PermList(list);
-  mat := PermutationMat(perm^-1,w.d,w.f);
-  ConvertToMatrixRep(mat,w.f);
-  w.bas := w.bas{list};
-  ConvertToMatrixRep(w.bas,w.f);
-  w.basi := w.basi*mat;
-
-  # Now add the new transvections:
-  for i in [1..w.n-1] do
-      w.transh[w.ext*(w.n-1)+w.ext*(i-1)+1] := transr[i];
-  od;
-  Append(w.transv,transd);
-  w.n := 2*w.n-1;
-  return w;
+  new := RECOG.ClassicalStandardGenerators("SL", nn, f);
+  return Concatenation(F{[1 .. 3]},
+      List([new.v, new.x],
+           M -> RECOG.SL_ExpressByElementary(M, elementary, F[1]^0)));
 end;
