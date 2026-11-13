@@ -121,5 +121,31 @@ gap> Filtered([[1, 3], [-1, 3], [1, 5], [-1, 5], [1, 7], [-1, 7], [1, 9],
 >              [-1, 11], [1, 27]], c -> not CallFuncList(CheckFinalDescent, c));
 [  ]
 
+# RECOG.FindStdGens_O must express the standard generators of Omega(d,q)
+# of RECOG.ClassicalStandardGenerators as straight line programs in the
+# given generators, with respect to the basis it returns.
+gap> CheckFindStdGens_O := function(e, d, q)
+>     local f, G, res, gens, std, i;
+>     f := GF(q);
+>     G := Omega(e, d, q)^PseudoRandom(GL(d, f));
+>     res := RECOG.FindStdGens_O(G);
+>     gens := ResultOfStraightLineProgram(res.slpstd, GeneratorsOfGroup(G));
+>     std := RECOG.ClassicalStandardGenerators(res.type, d, f).all;
+>     for i in [1 .. Length(std)] do
+>         if gens[i]^res.basi <> std[i] then
+>             return Concatenation(res.type, "(", String(d), ",", String(q),
+>                                  "): generator ", String(i), " is wrong");
+>         fi;
+>     od;
+>     return res.type = RECOG.OrthogonalTypes[Position([1, -1, 0], e)];
+> end;;
+gap> List([[1, 8, 3], [-1, 8, 3], [1, 8, 5], [1, 8, 7], [-1, 8, 9],
+>          [0, 9, 3], [0, 9, 5], [1, 10, 5], [-1, 10, 7], [0, 11, 9],
+>          [1, 12, 3], [-1, 14, 3], [0, 13, 7], [1, 20, 11], [-1, 22, 5],
+>          [0, 21, 27], [0, 35, 3]],
+>         args -> CallFuncList(CheckFindStdGens_O, args));
+[ true, true, true, true, true, true, true, true, true, true, true, true, 
+  true, true, true, true, true ]
+
 #
 gap> STOP_TEST("on.tst");
