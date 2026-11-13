@@ -893,7 +893,7 @@ function(recognise)
 
             ## first we test whether the characteristic polynomial has
             ## two factors of degree d/2.
-            facs := Factors( cpol );
+            facs := Factors( PolynomialRing(f), cpol );
             deg := List(facs, EuclideanDegree );
             if Length(deg) = 2 and deg[1] = deg[2] and deg[1] = d/2 then
 
@@ -1061,7 +1061,7 @@ function(recognise)
     local deg, dims, g;
 
     # compute the degrees of the irreducible factors
-    deg := List(Factors(recognise.cpol), Degree);
+    deg := List(Factors(PolynomialRing(recognise.field), recognise.cpol), Degree);
 
     # compute all possible dimensions
     dims := [0];
