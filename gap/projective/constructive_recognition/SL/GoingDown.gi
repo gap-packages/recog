@@ -12,160 +12,36 @@
 ##  SPDX-License-Identifier: GPL-3.0-or-later
 ##
 ##
-##  GoingDown method for special linear groups
+##  FinalDescent for special linear groups, from SL(4,q) to SL(2,q), as in
+##  Horn, Niemeyer, Praeger, Rademacher, "Constructive recognition of
+##  special linear groups", arXiv:2404.18860 (2024), cited as [HNPR24]
+##  below. [EHNPR] (see ../GoingDown.gi), Section 'Terminal groups and
+##  initial groups', leaves the final descent open, with [LGO09] (q odd)
+##  and [DLGLO13] (q even) as a reference solution; recog implements
+##  neither.
 ##
 #############################################################################
 
-# finds first element of a list that is relative prime to all others
-# input: list=[SL(d,q), d, q, SL(n,q)] acting as a subgroup of some big SL(n,q)
-# output: list=[rr, dd] for a ppd(2*dd;q)-element rr
-RECOG.SLn_godown:=function(list)
-  local d, first, q, g, gg, i, r, pol, factors, degrees, newdim, power, rr, ss,
-  newgroup, colldegrees, exp, count;
-
-  first:=function(list)
-  local i;
-
-  for i in [1..Length(list)] do
-      if list[i]>1 and Gcd(list[i],Product(list)/list[i])=1 then
-         return list[i];
-      fi;
-  od;
-
-  return fail;
-  end;
-
-  g:=list[1];
-  d:=list[2];
-  q:=list[3];
-  gg:=list[4];
-
-  #find an element with irreducible action of relative prime dimension to
-  #all other invariant subspaces
-  #count is just safety, if things go very bad
-  count:=0;
-
-  repeat
-     count:=count+1;
-     if InfoLevel(InfoRecog_ClassicalNatural) >= 3 then Print(".\c"); fi;
-     r:=PseudoRandom(g);
-     pol:=CharacteristicPolynomial(r);
-     factors:=Factors(pol);
-     degrees:=AsSortedList(List(factors,Degree));
-     newdim:=first(degrees);
-  until (count>10) or (newdim <> fail and newdim<=Maximum(2,d/4));
-
-  if count>10 then
-     return fail;
-  fi;
-
-  # raise r to a power so that acting trivially outside one invariant subspace
-  degrees:=Filtered(degrees, x->x<>newdim);
-  colldegrees:=Collected(degrees);
-  power:=Lcm(List(degrees, x->q^x-1))*q;
-  # power further to cancel q-part of element order
-  if degrees[1]=1 then
-     exp:=colldegrees[1][2]-(DimensionOfMatrixGroup(gg)-d);
-     if exp>0 then
-       power:=power*q^exp;
-     fi;
-  fi;
-  rr:=r^power;
-
-  #conjugate rr to hopefully get a smaller dimensional SL
-  #ss:=rr^PseudoRandom(gg);
-  #newgroup:=Group(rr,ss);
-
-  return [rr,newdim];
-end;
-
-# input is (group,dimension,q)
-# output is a group element acting irreducibly in two dimensions, and fixing
-# a (dimension-2)-dimensional subspace
-RECOG.SLn_constructppd2:=function(g,dim,q)
-  local out, list ;
-
-  Info(InfoRecog_ClassicalNatural,2,"  SL_n GoingDown: degree ",dim);
-  list:=[g,dim,q,g];
-  repeat
-     out:=RECOG.SLn_godown(list);
-     if out=fail or out[1]*out[1]=One(out[1]) then
-        Info(InfoRecog_ClassicalNatural,3,"    SL_n GoingDown: no ppd element, restart");
-        list:=[g,dim,q,g];
-        out:=fail;
-     else
-        if out[2]>2 then
-           list:=[Group(out[1],out[1]^PseudoRandom(g)),2*out[2],q,g];
-        fi;
-     fi;
-  until out<>fail and out[2]=2;
-
-  return out[1];
-
-end;
-
-RECOG.SLn_constructsl4:=function(g,dim,q,r)
-  local s,h,count,readydim4,readydim3,ready,u,orderu,
-        nullr,nulls,nullspacer,nullspaces,int,intbasis,nullintbasis,
-        newu,newbasis,newbasisinv,newr,news,outputu,mat,i,shorts,shortr;
-  nullr:=RECOG.FixspaceMat(StripMemory(r));
-  nullspacer:=VectorSpace(GF(q),nullr);
-  mat:=One(r);
-  ready:=false;
-  repeat
-    s:=r^PseudoRandom(g);
-    nulls:=RECOG.FixspaceMat(StripMemory(s));
-    nullspaces:=VectorSpace(GF(q),nulls);
-    int:=Intersection(nullspacer,nullspaces);
-    intbasis:=Basis(int);
-    newbasis:=[];
-    for i in [1..Length(intbasis)] do
-        Add(newbasis,intbasis[i]);
-    od;
-    i:=0;
-    repeat
-       i:=i+1;
-       if not mat[i] in int then
-          Add(newbasis,mat[i]);
-          int:=VectorSpace(GF(q),newbasis);
-       fi;
-    until Dimension(int)=dim;
-    ConvertToMatrixRep(newbasis);
-    newbasisinv:=newbasis^(-1);
-    newr:=newbasis*r*newbasisinv;
-    news:=newbasis*s*newbasisinv;
-
-    #shortr, shorts do not need memory
-    #we shall throw away the computations in h
-    #check that we have SL(4,q), by non-constructive recognition
-    shortr:=newr{[dim-3..dim]}{[dim-3..dim]};
-    shorts:=news{[dim-3..dim]}{[dim-3..dim]};
-    h:=Group(shortr,shorts);
-    count:=0;
-    readydim4:=false;
-    readydim3:=false;
-    repeat
-       u:=PseudoRandom(h);
-       orderu:=Order(u);
-       if orderu mod ((q^4-1)/(q-1)) = 0 then
-          readydim4:=true;
-       elif Gcd(orderu,(q^2+q+1)/Gcd(3,q-1))>1 then
-          readydim3:=true;
-       fi;
-       if readydim4 = true and readydim3 = true then
-          ready:=true;
-          break;
-       fi;
-       count:=count+1;
-    until count=30;
-  until ready=true;
-
-  return Group(r,s);
-end;
-
-
 #g=SL(d,q), given as a subgroup of SL(dim,q)
 #output: [SL(2,q), and a basis for the 2-dimensional subspace where it acts
+# Kantor and Seress (KS), "Black box classical groups", Mem. Amer. Math.
+# Soc. 149 (2001), no. 708, Section 3.6.3, generalised from d = 3: a
+# power yy of a random element is scalar on a 1-space <vec> and on a
+# (d-1)-space, and for a random conjugate x = yy^z, commutators of x and
+# yy generate an SL(2,q) on <vec, vec*z>. Deviations:
+#  - KS choose the element by its ppd order and use its power to the
+#    exponent 2(q+1); here, in the natural representation, its
+#    characteristic polynomial has an irreducible factor of degree d-1,
+#    and yy is its power of order q-1.
+#  - KS take an SL(2,q) in <x,yy>, such as its derived group, and verify
+#    it by recognising it (3.6.1); here a = [x,yy], b = a^yy, c = a^x
+#    are taken if 20 random elements of <a,b,c> on <vec, vec*z> include
+#    ones of orders q-1 and q+1. This proves SL(2,q) only for q >= 8:
+#    2.S4 in SL(2,7) has elements of orders 6 and 8.
+#  - The number of random selections is not bounded.
+# For d = dim = 4 it needs q not in [2,3,4,5,9]: yy is scalar for
+# (q-1) | 4 and a scalar times a reflection for q = 9, so the loops do
+# not end, and yy is 1 on <vec> for q = 4, so es[2] is unbound.
 RECOG.SLn_godownfromd:=function(g,q,d,dim)
   local y,yy,ready,order,es,dims,subsp,z,x,a,b,c,h,vec,vec2,
   pol,factors,degrees,comm1,comm2,comm3,image,basis,action,vs,readyqpl1,
@@ -247,37 +123,52 @@ RECOG.SLn_godownfromd:=function(g,q,d,dim)
 
 end;
 
-#going down from 4 to 2 dimensions, when q=2,3,4,5,9
-#just construct the 4-dimensional invariant space and generators
-#for the group acting on it
-RECOG.SLn_exceptionalgodown:=function(h,q,dim)
-  local basis, v, vs, i, gen;
+# FinalDescent for SL, the BaseCase algorithm of [HNPR24], Section 4:
+# <gens> are 4x4 matrices generating SL(4,q), q = Size(<f>). An SL(2,q)
+# found by RECOG.SLn_godownfromd is recognised by
+# RECOG.RecogniseSL2Natural. [HNPR24] attributes the search to [LGO09]
+# and [DLGLO13]; RECOG.SLn_godownfromd follows Kantor and Seress instead.
+# Returns a record with the following components:
+#  - `slp`: SLP in <gens> for the standard generators of an SL(2,q)
+#  - `bas`: a 4x4 matrix whose first two rows span the space on which this
+#    SL(2,q) acts and whose last two span its fixed space; relative to bas
+#    the standard generators are those of RECOG.MakeSL_StdGens(p,ext,2,4)
+RECOG.SLn_FinalDescent := function(gens, f)
+  local q, p, ext, std, h, sl2, sl2gens, V, fix, b, action, resl2, slp;
 
-  vs:=VectorSpace(GF(q),One(h));
-  basis:=[];
-  repeat
-     Info(InfoRecog_ClassicalNatural,3,"    SL_n GoingDown: looking for the SL(4,",q,") space");
-     for i in [1..4] do
-        v:=PseudoRandom(vs);
-        for gen in GeneratorsOfGroup(h) do
-           Add(basis,v*gen-v);
-        od;
-     od;
-     basis:=ShallowCopy(SemiEchelonMat(basis).vectors);
-  until Length(basis)=4;
-  return [h,VectorSpace(GF(q),basis)];
-end;
-
-
-RECOG.SLn_constructsl2:=function(g,d,q)
-  local r,h;
-
-  r:=RECOG.SLn_constructppd2(g,d,q);
-  h:=RECOG.SLn_constructsl4(g,d,q,r);
-  if not (q in [2,3,4,5,9]) then
-     return RECOG.SLn_godownfromd(h,q,4,d);
-  else
-     return RECOG.SLn_exceptionalgodown(h,q,d);
-  #   return ["sorry only SL(4,q)",h];
+  if NrRows(gens[1]) <> 4 then
+    ErrorNoReturn("RECOG.SLn_FinalDescent: <gens> must be 4x4 matrices");
   fi;
+
+  q := Size(f);
+  p := Characteristic(f);
+  ext := DegreeOverPrimeField(f);
+
+  # SLn_godownfromd does not apply to these fields (see there);
+  # constructive membership in SL(4,q), by a stabiliser chain, yields the
+  # SL(2,q) instead
+  if q in [2,3,4,5,9] then
+    Info(InfoRecog_ClassicalNatural,1,"SL_n: base case SL(4,",q,")");
+    std := RECOG.MakeSL_StdGens(p,ext,2,4).all;
+    return rec( slp := RECOG.FindStdGensUsingBSGS(Group(gens),std,false,false),
+                bas := IdentityMat(4,f) );
+  fi;
+
+  Info(InfoRecog_ClassicalNatural,1,"SL_n: base case SL(2,",q,")");
+  h := GroupWithMemory(gens);
+  sl2 := RECOG.SLn_godownfromd(h,q,4,4);
+  sl2gens := GeneratorsOfGroup(sl2[1]);
+  V := BasisVectors(Basis(sl2[2]));
+  fix := BasisVectors(Basis(Intersection(List(StripMemory(sl2gens),
+             x -> VectorSpace(f, RECOG.FixspaceMat(x))))));
+  Assert(1, Length(fix) = 2 and RankMat(Concatenation(V, fix)) = 4);
+
+  b := Basis(sl2[2],V);
+  action := List(StripMemory(sl2gens),x->RECOG.LinearAction(b,f,x));
+  resl2 := RECOG.RecogniseSL2Natural(Group(GeneratorsWithMemory(action)),f);
+  slp := CompositionOfStraightLinePrograms(SLPOfElms(resl2.all),
+                                           SLPOfElms(sl2gens));
+  b := Concatenation(resl2.bas * V, fix);
+  ConvertToMatrixRep(b,f);
+  return rec( slp := slp, bas := b );
 end;
