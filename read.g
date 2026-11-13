@@ -66,6 +66,7 @@ ReadPackage("recog","gap/projective/constructive_recognition/Sp_OddChar/BaseCase
 ReadPackage("recog","gap/projective/constructive_recognition/Sp_OddChar/GoingUp.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/Sp_OddChar/main.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/SU/BaseCase.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/SU/GoingUp.gi");
 ReadPackage("recog","gap/projective/sl2_natural.gi");
 ReadPackage("recog","gap/projective/AnSnOnFDPM.gi");
 
