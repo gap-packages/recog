@@ -57,6 +57,7 @@ ReadPackage("recog","gap/projective/classicalnatural.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/utils/utils.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/StandardGenerators.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/GoingDown.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/GoingUp.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/SL/GoingDown.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/SL/GoingUp.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/SL/main.gi");
