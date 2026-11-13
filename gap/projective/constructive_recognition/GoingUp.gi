@@ -66,12 +66,22 @@ RECOG.GoingUpEmbed := function(M, d, f)
   return res;
 end;
 
+# <powers>[1]^<c> for an integer c > 0, kept as powers[c], so that the
+# SLP of a word with memory computes each power once
+RECOG.GoingUpPower := function(powers, c)
+  if not IsBound(powers[c]) then
+    powers[c] := powers[1]^c;
+  fi;
+  return powers[c];
+end;
+
 # The root element for <lambda> in GF(q), as the product of the
-# <words>[k]^c_k for the coefficients c_k of lambda in <basis>, a basis of
-# GF(q) over GF(p), where words[k] is the root element for basis[k]. Root
-# elements in one root group are additive in lambda. Factors with c_k = 0
-# are left out, and <one> stands for lambda = 0.
-RECOG.GoingUpRootWord := function(words, basis, lambda, one)
+# words[k]^c_k for the coefficients c_k of lambda in <basis>, a basis of
+# GF(q) over GF(p), where words[k] = <powers>[k][1] is the root element for
+# basis[k]; powers[k] is a list for RECOG.GoingUpPower. Root elements in
+# one root group are additive in lambda. Factors with c_k = 0 are left
+# out, and <one> stands for lambda = 0.
+RECOG.GoingUpRootWord := function(powers, basis, lambda, one)
   local coeffs, res, k, y;
 
   coeffs := List(Coefficients(basis, lambda), IntFFE);
@@ -79,11 +89,8 @@ RECOG.GoingUpRootWord := function(words, basis, lambda, one)
   for k in [1 .. Length(coeffs)] do
     if coeffs[k] = 0 then
       continue;
-    elif coeffs[k] = 1 then
-      y := words[k];
-    else
-      y := words[k]^coeffs[k];
     fi;
+    y := RECOG.GoingUpPower(powers[k], coeffs[k]);
     if res = fail then
       res := y;
     else
