@@ -2,8 +2,8 @@ gap> START_TEST("goingup.tst");
 gap> Reset(GlobalMersenneTwister, 1);;
 gap> Reset(GlobalRandomSource, 1);;
 
-# The root elements of RECOG.SL_RootElements are the elementary matrices
-# they name.
+# The root elements of RECOG.SL_RootElements and RECOG.Sp_RootElements
+# are the elementary matrices resp. the root elements they name.
 gap> CheckSLRoots := function(n, q)
 >     local f, Y, R, i, j, lambda, M;
 >     f := GF(q);
@@ -26,11 +26,63 @@ gap> CheckSLRoots := function(n, q)
 gap> ForAll([[2, 3], [3, 4], [4, 9], [5, 2], [6, 25], [7, 27]],
 >           c -> CheckSLRoots(c[1], c[2]) = true);
 true
+gap> FormRootMatrix := function(R, kind, j, lambda, n)
+>     local M, c, eps;
+>     M := MutableCopyMat(IdentityMat(n, R.f));
+>     c := R.conj(lambda);
+>     eps := R.eps;
+>     if kind = "Lf" then
+>         M[1, 2] := lambda;
+>     elif kind = "Le" then
+>         M[2, 1] := eps * lambda;
+>     elif kind = "See" then
+>         M[2, 2 * j - 1] := lambda;
+>         M[2 * j, 1] := -eps * c;
+>     elif kind = "Sff" then
+>         M[1, 2 * j] := lambda;
+>         M[2 * j - 1, 2] := -eps * c;
+>     elif kind = "M1j" then
+>         M[1, 2 * j - 1] := lambda;
+>         M[2 * j, 2] := -c;
+>     else
+>         M[2 * j - 1, 1] := lambda;
+>         M[2, 2 * j] := -c;
+>     fi;
+>     return M;
+> end;;
+gap> CheckFormRoots := function(type, n, q)
+>     local f, Y, R, form, kind, j, c, lambda, M;
+>     f := GF(q);
+>     Y := GeneratorsWithMemory(
+>              RECOG.ClassicalStandardGenerators(type, n, f).all);
+>     R := RECOG.GoingUpParameters(type).rootElementsOf(Y, n, f);
+>     form := RECOG.ClassicalForm(type, n, f);
+>     for kind in ["Lf", "Le", "See", "Sff", "M1j", "Mj1"] do
+>         for j in [2 .. n / 2] do
+>             # the parameters of Lf and Le satisfy lambda^sigma = -eps lambda
+>             c := Random(f);
+>             lambda := c;
+>             if kind in ["Lf", "Le"] then
+>                 lambda := c - R.eps * R.conj(c);
+>             fi;
+>             M := FormRootMatrix(R, kind, j, lambda, n);
+>             if RECOG.FormGram(form, M) <> form.gram
+>                or StripMemory(RECOG.Form_RootElement(R, kind, j, lambda))
+>                   <> M then
+>                 return [kind, j, lambda];
+>             fi;
+>         od;
+>     od;
+>     return true;
+> end;;
+gap> ForAll([["Sp", 4, 3], ["Sp", 6, 5], ["Sp", 8, 9], ["Sp", 10, 27]],
+>           c -> CallFuncList(CheckFormRoots, c) = true);
+true
 
 # The eliminations map vectors to the basis vectors they promise, also
 # vectors with few nonzero coordinates, which take the rarer branches.
 gap> CheckEliminations := function(n, q)
->     local f, e, R, vecs, y, b;
+>     local f, e, R, vecs, y, b, type, form;
 >     f := GF(q);
 >     e := IdentityMat(n, f);
 >     vecs := Concatenation(e, List([1 .. 20], i -> Random(f^n)),
@@ -43,6 +95,33 @@ gap> CheckEliminations := function(n, q)
 >         if y * b.mat <> e[n] or StripMemory(b.word) <> b.mat then
 >             return ["SL", y];
 >         fi;
+>     od;
+>     if IsOddInt(n) or IsEvenInt(q) then
+>         return true;
+>     fi;
+>     for type in ["Sp"] do
+>         R := RECOG.GoingUpParameters(type).rootElementsOf(
+>                  GeneratorsWithMemory(
+>                      RECOG.ClassicalStandardGenerators(type, n, f).all),
+>                  n, f);
+>         form := RECOG.ClassicalForm(type, n, f);
+>         for y in vecs do
+>             b := RECOG.Form_MapToStd(R, y);
+>             if y * b.mat <> e[1] + RECOG.FormValue(form, y, y) / 2 * e[2]
+>                or StripMemory(b.word) <> b.mat then
+>                 return [type, y];
+>             fi;
+>             # an isotropic vector with beta(e_1, y) = 1
+>             y := ShallowCopy(y);
+>             y[1] := Zero(f);
+>             y[2] := One(f);
+>             y[1] := -RECOG.FormValue(form, y, y) / 2;
+>             b := RECOG.Form_MapToF1FixingE1(R, y);
+>             if y * b.mat <> e[2] or e[1] * b.mat <> e[1]
+>                or StripMemory(b.word) <> b.mat then
+>                 return [type, "fixing e_1", y];
+>             fi;
+>         od;
 >     od;
 >     return true;
 > end;;
@@ -85,7 +164,8 @@ gap> CheckGoingUp := function(type, n, d, q)
 >                 x -> res.bas * x * res.bas^-1) = std;
 > end;;
 gap> ForAll([["SL", 2, 3, 7], ["SL", 2, 8, 4], ["SL", 2, 17, 5],
->            ["SL", 2, 12, 9]],
+>            ["SL", 2, 12, 9], ["Sp", 4, 6, 3], ["Sp", 4, 14, 5],
+>            ["Sp", 4, 20, 9]],
 >           c -> CallFuncList(CheckGoingUp, c));
 true
 
