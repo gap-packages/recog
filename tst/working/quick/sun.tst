@@ -23,6 +23,27 @@ gap> Filtered([3, 5, 7, 9, 11, 13, 25, 27, 49, 81, 121, 243],
 >             q -> not CheckFindStdGensSU4(q));
 [  ]
 
+# The same for RECOG.FindStdGens_SU and SU(d,q).
+gap> CheckFindStdGens_SU := function(d, q)
+>     local F, G, res, gens, std, i;
+>     F := GF(q^2);
+>     G := SU(d, q)^PseudoRandom(GL(d, F));
+>     res := RECOG.FindStdGens_SU(G);
+>     gens := ResultOfStraightLineProgram(res.slpstd, GeneratorsOfGroup(G));
+>     std := RECOG.ClassicalStandardGenerators("SU", d, F).all;
+>     for i in [1..Length(std)] do
+>         if gens[i]^res.basi <> std[i] then
+>             return Concatenation("SU(", String(d), ",", String(q),
+>                                  "): generator ", String(i), " is wrong");
+>         fi;
+>     od;
+>     return true;
+> end;;
+gap> List([[6,3], [8,3], [12,3], [6,5], [8,7], [6,9], [6,13], [10,11],
+>          [6,25], [6,27], [24,3]],
+>         args -> CallFuncList(CheckFindStdGens_SU, args));
+[ true, true, true, true, true, true, true, true, true, true, true ]
+
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
 gap> STOP_TEST("sun.tst");
