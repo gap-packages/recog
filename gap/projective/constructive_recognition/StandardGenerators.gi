@@ -45,6 +45,164 @@ RECOG.ClassicalStandardForm := function(type, d, f)
   return J;
 end;
 
+# Forms are records with components `gram`, `frob` and `field`, standing
+# for the form beta(x, y) = x * gram * y^frob on row vectors over the
+# finite field `field`, where y^frob raises each entry of y to the power
+# frob: frob = 1 for a bilinear form, and frob = q0 for a sesquilinear form
+# over GF(q0^2).
+# All forms here are reflexive, beta(y, x) = eps * beta(x, y)^frob with
+# eps = 1 or -1, as alternating and hermitian forms are.
+
+# The standard form of type <type>, "Sp", on GF(q)^<d>,
+# q = Size(<f>), as a form record
+RECOG.ClassicalForm := function(type, d, f)
+  return rec( gram := RECOG.ClassicalStandardForm(type, d, f),
+              frob := 1, field := f );
+end;
+
+# The vector or matrix <v> with its entries raised to the power form.frob,
+# compressed: products of plain lists are slow
+RECOG.FormConjugate := function(form, v)
+  local res;
+
+  if form.frob = 1 then
+    return v;
+  elif IsMatrix(v) then
+    res := List(v, r -> List(r, c -> c^form.frob));
+    ConvertToMatrixRep(res, form.field);
+    return res;
+  fi;
+  res := List(v, c -> c^form.frob);
+  ConvertToVectorRep(res, form.field);
+  return res;
+end;
+
+RECOG.FormValue := {form, x, y} -> x * form.gram * RECOG.FormConjugate(form, y);
+
+# The Gram matrix of the rows of <M>
+RECOG.FormGram := {form, M} ->
+    M * form.gram * TransposedMat(RECOG.FormConjugate(form, M));
+
+# A hyperbolic pair [e, f], beta(e, e) = beta(f, f) = 0 and
+# beta(e, f) = 1, in the span of the rows <vecs> for <form>, an
+# alternating or hermitian form in odd characteristic, where
+# dual[i] = vecs[i] * form.gram. Returns a record with components `e`,
+# `f`, `eJ` = e * form.gram, `fJ` and `drop`, two positions in <vecs>
+# whose rows together with e and f span the span of <vecs>, or fail if
+# the step finds no pair; it finds one if the span is non-degenerate of
+# dimension at least 2.
+RECOG.FormHyperbolicPairStep := function(form, vecs, dual)
+  local conj, x, cx, a, lam, y, yJ, cy, e, eJ, ce, i, drop, b, bJ, c, f, fJ;
+
+  if Length(vecs) < 2 then
+    return fail;
+  fi;
+  conj := v -> RECOG.FormConjugate(form, v);
+
+  # an isotropic vector e: x = vecs[1], or for y in <vecs[1], vecs[2]>
+  # orthogonal to x, y or x + c y with c^(frob+1) = -beta(x, x) / beta(y, y)
+  x := vecs[1];
+  cx := conj(x);
+  a := dual[1] * cx;
+  if IsZero(a) then
+    e := x;
+    eJ := dual[1];
+    drop := 1;
+  else
+    lam := dual[2] * cx / a;
+    y := vecs[2] - lam * x;
+    yJ := dual[2] - lam * dual[1];
+    cy := conj(y);
+    if IsZero(yJ * cy) then
+      e := y;
+      eJ := yJ;
+      drop := 2;
+    else
+      c := RootFFE(form.field, -a / (yJ * cy), form.frob + 1);
+      e := x + c * y;
+      eJ := dual[1] + c * yJ;
+      drop := [1, 2];
+    fi;
+  fi;
+  ce := conj(e);
+
+  # b with beta(b, e) <> 0; for e = x + c y, b = x does
+  if IsInt(drop) then
+    i := PositionProperty(dual, w -> not IsZero(w * ce));
+    if i = fail then
+      return fail;
+    fi;
+    drop := [drop, i];
+  else
+    i := 1;
+  fi;
+  b := vecs[i];
+  bJ := dual[i];
+
+  # beta(e, c b) = c^frob beta(e, b), and f + c e with beta(e, f) = 1 has
+  # norm beta(f, f) + c + eps c^frob, which is 0 for c = -beta(f, f) / 2
+  c := (1 / (eJ * conj(b)))^form.frob;
+  f := c * b;
+  fJ := c * bJ;
+  c := -(fJ * conj(f)) / 2;
+  f := f + c * e;
+  fJ := fJ + c * eJ;
+  return rec( e := e, f := f, eJ := eJ, fJ := fJ, drop := drop );
+end;
+
+# A hyperbolic pair [e, f] in the span of the rows <vecs> for <form>, as
+# for RECOG.FormHyperbolicPairStep. Returns fail if the span contains none,
+# that is, if the Gram matrix of <vecs> has rank less than 2.
+RECOG.FormHyperbolicPair := function(form, vecs)
+  local G, heads, step;
+
+  # rows of vecs whose rows in G are a basis of the row space of G span a
+  # complement of the radical, which is non-degenerate
+  G := RECOG.FormGram(form, vecs);
+  heads := SemiEchelonMat(TransposedMat(G)).heads;
+  vecs := vecs{Filtered([1 .. Length(vecs)], i -> heads[i] <> 0)};
+  step := RECOG.FormHyperbolicPairStep(form, vecs,
+                                       List(vecs, v -> v * form.gram));
+  if step = fail then
+    return fail;
+  fi;
+  return [step.e, step.f];
+end;
+
+# A standard basis (e_1, f_1, e_2, f_2, ...) of the span of the rows
+# <vecs> for <form>, as for RECOG.FormHyperbolicPairStep, or fail if the
+# form is degenerate on that span or its dimension is odd
+RECOG.FormStandardBasis := function(form, vecs)
+  local dual, res, step, ce, cf, eps, keep, bf, be, i;
+
+  vecs := ShallowCopy(vecs);
+  dual := List(vecs, v -> v * form.gram);
+  res := [];
+  while vecs <> [] do
+    step := RECOG.FormHyperbolicPairStep(form, vecs, dual);
+    if step = fail then
+      return fail;
+    fi;
+    Append(res, [step.e, step.f]);
+
+    # project the other rows onto the orthogonal complement of <e, f>:
+    # x - beta(x, f) e - eps beta(x, e) f, eps = beta(f, e)
+    ce := RECOG.FormConjugate(form, step.e);
+    cf := RECOG.FormConjugate(form, step.f);
+    eps := step.fJ * ce;
+    keep := Difference([1 .. Length(vecs)], step.drop);
+    vecs := vecs{keep};
+    dual := dual{keep};
+    for i in [1 .. Length(vecs)] do
+      bf := dual[i] * cf;
+      be := eps * (dual[i] * ce);
+      vecs[i] := vecs[i] - bf * step.e - be * step.f;
+      dual[i] := dual[i] - bf * step.eJ - be * step.fJ;
+    od;
+  od;
+  return res;
+end;
+
 # The matrix which acts as <M> on the basis vectors with indices <idx> and
 # fixes the other basis vectors of GF(q)^<d>
 RECOG.EmbedBlock := function(d, f, idx, M)
