@@ -47,40 +47,20 @@ RECOG.SL2_FromMakeSLStdGens := function(f)
   return SLPOfElms([s, t, delta, one, one]);
 end;
 
-# SLP in the standard generators of RECOG.ClassicalStandardGenerators("SL",
-# <d>, <f>) for those of RECOG.MakeSL_StdGens(p,ext,d,d), which are
-# elementary matrices and signed permutation matrices
-RECOG.SL_MakeSLStdGensFromStandard := function(d, f)
-  local ext, recog, Y, R, E, words;
-
-  ext := DegreeOverPrimeField(f);
-  recog := RECOG.MakeSL_StdGens(Characteristic(f), ext, d, d);
-  Y := GeneratorsWithMemory(ListWithIdenticalEntries(5, ()));
-  R := RECOG.SL_RootElements(Y, d, f);
-  E := {i, j, lambda} -> RECOG.SL_ElementaryMatrix(R, i, j, lambda);
-  words := Concatenation(
-      List([0 .. ext - 1], k -> E(1, 2, Z(Size(f))^k)),
-      List([0 .. ext - 1], k -> E(2, 1, Z(Size(f))^k)),
-      List([recog.a, recog.b],
-           M -> RECOG.SL_ExpressByElementary(M, E, R.one)));
-  return SLPOfElms(words);
-end;
-
 # Algorithm StandardGenerators of [EHNPR] (see ../GoingDown.gi), Section
 # 'Outline of the algorithm', for SL(d,q), d >= 3: GoingDown to SL(4,q)
 # (none for d = 3), FinalDescent to SL(2,q) as in [HNPR24] (see
 # BaseCase.gi), and GoingUp (see ../GoingUp.gi). It takes no bounds on
 # random selections and does not return fail, as its three parts retry
 # until they succeed.
-# GoingUp works with the standard generators of
-# RECOG.ClassicalStandardGenerators; those of the SL(2,q) and of the result
-# are translated from and to RECOG.MakeSL_StdGens, which the recognition
-# method in ../../classicalnatural.gi uses.
+# The standard generators are those of RECOG.ClassicalStandardGenerators;
+# those of the SL(2,q) are translated from RECOG.MakeSL_StdGens, which
+# RECOG.SL_FinalDescent returns.
 # The generators of <sld> must have memory, or sld is replaced by a group
 # with memory.
 # Returns a record with the following components:
 #  - `slpstd`: SLP in the generators of <sld> for the standard generators
-#    of RECOG.MakeSL_StdGens(p,ext,d,d) relative to bas
+#    of RECOG.ClassicalStandardGenerators("SL", d, f) relative to bas
 #  - `bas`: that basis, as a matrix
 #  - `basi`: its inverse
 RECOG.FindStdGens_SL := function(sld)
@@ -110,7 +90,5 @@ RECOG.FindStdGens_SL := function(sld)
 
   Info(InfoRecog_ClassicalNatural, 1, "SL_n: going up");
   up := RECOG.GoingUp(sld, "SL", rec( slp := slp, bas := bas, n := 2 ));
-  slp := CompositionOfStraightLinePrograms(
-             RECOG.SL_MakeSLStdGensFromStandard(d, f), up.slp);
-  return rec( slpstd := slp, bas := up.bas, basi := up.bas^-1 );
+  return rec( slpstd := up.slp, bas := up.bas, basi := up.bas^-1 );
 end;
