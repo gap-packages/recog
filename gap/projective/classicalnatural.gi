@@ -321,43 +321,6 @@ RECOG.ExpressInStd_SL2 := function(m,std)
   return SLPOfElm(std.left);
 end;
 
-RECOG.ExpressInStd_SL := function(m,std)
-  # m a matrix, std a fake standard generator record with trivial
-  # generators with memory
-  local d,i,j,mi,pos;
-
-  if IsObjWithMemory(m) then
-      mi := InverseMutable(StripMemory(m));
-  else
-      mi := InverseMutable(m);
-  fi;
-  std.left := std.One;
-  d := Length(m);
-  for i in [1..d] do
-      if not IsOne(mi[i,i]) then
-          pos := First([i+1..d],k->not IsZero(mi[k,i]));
-          if pos = fail then
-              pos := i+1;
-              RECOG.DoRowOp_SL(mi,pos,i,std.one,std);
-          fi;
-          RECOG.DoRowOp_SL(mi,i,pos,(std.one-mi[i,i])/mi[pos,i],std);
-      fi;
-      # Now mi[i,i] is equal to one
-      for j in Concatenation([1..i-1],[i+1..d]) do
-          if not IsZero(mi[j,i]) then
-              RECOG.DoRowOp_SL(mi,j,i,-mi[j,i],std);
-          fi;
-      od;
-      # Now mi[i,i] is the only non-zero entry in the column
-  od;
-  # Now mi is the identity matrix, the element collected in std
-  # is the one to multiply on the left hand side to transform mi to the
-  # identity. Thus it is equal to m.
-  return SLPOfElm(std.left);
-end;
-
-
-
 RECOG.RecogniseSL2NaturalOddCharUsingBSGS := function(g,f)
   local ext,p,q,res,slp,std;
   p := Characteristic(f);
@@ -635,13 +598,13 @@ RECOG.SetupNormalisationListForPSLd := function(f,d)
 end;
 
 
-# Express an element of PSL_d as an slp in terms of standard generators.
+# Express an element of PSL_d as an slp in terms of the standard generators
+# of RECOG.ClassicalStandardGenerators.
 SLPforElementFuncsProjective.PSLd := function(ri,x)
   local det,pos,root,s,slp,y;
-  ri!.fakegens.count := ri!.fakegens.count + 1;
-  if ri!.fakegens.count > 1000 then
-      ri!.fakegens := RECOG.InitSLfake(ri!.field,ri!.dimension);
-      ri!.fakegens.count := 0;
+  ri!.rewrite.count := ri!.rewrite.count + 1;
+  if ri!.rewrite.count > 1000 then
+      ri!.rewrite := RECOG.SL_RewriteSetup(ri!.dimension,ri!.field);
   fi;
   y := ri!.nicebas * x * ri!.nicebasi;
   det := DeterminantMat(y);
@@ -666,7 +629,7 @@ SLPforElementFuncsProjective.PSLd := function(ri,x)
   fi;
   pos := PositionNonZeroInRow(y, 1);
   s := RECOG.NormaliseScalarForPSLd(y[1,pos],ri!.normlist);
-  slp := RECOG.ExpressInStd_SL(s * y,ri!.fakegens);
+  slp := RECOG.SL_Rewrite(ri!.rewrite,s * y);
   return slp;
 end;
 
@@ -676,12 +639,11 @@ end;
 BindRecogMethod("FindHomMethodsProjective", "ClassicalNatural",
 "check whether it is a classical group in its natural representation",
 function(ri)
-  local g,changed,classical,d,det,ext,f,gcd,gens,gm,i,p,pr,q,root,std,stdg;
+  local g,changed,classical,d,det,f,gcd,gens,gm,i,pr,q,root,std;
   g := Grp(ri);
   d := ri!.dimension;
   f := ri!.field;
   q := Size(f);
-  p := Characteristic(f);
   RECOG.SetPseudoRandomStamp(g,"ClassicalNatural");
 
   # First check whether we are applicable:
@@ -759,12 +721,9 @@ function(ri)
           Setslptonice(ri,std.slpstd);
           ri!.nicebas := std.bas;
           ri!.nicebasi := std.basi;
-          ext := DegreeOverPrimeField(f);
-          stdg := RECOG.MakeSL_StdGens(p,ext,d,d);
-          SetNiceGens(ri,List(StripMemory(stdg.all),
+          SetNiceGens(ri,List(RECOG.ClassicalStandardGenerators("SL",d,f).all,
                       x->std.basi*x*std.bas));
-          ri!.fakegens := RECOG.InitSLfake(f,d);
-          ri!.fakegens.count := 0;
+          ri!.rewrite := RECOG.SL_RewriteSetup(d,f);
           ri!.comment := "PSLd";
           ri!.gcd := gcd;
           SetFilterObj(ri,IsLeaf);
