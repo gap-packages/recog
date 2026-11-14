@@ -15,8 +15,8 @@
 ##  GoingDown for classical groups in their natural representation, as in
 ##  Eisenbrand, Horn, Niemeyer, Praeger, Rademacher, "Constructive
 ##  recognition of finite classical groups using stingray elements" (in
-##  preparation), cited as [EHNPR] below. Orthogonal groups are not
-##  implemented.
+##  preparation), cited as [EHNPR] below. Orthogonal groups are those of
+##  odd characteristic.
 ##
 #############################################################################
 
@@ -32,6 +32,8 @@ RECOG.GoingDownRandomBound := 100;
 #   isNamed  : whether a group of the active degree is the full classical
 #              group, by RecogniseClassical [NP98]; this is the naming
 #              test of GoingDownStep
+# All groups of the chain below an orthogonal group are orthogonal, of
+# either sign ([EHNPR], 'GoingDown algorithm', remark on the types).
 RECOG.GoingDownParameters := function(type, q)
   local q0, m;
 
@@ -65,6 +67,18 @@ RECOG.GoingDownParameters := function(type, q)
     return rec( terminal := 2 * m, minBody := m, parity := 1,
                 isNamed := H -> RecogniseClassical(H,
                                     rec(case := "unitary")).isSUContained = true );
+  fi;
+  if type in RECOG.OrthogonalTypes then
+    # Bodies have even dimension and type -, as the stingray element is
+    # irreducible on its body; the sum of two has either type. There is no
+    # naming test: RecogniseClassical needs the sign, that is, the form,
+    # and [EHNPR] ('Implementation and timing') omits the test and
+    # restarts GoingDown instead, as RECOG.GoingDown does.
+    if IsEvenInt(q) then
+      ErrorNoReturn("RECOG.GoingDownParameters: orthogonal types need odd q");
+    fi;
+    return rec( terminal := 8, minBody := 4, parity := 0,
+                isNamed := ReturnTrue );
   fi;
   ErrorNoReturn("RECOG.GoingDownParameters: unsupported type ", type);
 end;
