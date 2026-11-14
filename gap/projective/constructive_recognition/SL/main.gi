@@ -13,84 +13,96 @@
 ##
 #############################################################################
 
-# TODO: which algorithm is this? reference?
-RECOG.FindStdGens_SL := function(sld)
-  # gens of sld must be gens for SL(d,q) in its natural rep with memory
-  # This function calls RECOG.SLn_constructsl2 and then extends
-  # the basis to a basis of the full row space and calls
-  # RECOG.SLn_UpStep often enough. Finally it returns an slp such
-  # that the SL(d,q) standard generators with respect to this basis are
-  # expressed by the slp in terms of the original generators of sld.
-  local V,b,bas,basi,basit,d,data,ext,fakegens,nu,nu2,p,q,resl2,sl2,sl2gens,
-        sl2gensf,sl2genss,sl2stdf,slp,slpsl2std,slptosl2,st,std,stdgens,i,ex,f;
+# SLP in the standard generators of RECOG.MakeSL_StdGens(p,ext,2,2) for
+# those of RECOG.ClassicalStandardGenerators("SL", 2, <f>): t = E(1,2,1),
+# s = E(1,2,1) E(2,1,-1) E(1,2,1) and delta, a product of elementary
+# matrices; v and x are the identity.
+RECOG.SL2_FromMakeSLStdGens := function(f)
+  local ext, recog, gens, upper, lower, basis, E, one, t, s, delta;
 
-  # Some setup:
-  f := FieldOfMatrixGroup(sld);
-  p := Characteristic(f);
-  q := Size(f);
   ext := DegreeOverPrimeField(f);
+  recog := RECOG.MakeSL_StdGens(Characteristic(f), ext, 2, 2);
+  gens := GeneratorsWithMemory(recog.all);
+  upper := gens{[1 .. ext]};
+  lower := gens{[ext + 1 .. 2 * ext]};
+  basis := Basis(f, List([0 .. ext - 1], k -> Z(Size(f))^k));
+
+  # E(1, 2, lambda) and E(2, 1, lambda) from those with lambda in the basis
+  E := function(i, j, lambda)
+    local words;
+    if i = 1 then
+      words := upper;
+    else
+      words := lower;
+    fi;
+    return Product(ListN(words, List(Coefficients(basis, lambda), IntFFE),
+                         \^));
+  end;
+
+  one := gens[1]^0;
+  t := E(1, 2, One(f));
+  s := t * E(2, 1, -One(f)) * t;
+  delta := RECOG.SL_ExpressByElementary(
+               RECOG.ClassicalStandardGenerators("SL", 2, f).delta, E, one);
+  return SLPOfElms([s, t, delta, one, one]);
+end;
+
+# SLP in the standard generators of RECOG.ClassicalStandardGenerators("SL",
+# <d>, <f>) for those of RECOG.MakeSL_StdGens(p,ext,d,d), which are
+# elementary matrices and signed permutation matrices
+RECOG.SL_MakeSLStdGensFromStandard := function(d, f)
+  local ext, recog, Y, R, E, words;
+
+  ext := DegreeOverPrimeField(f);
+  recog := RECOG.MakeSL_StdGens(Characteristic(f), ext, d, d);
+  Y := GeneratorsWithMemory(ListWithIdenticalEntries(5, ()));
+  R := RECOG.SL_RootElements(Y, d, f);
+  E := {i, j, lambda} -> RECOG.SL_ElementaryMatrix(R, i, j, lambda);
+  words := Concatenation(
+      List([0 .. ext - 1], k -> E(1, 2, Z(Size(f))^k)),
+      List([0 .. ext - 1], k -> E(2, 1, Z(Size(f))^k)),
+      List([recog.a, recog.b],
+           M -> RECOG.SL_ExpressByElementary(M, E, R.one)));
+  return SLPOfElms(words);
+end;
+
+# Algorithm StandardGenerators of [EHNPR] (see ../GoingDown.gi), Section
+# 'Outline of the algorithm', for SL(d,q), d >= 4: GoingDown to SL(4,q),
+# FinalDescent to SL(2,q) as in [HNPR24] (see GoingDown.gi), and GoingUp
+# (see ../GoingUp.gi). It takes no bounds on random selections and does
+# not return fail, as its three parts retry until they succeed.
+# GoingUp works with the standard generators of
+# RECOG.ClassicalStandardGenerators; those of the SL(2,q) and of the result
+# are translated from and to RECOG.MakeSL_StdGens, which the recognition
+# method in ../../classicalnatural.gi uses.
+# The generators of <sld> must have memory, or sld is replaced by a group
+# with memory.
+# Returns a record with the following components:
+#  - `slpstd`: SLP in the generators of <sld> for the standard generators
+#    of RECOG.MakeSL_StdGens(p,ext,d,d) relative to bas
+#  - `bas`: that basis, as a matrix
+#  - `basi`: its inverse
+RECOG.FindStdGens_SL := function(sld)
+  local f, d, down, init, slp, bas, up;
+
+  f := FieldOfMatrixGroup(sld);
   d := DimensionOfMatrixGroup(sld);
   if not IsObjWithMemory(GeneratorsOfGroup(sld)[1]) then
-      sld := GroupWithMemory(sld);
+    sld := GroupWithMemory(sld);
   fi;
 
-  # First find an SL2 with the space it acts on:
-  Info(InfoRecog_ClassicalNatural,1,"SL_n: going down in SL(",d,",",q,")");
-  data := RECOG.SLn_constructsl2(sld,d,q);
+  Info(InfoRecog_ClassicalNatural, 1, "SL_n: going down in SL(", d, ",",
+       Size(f), ")");
+  down := RECOG.GoingDown(sld, "SL", RECOG.GoingDownRandomBound);
+  init := RECOG.SLn_FinalDescent(down.gens, f);
+  slp := CompositionOfStraightLinePrograms(init.slp, down.slp);
+  slp := CompositionOfStraightLinePrograms(RECOG.SL2_FromMakeSLStdGens(f),
+                                           slp);
+  bas := Concatenation(init.bas * down.bas{[1 .. 4]}, down.bas{[5 .. d]});
 
-  bas := ShallowCopy(BasisVectors(Basis(data[2])));
-  sl2 := data[1];
-  slptosl2 := SLPOfElms(GeneratorsOfGroup(sl2));
-  sl2gens := StripMemory(GeneratorsOfGroup(sl2));
-  V := data[2];
-  b := Basis(V,bas);
-  sl2genss := List(sl2gens,x->RECOG.LinearAction(b,f,x));
-
-  if q in [2,3,4,5,9] then
-      Info(InfoRecog_ClassicalNatural,1,"SL_n: base case SL(4,",q,")");
-      stdgens := RECOG.MakeSL_StdGens(p,ext,4,4).all;
-      slpsl2std := RECOG.FindStdGensUsingBSGS(Group(sl2genss),stdgens,
-                                              false,false);
-      nu := List(sl2gens, RECOG.FixspaceMat);
-      ex := SumIntersectionMat(nu[1],nu[2])[2];
-      for i in [3..Length(nu)] do
-          ex := SumIntersectionMat(nu[3],ex);
-      od;
-      Append(bas,ex);
-      ConvertToMatrixRep(bas,q);
-      basi := bas^-1;
-  else
-      # Now compute the natural SL2 action and run constructive recognition:
-      Info(InfoRecog_ClassicalNatural,1,"SL_n: base case SL(2,",q,")");
-      sl2genss := GeneratorsWithMemory(sl2genss);
-      resl2 := RECOG.RecogniseSL2Natural(Group(sl2genss),f);
-      slpsl2std := SLPOfElms(resl2.all);
-      bas := resl2.bas * bas;
-      # We need the actual transvections:
-      slp := SLPOfElms([resl2.s[1],resl2.t[1]]);
-      st := ResultOfStraightLineProgram(slp,
-                                        StripMemory(GeneratorsOfGroup(sl2)));
-
-      # Extend basis by something invariant under SL2:
-      nu := RECOG.FixspaceMat(StripMemory(st[1]));
-      nu2 := RECOG.FixspaceMat(StripMemory(st[2]));
-      Append(bas,SumIntersectionMat(nu,nu2)[2]);
-      ConvertToMatrixRep(bas,q);
-      basi := bas^-1;
-  fi;
-
-  # Now set up fake generators for keeping track what we do:
-  fakegens := ListWithIdenticalEntries(Length(GeneratorsOfGroup(sld)),());
-  fakegens := GeneratorsWithMemory(fakegens);
-  sl2gensf := ResultOfStraightLineProgram(slptosl2,fakegens);
-  sl2stdf := ResultOfStraightLineProgram(slpsl2std,sl2gensf);
-  std := rec( f := f, d := d, n := 2, bas := bas, basi := basi,
-              sld := sld, sldf := fakegens, slnstdf := sl2stdf,
-              p := p, ext := ext );
-  Info(InfoRecog_ClassicalNatural,1,"SL_n: going up");
-  while std.n < std.d do
-      RECOG.SLn_UpStep(std);
-  od;
-  return rec( slpstd := SLPOfElms(std.slnstdf),
-              bas := std.bas, basi := std.basi );
+  Info(InfoRecog_ClassicalNatural, 1, "SL_n: going up");
+  up := RECOG.GoingUp(sld, "SL", rec( slp := slp, bas := bas, n := 2 ));
+  slp := CompositionOfStraightLinePrograms(
+             RECOG.SL_MakeSLStdGensFromStandard(d, f), up.slp);
+  return rec( slpstd := slp, bas := up.bas, basi := up.bas^-1 );
 end;
