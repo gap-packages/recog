@@ -2,8 +2,9 @@ gap> START_TEST("goingup.tst");
 gap> Reset(GlobalMersenneTwister, 1);;
 gap> Reset(GlobalRandomSource, 1);;
 
-# The root elements of RECOG.SL_RootElements and RECOG.Sp_RootElements
-# are the elementary matrices resp. the root elements they name.
+# The root elements of RECOG.SL_RootElements, RECOG.Sp_RootElements and
+# RECOG.SU_RootElements are the elementary matrices resp. the root elements
+# they name.
 gap> CheckSLRoots := function(n, q)
 >     local f, Y, R, i, j, lambda, M;
 >     f := GF(q);
@@ -75,7 +76,8 @@ gap> CheckFormRoots := function(type, n, q)
 >     od;
 >     return true;
 > end;;
-gap> ForAll([["Sp", 4, 3], ["Sp", 6, 5], ["Sp", 8, 9], ["Sp", 10, 27]],
+gap> ForAll([["Sp", 4, 3], ["Sp", 6, 5], ["Sp", 8, 9], ["Sp", 10, 27],
+>            ["SU", 4, 9], ["SU", 6, 25], ["SU", 8, 81], ["SU", 4, 729]],
 >           c -> CallFuncList(CheckFormRoots, c) = true);
 true
 
@@ -99,7 +101,10 @@ gap> CheckEliminations := function(n, q)
 >     if IsOddInt(n) or IsEvenInt(q) then
 >         return true;
 >     fi;
->     for type in ["Sp"] do
+>     for type in ["Sp", "SU"] do
+>         if type = "SU" and not IsInt(Sqrt(q)) then
+>             continue;
+>         fi;
 >         R := RECOG.GoingUpParameters(type).rootElementsOf(
 >                  GeneratorsWithMemory(
 >                      RECOG.ClassicalStandardGenerators(type, n, f).all),
@@ -165,7 +170,8 @@ gap> CheckGoingUp := function(type, n, d, q)
 > end;;
 gap> ForAll([["SL", 2, 3, 7], ["SL", 2, 8, 4], ["SL", 2, 17, 5],
 >            ["SL", 2, 12, 9], ["Sp", 4, 6, 3], ["Sp", 4, 14, 5],
->            ["Sp", 4, 20, 9]],
+>            ["Sp", 4, 20, 9], ["SU", 4, 6, 9], ["SU", 4, 14, 25],
+>            ["SU", 4, 20, 9]],
 >           c -> CallFuncList(CheckGoingUp, c));
 true
 

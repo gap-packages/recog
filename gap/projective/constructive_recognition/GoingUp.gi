@@ -13,26 +13,26 @@
 ##
 ##
 ##  GoingUp for classical groups in their natural representation, as in
-##  [EHNPR] (see GoingDown.gi), Section 'GoingUp algorithm', for SL and for
-##  Sp in odd characteristic.
+##  [EHNPR] (see GoingDown.gi), Section 'GoingUp algorithm', for SL, and for
+##  Sp and SU in odd characteristic.
 ##
 ##  A GoingUp step ([EHNPR], 'The GoingUpStep algorithm', whose steps are
 ##  numbered as here) starts from a stingray embedding: a basis B of
-##  V = GF(q)^d, a standard basis for Sp, whose first n vectors span U, and
-##  words for the standard generators Y of CL(U) relative to these vectors,
-##  extended by the identity on T = <v_(n+1), ..., v_d>. With the overlap
-##  k = 1 for SL and 2 for Sp, it constructs the same for degree
-##  n' = min(2n - k, d), keeping the first n vectors of B:
+##  V = GF(q)^d, a standard basis for Sp and SU, whose first n vectors span
+##  U, and words for the standard generators Y of CL(U) relative to these
+##  vectors, extended by the identity on T = <v_(n+1), ..., v_d>. With the
+##  overlap k = 1 for SL and 2 for Sp and SU, it constructs the same for
+##  degree n' = min(2n - k, d), keeping the first n vectors of B:
 ##
 ##     U = A + P, P = <v_(n-k+1), ..., v_n> the pivot space
 ##     1. t in <Y> whose fixed space on U has dimension k (the seed)
 ##     2. g = t^a for random a, until W = U + Ug has dimension n', T meets
-##        Fix(g) in a complement of W (for Sp: W is non-degenerate), and
+##        Fix(g) in a complement of W (for Sp, SU: W is non-degenerate), and
 ##        U meets Fix(g) in a suitable k-space P'
 ##     3. g~ = g^b with b in <Y> mapping P' onto P, so that g~ fixes P
 ##     4. v_(n+1), ..., v_d := a basis of N, the projection of A g~ to T,
-##        and fixed vectors of g~ in T (for Sp: standard bases of N and of
-##        its orthogonal complement in T); so W = U + N
+##        and fixed vectors of g~ in T (for Sp, SU: standard bases of N and
+##        of its orthogonal complement in T); so W = U + N
 ##     5. the standard generators of CL(W) as words in Y and g~
 ##
 #############################################################################
@@ -43,9 +43,9 @@ RECOG.GoingUpRandomBound := 100;
 # The functions of the GoingUp step for the classical type <type>, and its
 # overlap k (see the top of this file). rootElements(n, f) returns the
 # record of root elements of CL(n,q), whose component Y holds the words
-# standing for the standard generators; for Sp, rootElementsOf(Y, n, f)
-# returns it for given words Y. The other functions are documented where
-# they are defined, in SL/GoingUp.gi and below.
+# standing for the standard generators; for Sp and SU, rootElementsOf(Y,
+# n, f) returns it for given words Y. The other functions are documented
+# where they are defined, in SL/GoingUp.gi and below.
 RECOG.GoingUpParameters := function(type)
   local of, k;
 
@@ -60,6 +60,8 @@ RECOG.GoingUpParameters := function(type)
   fi;
   if type = "Sp" then
     of := RECOG.Sp_RootElements;
+  elif type = "SU" then
+    of := RECOG.SU_RootElements;
   else
     ErrorNoReturn("RECOG.GoingUpParameters: unsupported type ", type);
   fi;
@@ -186,15 +188,16 @@ RECOG.GoingUpStep := function(std, N)
 end;
 
 # GoingUp of [EHNPR] ('Outline of the algorithm', subsection 'GoingUp
-# algorithm') for the type <type>, "SL" or "Sp" (q odd): <G> is
-# SL(d,q), resp. Sp(d,q) for some alternating form, with generators with
-# memory, and <init> describes an embedded CL(n,q) as follows:
+# algorithm') for the type <type>, "SL", or "Sp" or "SU" (q odd, d even):
+# <G> is SL(d,q), resp. Sp(d,q) or SU(d,q0) for some alternating resp.
+# hermitian form, with generators with memory, and <init> describes an
+# embedded CL(n,q) as follows:
 #  - `slp`: SLP in the generators of <G> for the standard generators of
 #    CL(n,q), as in RECOG.ClassicalStandardGenerators, relative to bas
 #  - `bas`: a d x d matrix whose last d-n rows are fixed by that CL(n,q);
-#    for Sp, its rows are a standard basis of V for a multiple of the form
-#    of <G>
-#  - `n`: the degree n, at least 2 for SL and 4 for Sp
+#    for Sp and SU, its rows are a standard basis of V for a multiple of
+#    the form of <G>
+#  - `n`: the degree n, at least 2 for SL and 4 for Sp and SU
 # Returns a record with the following components:
 #  - `slp`: SLP in the generators of <G> for the standard generators of
 #    CL(d,q) relative to bas
@@ -242,8 +245,9 @@ end;
 ##  and the conjugators and transvections in 'Constructing the enlarged
 ##  group', by constructive membership testing (Costi, PhD thesis, Queen
 ##  Mary, University of London, 2009). Here they are products of the root
-##  elements of RECOG.Sp_RootElements and of a torus element, found by
-##  elimination, which yields each word together with its matrix.
+##  elements of RECOG.Sp_RootElements resp. RECOG.SU_RootElements and of a
+##  torus element, found by elimination, which yields each word together
+##  with its matrix.
 ##
 ##  The record R of root elements of CL(n,q), as words in standard
 ##  generators Y, has the following components:
@@ -656,8 +660,8 @@ RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g)
 end;
 
 # The basis <bas> with its rows n+1, ..., d replaced by a standard basis of
-# their span, for the multiple of the form of <G> of type <type> ("Sp")
-# for which the first <n> rows are a standard basis, as at the end of
+# their span, for the multiple of the form of <G> of type <type> ("Sp" or
+# "SU") for which the first <n> rows are a standard basis, as at the end of
 # the final descent of [EHNPR] ('Terminal groups and initial groups'). The
 # last d-n rows of <bas> must span the orthogonal complement of the first n.
 RECOG.Form_CompleteStandardBasis := function(G, type, bas, n)
