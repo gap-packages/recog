@@ -2089,8 +2089,9 @@ function(recognise)
     # For each q we have that OmegaPlus(6,q) is isomorphic to PSL(4,q).
     elif d = 6 and q = 2 then
         # Additionally, OmegaPlus(6,2) is isomorphic to AlternatingGroup(8).
-        if not HasElementsMultipleOf( recognise.orders, [7]) and
-           not HasElementsMultipleOf( recognise.orders, [15]) then
+        # Its only maximal subgroup of order divisible by 7*15 is A7, which
+        # has no elements of order 15 [NP99, Theorem 5.3].
+        if not HasElementsMultipleOf( recognise.orders, [7, 15]) then
             return TemporaryFailure;
         fi;
     elif d = 6 and q = 3 then

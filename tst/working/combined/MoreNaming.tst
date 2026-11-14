@@ -757,6 +757,16 @@ gap> ri := RecogniseClassical(grp);;
 gap> ri.isSLContained;
 "unknown"
 
+# A7 < Omega^+(6,2) = A8, from ClassicalMaximalsGeneric("O+",6,2)
+gap> grp := Group(Z(2)^0*[
+>   [[0,0,0,1,0,1],[0,0,0,0,1,1],[1,1,1,1,1,0],
+>    [0,0,0,1,0,0],[0,1,0,0,0,1],[1,1,0,1,1,1]],
+>   [[1,1,1,0,1,1],[0,1,0,0,0,1],[1,0,0,0,1,0],
+>    [1,0,1,1,1,1],[1,0,0,1,0,0],[1,0,0,1,1,0]]]);;
+gap> ri := RecogniseClassical(grp);;
+gap> ri.isOmegaContained;
+"unknown"
+
 # some maximal subgroups of the conformal group CGO^+(8,5)
 gap> ri := RecogniseClassical(maxes_cgo_plus_8_5[1]);;
 gap> ri.isNotPSL;
