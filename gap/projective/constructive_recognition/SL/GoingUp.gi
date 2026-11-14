@@ -122,11 +122,11 @@ end;
 # A word for the matrix <M> in SL(n,q), as a product of the elementary
 # matrices E(i, j, lambda) = <E>(i, j, lambda), which may be words in
 # anything; <one> is the identity among them. Row reduction of M^-1 by
-# adding multiples of rows only, as in RECOG.ExpressInStd_SL: each row
-# operation multiplies by an elementary matrix from the left, and their
-# product is M. Clearing below the diagonal first and above it last keeps
-# rows sparse: a signed permutation matrix takes O(n) row operations,
-# instead of O(n^2) when each column is cleared completely at once.
+# adding multiples of rows only: each row operation multiplies by an
+# elementary matrix from the left, and their product is M. Clearing below
+# the diagonal first and above it last keeps rows sparse: a signed
+# permutation matrix takes O(n) row operations, instead of O(n^2) when
+# each column is cleared completely at once.
 RECOG.SL_ExpressByElementary := function(M, E, one)
   local n, X, word, rowOp, i, pos, j;
 
