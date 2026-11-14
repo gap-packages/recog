@@ -38,6 +38,16 @@ RECOG.GoingDownParameters := function(type, q)
                 isNamed := H -> RecogniseClassical(H,
                                     rec(case := "linear")).isSLContained = true );
   fi;
+  if type = "Sp" then
+    # for q even, the groups below Sp are orthogonal ([EHNPR], Section
+    # 'GoingDown algorithm')
+    if IsEvenInt(q) then
+      ErrorNoReturn("RECOG.GoingDownParameters: Sp needs odd q");
+    fi;
+    return rec( terminal := 8, minBody := 4, parity := 0,
+                isNamed := H -> RecogniseClassical(H,
+                                    rec(case := "symplectic")).isSpContained = true );
+  fi;
   ErrorNoReturn("RECOG.GoingDownParameters: unsupported type ", type);
 end;
 
