@@ -61,6 +61,12 @@ ReadPackage("recog","gap/projective/constructive_recognition/SL/main.gi");
 ReadPackage("recog","gap/projective/sl2_natural.gi");
 ReadPackage("recog","gap/projective/AnSnOnFDPM.gi");
 
+# Classical graybox recognition (uses the Lie type helpers above)
+ReadPackage("recog","data/DEFREPDATA.g");
+ReadPackage("recog","data/SmallDegreeTables.g");
+ReadPackage("recog","gap/matrix/possiblenaturaldegrees.gi");
+ReadPackage("recog","gap/matrix/classicalgraybox.gi");
+
 # All the method installations are now here:
 ReadPackage("recog","gap/perm.gi");
 ReadPackage("recog","gap/matrix.gi");

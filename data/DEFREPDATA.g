@@ -30,18 +30,18 @@
 ##  
 ##  Here are two utility functions:
 ##  
-##  AllCases(n, q) with n <= 300 and q a prime power returns a list of lists 
+##  RECOG.AllCases(n, q) with n <= 300 and q a prime power returns a list of lists 
 ##  of form  [type, rank, [list of weights]] showing which of the mentioned
 ##  representations occur for given n and q. The 'list of weights' is as
 ##  described above. The function
 ##  
-##  AllHighestWeightsOfCase( case, q ) can be used to actually transform this
+##  RECOG.AllHighestWeightsOfCase( case, q ) can be used to actually transform this
 ##  into an explicit list of highest weights which are relevant for the
 ##  representations of groups G(q). (If q is a high power of a prime p then this
 ##  list can easily become quite long. For this reason these two functions are
 ##  separated.)
 ##  
-##  DimensionsOfTensorFactors(n, q, case) to find the dimensions of irreducible
+##  RECXOG.DimensionsOfTensorFactors(n, q, case) to find the dimensions of irreducible
 ##  tensor factors. This will always return nontrivial factors when case[3] has
 ##  length at least 2, then the corresponding representations are tensor
 ##  products by the Steinberg tensor product theorem. But sometimes also
@@ -49,7 +49,7 @@
 ##  those) can also be a nontrivial tensor product, see the G_2 example below.
 ##  
 ##  Example:
-##  gap> cases := AllCases(56, 3^4);
+##  gap> cases := RECXOG.AllCases(56, 3^4);
 ##  [ [ "A", 7, [ [ 0, 0, 0, 0, 1, 0, 0 ] ] ], 
 ##    [ "A", 7, [ [ 0, 0, 1, 0, 0, 0, 0 ] ] ], 
 ##    [ "B", 2, [ [ 1, 0 ], [ 0, 2 ] ] ], 
@@ -71,21 +71,21 @@
 ##                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 ##                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 ##                0, 0, 0, 0, 0, 0, 0, 1 ] ] ] ]
-##  gap> AllHighestWeightsOfCase(cases[3], 3^4);
+##  gap> RECOG.AllHighestWeightsOfCase(cases[3], 3^4);
 ##  [ [ 1, 6 ], [ 1, 18 ], [ 1, 54 ], [ 3, 2 ], [ 3, 18 ], 
 ##    [ 3, 54 ], [ 9, 2 ], [ 9, 6 ], [ 9, 54 ], [ 27, 2 ], 
 ##    [ 27, 6 ], [ 27, 18 ] ]
-##  gap> DimensionsOfTensorFactors(56,3^4,cases[3]);
+##  gap> RECOG.DimensionsOfTensorFactors(56,3^4,cases[3]);
 ##  [ 4, 14 ]
-##  gap> cases := AllCases(49, 3^4);;
+##  gap> cases := RECOG.AllCases(49, 3^4);;
 ##  gap> cases[9];
 ##  [ "G", 2, [ [ 1, 1 ] ] ]
-##  gap> DimensionsOfTensorFactors(49,3^4,cases[9]);
+##  gap> RECOG.DimensionsOfTensorFactors(49,3^4,cases[9]);
 ##  [ 7, 7 ]
 ##  gap> 
 ##  
 DEFREPDATA := 0; # actual data below
-AllCases := function(n, q)
+RECOG.AllCases := function(n, q)
   local p, f, l, lp, lq;
   p := SmallestRootInt(q);
   f := LogInt(q, p);
@@ -101,7 +101,7 @@ AllCases := function(n, q)
   lq := Filtered(lp, a-> Length(a[3]) <= f);
   return List(lq, a-> [a[1][1], a[1][2], a[3]]);
 end;
-AllHighestWeightsOfCase := function(case, q)
+RECOG.AllHighestWeightsOfCase := function(case, q)
   local p, f, comb, pps;
   p := SmallestRootInt(q);
   f := LogInt(q, p);
@@ -110,7 +110,7 @@ AllHighestWeightsOfCase := function(case, q)
   pps := List([1..f], i-> p^(i-1));
   return Set(List(comb, a-> pps{a} * case[3]));
 end;
-DimensionsOfTensorFactors := function(n, q, case)
+RECOG.DimensionsOfTensorFactors := function(n, q, case)
   local res, la, mu, d, a;
   if Length(case[3]) > 1 then
     # it is a tensor product because of the Steinberg tensor product theorem
@@ -118,7 +118,7 @@ DimensionsOfTensorFactors := function(n, q, case)
     res := [];
     for d in [1..n] do 
       if n mod d = 0 then
-        for a in AllCases(d, q) do
+        for a in RECOG.AllCases(d, q) do
           if a[1] = case[1] and a[2] = case[2]  
              and Length(a[3]) = 1 and a[3][1] in case[3] then
             Add(res, d);
@@ -136,11 +136,11 @@ DimensionsOfTensorFactors := function(n, q, case)
     la := case[3][1];
     for d in [1..RootInt(n,2)] do 
       if n mod d = 0 then
-        for a in AllCases(d, q) do
+        for a in RECOG.AllCases(d, q) do
           if a[1] = case[1] and a[2] = case[2]  
               and Length(a[3]) = 1 and ForAll(la-a[3][1], x-> x>=0) then
             mu := la-a[3][1];
-            if ForAny(AllCases(n/d, q), b-> b[1] = case[1] and b[2] = case[2]
+            if ForAny(RECOG.AllCases(n/d, q), b-> b[1] = case[1] and b[2] = case[2]
                                      and Length(b[3]) = 1 and b[3][1] = mu) then
               return [d, n/d];
             fi;
