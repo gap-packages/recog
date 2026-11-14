@@ -12,6 +12,8 @@ This file describes changes in the recog package.
   `InfoRecog_`, so that tab completion on `InfoRecog` finds them; e.g.
   `InfoClassical` is now `InfoRecog_ClassicalNaming`. The old names
   still work
+- Fix `FindElmOfEvenNormalSubgroup` discarding some involutions it
+  found, and failing on the trivial group (PR #539)
 
 ## 1.5.1 (2026-05-19)
 
