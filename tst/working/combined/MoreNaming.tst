@@ -749,6 +749,14 @@ gap> ri := RecogniseClassical(grp);;
 gap> ri.isSLContained;
 "unknown"
 
+# L2(7) < SL(3,11), from ClassicalMaximalsGeneric("L",3,11)
+gap> grp := Group(Z(11)^0*[
+>   [[3,4,6],[8,7,1],[8,8,0]],
+>   [[0,0,10],[6,1,6],[10,7,10]]]);;
+gap> ri := RecogniseClassical(grp);;
+gap> ri.isSLContained;
+"unknown"
+
 # some maximal subgroups of the conformal group CGO^+(8,5)
 gap> ri := RecogniseClassical(maxes_cgo_plus_8_5[1]);;
 gap> ri.isNotPSL;

@@ -691,13 +691,12 @@ end);
 BindRecogMethod("FindHomMethodsClassical", "IsNotPSL",
 "tests whether PSL groups are ruled out",
 function(recognise)
-   local i, E, LE, d, p, a, q, str, fn, ord, r;
+   local i, E, LE, d, p, q, str, fn, ord, r;
 
     E := recognise.E;
     LE := recognise.LE;
     d := recognise.d;
     q := recognise.q;
-    a := recognise.a;
     p := recognise.p;
 
 #    if recognise.hint <> "unknown" and recognise.hint <> "linear" then
@@ -747,10 +746,11 @@ function(recognise)
             recognise.isNotPSL := true;
             return NeverApplicable;
         elif ((q+1) mod 3 = 0 and IsPowerOfTwo((q+1)/3)) then
-            # q = 3*2^s-1 and q^2-1 has no large ppd.
-            # TODO recheck this
+            # q = 3*2^s-1 with s >= 2, so q^2-1 has no large ppd. By
+            # [NP98, Table 14] the witnesses are the elements of order
+            # dividing q^2-1 but not 6(q-1).
              ord := Order(recognise.g);
-             if (ord mod 8 <> 0 or (p^(2*a)-1) mod ord = 0) then
+             if (q^2-1) mod ord = 0 and (6*(q-1)) mod ord <> 0 then
                  Info( InfoRecog_ClassicalNaming, 2, "G' is not PSL(2,7)");
                  recognise.isNotPSL := true;
                  return NeverApplicable;
