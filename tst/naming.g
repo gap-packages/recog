@@ -64,6 +64,37 @@ TestNaming := function(grpname, param...)
     return failures;
 end;
 
+# Name each maximal subgroup of the quasisimple classical group of the given
+# type (as in ClassicalMaximalsGeneric) 5 times, and return the number of
+# subgroups named as the full group. Naming one over a proper subfield is
+# right: a subfield subgroup contains the classical group over that field.
+TestNamingMaximals := function(type, d, q)
+    local flag, fieldsize, failures, maxes, k, M, i, ri;
+    flag := rec(L := "isSLContained", U := "isSUContained",
+                S := "isSpContained", O := "isOmegaContained",
+                ("O+") := "isOmegaContained", ("O-") := "isOmegaContained");
+    fieldsize := q;
+    if type = "U" then
+        fieldsize := q^2;
+    fi;
+    failures := 0;
+    maxes := ValueGlobal("ClassicalMaximalsGeneric")(type, d, q);
+    for k in [1..Length(maxes)] do
+        M := maxes[k];
+        for i in [1..5] do
+            ri := RecogniseClassical(M);
+            if ri.(flag.(type)) = true and ri.q = fieldsize then
+                Print(type, "(", d, ",", q, "): maximal subgroup ", k,
+                      " of order ", Size(M), " is named as the full group\n");
+                failures := failures + 1;
+                break;
+            fi;
+        od;
+    od;
+    return failures;
+end;
+
+
 # Some maximal subgroups of the conformal group CGO^+(8,5), which
 # are particularly tricky for the naming functions
 maxes_cgo_plus_8_5 := [
