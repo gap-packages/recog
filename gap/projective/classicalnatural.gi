@@ -564,178 +564,6 @@ RECOG.RecogniseSL2NaturalEvenChar := function(g,f,torig)
   return res;
 end;
 
-RECOG.GuessProjSL2ElmOrder := function(x,f)
-  local facts,i,j,o,p,q,r,s,y,z;
-  p := Characteristic(f);
-  q := Size(f);
-  if IsOneProjective(x) then return 1;
-  elif IsEvenInt(p) and IsOneProjective(x^2) then return 2;
-  fi;
-  if p > 2 then
-      y := x^p;
-      if IsOneProjective(y) then
-          return p;
-      fi;
-  fi;
-  if IsOneProjective(x^(q-1)) then
-      facts := Collected(FactInt(q-1:cheap)[1]);
-      s := Product(facts,x->x[1]^x[2]);
-      r := (q-1)/s;
-  else
-      facts := Collected(FactInt(q+1:cheap)[1]);
-      s := Product(facts,x->x[1]^x[2]);
-      r := (q+1)/s;
-  fi;
-  y := x^r;
-  o := r;
-  for i in [1..Length(facts)] do
-      p := facts[i];
-      j := p[2]-1;
-      while j >= 0 do
-          z := y^(s/p[1]^(p[2]-j));
-          if not IsOneProjective(z) then break; fi;
-          j := j - 1;
-      od;
-      o := o * p[1]^(j+1);
-  od;
-  return o;
-end;
-
-RECOG.IsThisSL2Natural := function(gens,f)
-  # Checks quickly whether or not this is SL(2,f).
-  # The answer is not guaranteed to be correct, this is Las Vegas.
-  local CheckElm,a,b,clos,coms,i,isabelian,j,l,notA5,p,q,S,seenqm1,seenqp1,x;
-
-  # The following method does not work for q <= 11, as then
-  # the projective orders are either q+1, or else less than 5.
-  # Hence seenqm1 never gets set.
-  CheckElm := function(x)
-      local o;
-      o := RECOG.GuessProjSL2ElmOrder(x,f);
-      if o in [1,2] then
-          return false;
-      fi;
-      if o > 5 then
-          if notA5 = false then Info(InfoRecog,4,"SL2: Group is not A5"); fi;
-          notA5 := true;
-          if seenqp1 and seenqm1 then
-              return true;
-          fi;
-      fi;
-      if o = p or o <= 5 then
-          return false;
-      fi;
-      if (q+1) mod o = 0 then
-          if not seenqp1 then
-              Info(InfoRecog,4,"SL2: Found element of order dividing q+1.");
-              seenqp1 := true;
-              if seenqm1 and notA5 then
-                  return true;
-              fi;
-          fi;
-      else
-          if not seenqm1 then
-              Info(InfoRecog,4,"SL2: Found element of order dividing q-1.");
-              seenqm1 := true;
-              if seenqp1 and notA5 then
-                  return true;
-              fi;
-          fi;
-      fi;
-      return false;
-  end;
-
-  if Length(gens) <= 1 then
-      Info(InfoRecog,4,"SL2: Group cyclic");
-      return false;
-  fi;
-
-  q := Size(f);
-  p := Characteristic(f);
-  # For small q, compute the order of the group via a stabilizer chain.
-  if q <= 11 then    # this could be increased if needed
-      Info(InfoRecog,4,"SL2: Computing stabiliser chain.");
-      S := StabilizerChain(Group(gens));
-      Info(InfoRecog,4,"SL2: size is ",Size(S));
-      return Size(S) = (q*(q-1)*(q+1));
-  fi;
-
-  seenqp1 := false;
-  seenqm1 := false;
-  notA5 := false;
-
-  for i in [1..Length(gens)] do
-      if CheckElm(gens[i]) then
-          return true;
-      fi;
-  od;
-  CheckElm(gens[1]*gens[2]);
-  if Length(gens) >= 3 then
-      CheckElm(gens[1]*gens[3]);
-      CheckElm(gens[2]*gens[3]);
-  fi;
-
-  # First we check the derived group:
-  coms := EmptyPlist(20);
-  l := Length(gens);
-  if l <= 4 then
-      Info(InfoRecog,4,"SL2: Computing commutators of gens...");
-      for i in [1..l-1] do
-          for j in [i+1..l] do
-              x := Comm(gens[i],gens[j]);
-              if CheckElm(x) then
-                  return true;
-              fi;
-              Add(coms,x);
-          od;
-      od;
-  else
-      Info(InfoRecog,4,"SL2: Computing 6 random commutators...");
-      for i in [1..6] do
-          a := RECOG.RandomSubproduct(gens,rec());
-          b := RECOG.RandomSubproduct(gens,rec());
-          x := Comm(a,b);
-          if CheckElm(x) then
-              return true;
-          fi;
-          Add(coms,x);
-      od;
-  fi;
-  if ForAll(coms, RECOG.IsScalarMat) then
-      Info(InfoRecog,4,"SL2: Group is soluble, commutators are central");
-      return false;
-  fi;
-  Info(InfoRecog,4,"SL2: Computing normal closure...");
-  clos := FastNormalClosure(gens,coms,5);
-  for i in [Length(coms)+1..Length(clos)] do
-      if CheckElm(clos[i]) then
-          return true;
-      fi;
-  od;
-  if ForAll(clos{[Length(coms)+1..Length(clos)]}, RECOG.IsScalarMat) then
-      Info(InfoRecog,4,"SL2: Group is soluble, derived subgroup central");
-      return false;
-  fi;
-  Info(InfoRecog,4,"SL2: Computing 6 random commutators...");
-  isabelian := true;
-  for i in [1..6] do
-      a := RECOG.RandomSubproduct(clos,rec());
-      b := RECOG.RandomSubproduct(clos,rec());
-      x := Comm(a,b);
-      if not RECOG.IsScalarMat(x) then isabelian := false; break; fi;
-  od;
-  if isabelian then
-      Info(InfoRecog,4,
-           "SL2: Group is soluble, derived subgroup abelian mod scalars");
-      return false;
-  fi;
-
-  # Now we know that the group is not dihedral!
-  return false;
-end;
-
-
-
 # Now the code for writing SLPs:
 
 SLPforElementFuncsProjective.PSL2 := function(ri,x)
@@ -857,15 +685,10 @@ function(ri)
   RECOG.SetPseudoRandomStamp(g,"ClassicalNatural");
 
   # First check whether we are applicable:
-  # check if this group contains SL_d -- for d > 2 we can use RecogniseClassical;
-  # for d = 2, we can use RECOG.IsThisSL2Natural, but only after adjusting
-  # the determinants of the generators (comes next)
-  if d <> 2 then
-      classical := RecogniseClassical(g);
-      if classical.isSLContained <> true then
-          Info(InfoRecog,2,"ClassicalNatural: Is not PSL.");
-          return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
-      fi;
+  classical := RecogniseClassical(g);
+  if classical.isSLContained <> true then
+      Info(InfoRecog,2,"ClassicalNatural: Is not PSL.");
+      return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
   fi;
 
   # Now get rid of nasty determinants:
@@ -885,14 +708,6 @@ function(ri)
           changed := true;
       fi;
   od;
-
-  # Now check whether the normalized matrices generate an SL_2:
-  if d = 2 then
-      if not RECOG.IsThisSL2Natural(gens,f) then
-          Info(InfoRecog,2,"ClassicalNatural: Is not PSL_2.");
-          return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
-      fi;
-  fi;
 
   if changed then
       gm := GroupWithMemory(gens);

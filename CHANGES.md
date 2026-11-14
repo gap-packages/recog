@@ -14,6 +14,8 @@ This file describes changes in the recog package.
   still work
 - Fix `FindElmOfEvenNormalSubgroup` discarding some involutions it
   found, and failing on the trivial group (PR #539)
+- Fix `RecogniseClassical` leaving `isSLContained` at "unknown" for
+  every group of degree 2 (issue #345)
 
 ## 1.5.1 (2026-05-19)
 
