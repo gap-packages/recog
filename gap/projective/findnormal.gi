@@ -334,24 +334,13 @@ BindGlobal( "FINDEVENNORMALOPTS", rec(
 #   return res;
 # end );
 
-# All powers that can be done with at most 5 multiplications/inversion:
-RECOG.MYRANDOMSUBPRODUCTPOWERS :=
-  [1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,20,24,32,
-   -1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-12,-16];
-  # (without undue and unimplemented tricks)!
-
 RECOG.RandomSubproduct := function(a,opt)
-    local allone,dopowers,g,isone,power,prod,rs;
+    local allone,g,isone,prod,rs;
 
     if IsBound(opt.RandomSource) then
         rs := opt.RandomSource;
     else
         rs := GlobalMersenneTwister;
-    fi;
-    if IsBound(opt.DoPowers) then
-        dopowers := opt.DoPowers;
-    else
-        dopowers := false;
     fi;
     if IsBound(opt.IsOne) then
         isone := opt.IsOne;
@@ -366,15 +355,10 @@ RECOG.RandomSubproduct := function(a,opt)
             if not isone(g) then
                 allone := false;
                 if Random( rs, [ true, false ] )  then
-                    if dopowers then
-                        power := Random(rs,RECOG.RANDOMSUBPRODUCTPOWERS);
-                    else
-                        power := 1;
-                    fi;
                     if Random( rs, [ true, false ] )  then
-                        prod := prod * g^power;
+                        prod := prod * g;
                     else
-                        prod := g^power * prod;
+                        prod := g * prod;
                     fi;
                 fi;
             fi;
@@ -388,17 +372,12 @@ RECOG.BlindDescentStep := function(G,x,y,opt)
   # be and it will be nontrivial:
   # Only use for non-abelian groups and for non-trivial x and y!
 
-  local c,i,isone,l,usepseudo,xx;
+  local c,i,isone,l,xx;
 
   if IsBound(opt.IsOne) then
       isone := opt.IsOne;
   else
       isone := IsOne;
-  fi;
-  if IsBound(opt.UsePseudoRandom) then
-      usepseudo := opt.UsePseudoRandom;
-  else
-      usepseudo := false;
   fi;
 
   c := Comm(x,y);
@@ -414,12 +393,7 @@ RECOG.BlindDescentStep := function(G,x,y,opt)
   # Now try generators for the normal closure of x:
   l := [x];
   for i in [1..18] do
-    if usepseudo then
-        xx := RECOG.RandomSubproduct(l,opt)^PseudoRandom(G);
-    else
-        xx := RECOG.RandomSubproduct(l,opt)^
-              RECOG.RandomSubproduct(GeneratorsOfGroup(G),opt);
-    fi;
+    xx := RECOG.RandomSubproduct(l,opt)^PseudoRandom(G);
     Add(l,xx);
     c := Comm(xx,y);
     if not isone(c) then
@@ -541,7 +515,7 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
               o := opt.Order(z);
               if IsEvenInt(o) then
                   z := z^(o/2);
-                  if AddList(centinvols,z^(o/2)) then
+                  if AddList(centinvols,z) then
                       UseElement(z);
                       if blindr.isknownproper then
                       if InfoLevel(InfoRecog_FindEvenNormal)>=3 then Print("\n"); fi;
@@ -654,7 +628,7 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
       gens := GeneratorsOfGroup(g);
       pos := First([1..Length(gens)],i->not opt.IsOne(gens[i]));
       if pos = fail then
-          res := rec( success := fail, msg := "Group is trivial" );
+          return rec( success := fail, msg := "Group is trivial" );
       fi;
       i := 1;
       abelian := true;
@@ -669,12 +643,10 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
           i := i + 1;
       od;
       if abelian then
-          res := rec( success := true, msg := "Group is abelian",
+          return rec( success := true, msg := "Group is abelian",
                       el := gens[pos] );
       fi;
   fi;
-
-  opt.UsePseudoRandom := true;   # This is for the blind descent
 
   # First make sure we have an involution list:
   if IsBound(opt.invols) then
