@@ -23,4 +23,7 @@ gap> G:=Group(Z(25)^0 * [
 <matrix group with 4 generators>
 
 #
+gap> oldOrbInfoLevel := InfoLevel(InfoOrb);;
+gap> SetInfoLevel(InfoOrb, 0); # genss may warn "Schreier tree is not shallow"
 gap> ri := RECOG.TestGroup(G, false, 374400);;
+gap> SetInfoLevel(InfoOrb, oldOrbInfoLevel);
