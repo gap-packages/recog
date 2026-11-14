@@ -14,6 +14,9 @@ This file describes changes in the recog package.
   still work
 - Fix `FindElmOfEvenNormalSubgroup` discarding some involutions it
   found, and failing on the trivial group (PR #539)
+- `RandomSubproduct` now returns the identity only if all entries are
+  trivial, and takes an optional record setting the random source and
+  the identity test. It replaces `RECOG.RandomSubproduct`
 
 ## 1.5.1 (2026-05-19)
 
