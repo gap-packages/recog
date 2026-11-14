@@ -10,11 +10,15 @@ true
 #
 #@if not IsBound(RECOG_TEST_SUITE) or RECOG_TEST_SUITE = "quick"
 gap> d:=3;; for q in [2, 3] do TestNaming("SL", d, q); od;
+gap> d:=3;; for q in [2, 3] do TestNaming("GL", d, q); od;
 #@fi
 #@if not IsBound(RECOG_TEST_SUITE) or RECOG_TEST_SUITE = "slow"
 gap> d:=3;; for q in [4, 5, 7, 8, 9, 11, 13] do TestNaming("SL", d, q); od;
 gap> d:=4;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SL", d, q); od;
 gap> d:=5;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SL", d, q); od;
+gap> d:=3;; for q in [4, 5, 7, 8, 9, 11, 13] do TestNaming("GL", d, q); od;
+gap> d:=4;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("GL", d, q); od;
+gap> d:=5;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("GL", d, q); od;
 #@fi
 
 #
@@ -22,12 +26,20 @@ gap> d:=5;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SL", d, q); od
 #
 #@if not IsBound(RECOG_TEST_SUITE) or RECOG_TEST_SUITE = "quick"
 gap> d:=3;; for q in [2, 3] do TestNaming("SO", d, q); od;
+gap> d:=3;; for q in [2, 3] do TestNaming("GO", d, q); od;
+gap> d:=3;; for q in [2, 3] do TestNaming("Omega", d, q); od;
 #@fi
 
 #@if not IsBound(RECOG_TEST_SUITE) or RECOG_TEST_SUITE = "slow"
 gap> d:=3;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SO", d, q); od;
 gap> d:=5;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SO", d, q); od;
 gap> d:=7;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SO", d, q); od;
+gap> d:=3;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("GO", d, q); od;
+gap> d:=5;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("GO", d, q); od;
+gap> d:=7;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("GO", d, q); od;
+gap> d:=3;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("Omega", d, q); od;
+gap> d:=5;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("Omega", d, q); od;
+gap> d:=7;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("Omega", d, q); od;
 #@fi
 
 #
@@ -37,6 +49,8 @@ gap> d:=7;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SO", d, q); od
 #
 #@if not IsBound(RECOG_TEST_SUITE) or RECOG_TEST_SUITE = "quick"
 gap> d:=4;; for q in [2, 3] do TestNaming("SO", +1, d, q); od;
+gap> d:=4;; for q in [2, 3] do TestNaming("GO", +1, d, q); od;
+gap> d:=4;; for q in [2, 3] do TestNaming("Omega", +1, d, q); od;
 #@fi
 
 #@if not IsBound(RECOG_TEST_SUITE) or RECOG_TEST_SUITE = "slow"
@@ -45,6 +59,12 @@ gap> d:=6;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SO", +1, d, q)
 gap> d:=8;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SO", +1, d, q); od;
 gap> d:=10;; for q in [2, 3, 4, 5] do TestNaming("SO", +1, d, q); od;
 gap> d:=12;; for q in [2, 3, 4, 5] do TestNaming("SO", +1, d, q); od;
+gap> d:=4;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("GO", +1, d, q); od;
+gap> d:=6;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("GO", +1, d, q); od;
+gap> d:=4;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("Omega", +1, d, q); od;
+gap> d:=6;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("Omega", +1, d, q); od;
+gap> d:=8;; for q in [2, 3, 4] do TestNaming("GO", +1, d, q); od;
+gap> d:=8;; for q in [2, 3, 4] do TestNaming("Omega", +1, d, q); od;
 #@fi
 
 #
@@ -52,12 +72,20 @@ gap> d:=12;; for q in [2, 3, 4, 5] do TestNaming("SO", +1, d, q); od;
 #
 #@if not IsBound(RECOG_TEST_SUITE) or RECOG_TEST_SUITE = "quick"
 gap> d:=4;; for q in [2, 3] do TestNaming("SO", -1, d, q); od;
+gap> d:=4;; for q in [2, 3] do TestNaming("GO", -1, d, q); od;
+gap> d:=4;; for q in [2, 3] do TestNaming("Omega", -1, d, q); od;
 #@fi
 
 #@if not IsBound(RECOG_TEST_SUITE) or RECOG_TEST_SUITE = "slow"
 gap> d:=4;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SO", -1, d, q); od;
 gap> d:=6;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SO", -1, d, q); od;
 gap> d:=8;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SO", -1, d, q); od;
+gap> d:=4;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("GO", -1, d, q); od;
+gap> d:=6;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("GO", -1, d, q); od;
+gap> d:=4;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("Omega", -1, d, q); od;
+gap> d:=6;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("Omega", -1, d, q); od;
+gap> d:=8;; for q in [2, 3, 4] do TestNaming("GO", -1, d, q); od;
+gap> d:=8;; for q in [2, 3, 4] do TestNaming("Omega", -1, d, q); od;
 #@fi
 
 #
@@ -79,6 +107,7 @@ gap> d:=8;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("Sp", d, q); od
 #
 #@if not IsBound(RECOG_TEST_SUITE) or RECOG_TEST_SUITE = "quick"
 gap> d:=3;; for q in [2, 3] do TestNaming("SU", d, q); od;
+gap> d:=3;; for q in [2, 3] do TestNaming("GU", d, q); od;
 #@fi
 
 #@if not IsBound(RECOG_TEST_SUITE) or RECOG_TEST_SUITE = "slow"
@@ -86,4 +115,8 @@ gap> d:=3;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SU", d, q); od
 gap> d:=4;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SU", d, q); od;
 gap> d:=5;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SU", d, q); od;
 gap> d:=6;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("SU", d, q); od;
+gap> d:=3;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("GU", d, q); od;
+gap> d:=4;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("GU", d, q); od;
+gap> d:=5;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("GU", d, q); od;
+gap> d:=6;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("GU", d, q); od;
 #@fi

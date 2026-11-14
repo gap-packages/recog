@@ -1,5 +1,8 @@
+# Name <grpname>(<param>) 20 times and return the number of wrong answers.
+# "unknown" is acceptable in a single run, but the group must be named in at
+# least one of them.
 TestNaming := function(grpname, param...)
-    local expected, G, actual, i, n, failures;
+    local expected, G, actual, i, n, failures, target, named;
     failures := 0;
     expected := rec(
         #isGeneric := true,
@@ -14,26 +17,31 @@ TestNaming := function(grpname, param...)
         isSUContained := false,
     );
 
-    if grpname = "SL" then
-        expected.isSLContained := true;
-    elif grpname = "SO" then
+    if grpname = "SL" or grpname = "GL" then
+        target := "isSLContained";
+    elif grpname = "SO" or grpname = "GO" or grpname = "Omega" then
         if Length(param) = 2 and IsEvenInt(param[2]) then
             Assert(0, IsOddInt(param[1]));
-            expected.isReducible := true;
+            target := "isReducible";
         else
-            expected.isOmegaContained := true;
+            target := "isOmegaContained";
         fi;
     elif grpname = "Sp" then
-        expected.isSpContained := true;
-    elif grpname = "SU" then
-        expected.isSUContained := true;
+        target := "isSpContained";
+    elif grpname = "SU" or grpname = "GU" then
+        target := "isSUContained";
     else
         Error("unsupported group type ", grpname);
     fi;
+    expected.(target) := true;
 
     G := CallFuncList(ValueGlobal(grpname), param);
+    named := false;
     for i in [1..20] do
         actual := RecogniseClassical(G);
+        if actual.(target) = true then
+            named := true;
+        fi;
         for n in RecNames(expected) do
             if actual.(n) <> expected.(n) then
                 if actual.(n) = "unknown" then
@@ -47,14 +55,14 @@ TestNaming := function(grpname, param...)
                 failures := failures + 1;
             fi;
         od;
-        # TODO: also verify maximal subgroups are *not* recognized as the full
-        # group; problem is that the list of MaximalSubgroupClassReps is not
-        # (yet) fully available for the classical groups in GAP
-        #MaximalSubgroupClassReps
     od;
+    if not named then
+        Print(grpname, "(", JoinStringsWithSeparator(List(param, String), ","),
+              ") never has ", target, " = true\n");
+        failures := failures + 1;
+    fi;
     return failures;
 end;
-
 
 # Some maximal subgroups of the conformal group CGO^+(8,5), which
 # are particularly tricky for the naming functions
