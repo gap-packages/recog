@@ -25,5 +25,13 @@ gap> Reset(rs, 7);;
 gap> x = draw();
 true
 
+# Argument checks.
+gap> RandomSubproduct([]);
+Error, <a> must be a nonempty list of group elements
+gap> RandomSubproduct(1);
+Error, <a> must be a group or a nonempty list of group elements
+gap> RandomSubproduct(G, rec(), rec());
+Error, usage: RandomSubproduct( <a>[, <opt>] )
+
 #
 gap> STOP_TEST("RandomSubproduct.tst");
