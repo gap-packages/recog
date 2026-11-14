@@ -21,9 +21,5 @@ DeclareInfoClass("InfoRecog_FindEvenNormal");
 SetInfoLevel(InfoRecog_FindEvenNormal,0);
 DeclareSynonym("InfoFindEvenNormal", InfoRecog_FindEvenNormal);  # old name
 
-# DeclareGlobalFunction("RECOG_IsNormal");
-
-# DeclareOperation( "FindEvenNormalSubgroup", [ IsGroup, IsRecord ] );
-# DeclareOperation( "FindEvenNormalSubgroup", [ IsGroup ] );
 DeclareOperation( "FindElmOfEvenNormalSubgroup", [ IsGroup, IsRecord ] );
 DeclareOperation( "FindElmOfEvenNormalSubgroup", [ IsGroup ] );
