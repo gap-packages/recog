@@ -727,6 +727,28 @@ gap> ri := RecogniseClassical(grp);;
 gap> ri.isSLContained;
 "unknown"
 
+# ... nor in dimension 3 for q = 2 mod 3, where the order 3 Frobenius
+# is a ppd(3,q;2)-element. Groups 7:3 < SL(3,2), 31:3 < SL(3,5) and
+# 133:3 < SL(3,11) from ClassicalMaximalsGeneric("L",3,q).
+gap> grp := Group(Z(2)^0*[
+>   [[1,0,0],[0,0,1],[0,1,1]],
+>   [[0,1,0],[0,0,1],[1,1,0]]]);;
+gap> ri := RecogniseClassical(grp);;
+gap> ri.isSLContained;
+"unknown"
+gap> grp := Group(Z(5)^0*[
+>   [[1,0,0],[4,4,2],[3,2,0]],
+>   [[0,2,2],[4,4,2],[4,3,4]]]);;
+gap> ri := RecogniseClassical(grp);;
+gap> ri.isSLContained;
+"unknown"
+gap> grp := Group(Z(11)^0*[
+>   [[1,0,0],[6,9,10],[0,3,1]],
+>   [[4,10,3],[6,9,10],[9,8,9]]]);;
+gap> ri := RecogniseClassical(grp);;
+gap> ri.isSLContained;
+"unknown"
+
 # some maximal subgroups of the conformal group CGO^+(8,5)
 gap> ri := RecogniseClassical(maxes_cgo_plus_8_5[1]);;
 gap> ri.isNotPSL;

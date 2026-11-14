@@ -396,9 +396,9 @@ function(recognise)
         if Length(recognise.ClassicalForms) > 0 then
             # A trivial form only tells us that we are in the linear case.
             # For generic linear groups, use that to avoid ruling out Singer
-            # normalizers too early. The d <= 3 linear cases are handled by
-            # NonGenericLinear, so there is no need to force isNotExt here.
-            if d > 3 and First(recognise.ClassicalForms, IsTrivialForm) <> fail then
+            # normalizers too early. Test it before IsSymplecticForm, which
+            # also holds for the zero form.
+            if First(recognise.ClassicalForms, IsTrivialForm) <> fail then
                 hint := "linear";
             elif First(recognise.ClassicalForms, IsHermitianForm) <> fail then
                 hint := "unitary";
@@ -439,7 +439,23 @@ function(recognise)
     fi;
 
     if hint = "linear" then
-        if d > 3 then
+        if d = 3 and not 2 in recognise.LE then
+            # The 3-witnesses of [NP98, Section 7] are lppd(3,q;2)-elements,
+            # which SL(3,q) lacks for q = 3*2^s-1. Every element of
+            # GammaL(1,q^3) has order dividing q^3-1 or 3(q-1), so an element
+            # of any other order is a witness as well.
+            if not recognise.needOrders then
+                recognise.needOrders := true;
+                return TemporaryFailure;
+            fi;
+            if ForAny(recognise.orders,
+                      o -> (q^3-1) mod o <> 0 and 3*(q-1) mod o <> 0) then
+                recognise.isNotExt := true;
+                return NeverApplicable;
+            fi;
+            return TemporaryFailure;
+        fi;
+        if d >= 3 then
             # For generic linear groups, E is built from random elements.
             # Seeing only part of the expected extension-field pattern is not
             # enough to rule that case out yet; we only reject when the data is
