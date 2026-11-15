@@ -281,7 +281,7 @@ Dependencies := rec(
     ["FactInt", ">= 1.6.3"],
     ["Forms", ">= 1.2.11"],
     ["genss", ">= 1.6.8"],
-    ["Orb", ">= 4.9.0"],  # really should be 5.1.0 for latest bug fixes
+    ["Orb", ">= 5.1.0"],
   ],
   SuggestedOtherPackages := [],
   ExternalConditions := []

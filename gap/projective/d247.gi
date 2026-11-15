@@ -300,9 +300,7 @@ RECOG.SortOutReducibleNormalSubgroup :=
         return TemporaryFailure;
     fi;
     homsimg := BasisVectors(Basis(VectorSpace(f,Concatenation(homs))));
-    homcomp := MutableCopyMat(homsimg);
-# FIXME: This will go:
-ConvertToMatrixRep(homcomp,f);
+    homcomp := RECOG.MutableCopyMatOverField(homsimg,f);
     TriangulizeMat(homcomp);
     o := Orb(G,homcomp,OnSubspacesByCanonicalBasis,rec(storenumbers := true));
     Enumerate(o,QuoInt(ri!.dimension,Length(homcomp)));
