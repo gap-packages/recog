@@ -250,6 +250,29 @@ gap> ri := Leaf(RECOG.TestGroup(SO(9, 3), false, Size(SO(9, 3))));;
 gap> [ri!.fhmethsel.successMethod, Size(ImageRecogNode(ri)),
 >    KernelRecogNode(ri)!.fhmethsel.successMethod];
 [ "ClassicalNatural", 2, "ClassicalNatural" ]
+gap> [SLPforElement(ri, PseudoRandom(GL(9, 3))),
+>     SLPforElement(ri, PseudoRandom(GL(9, 9)))];
+[ fail, fail ]
+
+# In even dimension the first quotient is mu mod squares and det / mu^(d/2),
+# with kernel PSO: GO-(10,5) has elements of determinant -1, a 10th power
+# in GF(5), which ProjDeterminant misses. The spinor norm follows if -1
+# lies in Omega, as in GO+(10,5) and SO+(8,3). GO(9,3) needs the sign that
+# makes the determinant 1.
+gap> Split := function(ri)
+>     if IsLeaf(ri) then
+>         return ri!.fhmethsel.successMethod;
+>     fi;
+>     return [ri!.fhmethsel.successMethod, Size(ImageRecogNode(ri)),
+>             Split(KernelRecogNode(ri))];
+> end;;
+gap> for G in [GO(9, 3), GO(-1, 10, 5), GO(1, 10, 5), SO(1, 8, 3)] do
+>     Print(Split(Leaf(RECOG.TestGroup(G, false, Size(G)))), "\n");
+> od;
+[ "ClassicalNatural", 2, "ClassicalNatural" ]
+[ "ClassicalNatural", 2, "ClassicalNatural" ]
+[ "ClassicalNatural", 2, [ "ClassicalNatural", 2, "ClassicalNatural" ] ]
+[ "ClassicalNatural", 2, "ClassicalNatural" ]
 
 #
 gap> STOP_TEST("on.tst");
