@@ -464,10 +464,32 @@ RECOG.SimilarityFactor := function(g,form)
   return c;
 end;
 
-# The scalar lambda with lambda <g> in the group of type <type>, "Sp" or
-# "SU", of the form record <form>, or fail if there is none. For "Sp",
-# lambda^2 inverts the similarity factor mu. For "SU", mu lies in GF(q0),
-# lambda^(q0+1) inverts it, and lambda^d det(g) = 1.
+# Whether the isometry <g> of determinant 1 of the symmetric bilinear form
+# beta with Gram matrix <J>, q odd, has spinor norm 1, that is, lies in
+# Omega (D. E. Taylor, The geometry of the classical groups, 1992, Theorem
+# 11.51). The spinor norm is the discriminant of the Wall form of g on the
+# image of g - 1, chi(w(1-g), v) = beta(w, v) (op. cit., (11.31)). The
+# matrix beta(x_i(g-1), x_j) used here, for a basis x_i(g-1) of the image,
+# is minus the transpose of that of chi. As the image of an element of SO
+# has even dimension, their determinants agree, and multiples of J change
+# them by squares.
+RECOG.HasTrivialSpinorNorm := function(g,J)
+  local sem;
+  sem := SemiEchelonMatTransformation(g - One(g));
+  if Length(sem.vectors) = 0 then
+      return true;
+  fi;
+  return RECOG.IsSquareFFE(
+             DeterminantMat(sem.vectors * J * TransposedMat(sem.coeffs)),
+             Size(DefaultFieldOfMatrix(g)));
+end;
+
+# The scalar lambda with lambda <g> in the group of type <type>, "Sp",
+# "SU" or an orthogonal type, of the form record <form>, or fail if there
+# is none. For "Sp" and the orthogonal types, lambda^2 inverts the
+# similarity factor mu, and for the latter lambda g lies in Omega. For
+# "SU", mu lies in GF(q0), lambda^(q0+1) inverts it, and
+# lambda^d det(g) = 1.
 RECOG.ClassicalNaturalScalar := function(type,g,form)
   local f,mu,det,z,q0,lambda,c,t;
   f := form.field;
@@ -479,6 +501,22 @@ RECOG.ClassicalNaturalScalar := function(type,g,form)
           return One(f);
       fi;
       return RootFFE(f,mu^-1,2);
+  elif type in RECOG.OrthogonalTypes then
+      lambda := One(f);
+      if not IsOne(mu) then
+          lambda := RootFFE(f,mu^-1,2);
+          if lambda = fail then
+              return fail;
+          fi;
+      fi;
+      # det(-g) = -det(g) for d odd; -1 has spinor norm 1 or not
+      for c in [lambda,-lambda] do
+          if IsOne(DeterminantMat(c * g))
+             and RECOG.HasTrivialSpinorNorm(c * g,form.gram) then
+              return c;
+          fi;
+      od;
+      return fail;
   fi;
   det := DeterminantMat(g);
   if IsOne(mu) and IsOne(det) then
@@ -496,8 +534,8 @@ RECOG.ClassicalNaturalScalar := function(type,g,form)
   return lambda * z^((q0-1) * t);
 end;
 
-# Express an element of PSp_d or PSU_d as an slp in terms of the standard
-# generators of RECOG.ClassicalStandardGenerators.
+# Express an element of PSp_d, PSU_d or POmega_d as an slp in terms of the
+# standard generators of RECOG.ClassicalStandardGenerators.
 SLPforElementFuncsProjective.ClassicalForm := function(ri,x)
   local y,lambda,pos;
   ri!.rewrite.count := ri!.rewrite.count + 1;
@@ -539,14 +577,17 @@ RECOG.ClassicalNaturalGroupWithMemory := function(ri,gens,changed)
   return gm;
 end;
 
-# ClassicalNatural for <ri> containing PSp(d,q) or PSU(d,q0), q odd and d
-# even, as <classical> of RecogniseClassical says; <type> is "Sp" or "SU".
-# The generators are scaled into Sp(d,q) or SU(d,q0). That needs
-# similarity factors that are squares for Sp and determinants that
-# scalars can bring to 1 for SU; for a conformal symplectic group, or a
-# unitary group with other determinants, the method does not apply.
+# ClassicalNatural for <ri> containing PSp(d,q), PSU(d,q0) or
+# POmega(d,q), q odd, d even for Sp and SU and at least 8 for Omega, as
+# <classical> of RecogniseClassical says; <type> is "Sp", "SU" or "O",
+# which stands for all orthogonal types here. The generators are scaled
+# into Sp(d,q), SU(d,q0) or Omega(d,q). That needs similarity factors that
+# are squares for Sp and Omega, determinants that scalars can bring to 1
+# for SU, and for Omega determinant 1 and spinor norm 1 up to the sign;
+# for a conformal symplectic group, a unitary group with other
+# determinants, or SO(d,q), the method does not apply.
 RECOG.ClassicalNaturalForm := function(ri,classical,type)
-  local d,f,q,form,gens,changed,i,lambda,std,m,q0,gcd,size;
+  local d,f,q,form,gens,changed,i,lambda,std,m,q0,gcd,size,eps;
   d := ri!.dimension;
   f := ri!.field;
   q := Size(f);
@@ -554,11 +595,16 @@ RECOG.ClassicalNaturalForm := function(ri,classical,type)
       form := rec( gram := GramMatrix(First(classical.ClassicalForms,
                                             IsSymplecticForm)),
                    frob := 1, field := f );
-  else
+  elif type = "SU" then
       q0 := RootInt(q,2);
       form := rec( gram := GramMatrix(First(classical.ClassicalForms,
                           F -> IsSesquilinearForm(F) and IsHermitianForm(F))),
                    frob := q0, field := f );
+  else
+      form := rec( gram := GramMatrix(First(classical.ClassicalForms,
+                          F -> IsSesquilinearForm(F) and (IsHyperbolicForm(F)
+                               or IsEllipticForm(F) or IsParabolicForm(F)))),
+                   frob := 1, field := f );
   fi;
   gens := ShallowCopy(GeneratorsOfGroup(Grp(ri)));
   changed := false;
@@ -586,8 +632,11 @@ RECOG.ClassicalNaturalForm := function(ri,classical,type)
   gens := RECOG.ClassicalNaturalGroupWithMemory(ri,gens,changed);
   if type = "Sp" then
       std := RECOG.FindStdGens_Sp(gens);
-  else
+  elif type = "SU" then
       std := RECOG.FindStdGens_SU(gens);
+  else
+      std := RECOG.FindStdGens_Omega(gens);
+      type := std.type;
   fi;
   Setslptonice(ri,std.slpstd);
   ri!.nicebas := std.bas;
@@ -597,16 +646,37 @@ RECOG.ClassicalNaturalForm := function(ri,classical,type)
   ri!.classicaltype := type;
   ri!.form := RECOG.ClassicalForm(type,d,f);
   ri!.rewrite := RECOG.Form_RewriteSetup(type,d,f);
-  m := d/2;
+  m := QuoInt(d,2);
   if type = "Sp" then
       gcd := 2;
       size := q^(m^2) * Product([1..m],i->q^(2*i)-1);
-  else
+  elif type = "SU" then
       gcd := Gcd(d,q0+1);
       size := q0^(d*(d-1)/2) * Product([2..d],i->q0^i-(-1)^i);
+  elif type = "O" then
+      gcd := 1;
+      size := q^(m^2) * Product([1..m],i->q^(2*i)-1) / 2;
+  else
+      # -1 lies in Omega^eps(d,q) if and only if q^m = eps mod 4 (D. E.
+      # Taylor, The geometry of the classical groups, 1992, 'Order
+      # Formulae, II')
+      eps := 1;
+      if type = "O-" then
+          eps := -1;
+      fi;
+      gcd := 1;
+      if (q^m - eps) mod 4 = 0 then
+          gcd := 2;
+      fi;
+      size := q^(m*(m-1)) * (q^m - eps) * Product([1..m-1],i->q^(2*i)-1)
+              / 2;
   fi;
   ri!.normlist := RECOG.SetupNormalisationListForPSLd(f,gcd);
-  ri!.comment := Concatenation("P",type);
+  if type in RECOG.OrthogonalTypes then
+      ri!.comment := Concatenation("POmega",type{[2..Length(type)]});
+  else
+      ri!.comment := Concatenation("P",type);
+  fi;
   SetFilterObj(ri,IsLeaf);
   SetSize(ri,size / gcd);
   SetIsRecogInfoForSimpleGroup(ri,true);
@@ -635,6 +705,8 @@ function(ri)
   elif classical.isSUContained = true and IsOddInt(q) and IsEvenInt(d)
        then
       return RECOG.ClassicalNaturalForm(ri,classical,"SU");
+  elif classical.isOmegaContained = true and IsOddInt(q) and d >= 8 then
+      return RECOG.ClassicalNaturalForm(ri,classical,"O");
   fi;
   if classical.isSLContained <> true then
       Info(InfoRecog,2,"ClassicalNatural: Is not PSL.");

@@ -320,6 +320,13 @@ end;
 ##     bases.(kind) of their parameters
 ##   - `conjugator`: conjugator[j] maps e_2 to e_j and f_2 to f_j, and fixes
 ##     e_1, f_1, and `powers`: a cache for RECOG.Form_RootElement
+##   - `aniso` (only orthogonal groups of type - or o, see ../Rewrite.gi):
+##     a record with components `pos`, the indices of the basis w_1 (and
+##     w_2) of the anisotropic part, which follows the m hyperbolic pairs,
+##     `pairs`, the number m, `gram`, the Gram matrix on <w_1, w_2> resp.
+##     <w_1>, `unit`, the parameter of w_1, and `toField`, a function
+##     mapping a vector z of the anisotropic part to the parameter of
+##     Fw(z) and Ew(z) in bases.Fw and bases.Ew
 ##  The root elements, for 2 <= j <= m = n/2, are
 ##   - Lf(lambda) = T(f_1, lambda): e_1 -> e_1 + lambda f_1;
 ##   - Le(lambda) = T(e_1, lambda): f_1 -> f_1 + eps lambda e_1;
@@ -330,19 +337,26 @@ end;
 ##   - M1j(j, lambda): e_1 -> e_1 + lambda e_j,
 ##     f_j -> f_j - lambda^sigma f_1;
 ##   - Mj1(j, lambda): e_j -> e_j + lambda e_1,
-##     f_1 -> f_1 - lambda^sigma f_j.
+##     f_1 -> f_1 - lambda^sigma f_j;
+##   - with `aniso`, for z in the anisotropic part, the Siegel
+##     transformations Fw(z) = rho(f_1, z): e_1 -> e_1 - z - Q(z) f_1,
+##     w_i -> w_i + beta(w_i, z) f_1, and Ew(z) = rho(e_1, z): f_1 -> f_1 -
+##     z - Q(z) e_1, w_i -> w_i + beta(w_i, z) e_1.
 ##
 #############################################################################
 
 # The root element <kind>(<j>, <lambda>) of <R>, as a word in R.Y, where
-# <kind> is one of "Lf", "Le", "See", "Sff", "M1j", "Mj1", and <j> is
-# ignored for "Lf" and "Le". R.powers.(kind)[j] keeps the powers of the
-# conjugates of R.(kind) by R.conjugator[j] for RECOG.GoingUpRootWord,
-# with j = 2 for "Lf" and "Le".
+# <kind> is one of "Lf", "Le", "See", "Sff", "M1j", "Mj1", "Fw", "Ew",
+# and <j> is ignored for "Lf", "Le", "Fw" and "Ew". R.powers.(kind)[j]
+# keeps the powers of the conjugates of R.(kind) by R.conjugator[j] for
+# RECOG.GoingUpRootWord, with j = 2 for the kinds without j.
 RECOG.Form_RootElement := function(R, kind, j, lambda)
   local powers;
 
-  if kind in ["Lf", "Le"] then
+  if kind in ["Fw", "Ew"] then
+    lambda := R.aniso.toField(lambda);
+  fi;
+  if kind in ["Lf", "Le", "Fw", "Ew"] then
     j := 2;
   fi;
   powers := R.powers.(kind);
@@ -358,10 +372,34 @@ end;
 
 # The matrix of the root element <kind>(<j>, <lambda>) of <R> is the
 # identity plus the entries c at the positions [i, k] of the triples
-# [i, k, c] returned here. No k is also an i, so the entries act
-# independently.
+# [i, k, c] returned here. For "Fw" and "Ew" some k is also an i; the
+# entries which read row i come before those which change it, so applying
+# them in order acts as the matrix.
 RECOG.Form_RootElementEntries := function(R, kind, j, lambda)
-  local c;
+  local c, a, pos, bz, res, i;
+
+  if kind in ["Fw", "Ew"] then
+    # rho(a, z) for a = f_1 resp. e_1, whose partner has the index 3 - a
+    a := 2;
+    if kind = "Ew" then
+      a := 1;
+    fi;
+    pos := R.aniso.pos;
+    bz := lambda * R.aniso.gram;
+    res := [];
+    for i in [1 .. Length(pos)] do
+      if not IsZero(bz[i]) then
+        Add(res, [pos[i], a, bz[i]]);
+      fi;
+    od;
+    for i in [1 .. Length(pos)] do
+      if not IsZero(lambda[i]) then
+        Add(res, [3 - a, pos[i], -lambda[i]]);
+      fi;
+    od;
+    Add(res, [3 - a, a, -(bz * lambda) / 2]);
+    return res;
+  fi;
 
   c := R.conj(lambda);
   if kind = "Lf" then
@@ -434,34 +472,44 @@ end;
 # is left out and MT is replaced by (M b)^T in place, in O(n^2) instead of
 # O(n^3) field operations.
 RECOG.Form_MapToStd := function(R, y, MT...)
-  local n, elim, apply, j, nu;
+  local n, m, elim, apply, j, z, nu;
 
   n := Length(y);
+  m := n / 2;
+  if IsBound(R.aniso) then
+    m := R.aniso.pairs;
+  fi;
   elim := RECOG.Form_Elimination(R, y, MT);
   apply := elim.apply;
   y := elim.y;
 
   # make the e_1-coordinate nonzero; without Le (orthogonal groups), for
-  # y = c f_1 first f_1 -> f_1 + e_2
+  # y = c f_1 first f_1 -> f_1 + e_2, or, with an anisotropic part,
+  # f_1 -> f_1 - w_1 - Q(w_1) e_1, which leaves the pairs alone
   if IsZero(y[1]) then
     if not IsZero(y[2]) and IsBound(R.Le) then
       apply("Le", 1, R.longUnit);
     else
       j := PositionNonZero(y, 2);
-      if j > n then
-        apply("See", 2, One(R.f));
-        j := 3;
-      fi;
-      if IsOddInt(j) then
-        apply("Mj1", (j + 1) / 2, One(R.f));
+      if j > 2 * m and IsBound(R.aniso) then
+        apply("Ew", 1, R.aniso.unit);
       else
-        apply("See", j / 2, One(R.f));
+        if j > 2 * m then
+          apply("See", 2, One(R.f));
+          j := 3;
+        fi;
+        if IsOddInt(j) then
+          apply("Mj1", (j + 1) / 2, One(R.f));
+        else
+          apply("See", j / 2, One(R.f));
+        fi;
       fi;
     fi;
   fi;
 
-  # clear the other pairs, then make the e_1-coordinate 1
-  for j in [2 .. n / 2] do
+  # clear the other pairs and the anisotropic part, then make the
+  # e_1-coordinate 1
+  for j in [2 .. m] do
     if not IsZero(y[2 * j - 1]) then
       apply("M1j", j, -y[2 * j - 1] / y[1]);
     fi;
@@ -469,6 +517,12 @@ RECOG.Form_MapToStd := function(R, y, MT...)
       apply("Sff", j, -y[2 * j] / y[1]);
     fi;
   od;
+  if IsBound(R.aniso) then
+    z := y{R.aniso.pos};
+    if not IsZero(z) then
+      apply("Fw", 1, z / y[1]);
+    fi;
+  fi;
   if not IsOne(y[1]) then
     elim.scale(LogFFE(y[1]^-1, R.gamma));
   fi;
@@ -488,9 +542,13 @@ end;
 # <y> to f_1, where beta(e_1, y) = 1, as a record like that of
 # RECOG.Form_MapToStd, with the same optional argument
 RECOG.Form_MapToF1FixingE1 := function(R, y, MT...)
-  local n, elim, apply, j;
+  local n, m, elim, apply, j, z;
 
   n := Length(y);
+  m := n / 2;
+  if IsBound(R.aniso) then
+    m := R.aniso.pairs;
+  fi;
   if not IsOne(y[2]) then
     ErrorNoReturn("RECOG.Form_MapToF1FixingE1: beta(e_1, <y>) must be 1");
   fi;
@@ -500,7 +558,7 @@ RECOG.Form_MapToF1FixingE1 := function(R, y, MT...)
 
   # these root elements fix e_1 and add multiples of the f_1-coordinate;
   # the last one clears the e_1-coordinate, as y is isotropic
-  for j in [2 .. n / 2] do
+  for j in [2 .. m] do
     if not IsZero(y[2 * j - 1]) then
       apply("See", j, -y[2 * j - 1]);
     fi;
@@ -508,6 +566,12 @@ RECOG.Form_MapToF1FixingE1 := function(R, y, MT...)
       apply("Mj1", j, R.conj(y[2 * j]));
     fi;
   od;
+  if IsBound(R.aniso) then
+    z := y{R.aniso.pos};
+    if not IsZero(z) then
+      apply("Ew", 1, z);
+    fi;
+  fi;
   if not IsZero(y[1]) then
     apply("Le", 1, -R.eps * y[1]);
   fi;
