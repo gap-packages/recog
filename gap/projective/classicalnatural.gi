@@ -648,23 +648,25 @@ RECOG.SimilarityFactor := function(g,form)
 end;
 
 # Whether the isometry <g> of determinant 1 of the symmetric bilinear form
-# beta with Gram matrix <J>, q odd, has spinor norm 1, that is, lies in
+# beta of the form record <form>, q odd, has spinor norm 1, that is, lies in
 # Omega (D. E. Taylor, The geometry of the classical groups, 1992, Theorem
 # 11.51). The spinor norm is the discriminant of the Wall form of g on the
 # image of g - 1, chi(w(1-g), v) = beta(w, v) (op. cit., (11.31)). The
 # matrix beta(x_i(g-1), x_j) used here, for a basis x_i(g-1) of the image,
 # is minus the transpose of that of chi. As the image of an element of SO
-# has even dimension, their determinants agree, and multiples of J change
-# them by squares.
-RECOG.HasTrivialSpinorNorm := function(g,J)
+# has even dimension, their determinants agree, and multiples of the Gram
+# matrix change them by squares. Squares are those of form.field, which
+# may be larger than the field of the entries of g.
+RECOG.HasTrivialSpinorNorm := function(g,form)
   local sem;
   sem := SemiEchelonMatTransformation(g - One(g));
   if Length(sem.vectors) = 0 then
       return true;
   fi;
   return RECOG.IsSquareFFE(
-             DeterminantMat(sem.vectors * J * TransposedMat(sem.coeffs)),
-             Size(DefaultFieldOfMatrix(g)));
+             DeterminantMat(sem.vectors * form.gram
+                            * TransposedMat(sem.coeffs)),
+             Size(form.field));
 end;
 
 # The scalar lambda with lambda <g> in the group of type <type>, "Sp",
@@ -695,7 +697,7 @@ RECOG.ClassicalNaturalScalar := function(type,g,form)
       # det(-g) = -det(g) for d odd; -1 has spinor norm 1 or not
       for c in [lambda,-lambda] do
           if IsOne(DeterminantMat(c * g))
-             and RECOG.HasTrivialSpinorNorm(c * g,form.gram) then
+             and RECOG.HasTrivialSpinorNorm(c * g,form) then
               return c;
           fi;
       od;
