@@ -670,27 +670,33 @@ RECOG.SimilarityFactor := function(g,form)
   return c;
 end;
 
-# Whether the isometry <g> of determinant 1 of the symmetric bilinear form
-# beta of the form record <form>, q odd, has spinor norm 1, that is, lies in
-# Omega (D. E. Taylor, The geometry of the classical groups, 1992, Theorem
-# 11.51). The spinor norm is the discriminant of the Wall form of g on the
-# image of g - 1, chi(w(1-g), v) = beta(w, v) (op. cit., (11.31)). The
-# matrix beta(x_i(g-1), x_j) used here, for a basis x_i(g-1) of the image,
-# is minus the transpose of that of chi. As the image of an element of SO
-# has even dimension, their determinants agree, and multiples of the Gram
-# matrix change them by squares. Squares are those of form.field, which
-# may be larger than the field of the entries of g.
-RECOG.HasTrivialSpinorNorm := function(g,form)
-  local sem;
+# The spinor norm of the isometry <g> of the symmetric bilinear form beta
+# of the form record <form>, q odd, as 0 (a square in form.field, which may
+# be larger than the field of the entries of g) or 1. It is the
+# discriminant of the Wall form chi(w(1-g), v) = beta(w, v) on the image of
+# g - 1 (D. E. Taylor, The geometry of the classical groups, 1992, (11.31)),
+# a homomorphism on the whole isometry group (op. cit., Theorem 11.50).
+# For a basis x_i(g-1) of the image, of dimension k, chi has matrix -M^T
+# with M = beta(x_i(g-1), x_j). Scaling the Gram matrix by c multiplies the
+# discriminant by c^k; on SO, k is even.
+RECOG.SpinorNorm := function(g,form)
+  local sem,k,det;
   sem := SemiEchelonMatTransformation(g - One(g));
-  if Length(sem.vectors) = 0 then
-      return true;
+  k := Length(sem.vectors);
+  if k = 0 then
+      return 0;
   fi;
-  return RECOG.IsSquareFFE(
-             DeterminantMat(sem.vectors * form.gram
-                            * TransposedMat(sem.coeffs)),
-             Size(form.field));
+  det := (-1)^k * DeterminantMat(sem.vectors * form.gram
+                                 * TransposedMat(sem.coeffs));
+  if RECOG.IsSquareFFE(det,Size(form.field)) then
+      return 0;
+  fi;
+  return 1;
 end;
+
+# Whether the isometry <g> of determinant 1 of the form record <form> lies
+# in Omega (Taylor, op. cit., Theorem 11.51).
+RECOG.HasTrivialSpinorNorm := {g,form} -> RECOG.SpinorNorm(g,form) = 0;
 
 # The scalar lambda with lambda <g> in the group of type <type>, "Sp",
 # "SU" or an orthogonal type, of the form record <form>, or fail if there
@@ -740,6 +746,121 @@ RECOG.ClassicalNaturalScalar := function(type,g,form)
       return fail;
   fi;
   return lambda * z^((q0-1) * t);
+end;
+
+# The image of <g> in an abelian section of N(Omega) / (Omega Z), as an
+# exponent vector, or fail if g does not normalise Omega; <data> has type,
+# form, d, layer. Sp: the similarity factor mu mod squares. SU: det(lambda g)
+# with lambda^(q0+1) mu = 1, modulo d-th powers of the scalars of GU.
+# Orthogonal, layer 1 (d even): mu mod squares and det(g) / mu^(d/2) = +-1,
+# with kernel SO Z. Layer 2: the spinor norm of lambda g, lambda^2 mu = 1,
+# with the sign making the determinant 1 for d odd; for d even it is only
+# used if -1 lies in Omega.
+RECOG.ClassicalNaturalCoset := function(data,g)
+  local form,f,q,mu,z,q0,lambda,c,v;
+  form := data.form;
+  f := form.field;
+  q := Size(f);
+  mu := RECOG.SimilarityFactor(g,form);
+  if mu = fail then
+      return fail;
+  fi;
+  v := [0,0];
+  if not RECOG.IsSquareFFE(mu,q) then
+      v[1] := 1;
+  fi;
+  if data.type = "Sp" then
+      return v{[1]};
+  elif data.type = "SU" then
+      z := PrimitiveRoot(f);
+      q0 := form.frob;
+      lambda := z^(LogFFE(mu^-1,z) / (q0+1));
+      c := LogFFE((lambda^data.d * DeterminantMat(g))^-1,z^(q0-1));
+      return [c mod data.order];
+  elif data.layer = 1 then
+      if DeterminantMat(g) <> mu^(data.d/2) then
+          v[2] := 1;
+      fi;
+      return v;
+  fi;
+  lambda := RootFFE(f,mu^-1,2);
+  if lambda = fail then
+      return fail;
+  fi;
+  if not IsOne(DeterminantMat(lambda * g)) then
+      lambda := -lambda;
+  fi;
+  return [RECOG.SpinorNorm(lambda * g,form)];
+end;
+
+RECOG.HomClassicalNaturalCoset := function(data,m)
+  local i,mm,v;
+  i := PositionNonZeroInRow(m,1);
+  mm := m;
+  if not mm[1,i] in data.form.field then
+      mm := mm / mm[1,i];
+  fi;
+  if not IsSubset(data.form.field,FieldOfMatrixList([mm])) then
+      return fail;
+  fi;
+  v := RECOG.ClassicalNaturalCoset(data,mm);
+  if v = fail then
+      return fail;
+  fi;
+  return Product([1..Length(v)],i->data.perms[i]^v[i],());
+end;
+
+# If some generator of <ri> lies outside Omega Z, map ri onto an abelian
+# section of N(Omega) / (Omega Z), see RECOG.ClassicalNaturalCoset, and
+# return Success; return fail if all generators lie in Omega Z, and
+# NeverApplicable if some generator does not normalise Omega. In even
+# dimension PCO/POmega can be D8 (Kleidman-Liebeck, Propositions 2.7.3 and
+# 2.8.2), hence two layers.
+RECOG.ClassicalNaturalQuotient := function(ri,form,type)
+  local d,data,imgs,H,hom;
+  d := ri!.dimension;
+  data := rec( type := type, form := form, d := d, layer := 1 );
+  if type = "Sp" then
+      data.perms := [(1,2)];
+  elif type = "SU" then
+      data.order := Gcd(d,form.frob+1);
+      data.perms := [CycleFromList([1..data.order])];
+  elif IsEvenInt(d) then
+      data.perms := [(1,2),(3,4)];
+      if ForAll(GeneratorsOfGroup(Grp(ri)),
+                x -> RECOG.ClassicalNaturalCoset(data,x) = [0,0]) then
+          # -1 lies in SO \ Omega if its spinor norm is not trivial
+          if RECOG.SpinorNorm(-One(form.gram),form) = 1 then
+              return fail;
+          fi;
+          data.layer := 2;
+          data.perms := [(1,2)];
+      fi;
+  else
+      data.layer := 2;
+      data.perms := [(1,2)];
+  fi;
+  imgs := List(GeneratorsOfGroup(Grp(ri)),
+               x -> RECOG.HomClassicalNaturalCoset(data,x));
+  if fail in imgs then
+      return NeverApplicable;
+  fi;
+  if ForAll(imgs,IsOne) then
+      return fail;
+  fi;
+  Info(InfoRecog,2,"ClassicalNatural: mapping onto N(",type,")/(",type,
+       "Z), layer ",data.layer," image ",imgs);
+  H := GroupWithGenerators(imgs);
+  hom := GroupHomByFuncWithData(Grp(ri),H,RECOG.HomClassicalNaturalCoset,
+                                data);
+  SetHomom(ri,hom);
+  Setvalidatehomominput(ri,{ri,x} -> RECOG.HomClassicalNaturalCoset(data,x)
+                                     <> fail);
+  Setmethodsforimage(ri,FindHomDbPerm);
+  Setimmediateverification(ri,true);
+  AddMethod(InitialDataForKernelRecogNode(ri).hints,
+            FindHomMethodsProjective.ClassicalNatural,2000);
+  return Success;
 end;
 
 # Express an element of PSp_d, PSU_d or POmega_d as an slp in terms of the
@@ -818,6 +939,18 @@ RECOG.ClassicalNaturalForm := function(ri,classical,type)
                                or IsEllipticForm(F) or IsParabolicForm(F)))),
                    frob := 1, field := f );
   fi;
+  # Small cases are left to the other methods, which end in a
+  # stabiliser chain
+  if (q^d-1)/(q-1) <= 1000 then
+      Info(InfoRecog,2,"ClassicalNatural: ",type,"(",d,",",q,") is small.");
+      return TemporaryFailure;
+  fi;
+
+  i := RECOG.ClassicalNaturalQuotient(ri,form,type);
+  if i <> fail then
+      return i;
+  fi;
+
   gens := ShallowCopy(GeneratorsOfGroup(Grp(ri)));
   changed := false;
   for i in [1..Length(gens)] do
@@ -832,13 +965,6 @@ RECOG.ClassicalNaturalForm := function(ri,classical,type)
           changed := true;
       fi;
   od;
-
-  # Small cases are left to the other methods, which end in a
-  # stabiliser chain
-  if (q^d-1)/(q-1) <= 1000 then
-      Info(InfoRecog,2,"ClassicalNatural: ",type,"(",d,",",q,") is small.");
-      return TemporaryFailure;
-  fi;
 
   Info(InfoRecog,2,"ClassicalNatural: this is P",type,"_n!");
   gens := RECOG.ClassicalNaturalGroupWithMemory(ri,gens,changed);
