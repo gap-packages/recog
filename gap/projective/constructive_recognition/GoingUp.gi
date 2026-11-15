@@ -379,16 +379,23 @@ RECOG.Form_RootElementEntries := function(R, kind, j, lambda)
 end;
 
 # A record for a product b of root elements and powers of the torus
-# element of <R>, built by elimination on the vector <y> of length n:
-# `word` is b as a word in R.Y, `y` is y b, `MT` is the transpose of the
-# matrix of b, `apply(kind, j, lambda)` multiplies b by the root element
-# kind(j, lambda), and `scale(k)` by R.torus^k
-RECOG.Form_Elimination := function(R, y)
+# element of <R>, built by elimination on the vector <y> of length n, for
+# the list <opt> of optional arguments of RECOG.Form_MapToStd: `word` is b
+# as a word in R.Y, `y` is y b, `MT` is b^T opt[1], in place, or b^T if
+# opt is empty, `apply(kind, j, lambda)` multiplies b by the root element
+# kind(j, lambda), `scale(k)` by R.torus^k, and `result()` returns the
+# record of RECOG.Form_MapToStd. Each entry of a root element costs O(n)
+# field operations on MT.
+RECOG.Form_Elimination := function(R, y, opt)
   local res;
 
-  res := rec( word := R.one, y := ShallowCopy(y),
-              MT := MutableCopyMat(IdentityMat(Length(y), R.f)) );
-  ConvertToMatrixRep(res.MT, R.f);
+  res := rec( word := R.one, y := ShallowCopy(y) );
+  if Length(opt) = 0 then
+    res.MT := MutableCopyMat(IdentityMat(Length(y), R.f));
+    ConvertToMatrixRep(res.MT, R.f);
+  else
+    res.MT := opt[1];
+  fi;
   res.apply := function(kind, j, lambda)
     local x;
     res.word := res.word * RECOG.Form_RootElement(R, kind, j, lambda);
@@ -407,6 +414,12 @@ RECOG.Form_Elimination := function(R, y)
       res.MT[i] := c * res.MT[i];
     od;
   end;
+  res.result := function()
+    if Length(opt) = 0 then
+      return rec( word := res.word, mat := TransposedMat(res.MT) );
+    fi;
+    return rec( word := res.word );
+  end;
   return res;
 end;
 
@@ -417,11 +430,14 @@ end;
 # Returns a record with the following components:
 #  - `word`: b, as a word in R.Y
 #  - `mat`: the matrix of b
-RECOG.Form_MapToStd := function(R, y)
+# With the optional argument MT, the transpose of an n x n matrix M, `mat`
+# is left out and MT is replaced by (M b)^T in place, in O(n^2) instead of
+# O(n^3) field operations.
+RECOG.Form_MapToStd := function(R, y, MT...)
   local n, elim, apply, j, nu;
 
   n := Length(y);
-  elim := RECOG.Form_Elimination(R, y);
+  elim := RECOG.Form_Elimination(R, y, MT);
   apply := elim.apply;
   y := elim.y;
 
@@ -465,20 +481,20 @@ RECOG.Form_MapToStd := function(R, y)
   fi;
 
   Assert(1, y = IdentityMat(n, R.f)[1] + nu / 2 * IdentityMat(n, R.f)[2]);
-  return rec( word := elim.word, mat := TransposedMat(elim.MT) );
+  return elim.result();
 end;
 
 # An element b of CL(n,q) which fixes e_1 and maps the isotropic vector
 # <y> to f_1, where beta(e_1, y) = 1, as a record like that of
-# RECOG.Form_MapToStd
-RECOG.Form_MapToF1FixingE1 := function(R, y)
+# RECOG.Form_MapToStd, with the same optional argument
+RECOG.Form_MapToF1FixingE1 := function(R, y, MT...)
   local n, elim, apply, j;
 
   n := Length(y);
   if not IsOne(y[2]) then
     ErrorNoReturn("RECOG.Form_MapToF1FixingE1: beta(e_1, <y>) must be 1");
   fi;
-  elim := RECOG.Form_Elimination(R, y);
+  elim := RECOG.Form_Elimination(R, y, MT);
   apply := elim.apply;
   y := elim.y;
 
@@ -497,7 +513,7 @@ RECOG.Form_MapToF1FixingE1 := function(R, y)
   fi;
 
   Assert(1, y = IdentityMat(n, R.f)[2]);
-  return rec( word := elim.word, mat := TransposedMat(elim.MT) );
+  return elim.result();
 end;
 
 # The seed t of the GoingUp step for Sp and SU ([EHNPR], Step 1
