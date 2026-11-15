@@ -24,24 +24,50 @@
 ##
 #############################################################################
 
-# The data for RECOG.Form_Rewrite in the group of type <type>, "Sp", of
-# degree <d> over <f>: root elements on generators with memory of a
-# trivial group, as only the words matter, and the pair cycle v. Since the
-# memory of these generators grows with every call, callers replace the
-# record after a while.
-RECOG.Form_RewriteSetup := function(type, d, f)
-  local std, Y, R;
+# The matrix <A> as a record for RECOG.Form_Rewrite: `pos`, the indices
+# of the rows and columns on which A differs from the identity, and
+# `block`, A{pos}{pos}
+RECOG.Form_RewriteBlock := function(A)
+  local D, pos, i;
 
-  if type <> "Sp" then
-    ErrorNoReturn("RECOG.Form_RewriteSetup: unsupported type ", type);
-  fi;
+  D := A - One(A);
+  pos := [];
+  for i in [1 .. NrRows(D)] do
+    if not IsZero(D[i]) then
+      pos := Union(pos, [i], PositionsProperty(D[i], x -> not IsZero(x)));
+    fi;
+  od;
+  return rec( pos := pos, block := A{pos}{pos} );
+end;
+
+# The data for RECOG.Form_Rewrite in the group of type <type>, "Sp" or
+# "SU", of degree <d> over <f>: root elements on generators with memory of
+# a trivial group, as only the words matter, and the pair cycle v. Since
+# the memory of these generators grows with every call, callers replace
+# the record after a while.
+RECOG.Form_RewriteSetup := function(type, d, f)
+  local std, Y, R, res;
+
   std := RECOG.ClassicalStandardGenerators(type, d, f);
   Y := GeneratorsWithMemory(List(std.all, x -> ()));
-  R := RECOG.Sp_RootElements(Y, d, f);
+  if type = "Sp" then
+    R := RECOG.Sp_RootElements(Y, d, f);
+  elif type = "SU" then
+    R := RECOG.SU_RootElements(Y, d, f);
+  else
+    ErrorNoReturn("RECOG.Form_RewriteSetup: unsupported type ", type);
+  fi;
   # v^-T, by which RECOG.Form_Rewrite conjugates the transpose
-  return rec( R := R, vi := R.v^-1,
+  res := rec( R := R, vi := R.v^-1,
               vT := RECOG.MonomialData(TransposedMat(std.v^-1)),
               count := 0 );
+  if type = "SU" then
+    # delta^u = diag(gamma0, gamma0^-1) on the second pair
+    res.deltau := Y[3]^Y[4];
+    res.deltaumat := RECOG.Form_RewriteBlock(std.delta^std.u);
+    res.gamma0 := std.delta[1, 1];
+  fi;
+  return res;
 end;
 
 # An SLP in the standard generators for the matrix <g> of the group, with
@@ -50,12 +76,15 @@ end;
 # bring the next pair to the front. A cleared pair has unit rows and
 # columns, as g preserves its orthogonal complement, and no later step
 # changes them: the root elements only touch the first pair and pairs on
-# which e_1 g or f_1 g have nonzero coordinates.
+# which e_1 g or f_1 g have nonzero coordinates. The exception is the
+# torus element y of SU, which also scales the second pair. That pair is
+# a cleared one only in the last step, which therefore leaves
+# diag(c, c^-1) on it, c in GF(q0): a power of delta^u.
 # The root elements act on the columns of g, so the steps work on the
 # transpose gT, where they are row operations of O(d) field operations
 # each, and v is monomial: a step costs O(d^2).
 RECOG.Form_Rewrite := function(W, g)
-  local R, m, gT, L, Rt, k, b;
+  local R, m, gT, L, Rt, mult, k, b;
 
   R := W.R;
   m := NrRows(g) / 2;
@@ -64,6 +93,11 @@ RECOG.Form_Rewrite := function(W, g)
   gT := TransposedMatMutable(g);
   L := R.one;
   Rt := R.one;
+  # g := g A^k for the record A of RECOG.Form_RewriteBlock
+  mult := function(A, k)
+    gT{A.pos} := TransposedMat(A.block^k) * gT{A.pos};
+  end;
+
   for k in [1 .. m] do
     b := RECOG.Form_MapToStd(R, List(gT, r -> r[1]), gT);
     Rt := Rt * b.word;
@@ -77,6 +111,11 @@ RECOG.Form_Rewrite := function(W, g)
     fi;
   od;
 
+  if IsBound(W.deltau) and not IsOne(gT) then
+    k := LogFFE(gT[3, 3], W.gamma0);
+    mult(W.deltaumat, -k);
+    Rt := Rt * W.deltau^-k;
+  fi;
   Assert(1, IsOne(gT));
   return SLPOfElm(L * Rt^-1);
 end;

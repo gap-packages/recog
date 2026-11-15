@@ -18,11 +18,12 @@
 #############################################################################
 
 # StandardGenerators of [EHNPR] (see ../GoingDown.gi), 'Outline of the
-# algorithm', for SU(d,q0), d >= 6 even and q0 odd: GoingDown to SU(6,q0),
-# FinalDescent to SU(4,q0), and GoingUp (see ../GoingUp.gi). [EHNPR] also
-# covers odd d and even q0; here the GoingUp has neither the standard
-# generators x, y of odd degree nor the transvections of even q, and the
-# involutions of RECOG.SU_FinalDescent need q0 odd.
+# algorithm', for SU(d,q0), d >= 4 even and q0 odd: RECOG.FindStdGensSU4
+# for d = 4, otherwise GoingDown to SU(6,q0), FinalDescent to SU(4,q0),
+# and GoingUp (see ../GoingUp.gi). [EHNPR] also covers odd d and even q0;
+# here the GoingUp has neither the standard generators x, y of odd degree
+# nor the transvections of even q, and the involutions of
+# RECOG.SU_FinalDescent need q0 odd.
 # Returns a record with the following components:
 #  - `slpstd`: SLP in the generators of <G> for the standard generators of
 #    SU(d,q0), as in RECOG.ClassicalStandardGenerators, relative to bas
@@ -37,12 +38,18 @@ RECOG.FindStdGens_SU := function(G)
   if IsEvenInt(q) then
     ErrorNoReturn("RECOG.FindStdGens_SU: q must be odd");
   fi;
-  if d < 6 or IsOddInt(d) then
+  if d < 4 or IsOddInt(d) then
     ErrorNoReturn("RECOG.FindStdGens_SU: the degree must be even and at ",
-                  "least 6");
+                  "least 4");
   fi;
   if not IsObjWithMemory(GeneratorsOfGroup(G)[1]) then
     G := GroupWithMemory(G);
+  fi;
+
+  if d = 4 then
+    init := RECOG.FindStdGensSU4(StripMemory(GeneratorsOfGroup(G)), f);
+    return rec( slpstd := init.slp, bas := init.bas,
+                basi := init.bas^-1 );
   fi;
 
   Info(InfoRecog_ClassicalNatural, 1, "SU_n: going down in SU(", d, ",",
