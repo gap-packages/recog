@@ -633,13 +633,125 @@ SLPforElementFuncsProjective.PSLd := function(ri,x)
   return slp;
 end;
 
+# The scalar c with <g> <J> g^T = c J, or fail if there is none
+RECOG.SimilarityFactor := function(g,J)
+  local M,pos,c;
+  M := g * J * TransposedMat(g);
+  pos := PositionNonZero(J[1]);
+  c := M[1,pos] / J[1,pos];
+  if M <> c * J then
+      return fail;
+  fi;
+  return c;
+end;
+
+# Express an element of PSp_d as an slp in terms of the standard generators
+# of RECOG.ClassicalStandardGenerators.
+SLPforElementFuncsProjective.PSp := function(ri,x)
+  local y,mu,root,pos;
+  ri!.rewrite.count := ri!.rewrite.count + 1;
+  if ri!.rewrite.count > 1000 then
+      ri!.rewrite := RECOG.Form_RewriteSetup("Sp",ri!.dimension,ri!.field);
+  fi;
+  y := ri!.nicebas * x * ri!.nicebasi;
+  # lambda y lies in Sp for a scalar lambda with lambda^2 = mu^-1
+  mu := RECOG.SimilarityFactor(y,ri!.form);
+  if mu = fail then
+      return fail;
+  fi;
+  root := RootFFE(ri!.field,mu^-1,2);
+  if root = fail then
+      return fail;
+  fi;
+  y := root * y;
+  # y and -y lie in Sp; to make them behave the same, scale by -1 or 1
+  pos := PositionNonZeroInRow(y,1);
+  y := RECOG.NormaliseScalarForPSLd(y[1,pos],ri!.normlist) * y;
+  return RECOG.Form_Rewrite(ri!.rewrite,y);
+end;
+
+# The group with memory for RECOG.FindStdGens_* in ClassicalNatural: on
+# <gens> if they are the generators of <ri> scaled (<changed>), else the
+# generators of ri with memory, with the random elements of ri
+RECOG.ClassicalNaturalGroupWithMemory := function(ri,gens,changed)
+  local gm,pr;
+  if changed then
+      gm := GroupWithMemory(gens);
+      pr := ProductReplacer(GeneratorsOfGroup(gm),rec(maxdepth := 500));
+      gm!.pseudorandomfunc := [rec( func := Next, args := [pr] )];
+  else
+      gm := Group(ri!.gensHmem);
+      gm!.pseudorandomfunc := [rec(func := function(ri,name,bool)
+                                      return RandomElm(ri,name,bool).el;
+                                    end,
+                            args := [ri,"ClassicalNatural",true])];
+  fi;
+  return gm;
+end;
+
+# ClassicalNatural for <ri> containing PSp(d,q), q odd, as <classical> of
+# RecogniseClassical says. The generators are scaled into Sp(d,q), which
+# needs similarity factors that are squares; for a conformal symplectic
+# group, which has others, the method does not apply.
+RECOG.ClassicalNaturalSp := function(ri,classical)
+  local d,f,q,J,gens,changed,i,mu,root,std,m;
+  d := ri!.dimension;
+  f := ri!.field;
+  q := Size(f);
+  J := GramMatrix(First(classical.ClassicalForms,IsSymplecticForm));
+  gens := ShallowCopy(GeneratorsOfGroup(Grp(ri)));
+  changed := false;
+  for i in [1..Length(gens)] do
+      mu := RECOG.SimilarityFactor(gens[i],J);
+      if mu = fail then
+          return TemporaryFailure;
+      fi;
+      if not IsOne(mu) then
+          root := RootFFE(f,mu^-1,2);
+          if root = fail then
+              Info(InfoRecog,2,"ClassicalNatural: similarity factor is ",
+                   "not a square.");
+              return TemporaryFailure;
+          fi;
+          gens[i] := root * gens[i];
+          changed := true;
+      fi;
+  od;
+
+  # Small cases are left to the other methods, which end in a
+  # stabiliser chain
+  if (q^d-1)/(q-1) <= 1000 then
+      Info(InfoRecog,2,"ClassicalNatural: Sp(",d,",",q,") is small.");
+      return TemporaryFailure;
+  fi;
+
+  Info(InfoRecog,2,"ClassicalNatural: this is PSp_n!");
+  std := RECOG.FindStdGens_Sp(
+             RECOG.ClassicalNaturalGroupWithMemory(ri,gens,changed));
+  Setslptonice(ri,std.slpstd);
+  ri!.nicebas := std.bas;
+  ri!.nicebasi := std.basi;
+  SetNiceGens(ri,List(RECOG.ClassicalStandardGenerators("Sp",d,f).all,
+                      x->std.basi*x*std.bas));
+  ri!.form := RECOG.ClassicalStandardForm("Sp",d,f);
+  ri!.normlist := RECOG.SetupNormalisationListForPSLd(f,2);
+  ri!.rewrite := RECOG.Form_RewriteSetup("Sp",d,f);
+  ri!.comment := "PSp";
+  SetFilterObj(ri,IsLeaf);
+  m := d/2;
+  SetSize(ri,q^(m^2) * Product([1..m],i->q^(2*i)-1) / 2);
+  SetIsRecogInfoForSimpleGroup(ri,true);
+  Setslpforelement(ri,SLPforElementFuncsProjective.PSp);
+  return Success;
+end;
+
 #! @BeginChunk ClassicalNatural
 #! TODO
 #! @EndChunk
 BindRecogMethod("FindHomMethodsProjective", "ClassicalNatural",
 "check whether it is a classical group in its natural representation",
 function(ri)
-  local g,changed,classical,d,det,f,gcd,gens,gm,i,pr,q,root,std;
+  local g,changed,classical,d,det,f,gcd,gens,gm,i,q,root,std;
   g := Grp(ri);
   d := ri!.dimension;
   f := ri!.field;
@@ -648,6 +760,10 @@ function(ri)
 
   # First check whether we are applicable:
   classical := RecogniseClassical(g);
+  # Sp(2,q) = SL(2,q) is left to the code for SL_2 below
+  if d > 2 and classical.isSpContained = true and IsOddInt(q) then
+      return RECOG.ClassicalNaturalSp(ri,classical);
+  fi;
   if classical.isSLContained <> true then
       Info(InfoRecog,2,"ClassicalNatural: Is not PSL.");
       return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
@@ -671,17 +787,7 @@ function(ri)
       fi;
   od;
 
-  if changed then
-      gm := GroupWithMemory(gens);
-      pr := ProductReplacer(GeneratorsOfGroup(gm),rec(maxdepth := 500));
-      gm!.pseudorandomfunc := [rec( func := Next, args := [pr] )];
-  else
-      gm := Group(ri!.gensHmem);
-      gm!.pseudorandomfunc := [rec(func := function(ri,name,bool)
-                                      return RandomElm(ri,name,bool).el;
-                                    end,
-                            args := [ri,"ClassicalNatural",true])];
-  fi;
+  gm := RECOG.ClassicalNaturalGroupWithMemory(ri,gens,changed);
 
   if d = 2 then
       # We only have to check for (P)SL_2 since otherwise the subfield
