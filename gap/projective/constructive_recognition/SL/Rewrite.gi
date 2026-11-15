@@ -41,6 +41,7 @@ RECOG.SL_RewriteSetup := function(d, f)
     res.cyc := Y[4] * Y[5];
     res.cycmat := std.v * std.x;
   fi;
+  res.cyci := res.cyc^-1;
   res.cycmon := RECOG.MonomialData(res.cycmat);
   return res;
 end;
@@ -117,8 +118,8 @@ RECOG.SL_Rewrite := function(W, g)
     # the one index left after the last step has the entry det g = 1
     if k < n - 1 then
       g := RECOG.MonomialConjugate(g, W.cycmon);
-      L := L * W.cyc^-1;
-      Rt := Rt * W.cyc^-1;
+      L := L * W.cyci;
+      Rt := Rt * W.cyci;
     fi;
   od;
 
