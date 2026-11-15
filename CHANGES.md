@@ -14,6 +14,11 @@ This file describes changes in the recog package.
   still work
 - Fix `FindElmOfEvenNormalSubgroup` discarding some involutions it
   found, and failing on the trivial group (PR #539)
+- Fix errors such as "no 1st choice method found for `+`" when
+  recognising matrix groups over fields with more than 256 elements,
+  e.g. 6.A6 in SU(6,23), caused by orbits of subspaces defined over a
+  subfield (PR #552)
+- Require orb 5.1.0 (PR #552)
 - `RandomSubproduct` now returns the identity only if all entries are
   trivial, and takes an optional record setting the random source and
   the identity test. It replaces `RECOG.RandomSubproduct`

@@ -162,3 +162,17 @@ end;
 RECOG.FixspaceMat := function(mat)
     return RECOG.EigenspaceMat(mat, 1);
 end;
+
+# Mutable copy of the matrix m with rows in GAP's representation for vectors
+# over the field f. orb picks an orbit's hash function from the
+# representation of its first point, so rows compressed over a proper
+# subfield of f make the hash fail on later points. For fields with more
+# than 256 elements ConvertToMatrixRep fails and leaves such rows unchanged;
+# make them plain.
+RECOG.MutableCopyMatOverField := function(m, f)
+    m := MutableCopyMat(m);
+    if ConvertToMatrixRep(m, f) = fail then
+        m := List(m, PlainListCopy);
+    fi;
+    return m;
+end;

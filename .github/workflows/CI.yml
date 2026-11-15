@@ -34,6 +34,10 @@ jobs:
       - uses: gap-actions/setup-gap@v3
         with:
           gap-version: ${{ matrix.gap-version }}
+      # GAP 4.13 bundles orb 4.9.0; a no-op where 5.1.0 is already present
+      - uses: gap-actions/install-pkg@v1
+        with:
+          packages: orb@5.1.0
       - run: |
           cd $GAPROOT/pkg
           ../bin/BuildPackages.sh --strict cvec io orb

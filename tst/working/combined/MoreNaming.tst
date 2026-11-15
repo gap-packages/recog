@@ -781,4 +781,4 @@ gap> ri.isSpContained;
 
 #
 gap> SetInfoLevel(InfoOrb, oldOrbInfoLevel);
-gap> SetInfoLevel(InfoOrb, oldRecogInfoLevel);
+gap> SetInfoLevel(InfoRecog, oldRecogInfoLevel);

@@ -2,8 +2,6 @@
 gap> START_TEST("presentation.tst");
 gap> oldInfoLevel := InfoLevel(InfoRecog);;
 gap> SetInfoLevel(InfoRecog, 0);;
-gap> oldOrbInfoLevel := InfoLevel(InfoOrb);;
-gap> SetInfoLevel(InfoOrb, 0); # genss may warn "Schreier tree is not shallow"
 gap> testPres := function(G, small, projective)
 > local ri,iso,pres,F,hom,rel,projG,projString;
 > if projective then ri := RecogniseProjectiveGroup(G);; else ri := RecogniseGroup(G);; fi;
@@ -64,13 +62,15 @@ gap> RelatorsOfFpGroup(StdPresentation(leaf));
   f2^-1*f3*f2*f3^-1 ]
 
 #
+gap> oldOrbInfoLevel := InfoLevel(InfoOrb);;
+gap> SetInfoLevel(InfoOrb, 0); # genss may warn "Schreier tree is not shallow"
 gap> for G in smallMatGroups do testPres(G, true, false); od;
 gap> for G in largeMatGroups do testPres(G, false, false); od;
 gap> for G in smallMatGroups do testPres(G, true, true); od;
 gap> for G in largeMatGroups do testPres(G, false, true); od;
 gap> for G in permGroups do testPres(G, true, false); od;
+gap> SetInfoLevel(InfoOrb, oldOrbInfoLevel);
 
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
-gap> SetInfoLevel(InfoOrb, oldOrbInfoLevel);
 gap> STOP_TEST("presentation.tst");
