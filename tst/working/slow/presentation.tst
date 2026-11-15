@@ -62,11 +62,14 @@ gap> RelatorsOfFpGroup(StdPresentation(leaf));
   f2^-1*f3*f2*f3^-1 ]
 
 #
+gap> oldOrbInfoLevel := InfoLevel(InfoOrb);;
+gap> SetInfoLevel(InfoOrb, 0); # genss may warn "Schreier tree is not shallow"
 gap> for G in smallMatGroups do testPres(G, true, false); od;
 gap> for G in largeMatGroups do testPres(G, false, false); od;
 gap> for G in smallMatGroups do testPres(G, true, true); od;
 gap> for G in largeMatGroups do testPres(G, false, true); od;
 gap> for G in permGroups do testPres(G, true, false); od;
+gap> SetInfoLevel(InfoOrb, oldOrbInfoLevel);
 
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
