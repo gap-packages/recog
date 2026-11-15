@@ -61,10 +61,10 @@ gap> d:=10;; for q in [2, 3, 4, 5] do TestNaming("SO", +1, d, q); od;
 gap> d:=12;; for q in [2, 3, 4, 5] do TestNaming("SO", +1, d, q); od;
 gap> d:=4;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("GO", +1, d, q); od;
 gap> d:=6;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("GO", +1, d, q); od;
+gap> d:=8;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("GO", +1, d, q); od;
 gap> d:=4;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("Omega", +1, d, q); od;
 gap> d:=6;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("Omega", +1, d, q); od;
-gap> d:=8;; for q in [2, 3, 4] do TestNaming("GO", +1, d, q); od;
-gap> d:=8;; for q in [2, 3, 4] do TestNaming("Omega", +1, d, q); od;
+gap> d:=8;; for q in [2, 3, 4, 5, 7, 8, 9, 11, 13] do TestNaming("Omega", +1, d, q); od;
 #@fi
 
 #

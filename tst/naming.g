@@ -68,7 +68,8 @@ end;
 # type (as in ClassicalMaximalsGeneric) 5 times, and return the number of
 # subgroups named as the full group. Naming one over a proper subfield is
 # right: a subfield subgroup contains the classical group over that field.
-TestNamingMaximals := function(type, d, q)
+# The optional argument is a filter selecting the subgroups to test.
+TestNamingMaximals := function(type, d, q, filter...)
     local flag, fieldsize, failures, maxes, k, M, i, ri;
     flag := rec(L := "isSLContained", U := "isSUContained",
                 S := "isSpContained", O := "isOmegaContained",
@@ -79,6 +80,9 @@ TestNamingMaximals := function(type, d, q)
     fi;
     failures := 0;
     maxes := ValueGlobal("ClassicalMaximalsGeneric")(type, d, q);
+    if not IsEmpty(filter) then
+        maxes := Filtered(maxes, filter[1]);
+    fi;
     for k in [1..Length(maxes)] do
         M := maxes[k];
         for i in [1..5] do
@@ -92,6 +96,20 @@ TestNamingMaximals := function(type, d, q)
         od;
     od;
     return failures;
+end;
+
+# The conformal group CGO^+(d,q), q odd: GO^+(d,q) and a similitude with
+# non-square multiplier nu, mapping the form F to nu * F, which is isometric
+# to F as d is even.
+ConformalOrthogonalPlusGroup := function(d, q)
+    local G, field, F, nu, B1, B2;
+    G := GO(+1, d, q);
+    field := GF(q);
+    F := InvariantBilinearForm(G).matrix;
+    nu := PrimitiveRoot(field);
+    B1 := BaseChangeToCanonical(BilinearFormByMatrix(F, field));
+    B2 := BaseChangeToCanonical(BilinearFormByMatrix(nu * F, field));
+    return ClosureGroup(G, B2^-1 * B1);
 end;
 
 

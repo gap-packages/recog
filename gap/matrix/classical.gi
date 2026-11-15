@@ -33,6 +33,11 @@
 ##      "A Recognition Algorithm for Special Linear Groups",
 ##      Proc. London Math. Soc. (3) 65, 1992, 555-603.
 ##
+##  [Kle87] Peter B. Kleidman
+##      "The maximal subgroups of the finite 8-dimensional orthogonal groups
+##       POmega+(8,q) and of their automorphism groups",
+##      J. Algebra 110, 1987, 173-242.
+##
 ##  This implementation uses some algorithms described elsewhere:
 ##
 ##  [CLG97a] Frank Celler and C.R. Leedham-Green
@@ -263,6 +268,64 @@ RECOG.EstimateProjOrder := function(G)
     fi;
   od;
   return size;
+end;
+
+# Return true if there is a nonzero w in the fourth exterior power of the
+# natural module such that w * g = c(g)^2 * w for all g in <gens>, where
+# g * F * g^T = c(g) * F. The Cayley 4-form spans such a line for the
+# normaliser of Spin(7,q) in its spin representation.
+RECOG.FixesFourFormLine := function(gens, F)
+    local d, field, one, outer, pairs, quads, P2, L, a, b, S, T, J, sgn,
+          i, j, B, g, c, ext2, ext4, X;
+
+    d := Length(F);
+    field := DefaultFieldOfMatrix(F);
+    one := One(field);
+    outer := {u, v} -> Concatenation(List(u, x -> x * v));
+    pairs := Combinations([1 .. d], 2);
+    quads := Combinations([1 .. d], 4);
+
+    # P2 maps u ⊗ v to u ∧ v
+    P2 := NullMat(d^2, Length(pairs), field);
+    for a in [1 .. Length(pairs)] do
+        P2[(pairs[a][1] - 1) * d + pairs[a][2], a] := one;
+        P2[(pairs[a][2] - 1) * d + pairs[a][1], a] := -one;
+    od;
+    P2 := ImmutableMatrix(field, P2);
+
+    # L maps x ⊗ y in Λ²V ⊗ Λ²V to x ∧ y in Λ⁴V
+    L := NullMat(Length(pairs)^2, Length(quads), field);
+    for a in [1 .. Length(pairs)] do
+        for b in [1 .. Length(pairs)] do
+            S := pairs[a];
+            T := pairs[b];
+            if not IsEmpty(Intersection(S, T)) then
+                continue;
+            fi;
+            J := Union(S, T);
+            sgn := SignPerm(PermList(List(Concatenation(S, T),
+                                          x -> Position(J, x))));
+            L[(a - 1) * Length(pairs) + b, Position(quads, J)] := sgn * one;
+        od;
+    od;
+    L := ImmutableMatrix(field, L);
+
+    # B spans the common eigenspace of the generators seen so far
+    i := PositionProperty(F, row -> not IsZero(row));
+    j := PositionNonZero(F[i]);
+    B := IdentityMat(Length(quads), field);
+    for g in gens do
+        c := (g * F * TransposedMat(g))[i, j] / F[i, j];
+        ext2 := List(pairs, p -> outer(g[p[1]], g[p[2]])) * P2;
+        ext4 := List(quads, Q -> outer(ext2[Position(pairs, Q{[1, 2]})],
+                                       ext2[Position(pairs, Q{[3, 4]})])) * L;
+        X := NullspaceMat(B * ext4 - c^2 * B);
+        if IsEmpty(X) then
+            return false;
+        fi;
+        B := X * B;
+    od;
+    return true;
 end;
 
 # The naming algorithm for classical groups is divided into two
@@ -2046,62 +2109,38 @@ function(recognise)
            recognise.isOmegaContained := false;
            return NeverApplicable;
          fi;
-    elif d = 8 and q = 3 then
-        if not HasElementsMultipleOf( recognise.orders, [7,13]) then
+    elif d = 8 and (q = 3 or q = 5) then
+        # For q = 5, the 13 in [NP99, Table 4] stands for a splitting
+        # lppd(8,5;4)-element (proportion 1/81, see the proof). Elements of
+        # order 13 also lie in Spin(7,5) and in the maximal subgroups of
+        # types GU(4,5) and 2.Sz(8); the latter have no elements of order 31.
+        if q = 3 and not HasElementsMultipleOf(recognise.orders, [7, 13]) then
+            return TemporaryFailure;
+        elif q = 5 and
+             not HasElementsMultipleOf(recognise.orders, [3, 7, 13, 31]) then
             return TemporaryFailure;
         fi;
-        if RECOG.EstimateProjOrder(grp) mod 4952179814400 = 0 then # compare to Size(POmega(+1,8,3))
-             return CheckFlag();
-        else
-             recognise.isOmegaContained := false;
-             return NeverApplicable;
-        fi;
-    elif d = 8 and q = 5 then
-        ## 2.July.2019: There is a mistake in the paper here
-        ## There are maximal subgroups of Omega+(8,5) that contain
-        ## elements of order 7,13,3
-        ## 13.Jan.2021: Added 31
-        # TODO: This means, in Table 4 of [NP99] the second column of the line "d =
-        # 8, q = 5" should be "3, 7, 13, 31 + perm.rep"
-        if not HasElementsMultipleOf( recognise.orders, [3,7,13,31]) then
-            return TemporaryFailure;
-        fi;
-        # Such elements also exist in maximal subgroups of
-        # Omega+(8,5) with composition factors being C_2 and Omega(0,7,5).
-        # So we need more work to distinguish them
-        #
-        # It turns out that these groups don't contain elements of
-        # order 312, so if we see one, we are good.
-        if HasElementsMultipleOf( recognise.orders, [312]) then
-             return CheckFlag();
-        fi;
-        # We generated 10000 random elements for all groups between
-        # Omega+(8,5) and Delta+(8, 5). The percentage of elements with orders
-        # divisible by 3, 7, 13, 31, and 312 respectively were at least:
-        # 56, 14, 31, 16, 5.71
-        # Since elements of order divisible by 312 are relatively rare, we
-        # don't want to conclude too much from there not being such an
-        # element among those we generated randomly.
-        #
-        # Thus we compute the projective action of grp and then compare
-        # the size of resulting stabilizer chain to the size of POmega(+1,8,5).
-        #
-        # Note: Size(POmega(+1,8,5)) = 8911539000000000000
 
-        # HACK to avoid info message by orb of the form 'Have 38376 points'
-        # (in general one shouldn't ignore this kind of warning but here
-        # we know which groups are input, and it is acceptable)
-        ol := InfoLevel(InfoOrb);
-        SetInfoLevel(InfoOrb, 0);
-        ord := RECOG.EstimateProjOrder(grp);
-        SetInfoLevel(InfoOrb, ol);
-
-        if ord mod 8911539000000000000 = 0 then
-             return CheckFlag();
-        else
-             recognise.isOmegaContained := false;
-             return NeverApplicable;
+        # The maximal subgroups of Omega+(8,q) of order divisible by 7*13
+        # (q = 3) or 7*13*31 (q = 5) are two classes of <-1> x Omega(7,q),
+        # fixing a non-singular point, and their triality images, four
+        # classes of Spin(7,q) in its spin representation [Kle87, Table I].
+        # A proper subgroup of Omega(7,q) of such order lies in G2(3) and
+        # fixes a unique point. So an irreducible G not containing
+        # Omega+(8,q) normalises Spin(7,q), hence fixes its Cayley 4-form up
+        # to scalars, while Omega+(8,q) fixes no line of 4-forms. This test
+        # replaces the permutation representation of [NP99].
+        #
+        # If the MeatAxe or the forms are still missing, CheckFlag asks
+        # for them.
+        if recognise.isReducible = false and
+           not IsEmpty(recognise.ClassicalForms) and
+           RECOG.FixesFourFormLine(GeneratorsOfGroup(grp),
+               First(recognise.ClassicalForms, isHypForm)!.matrix) then
+            recognise.isOmegaContained := false;
+            return NeverApplicable;
         fi;
+        return CheckFlag();
     elif d = 8 and (q = 4 or q > 5) then
         if not 6 in recognise.LB then
             return TemporaryFailure;

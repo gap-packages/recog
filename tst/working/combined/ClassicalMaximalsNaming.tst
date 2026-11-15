@@ -39,6 +39,12 @@ gap> d:=5;; for q in [5, 7, 9] do TestNamingMaximals("O", d, q); od;
 gap> d:=7;; for q in [3, 5, 7, 9] do TestNamingMaximals("O", d, q); od;
 gap> d:=6;; for q in [3, 4, 5, 8] do TestNamingMaximals("O+", d, q); od;
 gap> d:=8;; for q in [2] do TestNamingMaximals("O+", d, q); od;
+
+# For q = 3, 5 only the subgroups of order |SO(7,q)|, among them Spin(7,q),
+# which the 4-form test must reject; the full sweep takes about a minute.
+gap> d:=8;; for q in [3, 5] do
+>      TestNamingMaximals("O+", d, q, M -> Size(M) = Size(SO(d - 1, q)));
+>    od;
 gap> d:=4;; for q in [2, 4, 5, 7, 9] do TestNamingMaximals("O-", d, q); od;
 gap> d:=6;; for q in [2, 4, 5] do TestNamingMaximals("O-", d, q); od;
 gap> d:=8;; for q in [3] do TestNamingMaximals("O-", d, q); od;
