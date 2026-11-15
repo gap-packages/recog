@@ -189,6 +189,22 @@ gap> RECOG.HasTrivialSpinorNorm(DiagonalMat([-1, -1, 1, 1, 1, 1, 1, 1] * Z(3)^0)
 >        RECOG.ClassicalForm("O+", 8, GF(9)));
 true
 
+# On all of GO the spinor norm is a homomorphism, and on the reflection in
+# v it is beta(v,v)/2 mod squares
+gap> form := FormOf(GO(9, 3));;
+gap> Refl := v -> One(form.gram)
+>        - (2 / (v * form.gram * v)) * TransposedMat([form.gram * v]) * [v];;
+gap> vs := Filtered(List([1 .. 20], i -> Random(GF(3)^9)),
+>        v -> not IsZero(v * form.gram * v));;
+gap> ForAll(vs, v -> (RECOG.SpinorNorm(Refl(v), form) = 0)
+>        = RECOG.IsSquareFFE(v * form.gram * v / 2, 3));
+true
+gap> xs := List([1 .. 10], i -> PseudoRandom(GO(9, 3)));;
+gap> ForAll([1 .. 9], i -> RECOG.SpinorNorm(xs[i] * xs[i + 1], form)
+>        = (RECOG.SpinorNorm(xs[i], form)
+>           + RECOG.SpinorNorm(xs[i + 1], form)) mod 2);
+true
+
 # ClassicalNatural makes natural Omega(d,q) a POmega leaf, also with
 # scalars on the generators, and its SLPs accept any scalar, also from a
 # larger field, and matrices over GF(9) with entries in GF(3), but no
@@ -230,8 +246,10 @@ gap> G := Group(List(GeneratorsOfGroup(Omega(-1, 8, 5)),
 >                    x -> Z(5)^Random([0 .. 3]) * x));;
 gap> Leaf(RECOG.TestGroup(G, true, Size(Omega(-1, 8, 5))))!.fhmethsel.successMethod;
 "ClassicalNatural"
-gap> Leaf(RECOG.TestGroup(SO(9, 3), false, Size(SO(9, 3))))!.fhmethsel.successMethod;
-"StabilizerChainProj"
+gap> ri := Leaf(RECOG.TestGroup(SO(9, 3), false, Size(SO(9, 3))));;
+gap> [ri!.fhmethsel.successMethod, Size(ImageRecogNode(ri)),
+>    KernelRecogNode(ri)!.fhmethsel.successMethod];
+[ "ClassicalNatural", 2, "ClassicalNatural" ]
 
 #
 gap> STOP_TEST("on.tst");
