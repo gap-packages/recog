@@ -168,19 +168,27 @@ true
 
 # The spinor norm is trivial on Omega, multiplicative, and trivial on -1
 # exactly if q^m = eps mod 4
-gap> J := InvariantBilinearForm(SO(1, 8, 5)).matrix;;
+gap> FormOf := G -> rec( gram := InvariantBilinearForm(G).matrix, frob := 1,
+>                        field := FieldOfMatrixGroup(G) );;
+gap> form := FormOf(SO(1, 8, 5));;
 gap> xs := List([1 .. 10], i -> PseudoRandom(SO(1, 8, 5)));;
 gap> ForAll(GeneratorsOfGroup(Omega(1, 8, 5)), g -> RECOG.HasTrivialSpinorNorm(
->        g, InvariantBilinearForm(Omega(1, 8, 5)).matrix));
+>        g, FormOf(Omega(1, 8, 5))));
 true
-gap> ForAll([1 .. 9], i -> RECOG.HasTrivialSpinorNorm(xs[i] * xs[i + 1], J)
->        = (RECOG.HasTrivialSpinorNorm(xs[i], J)
->           = RECOG.HasTrivialSpinorNorm(xs[i + 1], J)));
+gap> ForAll([1 .. 9], i -> RECOG.HasTrivialSpinorNorm(xs[i] * xs[i + 1], form)
+>        = (RECOG.HasTrivialSpinorNorm(xs[i], form)
+>           = RECOG.HasTrivialSpinorNorm(xs[i + 1], form)));
 true
 gap> List([[1, 8, 3], [-1, 8, 3], [1, 10, 3], [-1, 10, 3]], c ->
 >        RECOG.HasTrivialSpinorNorm(-IdentityMat(c[2], GF(c[3])),
->            InvariantBilinearForm(Omega(c[1], c[2], c[3])).matrix));
+>            FormOf(Omega(c[1], c[2], c[3]))));
 [ true, false, false, true ]
+
+# Squares are those of the field of the form: -1 on a hyperbolic pair has
+# spinor norm -1, a square in GF(9), also as a matrix over GF(3)
+gap> RECOG.HasTrivialSpinorNorm(DiagonalMat([-1, -1, 1, 1, 1, 1, 1, 1] * Z(3)^0),
+>        RECOG.ClassicalForm("O+", 8, GF(9)));
+true
 
 # ClassicalNatural makes natural Omega(d,q) a POmega leaf, also with
 # scalars on the generators, and its SLPs accept any scalar. SO(9,3) is no
