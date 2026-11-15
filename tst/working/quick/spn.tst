@@ -44,7 +44,7 @@ gap> ForAll([4, 6, 8, 10], d -> ForAll([3, 5, 9, 25], q -> CheckForm_Rewrite(d, 
 true
 
 # ClassicalNatural makes natural Sp(d,q) a PSp leaf, also with scalars on
-# the generators, but not a conformal symplectic group
+# the generators, and maps a conformal symplectic group onto C2 above it
 gap> Leaf := function(ri)
 >     if not IsLeaf(ri) then
 >         ri := ImageRecogNode(ri);
@@ -62,7 +62,7 @@ gap> simil := First(List(Tuples([1, -1] * Z(3)^0, 8), DiagonalMat),
 >                   x -> x * F * TransposedMat(x) = -F);;
 gap> Leaf(RECOG.TestGroup(Group(Concatenation(GeneratorsOfGroup(S), [simil])),
 >                         false, 2 * Size(S)));
-"StabilizerChainProj"
+"ClassicalNatural"
 
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
