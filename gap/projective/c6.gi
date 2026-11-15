@@ -234,7 +234,7 @@ RECOG.basis2:=function(r,n,q,g)
 
        repeat
           if IsBound(gens[k]) then
-             if gens[k]<>gens[k][1,1]*One(g) then
+             if not RECOG.IsScalarMat(gens[k]) then
                 a:=gens[k];
                 posa:=k;
              else
@@ -249,7 +249,7 @@ RECOG.basis2:=function(r,n,q,g)
           k:=k+1;
           repeat
             if IsBound(gens[k]) then
-               if gens[k] = gens[k][1,1]*One(g) then
+               if RECOG.IsScalarMat(gens[k]) then
                   Unbind(gens[k]);
                   k:=k+1;
                elif gens[k]*a <> a*gens[k] then
@@ -364,7 +364,7 @@ RECOG.rewriteones := function(r,n,q,data,blocks,x)
             xx := list[i]^x;
             exp := RECOG.exponents(r,n,q,data.es,xx);
             remain := RECOG.check(r,n,q,list,xx,exp);
-            if remain <> remain[1,1]*One(remain) then
+            if not RECOG.IsScalarMat(remain) then
                 return fail;
             fi;
             Add(mat, Z(r)^0*exp);
@@ -454,7 +454,7 @@ RECOG.BlindDescent := function(r,n,grp,limit)
         fi;
         for p in Union(List( Collected(Factors(oy)), i->i[1]),[1]) do
             z :=Comm(x,y^(oy/p));
-            if z <> z[1,1] * One(z) then
+            if not RECOG.IsScalarMat(z) then
                 x := z;
             fi;
         od;

@@ -62,8 +62,7 @@ RECOG.FindTensorKernel := function(G,onlyone)
       #Print(Length(notused)," \c");
       N := GroupWithGenerators(FastNormalClosure(G,[c],10));
       if onlyone and
-         (ForAny(GeneratorsOfGroup(N),m->IsZero(m[1,1]) or
-                                         not IsOne(m*(m[1,1])^-1))) then
+         ForAny(GeneratorsOfGroup(N), m -> not RECOG.IsScalarMat(m)) then
           # we found a non-scalar normal subgroup:
           #Print("\n");
           return N;
