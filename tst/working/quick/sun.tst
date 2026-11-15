@@ -40,9 +40,59 @@ gap> CheckFindStdGens_SU := function(d, q)
 >     return true;
 > end;;
 gap> List([[6,3], [8,3], [12,3], [6,5], [8,7], [6,9], [6,13], [10,11],
->          [6,25], [6,27], [24,3]],
+>          [6,25], [6,27], [24,3], [4,5]],
 >         args -> CallFuncList(CheckFindStdGens_SU, args));
-[ true, true, true, true, true, true, true, true, true, true, true ]
+[ true, true, true, true, true, true, true, true, true, true, true, true ]
+
+# RECOG.Form_Rewrite must return an SLP in the standard generators for
+# elements of the standard copy
+gap> CheckForm_Rewrite := function(d, q)
+>     local f, W, std, G, els;
+>     f := GF(q^2);
+>     W := RECOG.Form_RewriteSetup("SU", d, f);
+>     std := RECOG.ClassicalStandardGenerators("SU", d, f);
+>     G := Group(std.all);
+>     els := Concatenation(List([1 .. 4], i -> PseudoRandom(G)), std.all,
+>                          [One(G), std.delta^std.u, std.y^std.v]);
+>     return ForAll(els, g -> ResultOfStraightLineProgram(
+>                                 RECOG.Form_Rewrite(W, g), std.all) = g);
+> end;;
+gap> ForAll([4, 6, 8], d -> ForAll([3, 5, 9], q -> CheckForm_Rewrite(d, q)));
+true
+
+# ClassicalNatural makes natural SU(d,q) a PSU leaf, also with scalars of
+# GU(d,q) on the generators, and its SLPs accept any scalar. Generators
+# with other scalars are left out: with them, RecogniseClassical often
+# misses the form, as ClassicalForms_ScalarMultipleFrobenius of Forms
+# 1.3.0 returns a wrong scalar. GU(4,5) is no leaf: scalars cannot bring
+# its determinants of order 6 to 1.
+gap> Leaf := function(ri)
+>     if not IsLeaf(ri) then
+>         ri := ImageRecogNode(ri);
+>     fi;
+>     return ri;
+> end;;
+gap> IsScalarMultiple := function(x, y)
+>     local pos;
+>     pos := PositionNonZero(y[1]);
+>     return x = x[1, pos] / y[1, pos] * y;
+> end;;
+gap> S := SU(6, 3)^PseudoRandom(GL(6, 9));;
+gap> ri := Leaf(RECOG.TestGroup(S, false, Size(S)));;
+gap> ri!.fhmethsel.successMethod;
+"ClassicalNatural"
+gap> ForAll([1 .. 5], function(i)
+>     local x;
+>     x := PseudoRandom(S);
+>     return IsScalarMultiple(ResultOfStraightLineProgram(
+>                SLPforElement(ri, Z(9)^i * x), NiceGens(ri)), x);
+> end);
+true
+gap> G := Group(List(GeneratorsOfGroup(SU(4, 5)), x -> Z(25)^(4 * Random([0 .. 5])) * x));;
+gap> Leaf(RECOG.TestGroup(G, true, Size(SU(4, 5)) / 2))!.fhmethsel.successMethod;
+"ClassicalNatural"
+gap> Leaf(RECOG.TestGroup(GU(4, 5), false, Size(GU(4, 5))))!.fhmethsel.successMethod;
+"StabilizerChainProj"
 
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);

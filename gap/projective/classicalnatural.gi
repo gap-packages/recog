@@ -450,10 +450,12 @@ SLPforElementFuncsProjective.PSLd := function(ri,x)
   return slp;
 end;
 
-# The scalar c with <g> <J> g^T = c J, or fail if there is none
-RECOG.SimilarityFactor := function(g,J)
-  local M,pos,c;
-  M := g * J * TransposedMat(g);
+# The scalar c with <g> J (g^frob)^T = c J for the form record <form>
+# with Gram matrix J, or fail if there is none
+RECOG.SimilarityFactor := function(g,form)
+  local J,M,pos,c;
+  J := form.gram;
+  M := g * J * TransposedMat(RECOG.FormConjugate(form,g));
   pos := PositionNonZero(J[1]);
   c := M[1,pos] / J[1,pos];
   if M <> c * J then
@@ -462,26 +464,55 @@ RECOG.SimilarityFactor := function(g,J)
   return c;
 end;
 
-# Express an element of PSp_d as an slp in terms of the standard generators
-# of RECOG.ClassicalStandardGenerators.
-SLPforElementFuncsProjective.PSp := function(ri,x)
-  local y,mu,root,pos;
-  ri!.rewrite.count := ri!.rewrite.count + 1;
-  if ri!.rewrite.count > 1000 then
-      ri!.rewrite := RECOG.Form_RewriteSetup("Sp",ri!.dimension,ri!.field);
-  fi;
-  y := ri!.nicebas * x * ri!.nicebasi;
-  # lambda y lies in Sp for a scalar lambda with lambda^2 = mu^-1
-  mu := RECOG.SimilarityFactor(y,ri!.form);
+# The scalar lambda with lambda <g> in the group of type <type>, "Sp" or
+# "SU", of the form record <form>, or fail if there is none. For "Sp",
+# lambda^2 inverts the similarity factor mu. For "SU", mu lies in GF(q0),
+# lambda^(q0+1) inverts it, and lambda^d det(g) = 1.
+RECOG.ClassicalNaturalScalar := function(type,g,form)
+  local f,mu,det,z,q0,lambda,c,t;
+  f := form.field;
+  mu := RECOG.SimilarityFactor(g,form);
   if mu = fail then
       return fail;
+  elif type = "Sp" then
+      if IsOne(mu) then
+          return One(f);
+      fi;
+      return RootFFE(f,mu^-1,2);
   fi;
-  root := RootFFE(ri!.field,mu^-1,2);
-  if root = fail then
+  det := DeterminantMat(g);
+  if IsOne(mu) and IsOne(det) then
+      return One(f);
+  fi;
+  # z^(q0+1) generates GF(q0)^*, and z^(q0-1) the scalars of GU
+  z := PrimitiveRoot(f);
+  q0 := form.frob;
+  lambda := z^(LogFFE(mu^-1,z) / (q0+1));
+  c := LogFFE((lambda^NrRows(g) * det)^-1,z^(q0-1));
+  t := QuotientMod(c,NrRows(g),q0+1);
+  if t = fail then
       return fail;
   fi;
-  y := root * y;
-  # y and -y lie in Sp; to make them behave the same, scale by -1 or 1
+  return lambda * z^((q0-1) * t);
+end;
+
+# Express an element of PSp_d or PSU_d as an slp in terms of the standard
+# generators of RECOG.ClassicalStandardGenerators.
+SLPforElementFuncsProjective.ClassicalForm := function(ri,x)
+  local y,lambda,pos;
+  ri!.rewrite.count := ri!.rewrite.count + 1;
+  if ri!.rewrite.count > 1000 then
+      ri!.rewrite := RECOG.Form_RewriteSetup(ri!.classicaltype,
+                                             ri!.dimension,ri!.field);
+  fi;
+  y := ri!.nicebas * x * ri!.nicebasi;
+  lambda := RECOG.ClassicalNaturalScalar(ri!.classicaltype,y,ri!.form);
+  if lambda = fail then
+      return fail;
+  fi;
+  y := lambda * y;
+  # y and its multiples by the centre lie in the group; to make them
+  # behave the same, scale by an element of the centre
   pos := PositionNonZeroInRow(y,1);
   y := RECOG.NormaliseScalarForPSLd(y[1,pos],ri!.normlist) * y;
   return RECOG.Form_Rewrite(ri!.rewrite,y);
@@ -508,31 +539,38 @@ RECOG.ClassicalNaturalGroupWithMemory := function(ri,gens,changed)
   return gm;
 end;
 
-# ClassicalNatural for <ri> containing PSp(d,q), q odd, as <classical> of
-# RecogniseClassical says. The generators are scaled into Sp(d,q), which
-# needs similarity factors that are squares; for a conformal symplectic
-# group, which has others, the method does not apply.
-RECOG.ClassicalNaturalSp := function(ri,classical)
-  local d,f,q,J,gens,changed,i,mu,root,std,m;
+# ClassicalNatural for <ri> containing PSp(d,q) or PSU(d,q0), q odd and d
+# even, as <classical> of RecogniseClassical says; <type> is "Sp" or "SU".
+# The generators are scaled into Sp(d,q) or SU(d,q0). That needs
+# similarity factors that are squares for Sp and determinants that
+# scalars can bring to 1 for SU; for a conformal symplectic group, or a
+# unitary group with other determinants, the method does not apply.
+RECOG.ClassicalNaturalForm := function(ri,classical,type)
+  local d,f,q,form,gens,changed,i,lambda,std,m,q0,gcd,size;
   d := ri!.dimension;
   f := ri!.field;
   q := Size(f);
-  J := GramMatrix(First(classical.ClassicalForms,IsSymplecticForm));
+  if type = "Sp" then
+      form := rec( gram := GramMatrix(First(classical.ClassicalForms,
+                                            IsSymplecticForm)),
+                   frob := 1, field := f );
+  else
+      q0 := RootInt(q,2);
+      form := rec( gram := GramMatrix(First(classical.ClassicalForms,
+                          F -> IsSesquilinearForm(F) and IsHermitianForm(F))),
+                   frob := q0, field := f );
+  fi;
   gens := ShallowCopy(GeneratorsOfGroup(Grp(ri)));
   changed := false;
   for i in [1..Length(gens)] do
-      mu := RECOG.SimilarityFactor(gens[i],J);
-      if mu = fail then
+      lambda := RECOG.ClassicalNaturalScalar(type,gens[i],form);
+      if lambda = fail then
+          Info(InfoRecog,2,"ClassicalNatural: no scalar brings a ",
+               "generator into ",type,".");
           return TemporaryFailure;
       fi;
-      if not IsOne(mu) then
-          root := RootFFE(f,mu^-1,2);
-          if root = fail then
-              Info(InfoRecog,2,"ClassicalNatural: similarity factor is ",
-                   "not a square.");
-              return TemporaryFailure;
-          fi;
-          gens[i] := root * gens[i];
+      if not IsOne(lambda) then
+          gens[i] := lambda * gens[i];
           changed := true;
       fi;
   od;
@@ -540,27 +578,39 @@ RECOG.ClassicalNaturalSp := function(ri,classical)
   # Small cases are left to the other methods, which end in a
   # stabiliser chain
   if (q^d-1)/(q-1) <= 1000 then
-      Info(InfoRecog,2,"ClassicalNatural: Sp(",d,",",q,") is small.");
+      Info(InfoRecog,2,"ClassicalNatural: ",type,"(",d,",",q,") is small.");
       return TemporaryFailure;
   fi;
 
-  Info(InfoRecog,2,"ClassicalNatural: this is PSp_n!");
-  std := RECOG.FindStdGens_Sp(
-             RECOG.ClassicalNaturalGroupWithMemory(ri,gens,changed));
+  Info(InfoRecog,2,"ClassicalNatural: this is P",type,"_n!");
+  gens := RECOG.ClassicalNaturalGroupWithMemory(ri,gens,changed);
+  if type = "Sp" then
+      std := RECOG.FindStdGens_Sp(gens);
+  else
+      std := RECOG.FindStdGens_SU(gens);
+  fi;
   Setslptonice(ri,std.slpstd);
   ri!.nicebas := std.bas;
   ri!.nicebasi := std.basi;
-  SetNiceGens(ri,List(RECOG.ClassicalStandardGenerators("Sp",d,f).all,
+  SetNiceGens(ri,List(RECOG.ClassicalStandardGenerators(type,d,f).all,
                       x->std.basi*x*std.bas));
-  ri!.form := RECOG.ClassicalStandardForm("Sp",d,f);
-  ri!.normlist := RECOG.SetupNormalisationListForPSLd(f,2);
-  ri!.rewrite := RECOG.Form_RewriteSetup("Sp",d,f);
-  ri!.comment := "PSp";
-  SetFilterObj(ri,IsLeaf);
+  ri!.classicaltype := type;
+  ri!.form := RECOG.ClassicalForm(type,d,f);
+  ri!.rewrite := RECOG.Form_RewriteSetup(type,d,f);
   m := d/2;
-  SetSize(ri,q^(m^2) * Product([1..m],i->q^(2*i)-1) / 2);
+  if type = "Sp" then
+      gcd := 2;
+      size := q^(m^2) * Product([1..m],i->q^(2*i)-1);
+  else
+      gcd := Gcd(d,q0+1);
+      size := q0^(d*(d-1)/2) * Product([2..d],i->q0^i-(-1)^i);
+  fi;
+  ri!.normlist := RECOG.SetupNormalisationListForPSLd(f,gcd);
+  ri!.comment := Concatenation("P",type);
+  SetFilterObj(ri,IsLeaf);
+  SetSize(ri,size / gcd);
   SetIsRecogInfoForSimpleGroup(ri,true);
-  Setslpforelement(ri,SLPforElementFuncsProjective.PSp);
+  Setslpforelement(ri,SLPforElementFuncsProjective.ClassicalForm);
   return Success;
 end;
 
@@ -581,7 +631,10 @@ function(ri)
   classical := RecogniseClassical(g);
   # Sp(2,q) = SL(2,q) is left to the code for SL_2 below
   if d > 2 and classical.isSpContained = true and IsOddInt(q) then
-      return RECOG.ClassicalNaturalSp(ri,classical);
+      return RECOG.ClassicalNaturalForm(ri,classical,"Sp");
+  elif classical.isSUContained = true and IsOddInt(q) and IsEvenInt(d)
+       then
+      return RECOG.ClassicalNaturalForm(ri,classical,"SU");
   fi;
   if classical.isSLContained <> true then
       Info(InfoRecog,2,"ClassicalNatural: Is not PSL.");
