@@ -729,6 +729,16 @@ SLPforElementFuncsProjective.ClassicalForm := function(ri,x)
                                              ri!.dimension,ri!.field);
   fi;
   y := ri!.nicebas * x * ri!.nicebasi;
+
+  # x may carry a scalar from a larger field
+  pos := PositionNonZeroInRow(y,1);
+  if not y[1,pos] in ri!.field then
+      y := y[1,pos]^-1 * y;
+  fi;
+  if not IsSubset(ri!.field,FieldOfMatrixList([y])) then
+      return fail;
+  fi;
+
   lambda := RECOG.ClassicalNaturalScalar(ri!.classicaltype,y,ri!.form);
   if lambda = fail then
       return fail;
