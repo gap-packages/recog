@@ -191,8 +191,10 @@ gap> RECOG.HasTrivialSpinorNorm(DiagonalMat([-1, -1, 1, 1, 1, 1, 1, 1] * Z(3)^0)
 true
 
 # ClassicalNatural makes natural Omega(d,q) a POmega leaf, also with
-# scalars on the generators, and its SLPs accept any scalar. SO(9,3) is no
-# leaf: it is Omega(9,3) extended by an element of spinor norm -1.
+# scalars on the generators, and its SLPs accept any scalar, also from a
+# larger field, and matrices over GF(9) with entries in GF(3), but no
+# element of Omega(9,9). SO(9,3) is no leaf: it is Omega(9,3) extended by
+# an element of spinor norm -1.
 gap> Leaf := function(ri)
 >     if not IsLeaf(ri) then
 >         ri := ImageRecogNode(ri);
@@ -204,7 +206,8 @@ gap> IsScalarMultiple := function(x, y)
 >     pos := PositionNonZero(y[1]);
 >     return x = x[1, pos] / y[1, pos] * y;
 > end;;
-gap> S := Omega(9, 3)^PseudoRandom(GL(9, 3));;
+gap> g := PseudoRandom(GL(9, 3));;
+gap> S := Omega(9, 3)^g;;
 gap> ri := Leaf(RECOG.TestGroup(S, false, Size(S)));;
 gap> ri!.fhmethsel.successMethod;
 "ClassicalNatural"
@@ -212,8 +215,14 @@ gap> ForAll([1 .. 5], function(i)
 >     local x;
 >     x := PseudoRandom(S);
 >     return IsScalarMultiple(ResultOfStraightLineProgram(
->                SLPforElement(ri, -x), NiceGens(ri)), x);
+>                SLPforElement(ri, Z(9)^i * x), NiceGens(ri)), x);
 > end);
+true
+gap> SLPforElement(ri, PseudoRandom(Omega(9, 9))^g);
+fail
+gap> x := PseudoRandom(S);;
+gap> IsScalarMultiple(ResultOfStraightLineProgram(
+>        SLPforElement(ri, ImmutableMatrix(GF(9), x)), NiceGens(ri)), x);
 true
 gap> S := Omega(1, 10, 3)^PseudoRandom(GL(10, 3));;
 gap> Leaf(RECOG.TestGroup(S, false, Size(S)))!.fhmethsel.successMethod;
