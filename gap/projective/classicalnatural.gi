@@ -546,6 +546,10 @@ SLPforElementFuncsProjective.ClassicalForm := function(ri,x)
                                              ri!.dimension,ri!.field);
   fi;
   y := ri!.nicebas * x * ri!.nicebasi;
+  y := RECOG.ScaleMatrixIntoField(y,ri!.field);
+  if y = fail then
+      return fail;
+  fi;
   lambda := RECOG.ClassicalNaturalScalar(ri!.classicaltype,y,ri!.form);
   if lambda = fail then
       return fail;
