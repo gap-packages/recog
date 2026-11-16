@@ -255,6 +255,13 @@ gap> [SLPforElement(ri, PseudoRandom(GL(9, 3))),
 >     SLPforElement(ri, PseudoRandom(GL(9, 9)))];
 [ fail, fail ]
 
+# Like the leaf, the quotient node above it accepts scalars from a larger
+# field and matrices over GF(9) with entries in GF(3)
+gap> x := PseudoRandom(SO(9, 3));;
+gap> ForAll([Z(9) * x, ImmutableMatrix(GF(9), x)], y -> IsScalarMultiple(
+>        ResultOfStraightLineProgram(SLPforElement(ri, y), NiceGens(ri)), x));
+true
+
 # In even dimension the first quotient is mu mod squares and det / mu^(d/2),
 # with kernel PSO: GO-(10,5) has elements of determinant -1, a 10th power
 # in GF(5), which ProjDeterminant misses. The spinor norm follows if -1
