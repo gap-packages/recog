@@ -44,6 +44,13 @@ gap> List([[6,3], [8,3], [12,3], [6,5], [8,7], [6,9], [6,13], [10,11],
 >         args -> CallFuncList(CheckFindStdGens_SU, args));
 [ true, true, true, true, true, true, true, true, true, true, true, true ]
 
+# Odd degree: SU(5,q) has no GoingDown, SU(7,q) one step to SU(6,q), and
+# the last GoingUp step adds the generators x, y of odd degree.
+gap> List([[5,3], [5,5], [5,9], [5,27], [7,3], [7,9], [9,5], [11,3],
+>          [13,7], [21,3]],
+>         args -> CallFuncList(CheckFindStdGens_SU, args));
+[ true, true, true, true, true, true, true, true, true, true ]
+
 # RECOG.Form_Rewrite must return an SLP in the standard generators for
 # elements of the standard copy
 gap> CheckForm_Rewrite := function(d, q)
