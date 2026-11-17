@@ -844,8 +844,9 @@ RECOG.ClassicalNaturalQuotient := function(ri,form,type)
   local d,data,imgs,H,hom;
   d := ri!.dimension;
   # for q even, CO = O Z, and O/Omega, given by the Dickson invariant, is
-  # not split here: generators of O^+-(d,q) outside Omega Z fall through
-  if type = "O" and IsEvenInt(Size(form.field)) then
+  # not split here: generators of O^+-(d,q) outside Omega Z fall through;
+  # CSp = Sp Z, as every similarity factor is a square
+  if type in ["O","Sp"] and IsEvenInt(Size(form.field)) then
       return fail;
   fi;
   data := rec( type := type, form := form, d := d, layer := 1 );
