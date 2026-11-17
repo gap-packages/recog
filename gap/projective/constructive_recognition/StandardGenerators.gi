@@ -239,10 +239,11 @@ RECOG.FormGram := {form, M} ->
 
 # A hyperbolic pair [e, f], beta(e, e) = beta(f, f) = 0 and
 # beta(e, f) = 1, in the span of the rows <vecs> for <form>, an
-# alternating, hermitian or symmetric form in odd characteristic, where
-# dual[i] = vecs[i] * form.gram. Returns a record with components `e`,
-# `f`, `eJ` = e * form.gram, `fJ` and `drop`, two positions in <vecs>
-# whose rows together with e and f span the span of <vecs>, or fail if
+# alternating form, or a hermitian or symmetric form in odd
+# characteristic, where dual[i] = vecs[i] * form.gram. Returns a record
+# with components `e`, `f`, `eJ` = e * form.gram, `fJ` and `drop`, two
+# positions in <vecs> whose rows together with e and f span the span of
+# <vecs>, or fail if
 # the step finds no pair; it finds one if the span is non-degenerate of
 # dimension at least 2, except for a symmetric form on an anisotropic
 # span, of dimension at most 2.
@@ -321,14 +322,70 @@ RECOG.FormHyperbolicPairStep := function(form, vecs, dual)
   bJ := dual[i];
 
   # beta(e, c b) = c^frob beta(e, b), and f + c e with beta(e, f) = 1 has
-  # norm beta(f, f) + c + eps c^frob, which is 0 for c = -beta(f, f) / 2
+  # norm beta(f, f) + c + eps c^frob, which is 0 for c = -beta(f, f) / 2;
+  # an alternating form, also in characteristic 2, needs no correction
   c := (1 / (eJ * conj(b)))^form.frob;
   f := c * b;
   fJ := c * bJ;
-  c := -(fJ * conj(f)) / 2;
-  f := f + c * e;
-  fJ := fJ + c * eJ;
+  c := fJ * conj(f);
+  if not IsZero(c) then
+    f := f - c / 2 * e;
+    fJ := fJ - c / 2 * eJ;
+  fi;
   return rec( e := e, f := f, eJ := eJ, fJ := fJ, drop := drop );
+end;
+
+# A singular vector e, Q(e) = 0, in the span of the rows <vecs> for the
+# quadratic form <form> in characteristic 2, where dual[i] =
+# vecs[i] * form.gram and qv[i] = Q(vecs[i]). Returns a record with
+# components `e`, `eJ` = e * form.gram and `j`, a position at which e has
+# the coefficient 1, or fail if the step finds none; it finds one if the
+# span has dimension at least 3 or is not anisotropic. Either e = x =
+# vecs[1], or e = z + s x for z orthogonal to x, as
+# Q(z + s x) = Q(z) + s^2 Q(x); in a plane <x, y> with beta(x, y) = 1,
+# Q(x + lam y) = Q(x) + lam + lam^2 Q(y) is 0 for lam = mu/Q(y),
+# mu^2 + mu = Q(x) Q(y), if that has a solution.
+RECOG.FormQuadSingularVector := function(form, vecs, dual, qv)
+  local F, n, x, c, k, z, zJ, qz, j, lam, b, y, yJ, a, mu, s;
+
+  F := form.field;
+  n := Length(vecs);
+  x := vecs[1];
+  c := qv[1];
+  if IsZero(c) then
+    return rec( e := x, eJ := dual[1], j := 1 );
+  elif n < 2 then
+    return fail;
+  fi;
+  k := First([2 .. n], k -> IsZero(dual[1] * vecs[k]));
+  if k <> fail then
+    z := vecs[k];
+    zJ := dual[k];
+    qz := qv[k];
+    j := k;
+  elif n >= 3 then
+    lam := (dual[1] * vecs[3]) / (dual[1] * vecs[2]);
+    z := vecs[3] - lam * vecs[2];
+    zJ := dual[3] - lam * dual[2];
+    qz := qv[3] + lam^2 * qv[2] - lam * (dual[3] * vecs[2]);
+    j := 3;
+  else
+    b := dual[1] * vecs[2];
+    y := vecs[2] / b;
+    yJ := dual[2] / b;
+    a := qv[2] / b^2;
+    if IsZero(a) then
+      return rec( e := y, eJ := yJ, j := 2 );
+    fi;
+    mu := RECOG.ArtinSchreierRoot(a * c, F);
+    if mu = fail then
+      return fail;
+    fi;
+    lam := mu / a;
+    return rec( e := x + lam * y, eJ := dual[1] + lam * yJ, j := 1 );
+  fi;
+  s := RECOG.SqrtFFE2(qz / c, Size(F));
+  return rec( e := z + s * x, eJ := zJ + s * dual[1], j := j );
 end;
 
 # RECOG.FormHyperbolicPairStep for a quadratic form <form> in
@@ -337,66 +394,19 @@ end;
 # pair if the span is non-degenerate of dimension at least 3, or a
 # hyperbolic plane.
 RECOG.FormQuadHyperbolicPairStep := function(form, vecs, dual, qv)
-  local F, n, x, c, k, z, zJ, qz, j, b, y, yJ, a, mu, lam, e, eJ, s, i, f,
-        fJ;
+  local n, sing, e, eJ, j, i, b, f, fJ, c;
 
-  F := form.field;
   n := Length(vecs);
   if n < 2 then
     return fail;
   fi;
-
-  # a singular vector e, with coefficient 1 at the j-th row of <vecs>:
-  # x = vecs[1], or z + s x for z orthogonal to x, as
-  # Q(z + s x) = Q(z) + s^2 Q(x); in a plane <x, y> with beta(x, y) = 1,
-  # Q(x + lam y) = Q(x) + lam + lam^2 Q(y) is 0 for lam = mu/Q(y),
-  # mu^2 + mu = Q(x) Q(y), if that has a solution
-  x := vecs[1];
-  c := qv[1];
-  z := fail;
-  if IsZero(c) then
-    e := x;
-    eJ := dual[1];
-    j := 1;
-  else
-    k := First([2 .. n], k -> IsZero(dual[1] * vecs[k]));
-    if k <> fail then
-      z := vecs[k];
-      zJ := dual[k];
-      qz := qv[k];
-      j := k;
-    elif n >= 3 then
-      lam := (dual[1] * vecs[3]) / (dual[1] * vecs[2]);
-      z := vecs[3] - lam * vecs[2];
-      zJ := dual[3] - lam * dual[2];
-      qz := qv[3] + lam^2 * qv[2] - lam * (dual[3] * vecs[2]);
-      j := 3;
-    else
-      b := dual[1] * vecs[2];
-      y := vecs[2] / b;
-      yJ := dual[2] / b;
-      a := qv[2] / b^2;
-      if IsZero(a) then
-        e := y;
-        eJ := yJ;
-        j := 2;
-      else
-        mu := RECOG.ArtinSchreierRoot(a * c, F);
-        if mu = fail then
-          return fail;
-        fi;
-        lam := mu / a;
-        e := x + lam * y;
-        eJ := dual[1] + lam * yJ;
-        j := 1;
-      fi;
-    fi;
+  sing := RECOG.FormQuadSingularVector(form, vecs, dual, qv);
+  if sing = fail then
+    return fail;
   fi;
-  if z <> fail then
-    s := RECOG.SqrtFFE2(qz / c, Size(F));
-    e := z + s * x;
-    eJ := zJ + s * dual[1];
-  fi;
+  e := sing.e;
+  eJ := sing.eJ;
+  j := sing.j;
 
   # f = b / beta(e, b) for a row b other than the j-th with beta(e, b) <> 0,
   # which exists as the span is non-degenerate; f + Q(f) e is singular
@@ -894,7 +904,7 @@ end;
 
 # The standard generators of CL(<d>, q) of type <type> relative to the
 # standard basis of GF(q)^<d>, q = Size(<f>), with gamma = Z(q) ([EHNPR],
-# Definition of standard generators). For SL, for Sp with q odd, for SU
+# Definition of standard generators). For SL, for Sp, for SU
 # with q odd and d even, and for the orthogonal types with q odd, they are
 # those of Leedham-Green and O'Brien [LGO09], Section 3, Table 1, relative
 # to the basis order of [EHNPR], except u for SL and y, which are the

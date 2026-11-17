@@ -14,11 +14,13 @@
 ##
 ##  The root elements of symplectic groups for the GoingUp of [EHNPR]
 ##  (see ../GoingUp.gi), Section 'GoingUp algorithm', whose other parts are
-##  shared with special unitary groups.
+##  shared with special unitary groups. They serve every q: for q even,
+##  RECOG.Sp_EvenFinalStep (see ../Sp_EvenChar/GoingUp.gi) and the
+##  rewriting in ../Rewrite.gi use them as well.
 ##
 #############################################################################
 
-# Root elements of Sp(<n>,q), q = Size(<f>) odd, as words in the standard
+# Root elements of Sp(<n>,q), q = Size(<f>), as words in the standard
 # generators, in the record described in ../GoingUp.gi. <Y> are elements
 # with memory standing for the standard generators of Sp(n,q) relative to
 # the standard basis, in the order of RECOG.ClassicalStandardGenerators;
@@ -60,7 +62,6 @@ RECOG.Sp_RootElements := function(Y, n, f)
     torus := delta,
     torusDiag := [gamma, gamma^-1],
     gamma := gamma,
-    tau := [One(f), One(f) / 2],
     Lf := List([0 .. ext - 1], k -> t^(delta^-k)),
     See := see,
     Sff := List(see, y -> (y^-1)^(s * s2)),
@@ -73,6 +74,9 @@ RECOG.Sp_RootElements := function(Y, n, f)
                    Mj1 := [] ),
   );
   res.Le := List(res.Lf, y -> y^s);
+  if IsOddInt(Size(f)) then
+    res.tau := [One(f), One(f) / 2];
+  fi;
 
   if n >= 4 then
     res.conjugator[2] := res.one;

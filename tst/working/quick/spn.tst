@@ -27,6 +27,13 @@ gap> List([[4,3,1], [4,5,1], [6,3,1], [6,7,1], [6,3,2], [8,3,1], [12,3,1],
 >         args -> CallFuncList(CheckFindStdGens_Sp, args));
 [ true, true, true, true, true, true, true, true, true, true, true ]
 
+# For q even, through Omega^+(6,q): d = 6 directly, d = 10 and 18 where
+# the orthogonal chain reaches d, and the others through its last step
+gap> List([[6,2,2], [6,2,3], [8,2,1], [8,2,2], [10,2,1], [10,2,2],
+>          [12,2,1], [14,2,3], [18,2,1], [20,2,2]],
+>         args -> CallFuncList(CheckFindStdGens_Sp, args));
+[ true, true, true, true, true, true, true, true, true, true ]
+
 # RECOG.Form_Rewrite must return an SLP in the standard generators for
 # elements of the standard copy
 gap> CheckForm_Rewrite := function(d, q)
