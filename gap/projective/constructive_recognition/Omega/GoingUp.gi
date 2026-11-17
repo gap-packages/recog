@@ -13,7 +13,7 @@
 ##
 ##
 ##  The parts of the GoingUp of [EHNPR] (see ../GoingUp.gi), Section
-##  'GoingUp algorithm', specific to orthogonal groups, q odd.
+##  'GoingUp algorithm', specific to orthogonal groups.
 ##
 ##  The groups CL(U) of the steps are Omega^+(n,q), n = 2m with m odd; the
 ##  type of V only enters the last step. Omega contains no transvections.
@@ -30,7 +30,7 @@
 ##
 #############################################################################
 
-# Root elements of Omega^+(<n>,q), q = Size(<f>) odd, n >= 4, as words in
+# Root elements of Omega^+(<n>,q), q = Size(<f>), n >= 4, as words in
 # the standard generators, in the record described in ../GoingUp.gi; <Y>
 # are as for RECOG.Sp_RootElements. There are no components `Lf`, `Le`,
 # `longUnit` and `tau`, and `s'` is the standard generator of that name.
@@ -147,14 +147,16 @@ end;
 # s = W(2 w_1) and delta = W(2 gamma w_1) s^-1. On <w_1, w_2> identified
 # with GF(q^2) by w_1 -> 1, w_2 -> alpha, Q(z) = -z z^q, W(z) s^-1 is
 # multiplication by z^(q-1), and N(z) = z^(q+1); so delta is the case
-# z = g. [EHNPR] leaves these factorisations open ('The standard
-# generators of CL(W)', part (3)).
+# z = g. For "O-" and q even, the same holds with N(z) = Q(z), w_2 -> g and
+# Q(z) = z z^q; there delta multiplies by g^(1-q), the case
+# z = g^q = eta w_1 + w_2. [EHNPR] leaves these factorisations open ('The
+# standard generators of CL(W)', part (3)).
 # Returns the list of words, as elements with memory in generators standing
 # for Y and g~.
 RECOG.Omega_GoingUpNewGenerators := function(std, Y, R, g)
   local f, q, d, n, nn, m, F, gt, RF, e, cmat, c, solver, siegelU, siegelP,
-        siegel1, mm, v, j, sigma, type, w1, w2, gh, alpha, N, Wz, s, t,
-        delta, z;
+        siegel1, mm, v, j, sigma, type, w1, w2, gh, alpha, form, N, Wz, s,
+        t, delta, z;
 
   f := std.f;
   q := Size(f);
@@ -235,7 +237,8 @@ RECOG.Omega_GoingUpNewGenerators := function(std, Y, R, g)
 
   # the generators on <e_1, f_1, w_1, w_2> resp. <e_1, f_1, w_1>
   w1 := e[2 * mm + 1];
-  N := z -> -(z * RECOG.ClassicalStandardForm(type, d, f) * z) / 2;
+  form := RECOG.ClassicalForm(type, d, f);
+  N := z -> -RECOG.FormQuadraticValue(form, z);
   Wz := function(z)
     local r;
     r := siegel1(n, z);
@@ -243,11 +246,15 @@ RECOG.Omega_GoingUpNewGenerators := function(std, Y, R, g)
   end;
   if type = "O-" then
     w2 := e[2 * mm + 2];
-    gh := Z(q^2);
-    alpha := gh^((q + 1) / 2);
     t := siegel1(n, -w1);
     s := Wz(w1);
-    z := (gh + gh^q) / 2 * w1 + (gh - gh^q) / (2 * alpha) * w2;
+    if IsEvenInt(q) then
+      z := RECOG.OrthogonalEta(q) * w1 + w2;
+    else
+      gh := Z(q^2);
+      alpha := gh^((q + 1) / 2);
+      z := (gh + gh^q) / 2 * w1 + (gh - gh^q) / (2 * alpha) * w2;
+    fi;
   else
     t := siegel1(n, -2 * w1);
     s := Wz(2 * w1);
