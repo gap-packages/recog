@@ -236,6 +236,36 @@ end;
 
 RECOG.FormValue := {form, x, y} -> x * form.gram * RECOG.FormConjugate(form, y);
 
+# The constant alpha of [EHNPR] (Definition of the field constants) for SU
+# over <f> = GF(q0^2), with alpha^q0 = -alpha: gamma^((q0+1)/2) for q0 odd
+# and 1 for q0 even, gamma = Z(q0^2)
+RECOG.UnitaryAlpha := function(f)
+  local q0;
+  q0 := RootInt(Size(f), 2);
+  if IsEvenInt(q0) then
+    return One(f);
+  fi;
+  return Z(Size(f))^((q0 + 1) / 2);
+end;
+
+# An element h with h + h^frob = 1 for <form>, so that c = x h solves
+# c + c^frob = x for x in the fixed field of frob: 1/2 in odd
+# characteristic, and gamma/(gamma + gamma^q0), gamma = Z(q0^2), for a
+# hermitian form in characteristic 2
+RECOG.FormHalf := function(form)
+  local f, gamma;
+
+  f := form.field;
+  if IsOddInt(Size(f)) then
+    return One(f) / 2;
+  elif form.frob = 1 then
+    ErrorNoReturn("RECOG.FormHalf: no such element for a bilinear form in ",
+                  "characteristic 2");
+  fi;
+  gamma := Z(Size(f));
+  return gamma / (gamma + gamma^form.frob);
+end;
+
 # The Gram matrix of the rows of <M>
 RECOG.FormGram := {form, M} ->
     M * form.gram * TransposedMat(RECOG.FormConjugate(form, M));
@@ -325,15 +355,17 @@ RECOG.FormHyperbolicPairStep := function(form, vecs, dual)
   bJ := dual[i];
 
   # beta(e, c b) = c^frob beta(e, b), and f + c e with beta(e, f) = 1 has
-  # norm beta(f, f) + c + eps c^frob, which is 0 for c = -beta(f, f) / 2;
-  # an alternating form, also in characteristic 2, needs no correction
+  # norm beta(f, f) + c + eps c^frob, which is 0 for c = -beta(f, f) h,
+  # h = RECOG.FormHalf(form); an alternating form, also in characteristic
+  # 2, needs no correction
   c := (1 / (eJ * conj(b)))^form.frob;
   f := c * b;
   fJ := c * bJ;
   c := fJ * conj(f);
   if not IsZero(c) then
-    f := f - c / 2 * e;
-    fJ := fJ - c / 2 * eJ;
+    c := c * RECOG.FormHalf(form);
+    f := f - c * e;
+    fJ := fJ - c * eJ;
   fi;
   return rec( e := e, f := f, eJ := eJ, fJ := fJ, drop := drop );
 end;
@@ -736,14 +768,15 @@ RECOG.ClassicalInvariantForm := function(type, gens, f)
   fi;
 
   # (F^frob)^T = c*F with c^(frob+1) = 1, so F + (F^frob)^T is hermitian
-  # unless c = -1; then alpha*F is, for alpha^frob = -alpha
+  # unless c = -1; then alpha*F is, for alpha^frob = -alpha, and for q even
+  # F is
   frob := RootInt(Size(f), 2);
   F := MTX.InvariantSesquilinearForm(M);
   Fq := TransposedMat(List(F, r -> List(r, x -> x^frob)));
-  if IsZero(F + Fq) then
-    F := PrimitiveRoot(f)^((frob + 1) / 2) * F;
-  else
+  if not IsZero(F + Fq) then
     F := F + Fq;
+  elif IsOddInt(frob) then
+    F := PrimitiveRoot(f)^((frob + 1) / 2) * F;
   fi;
   ConvertToMatrixRep(F, f);
   return rec( gram := F, frob := frob, field := f );
@@ -923,8 +956,9 @@ end;
 # those of Leedham-Green and O'Brien [LGO09], Section 3, Table 1, relative
 # to the basis order of [EHNPR], except u for SL and y, which are the
 # identity there; for "O+" and "O-" with q even, those of [DLGLO13]
-# (doc/recog.bib), Lemma 2.2, with "O-" on the first pair. For SU,
-# q = q0^2, alpha = gamma^((q0+1)/2) and
+# (doc/recog.bib), Lemma 2.2, with "O-" on the first pair, and for SU with
+# q even the same matrices as for q odd with alpha = 1. For SU,
+# q = q0^2, alpha = RECOG.UnitaryAlpha(f) and
 # gamma0 = gamma^(q0+1). For the orthogonal types the components are those
 # of RECOG.OrthogonalStandardGenerators and `all`; otherwise
 # it returns a record with the following components:
@@ -934,8 +968,9 @@ end;
 #  - `u` (not "SL"): (e_1, e_2)(f_1, f_2), the identity for d = 2
 #  - `x`: for "Sp", the matrix [[1,0,0,0],[0,1,1,0],[0,0,1,0],[1,0,0,1]]
 #    on (e_1, f_1, e_2, f_2); for "SU", [[1,0,1,0],[0,1,0,0],[0,0,1,0],
-#    [0,-1,0,1]], and for d odd [[1,1,-1/2],[0,1,-1],[0,0,1]] on
-#    (e_1, w_1, f_1); for "SL" and d even, the signed cycle
+#    [0,-1,0,1]], and for d odd [[1,1,c],[0,1,-1],[0,0,1]] on
+#    (e_1, w_1, f_1), c = -RECOG.FormHalf(form), so c + c^q0 = -1; for "SL"
+#    and d even, the signed cycle
 #    (e_1, f_1, e_2, f_2)^-; the identity if it does not fit
 #  - `y` (only "SU"): diag(gamma, gamma^-q0, gamma^-1, gamma^q0) on
 #    (e_1, f_1, e_2, f_2), the identity for d = 2, and for d odd
@@ -969,7 +1004,7 @@ RECOG.ClassicalStandardGenerators := function(type, d, f)
     res := RECOG.OrthogonalStandardGenerators(type, d, f);
   elif type = "SU" then
     q0 := RootInt(Size(f), 2);
-    alpha := gamma^((q0 + 1) / 2);
+    alpha := RECOG.UnitaryAlpha(f);
     gamma0 := gamma^(q0 + 1);
     res := rec(
       s := RECOG.EmbedBlock(d, f, [1, 2], [[0, alpha], [alpha^-q0, 0]]),
@@ -998,7 +1033,8 @@ RECOG.ClassicalStandardGenerators := function(type, d, f)
                    [[1, 0, 0, 0], [0, 1, 1, 0], [0, 0, 1, 0], [1, 0, 0, 1]]);
     elif type = "SU" and IsOddInt(d) then
       res.x := RECOG.EmbedBlock(d, f, [1, d, 2],
-                   [[1, 1, -1/2 * One(f)], [0, 1, -1], [0, 0, 1]]);
+                   [[1, 1, -RECOG.FormHalf(RECOG.ClassicalForm("SU", d, f))],
+                    [0, 1, -1], [0, 0, 1]]);
       res.y := RECOG.EmbedBlock(d, f, [1, d, 2],
                    DiagonalMat([gamma, gamma^(q0 - 1), gamma^-q0]));
     elif m >= 2 then
