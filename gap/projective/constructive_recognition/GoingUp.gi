@@ -23,7 +23,8 @@
 ##  relative to these vectors, extended by the identity on
 ##  T = <v_(n+1), ..., v_d>. With the
 ##  overlap k = 1 for SL and 2 otherwise, it constructs the same for
-##  degree n' = min(2n - k, d), keeping the first n vectors of B:
+##  degree n' = min(2n - k, d), keeping the first n vectors of B, except
+##  for SL in step 5:
 ##
 ##     U = A + P, P = <v_(n-k+1), ..., v_n> the pivot space
 ##     1. t in <Y> whose fixed space on U has dimension k (the seed)
@@ -35,7 +36,9 @@
 ##     4. v_(n+1), ..., v_d := a basis of N, the projection of A g~ to T,
 ##        and fixed vectors of g~ in T (for the types with a form: standard
 ##        bases of N and of its orthogonal complement in T); so W = U + N
-##     5. the standard generators of CL(W) as words in Y and g~
+##     5. the standard generators of CL(W) as words in Y and g~; for SL
+##        mostly relative to a new basis of W, in which a short word in Y
+##        and g~ is almost the long cycle (see SL/GoingUp.gi)
 ##
 ##  For an orthogonal group, CL(U) is Omega^+(n,q), and so is CL(W) unless
 ##  n' = d.
@@ -269,7 +272,10 @@ end;
 # are words in Y and g~. All but a are elements with memory of the
 # trivial group (), so composing them multiplies no matrices; their
 # matrices relative to std.bas are computed alongside. GAP builds SLPs
-# from them, not the MSLPs of [EHNPR].
+# from them, not the MSLPs of [EHNPR]. params.newGenerators returns the
+# list of words relative to the adapted basis C * std.bas, a record with
+# the words relative to the basis M * C * std.bas and the matrix M as
+# components `words` and `basis`, or fail to have the step repeated.
 RECOG.GoingUpStep := function(std, N)
   local f, d, n, params, Y, R, dbl, C, Ci, g, words, ax, tx, bx, gx;
 
@@ -290,6 +296,14 @@ RECOG.GoingUpStep := function(std, N)
   Ci := C^-1;
   g := C * dbl.g * Ci;
   words := params.newGenerators(std, Y, R, g);
+  if words = fail then
+    return fail;
+  elif IsRecord(words) then
+    C := words.basis * C;
+    ConvertToMatrixRep(C, f);
+    Ci := C^-1;
+    words := words.words;
+  fi;
 
   # g~ = (t^a)^b, as a word in the input generators
   ax := ResultOfStraightLineProgram(SLPOfElm(dbl.a), std.Xf);
