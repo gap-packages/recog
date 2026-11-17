@@ -80,7 +80,7 @@ gap> CheckFormRoots := function(type, n, q)
 gap> ForAll([["Sp", 4, 3], ["Sp", 6, 5], ["Sp", 8, 9], ["Sp", 10, 27],
 >            ["SU", 4, 9], ["SU", 6, 25], ["SU", 8, 81], ["SU", 4, 729],
 >            ["O+", 6, 3], ["O+", 10, 5], ["O+", 10, 9], ["O+", 18, 27],
->            ["O+", 6, 2], ["O+", 10, 8]],
+>            ["O+", 6, 2], ["O+", 10, 8], ["Sp", 6, 4], ["Sp", 8, 2]],
 >           c -> CallFuncList(CheckFormRoots, c) = true);
 true
 
@@ -105,7 +105,7 @@ gap> CheckEliminations := function(n, q)
 >     if IsOddInt(n) then
 >         return true;
 >     fi;
->     types := ["O+"];
+>     types := ["Sp", "O+"];
 >     if IsOddInt(q) then
 >         types := ["Sp", "SU", "O+"];
 >     fi;
@@ -121,6 +121,8 @@ gap> CheckEliminations := function(n, q)
 >         half := y -> RECOG.FormValue(form, y, y) / 2;
 >         if type = "O+" then
 >             half := y -> RECOG.FormQuadraticValue(form, y);
+>         elif type = "Sp" then
+>             half := y -> Zero(f);
 >         fi;
 >         for y in vecs do
 >             b := RECOG.Form_MapToStd(R, y);
@@ -190,7 +192,8 @@ gap> ForAll([["SL", 2, 3, 7], ["SL", 2, 8, 4], ["SL", 2, 17, 5],
 >            ["O+", 6, 12, 9], ["O-", 6, 14, 3], ["O", 6, 15, 5],
 >            ["O+", 6, 20, 3], ["O-", 6, 22, 7], ["O", 6, 21, 9],
 >            ["O+", 6, 8, 2], ["O-", 6, 10, 4], ["O+", 6, 12, 8],
->            ["O-", 6, 14, 2], ["O-", 6, 20, 16]],
+>            ["O-", 6, 14, 2], ["O-", 6, 20, 16], ["Sp", 4, 14, 4],
+>            ["Sp", 4, 10, 16]],
 >           c -> CallFuncList(CheckGoingUp, c));
 true
 

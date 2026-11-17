@@ -21,7 +21,8 @@
 # algorithm', for Sp(d,q), d >= 4 and q odd: GoingDown to Sp(8,q) if
 # d > 8, FinalDescent to Sp(4,q), and GoingUp (see ../GoingUp.gi).
 # [EHNPR] needs d >= 8 and leaves d = 4, 6 to other algorithms ('Small
-# degrees'); RECOG.Sp_FinalDescent accepts these degrees as well.
+# degrees'); RECOG.Sp_FinalDescent accepts these degrees as well. For q
+# even see RECOG.FindStdGens_SpEven.
 # Returns a record with the following components:
 #  - `slpstd`: SLP in the generators of <G> for the standard generators of
 #    Sp(d,q), as in RECOG.ClassicalStandardGenerators, relative to bas
@@ -34,6 +35,9 @@ RECOG.FindStdGens_Sp := function(G)
   d := DimensionOfMatrixGroup(G);
   if not IsObjWithMemory(GeneratorsOfGroup(G)[1]) then
     G := GroupWithMemory(G);
+  fi;
+  if IsEvenInt(Size(f)) then
+    return RECOG.FindStdGens_SpEven(G);
   fi;
 
   if d > 8 then
