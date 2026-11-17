@@ -204,11 +204,13 @@ RECOG.FindStdGensSU4 := function(gens, f)
 end;
 
 # FinalDescent of [EHNPR] (see ../GoingDown.gi; 'Terminal groups and
-# initial groups', 'The final descent') for SU, q0 odd: <gens> are 6x6
-# matrices generating SU(6,q0) over <f> = GF(q0^2). The centraliser of an
-# involution with eigenspaces of dimension 4 and 2 contains SU(4,q0) on
-# the first; elements of it, powered to act trivially on the second,
-# generate it.
+# initial groups', 'The final descent') for SU, q0 odd: <gens> are d x d
+# matrices generating SU(d,q0) over <f> = GF(q0^2), d = 6 or 5. The
+# centraliser of an involution with eigenspaces of dimension 4 and d-4
+# contains SU(4,q0) on the first; elements of it, powered to act trivially
+# on the second, generate it. SU(5,q0) is below the terminal degree of
+# [EHNPR], which cites Brooksbank (LMS J. Comput. Math. 6 (2003)) for it;
+# here it takes this descent and one GoingUp step.
 # [EHNPR] leaves the final descent open, with [LGO09] as a reference
 # solution. This follows the route of [DR] which [EHNPR] sketches in that
 # section: Algorithm 16 of [DR] (Section 5.1.3, after [LGO09], Sections 8,
@@ -217,18 +219,20 @@ end;
 # pairs of powered elements instead of accumulating them.
 # Returns a record with the following components:
 #  - `slp`: SLP in <gens> for the standard generators of an SU(4,q0)
-#  - `bas`: a 6x6 matrix whose first four rows are a standard basis
+#  - `bas`: a d x d matrix whose first four rows are a standard basis
 #    (e1,f1,e2,f2), for a scalar multiple of the form, of the space on
-#    which this SU(4,q0) acts and whose last two span its fixed space;
+#    which this SU(4,q0) acts and whose last d-4 span its fixed space;
 #    relative to bas the standard generators are those of
 #    RECOG.ClassicalStandardGenerators("SU",4,<f>), extended by the
-#    identity on the last two rows
+#    identity on the last d-4 rows
 RECOG.SU_FinalDescent := function(gens, f)
-  local q, q0, h, isNamed, pr, invo, plus, minus, four, two, newbasis,
+  local d, q, q0, h, isNamed, pr, invo, plus, minus, four, two, newbasis,
         cent, x, y, H4, su4;
 
-  if NrRows(gens[1]) <> 6 then
-    ErrorNoReturn("RECOG.SU_FinalDescent: <gens> must be 6x6 matrices");
+  d := NrRows(gens[1]);
+  if not d in [5, 6] then
+    ErrorNoReturn("RECOG.SU_FinalDescent: <gens> must be 5x5 or 6x6 ",
+                  "matrices");
   fi;
 
   q := Size(f);
@@ -240,15 +244,18 @@ RECOG.SU_FinalDescent := function(gens, f)
 
   # As q0 is odd, an involution is diagonalisable with eigenvalues 1 and
   # -1, and its determinant 1 makes the dimension of the (-1)-eigenspace
-  # even. So an involution other than -1 has eigenspaces of dimension 4
-  # and 2, which are orthogonal.
+  # even. So for d = 6 an involution other than -1 has eigenspaces of
+  # dimension 4 and 2, which are orthogonal; for d = 5 that of -1 must
+  # have dimension 4, not 2.
   Info(InfoRecog_ClassicalNatural,1,"SU_n: base case SU(4,",q0,")");
   pr := ProductReplacer(GeneratorsOfGroup(h));
   repeat
     invo := RECOG.InvolutionSearcher(pr, g -> Order(StripMemory(g)), 100);
-  until invo <> fail and not IsOne(-StripMemory(invo));
-  plus := RECOG.FixspaceMat(StripMemory(invo));
-  minus := RECOG.FixspaceMat(-StripMemory(invo));
+    if invo <> fail then
+      plus := RECOG.FixspaceMat(StripMemory(invo));
+      minus := RECOG.FixspaceMat(-StripMemory(invo));
+    fi;
+  until invo <> fail and 4 in [Length(plus), Length(minus)];
   if Length(plus) = 4 then
     four := plus;
     two := minus;
@@ -263,7 +270,8 @@ RECOG.SU_FinalDescent := function(gens, f)
               RECOG.ProjectiveOrder, invo, 8));
   repeat
     x := [PseudoRandom(cent), PseudoRandom(cent)];
-    y := List(x, g -> g^Order((newbasis * StripMemory(g) * newbasis^-1){[5,6]}{[5,6]}));
+    y := List(x, g -> g^Order((newbasis * StripMemory(g)
+                                * newbasis^-1){[5 .. d]}{[5 .. d]}));
     H4 := List(y, g -> (newbasis * StripMemory(g) * newbasis^-1){[1..4]}{[1..4]});
   until isNamed(H4);
 
