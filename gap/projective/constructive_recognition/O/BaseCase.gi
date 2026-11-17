@@ -225,18 +225,22 @@ end;
 
 # FinalDescent for Omega^+-(8,2) by a stabiliser chain, with the
 # arguments and the result of RECOG.O_FinalDescent: the standard generators
-# of Omega^+(6,2) on the first six vectors of a standard basis of <form>
+# of Omega^+(6,2) on the first six vectors of a standard basis of <form>.
+# Returns fail if <gens> generate a subgroup which does not contain them.
 RECOG.O_FinalDescentByBSGS := function(gens, f, form)
-  local B, Bi, std;
+  local B, Bi, std, slp;
 
   B := RECOG.FormStandardBasis(form, IdentityMat(8, f));
   ConvertToMatrixRep(B, f);
   Bi := B^-1;
   std := List(RECOG.ClassicalStandardGenerators("O+", 6, f).all,
               x -> Bi * DirectSumMat(x, IdentityMat(2, f)) * B);
-  return rec( slp := RECOG.FindStdGensUsingBSGS(Group(StripMemory(gens)),
-                                                 std, false, false),
-              bas := B );
+  slp := RECOG.FindStdGensUsingBSGS(Group(StripMemory(gens)), std, false,
+                                    false);
+  if slp = fail then
+    return fail;
+  fi;
+  return rec( slp := slp, bas := B );
 end;
 
 # FinalDescent of [EHNPR] (see ../GoingDown.gi; 'Terminal groups and

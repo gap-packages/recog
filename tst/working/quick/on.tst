@@ -142,6 +142,15 @@ gap> Filtered([[1, 3], [-1, 3], [1, 5], [-1, 5], [1, 7], [-1, 7], [1, 9],
 >              [-1, 16]], c -> not CallFuncList(CheckFinalDescent, c));
 [  ]
 
+# For q = 2 the group GoingDown returns may be a proper subgroup of
+# Omega^+-(8,2), as GoingDown has no naming test; the final descent then
+# fails, which restarts GoingDown
+gap> f := GF(2);;
+gap> form := RECOG.ClassicalForm("O-", 8, f);;
+gap> x := RECOG.ClassicalStandardGenerators("O-", 8, f).v;;
+gap> RECOG.O_FinalDescent([x], f, form, RECOG.GoingDownRandomBound);
+fail
+
 # RECOG.FindStdGens_O must express the standard generators of Omega(d,q)
 # of RECOG.ClassicalStandardGenerators as straight line programs in the
 # given generators, with respect to the basis it returns.
