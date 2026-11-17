@@ -15,8 +15,7 @@
 ##  GoingDown for classical groups in their natural representation, as in
 ##  Eisenbrand, Horn, Niemeyer, Praeger, Rademacher, "Constructive
 ##  recognition of finite classical groups using stingray elements" (in
-##  preparation), cited as [EHNPR] below. Orthogonal groups are those of
-##  odd characteristic.
+##  preparation), cited as [EHNPR] below.
 ##
 #############################################################################
 
@@ -74,9 +73,6 @@ RECOG.GoingDownParameters := function(type, q)
     # naming test: RecogniseClassical needs the sign, that is, the form,
     # and [EHNPR] ('Implementation and timing') omits the test and
     # restarts GoingDown instead, as RECOG.GoingDown does.
-    if IsEvenInt(q) then
-      ErrorNoReturn("RECOG.GoingDownParameters: orthogonal types need odd q");
-    fi;
     return rec( terminal := 8, minBody := 4, parity := 0,
                 isNamed := ReturnTrue );
   fi;
