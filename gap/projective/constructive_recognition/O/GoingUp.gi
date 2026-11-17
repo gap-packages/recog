@@ -182,19 +182,19 @@ RECOG.O_GoingUpNewGenerators := function(std, Y, R, g)
   # See(j, -z_(e_j)) and Mj1(j, z_(f_j)), and rho(f_1, z) that of the
   # M1j(j, -z_(e_j)) and Sff(j, -z_(f_j)), z = a c^-1 in the pairs 2 to m
   siegelU := function(pos, a)
-    local z, res, j;
+    local z, prod, j;
     z := Concatenation(a, [Zero(f), Zero(f)]) * cmat;
-    res := RF.one;
+    prod := RECOG.Form_Product(RF, n);
     for j in [2 .. m] do
       if pos = n - 1 then
-        res := res * RECOG.Form_RootElement(RF, "See", j, -z[2 * j - 1])
-                   * RECOG.Form_RootElement(RF, "Mj1", j, z[2 * j]);
+        prod.apply("See", j, -z[2 * j - 1]);
+        prod.apply("Mj1", j, z[2 * j]);
       else
-        res := res * RECOG.Form_RootElement(RF, "M1j", j, -z[2 * j - 1])
-                   * RECOG.Form_RootElement(RF, "Sff", j, -z[2 * j]);
+        prod.apply("M1j", j, -z[2 * j - 1]);
+        prod.apply("Sff", j, -z[2 * j]);
       fi;
     od;
-    return res^c;
+    return prod.word()^c;
   end;
 
   # rho(p, x) for p as for siegelU and x in A + N + <p>, given by its d
