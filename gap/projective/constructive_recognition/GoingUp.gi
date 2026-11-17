@@ -287,14 +287,15 @@ end;
 ##     bases.(kind) of their parameters
 ##   - `conjugator`: conjugator[j] maps e_2 to e_j and f_2 to f_j, and fixes
 ##     e_1, f_1, and `powers`: a cache for RECOG.Form_RootElement
-##   - `aniso` (only orthogonal groups of type - or o, see ../Rewrite.gi):
-##     a record with components `pos`, the indices of the basis w_1 (and
-##     w_2) of the anisotropic part, which follows the m hyperbolic pairs,
-##     `pairs`, the number m, `gram`, the Gram matrix on <w_1, w_2> resp.
-##     <w_1>, `unit`, the parameter of w_1, `toField`, a function
-##     mapping a vector z of the anisotropic part to the parameter of
-##     Fw(z) and Ew(z) in bases.Fw and bases.Ew, and for q even `quad`, the
-##     matrix of Q on <w_1, w_2> (see RECOG.ClassicalForm)
+##   - `aniso` (only orthogonal groups of type - or o, see Rewrite.gi, and
+##     SU of odd degree, see SU/Rewrite.gi): a record with components
+##     `pos`, the indices of the basis w_1 (and w_2) of the anisotropic
+##     part, which follows the m hyperbolic pairs, `pairs`, the number m,
+##     `gram`, the Gram matrix on <w_1, w_2> resp. <w_1>, `unit`, the
+##     parameter of w_1, `toField`, a function mapping a vector z of the
+##     anisotropic part to the parameter of Fw(z) and Ew(z) in bases.Fw and
+##     bases.Ew, for q even `quad`, the matrix of Q on <w_1, w_2> (see
+##     RECOG.ClassicalForm), and for SU `lambda`, see below
 ##  The root elements, for 2 <= j <= m = n/2, are
 ##   - Lf(lambda) = T(f_1, lambda): e_1 -> e_1 + lambda f_1;
 ##   - Le(lambda) = T(e_1, lambda): f_1 -> f_1 + eps lambda e_1;
@@ -309,7 +310,8 @@ end;
 ##   - with `aniso`, for z in the anisotropic part, the Siegel
 ##     transformations Fw(z) = rho(f_1, z): e_1 -> e_1 - z - Q(z) f_1,
 ##     w_i -> w_i + beta(w_i, z) f_1, and Ew(z) = rho(e_1, z): f_1 -> f_1 -
-##     z - Q(z) e_1, w_i -> w_i + beta(w_i, z) e_1.
+##     z - Q(z) e_1, w_i -> w_i + beta(w_i, z) e_1; for SU, -Q(z) is
+##     lambda(kind, z) with kind = "Fw" resp. "Ew".
 ##
 #############################################################################
 
@@ -342,7 +344,9 @@ end;
 # identity plus the entries c at the positions [i, k] of the triples
 # [i, k, c] returned here. For "Fw" and "Ew" some k is also an i; the
 # entries which read row i come before those which change it, so applying
-# them in order acts as the matrix.
+# them in order acts as the matrix. These map the partner of a = f_1 resp.
+# e_1 to it minus z plus lam a, with lam = -Q(z), or for SU of odd degree
+# lam = R.aniso.lambda(kind, z) (see SU/Rewrite.gi).
 RECOG.Form_RootElementEntries := function(R, kind, j, lambda)
   local c, a, pos, bz, res, i;
 
@@ -353,7 +357,8 @@ RECOG.Form_RootElementEntries := function(R, kind, j, lambda)
       a := 1;
     fi;
     pos := R.aniso.pos;
-    bz := lambda * R.aniso.gram;
+    # beta(w_i, z)
+    bz := List(lambda * R.aniso.gram, R.conj);
     res := [];
     for i in [1 .. Length(pos)] do
       if not IsZero(bz[i]) then
@@ -365,7 +370,9 @@ RECOG.Form_RootElementEntries := function(R, kind, j, lambda)
         Add(res, [3 - a, pos[i], -lambda[i]]);
       fi;
     od;
-    if IsBound(R.aniso.quad) then
+    if IsBound(R.aniso.lambda) then
+      c := -R.aniso.lambda(kind, lambda);
+    elif IsBound(R.aniso.quad) then
       c := lambda * R.aniso.quad * lambda;
     else
       c := (bz * lambda) / 2;

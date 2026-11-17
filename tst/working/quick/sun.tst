@@ -64,7 +64,7 @@ gap> CheckForm_Rewrite := function(d, q)
 >     return ForAll(els, g -> ResultOfStraightLineProgram(
 >                                 RECOG.Form_Rewrite(W, g), std.all) = g);
 > end;;
-gap> ForAll([4, 6, 8], d -> ForAll([3, 5, 9], q -> CheckForm_Rewrite(d, q)));
+gap> ForAll([4 .. 9], d -> ForAll([3, 5, 9], q -> CheckForm_Rewrite(d, q)));
 true
 
 # ClassicalNatural makes natural SU(d,q) a PSU leaf, also with scalars of
@@ -95,6 +95,20 @@ gap> ForAll([1 .. 5], function(i)
 >                SLPforElement(ri, Z(9)^i * x), NiceGens(ri)), x);
 > end);
 true
+gap> S := SU(7, 3)^PseudoRandom(GL(7, 9));;
+gap> ri := Leaf(RECOG.TestGroup(S, false, Size(S)));;
+gap> ri!.fhmethsel.successMethod;
+"ClassicalNatural"
+gap> ForAll([1 .. 5], function(i)
+>     local x;
+>     x := PseudoRandom(S);
+>     return IsScalarMultiple(ResultOfStraightLineProgram(
+>                SLPforElement(ri, Z(9)^i * x), NiceGens(ri)), x);
+> end);
+true
+gap> G := Group(List(GeneratorsOfGroup(SU(5, 3)), x -> Z(9)^(2 * Random([0 .. 3])) * x));;
+gap> Leaf(RECOG.TestGroup(G, true, Size(SU(5, 3))))!.fhmethsel.successMethod;
+"ClassicalNatural"
 gap> G := Group(List(GeneratorsOfGroup(SU(4, 5)), x -> Z(25)^(4 * Random([0 .. 5])) * x));;
 gap> Leaf(RECOG.TestGroup(G, true, Size(SU(4, 5)) / 2))!.fhmethsel.successMethod;
 "ClassicalNatural"
