@@ -735,9 +735,9 @@ RECOG.ClassicalNaturalGroupWithMemory := function(ri,gens,changed)
 end;
 
 # ClassicalNatural for <ri> containing PSp(d,q), PSU(d,q0) or
-# POmega(d,q), d even for Sp and SU, at least 6 for Sp with q even and at
-# least 8 for Omega, q odd except for Sp and Omega^+-(d,q), as <classical>
-# of RecogniseClassical says; <type> is
+# POmega(d,q), d even for Sp, at least 4 for SU, at least 6 for Sp with
+# q even and at least 8 for Omega, q odd except for Sp and Omega^+-(d,q),
+# as <classical> of RecogniseClassical says; <type> is
 # "Sp", "SU" or "O", which stands for all orthogonal types here. The
 # generators are scaled into Sp(d,q), SU(d,q0) or Omega(d,q). That needs
 # similarity factors that are squares for Sp and Omega, determinants that
@@ -878,8 +878,7 @@ function(ri)
   # Sp(2,q) = SL(2,q) is left to the code for SL_2 below
   if d > 2 and classical.isSpContained = true and (IsOddInt(q) or d >= 6) then
       return RECOG.ClassicalNaturalForm(ri,classical,"Sp");
-  elif classical.isSUContained = true and IsOddInt(q) and IsEvenInt(d)
-       then
+  elif classical.isSUContained = true and IsOddInt(q) and d >= 4 then
       return RECOG.ClassicalNaturalForm(ri,classical,"SU");
   elif classical.isOmegaContained = true and d >= 8
        and (IsOddInt(q) or IsEvenInt(d)) then
