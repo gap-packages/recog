@@ -87,6 +87,8 @@ RECOG.GoingUpParameters := function(type)
   if type in RECOG.OrthogonalTypes then
     res.seed := RECOG.Omega_GoingUpSeed;
     res.newGenerators := RECOG.Omega_GoingUpNewGenerators;
+  elif type = "SU" then
+    res.newGenerators := RECOG.SU_GoingUpNewGenerators;
   fi;
   return res;
 end;
@@ -240,10 +242,10 @@ RECOG.GoingUpStep := function(std, N)
 end;
 
 # GoingUp of [EHNPR] ('Outline of the algorithm', subsection 'GoingUp
-# algorithm') for the type <type>, "SL", or "Sp" or "SU" (q odd, d even),
-# or an orthogonal type ("O+" or "O-" for q even): <G> is SL(d,q), resp.
-# Sp(d,q), SU(d,q0) or Omega(d,q) for some alternating, hermitian resp.
-# symmetric or quadratic form, with
+# algorithm') for the type <type>, "SL", or "Sp" (q odd, d even), "SU"
+# (q odd), or an orthogonal type ("O+" or "O-" for q even): <G> is
+# SL(d,q), resp. Sp(d,q), SU(d,q0) or Omega(d,q) for some alternating,
+# hermitian resp. symmetric or quadratic form, with
 # generators with memory, and <init> describes an embedded CL(n,q), of type
 # "O+" for orthogonal groups, as follows:
 #  - `slp`: SLP in the generators of <G> for the standard generators of
@@ -727,8 +729,9 @@ end;
 # v_W = tau_(m'-1) ... tau_m v_U, where tau_j swaps the pairs j and j+1.
 # Each tau_j is a product of four transvections of W, which are conjugates
 # of transvections of U. Returns the list of words, as elements with
-# memory in generators standing for Y and g~.
-RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g)
+# memory in generators standing for Y and g~, which the optional argument
+# gives, as a list.
+RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g, opt...)
   local f, d, n, nn, form, norm, F, RF, e, gi, Ub, Upb, Npb, Wb, coeffs,
         withNorm, mapInU, intoU, transvection, vpos, tau, v, j, a, b, res;
 
@@ -738,7 +741,11 @@ RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g)
   nn := Minimum(2 * n - 2, d);
   form := RECOG.ClassicalForm(std.type, d, f);
   norm := w -> RECOG.FormValue(form, w, w);
-  F := GeneratorsWithMemory(ListWithIdenticalEntries(Length(Y) + 1, ()));
+  if Length(opt) = 0 then
+    F := GeneratorsWithMemory(ListWithIdenticalEntries(Length(Y) + 1, ()));
+  else
+    F := opt[1];
+  fi;
   # root elements of CL(U) as words in the first generators of F
   RF := RECOG.GoingUpParameters(std.type).rootElementsOf(
             F{[1 .. Length(Y)]}, n, f);
@@ -830,7 +837,7 @@ RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g)
   # enlarged group')
   vpos := Position(RECOG.ClassicalStandardGeneratorNames(std.type), "v");
   v := F[vpos];
-  for j in [n / 2 .. nn / 2 - 1] do
+  for j in [n / 2 .. QuoInt(nn, 2) - 1] do
     a := e[2 * j - 1] - e[2 * j + 1];
     b := e[2 * j] - e[2 * j + 2];
     if IsBound(RF.tau) then
