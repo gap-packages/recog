@@ -188,7 +188,9 @@ gap> CheckForm_Rewrite := function(type, d, q)
 > end;;
 gap> ForAll([["O+", 8, 3], ["O+", 10, 5], ["O+", 8, 9], ["O-", 8, 3],
 >            ["O-", 10, 5], ["O-", 8, 9], ["O", 9, 3], ["O", 11, 5],
->            ["O", 9, 9]], c -> CallFuncList(CheckForm_Rewrite, c));
+>            ["O", 9, 9], ["O+", 8, 2], ["O+", 10, 4], ["O-", 8, 2],
+>            ["O-", 10, 4], ["O-", 8, 8], ["O-", 6, 16]],
+>           c -> CallFuncList(CheckForm_Rewrite, c));
 true
 
 # The spinor norm is trivial on Omega, multiplicative, and trivial on -1
@@ -230,6 +232,20 @@ gap> ForAll([1 .. 9], i -> RECOG.SpinorNorm(xs[i] * xs[i + 1], form)
 >        = (RECOG.SpinorNorm(xs[i], form)
 >           + RECOG.SpinorNorm(xs[i + 1], form)) mod 2);
 true
+
+# For q even, Omega is the kernel of the Dickson invariant on the isometries
+# of the quadratic form; the transvection swapping e_1 and f_1 is one
+gap> ForAll(GeneratorsOfGroup(Omega(-1, 8, 4)),
+>           RECOG.HasTrivialDicksonInvariant);
+true
+gap> form := RECOG.ClassicalForm("O+", 8, GF(4));;
+gap> x := RECOG.EmbedBlock(8, GF(4), [1, 2], [[0, 1], [1, 0]]);;
+gap> [RECOG.PreservesQuadraticForm(x, form),
+>     RECOG.HasTrivialDicksonInvariant(x)];
+[ true, false ]
+gap> x := RECOG.EmbedBlock(8, GF(4), [1, 2], [[1, 1], [0, 1]]);;
+gap> RECOG.PreservesQuadraticForm(x, form);
+false
 
 # ClassicalNatural makes natural Omega(d,q) a POmega leaf, also with
 # scalars on the generators, and its SLPs accept any scalar, also from a
@@ -310,6 +326,32 @@ gap> for G in [GO(9, 3), GO(-1, 10, 5), GO(1, 10, 5), SO(1, 8, 3)] do
 [ "ClassicalNatural", 2, "ClassicalNatural" ]
 [ "ClassicalNatural", 2, [ "ClassicalNatural", 2, "ClassicalNatural" ] ]
 [ "ClassicalNatural", 2, "ClassicalNatural" ]
+
+# The same for q even, where O^+(10,2) extends Omega^+(10,2) by an element
+# of Dickson invariant 1
+gap> g := PseudoRandom(GL(8, 4));;
+gap> S := Omega(-1, 8, 4)^g;;
+gap> ri := Leaf(RECOG.TestGroup(S, false, Size(S)));;
+gap> ri!.fhmethsel.successMethod;
+"ClassicalNatural"
+gap> ForAll([1 .. 5], function(i)
+>     local x;
+>     x := PseudoRandom(S);
+>     return IsScalarMultiple(ResultOfStraightLineProgram(
+>                SLPforElement(ri, Z(16)^i * x), NiceGens(ri)), x);
+> end);
+true
+gap> SLPforElement(ri, PseudoRandom(Sp(8, 4))^g);
+fail
+gap> S := Omega(1, 10, 2)^PseudoRandom(GL(10, 2));;
+gap> Leaf(RECOG.TestGroup(S, false, Size(S)))!.fhmethsel.successMethod;
+"ClassicalNatural"
+gap> G := Group(List(GeneratorsOfGroup(Omega(1, 8, 4)),
+>                    x -> Z(4)^Random([0 .. 2]) * x));;
+gap> Leaf(RECOG.TestGroup(G, true, Size(Omega(1, 8, 4))))!.fhmethsel.successMethod;
+"ClassicalNatural"
+gap> Leaf(RECOG.TestGroup(GO(1, 10, 2), false, Size(GO(1, 10, 2))))!.fhmethsel.successMethod;
+"StabilizerChainProj"
 
 #
 gap> STOP_TEST("on.tst");
