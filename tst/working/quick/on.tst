@@ -3,29 +3,33 @@ gap> Reset(GlobalMersenneTwister, 1);;
 gap> Reset(GlobalRandomSource, 1);;
 
 # The standard generators of the orthogonal types preserve the standard
-# form, have determinant 1 and generate Omega.
+# form, also the quadratic form for q even, have determinant 1 and
+# generate Omega.
 gap> CheckStdGens := function(type, d, q)
->     local f, std, J, e;
+>     local f, std, form, e;
 >     f := GF(q);
 >     std := RECOG.ClassicalStandardGenerators(type, d, f).all;
->     J := RECOG.ClassicalStandardForm(type, d, f);
+>     form := RECOG.ClassicalForm(type, d, f);
 >     e := Position(RECOG.OrthogonalTypes, type);
 >     e := [1, -1, 0][e];
->     return ForAll(std, g -> g * J * TransposedMat(g) = J
+>     return ForAll(std, g -> RECOG.FormRestriction(form, g) = form
 >                             and IsOne(DeterminantMat(g)))
->            and RECOG.FormOrthogonalType(RECOG.ClassicalForm(type, d, f),
->                                         IdentityMat(d, f)) = type
+>            and RECOG.FormOrthogonalType(form, IdentityMat(d, f)) = type
 >            and Size(Group(std)) = Size(Omega(e, d, q));
 > end;;
 gap> ForAll([["O+", 4, 5], ["O+", 6, 3], ["O+", 8, 3], ["O-", 4, 5],
 >            ["O-", 6, 3], ["O-", 8, 3], ["O-", 4, 9], ["O", 3, 7],
->            ["O", 5, 5], ["O", 7, 3], ["O", 5, 9]],
+>            ["O", 5, 5], ["O", 7, 3], ["O", 5, 9], ["O+", 4, 4],
+>            ["O+", 6, 2], ["O+", 8, 2], ["O+", 6, 4], ["O-", 4, 2],
+>            ["O-", 4, 4], ["O-", 6, 2], ["O-", 8, 2], ["O-", 4, 8],
+>            ["O-", 6, 4]],
 >           c -> CallFuncList(CheckStdGens, c));
 true
 
 # RECOG.ClassicalInvariantForm and RECOG.FormStandardBasis give a standard
 # basis of a conjugate of Omega, from random spanning vectors; for odd
-# degree the form must be the right multiple.
+# degree the form must be the right multiple, and for q even the basis is
+# standard for the quadratic form.
 gap> CheckStdBasis := function(type, d, q)
 >     local f, e, G, form, B;
 >     f := GF(q);
@@ -35,13 +39,15 @@ gap> CheckStdBasis := function(type, d, q)
 >     form := RECOG.ClassicalInvariantForm(type, GeneratorsOfGroup(G), f);
 >     B := RECOG.FormStandardBasis(form, RandomInvertibleMat(d, f));
 >     return B <> fail
->            and RECOG.FormGram(form, B)
->                = RECOG.ClassicalStandardForm(type, d, f)
+>            and RECOG.FormRestriction(form, B)
+>                = RECOG.ClassicalForm(type, d, f)
 >            and RECOG.FormOrthogonalType(form, IdentityMat(d, f)) = type;
 > end;;
 gap> ForAll([1 .. 4], i -> ForAll([["O+", 6, 3], ["O+", 10, 25], ["O-", 4, 3],
 >            ["O-", 8, 5], ["O-", 12, 9], ["O", 3, 3], ["O", 7, 5],
->            ["O", 9, 27], ["O", 11, 7]],
+>            ["O", 9, 27], ["O", 11, 7], ["O+", 6, 2], ["O+", 10, 4],
+>            ["O-", 4, 2], ["O-", 8, 8], ["O-", 12, 4], ["O+", 8, 64],
+>            ["O-", 6, 256]],
 >           c -> CallFuncList(CheckStdBasis, c)));
 true
 
@@ -61,6 +67,17 @@ gap> pair := RECOG.FormHyperbolicPair(form,
 gap> RECOG.FormGram(form, pair) = [[0, 1], [1, 0]] * One(f);
 true
 
+# For q even, the pair is singular for the quadratic form, also in a
+# hyperbolic plane spanned by a non-singular and a singular vector
+gap> f := GF(4);;
+gap> form := RECOG.ClassicalForm("O-", 4, f);;
+gap> e := IdentityMat(4, f);;
+gap> pair := RECOG.FormHyperbolicPair(form, [e[1] + e[3], e[2]]);;
+gap> RECOG.FormRestriction(form, pair) = RECOG.ClassicalForm("O+", 2, f);
+true
+gap> RECOG.FormHyperbolicPair(form, [e[3], e[4]]);
+fail
+
 # Lambda^2 of RECOG.O_KleinStandardPreimages are the standard generators of
 # Omega^+(6,q), relative to the basis b_ij of the exterior square, and
 # RECOG.O_KleinPreimage inverts Lambda^2 up to sign.
@@ -79,14 +96,16 @@ gap> CheckKlein := function(q)
 >         return RECOG.O_KleinPreimage(RECOG.O_Wedge2(M, f), f) in [M, -M];
 >     end);
 > end;;
-gap> Filtered([3, 5, 7, 9, 25, 27], q -> not CheckKlein(q));
+gap> Filtered([2, 3, 4, 5, 7, 8, 9, 25, 27], q -> not CheckKlein(q));
 [  ]
 
 # RECOG.O_FindStdGensOmega6 returns SLPs for the standard generators of
 # Omega^+(6,q) relative to a standard basis of the given form, and
 # RECOG.O_FinalDescent those of an Omega^+(6,q) in Omega^+-(8,q), whose
 # basis starts with a standard basis of the restricted form, also for
-# q = 3 mod 4, where no involution centraliser has the type it needs.
+# q = 3 mod 4, where no involution centraliser has the type it needs, and
+# for q even, by an element of odd order instead of an involution, resp. a
+# stabiliser chain for q = 2.
 gap> CheckOmega6 := function(q)
 >     local f, G, form, res, gens;
 >     f := GF(q);
@@ -96,10 +115,11 @@ gap> CheckOmega6 := function(q)
 >     gens := ResultOfStraightLineProgram(res.slp, GeneratorsOfGroup(G));
 >     return List(gens, g -> res.bas * g * res.bas^-1)
 >            = RECOG.ClassicalStandardGenerators("O+", 6, f).all
->            and RECOG.FormGram(form, res.bas)
->                = RECOG.ClassicalStandardForm("O+", 6, f);
+>            and RECOG.FormRestriction(form, res.bas)
+>                = RECOG.ClassicalForm("O+", 6, f);
 > end;;
-gap> Filtered([3, 5, 7, 9, 11, 25, 27, 81], q -> not CheckOmega6(q));
+gap> Filtered([2, 3, 4, 5, 7, 8, 9, 11, 16, 25, 27, 81],
+>             q -> not CheckOmega6(q));
 [  ]
 gap> CheckFinalDescent := function(e, q)
 >     local f, G, form, res, gens, std;
@@ -114,11 +134,12 @@ gap> CheckFinalDescent := function(e, q)
 >     std := RECOG.ClassicalStandardGenerators("O+", 6, f).all;
 >     return List(gens, g -> res.bas * g * res.bas^-1)
 >            = List(std, g -> DirectSumMat(g, IdentityMat(2, f)))
->            and RECOG.FormGram(form, res.bas{[1 .. 6]})
->                = RECOG.ClassicalStandardForm("O+", 6, f);
+>            and RECOG.FormRestriction(form, res.bas{[1 .. 6]})
+>                = RECOG.ClassicalForm("O+", 6, f);
 > end;;
 gap> Filtered([[1, 3], [-1, 3], [1, 5], [-1, 5], [1, 7], [-1, 7], [1, 9],
->              [-1, 11], [1, 27]], c -> not CallFuncList(CheckFinalDescent, c));
+>              [-1, 11], [1, 27], [1, 2], [-1, 2], [1, 4], [-1, 4], [1, 8],
+>              [-1, 16]], c -> not CallFuncList(CheckFinalDescent, c));
 [  ]
 
 # RECOG.FindStdGens_O must express the standard generators of Omega(d,q)
@@ -146,6 +167,10 @@ gap> List([[1, 8, 3], [-1, 8, 3], [1, 8, 5], [1, 8, 7], [-1, 8, 9],
 >         args -> CallFuncList(CheckFindStdGens_O, args));
 [ true, true, true, true, true, true, true, true, true, true, true, true, 
   true, true, true, true, true ]
+gap> List([[1, 8, 2], [-1, 8, 2], [1, 8, 4], [-1, 8, 4], [1, 10, 2],
+>          [-1, 12, 4], [1, 16, 8], [-1, 22, 2], [1, 20, 16]],
+>         args -> CallFuncList(CheckFindStdGens_O, args));
+[ true, true, true, true, true, true, true, true, true ]
 
 # RECOG.Form_Rewrite must return an SLP in the standard generators for
 # elements of the standard copy

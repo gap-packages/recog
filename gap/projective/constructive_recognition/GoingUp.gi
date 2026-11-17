@@ -13,8 +13,8 @@
 ##
 ##
 ##  GoingUp for classical groups in their natural representation, as in
-##  [EHNPR] (see GoingDown.gi), Section 'GoingUp algorithm', for SL, and for
-##  Sp, SU and orthogonal groups in odd characteristic.
+##  [EHNPR] (see GoingDown.gi), Section 'GoingUp algorithm', for SL, for Sp
+##  and SU in odd characteristic, and for orthogonal groups.
 ##
 ##  A GoingUp step ([EHNPR], 'The GoingUpStep algorithm', whose steps are
 ##  numbered as here) starts from a stingray embedding: a basis B of
@@ -205,8 +205,9 @@ end;
 
 # GoingUp of [EHNPR] ('Outline of the algorithm', subsection 'GoingUp
 # algorithm') for the type <type>, "SL", or "Sp" or "SU" (q odd, d even),
-# or an orthogonal type (q odd): <G> is SL(d,q), resp. Sp(d,q), SU(d,q0)
-# or Omega(d,q) for some alternating, hermitian resp. symmetric form, with
+# or an orthogonal type ("O+" or "O-" for q even): <G> is SL(d,q), resp.
+# Sp(d,q), SU(d,q0) or Omega(d,q) for some alternating, hermitian resp.
+# symmetric or quadratic form, with
 # generators with memory, and <init> describes an embedded CL(n,q), of type
 # "O+" for orthogonal groups, as follows:
 #  - `slp`: SLP in the generators of <G> for the standard generators of
@@ -288,9 +289,10 @@ end;
 ##     a record with components `pos`, the indices of the basis w_1 (and
 ##     w_2) of the anisotropic part, which follows the m hyperbolic pairs,
 ##     `pairs`, the number m, `gram`, the Gram matrix on <w_1, w_2> resp.
-##     <w_1>, `unit`, the parameter of w_1, and `toField`, a function
+##     <w_1>, `unit`, the parameter of w_1, `toField`, a function
 ##     mapping a vector z of the anisotropic part to the parameter of
-##     Fw(z) and Ew(z) in bases.Fw and bases.Ew
+##     Fw(z) and Ew(z) in bases.Fw and bases.Ew, and for q even `quad`, the
+##     matrix of Q on <w_1, w_2> (see RECOG.ClassicalForm)
 ##  The root elements, for 2 <= j <= m = n/2, are
 ##   - Lf(lambda) = T(f_1, lambda): e_1 -> e_1 + lambda f_1;
 ##   - Le(lambda) = T(e_1, lambda): f_1 -> f_1 + eps lambda e_1;
@@ -361,7 +363,12 @@ RECOG.Form_RootElementEntries := function(R, kind, j, lambda)
         Add(res, [3 - a, pos[i], -lambda[i]]);
       fi;
     od;
-    Add(res, [3 - a, a, -(bz * lambda) / 2]);
+    if IsBound(R.aniso.quad) then
+      c := lambda * R.aniso.quad * lambda;
+    else
+      c := (bz * lambda) / 2;
+    fi;
+    Add(res, [3 - a, a, -c]);
     return res;
   fi;
 
@@ -426,7 +433,8 @@ RECOG.Form_Elimination := function(R, y, opt)
 end;
 
 # An element b of CL(n,q) which maps the nonzero vector <y> to
-# e_1 + (nu/2) f_1, nu = beta(y, y), that is, to e_1 if y is isotropic. It
+# e_1 + (nu/2) f_1, nu = beta(y, y), that is, to e_1 if y is isotropic, and
+# to e_1 + Q(y) f_1 for orthogonal groups. It
 # clears the coordinates of y one by one with root elements, as in
 # Gaussian elimination, and scales the e_1-coordinate to 1 by the torus.
 # Returns a record with the following components:
@@ -492,13 +500,15 @@ RECOG.Form_MapToStd := function(R, y, MT...)
   fi;
 
   # y = e_1 + c f_1 has the norm nu = c^sigma + eps c, and nu/2 - c is a
-  # parameter of Lf; it is 0 for orthogonal groups
-  nu := R.conj(y[2]) + R.eps * y[2];
-  if y[2] <> nu / 2 then
-    apply("Lf", 1, nu / 2 - y[2]);
+  # parameter of Lf; orthogonal groups have no Lf, and c = Q(y)
+  if IsBound(R.Lf) then
+    nu := R.conj(y[2]) + R.eps * y[2];
+    if y[2] <> nu / 2 then
+      apply("Lf", 1, nu / 2 - y[2]);
+    fi;
   fi;
 
-  Assert(1, y = IdentityMat(n, R.f)[1] + nu / 2 * IdentityMat(n, R.f)[2]);
+  Assert(1, IsOne(y[1]) and IsZero(y{[3 .. n]}));
   return elim.result();
 end;
 
@@ -778,12 +788,16 @@ end;
 # that multiple must lie in the square class of the form of
 # RECOG.ClassicalInvariantForm.
 RECOG.Form_CompleteStandardBasis := function(G, type, bas, n)
-  local f, form;
+  local f, form, c;
 
   f := DefaultFieldOfMatrixGroup(G);
   form := RECOG.ClassicalInvariantForm(type,
               StripMemory(GeneratorsOfGroup(G)), f);
-  form.gram := form.gram / RECOG.FormValue(form, bas[1], bas[2]);
+  c := RECOG.FormValue(form, bas[1], bas[2]);
+  form.gram := form.gram / c;
+  if IsBound(form.quad) then
+    form.quad := form.quad / c;
+  fi;
   Assert(1, RECOG.FormGram(form, bas{[1 .. n]})
             = RECOG.ClassicalStandardForm(RECOG.ClassicalPrefixType(type),
                                           n, f));

@@ -58,9 +58,10 @@ gap> List([["SU", 7, 3], ["SU", 12, 4], ["SU", 15, 5], ["SU", 11, 2],
 >         args -> CallFuncList(CheckGoingDown, args));
 [ true, true, true, true, true ]
 gap> List([["O+", 10, 3], ["O-", 12, 5], ["O", 9, 3], ["O", 13, 7],
->          ["O+", 20, 9], ["O-", 30, 3]],
+>          ["O+", 20, 9], ["O-", 30, 3], ["O+", 10, 2], ["O-", 12, 4],
+>          ["O+", 16, 8]],
 >         args -> CallFuncList(CheckGoingDown, args));
-[ true, true, true, true, true, true ]
+[ true, true, true, true, true, true, true, true, true ]
 
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
