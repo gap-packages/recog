@@ -18,11 +18,11 @@
 #############################################################################
 
 # StandardGenerators of [EHNPR] (see ../GoingDown.gi), 'Outline of the
-# algorithm', for SU(d,q0), d >= 4 and q0 odd: RECOG.FindStdGensSU4 for
+# algorithm', for SU(d,q0), d >= 4 and q0 <> 2: RECOG.FindStdGensSU4 for
 # d = 4, otherwise GoingDown to SU(6,q0) (none for d = 5), FinalDescent
-# to SU(4,q0), and GoingUp (see ../GoingUp.gi). [EHNPR] also covers even
-# q0; here the GoingUp lacks the transvections of even q, and the
-# involutions of RECOG.SU_FinalDescent need q0 odd.
+# to SU(4,q0), and GoingUp (see ../GoingUp.gi). [EHNPR] also covers
+# q0 = 2, with GoingDown to SU(10,2); here neither the final descent nor
+# the base case work for q0 = 2.
 # Returns a record with the following components:
 #  - `slpstd`: SLP in the generators of <G> for the standard generators of
 #    SU(d,q0), as in RECOG.ClassicalStandardGenerators, relative to bas
@@ -34,8 +34,8 @@ RECOG.FindStdGens_SU := function(G)
   f := FieldOfMatrixGroup(G);
   q := Size(f);
   d := DimensionOfMatrixGroup(G);
-  if IsEvenInt(q) then
-    ErrorNoReturn("RECOG.FindStdGens_SU: q must be odd");
+  if q = 4 then
+    ErrorNoReturn("RECOG.FindStdGens_SU: q0 must not be 2");
   fi;
   if d < 4 then
     ErrorNoReturn("RECOG.FindStdGens_SU: the degree must be at least 4");
