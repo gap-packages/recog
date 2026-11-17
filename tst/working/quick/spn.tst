@@ -47,7 +47,8 @@ gap> CheckForm_Rewrite := function(d, q)
 >     return ForAll(els, g -> ResultOfStraightLineProgram(
 >                                 RECOG.Form_Rewrite(W, g), std.all) = g);
 > end;;
-gap> ForAll([4, 6, 8, 10], d -> ForAll([3, 5, 9, 25], q -> CheckForm_Rewrite(d, q)));
+gap> ForAll([4, 6, 8, 10], d -> ForAll([3, 5, 9, 25, 2, 4, 8],
+>                                     q -> CheckForm_Rewrite(d, q)));
 true
 
 # ClassicalNatural makes natural Sp(d,q) a PSp leaf, also with scalars on
@@ -70,6 +71,20 @@ gap> simil := First(List(Tuples([1, -1] * Z(3)^0, 8), DiagonalMat),
 gap> Leaf(RECOG.TestGroup(Group(Concatenation(GeneratorsOfGroup(S), [simil])),
 >                         false, 2 * Size(S)));
 "ClassicalNatural"
+
+# The same for q even, d >= 6; Sp(4,q) falls through
+gap> S := Sp(8, 4);;
+gap> Leaf(RECOG.TestGroup(S^PseudoRandom(GL(8, 4)), false, Size(S)));
+"ClassicalNatural"
+gap> G := Group(List(GeneratorsOfGroup(Sp(6, 4)), x -> Z(4)^Random([0 .. 2]) * x));;
+gap> Leaf(RECOG.TestGroup(G, true, Size(Sp(6, 4))));
+"ClassicalNatural"
+gap> S := Sp(10, 2);;
+gap> Leaf(RECOG.TestGroup(S^PseudoRandom(GL(10, 2)), false, Size(S)));
+"ClassicalNatural"
+gap> S := Sp(4, 16);;
+gap> Leaf(RECOG.TestGroup(S, false, Size(S)));
+"StabilizerChainProj"
 
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
