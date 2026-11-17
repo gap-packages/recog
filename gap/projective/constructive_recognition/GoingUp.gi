@@ -242,8 +242,8 @@ RECOG.GoingUpStep := function(std, N)
 end;
 
 # GoingUp of [EHNPR] ('Outline of the algorithm', subsection 'GoingUp
-# algorithm') for the type <type>, "SL", or "Sp" (q odd, d even), "SU"
-# (q odd), or an orthogonal type ("O+" or "O-" for q even): <G> is
+# algorithm') for the type <type>, "SL", or "Sp" (q odd, d even), "SU",
+# or an orthogonal type ("O+" or "O-" for q even): <G> is
 # SL(d,q), resp. Sp(d,q), SU(d,q0) or Omega(d,q) for some alternating,
 # hermitian resp. symmetric or quadratic form, with
 # generators with memory, and <init> describes an embedded CL(n,q), of type
@@ -546,10 +546,13 @@ RECOG.Form_MapToStd := function(R, y, MT...)
 
   # y = e_1 + c f_1 has the norm nu = c^sigma + eps c, and nu/2 - c is a
   # parameter of Lf; nu = 0 for Sp; orthogonal groups have no Lf, and
-  # c = Q(y)
+  # c = Q(y). For SU in characteristic 2, nu h replaces nu/2, with
+  # h = R.half of trace 1.
   if IsBound(R.Lf) then
     nu := R.conj(y[2]) + R.eps * y[2];
-    if not IsZero(nu) then
+    if IsBound(R.half) then
+      nu := nu * R.half;
+    elif not IsZero(nu) then
       nu := nu / 2;
     fi;
     if y[2] <> nu then
@@ -769,7 +772,8 @@ RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g, opt...)
 
   # a nonzero vector of z + P, P = <e_m, f_m> <= U meet U', of norm nu: z,
   # or z minus its component in P, of norm mu, plus e_m + c f_m, of norm
-  # 2c = nu - mu; for Sp, all norms are 0
+  # 2c = nu - mu, resp. c + c^sigma = nu - mu with c = (nu - mu) RF.half
+  # for SU; for Sp, all norms are 0
   withNorm := function(z, nu)
     local c;
     if not IsZero(z) and norm(z) = nu then
@@ -779,7 +783,9 @@ RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g, opt...)
     z[n - 1] := Zero(f);
     z[n] := Zero(f);
     c := nu - norm(z);
-    if not IsZero(c) then
+    if IsBound(RF.half) then
+      z[n] := c * RF.half;
+    elif not IsZero(c) then
       z[n] := c / 2;
     fi;
     z[n - 1] := One(f);
@@ -840,8 +846,8 @@ RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g, opt...)
 
   # tau_j = T(b, y) T(a, x) T(b, y) T(a, x), a = e_j - e_(j+1),
   # b = f_j - f_(j+1), with [x, y] = RF.tau, and for q even
-  # tau_j = T(a + b, 1) T(a, 1) T(b, 1) ([EHNPR], 'Constructing the
-  # enlarged group')
+  # tau_j = T(a + b, 1) T(a, 1) T(b, 1), a = e_j + e_(j+1),
+  # b = f_j + f_(j+1) ([EHNPR], 'Constructing the enlarged group')
   vpos := Position(RECOG.ClassicalStandardGeneratorNames(std.type), "v");
   v := F[vpos];
   for j in [n / 2 .. QuoInt(nn, 2) - 1] do

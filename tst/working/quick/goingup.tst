@@ -79,6 +79,7 @@ gap> CheckFormRoots := function(type, n, q)
 > end;;
 gap> ForAll([["Sp", 4, 3], ["Sp", 6, 5], ["Sp", 8, 9], ["Sp", 10, 27],
 >            ["SU", 4, 9], ["SU", 6, 25], ["SU", 8, 81], ["SU", 4, 729],
+>            ["SU", 4, 16], ["SU", 6, 64], ["SU", 8, 4],
 >            ["O+", 6, 3], ["O+", 10, 5], ["O+", 10, 9], ["O+", 18, 27],
 >            ["O+", 6, 2], ["O+", 10, 8], ["Sp", 6, 4], ["Sp", 8, 2]],
 >           c -> CallFuncList(CheckFormRoots, c) = true);
@@ -88,7 +89,7 @@ true
 # vectors with few nonzero coordinates, which take the rarer branches. For
 # orthogonal groups, Q(y) takes the place of beta(y, y)/2, also for q even.
 gap> CheckEliminations := function(n, q)
->     local f, e, R, vecs, y, b, types, type, form, half;
+>     local f, e, R, vecs, y, b, type, form, half;
 >     f := GF(q);
 >     e := IdentityMat(n, f);
 >     vecs := Concatenation(e, List([1 .. 20], i -> Random(f^n)),
@@ -105,11 +106,7 @@ gap> CheckEliminations := function(n, q)
 >     if IsOddInt(n) then
 >         return true;
 >     fi;
->     types := ["Sp", "O+"];
->     if IsOddInt(q) then
->         types := ["Sp", "SU", "O+"];
->     fi;
->     for type in types do
+>     for type in ["Sp", "SU", "O+"] do
 >         if type = "SU" and not IsInt(Sqrt(q)) then
 >             continue;
 >         fi;
@@ -118,7 +115,7 @@ gap> CheckEliminations := function(n, q)
 >                      RECOG.ClassicalStandardGenerators(type, n, f).all),
 >                  n, f);
 >         form := RECOG.ClassicalForm(type, n, f);
->         half := y -> RECOG.FormValue(form, y, y) / 2;
+>         half := y -> RECOG.FormValue(form, y, y) * RECOG.FormHalf(form);
 >         if type = "O+" then
 >             half := y -> RECOG.FormQuadraticValue(form, y);
 >         elif type = "Sp" then
@@ -145,7 +142,7 @@ gap> CheckEliminations := function(n, q)
 >     return true;
 > end;;
 gap> ForAll([[4, 3], [5, 4], [6, 5], [8, 9], [4, 25], [6, 81], [4, 2],
->            [6, 4], [8, 16]],
+>            [6, 4], [8, 16], [4, 16], [6, 64], [8, 4]],
 >           c -> CheckEliminations(c[1], c[2]) = true);
 true
 gap> CheckExpress := function(n, q)
@@ -188,7 +185,9 @@ gap> ForAll([["SL", 2, 3, 7], ["SL", 2, 8, 4], ["SL", 2, 17, 5],
 >            ["SL", 2, 12, 9], ["Sp", 4, 6, 3], ["Sp", 4, 14, 5],
 >            ["Sp", 4, 20, 9], ["SU", 4, 6, 9], ["SU", 4, 14, 25],
 >            ["SU", 4, 20, 9], ["SU", 4, 5, 9], ["SU", 4, 7, 25],
->            ["SU", 4, 15, 81], ["SU", 4, 21, 9], ["O+", 6, 8, 3], ["O-", 6, 8, 3],
+>            ["SU", 4, 15, 81], ["SU", 4, 21, 9], ["SU", 4, 6, 16],
+>            ["SU", 4, 5, 16], ["SU", 4, 14, 64], ["SU", 4, 11, 256],
+>            ["SU", 4, 20, 4], ["O+", 6, 8, 3], ["O-", 6, 8, 3],
 >            ["O", 6, 9, 3], ["O-", 6, 10, 5], ["O", 6, 11, 7],
 >            ["O+", 6, 12, 9], ["O-", 6, 14, 3], ["O", 6, 15, 5],
 >            ["O+", 6, 20, 3], ["O-", 6, 22, 7], ["O", 6, 21, 9],

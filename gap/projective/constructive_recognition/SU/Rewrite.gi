@@ -17,7 +17,7 @@
 ##
 #############################################################################
 
-# Root elements of SU(<d>,q0), d >= 5 odd, q = q0^2 = Size(<f>) odd, for
+# Root elements of SU(<d>,q0), d >= 5 odd, q = q0^2 = Size(<f>), for
 # RECOG.Form_Rewrite, on the standard generators <Y> with memory: those of
 # RECOG.SU_RootElements for the SU(2m) on the m hyperbolic pairs, and the
 # component `aniso` (see ../GoingUp.gi) for w_1. That SU(2m) has the
@@ -27,7 +27,7 @@
 # and gamma^-k = -alpha. The assertion checks these words.
 # Fw and Ew are the unitary Siegel transformations rho(f_1, z, lam) and
 # rho(e_1, z, lam) of ../SU/GoingUp.gi with z in <w_1>: the conjugates of
-# x = rho(f_1, -w_1, -1/2) by the y^-i, whose parameters z span <w_1> over
+# x = rho(f_1, -w_1, c) by the y^-i, whose parameters z span <w_1> over
 # GF(p), and their conjugates by s. Their products are not rho(., z, lam)
 # for a lam fixed by z; aniso.lambda(kind, z) returns the lam of the word
 # for z, by rho(p, z, lam) rho(p, z', lam') = rho(p, z + z', lam + lam' -
@@ -41,7 +41,7 @@ RECOG.SU_RewriteRootElements := function(Y, d, f)
   q0 := RootInt(q, 2);
   p := Characteristic(f);
   gamma := Z(q);
-  alpha := gamma^((q0 + 1) / 2);
+  alpha := RECOG.UnitaryAlpha(f);
   m := QuoInt(d, 2);
 
   # Y = s, t, delta, u, v, x, y
