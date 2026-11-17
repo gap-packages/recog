@@ -63,12 +63,12 @@ RECOG.SL_Rewrite := function(W, g)
   next := PositionNonZero(W.cycmat[1]);
 
   # g = L^-1 g0 Rt for the input g0
-  L := R.one;
-  Rt := R.one;
+  L := RECOG.SL_Product(R, n);
+  Rt := RECOG.SL_Product(R, n);
   # g := g E(i, j, lambda) adds lambda times column i to column j
   colOp := function(i, j, lambda)
     local r;
-    Rt := Rt * RECOG.SL_ElementaryMatrix(R, i, j, lambda);
+    Rt.apply(i, j, lambda);
     for r in [1 .. n] do
       g[r, j] := g[r, j] + lambda * g[r, i];
     od;
@@ -76,7 +76,7 @@ RECOG.SL_Rewrite := function(W, g)
   # g := E(i, j, lambda) g adds lambda times row j to row i; the inverse
   # E(i, j, -lambda) costs no inversion
   rowOp := function(i, j, lambda)
-    L := L * RECOG.SL_ElementaryMatrix(R, i, j, -lambda);
+    L.apply(i, j, -lambda);
     AddRowVector(g[i], g[j], lambda);
   end;
 
@@ -100,9 +100,7 @@ RECOG.SL_Rewrite := function(W, g)
     c := AdditiveInverseMutable(g[1]);
     c[1] := Zero(f);
     for j in [2 .. n] do
-      if not IsZero(c[j]) then
-        Rt := Rt * RECOG.SL_ElementaryMatrix(R, 1, j, c[j]);
-      fi;
+      Rt.apply(1, j, c[j]);
     od;
     for r in [1 .. n] do
       if not IsZero(g[r, 1]) then
@@ -118,11 +116,11 @@ RECOG.SL_Rewrite := function(W, g)
     # the one index left after the last step has the entry det g = 1
     if k < n - 1 then
       g := RECOG.MonomialConjugate(g, W.cycmon);
-      L := L * W.cyci;
-      Rt := Rt * W.cyci;
+      L.mulPlain(W.cyci);
+      Rt.mulPlain(W.cyci);
     fi;
   od;
 
   Assert(1, IsOne(g));
-  return SLPOfElm(L * Rt^-1);
+  return SLPOfElm(L.word() * Rt.word()^-1);
 end;

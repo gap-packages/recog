@@ -28,7 +28,8 @@
 # standard generators of SL(n,q) relative to the basis, in the order of
 # RECOG.ClassicalStandardGenerators; only their words are used, so they
 # may be generators with memory of any group. RECOG.SL_ElementaryMatrix
-# combines the words returned here.
+# combines the words returned here, and RECOG.SL_Product adds the
+# components `trie`, `block` and `trieDegree` on its first call.
 # E(1, 2, gamma^(2k)) is t^(delta^-k), gamma = Z(q), and these gamma^(2k),
 # 0 <= k < [GF(q):GF(p)], are a basis of GF(q) over GF(p); E(2, 1, lambda)
 # is E(1, 2, -lambda)^s. The element c = s v (n odd) or s v x (n even) maps
@@ -91,9 +92,10 @@ RECOG.SL_RootElements := function(Y, n, f)
 end;
 
 # The elementary matrix E(<i>, <j>, <lambda>) of RECOG.SL_RootElements, as
-# a word in R.Y. R.words[i][j][k] keeps the powers of E(i, j, b), b the
-# k-th vector of R.basis, for RECOG.GoingUpRootWord.
-RECOG.SL_ElementaryMatrix := function(R, i, j, lambda)
+# a word in R.Y, and the code of lambda, as RECOG.GoingUpRootWordCode
+# returns them. R.words[i][j] is the table of RECOG.GoingUpRootTable for
+# the E(i, j, b), b in R.basis.
+RECOG.SL_ElementaryMatrixCode := function(R, i, j, lambda)
   local words, signed, y;
 
   if not IsBound(R.words[i][j]) then
@@ -114,9 +116,48 @@ RECOG.SL_ElementaryMatrix := function(R, i, j, lambda)
       words := List([1 .. Length(R.E12)], k -> Comm(
           RECOG.SL_ElementaryMatrix(R, i, 1, BasisVectors(R.basis)[k]), y));
     fi;
-    R.words[i][j] := List(words, y -> [y]);
+    R.words[i][j] := RECOG.GoingUpRootTable(words);
   fi;
-  return RECOG.GoingUpRootWord(R.words[i][j], R.basis, lambda, R.one);
+  return RECOG.GoingUpRootWordCode(R.words[i][j], R.basis, lambda, R.one);
+end;
+
+# The word of RECOG.SL_ElementaryMatrixCode
+RECOG.SL_ElementaryMatrix := {R, i, j, lambda} ->
+    RECOG.SL_ElementaryMatrixCode(R, i, j, lambda)[1];
+
+# A product of elementary matrices of <R>, a record of root elements of
+# SL(n,q), as a word in R.Y, which shares the products of blocks of
+# consecutive indices with all products on R (see RECOG.GoingUpProduct);
+# R keeps the trie. `apply(i, j, lambda)` multiplies by E(i, j, lambda),
+# the identity for lambda = 0, `mulPlain(y)` by the word y, and `word()`
+# returns the product.
+RECOG.SL_Product := function(R, n)
+  local q, prod;
+
+  q := Size(R.f);
+  if not IsBound(R.trie) then
+    R.trie := rec( next := rec() );
+    R.block := RECOG.GoingUpBlockSize(n, q, 1);
+    R.trieDegree := n;
+  fi;
+  n := R.trieDegree;
+  prod := RECOG.GoingUpProduct(R.trie, R.one);
+  return rec(
+    apply := function(i, j, lambda)
+      local w;
+      if IsZero(lambda) then
+        return;
+      fi;
+      w := RECOG.SL_ElementaryMatrixCode(R, i, j, lambda);
+      if R.block = 0 then
+        prod.mulPlain(w[1]);
+      else
+        prod.mul(QuoInt(i - 1, R.block) * (n + 1) + QuoInt(j - 1, R.block),
+                 ((i - 1) * n + j - 1) * q + w[2], w[1]);
+      fi;
+    end,
+    mulPlain := prod.mulPlain,
+    word := prod.word );
 end;
 
 # A word for the matrix <M> in SL(n,q), as a product of the elementary
@@ -175,15 +216,15 @@ end;
 #  - `word`: b, as a word in R.Y
 #  - `mat`: the matrix of b
 RECOG.SL_MapToLast := function(R, u)
-  local n, word, mat, apply, i;
+  local n, prod, mat, apply, i;
 
   n := Length(u);
-  word := R.one;
+  prod := RECOG.SL_Product(R, n);
   mat := MutableCopyMat(IdentityMat(n, R.f));
   # u E(i, j, lambda) = u + lambda u_i v_j, and M E(i, j, lambda) adds
   # lambda times column i of M to column j
   apply := function(i, j, lambda)
-    word := word * RECOG.SL_ElementaryMatrix(R, i, j, lambda);
+    prod.apply(i, j, lambda);
     u[j] := u[j] + lambda * u[i];
     AddMatrixColumns(mat, j, i, lambda);
   end;
@@ -208,7 +249,7 @@ RECOG.SL_MapToLast := function(R, u)
   od;
 
   Assert(1, u = IdentityMat(n, R.f)[n]);
-  return rec( word := word, mat := mat );
+  return rec( word := prod.word(), mat := mat );
 end;
 
 # The seed t of the GoingUp step ([EHNPR], Step 1 (Constructing the seed
@@ -361,18 +402,16 @@ RECOG.SL_GoingUpNewGenerators := function(std, Y, R, g)
 
   # the product of the E(i, j, c[i]) or E(j, i, c[i]), i < n, as a word in Y
   product := function(c, j, toJ)
-    local res, i;
-    res := RF.one;
+    local prod, i;
+    prod := RECOG.SL_Product(RF, n);
     for i in [1 .. n - 1] do
-      if IsZero(c[i]) then
-        continue;
-      elif toJ then
-        res := res * RECOG.SL_ElementaryMatrix(RF, i, j, c[i]);
+      if toJ then
+        prod.apply(i, j, c[i]);
       else
-        res := res * RECOG.SL_ElementaryMatrix(RF, j, i, c[i]);
+        prod.apply(j, i, c[i]);
       fi;
     od;
-    return res;
+    return prod.word();
   end;
 
   # T(w, v_n) for w in <v_1, ..., v_(n-1), v_(n+1), ..., v_n'>

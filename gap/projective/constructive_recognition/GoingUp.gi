@@ -148,32 +148,132 @@ RECOG.GoingUpPower := function(powers, c)
   return res;
 end;
 
+# A table of the words of one root group for RECOG.GoingUpRootWord, with
+# <words>[k] the root element for the k-th basis vector: `powers[k]` is a
+# list for RECOG.GoingUpPower, and `words` keeps the root elements built
+# so far by the code of their parameter, so that each is one node of the
+# SLP however often it is used.
+RECOG.GoingUpRootTable := words -> rec( powers := List(words, y -> [y]),
+                                        words := rec() );
+
 # The root element for <lambda> in GF(q), as the product of the
 # words[k]^c_k for the coefficients c_k of lambda in <basis>, a basis of
-# GF(q) over GF(p), where words[k] = <powers>[k][1] is the root element for
-# basis[k]; powers[k] is a list for RECOG.GoingUpPower. Root elements in
-# one root group are additive in lambda. Factors with c_k = 0 are left
-# out, and <one> stands for lambda = 0.
-RECOG.GoingUpRootWord := function(powers, basis, lambda, one)
-  local coeffs, res, k, y;
+# GF(q) or a subspace over GF(p), with the words of the table <table> of
+# RECOG.GoingUpRootTable. Root elements in one root group are additive in
+# lambda. Factors with c_k = 0 are left out, and <one> stands for
+# lambda = 0. Returns the word and a code of lambda, an integer in
+# [0 .. q-1] which is 0 for lambda = 0 only: 1 + LogFFE(lambda, z) for z
+# the primitive root of the field of the basis vectors, or, for fields
+# larger than GAP's internal ones, c_1 + c_2 p + c_3 p^2 + ...
+RECOG.GoingUpRootWordCode := function(table, basis, lambda, one)
+  local coeffs, p, code, res, k, y;
 
-  coeffs := List(Coefficients(basis, lambda), IntFFE);
-  res := fail;
-  for k in [1 .. Length(coeffs)] do
-    if coeffs[k] = 0 then
-      continue;
-    fi;
-    y := RECOG.GoingUpPower(powers[k], coeffs[k]);
-    if res = fail then
-      res := y;
-    else
-      res := res * y;
-    fi;
-  od;
-  if res = fail then
-    return one;
+  if IsZero(lambda) then
+    return [one, 0];
   fi;
-  return res;
+  if not IsBound(table.root) then
+    table.root := PrimitiveRoot(DefaultField(BasisVectors(basis)));
+  fi;
+  coeffs := fail;
+  if IsInternalRep(lambda) then
+    code := LogFFE(lambda, table.root) + 1;
+  else
+    coeffs := List(Coefficients(basis, lambda), IntFFE);
+    p := Characteristic(lambda);
+    code := 0;
+    for k in [Length(coeffs), Length(coeffs) - 1 .. 1] do
+      code := code * p + coeffs[k];
+    od;
+  fi;
+
+  if not IsBound(table.words.(code)) then
+    if coeffs = fail then
+      coeffs := List(Coefficients(basis, lambda), IntFFE);
+    fi;
+    res := fail;
+    for k in [1 .. Length(coeffs)] do
+      if coeffs[k] = 0 then
+        continue;
+      fi;
+      y := RECOG.GoingUpPower(table.powers[k], coeffs[k]);
+      if res = fail then
+        res := y;
+      else
+        res := res * y;
+      fi;
+    od;
+    table.words.(code) := res;
+  fi;
+  return [table.words.(code), code];
+end;
+
+# The word of RECOG.GoingUpRootWordCode
+RECOG.GoingUpRootWord := {table, basis, lambda, one} ->
+    RECOG.GoingUpRootWordCode(table, basis, lambda, one)[1];
+
+# The number b of consecutive slots per block of RECOG.GoingUpProduct in
+# degree <n> over GF(<q>), with <k> parameters per slot: the q^(b k)
+# products of a block must be few against the about n products on the
+# same root elements. b = 0 turns the sharing off. Measured for q = 3, 9,
+# 121 and n up to 1000.
+RECOG.GoingUpBlockSize := {n, q, k} -> LogInt(n, q^k);
+
+# A product of root words, built factor by factor, which shares the
+# products of blocks of consecutive factors with all products built on
+# the same <trie>, a record rec( next := rec() ) kept by the caller, as
+# the four Russians method shares partial sums: the factors of a block
+# follow a path of trie nodes, each holding the product so far, so a
+# block met before costs one multiplication. A factor is given by its
+# block number, an integer key unique for it among the root elements on
+# the trie, and its word; the product starts with <one>, and factors
+# identical to <one> are left out.
+# `mul(block, key, y)` multiplies by y in that block, `mulPlain(y)` by y
+# outside any block, and `word()` returns the product.
+RECOG.GoingUpProduct := function(trie, one)
+  local word, node, block, times, flush;
+
+  word := one;
+  node := fail;
+  block := fail;
+  times := function(y)
+    if IsIdenticalObj(y, one) then
+      return;
+    elif IsIdenticalObj(word, one) then
+      word := y;
+    else
+      word := word * y;
+    fi;
+  end;
+  flush := function()
+    if node <> fail then
+      times(node.word);
+      node := fail;
+    fi;
+  end;
+  return rec(
+    mul := function(blk, key, y)
+      if node = fail or blk <> block then
+        flush();
+        node := trie;
+        block := blk;
+      fi;
+      if not IsBound(node.next.(key)) then
+        if IsIdenticalObj(node, trie) then
+          node.next.(key) := rec( word := y, next := rec() );
+        else
+          node.next.(key) := rec( word := node.word * y, next := rec() );
+        fi;
+      fi;
+      node := node.next.(key);
+    end,
+    mulPlain := function(y)
+      flush();
+      times(y);
+    end,
+    word := function()
+      flush();
+      return word;
+    end );
 end;
 
 # A function mapping a vector w in the row space of <M> to a vector c with
@@ -323,6 +423,8 @@ end;
 ##     bases.(kind) of their parameters
 ##   - `conjugator`: conjugator[j] maps e_2 to e_j and f_2 to f_j, and fixes
 ##     e_1, f_1, and `powers`: a cache for RECOG.Form_RootElement
+##   - `trie`, `block`, `trieDegree`: the shared products of
+##     RECOG.Form_Product, made by its first call
 ##   - `aniso` (only orthogonal groups of type - or o, see Rewrite.gi, and
 ##     SU of odd degree, see SU/Rewrite.gi): a record with components
 ##     `pos`, the indices of the basis w_1 (and w_2) of the anisotropic
@@ -354,9 +456,10 @@ end;
 # The root element <kind>(<j>, <lambda>) of <R>, as a word in R.Y, where
 # <kind> is one of "Lf", "Le", "See", "Sff", "M1j", "Mj1", "Fw", "Ew",
 # and <j> is ignored for "Lf", "Le", "Fw" and "Ew". R.powers.(kind)[j]
-# keeps the powers of the conjugates of R.(kind) by R.conjugator[j] for
-# RECOG.GoingUpRootWord, with j = 2 for the kinds without j.
-RECOG.Form_RootElement := function(R, kind, j, lambda)
+# is the table of RECOG.GoingUpRootTable for the conjugates of R.(kind) by
+# R.conjugator[j], with j = 2 for the kinds without j. Returns the word
+# and the code of RECOG.GoingUpRootWordCode.
+RECOG.Form_RootElementCode := function(R, kind, j, lambda)
   local powers;
 
   if kind in ["Fw", "Ew"] then
@@ -368,12 +471,56 @@ RECOG.Form_RootElement := function(R, kind, j, lambda)
   powers := R.powers.(kind);
   if not IsBound(powers[j]) then
     if j = 2 then
-      powers[j] := List(R.(kind), y -> [y]);
+      powers[j] := RECOG.GoingUpRootTable(R.(kind));
     else
-      powers[j] := List(R.(kind), y -> [y^R.conjugator[j]]);
+      powers[j] := RECOG.GoingUpRootTable(
+                       List(R.(kind), y -> y^R.conjugator[j]));
     fi;
   fi;
-  return RECOG.GoingUpRootWord(powers[j], R.bases.(kind), lambda, R.one);
+  return RECOG.GoingUpRootWordCode(powers[j], R.bases.(kind), lambda, R.one);
+end;
+
+# The word of RECOG.Form_RootElementCode
+RECOG.Form_RootElement := {R, kind, j, lambda} ->
+    RECOG.Form_RootElementCode(R, kind, j, lambda)[1];
+
+# The kinds of root elements on the pairs j >= 2, whose products
+# RECOG.Form_Product shares, with their numbers
+RECOG.Form_PairKinds := rec( See := 1, Sff := 2, M1j := 3, Mj1 := 4 );
+
+# A product of root elements of <R>, a record of root elements of CL(n,q),
+# as a word in R.Y, which shares the products of blocks of consecutive
+# pairs with all products on R (see RECOG.GoingUpProduct); R keeps the
+# trie. `apply(kind, j, lambda)` multiplies by the root element
+# kind(j, lambda), the identity for lambda = 0, `mulPlain(y)` by the word
+# y, and `word()` returns the product.
+RECOG.Form_Product := function(R, n)
+  local q, prod;
+
+  q := Size(R.f);
+  if not IsBound(R.trie) then
+    R.trie := rec( next := rec() );
+    R.block := RECOG.GoingUpBlockSize(n, q, 2);
+    R.trieDegree := n;
+  fi;
+  n := R.trieDegree;
+  prod := RECOG.GoingUpProduct(R.trie, R.one);
+  return rec(
+    apply := function(kind, j, lambda)
+      local w;
+      if IsZero(lambda) then
+        return;
+      fi;
+      w := RECOG.Form_RootElementCode(R, kind, j, lambda);
+      if R.block = 0 or not IsBound(RECOG.Form_PairKinds.(kind)) then
+        prod.mulPlain(w[1]);
+      else
+        prod.mul(QuoInt(j - 2, R.block),
+                 (RECOG.Form_PairKinds.(kind) * (n + 1) + j) * q + w[2], w[1]);
+      fi;
+    end,
+    mulPlain := prod.mulPlain,
+    word := prod.word );
 end;
 
 # The matrix of the root element <kind>(<j>, <lambda>) of <R> is the
@@ -434,16 +581,18 @@ end;
 
 # A record for a product b of root elements and powers of the torus
 # element of <R>, built by elimination on the vector <y> of length n, for
-# the list <opt> of optional arguments of RECOG.Form_MapToStd: `word` is b
-# as a word in R.Y, `y` is y b, `MT` is b^T opt[1], in place, or b^T if
-# opt is empty, `apply(kind, j, lambda)` multiplies b by the root element
+# the list <opt> of optional arguments of RECOG.Form_MapToStd: `y` is y b,
+# `MT` is b^T opt[1], in place, or b^T if opt is empty,
+# `apply(kind, j, lambda)` multiplies b by the root element
 # kind(j, lambda), `scale(k)` by R.torus^k, and `result()` returns the
-# record of RECOG.Form_MapToStd. Each entry of a root element costs O(n)
-# field operations on MT.
+# record of RECOG.Form_MapToStd, with b as a word in R.Y built by
+# RECOG.Form_Product. Each entry of a root element costs O(n) field
+# operations on MT.
 RECOG.Form_Elimination := function(R, y, opt)
-  local res;
+  local res, prod;
 
-  res := rec( word := R.one, y := ShallowCopy(y) );
+  res := rec( y := ShallowCopy(y) );
+  prod := RECOG.Form_Product(R, Length(y));
   if Length(opt) = 0 then
     res.MT := MutableCopyMat(IdentityMat(Length(y), R.f));
     ConvertToMatrixRep(res.MT, R.f);
@@ -452,7 +601,7 @@ RECOG.Form_Elimination := function(R, y, opt)
   fi;
   res.apply := function(kind, j, lambda)
     local x;
-    res.word := res.word * RECOG.Form_RootElement(R, kind, j, lambda);
+    prod.apply(kind, j, lambda);
     # y r adds c y_i to y_k, and r^T M^T adds c times row i to row k
     for x in RECOG.Form_RootElementEntries(R, kind, j, lambda) do
       res.y[x[2]] := res.y[x[2]] + x[3] * res.y[x[1]];
@@ -461,7 +610,7 @@ RECOG.Form_Elimination := function(R, y, opt)
   end;
   res.scale := function(k)
     local i, c;
-    res.word := res.word * R.torus^k;
+    prod.mulPlain(R.torus^k);
     for i in [1 .. Length(R.torusDiag)] do
       c := R.torusDiag[i]^k;
       res.y[i] := c * res.y[i];
@@ -470,9 +619,9 @@ RECOG.Form_Elimination := function(R, y, opt)
   end;
   res.result := function()
     if Length(opt) = 0 then
-      return rec( word := res.word, mat := TransposedMat(res.MT) );
+      return rec( word := prod.word(), mat := TransposedMat(res.MT) );
     fi;
-    return rec( word := res.word );
+    return rec( word := prod.word() );
   end;
   return res;
 end;
