@@ -40,6 +40,7 @@ ReadPackage("recog","gap/generic/SnAnUnknownDegree.gi");
 ReadPackage("recog","gap/matrix/matimpr.gi");
 ReadPackage("recog","gap/matrix/blocks.gi");
 ReadPackage("recog","gap/matrix/ppd.gi");
+ReadPackage("recog","gap/matrix/classicalforms.gi");
 ReadPackage("recog","gap/matrix/classical.gi");
 ReadPackage("recog","gap/matrix/slconstr.gi");
 
