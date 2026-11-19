@@ -211,7 +211,7 @@ end;
 BindRecogMethod("FindHomMethodsProjective", "NotAbsolutelyIrred",
 "write over a bigger field with smaller degree",
 function(ri)
-  local G,H,hom,m,r;
+  local G,H,hom,m,poss,r;
 
   G := Grp(ri);
   RECOG.SetPseudoRandomStamp(G,"NotAbsolutelyIrred");
@@ -244,6 +244,12 @@ function(ri)
 
   # Hand down hint that no MeatAxe run is needed nor can help:
   RECOG.SetIsAbsolutelyIrreducible(InitialDataForImageRecogNode(ri), true);
+
+  # Generators that become scalars over the bigger field lie in the kernel.
+  # Random kernel elements can miss them: for cyclic G, product replacement
+  # may return only elements of a proper subgroup for a long stretch.
+  poss := Filtered([1..Length(r.newgens)], i -> RECOG.IsScalarMat(r.newgens[i]));
+  Append(gensN(ri), ri!.gensHmem{poss});
 
   # There might be a kernel, because we have more scalars over the bigger
   # field, so go for it, however, fewer generators should suffice:
