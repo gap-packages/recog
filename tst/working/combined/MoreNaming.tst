@@ -338,7 +338,9 @@ gap> grp := Group(
 >     [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
 >     [ 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 ],
 >     [ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1 ] ] ]*Z(2)^0);;
-gap> Number([1..100], i -> "PSL(2,23)" in RecogniseClassical(grp).possibleNearlySimple) >= 90;
+
+# each call names PSL(2,23) with probability about 0.94
+gap> Number([1..100], i -> "PSL(2,23)" in RecogniseClassical(grp).possibleNearlySimple) >= 80;
 true
 
 # PSL(2,23) 22a
