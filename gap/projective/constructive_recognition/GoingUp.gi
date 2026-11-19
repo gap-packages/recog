@@ -1132,7 +1132,9 @@ RECOG.Form_GoingUpCycleRetries := 3;
 #    f_i -> f_i + sum_k S_ik b_k replaces by Z + S - C S C^-1, C the cyclic
 #    shift; moving the sum along each cyclic diagonal of Z to its first row
 #    or column leaves the radical part of c supported there, the product of
-#    two transvections with centres in E;
+#    two transvections with centres in E; if p does not divide m, c^p is
+#    the pair cycle relative to a suitable dual basis, as proposed in the
+#    same draft, and needs no correction;
 #  - this gives v_W relative to the basis (b_1, f_1, ..., b_m, f_m), and
 #    the other standard generators are products of transvections with
 #    centres among b_1, f_1, b_2, b_1 + b_2, b_1 - b_2, f_1 - f_2 and, for
@@ -1214,70 +1216,95 @@ RECOG.Form_GoingUpCycleBasis := function(std, F, RF, g, transvection)
   c1 := hW * rW;
   Assert(1, ForAll([1 .. m], i -> b[i] * c1 = b[i mod m + 1]));
 
-  # f_i with beta(b_i, f_j) = delta_ij and beta(f_i, f_j) = 0
-  solver := RECOG.GoingUpSolver(TransposedMat(List(b, x -> x * J)));
-  f0 := List(IdentityMat(m, f), z -> conj(solver(z)));
-  Gr := f0 * J * TransposedMat(List(f0, conj));
-  fv := List([1 .. m], j -> f0[j] - Gr[j] * b / 2);
-
-  # Z_(i,k) = beta(f_i c - f_(i+1), f_(k+1)), with Z_(k,i) =
-  # -eps Z_(i,k)^sigma, and S moving the sum along each cyclic diagonal
-  # (i, i + delta) to row 1 (and column 1 for its mirror diagonal
-  # m - delta; to both for delta = m/2)
-  next := i -> i mod m + 1;
-  X := List([1 .. m], i -> (fv[i] * c1 - fv[next(i)]) * J);
-  Z := X * TransposedMat(List([1 .. m], k -> conj(fv[next(k)])));
-  Assert(1, ForAll([1 .. m], i -> ForAll([1 .. m],
-                k -> Z[k][i] = -eps * Z[i][k]^q0)));
-  S := NullMat(m, m, f);
-  for delta in [0 .. QuoInt(m, 2)] do
-    a := List([1 .. m], i -> Z[i][(i + delta - 1) mod m + 1]);
-    sum := Sum(a);
-    half := 2 * delta = m;
-    # on the diagonal m/2, S must be its own mirror: sv[2 + delta] =
-    # -eps sv[2]^sigma, which this start achieves
-    sv := [];
-    sv[2] := Zero(f);
-    if half then
-      sum := Sum(a{[2 .. 1 + delta]});
-      sv[2] := -(sum + eps * sum^q0) / 4;
-      sum := Sum(a);
-    fi;
-    i := 2;
-    for k in [1 .. m - 1] do
-      sv[next(i)] := sv[i] + a[i];
-      if half and i = 1 + delta then
-        sv[next(i)] := sv[next(i)] - sum / 2;
-      fi;
-      i := next(i);
-    od;
-    for i in [1 .. m] do
-      S[i][(i + delta - 1) mod m + 1] := sv[i];
-      S[(i + delta - 1) mod m + 1][i] := -eps * sv[i]^q0;
-    od;
-  od;
-  fv := List([1 .. m], i -> fv[i] + S[i] * b);
-  X := List([1 .. m], i -> (fv[i] * c1 - fv[next(i)]) * J);
-  Zp := TransposedMat(List([1 .. m], k -> conj(fv[next(k)])));
-  Assert(1, ForAll((X * Zp){[2 .. m]}{[2 .. m]}, IsZero));
-  Zp := X[1] * Zp;
-
-  # T(w, lambda), w in E, adds lambda eps w^sigma w^T to Z; with mu
-  # (mu^sigma = -eps mu) and lamf = 1 / (2 eps mu), the radical part of c is
-  # T(w_1, lamf) T(w_2, -lamf)
+  # mu <> 0 with mu^sigma = -eps mu
   if std.type = "SU" then
     mu := PrimitiveRoot(f)^((q0 + 1) / 2);
   else
     mu := One(f);
   fi;
-  lamf := (2 * eps * mu)^-1;
-  zt := ShallowCopy(Zp);
-  zt[1] := zt[1] / 2;
-  vW := hw * transvection(pad(vv), lam);
-  if not IsZero(zt) then
-    w1 := (IdentityMat(m, f)[1] + mu * zt) * b;
-    w2 := (IdentityMat(m, f)[1] - mu * zt) * b;
-    vW := transvection(pad(w2), lamf) * transvection(pad(w1), -lamf) * vW;
+
+  # for p not dividing m, c' = c^p is the pair cycle: c^m - 1 maps W into
+  # E and kills E, so c^(mp) = 1, and c' still cycles all of E. Relative to
+  # e_i = e c'^(i-1) and f_i = f_1 c'^(i-1), beta(e_i, f_1) = delta_i1, the
+  # Gram matrix G of the f_i is circulant, and f_i -> f_i - sum_j G_ij e_j/2
+  # makes F totally isotropic and commutes with c'
+  if m mod Characteristic(f) <> 0 then
+    c1 := c1^Characteristic(f);
+    b := [e];
+    for i in [2 .. m] do
+      Add(b, b[i - 1] * c1);
+    od;
+    solver := RECOG.GoingUpSolver(TransposedMat(List(b, x -> x * J)));
+    fv := [conj(solver(IdentityMat(m, f)[1]))];
+    for i in [2 .. m] do
+      Add(fv, fv[i - 1] * c1);
+    od;
+    Gr := fv * J * TransposedMat(List(fv, conj));
+    fv := List([1 .. m], j -> fv[j] - Gr[j] * b / 2);
+    Assert(1, fv[m] * c1 = fv[1]
+              and IsZero(fv * J * TransposedMat(List(fv, conj))));
+    vW := (hw * transvection(pad(vv), lam))^Characteristic(f);
+  else
+    # f_i with beta(b_i, f_j) = delta_ij and beta(f_i, f_j) = 0
+    solver := RECOG.GoingUpSolver(TransposedMat(List(b, x -> x * J)));
+    f0 := List(IdentityMat(m, f), z -> conj(solver(z)));
+    Gr := f0 * J * TransposedMat(List(f0, conj));
+    fv := List([1 .. m], j -> f0[j] - Gr[j] * b / 2);
+
+    # Z_(i,k) = beta(f_i c - f_(i+1), f_(k+1)), with Z_(k,i) =
+    # -eps Z_(i,k)^sigma, and S moving the sum along each cyclic diagonal
+    # (i, i + delta) to row 1 (and column 1 for its mirror diagonal
+    # m - delta; to both for delta = m/2)
+    next := i -> i mod m + 1;
+    X := List([1 .. m], i -> (fv[i] * c1 - fv[next(i)]) * J);
+    Z := X * TransposedMat(List([1 .. m], k -> conj(fv[next(k)])));
+    Assert(1, ForAll([1 .. m], i -> ForAll([1 .. m],
+                  k -> Z[k][i] = -eps * Z[i][k]^q0)));
+    S := NullMat(m, m, f);
+    for delta in [0 .. QuoInt(m, 2)] do
+      a := List([1 .. m], i -> Z[i][(i + delta - 1) mod m + 1]);
+      sum := Sum(a);
+      half := 2 * delta = m;
+      # on the diagonal m/2, S must be its own mirror: sv[2 + delta] =
+      # -eps sv[2]^sigma, which this start achieves
+      sv := [];
+      sv[2] := Zero(f);
+      if half then
+        sum := Sum(a{[2 .. 1 + delta]});
+        sv[2] := -(sum + eps * sum^q0) / 4;
+        sum := Sum(a);
+      fi;
+      i := 2;
+      for k in [1 .. m - 1] do
+        sv[next(i)] := sv[i] + a[i];
+        if half and i = 1 + delta then
+          sv[next(i)] := sv[next(i)] - sum / 2;
+        fi;
+        i := next(i);
+      od;
+      for i in [1 .. m] do
+        S[i][(i + delta - 1) mod m + 1] := sv[i];
+        S[(i + delta - 1) mod m + 1][i] := -eps * sv[i]^q0;
+      od;
+    od;
+    fv := List([1 .. m], i -> fv[i] + S[i] * b);
+    X := List([1 .. m], i -> (fv[i] * c1 - fv[next(i)]) * J);
+    Zp := TransposedMat(List([1 .. m], k -> conj(fv[next(k)])));
+    Assert(1, ForAll((X * Zp){[2 .. m]}{[2 .. m]}, IsZero));
+    Zp := X[1] * Zp;
+
+    # T(w, lambda), w in E, adds lambda eps w^sigma w^T to Z; with mu and
+    # lamf = 1 / (2 eps mu), the radical part of c is T(w_1, lamf)
+    # T(w_2, -lamf)
+    lamf := (2 * eps * mu)^-1;
+    zt := ShallowCopy(Zp);
+    zt[1] := zt[1] / 2;
+    vW := hw * transvection(pad(vv), lam);
+    if not IsZero(zt) then
+      w1 := (IdentityMat(m, f)[1] + mu * zt) * b;
+      w2 := (IdentityMat(m, f)[1] - mu * zt) * b;
+      vW := transvection(pad(w2), lamf) * transvection(pad(w1), -lamf) * vW;
+    fi;
   fi;
 
   basis := MutableCopyMat(IdentityMat(d, f));
