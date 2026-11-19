@@ -55,10 +55,6 @@ RECOG.ScalarMultipleFrobenius := function( F, M )
     t := GcdRepresentation(I);
     i0 := I*t;
 
-    if not IsZero(tM) and not IsZero(tMi) then
-        return [i0, tM/tMi];
-    fi;
-
     # compute gcd representation
     a:=c[1];
     l:=List([1..Length(I)-1], x ->(a*c[d-I[x]+1]^qq/c[I[x]+1]));
