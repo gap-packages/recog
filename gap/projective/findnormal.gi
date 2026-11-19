@@ -38,39 +38,6 @@ BindGlobal( "FINDEVENNORMALOPTS", rec(
   SizeLimitAllInvols := 32,
 ) );
 
-RECOG.RandomSubproduct := function(a,opt)
-    local allone,g,isone,prod,rs;
-
-    if IsBound(opt.RandomSource) then
-        rs := opt.RandomSource;
-    else
-        rs := GlobalMersenneTwister;
-    fi;
-    if IsBound(opt.IsOne) then
-        isone := opt.IsOne;
-    else
-        isone := IsOne;
-    fi;
-
-    prod := One(a[1]);
-    allone := true;
-    repeat
-        for g in a do
-            if not isone(g) then
-                allone := false;
-                if Random( rs, [ true, false ] )  then
-                    if Random( rs, [ true, false ] )  then
-                        prod := prod * g;
-                    else
-                        prod := g * prod;
-                    fi;
-                fi;
-            fi;
-        od;
-    until allone or not isone(prod);
-    return prod;
-end;
-
 RECOG.BlindDescentStep := function(G,x,y,opt)
   # If either x or y are in a proper normal subgroup, then the result will
   # be and it will be nontrivial:
@@ -97,7 +64,7 @@ RECOG.BlindDescentStep := function(G,x,y,opt)
   # Now try generators for the normal closure of x:
   l := [x];
   for i in [1..18] do
-    xx := RECOG.RandomSubproduct(l,opt)^PseudoRandom(G);
+    xx := RandomSubproduct(l,opt)^PseudoRandom(G);
     Add(l,xx);
     c := Comm(xx,y);
     if not isone(c) then
@@ -293,7 +260,7 @@ InstallMethod( FindElmOfEvenNormalSubgroup, "for a group object and a record",
               else
                   for i in [1..20] do
                       if IsString(S) then
-                          y := RandomSubproduct(invols);
+                          y := RandomSubproduct(invols,opt);
                       else
                           y := Random(S);
                       fi;

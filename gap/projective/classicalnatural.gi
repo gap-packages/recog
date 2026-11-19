@@ -692,8 +692,8 @@ RECOG.IsThisSL2Natural := function(gens,f)
   else
       Info(InfoRecog,4,"SL2: Computing 6 random commutators...");
       for i in [1..6] do
-          a := RECOG.RandomSubproduct(gens,rec());
-          b := RECOG.RandomSubproduct(gens,rec());
+          a := RandomSubproduct(gens);
+          b := RandomSubproduct(gens);
           x := Comm(a,b);
           if CheckElm(x) then
               return true;
@@ -719,8 +719,8 @@ RECOG.IsThisSL2Natural := function(gens,f)
   Info(InfoRecog,4,"SL2: Computing 6 random commutators...");
   isabelian := true;
   for i in [1..6] do
-      a := RECOG.RandomSubproduct(clos,rec());
-      b := RECOG.RandomSubproduct(clos,rec());
+      a := RandomSubproduct(clos);
+      b := RandomSubproduct(clos);
       x := Comm(a,b);
       if not RECOG.IsScalarMat(x) then isabelian := false; break; fi;
   od;
