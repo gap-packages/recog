@@ -282,6 +282,9 @@ gap> ri.isSLContained;
 # where e2=1/2(r-1).
 # Tables 3, 14 of [NP98].
 #
+# A single run reports PSL(2,23) with probability about 0.93, so 80 of 100
+# runs fail to do so with probability below 10^-4.
+#
 
 # PSL(2,23) gens := AtlasGenerators("L2(23)", 2); 11a
 # they have no ppd(11,q; e)-elements for e <> e1, e2.
@@ -308,7 +311,7 @@ gap> grp := Group(
 >     [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 ],
 >     [ 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1 ],
 >     [ 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1 ] ] ]*Z(2));;
-gap> Number([1..100], i -> "PSL(2,23)" in RecogniseClassical(grp).possibleNearlySimple) >= 90;
+gap> Number([1..100], i -> "PSL(2,23)" in RecogniseClassical(grp).possibleNearlySimple) >= 80;
 true
 
 # PSL(2,23) gens := AtlasGenerators("L2(23)", 2); 11a
@@ -338,7 +341,7 @@ gap> grp := Group(
 >     [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
 >     [ 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 ],
 >     [ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1 ] ] ]*Z(2)^0);;
-gap> Number([1..100], i -> "PSL(2,23)" in RecogniseClassical(grp).possibleNearlySimple) >= 90;
+gap> Number([1..100], i -> "PSL(2,23)" in RecogniseClassical(grp).possibleNearlySimple) >= 80;
 true
 
 # PSL(2,23) 22a
