@@ -5,6 +5,11 @@ gap> SetInfoLevel(InfoRecog, 0);;
 gap> testPres := function(G, small, projective)
 > local ri,iso,pres,F,hom,rel,projG,projString;
 > if projective then ri := RecogniseProjectiveGroup(G);; else ri := RecogniseGroup(G);; fi;
+> if projective then projString := " (proj.)";; else projString := "";; fi;
+> if not IsReady(ri) then
+>   Print(G, projString, " was not recognised\n");;
+>   return;
+> fi;
 > pres := StdPresentation(ri);;
 > F := FreeGroupOfFpGroup(pres);;
 > hom := GroupHomomorphismByImages(F, G, GeneratorsOfGroup(F), NiceGens(ri));;
@@ -12,7 +17,6 @@ gap> testPres := function(G, small, projective)
 # Test that G satisfies all relations in presentation
 > for rel in RelatorsOfFpGroup(pres) do
 >   if not isone(ri)(hom(rel)) then
->       if projective then projString := " (proj.)";; else projString := "";; fi;
 >       Print(G, projString, " does not satisfy relation\n");;
 >   fi;;
 > od;;

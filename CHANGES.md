@@ -19,6 +19,9 @@ This file describes changes in the recog package.
   e.g. 6.A6 in SU(6,23), caused by orbits of subspaces defined over a
   subfield (PR #552)
 - Require orb 5.1.0 (PR #552)
+- `RandomSubproduct` now returns the identity only if all entries are
+  trivial, and takes an optional record setting the random source and
+  the identity test. It replaces `RECOG.RandomSubproduct`
 - Fix `RecogniseClassical` leaving `isSLContained` at "unknown" for
   every group of degree 2 (issue #345)
 

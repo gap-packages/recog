@@ -1151,9 +1151,9 @@ function(recognise)
 
     # now try to find an invariant form
     if recognise.maybeDual then
-        dmodule := ClassicalForms_GeneratorsWithoutScalarsDual(recognise.grp);
+        dmodule := RECOG.GeneratorsWithoutScalarsDual(recognise.grp);
         if dmodule <> false then
-            form := ClassicalForms_InvariantFormDual(module,dmodule);
+            form := RECOG.InvariantFormDual(module,dmodule);
             if form <> false then
                 Add( recognise.ClassicalForms,
                 BilinearFormByMatrix(form[2], field));
@@ -1169,9 +1169,9 @@ function(recognise)
     fi;
 
     if recognise.maybeFrobenius then
-        fmodule := ClassicalForms_GeneratorsWithoutScalarsFrobenius(recognise.grp);
+        fmodule := RECOG.GeneratorsWithoutScalarsFrobenius(recognise.grp);
         if fmodule <> false then
-            form := ClassicalForms_InvariantFormFrobenius(module,fmodule);
+            form := RECOG.InvariantFormFrobenius(module,fmodule);
             if form <> false then
                 Add( recognise.ClassicalForms,
                      HermitianFormByMatrix(form[2], field));
