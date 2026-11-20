@@ -309,10 +309,11 @@ end;
 # then ignores the quadratic form of H^g, T(v, 1) for v, w in U meet Ug~,
 # the standard generators of Sp(U), and those of Sp(V) by
 # RECOG.Form_GoingUpNewGenerators for Sp with the same g~. Returns fail, or
-# true after replacing std.Yx as RECOG.GoingUpStep does.
+# true after replacing std.Yx, std.bas and std.basi as RECOG.GoingUpStep
+# does.
 RECOG.Sp_EvenFinalStep := function(std, N)
-  local f, d, n, R, k, dbl, tv, g, gi, F, RF, T, YSp, words, ax, tx, bx,
-        gx;
+  local f, d, n, R, k, dbl, tv, g, gi, F, RF, T, YSp, sp, words, M, ax, tx,
+        bx, gx;
 
   f := std.f;
   d := std.d;
@@ -339,15 +340,33 @@ RECOG.Sp_EvenFinalStep := function(std, N)
        * RECOG.Sp_EvenSiegelWord(RF, (tv.v * gi){[1 .. n]},
                                  (tv.w * gi){[1 .. n]})^F[8];
   YSp := RECOG.Sp_FromOmegaAndTransvection(RF, T, tv.v{[1 .. n]}, f);
-  words := RECOG.Form_GoingUpNewGenerators(
-               rec( f := f, d := d, n := n, type := "Sp" ), YSp, fail, g);
+  # the step of Sp returns fail, to be repeated with a new doubling
+  # element, or words relative to the adapted basis, or relative to a new
+  # basis M * std.bas
+  sp := rec( f := f, d := d, n := n, type := "Sp" );
+  if IsBound(std.cycleRetries) then
+    sp.cycleRetries := std.cycleRetries;
+  fi;
+  words := RECOG.Form_GoingUpNewGenerators(sp, YSp, fail, g);
+  if IsBound(sp.cycleRetries) then
+    std.cycleRetries := sp.cycleRetries;
+  fi;
+  if words = fail then
+    return fail;
+  fi;
+  M := IdentityMat(d, f);
+  if IsRecord(words) then
+    M := words.basis;
+    ConvertToMatrixRep(M, f);
+    words := words.words;
+  fi;
   words := ResultOfStraightLineProgram(SLPOfElms(words),
                                        Concatenation(YSp, [F[8]]));
-  Assert(1, ResultOfStraightLineProgram(SLPOfElms(words),
-                Concatenation(List(RECOG.ClassicalStandardGenerators(
-                                       "O+", n, f).all,
-                                   x -> RECOG.GoingUpEmbed(x, d, f)),
-                              [g]))
+  Assert(1, List(ResultOfStraightLineProgram(SLPOfElms(words),
+                     Concatenation(List(RECOG.ClassicalStandardGenerators(
+                                            "O+", n, f).all,
+                                        x -> RECOG.GoingUpEmbed(x, d, f)),
+                                   [g])), x -> M * x * M^-1)
             = RECOG.ClassicalStandardGenerators("Sp", d, f).all);
 
   # g~ = (t^a)^b, as a word in the input generators
@@ -359,6 +378,8 @@ RECOG.Sp_EvenFinalStep := function(std, N)
                                         Concatenation(std.Yx, [gx]));
   std.n := d;
   std.type := "Sp";
+  std.bas := M * std.bas;
+  std.basi := std.basi * M^-1;
   return true;
 end;
 
