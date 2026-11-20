@@ -147,5 +147,91 @@ gap> List([[1, 8, 3], [-1, 8, 3], [1, 8, 5], [1, 8, 7], [-1, 8, 9],
 [ true, true, true, true, true, true, true, true, true, true, true, true, 
   true, true, true, true, true ]
 
+# RECOG.Form_Rewrite must return an SLP in the standard generators for
+# elements of the standard copy
+gap> CheckForm_Rewrite := function(type, d, q)
+>     local f, W, std, G, els;
+>     f := GF(q);
+>     W := RECOG.Form_RewriteSetup(type, d, f);
+>     std := RECOG.ClassicalStandardGenerators(type, d, f);
+>     G := Group(std.all);
+>     els := Concatenation(List([1 .. 4], i -> PseudoRandom(G)), std.all,
+>                          [One(G), std.s^std.v, std.delta^std.all[4]]);
+>     return ForAll(els, g -> ResultOfStraightLineProgram(
+>                                 RECOG.Form_Rewrite(W, g), std.all) = g);
+> end;;
+gap> ForAll([["O+", 8, 3], ["O+", 10, 5], ["O+", 8, 9], ["O-", 8, 3],
+>            ["O-", 10, 5], ["O-", 8, 9], ["O", 9, 3], ["O", 11, 5],
+>            ["O", 9, 9]], c -> CallFuncList(CheckForm_Rewrite, c));
+true
+
+# The spinor norm is trivial on Omega, multiplicative, and trivial on -1
+# exactly if q^m = eps mod 4
+gap> FormOf := G -> rec( gram := InvariantBilinearForm(G).matrix, frob := 1,
+>                        field := FieldOfMatrixGroup(G) );;
+gap> form := FormOf(SO(1, 8, 5));;
+gap> xs := List([1 .. 10], i -> PseudoRandom(SO(1, 8, 5)));;
+gap> ForAll(GeneratorsOfGroup(Omega(1, 8, 5)), g -> RECOG.HasTrivialSpinorNorm(
+>        g, FormOf(Omega(1, 8, 5))));
+true
+gap> ForAll([1 .. 9], i -> RECOG.HasTrivialSpinorNorm(xs[i] * xs[i + 1], form)
+>        = (RECOG.HasTrivialSpinorNorm(xs[i], form)
+>           = RECOG.HasTrivialSpinorNorm(xs[i + 1], form)));
+true
+gap> List([[1, 8, 3], [-1, 8, 3], [1, 10, 3], [-1, 10, 3]], c ->
+>        RECOG.HasTrivialSpinorNorm(-IdentityMat(c[2], GF(c[3])),
+>            FormOf(Omega(c[1], c[2], c[3]))));
+[ true, false, false, true ]
+
+# Squares are those of the field of the form: -1 on a hyperbolic pair has
+# spinor norm -1, a square in GF(9), also as a matrix over GF(3)
+gap> RECOG.HasTrivialSpinorNorm(DiagonalMat([-1, -1, 1, 1, 1, 1, 1, 1] * Z(3)^0),
+>        RECOG.ClassicalForm("O+", 8, GF(9)));
+true
+
+# ClassicalNatural makes natural Omega(d,q) a POmega leaf, also with
+# scalars on the generators, and its SLPs accept any scalar, also from a
+# larger field, and matrices over GF(9) with entries in GF(3), but no
+# element of Omega(9,9). SO(9,3) is no leaf: it is Omega(9,3) extended by
+# an element of spinor norm -1.
+gap> Leaf := function(ri)
+>     if not IsLeaf(ri) then
+>         ri := ImageRecogNode(ri);
+>     fi;
+>     return ri;
+> end;;
+gap> IsScalarMultiple := function(x, y)
+>     local pos;
+>     pos := PositionNonZero(y[1]);
+>     return x = x[1, pos] / y[1, pos] * y;
+> end;;
+gap> g := PseudoRandom(GL(9, 3));;
+gap> S := Omega(9, 3)^g;;
+gap> ri := Leaf(RECOG.TestGroup(S, false, Size(S)));;
+gap> ri!.fhmethsel.successMethod;
+"ClassicalNatural"
+gap> ForAll([1 .. 5], function(i)
+>     local x;
+>     x := PseudoRandom(S);
+>     return IsScalarMultiple(ResultOfStraightLineProgram(
+>                SLPforElement(ri, Z(9)^i * x), NiceGens(ri)), x);
+> end);
+true
+gap> SLPforElement(ri, PseudoRandom(Omega(9, 9))^g);
+fail
+gap> x := PseudoRandom(S);;
+gap> IsScalarMultiple(ResultOfStraightLineProgram(
+>        SLPforElement(ri, ImmutableMatrix(GF(9), x)), NiceGens(ri)), x);
+true
+gap> S := Omega(1, 10, 3)^PseudoRandom(GL(10, 3));;
+gap> Leaf(RECOG.TestGroup(S, false, Size(S)))!.fhmethsel.successMethod;
+"ClassicalNatural"
+gap> G := Group(List(GeneratorsOfGroup(Omega(-1, 8, 5)),
+>                    x -> Z(5)^Random([0 .. 3]) * x));;
+gap> Leaf(RECOG.TestGroup(G, true, Size(Omega(-1, 8, 5))))!.fhmethsel.successMethod;
+"ClassicalNatural"
+gap> Leaf(RECOG.TestGroup(SO(9, 3), false, Size(SO(9, 3))))!.fhmethsel.successMethod;
+"StabilizerChainProj"
+
 #
 gap> STOP_TEST("on.tst");
