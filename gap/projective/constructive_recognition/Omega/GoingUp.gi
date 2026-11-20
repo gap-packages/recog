@@ -139,11 +139,11 @@ end;
 # to the pair transpositions
 RECOG.Omega_GoingUpCycleRetries := 3;
 
-# Step 5 of the GoingUp step for Omega(W), q odd, relative to a new basis
-# of W, as proposed in the draft of [EHNPR] ('Constructing the enlarged
-# group', two Siegel transformations). Let W = H + W_0 with W_0
-# anisotropic of dimension r (0 unless n' = d and the type is - or o) and
-# H hyperbolic with m pairs, and eps = (-1)^(m-1):
+# Step 5 of the GoingUp step for Omega(W) relative to a new basis of W, as
+# proposed in the draft of [EHNPR] ('Constructing the enlarged group', two
+# Siegel transformations). Let W = H + W_0 with W_0 anisotropic of
+# dimension r (0 unless n' = d and the type is - or o) and H hyperbolic
+# with m pairs, and eps = (-1)^(m-1):
 #  - h = x x^g~ for x from RECOG.Omega_GoingUpCycleWords, with squarefree
 #    characteristic polynomial on W; for odd n', a simple factor x - 1;
 #  - for r = 0, e from RECOG.Form_IsotropicKrylovVector: E_0 = <e, e h,
@@ -174,6 +174,8 @@ RECOG.Omega_GoingUpCycleRetries := 3;
 #    v_W = k rho(e, w' - a_0 - y');
 #  - the other standard generators are products of Siegel transformations
 #    with centres in the first two new pairs and W_0 = A_2.
+# In characteristic 2, eps = 1, and the Krylov vector and the dual basis
+# take Q into account (see RECOG.Form_IsotropicKrylovVector).
 # No fixed vectors of h in W are forced, except one for odd n' by parity:
 # for x without fixed vectors on U, Fix(x) = U^perp, and
 # U^perp meet U^perp g~ = W^perp.
@@ -216,8 +218,15 @@ RECOG.Omega_GoingUpCycleBasis := function(std, F, g, siegel)
   Q := y -> RECOG.FormQuadraticValue(form, y);
   # a totally singular dual of E = <B> from vectors f0 with
   # beta(B_i, f0_j) = delta_ij
-  dual := {B, f0} -> List([1 .. Length(f0)],
-                          j -> f0[j] - (f0[j] * J * TransposedMat(f0)) * B / 2);
+  dual := function(B, f0)
+    local Gr;
+    Gr := f0 * J * TransposedMat(f0);
+    if p > 2 then
+      return List([1 .. Length(f0)], j -> f0[j] - Gr[j] * B / 2);
+    fi;
+    return List([1 .. Length(f0)], j -> f0[j] + Q(f0[j]) * B[j]
+                + Sum([1 .. j - 1], i -> Gr[j][i] * B[i], Zero(f0[j])));
+  end;
   gi := g^-1;
   pad := v -> ImmutableVector(f, Concatenation(v,
                   ListWithIdenticalEntries(d - Length(v), Zero(f))));
@@ -232,6 +241,8 @@ RECOG.Omega_GoingUpCycleBasis := function(std, F, g, siegel)
     if DegreeOfLaurentPolynomial(Gcd(chi, Derivative(chi))) = 0 then
       if r = 1 then
         e := RECOG.Form_IsotropicKrylovVector(hW, J, f, chi, "O");
+      elif p = 2 then
+        e := RECOG.Form_IsotropicKrylovVector(hW, J, f, chi, "O+", form.quad);
       else
         e := RECOG.Form_IsotropicKrylovVector(hW, J, f, chi, "O+");
       fi;
@@ -448,8 +459,12 @@ RECOG.Omega_GoingUpCycleBasis := function(std, F, g, siegel)
     basis[2 * i - 1] := pad(B[i]);
     basis[2 * i] := pad(fv[i]);
   od;
-  if r > 0 then
+  if r > 0 and p = 2 then
+    aniso := RECOG.FormQuadAnisotropicBasis(form, A2, A2 * J, List(A2, Q));
+  elif r > 0 then
     aniso := RECOG.FormAnisotropicBasis(form, A2, A2 * J);
+  fi;
+  if r > 0 then
     if aniso = fail then
       return fail;
     fi;
@@ -459,6 +474,7 @@ RECOG.Omega_GoingUpCycleBasis := function(std, F, g, siegel)
   fi;
   K := List(basis{[1 .. nn]}, x -> x{[1 .. nn]});
   if K * J * TransposedMat(K) <> J
+     or (p = 2 and List(K, Q) <> List(IdentityMat(nn, f), Q))
      or K * c1 <> RECOG.ClassicalStandardGenerators(type, nn, f).v * K then
     Info(InfoRecog_ClassicalNatural, 3, "GoingUp: cycle basis check failed");
     return fail;
@@ -504,9 +520,13 @@ RECOG.Omega_GoingUpCycleBasis := function(std, F, g, siegel)
     w2 := basis[2 * m + 2];
     tw := siegel(f1, -w1);
     ss := Wz(w1);
-    gh := Z(q^2);
-    alpha := gh^((q + 1) / 2);
-    zz := (gh + gh^q) / 2 * w1 + (gh - gh^q) / (2 * alpha) * w2;
+    if p = 2 then
+      zz := RECOG.OrthogonalEta(q) * w1 + w2;
+    else
+      gh := Z(q^2);
+      alpha := gh^((q + 1) / 2);
+      zz := (gh + gh^q) / 2 * w1 + (gh - gh^q) / (2 * alpha) * w2;
+    fi;
   else
     tw := siegel(f1, -2 * w1);
     ss := Wz(2 * w1);
@@ -559,14 +579,14 @@ end;
 # Q(z) = z z^q; there delta multiplies by g^(1-q), the case
 # z = g^q = eta w_1 + w_2. [EHNPR] leaves these factorisations open ('The
 # standard generators of CL(W)', part (3)).
-# For q odd, the step first tries RECOG.Omega_GoingUpCycleBasis.
+# The step first tries RECOG.Omega_GoingUpCycleBasis.
 # Returns its record, or fail, so that the step is repeated with a new
 # doubling element (see RECOG.Omega_GoingUpCycleRetries), or else the list of
 # words, as elements with memory in generators standing for Y and g~.
 RECOG.Omega_GoingUpNewGenerators := function(std, Y, R, g)
   local f, q, d, n, nn, m, F, gt, RF, e, cmat, c, solver, siegelU, siegelP,
-        siegel1, Jd, move, toP, siegel, r, res, mm, v, j, sigma, type, w1, w2,
-        gh, alpha, form, N, Wz, s, t, delta, z;
+        siegel1, formd, Jd, move, toP, siegel, r, res, mm, v, j, sigma, type,
+        w1, w2, gh, alpha, form, N, Wz, s, t, delta, z;
 
   f := std.f;
   q := Size(f);
@@ -625,11 +645,13 @@ RECOG.Omega_GoingUpNewGenerators := function(std, Y, R, g)
   # rho(x k, y k)^(k^-1), where k, a product of at most two rho(p, .) for
   # p in P, maps x to a multiple of e_m or f_m: rho(c p, y) = rho(p, c y).
   # k is kept for each x, with the maps [p, z] it is made of.
-  Jd := RECOG.ClassicalForm(std.type, d, f).gram;
+  formd := RECOG.ClassicalForm(std.type, d, f);
+  Jd := formd.gram;
   move := function(x, p, z)
     local xp;
     xp := x * Jd * p;
-    return x + (x * Jd * z - xp * (z * Jd * z) / 2) * p - xp * z;
+    return x + (x * Jd * z - xp * RECOG.FormQuadraticValue(formd, z)) * p
+           - xp * z;
   end;
   toP := [[], []];
   siegel := function(x, y)
@@ -687,7 +709,7 @@ RECOG.Omega_GoingUpNewGenerators := function(std, Y, R, g)
   elif nn = d and std.type = "O-" then
     r := 2;
   fi;
-  if IsOddInt(q) and nn - r > n then
+  if nn - r > n then
     res := RECOG.Omega_GoingUpCycleBasis(std, F, g, siegel);
     if not IsBound(std.cycleRetries) then
       std.cycleRetries := 0;
