@@ -14,26 +14,31 @@
 ##
 ##  GoingUp for classical groups in their natural representation, as in
 ##  [EHNPR] (see GoingDown.gi), Section 'GoingUp algorithm', for SL, and for
-##  Sp and SU in odd characteristic.
+##  Sp, SU and orthogonal groups in odd characteristic.
 ##
 ##  A GoingUp step ([EHNPR], 'The GoingUpStep algorithm', whose steps are
 ##  numbered as here) starts from a stingray embedding: a basis B of
-##  V = GF(q)^d, a standard basis for Sp and SU, whose first n vectors span
-##  U, and words for the standard generators Y of CL(U) relative to these
-##  vectors, extended by the identity on T = <v_(n+1), ..., v_d>. With the
-##  overlap k = 1 for SL and 2 for Sp and SU, it constructs the same for
+##  V = GF(q)^d, a standard basis for the types with a form, whose first n
+##  vectors span U, and words for the standard generators Y of CL(U)
+##  relative to these vectors, extended by the identity on
+##  T = <v_(n+1), ..., v_d>. With the
+##  overlap k = 1 for SL and 2 otherwise, it constructs the same for
 ##  degree n' = min(2n - k, d), keeping the first n vectors of B:
 ##
 ##     U = A + P, P = <v_(n-k+1), ..., v_n> the pivot space
 ##     1. t in <Y> whose fixed space on U has dimension k (the seed)
 ##     2. g = t^a for random a, until W = U + Ug has dimension n', T meets
-##        Fix(g) in a complement of W (for Sp, SU: W is non-degenerate), and
-##        U meets Fix(g) in a suitable k-space P'
+##        Fix(g) in a complement of W (for the types with a form: W is
+##        non-degenerate, and of type + for orthogonal groups if n' < d),
+##        and U meets Fix(g) in a suitable k-space P'
 ##     3. g~ = g^b with b in <Y> mapping P' onto P, so that g~ fixes P
 ##     4. v_(n+1), ..., v_d := a basis of N, the projection of A g~ to T,
-##        and fixed vectors of g~ in T (for Sp, SU: standard bases of N and
-##        of its orthogonal complement in T); so W = U + N
+##        and fixed vectors of g~ in T (for the types with a form: standard
+##        bases of N and of its orthogonal complement in T); so W = U + N
 ##     5. the standard generators of CL(W) as words in Y and g~
+##
+##  For an orthogonal group, CL(U) is Omega^+(n,q), and so is CL(W) unless
+##  n' = d.
 ##
 #############################################################################
 
@@ -43,11 +48,13 @@ RECOG.GoingUpRandomBound := 100;
 # The functions of the GoingUp step for the classical type <type>, and its
 # overlap k (see the top of this file). rootElements(n, f) returns the
 # record of root elements of CL(n,q), whose component Y holds the words
-# standing for the standard generators; for Sp and SU, rootElementsOf(Y,
-# n, f) returns it for given words Y. The other functions are documented
-# where they are defined, in SL/GoingUp.gi and below.
+# standing for the standard generators; for the types with a form,
+# rootElementsOf(Y, n, f) returns it for given words Y, and seed(Y, n, p)
+# is the seed. For orthogonal groups these are those of Omega^+(n,q). The
+# other functions are documented where they are defined, in SL/GoingUp.gi,
+# O/GoingUp.gi and below.
 RECOG.GoingUpParameters := function(type)
-  local of, k;
+  local of, k, res;
 
   if type = "SL" then
     return rec( overlap := 1,
@@ -62,17 +69,26 @@ RECOG.GoingUpParameters := function(type)
     of := RECOG.Sp_RootElements;
   elif type = "SU" then
     of := RECOG.SU_RootElements;
+  elif type in RECOG.OrthogonalTypes then
+    of := RECOG.O_RootElements;
   else
     ErrorNoReturn("RECOG.GoingUpParameters: unsupported type ", type);
   fi;
-  k := Length(RECOG.ClassicalStandardGeneratorNames(type));
-  return rec( overlap := 2,
+  k := Length(RECOG.ClassicalStandardGeneratorNames(
+                  RECOG.ClassicalPrefixType(type)));
+  res := rec( overlap := 2,
               rootElementsOf := of,
               rootElements := {n, f} -> of(
                   GeneratorsWithMemory(ListWithIdenticalEntries(k, ())), n, f),
+              seed := RECOG.Form_GoingUpSeed,
               doublingElement := RECOG.Form_GoingUpDoublingElement,
               adaptBasis := RECOG.Form_GoingUpAdaptBasis,
               newGenerators := RECOG.Form_GoingUpNewGenerators );
+  if type in RECOG.OrthogonalTypes then
+    res.seed := RECOG.O_GoingUpSeed;
+    res.newGenerators := RECOG.O_GoingUpNewGenerators;
+  fi;
+  return res;
 end;
 
 # The matrix acting as <M> on the first rows of the d x d identity and
@@ -188,16 +204,18 @@ RECOG.GoingUpStep := function(std, N)
 end;
 
 # GoingUp of [EHNPR] ('Outline of the algorithm', subsection 'GoingUp
-# algorithm') for the type <type>, "SL", or "Sp" or "SU" (q odd, d even):
-# <G> is SL(d,q), resp. Sp(d,q) or SU(d,q0) for some alternating resp.
-# hermitian form, with generators with memory, and <init> describes an
-# embedded CL(n,q) as follows:
+# algorithm') for the type <type>, "SL", or "Sp" or "SU" (q odd, d even),
+# or an orthogonal type (q odd): <G> is SL(d,q), resp. Sp(d,q), SU(d,q0)
+# or Omega(d,q) for some alternating, hermitian resp. symmetric form, with
+# generators with memory, and <init> describes an embedded CL(n,q), of type
+# "O+" for orthogonal groups, as follows:
 #  - `slp`: SLP in the generators of <G> for the standard generators of
 #    CL(n,q), as in RECOG.ClassicalStandardGenerators, relative to bas
 #  - `bas`: a d x d matrix whose last d-n rows are fixed by that CL(n,q);
-#    for Sp and SU, its rows are a standard basis of V for a multiple of
-#    the form of <G>
-#  - `n`: the degree n, at least 2 for SL and 4 for Sp and SU
+#    for the types with a form, its rows are a standard basis of V for a
+#    multiple of the form of <G>
+#  - `n`: the degree n, at least 2 for SL, 4 for Sp and SU, and 6 for
+#    orthogonal groups, where n/2 must be odd
 # Returns a record with the following components:
 #  - `slp`: SLP in the generators of <G> for the standard generators of
 #    CL(d,q) relative to bas
@@ -230,7 +248,8 @@ end;
 
 #############################################################################
 ##
-##  The GoingUp step for the types with a form, Sp and SU, q odd.
+##  The GoingUp step for the types with a form, Sp and SU, q odd, and its
+##  parts which orthogonal groups share (see O/GoingUp.gi).
 ##
 ##  Vectors are rows of coordinates relative to a standard basis
 ##  (e_1, f_1, ..., e_m, f_m), so e_i and f_i have the indices 2i-1 and 2i.
@@ -370,12 +389,17 @@ RECOG.Form_MapToStd := function(R, y)
   apply := elim.apply;
   y := elim.y;
 
-  # make the e_1-coordinate nonzero
+  # make the e_1-coordinate nonzero; without Le (orthogonal groups), for
+  # y = c f_1 first f_1 -> f_1 + e_2
   if IsZero(y[1]) then
-    if not IsZero(y[2]) then
+    if not IsZero(y[2]) and IsBound(R.Le) then
       apply("Le", 1, R.longUnit);
     else
-      j := PositionNonZero(y);
+      j := PositionNonZero(y, 2);
+      if j > n then
+        apply("See", 2, One(R.f));
+        j := 3;
+      fi;
       if IsOddInt(j) then
         apply("Mj1", (j + 1) / 2, One(R.f));
       else
@@ -398,7 +422,7 @@ RECOG.Form_MapToStd := function(R, y)
   fi;
 
   # y = e_1 + c f_1 has the norm nu = c^sigma + eps c, and nu/2 - c is a
-  # parameter of Lf
+  # parameter of Lf; it is 0 for orthogonal groups
   nu := R.conj(y[2]) + R.eps * y[2];
   if y[2] <> nu / 2 then
     apply("Lf", 1, nu / 2 - y[2]);
@@ -440,10 +464,10 @@ RECOG.Form_MapToF1FixingE1 := function(R, y)
   return rec( word := elim.word, mat := TransposedMat(elim.MT) );
 end;
 
-# The seed t of the GoingUp step ([EHNPR], Step 1 (Constructing the seed
-# element)): an element of CL(n,q), q a power of <p>, whose fixed space is
-# a non-degenerate plane, given as a word in the components s, t, u, v of
-# <Y>, which may be words or matrices.
+# The seed t of the GoingUp step for Sp and SU ([EHNPR], Step 1
+# (Constructing the seed element)): an element of CL(n,q), q a power of
+# <p>, whose fixed space is a non-degenerate plane, given as a word in the
+# components s, t, u, v of <Y>, which may be words or matrices.
 # The pair cycle v fixes <e_1 + ... + e_m, f_1 + ... + f_m>, on which beta
 # takes the value m = n/2; if p divides m, then s t^-1 v u fixes the plane
 # <e_2 + ... + e_m, f_2 + ... + f_m> instead, where beta is m - 1.
@@ -457,9 +481,9 @@ end;
 # Steps 1 to 3 of the GoingUp step of [EHNPR] (see the top of this file),
 # 'The random part' and 'The deterministic part': search at most <N>
 # random elements a of std.G for g = t^a such that W = U + Ug has
-# dimension n' and is non-degenerate, and U meets Fix(g) in a space with a
-# hyperbolic pair, which spans P'; then conjugate g by b in <Y> mapping P'
-# onto P.
+# dimension n' and is non-degenerate, of type + for orthogonal groups if
+# n' < d, and U meets Fix(g) in a space with a hyperbolic pair, which spans
+# P'; then conjugate g by b in <Y> mapping P' onto P.
 # <Y> and <R> are the standard generators of CL(n,q) with memory and their
 # root elements. Returns either fail, or else a record with the following
 # components:
@@ -468,8 +492,8 @@ end;
 #  - `b`: as a word with memory in <Y>
 #  - `g`: the matrix of g~ = (t^a)^b relative to std.bas
 RECOG.Form_GoingUpDoublingElement := function(std, Y, R, N)
-  local f, d, n, nn, form, Ubasis, Ystd, p, t, tmat, a, amat, g, Ug, Ufix,
-        pair, b, b2, bmat;
+  local f, d, n, nn, form, Ubasis, Ystd, p, seed, t, tmat, orth, a, amat, g,
+        Ug, Ufix, pair, b, b2, bmat;
 
   f := std.f;
   d := std.d;
@@ -477,10 +501,13 @@ RECOG.Form_GoingUpDoublingElement := function(std, Y, R, N)
   nn := Minimum(2 * n - 2, d);
   form := RECOG.ClassicalForm(std.type, d, f);
   Ubasis := IdentityMat(d, f){[1 .. n]};
-  Ystd := RECOG.ClassicalStandardGenerators(std.type, n, f);
+  Ystd := RECOG.ClassicalStandardGenerators(
+              RECOG.ClassicalPrefixType(std.type), n, f);
   p := Characteristic(f);
-  t := RECOG.Form_GoingUpSeed(R, n, p);
-  tmat := RECOG.GoingUpEmbed(RECOG.Form_GoingUpSeed(Ystd, n, p), d, f);
+  seed := RECOG.GoingUpParameters(std.type).seed;
+  t := seed(R, n, p);
+  tmat := RECOG.GoingUpEmbed(seed(Ystd, n, p), d, f);
+  orth := std.type in RECOG.OrthogonalTypes;
 
   repeat
     if N = 0 then
@@ -497,6 +524,9 @@ RECOG.Form_GoingUpDoublingElement := function(std, Y, R, N)
       continue;
     fi;
     if nn < d and RankMat(RECOG.FormGram(form, Ug)) <> nn then
+      continue;
+    fi;
+    if nn < d and orth and RECOG.FormOrthogonalType(form, Ug) <> "O+" then
       continue;
     fi;
 
@@ -660,10 +690,13 @@ RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g)
 end;
 
 # The basis <bas> with its rows n+1, ..., d replaced by a standard basis of
-# their span, for the multiple of the form of <G> of type <type> ("Sp" or
-# "SU") for which the first <n> rows are a standard basis, as at the end of
-# the final descent of [EHNPR] ('Terminal groups and initial groups'). The
-# last d-n rows of <bas> must span the orthogonal complement of the first n.
+# their span, for the multiple of the form of <G> of type <type> ("Sp", "SU"
+# or an orthogonal type) for which the first <n> rows are a standard basis,
+# of type "O+" for orthogonal groups, as at the end of the final descent of
+# [EHNPR] ('Terminal groups and initial groups'). The last d-n rows of
+# <bas> must span the orthogonal complement of the first n. For type "O",
+# that multiple must lie in the square class of the form of
+# RECOG.ClassicalInvariantForm.
 RECOG.Form_CompleteStandardBasis := function(G, type, bas, n)
   local f, form;
 
@@ -672,7 +705,8 @@ RECOG.Form_CompleteStandardBasis := function(G, type, bas, n)
               StripMemory(GeneratorsOfGroup(G)), f);
   form.gram := form.gram / RECOG.FormValue(form, bas[1], bas[2]);
   Assert(1, RECOG.FormGram(form, bas{[1 .. n]})
-            = RECOG.ClassicalStandardForm(type, n, f));
+            = RECOG.ClassicalStandardForm(RECOG.ClassicalPrefixType(type),
+                                          n, f));
   bas := Concatenation(bas{[1 .. n]},
              RECOG.FormStandardBasis(form, bas{[n + 1 .. NrRows(bas)]}));
   ConvertToMatrixRep(bas, f);
