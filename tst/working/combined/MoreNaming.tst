@@ -822,6 +822,14 @@ false
 gap> ri.isSpContained;
 "unknown"
 
+# the conformal groups CGO^+(8,q), and Omega^+(8,q) with all scalars
+gap> ForAll([3, 5], q -> RecogniseClassical(
+>        ConformalOrthogonalPlusGroup(8, q)).isOmegaContained = true);
+true
+gap> ForAll([3, 5], q -> RecogniseClassical(ClosureGroup(Omega(+1, 8, q),
+>        Z(q) * One(GL(8, q)))).isOmegaContained = true);
+true
+
 # without an extension field witness, isNotExt stays "unknown"
 gap> ri := rec(hint := "orthogonalplus", d := 10, q := 3, E := [6], LE := [],
 >              currentgcd := 2, ClassicalForms := [], isNotExt := "unknown");;
