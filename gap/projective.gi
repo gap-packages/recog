@@ -23,6 +23,33 @@ SLPforElementFuncsProjective.TrivialGroup_BlocksModScalars := function(ri,g)
     return StraightLineProgramNC( [ [1,0] ], 1 );
 end;
 
+# Identity, equality and order at BlocksModScalars nodes: each diagonal block
+# in <blocks> may differ by its own scalar; entries outside them are ignored.
+RECOG.IsOneBlocksModScalars := function(blocks, x)
+  if IsObjWithMemory(x) then
+      x := x!.el;
+  fi;
+  return ForAll(blocks, b -> IsOneProjective(ExtractSubMatrix(x, b, b)));
+end;
+
+RECOG.IsEqualBlocksModScalars := function(blocks, x, y)
+  if IsObjWithMemory(x) then
+      x := x!.el;
+  fi;
+  if IsObjWithMemory(y) then
+      y := y!.el;
+  fi;
+  return ForAll(blocks, b -> IsEqualProjective(ExtractSubMatrix(x, b, b),
+                                               ExtractSubMatrix(y, b, b)));
+end;
+
+RECOG.OrderBlocksModScalars := function(blocks, x)
+  if IsObjWithMemory(x) then
+      x := x!.el;
+  fi;
+  return Lcm(List(blocks, b -> RECOG.ProjectiveOrder(ExtractSubMatrix(x, b, b))));
+end;
+
 #! @BeginChunk BlocksModScalars
 #! This method is only called when hinted from above. In this method it is
 #! understood that G should <E>neither</E>
@@ -48,8 +75,12 @@ function(ri)
   # be recognised as a matrix group *nor* as a projective group. Rather,
   # all "block-scalars" shall be ignored. This method is only used when
   # used as a hint by FindHomMethodsMatrix.BlockDiagonal!
-  local G,H,data,hom,middle,newgens,nrblocks;
+  local G,H,blocks,data,hom,middle,newgens,nrblocks;
   G := Grp(ri);
+  blocks := ri!.blocks;
+  Setisone(ri, x -> RECOG.IsOneBlocksModScalars(blocks, x));
+  Setisequal(ri, {x, y} -> RECOG.IsEqualBlocksModScalars(blocks, x, y));
+  SetOrderFunc(ri, x -> RECOG.OrderBlocksModScalars(blocks, x));
   nrblocks := Length(ri!.blocks);  # this is always >= 1
   if ForAll(ri!.blocks,b->Length(b)=1) then
       # All blocks are projectively trivial, so nothing to do here:

@@ -826,11 +826,7 @@ InstallGlobalFunction( SLPforElementGeneric,
     # This is necessary during immediate verification, since the kernel might
     # have incorrectly been recognised as trivial.
     if riker = fail then
-        if not ri!.isone(n)
-                # Big ugly hack. If the successMethod is BlocksModScalars, then
-                # we can't use ri!.isone, see the documentation of
-                # BlocksModScalars. 
-                and not ri!.fhmethsel.successMethod = "BlocksModScalars" then
+        if not ri!.isone(n) then
             return fail;
         fi;
         return s1;
