@@ -2722,19 +2722,19 @@ function(recognise)
     # slow for fields with more than 2^16 elements.
     pts := [One(recognise.generators[1])[1]];
     i := 1;
-    while i <= Length(pts) and Length(pts) <= 60 do
+    while i <= Length(pts) do
         for gen in recognise.generators do
             v := OnLines(pts[i], gen);
             if not v in pts then
                 Add(pts, v);
+                if Length(pts) > 60 then
+                    recognise.isAlt5Alt4Sym4 := false;
+                    return NeverApplicable;
+                fi;
             fi;
         od;
         i := i + 1;
     od;
-    if Length(pts) > 60 then
-        recognise.isAlt5Alt4Sym4 := false;
-        return NeverApplicable;
-    fi;
     pgrp := Group(List(recognise.generators,
                g -> PermList(List(pts, p -> Position(pts, OnLines(p, g))))));
 
