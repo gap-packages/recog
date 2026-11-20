@@ -1117,6 +1117,28 @@ RECOG.TestGroupOptions := rec(
       tryNonGroupElements := true
   );
 
+# Return the first node of the tree 'ri' at which the SLP of a generator of
+# Grp(node), evaluated on NiceGens(node), does not give that generator, or
+# fail if there is none.
+RECOG.NodeWithBadNiceGens := function(ri)
+  local x, s, bad;
+  for x in GeneratorsOfGroup(Grp(ri)) do
+    s := SLPforElement(ri, x);
+    if s = fail or
+       not isequal(ri)(ResultOfStraightLineProgram(s, NiceGens(ri)), x) then
+      return ri;
+    fi;
+  od;
+  if IsLeaf(ri) then
+    return fail;
+  fi;
+  bad := RECOG.NodeWithBadNiceGens(ImageRecogNode(ri));
+  if bad = fail and HasKernelRecogNode(ri) and KernelRecogNode(ri) <> fail then
+    bad := RECOG.NodeWithBadNiceGens(KernelRecogNode(ri));
+  fi;
+  return bad;
+end;
+
 
 # Test recognition of a group 'g' with known size 'size'.
 # 'proj' denotes if the group is projective
@@ -1199,6 +1221,17 @@ RECOG.TestGroup := function(g,proj,size, optionlist...)
           fi;
       fi;
   until count >= options.inTests;
+
+  # The test above evaluates on CalcNiceGens of the root, which never reads
+  # the NiceGens stored at the nodes below it.
+  x := RECOG.NodeWithBadNiceGens(ri);
+  if x <> fail then
+      Print("group := ", g, ";\n");
+      Print("proj := ", proj, ";\n");
+      Print("node group := ", Grp(x), ";\n");
+      Print("node method := ", x!.fhmethsel.successMethod, ";\n");
+      Error("Alarm: SLPs of a node do not evaluate correctly on its NiceGens!\n");
+  fi;
 
   if IsPermGroup(g) then
     supergroup := SymmetricGroup(LargestMovedPoint(g) + 2);
