@@ -27,6 +27,13 @@ gap> List([[4,3,1], [4,5,1], [6,3,1], [6,7,1], [6,3,2], [8,3,1], [12,3,1],
 >         args -> CallFuncList(CheckFindStdGens_Sp, args));
 [ true, true, true, true, true, true, true, true, true, true, true ]
 
+# For q even, through Omega^+(6,q): d = 6 directly, d = 10 and 18 where
+# the orthogonal chain reaches d, and the others through its last step
+gap> List([[6,2,2], [6,2,3], [8,2,1], [8,2,2], [10,2,1], [10,2,2],
+>          [12,2,1], [14,2,3], [18,2,1], [20,2,2]],
+>         args -> CallFuncList(CheckFindStdGens_Sp, args));
+[ true, true, true, true, true, true, true, true, true, true ]
+
 # RECOG.Form_Rewrite must return an SLP in the standard generators for
 # elements of the standard copy
 gap> CheckForm_Rewrite := function(d, q)
@@ -40,7 +47,8 @@ gap> CheckForm_Rewrite := function(d, q)
 >     return ForAll(els, g -> ResultOfStraightLineProgram(
 >                                 RECOG.Form_Rewrite(W, g), std.all) = g);
 > end;;
-gap> ForAll([4, 6, 8, 10], d -> ForAll([3, 5, 9, 25], q -> CheckForm_Rewrite(d, q)));
+gap> ForAll([4, 6, 8, 10], d -> ForAll([3, 5, 9, 25, 2, 4, 8],
+>                                     q -> CheckForm_Rewrite(d, q)));
 true
 
 # ClassicalNatural makes natural Sp(d,q) a PSp leaf, also with scalars on
@@ -63,6 +71,20 @@ gap> simil := First(List(Tuples([1, -1] * Z(3)^0, 8), DiagonalMat),
 gap> Leaf(RECOG.TestGroup(Group(Concatenation(GeneratorsOfGroup(S), [simil])),
 >                         false, 2 * Size(S)));
 "ClassicalNatural"
+
+# The same for q even, d >= 6; Sp(4,q) falls through
+gap> S := Sp(8, 4);;
+gap> Leaf(RECOG.TestGroup(S^PseudoRandom(GL(8, 4)), false, Size(S)));
+"ClassicalNatural"
+gap> G := Group(List(GeneratorsOfGroup(Sp(6, 4)), x -> Z(4)^Random([0 .. 2]) * x));;
+gap> Leaf(RECOG.TestGroup(G, true, Size(Sp(6, 4))));
+"ClassicalNatural"
+gap> S := Sp(10, 2);;
+gap> Leaf(RECOG.TestGroup(S^PseudoRandom(GL(10, 2)), false, Size(S)));
+"ClassicalNatural"
+gap> S := Sp(4, 16);;
+gap> Leaf(RECOG.TestGroup(S, false, Size(S)));
+"StabilizerChainProj"
 
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);

@@ -278,8 +278,8 @@ end;
 ##   - `torus`: an element acting as diag(torusDiag) on the first basis
 ##     vectors and fixing the others, and `gamma`: torusDiag[1], a
 ##     primitive element of GF(q)
-##   - `tau`: the parameters [x, y] of the factors T(a, x) and T(b, y) of
-##     tau_j in RECOG.Form_GoingUpNewGenerators
+##   - `tau` (q odd): the parameters [x, y] of the factors T(a, x) and
+##     T(b, y) of tau_j in RECOG.Form_GoingUpNewGenerators
 ##   - for each kind of root element below, the component of that name, the
 ##     root elements kind(2, lambda) for lambda in the GF(p)-basis
 ##     bases.(kind) of their parameters
@@ -500,11 +500,15 @@ RECOG.Form_MapToStd := function(R, y, MT...)
   fi;
 
   # y = e_1 + c f_1 has the norm nu = c^sigma + eps c, and nu/2 - c is a
-  # parameter of Lf; orthogonal groups have no Lf, and c = Q(y)
+  # parameter of Lf; nu = 0 for Sp; orthogonal groups have no Lf, and
+  # c = Q(y)
   if IsBound(R.Lf) then
     nu := R.conj(y[2]) + R.eps * y[2];
-    if y[2] <> nu / 2 then
-      apply("Lf", 1, nu / 2 - y[2]);
+    if not IsZero(nu) then
+      nu := nu / 2;
+    fi;
+    if y[2] <> nu then
+      apply("Lf", 1, nu - y[2]);
     fi;
   fi;
 
@@ -573,7 +577,9 @@ end;
 # random elements a of std.G for g = t^a such that W = U + Ug has
 # dimension n' and is non-degenerate, of type + for orthogonal groups if
 # n' < d, and U meets Fix(g) in a space with a hyperbolic pair, which spans
-# P'; then conjugate g by b in <Y> mapping P' onto P.
+# P'; then conjugate g by b in <Y> mapping P' onto P. With std.mixed (see
+# RECOG.Sp_EvenGoingUp), the type refers to the quadratic form of
+# RECOG.Sp_MixedQuadraticForm, which is kept as std.quad.
 # <Y> and <R> are the standard generators of CL(n,q) with memory and their
 # root elements. Returns either fail, or else a record with the following
 # components:
@@ -583,7 +589,7 @@ end;
 #  - `g`: the matrix of g~ = (t^a)^b relative to std.bas
 RECOG.Form_GoingUpDoublingElement := function(std, Y, R, N)
   local f, d, n, nn, form, Ubasis, Ystd, p, seed, t, tmat, orth, a, amat, g,
-        Ug, Ufix, pair, b, b2, bmat;
+        Ug, quad, Ufix, pair, b, b2, bmat;
 
   f := std.f;
   d := std.d;
@@ -616,7 +622,16 @@ RECOG.Form_GoingUpDoublingElement := function(std, Y, R, N)
     if nn < d and RankMat(RECOG.FormGram(form, Ug)) <> nn then
       continue;
     fi;
-    if nn < d and orth and RECOG.FormOrthogonalType(form, Ug) <> "O+" then
+    if IsBound(std.mixed) then
+      # the orthogonal chain in Sp(d,q), q even: the type refers to the
+      # quadratic form which H and H^g preserve, also for n' = d
+      quad := RECOG.Sp_MixedQuadraticForm(std, g);
+      if quad = fail or RECOG.FormOrthogonalType(
+             rec( gram := form.gram, frob := 1, field := f, quad := quad ),
+             Ug) <> "O+" then
+        continue;
+      fi;
+    elif nn < d and orth and RECOG.FormOrthogonalType(form, Ug) <> "O+" then
       continue;
     fi;
 
@@ -634,6 +649,10 @@ RECOG.Form_GoingUpDoublingElement := function(std, Y, R, N)
   amat := RECOG.GoingUpEmbed(bmat, d, f);
   g := amat^-1 * g * amat;
   Assert(1, g{[n - 1, n]} = IdentityMat(d, f){[n - 1, n]});
+  if IsBound(std.mixed) then
+    # b fixes T pointwise, so H^(g~) preserves the same form
+    std.quad := quad;
+  fi;
   return rec( a := a, t := t, b := b, g := g );
 end;
 
@@ -642,14 +661,16 @@ end;
 # the next n'-n by a standard basis of N, the projection to T of A <g>
 # (rows 1 to n-2 of <g>), and the last d-n' by a standard basis of its
 # orthogonal complement in T. The new basis is C * std.bas; for n' = d,
-# N = T and C is the identity.
+# N = T and C is the identity. With std.quad, RECOG.Sp_MixedAdaptBasis.
 RECOG.Form_GoingUpAdaptBasis := function(std, g)
   local f, d, n, formT, N, rest;
 
   f := std.f;
   d := std.d;
   n := std.n;
-  if 2 * n - 2 >= d then
+  if IsBound(std.quad) then
+    return RECOG.Sp_MixedAdaptBasis(std, g);
+  elif 2 * n - 2 >= d then
     return IdentityMat(d, f);
   fi;
 
@@ -698,15 +719,19 @@ RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g)
 
   # a nonzero vector of z + P, P = <e_m, f_m> <= U meet U', of norm nu: z,
   # or z minus its component in P, of norm mu, plus e_m + c f_m, of norm
-  # 2c = nu - mu
+  # 2c = nu - mu; for Sp, all norms are 0
   withNorm := function(z, nu)
+    local c;
     if not IsZero(z) and norm(z) = nu then
       return z;
     fi;
     z := ShallowCopy(z);
     z[n - 1] := Zero(f);
     z[n] := Zero(f);
-    z[n] := (nu - norm(z)) / 2;
+    c := nu - norm(z);
+    if not IsZero(c) then
+      z[n] := c / 2;
+    fi;
     z[n - 1] := One(f);
     return z;
   end;
@@ -764,15 +789,21 @@ RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g)
   end;
 
   # tau_j = T(b, y) T(a, x) T(b, y) T(a, x), a = e_j - e_(j+1),
-  # b = f_j - f_(j+1), with [x, y] = RF.tau ([EHNPR], 'Constructing the
+  # b = f_j - f_(j+1), with [x, y] = RF.tau, and for q even
+  # tau_j = T(a + b, 1) T(a, 1) T(b, 1) ([EHNPR], 'Constructing the
   # enlarged group')
   vpos := Position(RECOG.ClassicalStandardGeneratorNames(std.type), "v");
   v := F[vpos];
   for j in [n / 2 .. nn / 2 - 1] do
     a := e[2 * j - 1] - e[2 * j + 1];
     b := e[2 * j] - e[2 * j + 2];
-    tau := transvection(b, RF.tau[2]) * transvection(a, RF.tau[1]);
-    v := tau * tau * v;
+    if IsBound(RF.tau) then
+      tau := transvection(b, RF.tau[2]) * transvection(a, RF.tau[1]);
+      v := tau * tau * v;
+    else
+      v := transvection(a + b, One(f)) * transvection(a, One(f))
+           * transvection(b, One(f)) * v;
+    fi;
   od;
   res := F{[1 .. Length(Y)]};
   res[vpos] := v;
