@@ -20,9 +20,13 @@
 ##  them, of dimension d0 = 0, except for the orthogonal types "O-"
 ##  (d0 = 2) and "O" (odd degree, d0 = 1); "O+" has d0 = 0.
 ##
-##  Orthogonal groups are those of odd characteristic only. Their quadratic
-##  form Q is then determined by its polar form beta, Q(x) = beta(x, x)/2,
-##  and the code works with beta alone; the classical group is Omega.
+##  For orthogonal groups, the classical group is Omega. In odd
+##  characteristic the quadratic form Q is determined by its polar form
+##  beta, Q(x) = beta(x, x)/2, and the code works with beta alone. In
+##  characteristic 2, beta is alternating, and form records also carry Q
+##  (see RECOG.FormQuadraticValue); there only the types "O+" and "O-" are
+##  supported, as Omega(d,q) of odd degree acts reducibly ([EHNPR],
+##  'Algorithmic conventions').
 ##
 #############################################################################
 
@@ -44,7 +48,9 @@ end;
 # J = [[0,1],[-1,0]] for "Sp" and J = [[0,1],[1,0]] otherwise, and J0 the
 # Gram matrix on the anisotropic part: [-1/2] for "O", that is,
 # Q(w_1) = -1/4, and diag(-2, 2 gamma), gamma = Z(q), for "O-", that is,
-# Q(w_1) = -1 and Q(w_2) = gamma. Type "SL" has no form; its standard scalar
+# Q(w_1) = -1 and Q(w_2) = gamma. For "O-" and q even, J0 = [[0,eta],
+# [eta,0]], the polar form of Q(w_1) = 1, Q(w_2) = gamma, with
+# eta = RECOG.OrthogonalEta(q). Type "SL" has no form; its standard scalar
 # product has Gram matrix the identity.
 RECOG.ClassicalStandardForm := function(type, d, f)
   local eps, J, m, i;
@@ -55,8 +61,8 @@ RECOG.ClassicalStandardForm := function(type, d, f)
   if not type in Concatenation(["Sp", "SU"], RECOG.OrthogonalTypes) then
     ErrorNoReturn("RECOG.ClassicalStandardForm: unsupported type ", type);
   fi;
-  if type in RECOG.OrthogonalTypes and IsEvenInt(Size(f)) then
-    ErrorNoReturn("RECOG.ClassicalStandardForm: orthogonal types need odd q");
+  if type = "O" and IsEvenInt(Size(f)) then
+    ErrorNoReturn("RECOG.ClassicalStandardForm: \"O\" needs odd q");
   fi;
   if type = "O" and IsEvenInt(d) then
     ErrorNoReturn("RECOG.ClassicalStandardForm: <d> must be odd");
@@ -81,12 +87,44 @@ RECOG.ClassicalStandardForm := function(type, d, f)
   od;
   if type = "O" then
     J[d, d] := -One(f) / 2;
+  elif type = "O-" and IsEvenInt(Size(f)) then
+    J[d - 1, d] := RECOG.OrthogonalEta(Size(f));
+    J[d, d - 1] := J[d - 1, d];
   elif type = "O-" then
     J[d - 1, d - 1] := -2 * One(f);
     J[d, d] := 2 * Z(Size(f));
   fi;
   ConvertToMatrixRep(J, f);
   return J;
+end;
+
+# eta = h + h^q for the primitive element h = Z(q^2) of GF(q^2), an element
+# of GF(q) ([EHNPR], Definition of the field constants)
+RECOG.OrthogonalEta := q -> Z(q^2) + Z(q^2)^q;
+
+# The upper triangular matrix A with Q(x) = x A x^T for the standard
+# quadratic form Q of the orthogonal type <type>, "O+" or "O-", on
+# GF(q)^<d>, q = Size(<f>) even: A + A^T is RECOG.ClassicalStandardForm,
+# and the diagonal holds the values Q(e_i) = Q(f_i) = 0, and Q(w_1) = 1 and
+# Q(w_2) = gamma = Z(q) for "O-"
+RECOG.ClassicalStandardQuadraticForm := function(type, d, f)
+  local m, A, i;
+
+  m := d / 2;
+  if type = "O-" then
+    m := m - 1;
+  fi;
+  A := NullMat(d, d, f);
+  for i in [1, 3 .. 2 * m - 1] do
+    A[i, i + 1] := One(f);
+  od;
+  if type = "O-" then
+    A[d - 1, d - 1] := One(f);
+    A[d - 1, d] := RECOG.OrthogonalEta(Size(f));
+    A[d, d] := Z(Size(f));
+  fi;
+  ConvertToMatrixRep(A, f);
+  return A;
 end;
 
 # Forms are records with components `gram`, `frob` and `field`, standing
@@ -96,19 +134,85 @@ end;
 # over GF(q0^2).
 # All forms here are reflexive, beta(y, x) = eps * beta(x, y)^frob with
 # eps = 1 or -1, as alternating, hermitian and symmetric forms are.
+# A quadratic form Q in characteristic 2 has the further component `quad`,
+# an upper triangular matrix A with Q(x) = x A x^T, and gram = A + A^T is
+# its polar form.
 
 # The standard form of type <type>, "Sp", "SU" or an orthogonal type, on
 # GF(q)^<d>, q = Size(<f>), as a form record
 RECOG.ClassicalForm := function(type, d, f)
-  local frob;
+  local frob, res;
 
   frob := 1;
   if type = "SU" then
     frob := RootInt(Size(f), 2);
   fi;
-  return rec( gram := RECOG.ClassicalStandardForm(type, d, f),
+  res := rec( gram := RECOG.ClassicalStandardForm(type, d, f),
               frob := frob, field := f );
+  if type in RECOG.OrthogonalTypes and IsEvenInt(Size(f)) then
+    res.quad := RECOG.ClassicalStandardQuadraticForm(type, d, f);
+  fi;
+  return res;
 end;
+
+# Q(<x>) for the symmetric or quadratic form <form>: beta(x, x)/2 in odd
+# characteristic
+RECOG.FormQuadraticValue := function(form, x)
+  if IsBound(form.quad) then
+    return x * form.quad * x;
+  fi;
+  return x * form.gram * x / 2;
+end;
+
+# The upper triangular matrix A with x A x^T = x <B> x^T for all x
+RECOG.UpperTriangularForm := function(B)
+  local A, n, i, j;
+
+  A := MutableCopyMat(B);
+  n := NrRows(A);
+  for i in [1 .. n] do
+    for j in [i + 1 .. n] do
+      A[i, j] := A[i, j] + A[j, i];
+      A[j, i] := Zero(A[j, i]);
+    od;
+  od;
+  return A;
+end;
+
+# The restriction of <form> to the span of the rows of <M>, relative to
+# them, as a form record
+RECOG.FormRestriction := function(form, M)
+  local res;
+
+  res := rec( gram := RECOG.FormGram(form, M), frob := form.frob,
+              field := form.field );
+  if IsBound(form.quad) then
+    res.quad := RECOG.UpperTriangularForm(M * form.quad * TransposedMat(M));
+    ConvertToMatrixRep(res.quad, form.field);
+  fi;
+  return res;
+end;
+
+# A solution x in <f> of x^2 + x = <r>, for <f> of characteristic 2, or
+# fail if there is none, that is, if the trace of r over GF(2) is 1. The
+# map x -> x^2 + x is GF(2)-linear with kernel GF(2).
+RECOG.ArtinSchreierRoot := function(r, f)
+  local B, M, c;
+
+  if IsZero(r) then
+    return Zero(f);
+  fi;
+  B := CanonicalBasis(f);
+  M := List(BasisVectors(B), b -> Coefficients(B, b^2 + b));
+  c := SolutionMat(M, Coefficients(B, r));
+  if c = fail then
+    return fail;
+  fi;
+  return c * BasisVectors(B);
+end;
+
+# The square root of <x> in a field of order <q>, a power of 2
+RECOG.SqrtFFE2 := {x, q} -> x^(q / 2);
 
 # The vector or matrix <v> with its entries raised to the power form.frob,
 # compressed: products of plain lists are slow
@@ -227,6 +331,87 @@ RECOG.FormHyperbolicPairStep := function(form, vecs, dual)
   return rec( e := e, f := f, eJ := eJ, fJ := fJ, drop := drop );
 end;
 
+# RECOG.FormHyperbolicPairStep for a quadratic form <form> in
+# characteristic 2, with the hyperbolic pair singular for Q: Q(e) = Q(f) = 0
+# and beta(e, f) = 1. <qv> holds the values Q(vecs[i]). The step finds a
+# pair if the span is non-degenerate of dimension at least 3, or a
+# hyperbolic plane.
+RECOG.FormQuadHyperbolicPairStep := function(form, vecs, dual, qv)
+  local F, n, x, c, k, z, zJ, qz, j, b, y, yJ, a, mu, lam, e, eJ, s, i, f,
+        fJ;
+
+  F := form.field;
+  n := Length(vecs);
+  if n < 2 then
+    return fail;
+  fi;
+
+  # a singular vector e, with coefficient 1 at the j-th row of <vecs>:
+  # x = vecs[1], or z + s x for z orthogonal to x, as
+  # Q(z + s x) = Q(z) + s^2 Q(x); in a plane <x, y> with beta(x, y) = 1,
+  # Q(x + lam y) = Q(x) + lam + lam^2 Q(y) is 0 for lam = mu/Q(y),
+  # mu^2 + mu = Q(x) Q(y), if that has a solution
+  x := vecs[1];
+  c := qv[1];
+  z := fail;
+  if IsZero(c) then
+    e := x;
+    eJ := dual[1];
+    j := 1;
+  else
+    k := First([2 .. n], k -> IsZero(dual[1] * vecs[k]));
+    if k <> fail then
+      z := vecs[k];
+      zJ := dual[k];
+      qz := qv[k];
+      j := k;
+    elif n >= 3 then
+      lam := (dual[1] * vecs[3]) / (dual[1] * vecs[2]);
+      z := vecs[3] - lam * vecs[2];
+      zJ := dual[3] - lam * dual[2];
+      qz := qv[3] + lam^2 * qv[2] - lam * (dual[3] * vecs[2]);
+      j := 3;
+    else
+      b := dual[1] * vecs[2];
+      y := vecs[2] / b;
+      yJ := dual[2] / b;
+      a := qv[2] / b^2;
+      if IsZero(a) then
+        e := y;
+        eJ := yJ;
+        j := 2;
+      else
+        mu := RECOG.ArtinSchreierRoot(a * c, F);
+        if mu = fail then
+          return fail;
+        fi;
+        lam := mu / a;
+        e := x + lam * y;
+        eJ := dual[1] + lam * yJ;
+        j := 1;
+      fi;
+    fi;
+  fi;
+  if z <> fail then
+    s := RECOG.SqrtFFE2(qz / c, Size(F));
+    e := z + s * x;
+    eJ := zJ + s * dual[1];
+  fi;
+
+  # f = b / beta(e, b) for a row b other than the j-th with beta(e, b) <> 0,
+  # which exists as the span is non-degenerate; f + Q(f) e is singular
+  i := First([1 .. n], k -> k <> j and not IsZero(dual[k] * e));
+  if i = fail then
+    return fail;
+  fi;
+  b := dual[i] * e;
+  f := vecs[i] / b;
+  fJ := dual[i] / b;
+  c := qv[i] / b^2;
+  return rec( e := e, f := f + c * e, eJ := eJ, fJ := fJ + c * eJ,
+              drop := [j, i] );
+end;
+
 # A hyperbolic pair [e, f] in the span of the rows <vecs> for <form>, as
 # for RECOG.FormHyperbolicPairStep. Returns fail if the span contains none,
 # that is, if the Gram matrix of <vecs> has rank less than 2, or the span
@@ -239,8 +424,14 @@ RECOG.FormHyperbolicPair := function(form, vecs)
   G := RECOG.FormGram(form, vecs);
   heads := SemiEchelonMat(TransposedMat(G)).heads;
   vecs := vecs{Filtered([1 .. Length(vecs)], i -> heads[i] <> 0)};
-  step := RECOG.FormHyperbolicPairStep(form, vecs,
-                                       List(vecs, v -> v * form.gram));
+  if IsBound(form.quad) then
+    step := RECOG.FormQuadHyperbolicPairStep(form, vecs,
+                List(vecs, v -> v * form.gram),
+                List(vecs, v -> RECOG.FormQuadraticValue(form, v)));
+  else
+    step := RECOG.FormHyperbolicPairStep(form, vecs,
+                                         List(vecs, v -> v * form.gram));
+  fi;
   if step = fail then
     return fail;
   fi;
@@ -300,6 +491,38 @@ RECOG.FormAnisotropicBasis := function(form, vecs, dual)
   return [w1, w2];
 end;
 
+# RECOG.FormAnisotropicBasis for a quadratic form <form> in characteristic
+# 2, where qv[i] = Q(vecs[i]): a basis (w_1, w_2) of the anisotropic plane
+# spanned by <vecs> with Q(w_1) = 1, beta(w_1, w_2) = eta and
+# Q(w_2) = gamma (see RECOG.ClassicalStandardQuadraticForm), or fail. With
+# beta(w_1, y) = 1, w_2 = eta (k w_1 + y) has
+# Q(w_2) = eta^2 (k^2 + k + Q(y)), which is gamma for a solution k of
+# k^2 + k = gamma/eta^2 + Q(y); one exists as any two anisotropic planes
+# are isometric.
+RECOG.FormQuadAnisotropicBasis := function(form, vecs, dual, qv)
+  local F, q, eta, r, w1, w1J, b, y, k;
+
+  F := form.field;
+  q := Size(F);
+  if Length(vecs) <> 2 or IsZero(qv[1]) then
+    return fail;
+  fi;
+  r := RECOG.SqrtFFE2(qv[1], q);
+  w1 := vecs[1] / r;
+  w1J := dual[1] / r;
+  b := w1J * vecs[2];
+  if IsZero(b) then
+    return fail;
+  fi;
+  y := vecs[2] / b;
+  eta := RECOG.OrthogonalEta(q);
+  k := RECOG.ArtinSchreierRoot(Z(q) / eta^2 + qv[2] / b^2, F);
+  if k = fail then
+    return fail;
+  fi;
+  return [w1, eta * (k * w1 + y)];
+end;
+
 # A standard basis (e_1, f_1, e_2, f_2, ..., w_1, ..., w_d0) of the span of
 # the rows <vecs> for <form>, as for RECOG.FormHyperbolicPairStep and
 # RECOG.FormAnisotropicBasis, or fail if the form is degenerate on that
@@ -307,6 +530,9 @@ end;
 RECOG.FormStandardBasis := function(form, vecs)
   local dual, res, step, aniso, ce, cf, eps, keep, bf, be, i;
 
+  if IsBound(form.quad) then
+    return RECOG.FormQuadStandardBasis(form, vecs);
+  fi;
   vecs := ShallowCopy(vecs);
   dual := List(vecs, v -> v * form.gram);
   res := [];
@@ -339,6 +565,42 @@ RECOG.FormStandardBasis := function(form, vecs)
   return res;
 end;
 
+# RECOG.FormStandardBasis for a quadratic form <form> in characteristic 2.
+# The projection x' = x + beta(x, f) e + beta(x, e) f of a row onto the
+# orthogonal complement of the pair has Q(x') = Q(x) + beta(x, e) beta(x, f).
+RECOG.FormQuadStandardBasis := function(form, vecs)
+  local dual, qv, res, step, aniso, keep, bf, be, i;
+
+  vecs := ShallowCopy(vecs);
+  dual := List(vecs, v -> v * form.gram);
+  qv := List(vecs, v -> RECOG.FormQuadraticValue(form, v));
+  res := [];
+  while vecs <> [] do
+    step := RECOG.FormQuadHyperbolicPairStep(form, vecs, dual, qv);
+    if step = fail then
+      aniso := RECOG.FormQuadAnisotropicBasis(form, vecs, dual, qv);
+      if aniso = fail then
+        return fail;
+      fi;
+      return Concatenation(res, aniso);
+    fi;
+    Append(res, [step.e, step.f]);
+
+    keep := Difference([1 .. Length(vecs)], step.drop);
+    vecs := vecs{keep};
+    dual := dual{keep};
+    qv := qv{keep};
+    for i in [1 .. Length(vecs)] do
+      bf := dual[i] * step.f;
+      be := dual[i] * step.e;
+      vecs[i] := vecs[i] + bf * step.e + be * step.f;
+      dual[i] := dual[i] + bf * step.eJ + be * step.fJ;
+      qv[i] := qv[i] + be * bf;
+    od;
+  od;
+  return res;
+end;
+
 # Whether the nonzero <x> in GF(<q>), q odd, is a square
 RECOG.IsSquareFFE := {x, q} -> IsOne(x^((q - 1) / 2));
 
@@ -353,9 +615,55 @@ RECOG.FormOrthogonalType := function(form, vecs)
   n := Length(vecs);
   if IsOddInt(n) then
     return "O";
+  elif IsBound(form.quad) then
+    return RECOG.FormQuadOrthogonalType(form, vecs);
   fi;
   det := (-1)^(n / 2) * DeterminantMat(RECOG.FormGram(form, vecs));
   if RECOG.IsSquareFFE(det, Size(form.field)) then
+    return "O+";
+  fi;
+  return "O-";
+end;
+
+# RECOG.FormOrthogonalType for a quadratic form <form> in characteristic 2
+# and an even number of rows <vecs>: "O+" if and only if the Arf invariant
+# sum Q(x_i) Q(y_i), for a symplectic basis (x_i, y_i) of the span, has
+# trace 0 over GF(2), that is, lies in {k^2 + k} (Taylor, The geometry of
+# the classical groups, 1992, p. 140). The projection
+# z' = z + beta(z, y) x + beta(z, x) y onto the complement of a pair with
+# beta(x, y) = 1 has Q(z') = Q(z) + a^2 Q(x) + b^2 Q(y) + a b,
+# a = beta(z, y), b = beta(z, x).
+RECOG.FormQuadOrthogonalType := function(form, vecs)
+  local dual, qv, arf, i, c, y, yJ, qy, keep, a, b;
+
+  vecs := ShallowCopy(vecs);
+  dual := List(vecs, v -> v * form.gram);
+  qv := List(vecs, v -> RECOG.FormQuadraticValue(form, v));
+  arf := Zero(form.field);
+  while vecs <> [] do
+    i := First([2 .. Length(vecs)], k -> not IsZero(dual[1] * vecs[k]));
+    if i = fail then
+      ErrorNoReturn("RECOG.FormQuadOrthogonalType: the form is degenerate");
+    fi;
+    c := dual[1] * vecs[i];
+    y := vecs[i] / c;
+    yJ := dual[i] / c;
+    qy := qv[i] / c^2;
+    arf := arf + qv[1] * qy;
+
+    keep := Difference([2 .. Length(vecs)], [i]);
+    for i in keep do
+      a := dual[i] * y;
+      b := dual[i] * vecs[1];
+      qv[i] := qv[i] + a^2 * qv[1] + b^2 * qy + a * b;
+      vecs[i] := vecs[i] + a * vecs[1] + b * y;
+      dual[i] := dual[i] + a * dual[1] + b * yJ;
+    od;
+    vecs := vecs{keep};
+    dual := dual{keep};
+    qv := qv{keep};
+  od;
+  if RECOG.ArtinSchreierRoot(arf, form.field) <> fail then
     return "O+";
   fi;
   return "O-";
@@ -366,14 +674,26 @@ end;
 # to a scalar: g * gram * (g^frob)^T = gram for g in gens. For "SU" it is
 # hermitian, and for "O" (odd degree) it is the multiple for which a
 # standard basis exists: [EHNPR], 'Classical forms and classical groups',
-# Lemma on standard bases. For even degree every multiple has one.
+# Lemma on standard bases. For even degree every multiple has one. For the
+# orthogonal types and q even it is the quadratic form of
+# RECOG.InvariantQuadraticForm.
 RECOG.ClassicalInvariantForm := function(type, gens, f)
-  local M, frob, F, Fq, d, std;
+  local M, frob, F, Fq, d, std, res;
 
   M := GModuleByMats(gens, f);
   if type = "Sp" then
     return rec( gram := MTX.InvariantBilinearForm(M), frob := 1,
                 field := f );
+  elif type in RECOG.OrthogonalTypes and IsEvenInt(Size(f)) then
+    F := MTX.InvariantBilinearForm(M);
+    ConvertToMatrixRep(F, f);
+    res := rec( gram := F, frob := 1, field := f,
+                quad := RECOG.InvariantQuadraticForm(gens, F, f) );
+    if res.quad = fail then
+      ErrorNoReturn("RECOG.ClassicalInvariantForm: <gens> preserve no ",
+                    "quadratic form");
+    fi;
+    return res;
   elif type in RECOG.OrthogonalTypes then
     F := MTX.InvariantBilinearForm(M);
     d := NrRows(F);
@@ -404,6 +724,48 @@ RECOG.ClassicalInvariantForm := function(type, gens, f)
   return rec( gram := F, frob := frob, field := f );
 end;
 
+# The upper triangular matrix A of the quadratic form Q(x) = x A x^T with
+# polar form <F>, an alternating Gram matrix over <f> of characteristic 2,
+# which the matrices <gens> preserve, or fail if there is none; it is
+# unique if <gens> fix no nonzero vector of the dual space, for example if
+# they act irreducibly. With U the strict upper triangle of F,
+# Q(x) = x U x^T + (x . c)^2 for a vector c, whose squares are the diagonal
+# of A. For g in gens, Q o g - Q is the square of a linear form, so it
+# vanishes if it does on the basis vectors b_k: (b_k g U (b_k g)^T) +
+# ((b_k g) . c + c_k)^2 = 0, that is, (g + 1) c = r_g with r_g[k] the
+# square root of (b_k g) U (b_k g)^T.
+RECOG.InvariantQuadraticForm := function(gens, F, f)
+  local n, q, U, i, j, M, r, gU, c, A;
+
+  n := NrRows(F);
+  q := Size(f);
+  U := NullMat(n, n, f);
+  for i in [1 .. n] do
+    for j in [i + 1 .. n] do
+      U[i, j] := F[i, j];
+    od;
+  od;
+  ConvertToMatrixRep(U, f);
+
+  M := [];
+  r := [];
+  for i in [1 .. Length(gens)] do
+    Append(M, gens[i] + One(gens[i]));
+    gU := gens[i] * U;
+    Append(r, List([1 .. n], k -> RECOG.SqrtFFE2(gU[k] * gens[i][k], q)));
+  od;
+  # M c = r for the column vector c
+  c := SolutionMat(TransposedMat(M), r);
+  if c = fail then
+    return fail;
+  fi;
+  A := U;
+  for i in [1 .. n] do
+    A[i, i] := c[i]^2;
+  od;
+  return A;
+end;
+
 # The matrix which acts as <M> on the basis vectors with indices <idx> and
 # fixes the other basis vectors of GF(q)^<d>
 RECOG.EmbedBlock := function(d, f, idx, M)
@@ -431,7 +793,7 @@ RECOG.SignedCycle := function(d, f, idx, sign)
 end;
 
 # The standard generators of Omega(<d>, q) of the orthogonal type <type>,
-# q = Size(<f>) odd, for RECOG.ClassicalStandardGenerators, as a record
+# q = Size(<f>), for RECOG.ClassicalStandardGenerators, as a record
 # with the components named by RECOG.ClassicalStandardGeneratorNames. With
 # gamma = Z(q), m the number of hyperbolic pairs and sign = (-1)^(m+1):
 #  - "O+": on (e_1, f_1, e_2, f_2), s = [[0,0,0,-1],[0,0,-1,0],[0,1,0,0],
@@ -447,6 +809,11 @@ end;
 #    B = (g^(q-1) - g^(1-q))/(2a) and C = gamma B. [LGO09], Section 3,
 #    has B and C interchanged, a misprint ([EHNPR], Definition of the
 #    field constants)
+#  - "O-", q even: on (e_1, f_1, w_1, w_2), s = [[0,1,0,0],[1,0,0,0],
+#    [0,0,1,0],[0,0,eta,1]], t = [[1,1,1,0],[0,1,0,0],[0,0,1,0],
+#    [0,eta,0,1]] and delta = [[gamma,0,0,0],[0,gamma^-1,0,0],[0,0,1,a],
+#    [0,0,eta,c]] with eta = g + g^q, a = g^-1 + g^-q and
+#    c = g^(1-q) + g^(q-1) + 1 ([EHNPR], Definition of the field constants)
 #  - "O": on (e_1, f_1, w_1), s = [[0,1,0],[1,0,0],[0,0,-1]],
 #    t = [[1,1,2],[0,1,0],[0,1,1]] and delta = diag(gamma^2, gamma^-2, 1)
 #  - u ("O-", "O"): (e_1, e_2)^-(f_1, f_2)^-, the identity for m = 1
@@ -490,7 +857,18 @@ RECOG.OrthogonalStandardGenerators := function(type, d, f)
     res.u := RECOG.SignedCycle(d, f, [1, 3], -1)
              * RECOG.SignedCycle(d, f, [2, 4], -1);
   fi;
-  if type = "O-" then
+  if type = "O-" and IsEvenInt(q) then
+    idx := [1, 2, d - 1, d];
+    g := Z(q^2);
+    a := RECOG.OrthogonalEta(q);
+    res.s := RECOG.EmbedBlock(d, f, idx,
+                 [[0, 1, 0, 0], [1, 0, 0, 0], [0, 0, 1, 0], [0, 0, a, 1]]);
+    res.t := RECOG.EmbedBlock(d, f, idx,
+                 [[1, 1, 1, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, a, 0, 1]]);
+    res.delta := RECOG.EmbedBlock(d, f, idx,
+                     [[gamma, 0, 0, 0], [0, gamma^-1, 0, 0],
+                      [0, 0, 1, g^-1 + g^-q], [0, 0, a, g^(1 - q) + g^(q - 1) + 1]]);
+  elif type = "O-" then
     idx := [1, 2, d - 1, d];
     g := Z(q^2);
     a := g^((q + 1) / 2);
@@ -519,7 +897,9 @@ end;
 # with q odd and d even, and for the orthogonal types with q odd, they are
 # those of Leedham-Green and O'Brien [LGO09], Section 3, Table 1, relative
 # to the basis order of [EHNPR], except u for SL and y, which are the
-# identity there. For SU, q = q0^2, alpha = gamma^((q0+1)/2) and
+# identity there; for "O+" and "O-" with q even, those of [DLGLO13]
+# (doc/recog.bib), Lemma 2.2, with "O-" on the first pair. For SU,
+# q = q0^2, alpha = gamma^((q0+1)/2) and
 # gamma0 = gamma^(q0+1). For the orthogonal types the components are those
 # of RECOG.OrthogonalStandardGenerators and `all`; otherwise
 # it returns a record with the following components:
@@ -549,9 +929,8 @@ RECOG.ClassicalStandardGenerators := function(type, d, f)
     ErrorNoReturn("RECOG.ClassicalStandardGenerators: <d> must be even");
   elif type = "O" and IsEvenInt(d) then
     ErrorNoReturn("RECOG.ClassicalStandardGenerators: <d> must be odd");
-  elif type in RECOG.OrthogonalTypes and IsEvenInt(Size(f)) then
-    ErrorNoReturn("RECOG.ClassicalStandardGenerators: orthogonal types ",
-                  "need odd q");
+  elif type = "O" and IsEvenInt(Size(f)) then
+    ErrorNoReturn("RECOG.ClassicalStandardGenerators: \"O\" needs odd q");
   fi;
 
   gamma := Z(Size(f));

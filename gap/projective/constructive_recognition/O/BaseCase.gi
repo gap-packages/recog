@@ -12,12 +12,12 @@
 ##  SPDX-License-Identifier: GPL-3.0-or-later
 ##
 ##
-##  FinalDescent for orthogonal groups, q odd, from Omega^+-(8,q) to
+##  FinalDescent for orthogonal groups from Omega^+-(8,q) to
 ##  Omega^+(6,q), and constructive recognition of Omega^+(6,q) in its
 ##  natural representation by the Klein correspondence: SL(4,q) acts on
 ##  the exterior square L = Lambda^2(GF(q)^4) with kernel <-1> and image
 ##  Omega^+(6,q), for the quadratic form Q given by w ^ w = 2 Q(w)
-##  b_1 ^ b_2 ^ b_3 ^ b_4.
+##  b_1 ^ b_2 ^ b_3 ^ b_4 for q odd, and by the formula below for all q.
 ##
 ##  L has the basis b_ij = b_i ^ b_j, i < j, in the order b_12, b_13, b_14,
 ##  b_23, b_24, b_34, and Q(sum p_ij b_ij) = p_12 p_34 - p_13 p_24 +
@@ -150,7 +150,7 @@ RECOG.O_IsOmega6 := function(gens, form, f)
   return A;
 end;
 
-# Constructive recognition of Omega^+(6,q), q odd, in its natural
+# Constructive recognition of Omega^+(6,q) in its natural
 # representation, by the Klein correspondence: <gens> are 6x6 matrices over
 # <f> which generate Omega^+(6,q) and preserve the symmetric form <form>,
 # a form record. For a standard basis B of <form> and the basis K of L it
@@ -196,16 +196,65 @@ RECOG.O_FindStdGensOmega6 := function(gens, form, f)
               bas := B );
 end;
 
+# A power of <x>, an element with memory of an orthogonal group in
+# characteristic 2, whose support im(x-1) is a plane, or fail: for an odd
+# prime r, the r-part of x or its power of order r. Elements of odd order
+# are semisimple, so their support is the orthogonal complement of their
+# fixed space, hence non-degenerate. <ord> computes orders.
+RECOG.O_PlanePower := function(x, ord)
+  local o, r, k, y, ym;
+
+  o := ord(x);
+  for r in PrimeDivisors(o) do
+    if r = 2 then
+      continue;
+    fi;
+    k := o;
+    while k mod r = 0 do
+      k := k / r;
+    od;
+    for y in [x^k, x^(o / r)] do
+      ym := StripMemory(y);
+      if RankMat(ym - One(ym)) = 2 then
+        return y;
+      fi;
+    od;
+  od;
+  return fail;
+end;
+
+# FinalDescent for Omega^+-(8,2) by a stabiliser chain, with the
+# arguments and the result of RECOG.O_FinalDescent: the standard generators
+# of Omega^+(6,2) on the first six vectors of a standard basis of <form>.
+# Returns fail if <gens> generate a subgroup which does not contain them.
+RECOG.O_FinalDescentByBSGS := function(gens, f, form)
+  local B, Bi, std, slp;
+
+  B := RECOG.FormStandardBasis(form, IdentityMat(8, f));
+  ConvertToMatrixRep(B, f);
+  Bi := B^-1;
+  std := List(RECOG.ClassicalStandardGenerators("O+", 6, f).all,
+              x -> Bi * DirectSumMat(x, IdentityMat(2, f)) * B);
+  slp := RECOG.FindStdGensUsingBSGS(Group(StripMemory(gens)), std, false,
+                                    false);
+  if slp = fail then
+    return fail;
+  fi;
+  return rec( slp := slp, bas := B );
+end;
+
 # FinalDescent of [EHNPR] (see ../GoingDown.gi; 'Terminal groups and
-# initial groups', 'The final descent') for orthogonal groups, q odd:
+# initial groups', 'The final descent') for orthogonal groups:
 # <gens> are 8x8 matrices over <f> generating Omega^+-(8,q), which preserve
-# the symmetric form <form>, a form record. A stingray element s with a
-# body W of dimension 4 and an involution j whose (-1)-eigenspace D has
-# dimension 2 are taken as a stingray duo, as in RECOG.GoingDownStep: if W
-# meets D trivially and V is the sum of W + D and the common fixed space,
-# then <s, j> acts on W + D and fixes its complement. If W + D has type +
-# and the preimages of s and j in SL(4,q) generate SL(4,q), then <s, j>
-# induces Omega^+(6,q) on W + D.
+# the symmetric or quadratic form <form>, a form record. A stingray element
+# s with a body W of dimension 4 and an element j whose support D = im(j-1)
+# is a non-degenerate plane are taken as a stingray duo, as in
+# RECOG.GoingDownStep: if W meets D trivially and V is the sum of W + D and
+# the common fixed space, then <s, j> acts on W + D and fixes its
+# complement. If W + D has type + and the preimages of s and j in SL(4,q)
+# generate SL(4,q), then <s, j> induces Omega^+(6,q) on W + D. For q odd,
+# j is an involution with (-1)-eigenspace D; for q even, of odd order,
+# found by RECOG.O_PlanePower.
 # The routes [EHNPR] sketches do not cover all these groups. The
 # centraliser of an involution with eigenspaces E2 and E6 of dimensions 2
 # and 6 ([DR], Section 8.1) needs E6 of type +, but the spinor norm of an
@@ -217,9 +266,15 @@ end;
 # at all. Here j takes its place: D may have type -, so such involutions
 # lie in Omega for every q. No success probability is known; over 10 seeds
 # for each Omega^+-(8,q), q <= 243 odd, every run succeeded, and 240 of
-# the 244 duos of type + generated Omega^+(6,q).
-# Makes at most <N> random selections of a stingray element or an
-# involution, and returns fail if they are used up. Otherwise it returns a
+# the 244 duos of type + generated Omega^+(6,q); for q = 4, 8, ..., 256,
+# 10 of 10 runs per group succeeded, after 1 to 13 pairs. For q = 2 no pair
+# generates Omega^+(6,2) = A8, acting on the non-trivial constituent of the
+# permutation module of degree 8: s is a 5-cycle and j a 3-cycle there, as
+# their supports have dimensions 4 and 2; they share a point or commute,
+# so they lie in an A7. Omega^+-(8,2) is small enough for a stabiliser
+# chain instead.
+# Makes at most <N> random selections of a stingray element or of j, and
+# returns fail if they are used up. Otherwise it returns a
 # record with the following components:
 #  - `slp`: SLP in <gens> for the standard generators of an Omega^+(6,q)
 #  - `bas`: an 8x8 matrix whose first six rows are a standard basis of
@@ -228,10 +283,13 @@ end;
 #    generators are those of RECOG.ClassicalStandardGenerators("O+", 6, <f>),
 #    extended by the identity on the last two rows
 RECOG.O_FinalDescent := function(gens, f, form, N)
-  local h, ord, pr, r, j, s, jm, W, sum, tail, H6, form6, base;
+  local h, ord, pr, r, j, s, jm, D, W, sum, tail, H6, form6, base;
 
   if NrRows(gens[1]) <> 8 then
     ErrorNoReturn("RECOG.O_FinalDescent: <gens> must be 8x8 matrices");
+  fi;
+  if Size(f) = 2 then
+    return RECOG.O_FinalDescentByBSGS(gens, f, form);
   fi;
 
   h := GroupWithMemory(gens);
@@ -246,9 +304,13 @@ RECOG.O_FinalDescent := function(gens, f, form, N)
     j := fail;
     while j = fail and N > 0 do
       N := N - 1;
-      j := RECOG.InvolutionSearcher(pr, ord, 100);
-      if j <> fail and Length(RECOG.FixspaceMat(-StripMemory(j))) <> 2 then
-        j := fail;
+      if IsEvenInt(Size(f)) then
+        j := RECOG.O_PlanePower(Next(pr), ord);
+      else
+        j := RECOG.InvolutionSearcher(pr, ord, 100);
+        if j <> fail and Length(RECOG.FixspaceMat(-StripMemory(j))) <> 2 then
+          j := fail;
+        fi;
       fi;
     od;
     if j = fail then
@@ -257,8 +319,13 @@ RECOG.O_FinalDescent := function(gens, f, form, N)
 
     s := StripMemory(r.element);
     jm := StripMemory(j);
+    if IsEvenInt(Size(f)) then
+      D := SemiEchelonMat(jm - One(jm)).vectors;
+    else
+      D := RECOG.FixspaceMat(-jm);
+    fi;
     W := SemiEchelonMatTransformation(s - One(s));
-    sum := SumIntersectionMat(W.vectors, RECOG.FixspaceMat(-jm))[1];
+    sum := SumIntersectionMat(W.vectors, D)[1];
     tail := SumIntersectionMat(W.relations, RECOG.FixspaceMat(jm))[2];
     if Length(sum) <> 6 or Length(tail) <> 2
        or RankMat(Concatenation(sum, tail)) <> 8 then
@@ -273,7 +340,7 @@ RECOG.O_FinalDescent := function(gens, f, form, N)
     fi;
     H6 := List([s, jm], g -> List(sum * g, v -> SolutionMat(sum, v)));
     Perform(H6, function(g) ConvertToMatrixRep(g, f); end);
-    form6 := rec( gram := RECOG.FormGram(form, sum), frob := 1, field := f );
+    form6 := RECOG.FormRestriction(form, sum);
     if RECOG.O_IsOmega6(H6, form6, f) = fail then
       Info(InfoRecog_ClassicalNatural, 3,
            "    FinalDescent: the duo does not generate Omega^+(6,q)");

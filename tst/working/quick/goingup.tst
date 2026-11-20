@@ -68,7 +68,7 @@ gap> CheckFormRoots := function(type, n, q)
 >                 lambda := c - R.eps * R.conj(c);
 >             fi;
 >             M := FormRootMatrix(R, kind, j, lambda, n);
->             if RECOG.FormGram(form, M) <> form.gram
+>             if RECOG.FormRestriction(form, M) <> form
 >                or StripMemory(RECOG.Form_RootElement(R, kind, j, lambda))
 >                   <> M then
 >                 return [kind, j, lambda];
@@ -79,14 +79,16 @@ gap> CheckFormRoots := function(type, n, q)
 > end;;
 gap> ForAll([["Sp", 4, 3], ["Sp", 6, 5], ["Sp", 8, 9], ["Sp", 10, 27],
 >            ["SU", 4, 9], ["SU", 6, 25], ["SU", 8, 81], ["SU", 4, 729],
->            ["O+", 6, 3], ["O+", 10, 5], ["O+", 10, 9], ["O+", 18, 27]],
+>            ["O+", 6, 3], ["O+", 10, 5], ["O+", 10, 9], ["O+", 18, 27],
+>            ["O+", 6, 2], ["O+", 10, 8]],
 >           c -> CallFuncList(CheckFormRoots, c) = true);
 true
 
 # The eliminations map vectors to the basis vectors they promise, also
-# vectors with few nonzero coordinates, which take the rarer branches.
+# vectors with few nonzero coordinates, which take the rarer branches. For
+# orthogonal groups, Q(y) takes the place of beta(y, y)/2, also for q even.
 gap> CheckEliminations := function(n, q)
->     local f, e, R, vecs, y, b, type, form;
+>     local f, e, R, vecs, y, b, types, type, form, half;
 >     f := GF(q);
 >     e := IdentityMat(n, f);
 >     vecs := Concatenation(e, List([1 .. 20], i -> Random(f^n)),
@@ -100,10 +102,14 @@ gap> CheckEliminations := function(n, q)
 >             return ["SL", y];
 >         fi;
 >     od;
->     if IsOddInt(n) or IsEvenInt(q) then
+>     if IsOddInt(n) then
 >         return true;
 >     fi;
->     for type in ["Sp", "SU", "O+"] do
+>     types := ["O+"];
+>     if IsOddInt(q) then
+>         types := ["Sp", "SU", "O+"];
+>     fi;
+>     for type in types do
 >         if type = "SU" and not IsInt(Sqrt(q)) then
 >             continue;
 >         fi;
@@ -112,9 +118,13 @@ gap> CheckEliminations := function(n, q)
 >                      RECOG.ClassicalStandardGenerators(type, n, f).all),
 >                  n, f);
 >         form := RECOG.ClassicalForm(type, n, f);
+>         half := y -> RECOG.FormValue(form, y, y) / 2;
+>         if type = "O+" then
+>             half := y -> RECOG.FormQuadraticValue(form, y);
+>         fi;
 >         for y in vecs do
 >             b := RECOG.Form_MapToStd(R, y);
->             if y * b.mat <> e[1] + RECOG.FormValue(form, y, y) / 2 * e[2]
+>             if y * b.mat <> e[1] + half(y) * e[2]
 >                or StripMemory(b.word) <> b.mat then
 >                 return [type, y];
 >             fi;
@@ -122,7 +132,7 @@ gap> CheckEliminations := function(n, q)
 >             y := ShallowCopy(y);
 >             y[1] := Zero(f);
 >             y[2] := One(f);
->             y[1] := -RECOG.FormValue(form, y, y) / 2;
+>             y[1] := -half(y);
 >             b := RECOG.Form_MapToF1FixingE1(R, y);
 >             if y * b.mat <> e[2] or e[1] * b.mat <> e[1]
 >                or StripMemory(b.word) <> b.mat then
@@ -132,7 +142,8 @@ gap> CheckEliminations := function(n, q)
 >     od;
 >     return true;
 > end;;
-gap> ForAll([[4, 3], [5, 4], [6, 5], [8, 9], [4, 25], [6, 81]],
+gap> ForAll([[4, 3], [5, 4], [6, 5], [8, 9], [4, 25], [6, 81], [4, 2],
+>            [6, 4], [8, 16]],
 >           c -> CheckEliminations(c[1], c[2]) = true);
 true
 gap> CheckExpress := function(n, q)
@@ -177,7 +188,9 @@ gap> ForAll([["SL", 2, 3, 7], ["SL", 2, 8, 4], ["SL", 2, 17, 5],
 >            ["SU", 4, 20, 9], ["O+", 6, 8, 3], ["O-", 6, 8, 3],
 >            ["O", 6, 9, 3], ["O-", 6, 10, 5], ["O", 6, 11, 7],
 >            ["O+", 6, 12, 9], ["O-", 6, 14, 3], ["O", 6, 15, 5],
->            ["O+", 6, 20, 3], ["O-", 6, 22, 7], ["O", 6, 21, 9]],
+>            ["O+", 6, 20, 3], ["O-", 6, 22, 7], ["O", 6, 21, 9],
+>            ["O+", 6, 8, 2], ["O-", 6, 10, 4], ["O+", 6, 12, 8],
+>            ["O-", 6, 14, 2], ["O-", 6, 20, 16]],
 >           c -> CallFuncList(CheckGoingUp, c));
 true
 

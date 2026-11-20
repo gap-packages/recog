@@ -675,11 +675,26 @@ end;
 # in Omega (Taylor, op. cit., Theorem 11.51).
 RECOG.HasTrivialSpinorNorm := {g,form} -> RECOG.SpinorNorm(g,form) = 0;
 
+# Whether the isometry <g> of the quadratic form of <form>, q even, lies
+# in Omega: whether its Dickson invariant, the dimension of the image of
+# g - 1 mod 2, is 0 (Taylor, op. cit., p. 160 and Theorem 11.51)
+RECOG.HasTrivialDicksonInvariant := g -> IsEvenInt(RankMat(g - One(g)));
+
+# Whether the isometry <g> of the polar form of the quadratic form of
+# <form>, q even, preserves the quadratic form: Q o g - Q is then the square
+# of a linear form, which vanishes if it does on the basis vectors
+RECOG.PreservesQuadraticForm := function(g,form)
+  local gA;
+  gA := g * form.quad;
+  return ForAll([1..NrRows(g)], k -> gA[k] * g[k] = form.quad[k,k]);
+end;
+
 # The scalar lambda with lambda <g> in the group of type <type>, "Sp",
 # "SU" or an orthogonal type, of the form record <form>, or fail if there
 # is none. For "Sp" and the orthogonal types, lambda^2 inverts the
-# similarity factor mu, and for the latter lambda g lies in Omega. For
-# "SU", mu lies in GF(q0), lambda^(q0+1) inverts it, and
+# similarity factor mu, and for the latter lambda g lies in Omega. For q
+# even, lambda is unique, and lambda g must preserve the quadratic form if
+# form has one. For "SU", mu lies in GF(q0), lambda^(q0+1) inverts it, and
 # lambda^d det(g) = 1.
 RECOG.ClassicalNaturalScalar := function(type,g,form)
   local f,mu,det,z,q0,lambda,c,t;
@@ -687,6 +702,15 @@ RECOG.ClassicalNaturalScalar := function(type,g,form)
   mu := RECOG.SimilarityFactor(g,form);
   if mu = fail then
       return fail;
+  elif type in RECOG.OrthogonalTypes and IsEvenInt(Size(f)) then
+      lambda := RootFFE(f,mu^-1,2);
+      if IsBound(form.quad)
+         and not RECOG.PreservesQuadraticForm(lambda * g,form) then
+          return fail;
+      elif not RECOG.HasTrivialDicksonInvariant(lambda * g) then
+          return fail;
+      fi;
+      return lambda;
   elif type = "Sp" then
       if IsOne(mu) then
           return One(f);
@@ -796,6 +820,11 @@ end;
 RECOG.ClassicalNaturalQuotient := function(ri,form,type)
   local d,data,imgs,H,hom;
   d := ri!.dimension;
+  # for q even, CO = O Z, and O/Omega, given by the Dickson invariant, is
+  # not split here: generators of O^+-(d,q) outside Omega Z fall through
+  if type = "O" and IsEvenInt(Size(form.field)) then
+      return fail;
+  fi;
   data := rec( type := type, form := form, d := d, layer := 1 );
   if type = "Sp" then
       data.perms := [(1,2)];
@@ -892,14 +921,15 @@ RECOG.ClassicalNaturalGroupWithMemory := function(ri,gens,changed)
 end;
 
 # ClassicalNatural for <ri> containing PSp(d,q), PSU(d,q0) or
-# POmega(d,q), q odd, d even for Sp and SU and at least 8 for Omega, as
-# <classical> of RecogniseClassical says; <type> is "Sp", "SU" or "O",
-# which stands for all orthogonal types here. The generators are scaled
-# into Sp(d,q), SU(d,q0) or Omega(d,q). That needs similarity factors that
-# are squares for Sp and Omega, determinants that scalars can bring to 1
-# for SU, and for Omega determinant 1 and spinor norm 1 up to the sign;
-# for a conformal symplectic group, a unitary group with other
-# determinants, or SO(d,q), the method does not apply.
+# POmega(d,q), d even for Sp and SU and at least 8 for Omega, q odd except
+# for Omega^+-(d,q), as <classical> of RecogniseClassical says; <type> is
+# "Sp", "SU" or "O", which stands for all orthogonal types here. The
+# generators are scaled into Sp(d,q), SU(d,q0) or Omega(d,q). That needs
+# similarity factors that are squares for Sp and Omega, determinants that
+# scalars can bring to 1 for SU, and for Omega determinant 1 and spinor
+# norm 1 up to the sign, resp. for q even a common quadratic form and
+# Dickson invariant 0; for a conformal symplectic group, a unitary group
+# with other determinants, SO(d,q) or O^+-(d,q), the method does not apply.
 RECOG.ClassicalNaturalForm := function(ri,classical,type)
   local d,f,q,form,gens,changed,i,lambda,std,m,q0,gcd,size,eps;
   d := ri!.dimension;
@@ -914,6 +944,12 @@ RECOG.ClassicalNaturalForm := function(ri,classical,type)
       form := rec( gram := GramMatrix(First(classical.ClassicalForms,
                           F -> IsSesquilinearForm(F) and IsHermitianForm(F))),
                    frob := q0, field := f );
+  elif IsEvenInt(q) then
+      # the polar form; the quadratic form follows from the scaled
+      # generators
+      form := rec( gram := GramMatrix(First(classical.ClassicalForms,
+                          F -> IsSesquilinearForm(F) and IsSymplecticForm(F))),
+                   frob := 1, field := f );
   else
       form := rec( gram := GramMatrix(First(classical.ClassicalForms,
                           F -> IsSesquilinearForm(F) and (IsHyperbolicForm(F)
@@ -946,6 +982,12 @@ RECOG.ClassicalNaturalForm := function(ri,classical,type)
           changed := true;
       fi;
   od;
+  if type = "O" and IsEvenInt(q)
+     and RECOG.InvariantQuadraticForm(gens,form.gram,f) = fail then
+      Info(InfoRecog,2,"ClassicalNatural: the generators preserve no ",
+           "common quadratic form.");
+      return TemporaryFailure;
+  fi;
 
   Info(InfoRecog,2,"ClassicalNatural: this is P",type,"_n!");
   gens := RECOG.ClassicalNaturalGroupWithMemory(ri,gens,changed);
@@ -988,7 +1030,7 @@ RECOG.ClassicalNaturalForm := function(ri,classical,type)
           gcd := 2;
       fi;
       size := q^(m*(m-1)) * (q^m - eps) * Product([1..m-1],i->q^(2*i)-1)
-              / 2;
+              / Gcd(2,q-1);
   fi;
   ri!.normlist := RECOG.SetupNormalisationListForPSLd(f,gcd);
   if type in RECOG.OrthogonalTypes then
@@ -1024,7 +1066,8 @@ function(ri)
   elif classical.isSUContained = true and IsOddInt(q) and IsEvenInt(d)
        then
       return RECOG.ClassicalNaturalForm(ri,classical,"SU");
-  elif classical.isOmegaContained = true and IsOddInt(q) and d >= 8 then
+  elif classical.isOmegaContained = true and d >= 8
+       and (IsOddInt(q) or IsEvenInt(d)) then
       return RECOG.ClassicalNaturalForm(ri,classical,"O");
   fi;
   if classical.isSLContained <> true then
