@@ -536,8 +536,8 @@ end;
 # words, as elements with memory in generators standing for Y and g~.
 RECOG.O_GoingUpNewGenerators := function(std, Y, R, g)
   local f, q, d, n, nn, m, F, gt, RF, e, cmat, c, solver, siegelU, siegelP,
-        siegel1, Jd, move, siegel, r, res, mm, v, j, sigma, type, w1, w2, gh,
-        alpha, form, N, Wz, s, t, delta, z;
+        siegel1, Jd, move, toP, siegel, r, res, mm, v, j, sigma, type, w1, w2,
+        gh, alpha, form, N, Wz, s, t, delta, z;
 
   f := std.f;
   q := Size(f);
@@ -594,45 +594,60 @@ RECOG.O_GoingUpNewGenerators := function(std, Y, R, g)
 
   # rho(x, y) for x singular in W and y in W orthogonal to x, as
   # rho(x k, y k)^(k^-1), where k, a product of at most two rho(p, .) for
-  # p in P, maps x to a multiple of e_m or f_m: rho(c p, y) = rho(p, c y)
+  # p in P, maps x to a multiple of e_m or f_m: rho(c p, y) = rho(p, c y).
+  # k is kept for each x, with the maps [p, z] it is made of.
   Jd := RECOG.ClassicalForm(std.type, d, f).gram;
   move := function(x, p, z)
     local xp;
     xp := x * Jd * p;
     return x + (x * Jd * z - xp * (z * Jd * z) / 2) * p - xp * z;
   end;
+  toP := [[], []];
   siegel := function(x, y)
-    local k, j, z, pos, dual, scale;
+    local pos, k, maps, xk, z, j, p, dual, scale;
     if IsZero(y) then
       return RF.one;
     fi;
-    k := RF.one;
-    if IsZero(x{[n - 1, n]}) then
-      z := x * Jd;
-      j := PositionNonZero(z);
-      z := e[j] / z[j];
-      k := siegelP(n - 1, z);
-      y := move(y, e[n - 1], z);
-      x := move(x, e[n - 1], z);
+    pos := Position(toP[1], x);
+    if pos = fail then
+      k := RF.one;
+      maps := [];
+      xk := x;
+      if IsZero(xk{[n - 1, n]}) then
+        z := xk * Jd;
+        j := PositionNonZero(z);
+        z := e[j] / z[j];
+        k := siegelP(n - 1, z);
+        Add(maps, [e[n - 1], z]);
+        xk := move(xk, e[n - 1], z);
+      fi;
+      if IsZero(xk[n]) then
+        p := n;
+      else
+        p := n - 1;
+      fi;
+      dual := 2 * n - 1 - p;
+      scale := xk[dual];
+      z := ShallowCopy(xk);
+      z[n - 1] := Zero(f);
+      z[n] := Zero(f);
+      z := z / scale;
+      if not IsZero(z) then
+        k := k * siegelP(p, z);
+        Add(maps, [e[p], z]);
+        xk := move(xk, e[p], z);
+      fi;
+      Assert(1, xk = scale * e[dual]);
+      Add(toP[1], x);
+      Add(toP[2], rec( k := k, ki := k^-1, maps := maps, dual := dual,
+                       scale := scale ));
+      pos := Length(toP[1]);
     fi;
-    if IsZero(x[n]) then
-      pos := n;
-    else
-      pos := n - 1;
-    fi;
-    dual := 2 * n - 1 - pos;
-    scale := x[dual];
-    z := ShallowCopy(x);
-    z[n - 1] := Zero(f);
-    z[n] := Zero(f);
-    z := z / scale;
-    if not IsZero(z) then
-      k := k * siegelP(pos, z);
-      y := move(y, e[pos], z);
-      x := move(x, e[pos], z);
-    fi;
-    Assert(1, x = scale * e[dual]);
-    return siegelP(dual, scale * y)^(k^-1);
+    k := toP[2][pos];
+    for z in k.maps do
+      y := move(y, z[1], z[2]);
+    od;
+    return k.k * siegelP(k.dual, k.scale * y) * k.ki;
   end;
 
   # over GF(3), a new doubling element is cheaper than the pair
