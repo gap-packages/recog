@@ -22,6 +22,8 @@ This file describes changes in the recog package.
 - `RandomSubproduct` now returns the identity only if all entries are
   trivial, and takes an optional record setting the random source and
   the identity test. It replaces `RECOG.RandomSubproduct`
+- Fix `RecogniseClassical` leaving `isSLContained` at "unknown" for
+  every group of degree 2 (issue #345)
 
 ## 1.5.1 (2026-05-19)
 
