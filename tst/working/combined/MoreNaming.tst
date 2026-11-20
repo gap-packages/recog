@@ -822,6 +822,23 @@ false
 gap> ri.isSpContained;
 "unknown"
 
+# without an extension field witness, isNotExt stays "unknown"
+gap> ri := rec(hint := "orthogonalplus", d := 10, q := 3, E := [6], LE := [],
+>              currentgcd := 2, ClassicalForms := [], isNotExt := "unknown");;
+gap> CallRecogMethod(FindHomMethodsClassical.RuledOutExtField, ri)
+>    = TemporaryFailure;
+true
+gap> ri.isNotExt;
+"unknown"
+gap> ri := rec(hint := "orthogonalplus", d := 12, q := 3, E := [6, 10],
+>              LE := [], currentgcd := 2, ClassicalForms := [],
+>              isNotExt := "unknown");;
+gap> CallRecogMethod(FindHomMethodsClassical.RuledOutExtField, ri)
+>    = TemporaryFailure;
+true
+gap> ri.isNotExt;
+"unknown"
+
 #
 gap> SetInfoLevel(InfoOrb, oldOrbInfoLevel);
 gap> SetInfoLevel(InfoRecog, oldRecogInfoLevel);

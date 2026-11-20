@@ -476,18 +476,28 @@ function(recognise)
         recognise.isNotExt := true;
         return NeverApplicable;
 
+    # Below, only a witness decides: without one, the random elements seen
+    # so far do not show that G lies in an extension field group.
     elif hint = "symplectic" then
         if d mod 4 = 2 and q mod 2 = 1 then
-             recognise.isNotExt := ForAny(E, x -> x mod 4 = 0);
+             if ForAny(E, x -> x mod 4 = 0) then
+                 recognise.isNotExt := true;
+             fi;
         elif d mod 4 = 0 and q mod 2 = 0 then
-             recognise.isNotExt := ForAny(E, x -> x mod 4 = 2);
+             if ForAny(E, x -> x mod 4 = 2) then
+                 recognise.isNotExt := true;
+             fi;
         elif d mod 4 = 0 and q mod 2 = 1 then
              if Length(E) < 2 then
                  return TemporaryFailure;
              fi;
-             recognise.isNotExt := differmodfour(E);
+             if differmodfour(E) then
+                 recognise.isNotExt := true;
+             fi;
         elif d mod 4 = 2 and q mod 2 = 0 then
-            recognise.isNotExt := (Length(E) > 0);
+            if Length(E) > 0 then
+                recognise.isNotExt := true;
+            fi;
         else
            Info( InfoRecog_ClassicalNaming, 2, "d cannot be odd in hint Sp");
            recognise.hintIsWrong := true;
@@ -497,7 +507,9 @@ function(recognise)
 
     elif hint = "orthogonalplus" then
         if d mod 4 = 2 then
-            recognise.isNotExt := ForAny(E, x -> x mod 4 = 0);
+            if ForAny(E, x -> x mod 4 = 0) then
+                recognise.isNotExt := true;
+            fi;
         elif d mod 4 = 0 then
             # With only one observed ppd exponent there is no mod 4
             # discrepancy yet, so we cannot conclude that the extension-field
@@ -505,7 +517,9 @@ function(recognise)
             if Length(E) < 2 then
                 return TemporaryFailure;
             fi;
-            recognise.isNotExt := differmodfour(E);
+            if differmodfour(E) then
+                recognise.isNotExt := true;
+            fi;
         else
            Info( InfoRecog_ClassicalNaming, 2, "d cannot be odd in hint O+");
            recognise.hintIsWrong := true;
@@ -516,12 +530,16 @@ function(recognise)
 
     elif hint = "orthogonalminus" then
         if d mod 4 = 0 then
-            recognise.isNotExt := ForAny(E, x -> x mod 4 = 2);
+            if ForAny(E, x -> x mod 4 = 2) then
+                recognise.isNotExt := true;
+            fi;
         elif d mod 4 = 2 then
             if Length(E) < 2 then
                 return TemporaryFailure;
             fi;
-            recognise.isNotExt := differmodfour(E);
+            if differmodfour(E) then
+                recognise.isNotExt := true;
+            fi;
         else
            Info( InfoRecog_ClassicalNaming, 2, "d cannot be odd in hint O-");
            recognise.hintIsWrong := true;
