@@ -65,7 +65,7 @@ true
 # with other scalars are left out: with them, RecogniseClassical often
 # misses the form, as ClassicalForms_ScalarMultipleFrobenius of Forms
 # 1.3.0 returns a wrong scalar. GU(4,5) is no leaf: scalars cannot bring
-# its determinants of order 6 to 1.
+# its determinants of order 6 to 1, so it maps onto C2 above a PSU leaf.
 gap> Leaf := function(ri)
 >     if not IsLeaf(ri) then
 >         ri := ImageRecogNode(ri);
@@ -92,7 +92,7 @@ gap> G := Group(List(GeneratorsOfGroup(SU(4, 5)), x -> Z(25)^(4 * Random([0 .. 5
 gap> Leaf(RECOG.TestGroup(G, true, Size(SU(4, 5)) / 2))!.fhmethsel.successMethod;
 "ClassicalNatural"
 gap> Leaf(RECOG.TestGroup(GU(4, 5), false, Size(GU(4, 5))))!.fhmethsel.successMethod;
-"StabilizerChainProj"
+"ClassicalNatural"
 
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
