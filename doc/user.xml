@@ -108,7 +108,7 @@ gap> RecogniseGroup(G);
  F:<recognition node (projective) ClassicalNatural Comment=PSLd Simple Size=
 749746041218752566202615590039253234863281250000000000000000000000000 Dim=10 Field=5>
  K:<recognition node DiagonalMatrices Dim=10 Field=5
-    F:<recognition node Scalar Dim=1 Field=5>
+    F:<recognition node Scalar Size=2 Dim=1 Field=5>
     K:<trivial kernel>>
 ]]></Log>
 

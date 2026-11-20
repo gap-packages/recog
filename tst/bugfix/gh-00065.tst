@@ -13,7 +13,7 @@ gap> RecogniseGroup(SL(2,3));
  F:<recognition node (projective) ClassicalNatural Comment=PSL2 Size=12 Dim=
 2 Field=3>
  K:<recognition node DiagonalMatrices Dim=2 Field=3
-    F:<recognition node Scalar Dim=1 Field=3>
+    F:<recognition node Scalar Size=2 Dim=1 Field=3>
     K:<trivial kernel>>
 gap> RecogniseGroup(SL(2,4));
 <recognition node GoProjective Dim=2 Field=4
@@ -25,7 +25,7 @@ gap> RecogniseGroup(SL(2,5));
  F:<recognition node (projective) ClassicalNatural Comment=PSL2 Simple Size=
 60 Dim=2 Field=5>
  K:<recognition node DiagonalMatrices Dim=2 Field=5
-    F:<recognition node Scalar Dim=1 Field=5>
+    F:<recognition node Scalar Size=2 Dim=1 Field=5>
     K:<trivial kernel>>
 
 #

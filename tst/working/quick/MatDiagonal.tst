@@ -31,3 +31,15 @@ gap> TestMatDiagonal(GF(16), 1);;
 gap> TestMatDiagonal(GF(16), 2);;
 gap> TestMatDiagonal(GF(16), 3);;
 gap> TestMatDiagonal(GF(16), 7);;
+
+# A Scalar leaf must store its size: the fallback Size(Grp(ri)) takes
+# seconds for a 1x1 matrix group over GF(4099).
+gap> oldInfoLevel := InfoLevel(InfoRecog);;
+gap> SetInfoLevel(InfoRecog, 0);
+gap> z := Z(4099);;
+gap> ri := RecognizeGroup(Group([[z^6]], [[z^9]]));;
+gap> HasSize(ri);
+true
+gap> Size(ri);
+1366
+gap> SetInfoLevel(InfoRecog, oldInfoLevel);
