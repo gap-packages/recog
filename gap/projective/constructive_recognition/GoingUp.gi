@@ -911,12 +911,13 @@ RECOG.Form_NormPreimage := function(R, f, a, q, k)
 end;
 
 # A vector e of W = GF(q)^n, n = 2m, for the isometry <h> of the form
-# beta(x, y) = x <J> y^(sigma T) of type <type>, "Sp" or "SU", over <F>
-# (sigma the identity, resp. c -> c^q0 for F = GF(q0^2)), with squarefree
-# characteristic polynomial <chi>, such that beta(e, e h^j) = 0 for
-# 0 <= j < m and beta(e, e h^m) <> 0, or fail. Then e, e h, ..., e h^(m-1)
-# span a totally isotropic space, and for SU, where det h = 1,
-# beta(e, e h^m) has trace 0.
+# beta(x, y) = x <J> y^(sigma T) of type <type>, "Sp", "SU" or "O+", over
+# <F> (sigma the identity, resp. c -> c^q0 for F = GF(q0^2)), with
+# squarefree characteristic polynomial <chi>, such that beta(e, e h^j) = 0
+# for 0 <= j < k and beta(e, e h^k) <> 0, with k = m, resp. k = m - 1 for
+# "O+", or fail. Then e, e h, ..., e h^(k-1) span a totally isotropic
+# (singular) space, and for SU, where det h = 1, beta(e, e h^m) has
+# trace 0.
 # W is a cyclic F[h]-module: e = c p(h) for a cyclic vector c, and with
 # phi(a) = beta(c, c a(h)), beta(e, e h^j) = phi(N x^j) for
 # N = p p^dagger, a^dagger = a^sigma(x^-1), in A = F[x]/chi. The
@@ -924,12 +925,12 @@ end;
 # sigma, with a one-dimensional solution space <N0> in general, and the
 # norm equation p p^dagger = N0 is solved in each factor of A: trivially
 # for a pair of factors f, f^dagger, by RECOG.Form_NormPreimage for
-# f = f^dagger otherwise, except for x - 1 and x + 1 in Sp, where it is a
-# square root.
+# f = f^dagger otherwise, except for x - 1 and x + 1 in Sp and O+, where it
+# is a square root.
 RECOG.Form_IsotropicKrylovVector := function(h, J, F, chi, type)
   local n, m, q, q0, conj, R, x, c, K, cJ, i, phi, ph, F0, omega, coords,
-        M, row, k, j, nu, cands, xi, N, N0, mods, rems, used, f, fs, a, z, p,
-        P, coeffs, e, form;
+        M, row, k, j, nu, cands, top, xi, N, N0, mods, rems, used, f, fs, a,
+        z, p, P, coeffs, e, form;
 
   n := NrRows(h);
   m := n / 2;
@@ -953,12 +954,15 @@ RECOG.Form_IsotropicKrylovVector := function(h, J, F, chi, type)
   until RankMat(K{[1 .. n]}) = n;
   cJ := c * J;
   phi := List(K, y -> cJ * conj(y));
-  # phi(x^-i) = beta(c h^i, c), which is -phi(x^i) resp. phi(x^i)^sigma
+  # phi(x^-i) = beta(c h^i, c), which is -phi(x^i), phi(x^i)^sigma resp.
+  # phi(x^i)
   ph := function(i)
     if i >= 0 then
       return phi[i + 1];
     elif type = "SU" then
       return phi[1 - i]^q0;
+    elif type = "O+" then
+      return phi[1 - i];
     fi;
     return -phi[1 - i];
   end;
@@ -988,6 +992,15 @@ RECOG.Form_IsotropicKrylovVector := function(h, J, F, chi, type)
     od;
     cands := List(NullspaceMat(M), v -> List([0 .. m],
                   k -> v[2 * k + 1] * One(F) + v[2 * k + 2] * omega));
+  elif type = "O+" then
+    # phi(N x^j) = 0 for 0 <= j < m - 1; the value at m - 1 is tested below
+    M := List([0 .. m - 1], k -> List([0 .. m - 2],
+                                      j -> ph(k + j) + ph(j - k)));
+    cands := NullspaceMat(M);
+    if Length(cands) <> 1 then
+      return fail;
+    fi;
+    cands := [Concatenation(cands[1], [Zero(F)])];
   else
     M := List([0 .. m - 1], k -> List([1 .. m - 1],
                                       j -> ph(k + j) + ph(j - k)));
@@ -998,12 +1011,16 @@ RECOG.Form_IsotropicKrylovVector := function(h, J, F, chi, type)
     cands := [Concatenation(cands[1], [Zero(F)])];
   fi;
 
-  # a nu with N <> 0 and phi(N x^m) <> 0
+  # a nu with N <> 0 and phi(N x^top) <> 0, top = m resp. m - 1 for "O+"
+  top := m;
+  if type = "O+" then
+    top := m - 1;
+  fi;
   xi := GcdRepresentation(R, x, chi)[1] mod chi;
   N0 := fail;
   for nu in cands do
-    if not IsZero(Sum([0 .. m], k -> nu[k + 1]^q0 * ph(k + m)
-                                     + nu[k + 1] * ph(m - k))) then
+    if not IsZero(Sum([0 .. m], k -> nu[k + 1]^q0 * ph(k + top)
+                                     + nu[k + 1] * ph(top - k))) then
       N := Sum([0 .. m], k -> nu[k + 1] * x^k
                           + nu[k + 1]^q0 * PowerMod(R, xi, k, chi)) mod chi;
       if not IsZero(N) then
@@ -1032,14 +1049,14 @@ RECOG.Form_IsotropicKrylovVector := function(h, J, F, chi, type)
       Append(mods, [f, fs]);
       Append(rems, [a, One(R)]);
       Add(used, fs);
-    elif type = "Sp" and DegreeOfLaurentPolynomial(f) = 1 then
+    elif type <> "SU" and DegreeOfLaurentPolynomial(f) = 1 then
       z := RootsOfUPol(F, x^2 - Value(a, Zero(F)));
       if z = [] then
         return fail;
       fi;
       Add(mods, f);
       Add(rems, z[1] * One(R));
-    elif type = "Sp" then
+    elif type <> "SU" then
       Add(mods, f);
       Add(rems, RECOG.Form_NormPreimage(R, f, a, q,
                                         DegreeOfLaurentPolynomial(f) / 2));
@@ -1062,8 +1079,8 @@ RECOG.Form_IsotropicKrylovVector := function(h, J, F, chi, type)
   coeffs := CoefficientsOfUnivariatePolynomial(p);
   e := Sum([1 .. Length(coeffs)], i -> coeffs[i] * K[i]);
   form := {y, z} -> y * J * conj(z);
-  Assert(1, ForAll([0 .. m - 1], j -> IsZero(form(e, e * h^j)))
-            and not IsZero(form(e, e * h^m)));
+  Assert(1, ForAll([0 .. top - 1], j -> IsZero(form(e, e * h^j)))
+            and not IsZero(form(e, e * h^top)));
   return e;
 end;
 
