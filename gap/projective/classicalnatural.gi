@@ -920,7 +920,6 @@ function(ri)
       Setslptonice(ri,SLPOfElms(std.all));
       ri!.nicebas := std.bas;
       ri!.nicebasi := std.basi;
-      SetNiceGens(ri,List(StripMemory(std.all),x->std.basi*x*std.bas));
       ri!.fakegens := RECOG.InitSLfake(f,2);
       ri!.fakegens.count := 0;
       ri!.gcd := gcd;
