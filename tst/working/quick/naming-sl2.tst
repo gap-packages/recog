@@ -37,6 +37,19 @@ gap> G := Group([[Z(37)^9,0*Z(37)],[0*Z(37),Z(37)^27]],
 gap> r := RecogniseClassical(G);; [r.isSLContained, r.hasExp2];
 [ false, true ]
 
+# Generators with scalar squares need not give exponent 2 modulo scalars:
+# these three generate GL(2,9)
+gap> z := Z(9);;
+gap> r := rec(n := 16, hasExp2 := "unknown", h := fail, q := 9,
+>             generators := [[[1,1],[0,2]]*Z(3)^0, [[z^3,z^2],[z^7,z^7]],
+>                            [[0*z,2*z^0],[z^5,0*z]]]);;
+gap> List(r.generators, g -> RECOG.IsScalarMat(g^2));
+[ true, true, true ]
+gap> FindHomMethodsClassical.ExponentTwoModScalars(r) = NeverApplicable;
+true
+gap> r.hasExp2;
+false
+
 # a subgroup of GammaL(1,q^2): the normaliser of a Singer cycle
 gap> G := Group([[0*Z(37),Z(37)^19],[Z(37)^0,Z(37)^2]],
 >               [[Z(37)^18,Z(37)^20],[0*Z(37),Z(37)^0]]);;
@@ -54,6 +67,15 @@ gap> FindHomMethodsClassical.IsSubgroupOfGammaL(r) = NeverApplicable;
 true
 gap> r.isSubgroupOfGammaL;
 false
+
+# GammaL(1,49): q^2-1 = 48 has no primitive prime divisor, which the test
+# must not need
+gap> G := Group([[0*Z(7),Z(7)^4],[Z(7)^0,Z(7)^0]],
+>               [[Z(7)^2,Z(7)^0],[Z(7)^2,Z(7)^5]]);;
+gap> Size(G);
+96
+gap> r := RecogniseClassical(G);; [r.isSLContained, r.isSubgroupOfGammaL];
+[ false, true ]
 
 # imprimitive: the diagonal torus extended by the swap
 gap> G := Group([[Z(37)^3,0*Z(37)],[0*Z(37),Z(37)^-3]],
@@ -79,6 +101,20 @@ gap> FieldOfMatrixGroup(G);
 GF(7^2)
 gap> r := RecogniseClassical(G);; [r.isSLContained, r.isRepresentableOverSubfield];
 [ false, true ]
+
+# Large q: nothing may enumerate the q+1 points of the projective line
+gap> RecogniseClassical(SL(2,2^20)).isSLContained;
+true
+gap> RecogniseClassical(GL(2,3^13)).isSLContained;
+true
+
+# beyond RECOG.Degree2LineEnumerationLimit a subfield group stays undecided
+gap> x := [[Z(2^20)^0, Z(2^20)], [0*Z(2), Z(2)^0]];;
+gap> G := Group(List(GeneratorsOfGroup(SL(2,2^10)), g -> g^x));;
+gap> FieldOfMatrixGroup(G);
+GF(2^20)
+gap> RecogniseClassical(G).isSLContained;
+"unknown"
 
 #
 gap> SetInfoLevel(InfoRecog_ClassicalNaming, oldInfoLevel);
