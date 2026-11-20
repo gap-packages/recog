@@ -130,22 +130,50 @@ end;
 # rho(f_1, z, lam) for z in N are rho(e_m, z, lam)^(c^-1) and
 # rho(f_m, z, lam)^(c^-1).
 RECOG.SU_GoingUpNewGenerators := function(std, Y, R, g)
-  local f, q0, d, n, m, F, res, gt, RF, form, beta, cmat, c, solver,
-        siegelU, siegelP, siegel1, gamma, alpha, A, a, w1, x, y;
+  local f, q0, d, n, F, res, RF, siegel1, gamma, alpha, A, a, w1, x, y;
 
   f := std.f;
   d := std.d;
   n := std.n;
   F := GeneratorsWithMemory(ListWithIdenticalEntries(Length(Y) + 1, ()));
   res := RECOG.Form_GoingUpNewGenerators(std, Y, R, g, F);
-  if Minimum(2 * n - 2, d) < d or IsEvenInt(d) then
+  if Minimum(2 * n - 2, d) < d or IsEvenInt(d) or not IsList(res) then
     return res;
   fi;
 
   q0 := RootInt(Size(f), 2);
+  RF := RECOG.SU_RootElements(F{[1 .. Length(Y)]}, n, f);
+  siegel1 := RECOG.SU_GoingUpSiegel(std, F, RF, g).siegel1;
+
+  gamma := Z(Size(f));
+  alpha := RECOG.UnitaryAlpha(f);
+  A := alpha * gamma;
+  a := RootFFE(f, -(A + A^q0), q0 + 1);
+  w1 := IdentityMat(d, f)[d];
+  x := siegel1(n, -w1, -RF.half);
+  y := siegel1(n, a * w1, A) * siegel1(n - 1, -(a / A) * w1, A^-q0)
+       * siegel1(n, a * A^(q0 - 1) * w1, A) * F[1]^-1;
+  res := ShallowCopy(res);
+  res[6] := x;
+  res[7] := y;
+  return res;
+end;
+
+# The Siegel transformations of RECOG.SU_GoingUpNewGenerators as words in
+# <F>, which stand for the standard generators of SU(U) and g~, with
+# matrix <g>, for the root elements <RF> on them: `siegelP`(pos, x, lam)
+# is rho(p, x, lam) for p = e_m (pos = n-1) or f_m (pos = n) and x in
+# A + N, `siegel1` the same for e_1 resp. f_1 and x in N, and `c` is
+# v^(m-1).
+RECOG.SU_GoingUpSiegel := function(std, F, RF, g)
+  local f, q0, d, n, m, gt, form, beta, cmat, c, solver, siegelU, siegelP;
+
+  f := std.f;
+  d := std.d;
+  n := std.n;
+  q0 := RootInt(Size(f), 2);
   m := n / 2;
   gt := F[Length(F)];
-  RF := RECOG.SU_RootElements(F{[1 .. Length(Y)]}, n, f);
   form := RECOG.ClassicalForm("SU", d, f);
   beta := {x, y} -> RECOG.FormValue(form, x, y);
 
@@ -196,19 +224,6 @@ RECOG.SU_GoingUpNewGenerators := function(std, Y, R, g)
            * siegelU(pos, a2, lam2)^gt;
   end;
 
-  # rho(e_1, x, lam) (pos = n-1) or rho(f_1, x, lam) (pos = n) for x in N
-  siegel1 := {pos, x, lam} -> siegelP(pos, x, lam)^(c^-1);
-
-  gamma := Z(Size(f));
-  alpha := RECOG.UnitaryAlpha(f);
-  A := alpha * gamma;
-  a := RootFFE(f, -(A + A^q0), q0 + 1);
-  w1 := IdentityMat(d, f)[d];
-  x := siegel1(n, -w1, -RF.half);
-  y := siegel1(n, a * w1, A) * siegel1(n - 1, -(a / A) * w1, A^-q0)
-       * siegel1(n, a * A^(q0 - 1) * w1, A) * F[1]^-1;
-  res := ShallowCopy(res);
-  res[6] := x;
-  res[7] := y;
-  return res;
+  return rec( siegelP := siegelP, c := c,
+              siegel1 := {pos, x, lam} -> siegelP(pos, x, lam)^(c^-1) );
 end;

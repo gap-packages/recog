@@ -28,7 +28,8 @@
 # standard generators of SL(n,q) relative to the basis, in the order of
 # RECOG.ClassicalStandardGenerators; only their words are used, so they
 # may be generators with memory of any group. RECOG.SL_ElementaryMatrix
-# combines the words returned here.
+# combines the words returned here, and RECOG.SL_Product adds the
+# components `trie`, `block` and `trieDegree` on its first call.
 # E(1, 2, gamma^(2k)) is t^(delta^-k), gamma = Z(q), and these gamma^(2k),
 # 0 <= k < [GF(q):GF(p)], are a basis of GF(q) over GF(p); E(2, 1, lambda)
 # is E(1, 2, -lambda)^s. The element c = s v (n odd) or s v x (n even) maps
@@ -91,9 +92,10 @@ RECOG.SL_RootElements := function(Y, n, f)
 end;
 
 # The elementary matrix E(<i>, <j>, <lambda>) of RECOG.SL_RootElements, as
-# a word in R.Y. R.words[i][j][k] keeps the powers of E(i, j, b), b the
-# k-th vector of R.basis, for RECOG.GoingUpRootWord.
-RECOG.SL_ElementaryMatrix := function(R, i, j, lambda)
+# a word in R.Y, and the code of lambda, as RECOG.GoingUpRootWordCode
+# returns them. R.words[i][j] is the table of RECOG.GoingUpRootTable for
+# the E(i, j, b), b in R.basis.
+RECOG.SL_ElementaryMatrixCode := function(R, i, j, lambda)
   local words, signed, y;
 
   if not IsBound(R.words[i][j]) then
@@ -114,9 +116,48 @@ RECOG.SL_ElementaryMatrix := function(R, i, j, lambda)
       words := List([1 .. Length(R.E12)], k -> Comm(
           RECOG.SL_ElementaryMatrix(R, i, 1, BasisVectors(R.basis)[k]), y));
     fi;
-    R.words[i][j] := List(words, y -> [y]);
+    R.words[i][j] := RECOG.GoingUpRootTable(words);
   fi;
-  return RECOG.GoingUpRootWord(R.words[i][j], R.basis, lambda, R.one);
+  return RECOG.GoingUpRootWordCode(R.words[i][j], R.basis, lambda, R.one);
+end;
+
+# The word of RECOG.SL_ElementaryMatrixCode
+RECOG.SL_ElementaryMatrix := {R, i, j, lambda} ->
+    RECOG.SL_ElementaryMatrixCode(R, i, j, lambda)[1];
+
+# A product of elementary matrices of <R>, a record of root elements of
+# SL(n,q), as a word in R.Y, which shares the products of blocks of
+# consecutive indices with all products on R (see RECOG.GoingUpProduct);
+# R keeps the trie. `apply(i, j, lambda)` multiplies by E(i, j, lambda),
+# the identity for lambda = 0, `mulPlain(y)` by the word y, and `word()`
+# returns the product.
+RECOG.SL_Product := function(R, n)
+  local q, prod;
+
+  q := Size(R.f);
+  if not IsBound(R.trie) then
+    R.trie := rec( next := rec() );
+    R.block := RECOG.GoingUpBlockSize(n, q, 1);
+    R.trieDegree := n;
+  fi;
+  n := R.trieDegree;
+  prod := RECOG.GoingUpProduct(R.trie, R.one);
+  return rec(
+    apply := function(i, j, lambda)
+      local w;
+      if IsZero(lambda) then
+        return;
+      fi;
+      w := RECOG.SL_ElementaryMatrixCode(R, i, j, lambda);
+      if R.block = 0 then
+        prod.mulPlain(w[1]);
+      else
+        prod.mul(QuoInt(i - 1, R.block) * (n + 1) + QuoInt(j - 1, R.block),
+                 ((i - 1) * n + j - 1) * q + w[2], w[1]);
+      fi;
+    end,
+    mulPlain := prod.mulPlain,
+    word := prod.word );
 end;
 
 # A word for the matrix <M> in SL(n,q), as a product of the elementary
@@ -175,15 +216,15 @@ end;
 #  - `word`: b, as a word in R.Y
 #  - `mat`: the matrix of b
 RECOG.SL_MapToLast := function(R, u)
-  local n, word, mat, apply, i, r;
+  local n, prod, mat, apply, i, r;
 
   n := Length(u);
-  word := R.one;
+  prod := RECOG.SL_Product(R, n);
   mat := MutableCopyMat(IdentityMat(n, R.f));
   # u E(i, j, lambda) = u + lambda u_i v_j, and M E(i, j, lambda) adds
   # lambda times column i of M to column j
   apply := function(i, j, lambda)
-    word := word * RECOG.SL_ElementaryMatrix(R, i, j, lambda);
+    prod.apply(i, j, lambda);
     u[j] := u[j] + lambda * u[i];
     for r in [1 .. n] do
       mat[r, j] := mat[r, j] + lambda * mat[r, i];
@@ -210,7 +251,7 @@ RECOG.SL_MapToLast := function(R, u)
   od;
 
   Assert(1, u = IdentityMat(n, R.f)[n]);
-  return rec( word := word, mat := mat );
+  return rec( word := prod.word(), mat := mat );
 end;
 
 # The seed t of the GoingUp step ([EHNPR], Step 1 (Constructing the seed
@@ -323,11 +364,179 @@ RECOG.SL_GoingUpAdaptBasis := function(std, g)
   return DirectSumMat(IdentityMat(n, f), Concatenation(N, rest));
 end;
 
+# The number of new doubling elements a GoingUp step for SL tries when
+# RECOG.SL_GoingUpCycleBasis fails, before it falls back to elimination
+RECOG.SL_GoingUpCycleRetries := 3;
+
+# The pairs [x, y] of RECOG.SL_GoingUpCycleBasis, h = x y^g~ for x, y in
+# z, s z, t z, delta z (numbered 1 to 4): first the four words of the
+# proposal, then the others.
+RECOG.SL_GoingUpCycleWords := Concatenation([[1, 1], [1, 2], [3, 1], [2, 3]],
+    Difference(Cartesian([1 .. 4], [1 .. 4]), [[1, 1], [1, 2], [3, 1], [2, 3]]));
+
+# Step 5 of the GoingUp step for SL relative to a new basis of W, as
+# proposed in the draft of [EHNPR] ('Constructing the enlarged group'),
+# with m = n' and e = v_n:
+#  - h is a short word in Y and g~, for which e is a cyclic vector on W,
+#    so e h^m = sum_j a_j e h^j;
+#  - b_1 = e and b_(i+1) = b_i h - a_(m-i) e, and the functional w on W
+#    with w(b_1) = 0 and w(b_(i+1)) = -a_(m-i): then c = h T(w, e) maps
+#    b_i to b_(i+1) and b_m to a_0 b_1 = (-1)^(m-1) b_1, as det h = 1;
+#  - the new basis consists of signed b_i, ordered so that c is the long
+#    cycle of SL(W), v for m odd and v x for m even; the other standard
+#    generators act on its first four vectors and are products of
+#    elementary maps E'(i, j, lambda) relative to it, conjugates by powers
+#    of c of the transvections E'(i', j0, lambda') = T(., e) for the
+#    position j0 of e.
+# T(., e) is toVn, O(n log q) nodes, so the step costs O(n log q) nodes
+# instead of the Theta(n^2 log q) of the elimination in
+# RECOG.SL_GoingUpNewGenerators. Some doubling elements admit no such h:
+# for SL(500,3) one had e in an invariant hyperplane for all the words.
+# <F> are the generators with memory standing for Y and g~, <g> is the
+# matrix of g~ relative to the adapted basis, and <toVn> is the function
+# of RECOG.SL_GoingUpNewGenerators. Returns fail if e is cyclic for none
+# of the words, else the record of RECOG.GoingUpStep.
+RECOG.SL_GoingUpCycleBasis := function(std, F, g, toVn)
+  local f, d, n, m, G, Ystd, z, x, gi, left, right, one, pair, h, hW, K, i,
+        a, b, Bi, w, new, P, pi, pinv, sigma, j0, rho, eps, cur, basis,
+        cycw, cache, E, k, words, xw;
+
+  f := std.f;
+  d := std.d;
+  n := std.n;
+  m := Minimum(2 * n - 1, d);
+  G := F[Length(F)];
+  Ystd := RECOG.ClassicalStandardGenerators("SL", n, f);
+
+  # z, the long cycle of SL(U), and s z, t z, delta z, as words and
+  # matrices
+  if n = 2 then
+    z := [F[1], Ystd.s];
+  elif IsOddInt(n) then
+    z := [F[4], Ystd.v];
+  else
+    z := [F[4] * F[5], Ystd.v * Ystd.x];
+  fi;
+  x := [z, [F[1] * z[1], Ystd.s * z[2]], [F[2] * z[1], Ystd.t * z[2]],
+        [F[3] * z[1], Ystd.delta * z[2]]];
+  x := List(x, y -> [y[1], RECOG.GoingUpEmbed(y[2], d, f)]);
+
+  # the first word h with the cyclic vector e on W, and its Krylov basis
+  # K; h = x g~^-1 y g~ acts on W, and its matrix there is the product of
+  # rows 1 to m of x g~^-1 with columns 1 to m of y g~
+  gi := g^-1;
+  left := [];
+  right := [];
+  h := fail;
+  for pair in RECOG.SL_GoingUpCycleWords do
+    if not IsBound(left[pair[1]]) then
+      left[pair[1]] := (x[pair[1]][2] * gi){[1 .. m]};
+    fi;
+    if not IsBound(right[pair[2]]) then
+      right[pair[2]] := (x[pair[2]][2] * g){[1 .. d]}{[1 .. m]};
+    fi;
+    hW := left[pair[1]] * right[pair[2]];
+    K := [ImmutableVector(f, IdentityMat(m, f)[n])];
+    for i in [2 .. m] do
+      Add(K, K[i - 1] * hW);
+    od;
+    if RankMat(K) = m then
+      h := x[pair[1]][1] * x[pair[2]][1]^G;
+      break;
+    fi;
+  od;
+  if h = fail then
+    Info(InfoRecog_ClassicalNatural, 3, "GoingUp: no cycle word");
+    return fail;
+  fi;
+  Info(InfoRecog_ClassicalNatural, 3, "GoingUp: cycle word ", pair);
+
+  # a[j+1] = a_j, the b_i and w
+  a := SolutionMat(K, K[m] * hW);
+  b := [K[1]];
+  for i in [1 .. m - 1] do
+    Add(b, b[i] * hW - a[m - i + 1] * K[1]);
+  od;
+  ConvertToMatrixRep(b, f);
+  Bi := b^-1;
+  w := Bi * Concatenation([Zero(f)], List([1 .. m - 1], i -> -a[m - i + 1]));
+
+  # the new basis vectors v'_j = eps[j] b_(rho[j]), with c mapping v'_j to
+  # sigma[j] v'_(pi[j]) as the long cycle P does
+  new := RECOG.ClassicalStandardGenerators("SL", m, f);
+  if IsOddInt(m) then
+    P := new.v;
+  else
+    P := new.v * new.x;
+  fi;
+  pi := List([1 .. m], i -> PositionNonZero(P[i]));
+  pinv := [];
+  pinv{pi} := [1 .. m];
+  sigma := List([1 .. m], i -> P[i, pi[i]]);
+  j0 := 1;
+  rho := [];
+  eps := [];
+  rho[j0] := 1;
+  eps[j0] := One(f);
+  cur := j0;
+  for i in [2 .. m] do
+    rho[pi[cur]] := i;
+    eps[pi[cur]] := eps[cur] / sigma[cur];
+    cur := pi[cur];
+  od;
+  Assert(1, eps[cur] * a[1] = sigma[cur]);
+  basis := MutableCopyMat(IdentityMat(d, f));
+  for i in [1 .. m] do
+    basis[i]{[1 .. m]} := eps[i] * b[rho[i]];
+  od;
+
+  cycw := h * toVn(w);
+
+  # E'(i, j, lambda): the coordinate of v'_i is x -> (x Bi)_(rho[i]) /
+  # eps[i]; conjugation by c maps E'(i, j, mu) to
+  # E'(pi[i], pi[j], mu sigma[j] / sigma[i])
+  cache := rec();
+  E := function(i, j, lambda)
+    local key, mu, k;
+    key := Concatenation(String([i, j]), String(lambda));
+    if not IsBound(cache.(key)) then
+      mu := lambda;
+      k := 0;
+      while j <> j0 do
+        i := pinv[i];
+        j := pinv[j];
+        mu := mu * sigma[i] / sigma[j];
+        k := k + 1;
+      od;
+      cache.(key) := toVn(mu / eps[i] * List(Bi, r -> r[rho[i]]));
+      if k > 0 then
+        cache.(key) := cache.(key)^(cycw^k);
+      fi;
+    fi;
+    return cache.(key);
+  end;
+
+  # s, t, delta and x act on the first four basis vectors only
+  one := F[1]^0;
+  k := [1 .. Minimum(4, m)];
+  words := List([new.s, new.t, new.delta],
+                M -> RECOG.SL_ExpressByElementary(M{k}{k}, E, one));
+  if IsOddInt(m) then
+    Append(words, [cycw, one]);
+  else
+    xw := RECOG.SL_ExpressByElementary(new.x{k}{k}, E, one);
+    Append(words, [cycw * xw^-1, xw]);
+  fi;
+  return rec( words := words, basis := basis );
+end;
+
 # Step 5 of the GoingUp step for SL ([EHNPR], 'Constructing the enlarged
-# group'): the standard generators of SL(W), W = <v_1, ..., v_n'>,
-# relative to the adapted basis, as words in the standard generators <Y>
-# of SL(U) and g~, whose matrix relative to the adapted basis is <g>. s, t
-# and delta are those of SL(U); v and x are products of elementary
+# group'): the standard generators of SL(W), W = <v_1, ..., v_n'>, as
+# words in the standard generators <Y> of SL(U) and g~, whose matrix
+# relative to the adapted basis is <g>, by RECOG.SL_GoingUpCycleBasis
+# relative to a new basis if possible. Otherwise relative to the adapted
+# basis as follows. s, t and delta are those of SL(U); v and x are
+# products of elementary
 # matrices of W, found by RECOG.SL_ExpressByElementary ([EHNPR] names
 # Gaussian elimination but gives no words):
 #  - E(i, j, .) with i, j <= n lies in SL(U);
@@ -340,11 +549,13 @@ end;
 #    previous case, T(v_n, z)^(g h) = T(v_n, a + w) with a the part of zg
 #    in <v_1, ..., v_(n-1)>;
 #  - the others are commutators [E(i, n, lambda), E(n, j, 1)].
-# Returns the list of words, as elements with memory in generators standing
-# for Y and g~.
+# Returns the record of RECOG.SL_GoingUpCycleBasis, or fail, so that the
+# step is repeated with a new doubling element, at most
+# RECOG.SL_GoingUpCycleRetries times in a row, or else the list of words,
+# as elements with memory in generators standing for Y and g~.
 RECOG.SL_GoingUpNewGenerators := function(std, Y, R, g)
   local f, d, n, nn, F, G, RF, e, gis, toVnSolver, fromVnSolver, product,
-        toVn, r, h, fromVn, compute, unit, elementary, new;
+        toVn, res, r, h, fromVn, compute, unit, elementary, new;
 
   f := std.f;
   d := std.d;
@@ -363,18 +574,16 @@ RECOG.SL_GoingUpNewGenerators := function(std, Y, R, g)
 
   # the product of the E(i, j, c[i]) or E(j, i, c[i]), i < n, as a word in Y
   product := function(c, j, toJ)
-    local res, i;
-    res := RF.one;
+    local prod, i;
+    prod := RECOG.SL_Product(RF, n);
     for i in [1 .. n - 1] do
-      if IsZero(c[i]) then
-        continue;
-      elif toJ then
-        res := res * RECOG.SL_ElementaryMatrix(RF, i, j, c[i]);
+      if toJ then
+        prod.apply(i, j, c[i]);
       else
-        res := res * RECOG.SL_ElementaryMatrix(RF, j, i, c[i]);
+        prod.apply(j, i, c[i]);
       fi;
     od;
-    return res;
+    return prod.word();
   end;
 
   # T(w, v_n) for w in <v_1, ..., v_(n-1), v_(n+1), ..., v_n'>
@@ -384,6 +593,20 @@ RECOG.SL_GoingUpNewGenerators := function(std, Y, R, g)
     return product(c{[1 .. n - 1]}, n, true)
            * product(c{[n .. 2 * n - 2]}, n, true)^G;
   end;
+
+  # a new doubling element is cheaper than the elimination below
+  res := RECOG.SL_GoingUpCycleBasis(std, F, g, toVn);
+  if not IsBound(std.cycleRetries) then
+    std.cycleRetries := 0;
+  fi;
+  if res <> fail then
+    std.cycleRetries := 0;
+    return res;
+  elif std.cycleRetries < RECOG.SL_GoingUpCycleRetries then
+    std.cycleRetries := std.cycleRetries + 1;
+    return fail;
+  fi;
+  std.cycleRetries := 0;
 
   r := e[n] * gis;
   if r = e[n] then
