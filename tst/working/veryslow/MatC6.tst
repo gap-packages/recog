@@ -222,7 +222,4 @@ gap> for i in gens do ConvertToMatrixRep(i,5^2); od;
 gap> x := PseudoRandom(GL(27,5^2));;
 gap> gens := List(gens,y->y^x);;
 gap> g := GroupWithGenerators(gens);;
-gap> oldOrbInfoLevel := InfoLevel(InfoOrb);;
-gap> SetInfoLevel(InfoOrb, 0); # genss reports progress on orbits of 30000+ points
 gap> ri := RECOG.TestGroup(g,false,80225312993280);;
-gap> SetInfoLevel(InfoOrb, oldOrbInfoLevel);
