@@ -911,13 +911,13 @@ RECOG.Form_NormPreimage := function(R, f, a, q, k)
 end;
 
 # A vector e of W = GF(q)^n, n = 2m, for the isometry <h> of the form
-# beta(x, y) = x <J> y^(sigma T) of type <type>, "Sp", "SU" or "O+", over
-# <F> (sigma the identity, resp. c -> c^q0 for F = GF(q0^2)), with
-# squarefree characteristic polynomial <chi>, such that beta(e, e h^j) = 0
-# for 0 <= j < k and beta(e, e h^k) <> 0, with k = m, resp. k = m - 1 for
-# "O+", or fail. Then e, e h, ..., e h^(k-1) span a totally isotropic
-# (singular) space, and for SU, where det h = 1, beta(e, e h^m) has
-# trace 0.
+# beta(x, y) = x <J> y^(sigma T) of type <type>, "Sp", "SU", "O+" or "O"
+# (n = 2m + 1), over <F> (sigma the identity, resp. c -> c^q0 for
+# F = GF(q0^2)), with squarefree characteristic polynomial <chi>, such that
+# beta(e, e h^j) = 0 for 0 <= j < k and beta(e, e h^k) <> 0, with k = m,
+# resp. k = m - 1 for "O+", or fail. Then e, e h, ..., e h^(k-1) span a
+# totally isotropic (singular) space, and for SU, where det h = 1,
+# beta(e, e h^m) has trace 0.
 # W is a cyclic F[h]-module: e = c p(h) for a cyclic vector c, and with
 # phi(a) = beta(c, c a(h)), beta(e, e h^j) = phi(N x^j) for
 # N = p p^dagger, a^dagger = a^sigma(x^-1), in A = F[x]/chi. The
@@ -934,6 +934,11 @@ RECOG.Form_IsotropicKrylovVector := function(h, J, F, chi, type)
 
   n := NrRows(h);
   m := n / 2;
+  if type = "O" then
+    # as "O+" with one more unknown and condition
+    m := (n + 1) / 2;
+    type := "O+";
+  fi;
   q := Size(F);
   if type = "SU" then
     q0 := RootInt(q);
@@ -1031,6 +1036,16 @@ RECOG.Form_IsotropicKrylovVector := function(h, J, F, chi, type)
   od;
   if N0 = fail then
     return fail;
+  fi;
+  if IsOddInt(n) then
+    # N0 is determined up to a scalar, and the norm equation at x - 1 is a
+    # square root
+    a := Value(N0, One(F));
+    if IsZero(a) then
+      return fail;
+    elif a^((q - 1) / 2) <> One(F) then
+      N0 := PrimitiveRoot(F) * N0;
+    fi;
   fi;
 
   # p, with p p^dagger = N0, by the Chinese remainder theorem
