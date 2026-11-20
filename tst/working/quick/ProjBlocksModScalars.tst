@@ -51,6 +51,8 @@ gap> OrderFunc(r)(x);
 gap> o := OrderFunc(r)(h);;
 gap> isone(r)(h^o) and ForAll(PrimeDivisors(o), p -> not isone(r)(h^(o/p)));
 true
+gap> OrderFunc(r)(GeneratorsWithMemory([h])[1]) = o;
+true
 
 #
 gap> SLPWorks := function(r, x)
