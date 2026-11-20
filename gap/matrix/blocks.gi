@@ -115,6 +115,7 @@ function(ri)
   Setslptonice(ri,slp);   # this sets the nice generators
   Setslpforelement(ri,SLPforElementFuncsMatrix.DiscreteLog);
   ri!.generator := z^gcd;
+  SetSize(ri, (q-1)/gcd);
   SetFilterObj(ri,IsLeaf);
   return Success;
 end);
