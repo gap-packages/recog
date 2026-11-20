@@ -87,6 +87,8 @@ RECOG.GoingUpParameters := function(type)
   if type in RECOG.OrthogonalTypes then
     res.seed := RECOG.O_GoingUpSeed;
     res.newGenerators := RECOG.O_GoingUpNewGenerators;
+  elif type = "SU" then
+    res.newGenerators := RECOG.SU_GoingUpNewGenerators;
   fi;
   return res;
 end;
@@ -204,10 +206,10 @@ RECOG.GoingUpStep := function(std, N)
 end;
 
 # GoingUp of [EHNPR] ('Outline of the algorithm', subsection 'GoingUp
-# algorithm') for the type <type>, "SL", or "Sp" or "SU" (q odd, d even),
-# or an orthogonal type ("O+" or "O-" for q even): <G> is SL(d,q), resp.
-# Sp(d,q), SU(d,q0) or Omega(d,q) for some alternating, hermitian resp.
-# symmetric or quadratic form, with
+# algorithm') for the type <type>, "SL", or "Sp" (q odd, d even), "SU",
+# or an orthogonal type ("O+" or "O-" for q even): <G> is
+# SL(d,q), resp. Sp(d,q), SU(d,q0) or Omega(d,q) for some alternating,
+# hermitian resp. symmetric or quadratic form, with
 # generators with memory, and <init> describes an embedded CL(n,q), of type
 # "O+" for orthogonal groups, as follows:
 #  - `slp`: SLP in the generators of <G> for the standard generators of
@@ -285,14 +287,15 @@ end;
 ##     bases.(kind) of their parameters
 ##   - `conjugator`: conjugator[j] maps e_2 to e_j and f_2 to f_j, and fixes
 ##     e_1, f_1, and `powers`: a cache for RECOG.Form_RootElement
-##   - `aniso` (only orthogonal groups of type - or o, see ../Rewrite.gi):
-##     a record with components `pos`, the indices of the basis w_1 (and
-##     w_2) of the anisotropic part, which follows the m hyperbolic pairs,
-##     `pairs`, the number m, `gram`, the Gram matrix on <w_1, w_2> resp.
-##     <w_1>, `unit`, the parameter of w_1, `toField`, a function
-##     mapping a vector z of the anisotropic part to the parameter of
-##     Fw(z) and Ew(z) in bases.Fw and bases.Ew, and for q even `quad`, the
-##     matrix of Q on <w_1, w_2> (see RECOG.ClassicalForm)
+##   - `aniso` (only orthogonal groups of type - or o, see Rewrite.gi, and
+##     SU of odd degree, see SU/Rewrite.gi): a record with components
+##     `pos`, the indices of the basis w_1 (and w_2) of the anisotropic
+##     part, which follows the m hyperbolic pairs, `pairs`, the number m,
+##     `gram`, the Gram matrix on <w_1, w_2> resp. <w_1>, `unit`, the
+##     parameter of w_1, `toField`, a function mapping a vector z of the
+##     anisotropic part to the parameter of Fw(z) and Ew(z) in bases.Fw and
+##     bases.Ew, for q even `quad`, the matrix of Q on <w_1, w_2> (see
+##     RECOG.ClassicalForm), and for SU `lambda`, see below
 ##  The root elements, for 2 <= j <= m = n/2, are
 ##   - Lf(lambda) = T(f_1, lambda): e_1 -> e_1 + lambda f_1;
 ##   - Le(lambda) = T(e_1, lambda): f_1 -> f_1 + eps lambda e_1;
@@ -307,7 +310,8 @@ end;
 ##   - with `aniso`, for z in the anisotropic part, the Siegel
 ##     transformations Fw(z) = rho(f_1, z): e_1 -> e_1 - z - Q(z) f_1,
 ##     w_i -> w_i + beta(w_i, z) f_1, and Ew(z) = rho(e_1, z): f_1 -> f_1 -
-##     z - Q(z) e_1, w_i -> w_i + beta(w_i, z) e_1.
+##     z - Q(z) e_1, w_i -> w_i + beta(w_i, z) e_1; for SU, -Q(z) is
+##     lambda(kind, z) with kind = "Fw" resp. "Ew".
 ##
 #############################################################################
 
@@ -340,7 +344,9 @@ end;
 # identity plus the entries c at the positions [i, k] of the triples
 # [i, k, c] returned here. For "Fw" and "Ew" some k is also an i; the
 # entries which read row i come before those which change it, so applying
-# them in order acts as the matrix.
+# them in order acts as the matrix. These map the partner of a = f_1 resp.
+# e_1 to it minus z plus lam a, with lam = -Q(z), or for SU of odd degree
+# lam = R.aniso.lambda(kind, z) (see SU/Rewrite.gi).
 RECOG.Form_RootElementEntries := function(R, kind, j, lambda)
   local c, a, pos, bz, res, i;
 
@@ -351,7 +357,8 @@ RECOG.Form_RootElementEntries := function(R, kind, j, lambda)
       a := 1;
     fi;
     pos := R.aniso.pos;
-    bz := lambda * R.aniso.gram;
+    # beta(w_i, z)
+    bz := List(lambda * R.aniso.gram, R.conj);
     res := [];
     for i in [1 .. Length(pos)] do
       if not IsZero(bz[i]) then
@@ -363,7 +370,9 @@ RECOG.Form_RootElementEntries := function(R, kind, j, lambda)
         Add(res, [3 - a, pos[i], -lambda[i]]);
       fi;
     od;
-    if IsBound(R.aniso.quad) then
+    if IsBound(R.aniso.lambda) then
+      c := -R.aniso.lambda(kind, lambda);
+    elif IsBound(R.aniso.quad) then
       c := lambda * R.aniso.quad * lambda;
     else
       c := (bz * lambda) / 2;
@@ -501,10 +510,13 @@ RECOG.Form_MapToStd := function(R, y, MT...)
 
   # y = e_1 + c f_1 has the norm nu = c^sigma + eps c, and nu/2 - c is a
   # parameter of Lf; nu = 0 for Sp; orthogonal groups have no Lf, and
-  # c = Q(y)
+  # c = Q(y). For SU in characteristic 2, nu h replaces nu/2, with
+  # h = R.half of trace 1.
   if IsBound(R.Lf) then
     nu := R.conj(y[2]) + R.eps * y[2];
-    if not IsZero(nu) then
+    if IsBound(R.half) then
+      nu := nu * R.half;
+    elif not IsZero(nu) then
       nu := nu / 2;
     fi;
     if y[2] <> nu then
@@ -691,8 +703,9 @@ end;
 # v_W = tau_(m'-1) ... tau_m v_U, where tau_j swaps the pairs j and j+1.
 # Each tau_j is a product of four transvections of W, which are conjugates
 # of transvections of U. Returns the list of words, as elements with
-# memory in generators standing for Y and g~.
-RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g)
+# memory in generators standing for Y and g~, which the optional argument
+# gives, as a list.
+RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g, opt...)
   local f, d, n, nn, form, norm, F, RF, e, gi, Ub, Upb, Npb, Wb, coeffs,
         withNorm, mapInU, intoU, transvection, vpos, tau, v, j, a, b, res;
 
@@ -702,7 +715,11 @@ RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g)
   nn := Minimum(2 * n - 2, d);
   form := RECOG.ClassicalForm(std.type, d, f);
   norm := w -> RECOG.FormValue(form, w, w);
-  F := GeneratorsWithMemory(ListWithIdenticalEntries(Length(Y) + 1, ()));
+  if Length(opt) = 0 then
+    F := GeneratorsWithMemory(ListWithIdenticalEntries(Length(Y) + 1, ()));
+  else
+    F := opt[1];
+  fi;
   # root elements of CL(U) as words in the first generators of F
   RF := RECOG.GoingUpParameters(std.type).rootElementsOf(
             F{[1 .. Length(Y)]}, n, f);
@@ -719,7 +736,8 @@ RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g)
 
   # a nonzero vector of z + P, P = <e_m, f_m> <= U meet U', of norm nu: z,
   # or z minus its component in P, of norm mu, plus e_m + c f_m, of norm
-  # 2c = nu - mu; for Sp, all norms are 0
+  # 2c = nu - mu, resp. c + c^sigma = nu - mu with c = (nu - mu) RF.half
+  # for SU; for Sp, all norms are 0
   withNorm := function(z, nu)
     local c;
     if not IsZero(z) and norm(z) = nu then
@@ -729,7 +747,9 @@ RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g)
     z[n - 1] := Zero(f);
     z[n] := Zero(f);
     c := nu - norm(z);
-    if not IsZero(c) then
+    if IsBound(RF.half) then
+      z[n] := c * RF.half;
+    elif not IsZero(c) then
       z[n] := c / 2;
     fi;
     z[n - 1] := One(f);
@@ -790,11 +810,11 @@ RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g)
 
   # tau_j = T(b, y) T(a, x) T(b, y) T(a, x), a = e_j - e_(j+1),
   # b = f_j - f_(j+1), with [x, y] = RF.tau, and for q even
-  # tau_j = T(a + b, 1) T(a, 1) T(b, 1) ([EHNPR], 'Constructing the
-  # enlarged group')
+  # tau_j = T(a + b, 1) T(a, 1) T(b, 1), a = e_j + e_(j+1),
+  # b = f_j + f_(j+1) ([EHNPR], 'Constructing the enlarged group')
   vpos := Position(RECOG.ClassicalStandardGeneratorNames(std.type), "v");
   v := F[vpos];
-  for j in [n / 2 .. nn / 2 - 1] do
+  for j in [n / 2 .. QuoInt(nn, 2) - 1] do
     a := e[2 * j - 1] - e[2 * j + 1];
     b := e[2 * j] - e[2 * j + 2];
     if IsBound(RF.tau) then
