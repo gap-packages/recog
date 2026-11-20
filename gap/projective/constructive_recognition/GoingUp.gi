@@ -896,9 +896,9 @@ end;
 
 # A preimage z of <a> under the norm z -> z^(q^k + 1) of the field
 # F[x]/(<f>) of order q^(2k), for <f> irreducible in the polynomial ring
-# <R>, q odd, and a <> 0 in the subfield of order q^k: z = w b for a
-# random w and a square root b of a / N(w) in that subfield, by
-# Tonelli-Shanks.
+# <R> and a <> 0 in the subfield of order q^k: z = w b for a random w and
+# a square root b of a / N(w) in that subfield, by Tonelli-Shanks for q
+# odd; for q even, b = (a / N(w))^(q^k / 2).
 RECOG.Form_NormPreimage := function(R, f, a, q, k)
   local x, randomElement, Q, S, w, b, c, t, r, M, i, s, z;
 
@@ -907,6 +907,14 @@ RECOG.Form_NormPreimage := function(R, f, a, q, k)
     return Sum([0 .. DegreeOfLaurentPolynomial(f) - 1],
                i -> Random(CoefficientsRing(R)) * x^i);
   end;
+  if IsEvenInt(q) then
+    repeat
+      w := randomElement();
+      b := PowerMod(R, w, q^k + 1, f);
+    until not IsZero(b);
+    b := (a * GcdRepresentation(R, b, f)[1]) mod f;
+    return (w * PowerMod(R, b, q^k / 2, f)) mod f;
+  fi;
   repeat
     w := randomElement();
     b := PowerMod(R, w, q^k + 1, f);
@@ -963,10 +971,16 @@ end;
 # for a pair of factors f, f^dagger, by RECOG.Form_NormPreimage for
 # f = f^dagger otherwise, except for x - 1 and x + 1 in Sp and O+, where it
 # is a square root.
-RECOG.Form_IsotropicKrylovVector := function(h, J, F, chi, type)
+# In characteristic 2, h must not have the eigenvalue 1, and for "O+" the
+# optional argument is the matrix of the quadratic form Q (as in
+# RECOG.ClassicalForm). There N = nu_0 + sum_(k>0) nu_k (x^k + x^-k): the
+# conditions for j > 0 are those above without the term phi(x^0) for nu_0,
+# and for O+, Q(e) = nu_0 Q(c) + sum_(k>0) nu_k phi(x^k) replaces
+# phi(N) = 0.
+RECOG.Form_IsotropicKrylovVector := function(h, J, F, chi, type, quad...)
   local n, m, q, q0, conj, R, x, c, K, cJ, i, phi, ph, F0, omega, coords,
         M, row, k, j, nu, cands, top, xi, N, N0, mods, rems, used, f, fs, a,
-        z, p, P, coeffs, e, form;
+        z, p, P, coeffs, e, form, even;
 
   n := NrRows(h);
   m := n / 2;
@@ -976,6 +990,10 @@ RECOG.Form_IsotropicKrylovVector := function(h, J, F, chi, type)
     type := "O+";
   fi;
   q := Size(F);
+  even := type in ["O+", "Sp"] and IsEvenInt(q);
+  if even and IsZero(Value(chi, One(F))) then
+    return fail;
+  fi;
   if type = "SU" then
     q0 := RootInt(q);
     conj := v -> List(v, y -> y^q0);
@@ -1037,6 +1055,15 @@ RECOG.Form_IsotropicKrylovVector := function(h, J, F, chi, type)
     # phi(N x^j) = 0 for 0 <= j < m - 1; the value at m - 1 is tested below
     M := List([0 .. m - 1], k -> List([0 .. m - 2],
                                       j -> ph(k + j) + ph(j - k)));
+    if even then
+      for j in [1 .. m - 2] do
+        M[1][j + 1] := ph(j);
+      od;
+      for k in [1 .. m - 1] do
+        M[k + 1][1] := ph(k);
+      od;
+      M[1][1] := c * quad[1] * c;
+    fi;
     cands := NullspaceMat(M);
     if Length(cands) <> 1 then
       return fail;
@@ -1045,6 +1072,11 @@ RECOG.Form_IsotropicKrylovVector := function(h, J, F, chi, type)
   else
     M := List([0 .. m - 1], k -> List([1 .. m - 1],
                                       j -> ph(k + j) + ph(j - k)));
+    if even then
+      for j in [1 .. m - 1] do
+        M[1][j] := ph(j);
+      od;
+    fi;
     cands := NullspaceMat(M);
     if Length(cands) <> 1 then
       return fail;
@@ -1060,10 +1092,19 @@ RECOG.Form_IsotropicKrylovVector := function(h, J, F, chi, type)
   xi := GcdRepresentation(R, x, chi)[1] mod chi;
   N0 := fail;
   for nu in cands do
-    if not IsZero(Sum([0 .. m], k -> nu[k + 1]^q0 * ph(k + top)
-                                     + nu[k + 1] * ph(top - k))) then
+    if even then
+      a := nu[1] * ph(top) + Sum([1 .. m], k -> nu[k + 1] * (ph(k + top)
+                                                             + ph(top - k)));
+    else
+      a := Sum([0 .. m], k -> nu[k + 1]^q0 * ph(k + top)
+                              + nu[k + 1] * ph(top - k));
+    fi;
+    if not IsZero(a) then
       N := Sum([0 .. m], k -> nu[k + 1] * x^k
                           + nu[k + 1]^q0 * PowerMod(R, xi, k, chi)) mod chi;
+      if even then
+        N := (N + nu[1] * One(R)) mod chi;
+      fi;
       if not IsZero(N) then
         N0 := N;
         break;
@@ -1164,9 +1205,9 @@ RECOG.Form_GoingUpCycleRetries := 3;
 #    f_i -> f_i + sum_k S_ik b_k replaces by Z + S - C S C^-1, C the cyclic
 #    shift; moving the sum along each cyclic diagonal of Z to its first row
 #    or column leaves the radical part of c supported there, the product of
-#    two transvections with centres in E; if p does not divide m, c^p is
-#    the pair cycle relative to a suitable dual basis, as proposed in the
-#    same draft, and needs no correction;
+#    two transvections with centres in E (three in characteristic 2); if p
+#    does not divide m, c^p is the pair cycle relative to a suitable dual
+#    basis, as proposed in the same draft, and needs no correction;
 #  - this gives v_W relative to the basis (b_1, f_1, ..., b_m, f_m), and
 #    the other standard generators are products of transvections with
 #    centres among b_1, f_1, b_2, b_1 + b_2, b_1 - b_2, f_1 - f_2 and, for
@@ -1183,9 +1224,10 @@ RECOG.Form_GoingUpCycleBasis := function(std, F, RF, g, transvection)
         eps, zm, cw, cm, gi, seed, xw, xm, hW, chi, e, hw, b, i, y, vv, lam,
         rW, c1, solver, f0, Gr, fv, next, X, Z, S, delta, a, sum, sv, k,
         half, Zp, mu, lamf, zt, w1, w2, pad, vW, basis, words, B1, F1, B2, F2,
-        T, slam, sw, tau, x12, x21, om;
+        T, slam, sw, tau, x12, x21, om, p, halfGram, Kb, R, Bm, r1, al;
 
   f := std.f;
+  p := Characteristic(f);
   d := std.d;
   n := std.n;
   nn := Minimum(2 * n - 2, d);
@@ -1249,18 +1291,42 @@ RECOG.Form_GoingUpCycleBasis := function(std, F, RF, g, transvection)
   Assert(1, ForAll([1 .. m], i -> b[i] * c1 = b[i mod m + 1]));
 
   # mu <> 0 with mu^sigma = -eps mu
-  if std.type = "SU" then
+  if std.type = "SU" and p > 2 then
     mu := PrimitiveRoot(f)^((q0 + 1) / 2);
   else
     mu := One(f);
   fi;
 
+  # S with S_il + eps S_li^sigma = G_il for the Gram matrix G of vectors
+  # f_i dual to the b_i, so that the f_i - sum_l S_il b_l are totally
+  # isotropic; S is circulant if G is and m is odd. G/2 for q odd, h G with
+  # h of trace 1 for SU, and for Sp in characteristic 2 the entries of G on
+  # the cyclic diagonals 1, ..., (m-1)/2 and half of the diagonal m/2
+  halfGram := function(Gr)
+    local S, i, l, dl;
+    if p > 2 then
+      return Gr / 2;
+    elif std.type = "SU" then
+      return RF.half * Gr;
+    fi;
+    S := NullMat(m, m, f);
+    for i in [1 .. m] do
+      for l in [1 .. m] do
+        dl := (l - i) mod m;
+        if (0 < dl and 2 * dl < m) or (2 * dl = m and i < l) then
+          S[i][l] := Gr[i][l];
+        fi;
+      od;
+    od;
+    return S;
+  end;
+
   # for p not dividing m, c' = c^p is the pair cycle: c^m - 1 maps W into
   # E and kills E, so c^(mp) = 1, and c' still cycles all of E. Relative to
   # e_i = e c'^(i-1) and f_i = f_1 c'^(i-1), beta(e_i, f_1) = delta_i1, the
-  # Gram matrix G of the f_i is circulant, and f_i -> f_i - sum_j G_ij e_j/2
-  # makes F totally isotropic and commutes with c'
-  if m mod Characteristic(f) <> 0 then
+  # Gram matrix G of the f_i is circulant, and f_i -> f_i - sum_j S_ij e_j
+  # for S of halfGram makes F totally isotropic and commutes with c'
+  if m mod p <> 0 then
     c1 := c1^Characteristic(f);
     b := [e];
     for i in [2 .. m] do
@@ -1271,8 +1337,8 @@ RECOG.Form_GoingUpCycleBasis := function(std, F, RF, g, transvection)
     for i in [2 .. m] do
       Add(fv, fv[i - 1] * c1);
     od;
-    Gr := fv * J * TransposedMat(List(fv, conj));
-    fv := List([1 .. m], j -> fv[j] - Gr[j] * b / 2);
+    Gr := halfGram(fv * J * TransposedMat(List(fv, conj)));
+    fv := List([1 .. m], j -> fv[j] - Gr[j] * b);
     Assert(1, fv[m] * c1 = fv[1]
               and IsZero(fv * J * TransposedMat(List(fv, conj))));
     vW := (hw * transvection(pad(vv), lam))^Characteristic(f);
@@ -1280,8 +1346,8 @@ RECOG.Form_GoingUpCycleBasis := function(std, F, RF, g, transvection)
     # f_i with beta(b_i, f_j) = delta_ij and beta(f_i, f_j) = 0
     solver := RECOG.GoingUpSolver(TransposedMat(List(b, x -> x * J)));
     f0 := List(IdentityMat(m, f), z -> conj(solver(z)));
-    Gr := f0 * J * TransposedMat(List(f0, conj));
-    fv := List([1 .. m], j -> f0[j] - Gr[j] * b / 2);
+    Gr := halfGram(f0 * J * TransposedMat(List(f0, conj)));
+    fv := List([1 .. m], j -> f0[j] - Gr[j] * b);
 
     # Z_(i,k) = beta(f_i c - f_(i+1), f_(k+1)), with Z_(k,i) =
     # -eps Z_(i,k)^sigma, and S moving the sum along each cyclic diagonal
@@ -1298,9 +1364,24 @@ RECOG.Form_GoingUpCycleBasis := function(std, F, RF, g, transvection)
       sum := Sum(a);
       half := 2 * delta = m;
       # on the diagonal m/2, S must be its own mirror: sv[2 + delta] =
-      # -eps sv[2]^sigma, which this start achieves
+      # -eps sv[2]^sigma, which this start achieves. In characteristic 2,
+      # the first half of that diagonal is summed and the second half is
+      # its mirror, which leaves the remainder at (1, 1 + delta) and
+      # (1 + delta, 1).
       sv := [];
       sv[2] := Zero(f);
+      if half and p = 2 then
+        for i in [2 .. delta] do
+          sv[i + 1] := sv[i] + a[i];
+        od;
+        for i in [2 .. delta + 1] do
+          sv[(i + delta - 1) mod m + 1] := -eps * sv[i]^q0;
+        od;
+        for i in [1 .. m] do
+          S[i][(i + delta - 1) mod m + 1] := sv[i];
+        od;
+        continue;
+      fi;
       if half then
         sum := Sum(a{[2 .. 1 + delta]});
         sv[2] := -(sum + eps * sum^q0) / 4;
@@ -1328,14 +1409,53 @@ RECOG.Form_GoingUpCycleBasis := function(std, F, RF, g, transvection)
     # T(w, lambda), w in E, adds lambda eps w^sigma w^T to Z; with mu and
     # lamf = 1 / (2 eps mu), the radical part of c is T(w_1, lamf)
     # T(w_2, -lamf)
-    lamf := (2 * eps * mu)^-1;
-    zt := ShallowCopy(Zp);
-    zt[1] := zt[1] / 2;
     vW := hw * transvection(pad(vv), lam);
-    if not IsZero(zt) then
-      w1 := (IdentityMat(m, f)[1] + mu * zt) * b;
-      w2 := (IdentityMat(m, f)[1] - mu * zt) * b;
-      vW := transvection(pad(w2), lamf) * transvection(pad(w1), -lamf) * vW;
+    if p > 2 then
+      lamf := (2 * eps * mu)^-1;
+      zt := ShallowCopy(Zp);
+      zt[1] := zt[1] / 2;
+      if not IsZero(zt) then
+        w1 := (IdentityMat(m, f)[1] + mu * zt) * b;
+        w2 := (IdentityMat(m, f)[1] - mu * zt) * b;
+        vW := transvection(pad(w2), lamf) * transvection(pad(w1), -lamf) * vW;
+      fi;
+    else
+      # in characteristic 2, R = v c^-1 for the pair cycle v relative to
+      # (b_i, f_i) fixes E pointwise, and f_i R = f_i + sum_k B_ik b_k with
+      # B supported on its first row r and column. T(w, lambda),
+      # w = sum w_k b_k, has B = lambda (w^sigma)^T w. With z = r without
+      # its first entry: for Sp, B is that of T(b_1 + z, 1) T(b_1, r_1 + 1)
+      # T(z, 1); for SU, of T(b_1 + al z, l) T(b_1 + al^sigma z, l)
+      # T(b_1, r_1) with l = 1 / (al + al^sigma), al not in GF(q0)
+      Kb := Concatenation(List([1 .. m], i -> [b[i], fv[i]]));
+      R := Kb^-1 * RECOG.ClassicalStandardGenerators(std.type, nn, f).v * Kb
+           * c1^-1;
+      Bm := List([1 .. m], i -> List([1 .. m],
+                k -> form(fv[i] * R - fv[i], fv[k])));
+      Assert(1, ForAll(b, x -> x * R = x)
+                and ForAll(Bm{[2 .. m]}{[2 .. m]}, IsZero));
+      zt := ShallowCopy(Bm[1]);
+      r1 := zt[1];
+      zt[1] := Zero(f);
+      if IsZero(zt) then
+        if not IsZero(r1) then
+          vW := transvection(pad(b[1]), r1) * vW;
+        fi;
+      elif std.type = "Sp" then
+        vW := transvection(pad(b[1] + zt * b), One(f))
+              * transvection(pad(zt * b), One(f)) * vW;
+        if not IsOne(r1) then
+          vW := transvection(pad(b[1]), r1 + One(f)) * vW;
+        fi;
+      else
+        al := PrimitiveRoot(f);
+        lamf := (al + al^q0)^-1;
+        vW := transvection(pad(b[1] + al * zt * b), lamf)
+              * transvection(pad(b[1] + al^q0 * zt * b), lamf) * vW;
+        if not IsZero(r1) then
+          vW := transvection(pad(b[1]), r1) * vW;
+        fi;
+      fi;
     fi;
   fi;
 
@@ -1356,10 +1476,18 @@ RECOG.Form_GoingUpCycleBasis := function(std, F, RF, g, transvection)
   T := transvection;
   slam := l -> T(F1, l) * T(B1, -(eps * l)^-1) * T(F1, l);
   sw := slam(Ystd.s[1, 2]);
-  tau := T(F1 - F2, RF.tau[2]) * T(B1 - B2, RF.tau[1]);
+  # the swap u of the first two pairs, as in the transpositions of
+  # RECOG.Form_GoingUpNewGenerators
+  if IsBound(RF.tau) then
+    tau := T(F1 - F2, RF.tau[2]) * T(B1 - B2, RF.tau[1]);
+    tau := tau * tau;
+  else
+    tau := T(B1 + B2 + F1 + F2, One(f)) * T(B1 + B2, One(f))
+           * T(F1 + F2, One(f));
+  fi;
   words := rec( s := sw, t := T(F1, Ystd.t[1, 2]),
                 delta := slam(Ystd.delta[1, 1] * Ystd.s[1, 2]) * sw^-1,
-                u := tau * tau, v := vW );
+                u := tau, v := vW );
   if std.type = "Sp" then
     words.x := T(B1 + B2, -One(f)) * T(B1, One(f)) * T(B1, One(f))^vW;
   else
@@ -1382,7 +1510,7 @@ end;
 # Step 5 of the GoingUp step ([EHNPR], 'Constructing the enlarged group'):
 # the standard generators of CL(W), W = U + N, as words in the standard
 # generators <Y> of CL(U) and g~, whose matrix relative to the adapted
-# basis is <g>; for Sp and SU, q odd, by RECOG.Form_GoingUpCycleBasis
+# basis is <g>; for Sp and SU, n' even, by RECOG.Form_GoingUpCycleBasis
 # relative to a new basis if possible. Otherwise relative to the first n'
 # vectors of the adapted basis: they are those of CL(U) except the pair
 # cycle v, which is v_W = tau_(m'-1) ... tau_m v_U, where tau_j swaps the
@@ -1508,8 +1636,8 @@ RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g, opt...)
   end;
 
   # a new doubling element is cheaper than the transpositions below; the
-  # construction needs q odd and n' even
-  if std.type in ["Sp", "SU"] and IsOddInt(Size(f)) and IsEvenInt(nn) then
+  # construction needs n' even
+  if std.type in ["Sp", "SU"] and IsEvenInt(nn) then
     res := RECOG.Form_GoingUpCycleBasis(std, F, RF, g, transvection);
     if not IsBound(std.cycleRetries) then
       std.cycleRetries := 0;
