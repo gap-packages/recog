@@ -21,13 +21,25 @@
 # database with "CallMethods".
 #
 InstallGlobalFunction("AddMethod", function(methodDb, method, rank, extra...)
-    local pos, name;
+    local pos, name, oldfunc;
     if not IsRecogMethod(method) then
         if Length(extra) = 2 then
-            # HACK: workaround for matgrp package <= 0.70 which accesses the old
-            # API; a fix to use the new API is already in the matgrp repository
-            # but has not yet been released.
-            method := RecogMethod(extra[1], extra[2], method);
+            # HACK: matgrp <= 0.70 (bundled with GAP 4.13) uses the API of
+            # recog <= 1.4: a function of (ri, G) returning true, false or
+            # fail, plus stamp and comment.
+            oldfunc := method;
+            method := RecogMethod(extra[1], extra[2], function(ri)
+                local result;
+                result := oldfunc(ri, Grp(ri));
+                if result = true then
+                    return Success;
+                elif result = false then
+                    return NeverApplicable;
+                elif result = fail then
+                    return TemporaryFailure;
+                fi;
+                return result;
+            end);
         else
             ErrorNoReturn("<method> must be a RecogMethod");
         fi;
