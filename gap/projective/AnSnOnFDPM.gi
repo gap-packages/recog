@@ -1356,6 +1356,7 @@ RECOG.ExpectedForm := function(row, fdpmDim, nAmbig)
       if row[posNotB[1]] = 2*b then
         return [b, [posNotB[1]+1, fdpmDim + 2]];
       fi;
+      return fail;
     else # there are three different field elements in row
       return fail;
     fi;
