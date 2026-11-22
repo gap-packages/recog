@@ -76,7 +76,7 @@ end;
 
 RECOG.FindTensorDecomposition := function(G,N)
   # N a non-scalar normal subgroup of G
-  local b,basis,basisi,c,d,f,g,gens,gensn,h,homs,homsimg,i,l,lset,m,n,subdim,w;
+  local b,basis,basisi,d,f,gensn,homs,homsimg,i,m,n,o,subdim,w;
 
   d := DimensionOfMatrixGroup(G);
 
@@ -112,7 +112,8 @@ RECOG.FindTensorDecomposition := function(G,N)
       subdim := MTX.Dimension(w);
       if MTX.IsAbsolutelyIrreducible(w) then
           # This is a genuine tensor decomposition:
-          return rec(t := basis, ti := basisi, blocksize := subdim);
+          return rec(t := basis, ti := basisi, field := f,
+                     blocksize := subdim);
       fi;
       # Otherwise we have a tensor decomposition over a bigger field:
       # This will not be reached, since we have made sure that
@@ -120,49 +121,23 @@ RECOG.FindTensorDecomposition := function(G,N)
       # semilinear, then the product is.)
       ErrorNoReturn("This should never have happened (1), talk to Max.");
   fi;
-  # homsimg is a basis of an N-homogeneous component.
-  # We move that one around with G to find a basis of the natural module:
-  # By Clifford's theorem this is a block system:
+  # homsimg is a basis of an N-homogeneous component. By Clifford's theorem
+  # G permutes the d/Length(homsimg) homogeneous components transitively.
   if d mod Length(homsimg) <> 0 then
       # Not a homogeneous component, obviously we did not find
       # a normal subgroup for some reason!
       return fail;
   fi;
 
-  h := [ShallowCopy(homsimg)];
-  b := MutableCopyMat(homsimg);
+  b := RECOG.MutableCopyMatOverField(homsimg,f);
   TriangulizeMat(b);
-  l := [b];
-  lset := [b];
-  gens := GeneratorsOfGroup(G);
-  i := 1;
-  while Length(h) < d/Length(homsimg) and i <= Length(l) do
-      for g in gens do
-          c := OnSubspacesByCanonicalBasis(l[i],g);
-          if not c in lset then
-              Add(h,h[i]*g);
-              Add(l,c);
-              AddSet(lset,c);
-          fi;
-      od;
-      i := i + 1;
-  od;
-  h := Concatenation(h);
-  ConvertToMatrixRep(h,f);
-
-  if i > Length(l) then    # by Clifford this should never happen, but still...
-      if Length(l) = 1 then
-          return fail;
-      else
-          # We have a (relatively short) non-trivial orbit!
-          return rec(orbit := lset);
-      fi;
-  else
-      ConvertToMatrixRep(basis,f);
-      basisi := basis^-1;
-      return rec(t := basis, ti := basisi, spaces := lset, field := f,
-                 blocksize := Length(lset[1]));
+  o := Orb(G,b,OnSubspacesByCanonicalBasis,rec(storenumbers := true));
+  Enumerate(o,d/Length(homsimg));
+  if not IsClosed(o) or Length(o) = 1 then
+      # more images than components, or an invariant subspace: N is not normal
+      return fail;
   fi;
+  return rec(orbit := o);
 end;
 
 RECOG.IsKroneckerProduct := function(m,r)
@@ -241,10 +216,8 @@ function(ri)
   fi;
   if IsBound(r.orbit) then
       Info(InfoRecog,2,"Did not find tensor decomposition but orbit.");
-      # We did not find a tensor decomposition, but a relatively short orbit:
-      hom := ActionHomomorphism(G,r.orbit,OnSubspacesByCanonicalBasis,
-                                "surjective");
-      SetHomom(ri,hom);
+      # The normal subgroup has several homogeneous components, G acts on them:
+      SetHomom(ri,OrbActionHomomorphism(G,r.orbit));
       Setmethodsforimage(ri,FindHomDbPerm);
       return Success;
   fi;
@@ -256,14 +229,10 @@ function(ri)
   conjgensG := List(GeneratorsOfGroup(G),x->r.t * x * r.ti);
   kro := List(conjgensG,g->RECOG.IsKroneckerProduct(g,r));
   if not ForAll(kro, k -> k[1]) then
-      Info(InfoRecog,1,"VERY, VERY, STRANGE!");
-      Info(InfoRecog,1,"False alarm, was not a tensor decomposition.",
-           " Found at least a perm action.");
-      hom := ActionHomomorphism(G,r.spaces,OnSubspacesByCanonicalBasis,
-                                "surjective");
-      SetHomom(ri,hom);
-      Setmethodsforimage(ri,FindHomDbPerm);
-      return Success;
+      # G normalises End(W) tensor 1 for the constituent W of a normal
+      # subgroup, hence consists of Kronecker products: N is not normal.
+      Info(InfoRecog,2,"False alarm, was not a tensor decomposition.");
+      return TemporaryFailure;
   fi;
 
   H := GroupWithGenerators(conjgensG);
