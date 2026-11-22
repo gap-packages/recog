@@ -202,6 +202,26 @@ RECOG.RadBasis:=function(r,n,q,rad)
 end;
 
 
+# For a hyperbolic pair a, b: a basis of one eigenspace of a, followed by its
+# images under b, ..., b^(r-1), which are bases of the other eigenspaces.
+# Returns fail if a has no eigenspace of dimension r^(n-1) over GF(newq).
+RECOG.EigenspaceBasisOfHyperbolicPair := function(r,n,newq,a,b)
+    local sp,i,j;
+
+    sp := Eigenspaces(GF(newq),a);
+    if IsEmpty(sp) or Dimension(sp[1]) <> r^(n-1) then
+        return fail;
+    fi;
+    sp := List(GeneratorsOfVectorSpace(sp[1]),z->ShallowCopy(z));
+    for i in [1..r-1] do
+        for j in [1..r^(n-1)] do
+            sp[i*r^(n-1)+j] := sp[(i-1)*r^(n-1)+j]*b;
+        od;
+    od;
+    MakeImmutable(sp);
+    return sp;
+end;
+
 #creates a basis for a subgroup g of the extraspecial group
 RECOG.basis2:=function(r,n,q,g)
     local xxx,
@@ -259,27 +279,19 @@ RECOG.basis2:=function(r,n,q,g)
           until posb > 0 or k > len;
 
           if posb > 0 then # found a hyperbolic pair
+             # In an extraspecial group all commutators are central, and then
+             # each of a, b permutes the eigenspaces of the other cyclically.
+             if not RECOG.IsScalarMat(Comm(a,b)) then
+                 return fail;
+             fi;
+             spa := RECOG.EigenspaceBasisOfHyperbolicPair(r,n,newq,a,b);
+             spb := RECOG.EigenspaceBasisOfHyperbolicPair(r,n,newq,b,a);
+             if spa = fail or spb = fail then
+                 return fail;
+             fi;
              Add(list,a);
              Add(list,b);
-             spa := Eigenspaces(GF(newq),a)[1];
-             spa := List(GeneratorsOfVectorSpace(spa),z->ShallowCopy(z));
-             #list bases for other eigenspaces, in the order b permutes them
-                     for i in [1..r-1] do
-                        for j in [1..r^(n-1)] do
-                           spa[i*r^(n-1)+j]:=spa[(i-1)*r^(n-1)+j]*b;
-                        od;
-                     od;
-                     MakeImmutable(spa);
-                     Add(list2,spa);
-
-             spb := Eigenspaces(GF(newq),b)[1];
-             spb := List(GeneratorsOfVectorSpace(spb),z->ShallowCopy(z));
-             for i in [1..r-1] do
-                for j in [1..r^(n-1)] do
-                   spb[i*r^(n-1)+j]:=spb[(i-1)*r^(n-1)+j]*a;
-                od;
-             od;
-             MakeImmutable(spb);
+             Add(list2,spa);
              Add(list2,spb);
 
              ainv:=a^(-1);
