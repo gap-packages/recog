@@ -83,6 +83,18 @@ gap> G := Group([[Z(37)^3,0*Z(37)],[0*Z(37),Z(37)^-3]],
 gap> r := RecogniseClassical(G);; [r.isSLContained, r.isImprimitive];
 [ false, true ]
 
+# the same group permuting two lines other than the coordinate axes
+gap> G := G^([[1,2],[3,5]] * Z(37)^0);;
+gap> r := RecogniseClassical(G);; [r.isSLContained, r.isImprimitive];
+[ false, true ]
+
+# RecogniseSL2Natural loops on this group, so RecogniseGroup relies on that
+gap> oldRecogLevel := InfoLevel(InfoRecog);;
+gap> SetInfoLevel(InfoRecog, 0);
+gap> Size(RecogniseGroup(G));
+24
+gap> SetInfoLevel(InfoRecog, oldRecogLevel);
+
 # 2.Alt(5) inside SL(2,11). This used to come out true: the Alt(5) test only
 # fired when the projective group moved at most 5 points, but it acts on the
 # q+1 = 12 points of the projective line, and is transitive on them.
