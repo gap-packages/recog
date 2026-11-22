@@ -2748,8 +2748,10 @@ function(recognise)
         return NeverApplicable;
     fi;
 
+    # the rows are left eigenvectors, so conjugating by their inverse
+    # diagonalises h^2
     for gen in recognise.generators do
-        genNew := gen^eigenvectors;
+        genNew := eigenvectors * gen * eigenvectors^-1;
         if not IsMonomialMatrix(genNew) then
             recognise.isImprimitive := false;
             return NeverApplicable;
