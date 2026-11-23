@@ -65,6 +65,27 @@ gap> ri := RECOG.TestGroup(G, false, Size(Sp(6,4)));;
 gap> G := StoredOver(SO(9,3), GF(9));;
 gap> ri := RECOG.TestGroup(G, false, Size(SO(9,3)));;
 
+# A group of order 576 in GL(4,4) with a diagonal block that generates
+# GL(2,2), so that a node of its tree has entries in GF(2). GAP 4.13 and 4.14
+# drop the memory of generators stored over a larger field when they form a
+# group, and ClassicalNatural stopped with an error at that node.
+gap> one := IdentityMat(4, GF(4));;
+gap> Elementary := function(i, j)
+>   local m;
+>   m := NullMat(4, 4, GF(4));
+>   m[i,j] := Z(2);
+>   return m;
+> end;;
+gap> gens := [one, one + Elementary(2,3), PermutationMat((2,3), 4, GF(4)),
+>             one + Elementary(4,1), one + Elementary(2,1) + Elementary(4,3),
+>             DiagonalMat([Z(4), Z(4)^2, Z(4)^2, Z(4)])];;
+gap> ForAll([1, 13], function(seed)
+>   local ri;
+>   ri := RecogniseWithSeed(GroupWithGenerators(gens), seed);
+>   return IsReady(ri) and Size(ri) = 576;
+> end);
+true
+
 # A node inside the tree can be stored over a larger field as well. In this
 # dihedral group of order 30 the subgroup of order 3 has its entries in GF(4)
 # and reaches a node with a hint; when the hint does not apply, no other
