@@ -826,11 +826,7 @@ InstallGlobalFunction( SLPforElementGeneric,
     # This is necessary during immediate verification, since the kernel might
     # have incorrectly been recognised as trivial.
     if riker = fail then
-        if not ri!.isone(n)
-                # Big ugly hack. If the successMethod is BlocksModScalars, then
-                # we can't use ri!.isone, see the documentation of
-                # BlocksModScalars. 
-                and not ri!.fhmethsel.successMethod = "BlocksModScalars" then
+        if not ri!.isone(n) then
             return fail;
         fi;
         return s1;
@@ -1110,22 +1106,38 @@ InstallGlobalFunction( "GetCompositionTreeNode",
 # Testing:
 
 RECOG.TestGroupOptions := rec(
-      # Number of times to test whether the recognized size is right
-      sizeTests := 3,
-
       # Number of random elements in group to check
       # This is used both for the number of elements in the
       # group to check, and the number of random elements of
       # a supergroup to check
       inTests := 30,
 
-      # The following options are off by default as they fail on
-      # many examples at present
-
       # if the following is set to true, then we test what happens if  SLPforElement
       # is called with elements outside the group
-      tryNonGroupElements := false
+      tryNonGroupElements := true
   );
+
+# Return the first node of the tree 'ri' at which the SLP of a generator of
+# Grp(node), evaluated on NiceGens(node), does not give that generator, or
+# fail if there is none.
+RECOG.NodeWithBadNiceGens := function(ri)
+  local x, s, bad;
+  for x in GeneratorsOfGroup(Grp(ri)) do
+    s := SLPforElement(ri, x);
+    if s = fail or
+       not isequal(ri)(ResultOfStraightLineProgram(s, NiceGens(ri)), x) then
+      return ri;
+    fi;
+  od;
+  if IsLeaf(ri) then
+    return fail;
+  fi;
+  bad := RECOG.NodeWithBadNiceGens(ImageRecogNode(ri));
+  if bad = fail and HasKernelRecogNode(ri) and KernelRecogNode(ri) <> fail then
+    bad := RECOG.NodeWithBadNiceGens(KernelRecogNode(ri));
+  fi;
+  return bad;
+end;
 
 
 # Test recognition of a group 'g' with known size 'size'.
@@ -1209,6 +1221,17 @@ RECOG.TestGroup := function(g,proj,size, optionlist...)
           fi;
       fi;
   until count >= options.inTests;
+
+  # The test above evaluates on CalcNiceGens of the root, which never reads
+  # the NiceGens stored at the nodes below it.
+  x := RECOG.NodeWithBadNiceGens(ri);
+  if x <> fail then
+      Print("group := ", g, ";\n");
+      Print("proj := ", proj, ";\n");
+      Print("node group := ", Grp(x), ";\n");
+      Print("node method := ", x!.fhmethsel.successMethod, ";\n");
+      Error("Alarm: SLPs of a node do not evaluate correctly on its NiceGens!\n");
+  fi;
 
   if IsPermGroup(g) then
     supergroup := SymmetricGroup(LargestMovedPoint(g) + 2);

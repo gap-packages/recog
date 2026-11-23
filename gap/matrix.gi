@@ -183,8 +183,6 @@ AddMethod(FindHomDbMatrix, FindHomMethodsGeneric.FewGensAbelian, 1050);
 
 AddMethod(FindHomDbMatrix, FindHomMethodsMatrix.ReducibleIso, 1000);
 
-AddMethod(FindHomDbMatrix, FindHomMethodsGeneric.SnAnUnknownDegree, 950);
-
 AddMethod(FindHomDbMatrix, FindHomMethodsMatrix.GoProjective, 900);
 
 

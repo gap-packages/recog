@@ -29,10 +29,8 @@ RECOG.IndexMaxSub := function( hm, grp, d )
     local dim,dimnew,f,i,lastorb,lastsub,orb,sp,spnew,sub,subdim;
 
     # Here is the invariant subspace
-    sub := MTX.ProperSubmoduleBasis(hm);
-    sub := MutableCopyMat( sub );  # make mutable copy
-    # FIXME: this will be unnecessary:
-    ConvertToMatrixRep(sub,hm.field);
+    sub := RECOG.MutableCopyMatOverField(MTX.ProperSubmoduleBasis(hm),
+                                         hm.field);
     lastsub := fail;
     lastorb := fail;
     repeat
@@ -79,9 +77,7 @@ RECOG.IndexMaxSub := function( hm, grp, d )
         fi;
         lastsub := sub;
         lastorb := orb;
-        sub := MutableCopyMat(AsList(Basis(sp)));
-        # FIXME: This will vanish:
-        ConvertToMatrixRep(sub,hm.field);
+        sub := RECOG.MutableCopyMatOverField(AsList(Basis(sp)), hm.field);
     until false;
 end;
 

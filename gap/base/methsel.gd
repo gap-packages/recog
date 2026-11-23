@@ -17,13 +17,15 @@
 #############################################################################
 
 # Our own method selection code:
-DeclareInfoClass( "InfoMethSel" );
-SetInfoLevel(InfoMethSel,1);
+DeclareInfoClass( "InfoRecog_MethSel" );
+SetInfoLevel(InfoRecog_MethSel,1);
+DeclareSynonym("InfoMethSel", InfoRecog_MethSel);  # old name
 
 # InfoClass so that we can for example check whether every method checks
 # whether its input is valid.
-DeclareInfoClass( "InfoAddMethod" );
-SetInfoLevel(InfoAddMethod, 0);
+DeclareInfoClass( "InfoRecog_AddMethod" );
+SetInfoLevel(InfoRecog_AddMethod, 0);
+DeclareSynonym("InfoAddMethod", InfoRecog_AddMethod);  # old name
 
 ## <#GAPDoc Label="AddMethod">
 ## <ManSection>

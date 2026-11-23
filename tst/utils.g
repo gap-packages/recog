@@ -1,9 +1,8 @@
 TestRecogGL := function(d,q)
     local h, gens, g, ri, r, stamp;
     h := GL(d,q);
-    gens := List([1..10],x->PseudoRandom(h));
-    # FIXME: while this is a generating set with HIGH PROBABILITY, it is not always one.
-    # This could lead to spurious failures in the test suite...
+    # (ab)use product replacement algorithm to get randomized generators
+    gens := ProductReplacer(h)!.team;
     g := GroupWithGenerators(gens);
     ri := RECOG.TestGroup(g,false,Size(h));
     r := ri;

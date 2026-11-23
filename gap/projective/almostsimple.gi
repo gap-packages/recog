@@ -160,8 +160,7 @@ InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
             for c in cf do
                 homs := MTX.Homomorphisms(c,m);
                 if Length(homs) > 0 then
-                    ConvertToMatrixRep(homs[1],ri!.field);
-                    b := MutableCopyMat(homs[1]);
+                    b := RECOG.MutableCopyMatOverField(homs[1],ri!.field);
                     break;
                 fi;
                 # Some must be in the socle, so this terminates with break!
@@ -273,10 +272,8 @@ InstallGlobalFunction( DoHintedLowIndex, function(ri,G,hint)
               s := s * Remove(bas);
           od;
           # Now s is the basis of a minimal submodule, permute that:
-          s := MutableCopyMat(s);
+          s := RECOG.MutableCopyMatOverField(s, fld);
           TriangulizeMat(s);
-          # FIXME: this will be unnecessary:
-          ConvertToMatrixRep(s);
           Info(InfoRecog,2,"Found invariant subspace of dimension ",
                Length(s),", enumerating orbit...");
           if not IsBound(hint.subspacedims) or

@@ -3,6 +3,8 @@ gap> START_TEST("ClassicalNatural.tst");
 #
 gap> ReadPackage("recog", "tst/utils.g");
 true
+gap> oldOrbInfoLevel := InfoLevel(InfoOrb);;
+gap> SetInfoLevel(InfoOrb, 0); # genss may warn "Schreier tree is not shallow"
 
 #
 gap> TestRecogGL(2,2);;
@@ -229,4 +231,5 @@ gap> #TestRecogGL(18,27);; # disabled to speedup this .tst file
 gap> #TestRecogGL(19,27);; # disabled to speedup this .tst file
 
 #
+gap> SetInfoLevel(InfoOrb, oldOrbInfoLevel);
 gap> STOP_TEST("ClassicalNatural.tst");

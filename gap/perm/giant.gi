@@ -17,8 +17,9 @@
 ##
 #############################################################################
 
-DeclareInfoClass( "InfoGiants" );
-SetInfoLevel( InfoGiants, 1 );
+DeclareInfoClass( "InfoRecog_Giants" );
+SetInfoLevel( InfoRecog_Giants, 1 );
+DeclareSynonym("InfoGiants", InfoRecog_Giants);  # old name
 
 #########################################################################
 ## For a permutation group grp on n points and a list lenList of integers,
@@ -531,7 +532,7 @@ RECOG.RecogniseGiant :=  function( grp, eps )
 
     if gens = fail then
         infoString := Concatenation("couldn't find nice generators for ", grpName);
-        Info(InfoGiants,1,infoString);
+        Info(InfoRecog_Giants,1,infoString);
         return fail;
     fi;
 
@@ -851,42 +852,18 @@ function(ri)
     Setslpforelement(ri,SLPforElementFuncsPerm.Giant);
     ri!.giantinfo := res;
     SetFilterObj(ri,IsLeaf);
-    F := FreeGroup(2); # for presentation
-    # We set the presentations of Sn and An from
-    # [CM80] "Generators and relations for discrete groups", (6.21), 6.3.
-    # They coincide with the ones in
-    # [BLN+03] "A black-box group algorithm for recognizing finite symmetric 
-    # and alternating groups, I", (2.1), (2.2), (2.3),
-    # except that one relation in (2.1) and one relation in (2.3) is incorrect.
-    # Since deg>=8, we do not have to worry about small edge cases.
+    # Note: Since deg>=8, we are never in the small edge cases of
+    # AnPresentation/SnPresentation.
+    SetNiceGens(ri,StripMemory(res.gens));
     if res.stamp = "An" then
         SetSize(ri,Factorial(Length(mp))/2);
         SetIsRecogInfoForSimpleGroup(ri,true);
-        rels := [ F.2^(deg-2), F.1^3 ];
-        if deg mod 2 = 1 then
-            Add(rels, (F.2*F.1)^deg);
-            rels := Concatenation(
-                rels,
-                List([1..QuoInt(deg-3, 2)], k -> (F.1*F.2^(-k)*F.1*F.2^k)^2)
-            );
-        else
-            Add(rels, (F.2*F.1)^(deg-1));
-            rels := Concatenation(
-                rels,
-                List([1..QuoInt(deg-2, 2)], k -> (F.1^((-1)^k)*F.2^-k*F.1*F.2^k)^2)
-            );
-        fi;
+        SetStdPresentation(ri, RECOG.AnPresentation(deg));
     else
         SetSize(ri,Factorial(Length(mp)));
         SetIsRecogInfoForAlmostSimpleGroup(ri,true);
-        # Relations on F.1=(1,2), F.2 = (1,...,deg) from [CM80, (6.21)]
-        rels := [ F.1^2, F.2^deg, (F.1*F.2)^(deg-1), (F.1*(F.1^F.2))^3 ];
-        rels := Concatenation(
-            rels, List([2..QuoInt(deg, 2)], j -> (F.1*(F.1^(F.2^j)))^2)
-        );
+        SetStdPresentation(ri, RECOG.SnPresentation(deg));
     fi;
-    SetNiceGens(ri,StripMemory(res.gens));
-    SetStdPresentation(ri,F / rels);
     return Success;
 end);
 

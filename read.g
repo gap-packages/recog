@@ -20,6 +20,7 @@ ReadPackage("recog","gap/base/methsel.gi");
 ReadPackage("recog","gap/base/recognition.gi");
 ReadPackage("recog","gap/base/kernel.gi");
 ReadPackage("recog","gap/base/projective.gi");
+ReadPackage("recog","gap/base/presentation.gi");
 
 # Some tools
 ReadPackage("recog","gap/utils.gi");
@@ -39,6 +40,7 @@ ReadPackage("recog","gap/generic/SnAnUnknownDegree.gi");
 ReadPackage("recog","gap/matrix/matimpr.gi");
 ReadPackage("recog","gap/matrix/blocks.gi");
 ReadPackage("recog","gap/matrix/ppd.gi");
+ReadPackage("recog","gap/matrix/classicalforms.gi");
 ReadPackage("recog","gap/matrix/classical.gi");
 ReadPackage("recog","gap/matrix/slconstr.gi");
 
@@ -53,8 +55,11 @@ ReadPackage("recog","gap/projective/almostsimple.gi");
 ReadPackage("recog","gap/projective/almostsimple/lietype.gi");
 ReadPackage("recog","gap/projective/almostsimple/hints.gi");
 ReadPackage("recog","gap/projective/classicalnatural.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/utils/utils.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/SL/GoingDown.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/SL/GoingUp.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/SL/main.gi");
 ReadPackage("recog","gap/projective/sl2_natural.gi");
-ReadPackage("recog","gap/projective/sl.gi");
 ReadPackage("recog","gap/projective/AnSnOnFDPM.gi");
 
 # All the method installations are now here:

@@ -18,7 +18,7 @@ gap> testGroup := function(G)
 >    fi;
 >  od;
 >  if numSuccessful < 4 then
->    Display(
+>    Print(
 >       "Verification for ", G, " was succesful only ", numSuccessful,
 >       " out of ", numTests, " times"
 >    );

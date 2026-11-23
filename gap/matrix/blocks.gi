@@ -24,7 +24,7 @@ end;
 BindRecogMethod("FindHomMethodsMatrix", "DiagonalMatrices",
 "check whether all generators are diagonal matrices",
 function(ri)
-  local G,H,d,f,gens,hom,i,isscalars,j,newgens,upperleft;
+  local G,H,d,f,gens,hom,newgens;
 
   G := Grp(ri);
   d := ri!.dimension;
@@ -39,21 +39,7 @@ function(ri)
   fi;
 
   f := ri!.field;
-  isscalars := true;
-  i := 1;
-  while isscalars and i <= Length(gens) do
-      j := 2;
-      upperleft := gens[i][1,1];
-      while isscalars and j <= d do
-          if upperleft <> gens[i][j,j] then
-              isscalars := false;
-          fi;
-          j := j + 1;
-      od;
-      i := i + 1;
-  od;
-
-  if not isscalars then
+  if not ForAll(gens, RECOG.IsScalarMat) then
       # We quickly know that we want to make a balanced tree:
       ri!.blocks := List([1..d],i->[i]);
       # Note that we cannot tell the upper levels that they should better
@@ -129,6 +115,7 @@ function(ri)
   Setslptonice(ri,slp);   # this sets the nice generators
   Setslpforelement(ri,SLPforElementFuncsMatrix.DiscreteLog);
   ri!.generator := z^gcd;
+  SetSize(ri, (q-1)/gcd);
   SetFilterObj(ri,IsLeaf);
   return Success;
 end);

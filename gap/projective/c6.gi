@@ -233,23 +233,17 @@ RECOG.basis2:=function(r,n,q,g)
        k:=1;
 
        repeat
-          if IsBound(gens[k]) then
-             if gens[k]<>gens[k][1,1]*One(g) then
-                a:=gens[k];
-                posa:=k;
-             else
-                k:=k+1;
-             fi;
-             Unbind(gens[k]);
-          else
-             k:=k+1;
+          if IsBound(gens[k]) and not RECOG.IsScalarMat(gens[k]) then
+             a:=gens[k];
+             posa:=k;
           fi;
+          Unbind(gens[k]);
+          k:=k+1;
        until posa > 0 or k > len;
        if posa > 0 then
-          k:=k+1;
           repeat
             if IsBound(gens[k]) then
-               if gens[k] = gens[k][1,1]*One(g) then
+               if RECOG.IsScalarMat(gens[k]) then
                   Unbind(gens[k]);
                   k:=k+1;
                elif gens[k]*a <> a*gens[k] then
@@ -364,7 +358,7 @@ RECOG.rewriteones := function(r,n,q,data,blocks,x)
             xx := list[i]^x;
             exp := RECOG.exponents(r,n,q,data.es,xx);
             remain := RECOG.check(r,n,q,list,xx,exp);
-            if remain <> remain[1,1]*One(remain) then
+            if not RECOG.IsScalarMat(remain) then
                 return fail;
             fi;
             Add(mat, Z(r)^0*exp);
@@ -454,7 +448,7 @@ RECOG.BlindDescent := function(r,n,grp,limit)
         fi;
         for p in Union(List( Collected(Factors(oy)), i->i[1]),[1]) do
             z :=Comm(x,y^(oy/p));
-            if z <> z[1,1] * One(z) then
+            if not RECOG.IsScalarMat(z) then
                 x := z;
             fi;
         od;
@@ -474,6 +468,10 @@ RECOG.BlindDescent := function(r,n,grp,limit)
 end;
 
 
+# Bound on the rounds that enlarge the span of the <r>-core conjugates in
+# New2RecogniseC6, per dimension of R/Z(R).
+RECOG.C6ClosureRoundsPerDim := 4;
+
 #############################################################################
 ##
 #F  RecogniseC6() . . . . . . . . . . . . . . . .
@@ -491,7 +489,7 @@ end;
 RECOG.New2RecogniseC6 := function(grp)
 
     local   type, blocks, spaces, xxx, d, b, ppi,
-            r, n, q, u, rgrp, grpbasis, igens, list, i, grp1;
+            r, n, q, u, rlist, round, grpbasis, igens, list, i, grp1;
 
     d := DimensionOfMatrixGroup(grp);
     q := Size(FieldOfMatrixGroup(grp));
@@ -515,27 +513,36 @@ RECOG.New2RecogniseC6 := function(grp)
     u := b[1];
 
     ## take enough conjugates to generate the <r>-core
-    rgrp := Group(b[2]);
-    ## try to find a set of standard gens for <rgrp>
-    grpbasis := RECOG.basis2(r,n,q,rgrp);
-    # BlindDescent is randomized and only tests for an abelian witness. If the
-    # stronger basis construction fails, reject this C6 attempt and let method
-    # selection retry later instead of aborting recognition.
-    if grpbasis = fail then
-        return TemporaryFailure;
-    fi;
+    rlist := b[2];
+    for round in [0 .. RECOG.C6ClosureRoundsPerDim * 2 * n] do
+        ## try to find a set of standard gens for <rlist>
+        grpbasis := RECOG.basis2(r,n,q,Group(rlist));
+        # BlindDescent is randomized and only tests for an abelian witness. If
+        # the stronger basis construction fails, reject this C6 attempt and let
+        # method selection retry later instead of aborting recognition.
+        if grpbasis = fail then
+            return TemporaryFailure;
+        fi;
 
-    ## construct image of <grp> in classical group
-    Info(InfoRecog,3,"enter image computation");
-    igens := List(GeneratorsOfGroup(grp),
-               x->RECOG.rewriteones(r,n,q,grpbasis.basis,grpbasis.blocks,x));
-    Info(InfoRecog,3,"exit image computation");
-    if Position(igens,fail) = fail then
-        return rec( igens := igens, basis := grpbasis,
-                    r := r, n := n, q := q );
-    else
-        return TemporaryFailure;
-    fi;
+        ## construct image of <grp> in classical group
+        Info(InfoRecog,3,"enter image computation");
+        igens := List(GeneratorsOfGroup(grp),
+                   x->RECOG.rewriteones(r,n,q,grpbasis.basis,grpbasis.blocks,x));
+        Info(InfoRecog,3,"exit image computation");
+        if not fail in igens then
+            return rec( igens := igens, basis := grpbasis,
+                        r := r, n := n, q := q );
+        fi;
+
+        # <rlist> spans a subspace of R/Z(R) that the generators which failed
+        # to rewrite do not normalise, for example because the pseudo-random
+        # conjugators in TestAbelian were badly mixed. Add conjugates under
+        # those generators; each enlarges the span with probability >= 1/2.
+        for i in Positions(igens, fail) do
+            Add(rlist, RandomSubproduct(rlist)^GeneratorsOfGroup(grp)[i]);
+        od;
+    od;
+    return TemporaryFailure;
 
 end;
 
