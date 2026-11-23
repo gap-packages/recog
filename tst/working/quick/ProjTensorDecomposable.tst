@@ -34,6 +34,27 @@ gap> Success in res;
 true
 gap> ri := RECOG.TestGroup(G, true, 15^3 * 24);;
 
+# a subgroup that is not normal: the group does not permute its homogeneous
+# components
+gap> RECOG.FindTensorDecomposition(GL(2,5),
+>                                  Group(DiagonalMat([Z(5), Z(5)^0])));
+fail
+
+# SL(2,3) tensor 1 is homogeneous, but SL(4,3) does not normalise it and
+# respects no tensor decomposition. The method finds its subgroup by a random
+# search, so hand it this one.
+gap> G := SL(4,3);;
+gap> N := Group(List(GeneratorsOfGroup(SL(2,3)),
+>                    x -> KroneckerProduct(x, IdentityMat(2, GF(3)))));;
+gap> RECOG.FindTensorDecomposition(G, N).blocksize;
+2
+gap> origFindTensorKernel := RECOG.FindTensorKernel;;
+gap> RECOG.FindTensorKernel := {G, onlyone} -> N;;
+gap> CallRecogMethod(FindHomMethodsProjective.TensorDecomposable,
+>                    RecogNode(G, true)) = TemporaryFailure;
+true
+gap> RECOG.FindTensorKernel := origFindTensorKernel;;
+
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
 gap> STOP_TEST("ProjTensorDecomposable.tst");
