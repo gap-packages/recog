@@ -117,6 +117,7 @@ function(ri)
   ri!.generator := z^gcd;
   SetSize(ri, (q-1)/gcd);
   SetFilterObj(ri,IsLeaf);
+  SetLeafData(ri, RECOG.LeafDataPcgs([1], [(q-1)/gcd]));
   return Success;
 end);
 
@@ -792,7 +793,7 @@ end);
 BindRecogMethod("FindHomMethodsMatrix", "LowerLeftPGroup",
 "Hint TODO",
 function(ri)
-  local f,p;
+  local f,p,n;
   # Do we really have our favorite situation?
   if not (IsBound(ri!.blocks) and
           IsBound(ri!.lens) and
@@ -807,6 +808,10 @@ function(ri)
   SetFilterObj(ri,IsLeaf);
   Setslpforelement(ri,SLPforElementFuncsMatrix.LowerLeftPGroup);
   SetCalcStdPresentation(ri, CalcStdPresentationLowerLeftPGroup);
-  SetSize(ri,p^Length(ri!.gensNvectors));
+  n := Length(ri!.gensNvectors);
+  SetSize(ri,p^n);
+  # the generators are sorted by layer, and the layers are the factors of
+  # a central series
+  SetLeafData(ri,RECOG.LeafDataPcgs([1..n],ListWithIdenticalEntries(n,p)));
   return Success;
 end);

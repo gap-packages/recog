@@ -2440,7 +2440,7 @@ end;
 #! TODO: find a better name.
 #! @EndChunk
 SLCR.FindHom := function(ri,G,d,q)
-  local GM,data,e,genlist,gens,i,j,p,slp,y;
+  local GM,data,e,genlist,gens,i,j,leafdata,p,slp,y;
   p := Factors(q);
   e := Length(p);
   p := p[1];
@@ -2498,6 +2498,11 @@ SLCR.FindHom := function(ri,G,d,q)
   SetFilterObj(ri,IsLeaf);
   SetNiceGens(ri,StripMemory(genlist));
   Setslptonice(ri,SLPOfElms(genlist));
+  # G is a quotient of SL(d,q) by a central subgroup, and data.centre
+  # generates its centre. d and q come from a Monte Carlo naming algorithm.
+  leafdata := RECOG.LeafDataSLQuotient(d,q,OrderFunc(ri)(data.centre),"SLCR");
+  leafdata.proven := false;
+  SetLeafData(ri,leafdata);
   return Success;
 end;
 

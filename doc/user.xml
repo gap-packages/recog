@@ -253,9 +253,10 @@ generators, you can use the following function.
 
 <#Include Label="SLPforNiceGens">
 
-Lastly, a function to compute the composition series of a recognised group is
-the following.
+Lastly, the composition factors of a recognised group are available as data
+and for display.
 
+<#Include Label="CompositionFactorsOfRecogNode">
 <#Include Label="DisplayCompositionFactors">
 
 </Section>

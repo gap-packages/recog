@@ -1033,50 +1033,6 @@ InstallOtherMethod( \in, "for a group element and a recognition node",
     ErrorNoReturn("the recognition described by this recognition node has failed!");
   end);
 
-InstallGlobalFunction( "DisplayCompositionFactors", function(arg)
-  local c,depth,f,i,j,ri,homs,ksize;
-  if Length(arg) = 1 then
-      ri := arg[1];
-      depth := 0;
-      homs := 0;
-      ksize := 1;
-  else
-      ri := arg[1];
-      depth := arg[2];
-      homs := arg[3];
-      ksize := arg[4];
-  fi;
-  if not IsReady(ri) then
-      for j in [1..homs] do Print("-> "); od;
-      Print("Recognition failed\n");
-      return;
-  fi;
-  if IsLeaf(ri) then
-      c := CompositionSeries(Grp(ri));
-      for i in [1..Length(c)-1] do
-          if homs > 0 then
-              Print("Group with Size ",ksize*Size(c[i]));
-              for j in [1..homs] do Print(" ->"); od;
-              Print(" ");
-          fi;
-          Print("Group ",GroupString(c[i],""),"\n | ");
-          f := Image( NaturalHomomorphismByNormalSubgroup( c[i], c[i+1] ) );
-          Print(IsomorphismTypeInfoFiniteSimpleGroup( f ).name, "\n" );
-      od;
-  else
-      if HasKernelRecogNode(ri) and KernelRecogNode(ri) <> fail then
-          DisplayCompositionFactors(ImageRecogNode(ri),depth+1,homs+1,
-                                    ksize*Size(KernelRecogNode(ri)));
-          DisplayCompositionFactors(KernelRecogNode(ri),depth+1,homs,ksize);
-      else
-          DisplayCompositionFactors(ImageRecogNode(ri),depth+1,homs+1,ksize);
-      fi;
-  fi;
-  if depth = 0 then
-      Print("1\n");
-  fi;
-end );
-
 InstallGlobalFunction( "SLPforNiceGens", function(ri)
   local l,ll,s;
   l := List( [1..Length(GeneratorsOfGroup(Grp(ri)))], x->() );
@@ -1232,6 +1188,18 @@ RECOG.TestGroup := function(g,proj,size, optionlist...)
       Print("node method := ", x!.fhmethsel.successMethod, ";\n");
       Error("Alarm: SLPs of a node do not evaluate correctly on its NiceGens!\n");
   fi;
+
+  for x in RECOG.Leaves(ri) do
+      s := RECOG.CheckLeafData(x);
+      if s <> true then
+          Print("group := ", g, ";\n");
+          Print("proj := ", proj, ";\n");
+          Print("node group := ", Grp(x), ";\n");
+          Print("node method := ", x!.fhmethsel.successMethod, ";\n");
+          Print("LeafData := ", LeafData(x), ";\n");
+          Error("Alarm: LeafData of a leaf is wrong: ", s, "!\n");
+      fi;
+  od;
 
   if IsPermGroup(g) then
     supergroup := SymmetricGroup(LargestMovedPoint(g) + 2);

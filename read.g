@@ -18,6 +18,7 @@
 ReadPackage("recog","gap/base/methods.gi");
 ReadPackage("recog","gap/base/methsel.gi");
 ReadPackage("recog","gap/base/recognition.gi");
+ReadPackage("recog","gap/base/leafdata.gi");
 ReadPackage("recog","gap/base/kernel.gi");
 ReadPackage("recog","gap/base/projective.gi");
 ReadPackage("recog","gap/base/presentation.gi");

@@ -223,6 +223,7 @@ The following attributes are defined for recognition nodes:
 <#Include Label="SLPforElement">
 <#Include Label="StdPresentation">
 <#Include Label="IsCorrect">
+<#Include Label="LeafData">
 <#Include Label="methodsforimage">
 
 <ManSection>

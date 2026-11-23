@@ -699,7 +699,8 @@ end;
 BindRecogMethod("FindHomMethodsProjective", "ClassicalNatural",
 "check whether it is a classical group in its natural representation",
 function(ri)
-  local g,changed,classical,d,det,ext,f,gcd,gens,gm,i,p,pr,q,root,std,stdg;
+  local g,changed,classical,d,data,det,ext,f,gcd,gens,gm,i,p,pr,q,root,std,
+        stdg;
   g := Grp(ri);
   d := ri!.dimension;
   f := ri!.field;
@@ -764,6 +765,7 @@ function(ri)
       SetFilterObj(ri,IsLeaf);
       SetSize(ri,(q+1)*(q-1)*q/GcdInt(2,q-1));
       SetIsRecogInfoForSimpleGroup(ri, q>3);
+      SetLeafData(ri,RECOG.LeafDataPSL(2,q,"SL"));
       Setslpforelement(ri,SLPforElementFuncsProjective.PSL2);
       return Success;
   else   # bigger than 2:
@@ -775,6 +777,8 @@ function(ri)
                    "case, handing over to Schreier-Sims.");
               ri!.comment := Concatenation("SL(",String(d),",",String(q),")",
                                            "_StabilizerChain");
+              # PSL(d,q) is simple here, so the chain makes ri a leaf
+              SetLeafData(ri,RECOG.LeafDataPSL(d,q,"strong"));
               return FindHomMethodsProjective.StabilizerChainProj(ri);
           fi;
           Info(InfoRecog,2,"ClassicalNatural: this is PSL_n!");
@@ -793,6 +797,10 @@ function(ri)
           SetFilterObj(ri,IsLeaf);
           SetSize(ri,Product([0..d-1],i->(q^d-q^i))/((q-1)*gcd.gcd));
           SetIsRecogInfoForSimpleGroup(ri,true);
+          data := RECOG.LeafDataPSL(d,q,"SL");
+          # the nice generators generate a conjugate of SL(d,q)
+          data.scalars := gcd.gcd;
+          SetLeafData(ri,data);
           Setslpforelement(ri,SLPforElementFuncsProjective.PSLd);
           return Success;
       fi;

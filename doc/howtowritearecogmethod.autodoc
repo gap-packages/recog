@@ -19,6 +19,10 @@ provided below (TODO: add a reference):
 - Provide a function which maps any element $g\in G$ to a corresponding SLP in terms of the nice generators $Y$, as entry for the attribute `slpforelement`.
 - Call `SetFilterObj(ri, IsLeaf);` to mark the node as a leaf node.
 
+A leaf method should also record what it knows about the isomorphism type of
+the group via `SetLeafData`, see <Ref Attr="LeafData"/>. Without it, the
+composition factors of the leaf can only be computed from a stabiliser chain.
+
 There are further values that can be provided, in particular to speed up
 computations; we'll come back to that later. Let's first look at an example:
 The following method is used by <Package>recog</Package> to recognize trivial

@@ -176,6 +176,10 @@ function(ri)
       Unbind(S!.opt.RandomElmFunc);
       Setslpforelement(ri,SLPforElementFuncsProjective.StabilizerChainProj);
       SetFilterObj(ri,IsLeaf);
+      # ClassicalNatural knows the type and sets it before calling us
+      if not HasLeafData(ri) then
+          SetLeafData(ri,RECOG.LeafDataStabilizerChain());
+      fi;
   else
       ForgetMemory(S);
       SetHomom(ri,OrbActionHomomorphism(Grp(ri),S!.orb));

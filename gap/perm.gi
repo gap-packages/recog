@@ -262,6 +262,7 @@ function(ri)
      ri!.stabilizerchain := S;
      Setslpforelement(ri,SLPforElementFuncsPerm.StabChain);
      SetFilterObj(ri,IsLeaf);
+     SetLeafData(ri,RECOG.LeafDataStabilizerChain());
      SetSize(G,SizeStabChain(S));
      SetSize(ri,SizeStabChain(S));
      ri!.Gnomem := G;
@@ -299,6 +300,7 @@ function(ri)
   ForgetMemory(S);
   Setslpforelement(ri,SLPforElementFuncsPerm.StabilizerChainPerm);
   SetFilterObj(ri,IsLeaf);
+  SetLeafData(ri,RECOG.LeafDataStabilizerChain());
   return Success;
 end);
 
@@ -481,6 +483,10 @@ function(ri)
     ri!.stabilizerchain := S;
     Setslpforelement(ri,SLPforElementFuncsPerm.StabChain);
     SetFilterObj(ri,IsLeaf);
+    # the labels are the identity followed by the pcgs
+    SetLeafData(ri,RECOG.LeafDataPcgs(
+        List(StripMemory(AsList(pcgs)), x -> Position(S.labels,x)),
+        RelativeOrders(pcgs)));
     SetSize(G,SizeStabChain(S));
     SetSize(ri,SizeStabChain(S));
     ri!.Gnomem := G;
