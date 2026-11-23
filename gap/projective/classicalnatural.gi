@@ -566,6 +566,21 @@ end;
 
 # Now the code for writing SLPs:
 
+# Returns a scalar multiple of the matrix y with entries in the field f, or
+# fail if there is none. A projective element can reach a node with a scalar
+# from a larger field than that of the node.
+RECOG.ScaleMatrixIntoField := function(y,f)
+  local pos;
+  pos := PositionNonZeroInRow(y,1);
+  if not y[1,pos] in f then
+      y := y[1,pos]^-1 * y;
+  fi;
+  if not IsSubset(f,FieldOfMatrixList([y])) then
+      return fail;
+  fi;
+  return y;
+end;
+
 SLPforElementFuncsProjective.PSL2 := function(ri,x)
   local det,pos,root,s,slp,y;
   ri!.fakegens.count := ri!.fakegens.count + 1;
@@ -574,6 +589,10 @@ SLPforElementFuncsProjective.PSL2 := function(ri,x)
       ri!.fakegens.count := 0;
   fi;
   y := ri!.nicebas * x * ri!.nicebasi;
+  y := RECOG.ScaleMatrixIntoField(y,ri!.field);
+  if y = fail then
+      return fail;
+  fi;
   det := DeterminantMat(y);
   if not IsOne(det) then
       # In the projective image, det only has to be a square. If it is not,
@@ -644,6 +663,10 @@ SLPforElementFuncsProjective.PSLd := function(ri,x)
       ri!.fakegens.count := 0;
   fi;
   y := ri!.nicebas * x * ri!.nicebasi;
+  y := RECOG.ScaleMatrixIntoField(y,ri!.field);
+  if y = fail then
+      return fail;
+  fi;
   det := DeterminantMat(y);
   if not IsOne(det) then
       # At this point, y is in the kernel of the determinant map *mod scalars*.
