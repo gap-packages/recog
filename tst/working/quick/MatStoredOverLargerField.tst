@@ -25,9 +25,9 @@ gap> ri := RECOG.TestGroup(G, false, 36);;
 gap> ri := RECOG.TestGroup(G, true, 36);;
 
 # The root keeps the group it was given, and its nice generators are stored
-# like the generators of that group. GAP calls a matrix compressed over GF(2)
-# different from the same matrix compressed over GF(4), so SLPs have to
-# evaluate to the representation of the element they were asked for.
+# like the generators of that group. Matrices with different base domains need
+# not be equal, so SLPs have to evaluate to the representation of the element
+# they were asked for.
 gap> ri := RecogniseWithSeed(G, 1);;
 gap> IsIdenticalObj(Grp(ri), G);
 true
