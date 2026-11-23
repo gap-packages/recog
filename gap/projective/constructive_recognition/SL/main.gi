@@ -67,10 +67,11 @@ RECOG.SL_MakeSLStdGensFromStandard := function(d, f)
 end;
 
 # Algorithm StandardGenerators of [EHNPR] (see ../GoingDown.gi), Section
-# 'Outline of the algorithm', for SL(d,q), d >= 4: GoingDown to SL(4,q),
-# FinalDescent to SL(2,q) as in [HNPR24] (see GoingDown.gi), and GoingUp
-# (see ../GoingUp.gi). It takes no bounds on random selections and does
-# not return fail, as its three parts retry until they succeed.
+# 'Outline of the algorithm', for SL(d,q), d >= 3: GoingDown to SL(4,q)
+# (none for d = 3), FinalDescent to SL(2,q) as in [HNPR24] (see
+# GoingDown.gi), and GoingUp (see ../GoingUp.gi). It takes no bounds on
+# random selections and does not return fail, as its three parts retry
+# until they succeed.
 # GoingUp works with the standard generators of
 # RECOG.ClassicalStandardGenerators; those of the SL(2,q) and of the result
 # are translated from and to RECOG.MakeSL_StdGens, which the recognition
@@ -83,7 +84,7 @@ end;
 #  - `bas`: that basis, as a matrix
 #  - `basi`: its inverse
 RECOG.FindStdGens_SL := function(sld)
-  local f, d, down, init, slp, bas, up;
+  local f, d, down, n, init, slp, bas, up;
 
   f := FieldOfMatrixGroup(sld);
   d := DimensionOfMatrixGroup(sld);
@@ -91,14 +92,21 @@ RECOG.FindStdGens_SL := function(sld)
     sld := GroupWithMemory(sld);
   fi;
 
-  Info(InfoRecog_ClassicalNatural, 1, "SL_n: going down in SL(", d, ",",
-       Size(f), ")");
-  down := RECOG.GoingDown(sld, "SL", RECOG.GoingDownRandomBound);
+  if d = 3 then
+    down := rec( gens := StripMemory(GeneratorsOfGroup(sld)),
+                 slp := SLPOfElms(GeneratorsOfGroup(sld)),
+                 bas := IdentityMat(d, f) );
+  else
+    Info(InfoRecog_ClassicalNatural, 1, "SL_n: going down in SL(", d, ",",
+         Size(f), ")");
+    down := RECOG.GoingDown(sld, "SL", RECOG.GoingDownRandomBound);
+  fi;
+  n := NrRows(down.gens[1]);
   init := RECOG.SLn_FinalDescent(down.gens, f);
   slp := CompositionOfStraightLinePrograms(init.slp, down.slp);
   slp := CompositionOfStraightLinePrograms(RECOG.SL2_FromMakeSLStdGens(f),
                                            slp);
-  bas := Concatenation(init.bas * down.bas{[1 .. 4]}, down.bas{[5 .. d]});
+  bas := Concatenation(init.bas * down.bas{[1 .. n]}, down.bas{[n + 1 .. d]});
 
   Info(InfoRecog_ClassicalNatural, 1, "SL_n: going up");
   up := RECOG.GoingUp(sld, "SL", rec( slp := slp, bas := bas, n := 2 ));
