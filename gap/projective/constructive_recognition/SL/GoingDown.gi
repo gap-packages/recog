@@ -20,6 +20,11 @@
 ##  and [DLGLO13] (q even) as a reference solution; recog implements
 ##  neither.
 ##
+##  The same descent serves SL(3,q), which both papers leave to Lübeck,
+##  Magaard, O'Brien, "Constructive recognition of SL_3(q)", J. Algebra
+##  316 (2007), cited as [LMO07] below ([HNPR24], Remark 4.3; [EHNPR],
+##  Section 'Small degrees').
+##
 #############################################################################
 
 #g=SL(d,q), given as a subgroup of SL(dim,q)
@@ -42,6 +47,11 @@
 # For d = dim = 4 it needs q not in [2,3,4,5,9]: yy is scalar for
 # (q-1) | 4 and a scalar times a reflection for q = 9, so the loops do
 # not end, and yy is 1 on <vec> for q = 4, so es[2] is unbound.
+# For d = dim = 3 it needs q not in [2,3,4,7], as does [LMO07], Lemma
+# 2.5, by which <x,yy> then contains that SL(2,q) for most z: x and yy
+# act on <vec, vec*z> modulo scalars with order (q-1)/gcd(3,q-1), so yy
+# is scalar for q = 2, 4, the commutators commute for q = 7, and yy is 1
+# on <vec> for q = 3. For q = 5 the order test also accepts SL(2,3).
 RECOG.SLn_godownfromd:=function(g,q,d,dim)
   local y,yy,ready,order,es,dims,subsp,z,x,a,b,c,h,vec,vec2,
   pol,factors,degrees,comm1,comm2,comm3,image,basis,action,vs,readyqpl1,
@@ -142,44 +152,48 @@ RECOG.SLn_godownfromd:=function(g,q,d,dim)
 end;
 
 # FinalDescent for SL, the BaseCase algorithm of [HNPR24], Section 4:
-# <gens> are 4x4 matrices generating SL(4,q), q = Size(<f>). An SL(2,q)
-# found by RECOG.SLn_godownfromd is recognised by
-# RECOG.RecogniseSL2Natural. [HNPR24] attributes the search to [LGO09]
-# and [DLGLO13]; RECOG.SLn_godownfromd follows Kantor and Seress instead.
+# <gens> are d x d matrices generating SL(d,q), d = 3 or 4, q = Size(<f>).
+# An SL(2,q) found by RECOG.SLn_godownfromd is recognised by
+# RECOG.RecogniseSL2Natural. [HNPR24] takes d = 4 and attributes the
+# search to [LGO09] and [DLGLO13]; RECOG.SLn_godownfromd follows Kantor
+# and Seress instead.
 # Returns a record with the following components:
 #  - `slp`: SLP in <gens> for the standard generators of an SL(2,q)
-#  - `bas`: a 4x4 matrix whose first two rows span the space on which this
-#    SL(2,q) acts and whose last two span its fixed space; relative to bas
-#    the standard generators are those of RECOG.MakeSL_StdGens(p,ext,2,4)
+#  - `bas`: a d x d matrix whose first two rows span the space on which
+#    this SL(2,q) acts and whose other rows span its fixed space; relative
+#    to bas the standard generators are those of
+#    RECOG.MakeSL_StdGens(p,ext,2,d)
 RECOG.SLn_FinalDescent := function(gens, f)
-  local q, p, ext, std, h, sl2, sl2gens, V, fix, b, action, resl2, slp;
+  local d, q, p, ext, std, h, sl2, sl2gens, V, fix, b, action, resl2, slp;
 
-  if NrRows(gens[1]) <> 4 then
-    ErrorNoReturn("RECOG.SLn_FinalDescent: <gens> must be 4x4 matrices");
+  d := NrRows(gens[1]);
+  if not d in [3, 4] then
+    ErrorNoReturn("RECOG.SLn_FinalDescent: <gens> must be 3x3 or 4x4 ",
+                  "matrices");
   fi;
 
   q := Size(f);
   p := Characteristic(f);
   ext := DegreeOverPrimeField(f);
 
-  # SLn_godownfromd does not apply to these fields (see there);
-  # constructive membership in SL(4,q), by a stabiliser chain, yields the
-  # SL(2,q) instead
-  if q in [2,3,4,5,9] then
-    Info(InfoRecog_ClassicalNatural,1,"SL_n: base case SL(4,",q,")");
-    std := RECOG.MakeSL_StdGens(p,ext,2,4).all;
+  # SLn_godownfromd does not apply to these fields, or does not prove its
+  # result (see there); constructive membership in SL(d,q), by a
+  # stabiliser chain, yields the SL(2,q) instead
+  if q in [2,3,4,5] or (d = 3 and q = 7) or (d = 4 and q = 9) then
+    Info(InfoRecog_ClassicalNatural,1,"SL_n: base case SL(",d,",",q,")");
+    std := RECOG.MakeSL_StdGens(p,ext,2,d).all;
     return rec( slp := RECOG.FindStdGensUsingBSGS(Group(gens),std,false,false),
-                bas := IdentityMat(4,f) );
+                bas := IdentityMat(d,f) );
   fi;
 
   Info(InfoRecog_ClassicalNatural,1,"SL_n: base case SL(2,",q,")");
   h := GroupWithMemory(gens);
-  sl2 := RECOG.SLn_godownfromd(h,q,4,4);
+  sl2 := RECOG.SLn_godownfromd(h,q,d,d);
   sl2gens := GeneratorsOfGroup(sl2[1]);
   V := BasisVectors(Basis(sl2[2]));
   fix := BasisVectors(Basis(Intersection(List(StripMemory(sl2gens),
              x -> VectorSpace(f, RECOG.FixspaceMat(x))))));
-  Assert(1, Length(fix) = 2 and RankMat(Concatenation(V, fix)) = 4);
+  Assert(1, Length(fix) = d - 2 and RankMat(Concatenation(V, fix)) = d);
 
   b := Basis(sl2[2],V);
   action := List(StripMemory(sl2gens),x->RECOG.LinearAction(b,f,x));
