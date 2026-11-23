@@ -95,6 +95,15 @@ gap> Size(RecogniseGroup(G));
 24
 gap> SetInfoLevel(InfoRecog, oldRecogLevel);
 
+# the dihedral group of order 14 in SL(2,8), the normaliser of a split torus:
+# even characteristic, and not a prime field
+gap> D := Group([[Z(8)^0,Z(8)^2],[Z(8),Z(8)]], [[Z(8)^0,Z(8)^2],[0*Z(8),Z(8)^0]]);;
+gap> Size(D);
+14
+gap> r := RecogniseClassical(D);; [r.isSLContained, r.isImprimitive];
+[ false, true ]
+gap> ri := RECOG.TestGroup(D, false, 14);;
+
 # 2.Alt(5) inside SL(2,11). This used to come out true: the Alt(5) test only
 # fired when the projective group moved at most 5 points, but it acts on the
 # q+1 = 12 points of the projective line, and is transitive on them.
