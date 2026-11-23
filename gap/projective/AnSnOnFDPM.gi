@@ -1329,8 +1329,6 @@ RECOG.ExpectedForm := function(row, fdpmDim, nAmbig)
     # check row = [..b..-b..] for some b
     if row[posNonZero[1]] = -row[posNonZero[2]] then
       return [row[posNonZero[1]], posNonZero + 1];
-    else
-      return fail;
     fi;
   elif Length(posNonZero) >= fdpmDim - 1 and nAmbig then # only if delta = 2
     # determine +/- b: find two entries that are the same
@@ -1356,12 +1354,11 @@ RECOG.ExpectedForm := function(row, fdpmDim, nAmbig)
       if row[posNotB[1]] = 2*b then
         return [b, [posNotB[1]+1, fdpmDim + 2]];
       fi;
-    else # there are three different field elements in row
-      return fail;
     fi;
-  else # wrong number positions with non-zero entries
-    return fail;
   fi;
+
+  # row is not of the form b*(u_ix - u_1x)
+  return fail;
 end;
 
 RECOG.FindPermutation := function(rs, fdpm)
