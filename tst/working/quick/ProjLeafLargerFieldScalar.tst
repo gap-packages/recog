@@ -23,22 +23,13 @@ true
 gap> TestScaled(SL(4,11), Z(121));
 true
 
-# The group in which this was found, of order 576 in GL(4,4): a diagonal
-# block generates GL(2,2), and the last generator is not scalar on it
-gap> one := IdentityMat(4, GF(4));;
-gap> Elementary := function(i, j)
->   local m;
->   m := NullMat(4, 4, GF(4));
->   m[i,j] := Z(2);
->   return m;
-> end;;
-gap> gens := [one, one + Elementary(2,3), PermutationMat((2,3), 4, GF(4)),
->             one + Elementary(4,1), one + Elementary(2,1) + Elementary(4,3),
->             DiagonalMat([Z(4), Z(4)^2, Z(4)^2, Z(4)])];;
-gap> Reset(GlobalMersenneTwister, 1);; Reset(GlobalRandomSource, 1);;
-gap> ri := RecogniseGroup(GroupWithGenerators(gens));;
-gap> IsReady(ri) and Size(ri) = 576;
-true
+# an element that is no scalar multiple of a matrix over the field of the leaf
+gap> ri := RecogniseProjectiveGroup(SL(2,5));;
+gap> SLPforElement(ri, [[Z(25), 0*Z(5)], [0*Z(5), Z(5)^0]]);
+fail
+gap> ri := RecogniseProjectiveGroup(SL(4,11));;
+gap> SLPforElement(ri, DiagonalMat([Z(121), Z(11)^0, Z(11)^0, Z(11)^0]));
+fail
 
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
