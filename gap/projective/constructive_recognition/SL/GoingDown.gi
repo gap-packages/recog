@@ -192,14 +192,18 @@ RECOG.SLn_godownfromd:=function(g,q,d,dim)
             # of dimension dim-d; the last one is absent when dim=d.
             expecteddims:=Filtered([1,d-1,dim-d], x -> x > 0);
             if AsSortedList(dims)=AsSortedList(expecteddims) then
-               # yy is conjugated to diag(a,...,a,b,I_{dim-d}) with 
-               # |a| = q-1 and b = a^(d-1).
+               # yy is conjugate to diag(lambda*I_{d-1}, mu, I_{dim-d}) with
+               # |lambda| = q-1 and mu = lambda^(1-d), as det(yy) = 1.
+               # On the d-space, yy is lambda times a homology with
+               # eigenvalue lambda^(-d). We need lambda^(-d) <> 1 (else yy is
+               # scalar there), lambda^(-d) <> -1 (else <x,yy> is dihedral)
+               # and mu <> 1. For d = 4 this excludes q in [2,3,4,5,9].
                es:=Filtered(es,x->Dimension(x)=1);
                vec:=Basis(es[1])[1];
+               # If dim = d+1, the fixed space of g is a second
+               # 1-dimensional eigenspace.
                if vec*yy=vec then
                   vec:=Basis(es[2])[1];
-                  # In the case dim-d = 1 or d = 2 etc. there exists
-                  # more than one 1-dim. eigenspace.
                fi;
                repeat
                   z:=PseudoRandom(g);
@@ -210,24 +214,24 @@ RECOG.SLn_godownfromd:=function(g,q,d,dim)
                   comm1:= Comm(a,c);
                   comm2:=Comm(a,b);
                   comm3:=Comm(b,c);
-                  # Given v in F_q^d with v*yy= b*v. Then (v*z)*x= v*z =: w.
-                  # Let u \in F_q^d. Note that yy is diagonizable, to verify the 
-                  # following just write u as lin. comb. of eigenvectors of yy (or x
-                  # respectively). We have u*yy-a*u \in <v> and thus 
-                  # w*yy = a*w +(w*yy-a*w) \in <w> + <v>. Therefore U*yy=U with
-                  # U = <w,v>. Analogously, it follows v*x \in U. Hence U*x=U.
-                  # This yields a,b,c act on U. One can verify that <x,yy> would 
-                  # act non-trivially on the intersection between the Eigenspaces of 
-                  # a of yy and x. Thus, the commutator of x and yy is needed.
+                  # Let W be the d-space of g and H the lambda-eigenspace of yy
+                  # in W. On W, yy is lambda times a homology with centre <vec>
+                  # and axis H, x likewise with centre <vec*z> and axis H*z.
+                  # So both preserve U = <vec, vec*z> and act as lambda on
+                  # H meet H*z. Commutators cancel lambda: a, b, c act on U and
+                  # trivially on a complement. They generate a subgroup of
+                  # <yy, x>', usually all of it; see [KS01, 3.6.3].
                   if comm1<>One(a) and comm2<>One(a) and
                     comm3<>One(a) and Comm(comm1,comm2)<>One(a) then
-                    # The latter conditions check whether <a,b,c> is not abelean,
-                    # not metabelian, etc. This combined with the checks below 
-                    # should be verifying that <a,b,c> is isomorphic to SL(2,q).
-                    # For a more detailed analysis, see Hup25 Chapter II, Section 8.
+                    # Cheap filter: <a,b,c> is non-abelian and not metabelian.
                     vec2:=vec*z;
                     vs:=VectorSpace(GF(q),[vec,vec2]);
                     basis:=Basis(vs);
+                    # check that the action in 2 dimensions is SL(2,q)
+                    # by non-constructive recognition, finding elements of
+                    # order (q-1) and (q+1); by Dickson [Hup25, II.8.27] this
+                    # suffices for q >= 8, while for q = 7 also 2.S4 passes
+                    # we do not need memory in the group image
                     action:=List([a,b,c],x->RECOG.LinearAction(basis,q,x));
                     image:=Group(action);
                     count:=0;
