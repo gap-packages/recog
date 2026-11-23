@@ -56,36 +56,6 @@ RECOG.IterateWithRandomElements := function(func, times, group)
   return fail;
 end;
 
-## Functions for efficient matrix operations
-
-RECOG.Commute := function(g, h);
-# Commute(g,h) returns true if and only if
-# gh = hg
-  ConvertToMatrixRep(g);
-  ConvertToMatrixRep(h);
-  return g*h = h*g;
-end;
-
-RECOG.Conj := function(A, B)
-# Conj(A, B) returns the conjugation of
-# A by B (where A and B are two matrices)
-# That is Conj(A, B) = B^-1*A*B
-
-  ConvertToMatrixRep(B);
-
-  return A^B;
-end;
-
-RECOG.ConjInv := function(A, B)
-# ConjInv(A, B) returns the conjugation of
-# A by B^-1 (where A and B are two matrices)
-# That is ConjInv(A, B) = B*A*B^-1
-
-  ConvertToMatrixRep(B);
-
-  return B*A*B^-1;
-end;
-
 ## Finding a 3-cycle or double transposition
 
 RECOG.LinearFactors := function(poly, field)
@@ -427,7 +397,6 @@ RECOG.Construct3Cycle := function(mat, fdpm)
     order := Order(mat);
     if     order < (fdpm.dim + 2)^(18*RECOG.LogRat(fdpm.dim + 2, 2))
        and order mod 3 = 0 then
-      ConvertToMatrixRep(mat);
       mat := mat^(order / 3);
       return rec( matrix := mat, order := 3 );
     fi;
@@ -467,7 +436,6 @@ RECOG.ConstructDoubleTransposition := function(mat, fdpm)
     order := Order(mat);
     if     order < (fdpm.dim + 2)^(18*RECOG.LogRat(fdpm.dim + 2, 2))
        and order mod 2 = 0 then
-      ConvertToMatrixRep(mat);
       mat := mat^(order / 2);
       return rec( matrix := mat, order := 2 );
     fi;
@@ -504,13 +472,12 @@ RECOG.DoubleAndShrink := function(g, group, n)
   # get random element and calculate its inverse
   # and gi^ri
   ri := PseudoRandom(group);
-  ConvertToMatrixRep(ri);
   temp := ri^-1;
   rs := [[ri, temp, temp*gi*ri]];
 
   i := 1;
   # find elements that do not commute
-  while RECOG.Commute(gi, rs[i][3]) do
+  while gi * rs[i][3] = rs[i][3] * gi do
     if i >= maxItr then
       return fail;
     fi;
@@ -530,14 +497,14 @@ RECOG.DoubleAndShrink := function(g, group, n)
   s := rs[i][1];
   for j in [i,i-1..2] do
     # calc gs[j-1]^s
-    gconjs := RECOG.Conj(gs[j-1], s);
+    gconjs := gs[j-1]^s;
     # determine new s
-    if RECOG.Commute(gs[j-1], gconjs) then
+    if gs[j-1] * gconjs = gconjs * gs[j-1] then
       # calc gs[j-1]^(rs[j-1]*s)
-      gconjrs := RECOG.Conj(rs[j-1][3], s);
-      if not RECOG.Commute(gs[j-1], gconjrs) then
+      gconjrs := rs[j-1][3]^s;
+      if gs[j-1] * gconjrs <> gconjrs * gs[j-1] then
         s := rs[j-1][1] * s;
-      elif not RECOG.Commute(rs[j-1][3], gconjs) then
+      elif rs[j-1][3] * gconjs <> gconjs * rs[j-1][3] then
         s := s * rs[j-1][2];
       else
         # s := s^(rs[j-1][1]^-1)
@@ -548,7 +515,7 @@ RECOG.DoubleAndShrink := function(g, group, n)
     fi;
   od;
 
-  return RECOG.Conj(g, s);
+  return g^s;
 end;
 
 RECOG.FixedPointSubspace := function(mat, k)
@@ -627,7 +594,6 @@ RECOG.SubspaceIntersection := function(basisA, basisB)
     return fail;
   else
     # calculate vector in subspace intersection
-    ConvertToVectorRep(mat[1]);
     MultVector(mat[1], nullv[1][1]);
     AddVector(mat[1], mat[2], nullv[1][2]);
     return mat[1];
@@ -659,7 +625,6 @@ RECOG.FindBasisElement := function(g, group, epsilon, fdpm)
       if (   (g.order = 2 and Order(gh) = 6)
           or (g.order = 3 and Order(gh) = 5)) then
         # return intersection of the totally moved subspaces
-        ConvertToMatrixRep(h);
         temp := h^-1;
         return RECOG.SubspaceIntersection(
                    RECOG.FixedPointSubspace(g.matrix,  g.order)[2],
@@ -688,7 +653,6 @@ RECOG.Power := function(xs, k)
   while q > 0 do
     # extend the list if we have to
     if xn > Length(xs) then # we have xn = Length(xs) + 1
-      ConvertToMatrixRep(xs[xn - 1]);
       Add(xs, xs[xn - 1]^2);
     fi;
     # if this bit in the binary expansion of k is 1
@@ -729,7 +693,6 @@ RECOG.VectorImagesUnder := function(v, h, k)
 
   hs := [h];
   for p in [1..LogInt(k, 2)] do
-    ConvertToMatrixRep(hs[p]);
     Add(hs, hs[p]^2);
   od;
 
@@ -804,7 +767,6 @@ RECOG.MoreBasisVectors := function(x, g, v, fdpm)
   fi;
 
   # Calculate the vectors we will consider
-  ConvertToMatrixRep(g.matrix);
   vs := [];
   for k in [1..i] do
     Add(vs, v);
@@ -815,7 +777,6 @@ RECOG.MoreBasisVectors := function(x, g, v, fdpm)
   # where 2^k <= n < 2^(k+1) in log n time
   xs := [x];
   for k in [1..Int(LogInt(fdpm.dim + 2, 2))] do
-    ConvertToMatrixRep(xs[k]);
     Add(xs, xs[k]^2);
   od;
 
@@ -830,7 +791,6 @@ RECOG.MoreBasisVectors := function(x, g, v, fdpm)
   # x, ..., x^(n-1) (in log n time). Then we will have
   # the vectors vg^ix, ..., vg^ix^(n-1) for i = 0, 1, 2,
   # if g rep. a 3-cycle and i = 0, otherwise
-  ConvertToMatrixRep(vs);
   vImgs := TransposedMat(RECOG.VectorImages(vs, xs));
 
   # Calculate r(vg^i, x) for i = 0,1,2 if
@@ -1038,13 +998,12 @@ RECOG.FindBasis := function(x, vs, us, fdpm)
 
   # calc vi*x w.r.t. basis vi: for finding interval vectors
   P := RECOG.ExtendToBasisEchelon(vs, fdpm.dim, fdpm.field);
-  ConvertToMatrixRep(P);
+  P := ImmutableMatrix(fdpm.field, P);
   Pinv := P^-1;
   if Pinv = fail then
     return fail;
   else
     vsx := P * x * Pinv;
-    ConvertToMatrixRep(vsx);
   fi;
 
   # Find scalar b and i,j such that x = bh and j = i^h
@@ -1062,7 +1021,6 @@ RECOG.FindBasis := function(x, vs, us, fdpm)
     ih := fail; # we have not found the image of i yet
 
     vsum := ShallowCopy(vsx[i]);
-    ConvertToVectorRep(vsum);
     # find j s.t. vi*x + ... + vj*x is an interval vector in
     # span of vs
     for j in [i+1..s] do
@@ -1091,7 +1049,6 @@ RECOG.FindBasis := function(x, vs, us, fdpm)
     # if we haven't found i^h try another way
     if ih = fail then
       vsum := ShallowCopy(vsx[i]);
-      ConvertToVectorRep(vsum);
       # find j s.t. vj*x + ... + vi*x is an interval vector
       for j in [i-1,i-2..1] do
         AddVector(vsum, vsx[j]);
@@ -1120,13 +1077,11 @@ RECOG.FindBasis := function(x, vs, us, fdpm)
   else # look for i < s such that vi*x + v(i+1)*x is an interval vector
     i := 1;
     temp := ShallowCopy(vsx[i]);
-    ConvertToVectorRep(temp);
     AddVector(temp, vsx[i+1]);
     inti := RECOG.IsIntervalVector(temp, s);
     while inti = fail and i < s - 1 do
       i := i + 1;
       temp := ShallowCopy(vsx[i]);
-      ConvertToVectorRep(temp);
       AddVector(temp, vsx[i+1]);
       inti := RECOG.IsIntervalVector(temp, s);
     od;
@@ -1137,7 +1092,6 @@ RECOG.FindBasis := function(x, vs, us, fdpm)
       # we only try this for i <= s - 2
       if i = s - 1 then
         vsum := ShallowCopy(vsx[i]);
-        ConvertToVectorRep(vsum);
         AddVector(vsum, vsx[i+1]);
         # find j s.t. vi*x + v(i+1)^x + ... + vj*x is an interval vector
         for j in [i+2..s] do
@@ -1164,7 +1118,6 @@ RECOG.FindBasis := function(x, vs, us, fdpm)
       # if we haven't found ih try another way
       if ih = fail then
         vsum := ShallowCopy(vsx[i]);
-        ConvertToVectorRep(vsum);
         AddVector(vsum, vsx[i+1]);
         # find j s.t. vj*x + ... + vi*x + v(i+1)*x is an interval vector
         for j in [i-1,i-2..1] do
@@ -1204,13 +1157,10 @@ RECOG.FindBasis := function(x, vs, us, fdpm)
   vsx := b^-1 * vsx;
   # calc vi*h not w.r.t. basis vs
   vsh := vs * b^-1*x;
-  ConvertToMatrixRep(vsh);
 
   # extend linked sequence
   vsum := ShallowCopy(vsx[i]);
-  ConvertToVectorRep(vsum);
   vsumh := ShallowCopy(vsh[i]);
-  ConvertToVectorRep(vsumh);
   for j in [i+1..s] do
     # calc vi*h + v(i+1)*h + ... + vj*h w.r.t to basis vs
     AddVector(vsum, vsx[j]);
@@ -1220,12 +1170,10 @@ RECOG.FindBasis := function(x, vs, us, fdpm)
       # vsum is not an interval vector so vsumh is an interval
       # vector not in the span of vs
       temp := ShallowCopy(vsumh);
-      ConvertToVectorRep(temp);
       AddVector(temp, us[ih]);
       Add(us, temp); # us[s+2] := vi*h + ... + vj*h + us[ih]
 
       temp := ShallowCopy(us[s+2]);
-      ConvertToVectorRep(temp);
       AddVector(temp, us[s+1], mone);
       Add(vs, temp); # vs[s+1] := us[s+2] - us[s+1]
 
@@ -1240,13 +1188,11 @@ RECOG.FindBasis := function(x, vs, us, fdpm)
   if i <> 1 then
     # vsum = v1*h + ... + v(i-1)*h
     vsum := ShallowCopy(vsx[1]);
-    ConvertToVectorRep(vsum);
     for temp in [2..i-1] do
       AddVector(vsum, vsx[temp]);
     od;
 
     vsumh := ShallowCopy(vsh[1]);
-    ConvertToVectorRep(vsumh);
     for temp in [2..i-1] do
       AddVector(vsumh, vsh[temp]);
     od;
@@ -1256,19 +1202,16 @@ RECOG.FindBasis := function(x, vs, us, fdpm)
       if RECOG.IsIntervalVector(vsum, s) = fail then
         # vsum is an interval vector not in the span of vs
         temp := ShallowCopy(us[ih]);
-        ConvertToVectorRep(temp);
         AddVector(temp, vsumh, mone);
         Add(us, temp);
 
         temp := ShallowCopy(us[s+2]);
-        ConvertToVectorRep(temp);
         AddVector(temp, us[s+1], mone);
         Add(vs, temp);
         s := s + 1;
         if s = fdpm.dim then
           # return vs and us if they span the fully deleted permutation
           # module. Note: us[1] = u1 = 0
-          ConvertToMatrixRep(vs);
           return [vs, us{[2..s+1]}];
         fi;
       fi;
@@ -1568,7 +1511,6 @@ RECOG.RecogniseFDPM := function(group, field, eps)
   for k in [1..Length(vs)] do
     Add(us, us[k] + vs[k]);
   od;
-  ConvertToMatrixRep(us);
 
   uvs := RECOG.IterateWithRandomElements(
              m -> RECOG.FindBasis(m, vs, us, fdpm),
@@ -1586,8 +1528,7 @@ RECOG.RecogniseFDPM := function(group, field, eps)
   # determine permutations and scalars: uvs[2] contains the
   # change of basis matrix that takes group elements into
   # our prefered form
-  cob := uvs[2];
-  ConvertToMatrixRep(cob);
+  cob := ImmutableMatrix(fdpm.field, uvs[2]);
   cobi := cob^-1;
   if cobi = fail then
     return fail;
