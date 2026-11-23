@@ -37,6 +37,15 @@ fail
 gap> RECOG.basis2(2, 1, 9, GroupWithGenerators([-a, b]));
 fail
 
+# A scalar commutator is not enough either: here a has four eigenspaces of
+# dimension 1, not two of dimension 2
+gap> a := DiagonalMat([1, -1, 2, -2] * Z(5)^0);;
+gap> b := PermutationMat((1,2)(3,4), 4, GF(5));;
+gap> RECOG.IsScalarMat(Comm(a, b));
+true
+gap> RECOG.basis2(2, 2, 5, GroupWithGenerators([a, b]));
+fail
+
 # SL(2,5) o C8 in GL(2,9) is not a C6 group, but contains such pairs
 gap> z := Z(9);;
 gap> G := GroupWithGenerators([[[z^2, 0*z], [z^6, z^6]], [[0*z, z], [z^3, z^4]],
