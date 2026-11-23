@@ -233,11 +233,12 @@ RECOG.SLn_godownfromd:=function(g,q,d,dim)
                     vec2:=vec*z;
                     vs:=VectorSpace(GF(q),[vec,vec2]);
                     basis:=Basis(vs);
-                    # check that the action in 2 dimensions is SL(2,q)
-                    # by non-constructive recognition, finding elements of
-                    # order (q-1) and (q+1); by Dickson [Hup67, II.8.27] this
-                    # suffices for q >= 8, while for q = 7 also 2.S4 passes
-                    # we do not need memory in the group image
+                    # Non-constructive check that <a,b,c> induces SL(2,q) on
+                    # U: find elements of orders q-1 and q+1 in the action.
+                    # By Dickson [Hup67, II.8.27] this suffices for q >= 8;
+                    # for q = 7, 2.S4 also passes.
+                    # LinearAction returns matrices without memory, which is
+                    # fine: image only serves this test and is discarded.
                     action:=List([a,b,c],x->RECOG.LinearAction(basis,q,x));
                     image:=Group(action);
                     count:=0;
