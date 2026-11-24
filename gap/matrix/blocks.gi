@@ -541,16 +541,12 @@ end);
 #        coefficient field over its prime field. In the latter case the result
 #        is expanded to prime-field coordinates via `BlownUpVector`.
 #
-# `m` may be a scalar multiple of a matrix with identity diagonal blocks, as
-# the elements of a lower left p-group are in a projective node. The entries
-# of the latter are returned.
-#
 # This helper does not do any row reduction and does not modify `m`; the
 # callers perform the linear algebra and mirror it by multiplying group
 # elements. In particular, if `m` is the identity matrix and `blocks` really do
 # describe a partition of the basis, then the result must be the zero vector.
 RECOG.ExtractLowStuff := function(m,layer,blocks,lens,basisOfFieldExtension)
-  local block,i,j,k,l,pos,scalar,v,what,where;
+  local block,i,j,k,l,pos,v,what,where;
   Assert(1, ForAll(blocks, b -> Length(b) > 0 and b = [b[1]..Last(b)]));
   Assert(1, Concatenation(blocks) = [1..Length(m)]);
   Assert(1, layer in [1..Length(lens)]);
@@ -568,9 +564,11 @@ RECOG.ExtractLowStuff := function(m,layer,blocks,lens,basisOfFieldExtension)
           pos := pos + Length(what);
       od;
   od;
-  scalar := m[1,1];
-  if not IsOne(scalar) then
-      MultVector(v,scalar^-1);
+  # `m` may be a scalar multiple of a matrix with identity diagonal blocks, as
+  # the elements of a lower left p-group are in a projective node. The entries
+  # of the latter are returned.
+  if not IsOne(m[1,1]) then
+      MultVector(v,m[1,1]^-1);
   fi;
   if basisOfFieldExtension <> fail then
       # needed because we assume for example in
