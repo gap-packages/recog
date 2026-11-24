@@ -33,6 +33,39 @@ SLCR.PowerProg := {slp, n} ->
 ################################
 SLCR.InvProg := slp -> SLCR.PowerProg(slp, -1);
 
+################################
+SLCR.OneProg := data -> StraightLineProgram([[1, 0]], Length(data.gens));
+
+#############################################################################
+##
+## Layout of data.gens (see SLCR.AttachSLNewgens): for base = SLCR.QBase(d, j,
+## e), data.gens[base + k] is the transvection of Q with entry rho^(k-1) at
+## position (d, j); for base = SLCR.QgammaBase(d, j, e), the one of Qgamma at
+## position (j, d).
+SLCR.QBase := {d, j, e} -> ((d-1)*(d-2) + j-1)*e;
+SLCR.QgammaBase := {d, j, e} -> ((d-1)^2 + j-1)*e;
+
+#############################################################################
+##
+#F SLCR.FieldElmProg( <data>, <base>, <a> )
+##
+## SLP for the product of the data.gens[base+k]^c[k], where c is the
+## coefficient vector of the nonzero <a> in the basis 1, rho, ..., rho^(e-1)
+SLCR.FieldElmProg := function(data, base, a)
+    local c;
+    c := data.FB[LogFFE(a, Z(data.prime^data.power)) + 1];
+    return StraightLineProgram(
+        [Concatenation(List(PositionsProperty(c, x -> x <> 0), k -> [base + k, c[k]]))],
+        Length(data.gens));
+end;
+
+## SLPs for the transvections with entry <a> at position (d, j) in Q and (j, d)
+## in Qgamma
+SLCR.QProg := {data, d, j, a} ->
+    SLCR.FieldElmProg(data, SLCR.QBase(d, j, data.power), a);
+SLCR.QgammaProg := {data, d, j, a} ->
+    SLCR.FieldElmProg(data, SLCR.QgammaBase(d, j, data.power), a);
+
 ##############################################################################
 ## TODO Find and input the appropriate reference for this                   ##
 ## This is the implementation of the Kantor-Seress algorithm for PSL(d,q)   ##
@@ -613,34 +646,15 @@ end;
 ## upper left corner = rho^(-1), lower right corner = rho
 
 SLCR.SLSprog := function(data, d)
-    local p, e, rho, coeff1, coeff2, srslp, i, trslp, s1slp, t1slp, jslp;
-    p := data.prime;
+    local e, rho, srslp, trslp, s1, t1, jslp;
     e := data.power;
-    rho := Z(p^e);
-    coeff1 := data.FB[LogFFE(rho, rho) + 1];
-    coeff2 := data.FB[LogFFE(-rho^(-1), rho) + 1];
-    srslp := StraightLineProgram([[1, 0]], Length(data.gens));
-    for i in [1..e] do
-        if coeff1[i] > 0 then
-            srslp := SLCR.ProdProg(srslp,
-                StraightLineProgram([[(d-1)*(d-2)*e+i, coeff1[i]]], Length(data.gens)));
-        fi;
-    od;
-
-    trslp := StraightLineProgram([[1, 0]], Length(data.gens));
-    for i in [1..e] do
-        if coeff2[i] > 0 then
-            trslp := SLCR.ProdProg(trslp,
-                StraightLineProgram([[(d-1)*(d-1)*e+i, coeff2[i]]], Length(data.gens)));
-        fi;
-    od;
-
-    s1slp := StraightLineProgram([[(d-1)*(d-2)*e+1, -1]], Length(data.gens));
-    t1slp := StraightLineProgram([[(d-1)*(d-1)*e+1, 1]], Length(data.gens));
-    jslp := ProductOfStraightLinePrograms(s1slp, ProductOfStraightLinePrograms(t1slp, s1slp));
-
-    return ProductOfStraightLinePrograms(
-        ProductOfStraightLinePrograms(srslp, trslp), ProductOfStraightLinePrograms(srslp, jslp));
+    rho := Z(data.prime^e);
+    srslp := SLCR.QProg(data, d, 1, rho);
+    trslp := SLCR.QgammaProg(data, d, 1, -rho^(-1));
+    s1 := SLCR.QBase(d, 1, e) + 1;
+    t1 := SLCR.QgammaBase(d, 1, e) + 1;
+    jslp := StraightLineProgram([[s1, -1, t1, 1, s1, -1]], Length(data.gens));
+    return SLCR.ProdProg(SLCR.ProdProg(srslp, trslp), SLCR.ProdProg(srslp, jslp));
 end;
 
 ############################################################################
@@ -859,18 +873,15 @@ end;
 ## generators in the data structure
 
 SLCR.SLSLP := function(data, x, d)
-    local p, e, q, W, leftslp, rightslp, i, j, k, sprog, a, b, FB, coeffs;
+    local q, W, leftslp, rightslp, i, j, k, sprog, a;
 
-    p := data.prime;
-    e := data.power;
-    q := p^e;
-    FB := data.FB;
+    q := data.prime^data.power;
 
     if not IsOne(Determinant(x)) then
         return fail;
     fi;
-    leftslp := StraightLineProgram([[1, 0]], Length(data.gens));
-    rightslp := StraightLineProgram([[1, 0]], Length(data.gens));
+    leftslp := SLCR.OneProg(data);
+    rightslp := SLCR.OneProg(data);
     # in leftslp, we collect an slp for the INVERSE of the matrix
     # we multiply with from the left.
     # in rightslp we collect an slp for the right multiplier matri
@@ -879,8 +890,7 @@ SLCR.SLSLP := function(data, x, d)
         # put non-zero element in lower right corner
         if IsZero(W[d-i,d-i]) then
             j := First([1..d-i], a -> not IsZero(W[a,d-i]));
-            leftslp := SLCR.ProdProg(leftslp,
-                StraightLineProgram([[(d-i-1)*(d-i-2)*e+(j-1)*e+1, 1]], Length(data.gens)));
+            leftslp := SLCR.ProdProg(leftslp, SLCR.QProg(data, d-i, j, Z(q)^0));
             for k in [1..d-i] do
                 W[d-i,k] := W[d-i,k] - W[j,k];
             od;
@@ -890,16 +900,7 @@ SLCR.SLSLP := function(data, x, d)
             if not IsZero(W[j,d-i]) then
                 # a is the nontriv element of the multiplying matrix
                 a := -W[j,d-i]/W[d-i,d-i];
-                # b is what we have to express as a linear combination
-                # in the standard basis of GF(q)
-                b := -a;
-                coeffs := FB[LogFFE(b, Z(q))+1];
-                for k in [1..e] do
-                    if coeffs[k] <> 0 then
-                        leftslp := SLCR.ProdProg(leftslp,
-                            StraightLineProgram([[(d-i-1)^2*e+(j-1)*e+k, coeffs[k]]], Length(data.gens)));
-                    fi;
-                od;
+                leftslp := SLCR.ProdProg(leftslp, SLCR.QgammaProg(data, d-i, j, -a));
                 for k in [1..d-i] do
                     W[j,k] := W[j,k] + a * W[d-i,k];
                 od;
@@ -911,13 +912,7 @@ SLCR.SLSLP := function(data, x, d)
                 # a is the nontriv element of the multiplying matrix
                 a := -W[d-i,j]/W[d-i,d-i];
                 # no inverse is taken here
-                coeffs := FB[LogFFE(a, Z(q))+1];
-                for k in [1..e] do
-                    if coeffs[k] <> 0 then
-                        rightslp := SLCR.ProdProg(rightslp,
-                            StraightLineProgram([[(d-i-1)*(d-i-2)*e+(j-1)*e+k, coeffs[k]]], Length(data.gens)));
-                    fi;
-                od;
+                rightslp := SLCR.ProdProg(rightslp, SLCR.QProg(data, d-i, j, a));
                 for k in [1..d-i] do
                     W[k,j] := W[k,j] + a * W[k,d-i];
                 od;
@@ -946,21 +941,19 @@ end;
 ## generators in the data structure
 
 SLCR.SLSLPbb := function(data, x, d)
-    local p, e, q, bbg, W, rightslp, i, j, k, stop, FB, gens, coeffs, xinv, Q,
-          Qgamma, y, u, vec, mat, det, exp, slprog, smat, slp, W2, gcd, cent,
-          centprog;
+    local p, e, q, bbg, W, rightslp, i, j, k, stop, gens, xinv, Q, Qgamma, y,
+          u, vec, mat, det, exp, slprog, smat, slp, W2, gcd, cent, centprog;
 
     p := data.prime;
     e := data.power;
     q := p^e;
-    FB := data.FB;
     gens := data.gens;
     bbg := data.bbg;
 
-    rightslp := StraightLineProgram([[1, 0]], Length(data.gens));
+    rightslp := SLCR.OneProg(data);
     xinv := x^(-1);
-    Q := List([1..d-1], j -> gens[(d-1)*(d-2)*e + (j-1)*e + 1][1]);
-    Qgamma := List([1..d-1], j -> gens[(d-1)^2*e + (j-1)*e + 1][1]);
+    Q := List([1..d-1], j -> gens[SLCR.QBase(d, j, e) + 1][1]);
+    Qgamma := List([1..d-1], j -> gens[SLCR.QgammaBase(d, j, e) + 1][1]);
 
     # first modify x to normalize Q
     if not ForAll(Q, j -> SLCR.IsInQ(xinv*j*x, Q)) then
@@ -969,8 +962,7 @@ SLCR.SLSLPbb := function(data, x, d)
         repeat
             if not SLCR.IsOnAxis(Q[i]^(-1)*xinv, Qgamma, Q) then
                 stop := true;
-                rightslp := SLCR.ProdProg(rightslp,
-                    StraightLineProgram([[(d-1)*(d-2)*e+(i-1)*e+1, 1]], Length(data.gens)));
+                rightslp := SLCR.ProdProg(rightslp, SLCR.QProg(data, d, i, Z(q)^0));
                 u := Q[i];
             else
                 i := i+1;
@@ -1017,13 +1009,7 @@ SLCR.SLSLPbb := function(data, x, d)
         fi;
         for j in [1..d-1] do
             if not IsZero(vec[j]) then
-                coeffs := FB[LogFFE(vec[j], Z(q))+1];
-                for k in [1..e] do
-                    if coeffs[k] <> 0 then
-                        rightslp := SLCR.ProdProg(rightslp,
-                            StraightLineProgram([[(d-1)^2*e + (j-1)*e + k, coeffs[k]]], Length(data.gens)));
-                    fi;
-                od;
+                rightslp := SLCR.ProdProg(rightslp, SLCR.QgammaProg(data, d, j, vec[j]));
             fi;
         od;
         W := x * u * y^(-1);
@@ -1093,13 +1079,7 @@ SLCR.SLSLPbb := function(data, x, d)
     fi;
     for j in [1..d-1] do
         if not IsZero(vec[j]) then
-            coeffs := FB[LogFFE(vec[j], Z(q))+1];
-            for k in [1..e] do
-                if coeffs[k] <> 0 then
-                    rightslp := SLCR.ProdProg(rightslp,
-                        StraightLineProgram([[(d-1)*(d-2)*e+(j-1)*e+k, coeffs[k]]], Length(data.gens)));
-                fi;
-            od;
+            rightslp := SLCR.ProdProg(rightslp, SLCR.QProg(data, d, j, vec[j]));
         fi;
     od;
     rightslp := SLCR.InvProg(rightslp);
@@ -1211,11 +1191,7 @@ SLCR.SL2DataStructure := function(arg)
     data.c[1] := One(bbg);
     data.cprog := [];
     data.cprog[1] := [];
-    data.cprog[2] := ProductOfStraightLinePrograms(
-        StraightLineProgram([[1, -1]], Length(data.gens)),
-        ProductOfStraightLinePrograms(
-            StraightLineProgram([[e+1, 1]], Length(data.gens)),
-            StraightLineProgram([[1, -1]], Length(data.gens))));
+    data.cprog[2] := StraightLineProgram([[1, -1, e+1, 1, 1, -1]], Length(data.gens));
     data.c[2] := (data.gens[1][1])^(-1)*data.gens[e+1][1]*(data.gens[1][1])^(-1);
     data.t21 := data.gens[1][1];
     data.t21invtran := data.t21^data.c[2];
@@ -1601,9 +1577,9 @@ SLCR.AttachSLNewgens := function(data, data3, d, jgamma)
 
     for j in [1..d-1] do
         for i in [1..e] do
-            data.gens[(d-1)*(d-2)*e+(j-1)*e+i] :=
+            data.gens[SLCR.QBase(d, j, e) + i] :=
                 [data3.trangpQ[i+1]^conj, [[d, j, rho^(i-1)]]];
-            data.gens[(d-1)^2*e+(j-1)*e+i] :=
+            data.gens[SLCR.QgammaBase(d, j, e) + i] :=
                 [data3.trangpQgamma[i+1]^conj, [[j, d, rho^(i-1)]]];
         od;
         conj := conj*data.c[d-1];
