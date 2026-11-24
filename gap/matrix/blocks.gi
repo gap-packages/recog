@@ -540,16 +540,16 @@ end);
 #   `basisOfFieldExtension`: either `fail` for prime fields, or a basis of the
 #        coefficient field over its prime field. In the latter case the result
 #        is expanded to prime-field coordinates via `BlownUpVector`.
-#   `projective`: if `true`, then `m` is a scalar multiple of a matrix with
-#        identity diagonal blocks, as the elements of a lower left p-group are
-#        in a projective node, and the entries of the latter are returned.
+#
+# `m` may be a scalar multiple of a matrix with identity diagonal blocks, as
+# the elements of a lower left p-group are in a projective node. The entries
+# of the latter are returned.
 #
 # This helper does not do any row reduction and does not modify `m`; the
 # callers perform the linear algebra and mirror it by multiplying group
 # elements. In particular, if `m` is the identity matrix and `blocks` really do
 # describe a partition of the basis, then the result must be the zero vector.
-RECOG.ExtractLowStuff := function(m,layer,blocks,lens,basisOfFieldExtension,
-                                  projective)
+RECOG.ExtractLowStuff := function(m,layer,blocks,lens,basisOfFieldExtension)
   local block,i,j,k,l,pos,scalar,v,what,where;
   Assert(1, ForAll(blocks, b -> Length(b) > 0 and b = [b[1]..Last(b)]));
   Assert(1, Concatenation(blocks) = [1..Length(m)]);
@@ -568,11 +568,9 @@ RECOG.ExtractLowStuff := function(m,layer,blocks,lens,basisOfFieldExtension,
           pos := pos + Length(what);
       od;
   od;
-  if projective then
-      scalar := m[1,1];
-      if not IsOne(scalar) then
-          MultVector(v,scalar^-1);
-      fi;
+  scalar := m[1,1];
+  if not IsOne(scalar) then
+      MultVector(v,scalar^-1);
   fi;
   if basisOfFieldExtension <> fail then
       # needed because we assume for example in
@@ -639,8 +637,7 @@ RECOG.FindKernelLowerLeftPGroup := function(ri)
 
         # Now clean out this vector and remember what we did:
         curlay := 1;
-        v := RECOG.ExtractLowStuff(x,curlay,ri!.blocks,lens,
-                                   basisOfFieldExtension,ri!.projective);
+        v := RECOG.ExtractLowStuff(x,curlay,ri!.blocks,lens,basisOfFieldExtension);
         Assert(1, not IsOne(x) or IsZero(v));
         pos := PositionNonZero(v);
         i := 1;
@@ -651,9 +648,7 @@ RECOG.FindKernelLowerLeftPGroup := function(ri)
             while pos > Length(v) do
                 curlay := curlay + 1;
                 if curlay <= Length(lens) then
-                    v := RECOG.ExtractLowStuff(x,curlay,ri!.blocks,lens,
-                                               basisOfFieldExtension,
-                                               ri!.projective);
+                    v := RECOG.ExtractLowStuff(x,curlay,ri!.blocks,lens,basisOfFieldExtension);
                     Assert(1, not IsOne(x) or IsZero(v));  # IsOne(x) should imply IsZero(v)
                     pos := PositionNonZero(v);
                 else
@@ -731,7 +726,7 @@ SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
   i := 1;
   for layer in [1..Length(ri!.lens)] do
       h := RECOG.ExtractLowStuff(g,layer,ri!.blocks,ri!.lens,
-                                 ri!.basisOfFieldExtension,ri!.projective);
+                                 ri!.basisOfFieldExtension);
       while i <= Length(ri!.gensNvectors) and ri!.gensNpivots[i][1] = layer do
           done := h[ri!.gensNpivots[i][2]];
           if not IsZero(done) then
