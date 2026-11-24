@@ -212,7 +212,7 @@ RECOG.EigenspaceBasisOfHyperbolicPair := function(r,n,newq,a,b)
     if IsEmpty(sp) or Dimension(sp[1]) <> r^(n-1) then
         return fail;
     fi;
-    sp := List(GeneratorsOfVectorSpace(sp[1]),z->ShallowCopy(z));
+    sp := List(GeneratorsOfVectorSpace(sp[1]), ShallowCopy);
     for i in [1..r-1] do
         for j in [1..r^(n-1)] do
             sp[i*r^(n-1)+j] := sp[(i-1)*r^(n-1)+j]*b;
