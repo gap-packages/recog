@@ -738,8 +738,8 @@ end;
 
 # ClassicalNatural for <ri> containing PSp(d,q), PSU(d,q0) or
 # POmega(d,q), d even for Sp, at least 4 for SU, at least 6 for Sp with
-# q even and 5, 6 or at least 8 for Omega, q odd except for Sp, for SU with
-# q0 <> 2 and for Omega^+-(d,q), as <classical> of RecogniseClassical
+# q even and at least 4 but not 7 for Omega, q odd except for Sp, for SU
+# with q0 <> 2 and for Omega^+-(d,q), as <classical> of RecogniseClassical
 # says; <type> is "Sp", "SU" or "O", which stands for all orthogonal types
 # here. The generators are scaled into Sp(d,q), SU(d,q0) or Omega(d,q).
 # That needs similarity factors that are squares for Sp and Omega,
@@ -747,7 +747,8 @@ end;
 # determinant 1 and spinor norm 1 up to the sign, resp. for q even a
 # common quadratic form and Dickson invariant 0; for a conformal
 # symplectic group, a unitary group with other determinants, SO(d,q) or
-# O^+-(d,q), the method does not apply.
+# O^+-(d,q), the method does not apply, nor for Omega^+(4,q), which is not
+# quasisimple.
 RECOG.ClassicalNaturalForm := function(ri,classical,type)
   local d,f,q,form,gens,changed,i,lambda,std,m,q0,gcd,size,eps;
   d := ri!.dimension;
@@ -781,6 +782,12 @@ RECOG.ClassicalNaturalForm := function(ri,classical,type)
       return TemporaryFailure;
   fi;
 
+  if type = "O" and d = 4 and IsOddInt(q)
+     and RECOG.FormOrthogonalType(form,IdentityMat(d,f)) = "O+" then
+      Info(InfoRecog,2,"ClassicalNatural: O+(4,",q,") is not quasisimple.");
+      return TemporaryFailure;
+  fi;
+
   i := RECOG.ClassicalNaturalQuotient(ri,form,type);
   if i <> fail then
       return i;
@@ -800,11 +807,18 @@ RECOG.ClassicalNaturalForm := function(ri,classical,type)
           changed := true;
       fi;
   od;
-  if type = "O" and IsEvenInt(q)
-     and RECOG.InvariantQuadraticForm(gens,form.gram,f) = fail then
-      Info(InfoRecog,2,"ClassicalNatural: the generators preserve no ",
-           "common quadratic form.");
-      return TemporaryFailure;
+  if type = "O" and IsEvenInt(q) then
+      form.quad := RECOG.InvariantQuadraticForm(gens,form.gram,f);
+      if form.quad = fail then
+          Info(InfoRecog,2,"ClassicalNatural: the generators preserve no ",
+               "common quadratic form.");
+          return TemporaryFailure;
+      elif d = 4 and RECOG.FormOrthogonalType(form,IdentityMat(d,f)) = "O+"
+           then
+          Info(InfoRecog,2,"ClassicalNatural: O+(4,",q,") is not ",
+               "quasisimple.");
+          return TemporaryFailure;
+      fi;
   fi;
 
   Info(InfoRecog,2,"ClassicalNatural: this is P",type,"_n!");
@@ -883,7 +897,7 @@ function(ri)
       return RECOG.ClassicalNaturalForm(ri,classical,"Sp");
   elif classical.isSUContained = true and q <> 4 and d >= 4 then
       return RECOG.ClassicalNaturalForm(ri,classical,"SU");
-  elif classical.isOmegaContained = true and (d = 5 or d = 6 or d >= 8)
+  elif classical.isOmegaContained = true and d >= 4 and d <> 7
        and (IsOddInt(q) or IsEvenInt(d)) then
       return RECOG.ClassicalNaturalForm(ri,classical,"O");
   fi;

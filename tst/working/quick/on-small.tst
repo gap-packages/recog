@@ -104,6 +104,44 @@ gap> for G in [GO(-1, 6, 5), GO(1, 6, 5)] do
 [ "ClassicalNatural", 2, "ClassicalNatural" ]
 [ "ClassicalNatural", 2, [ "ClassicalNatural", 2, "ClassicalNatural" ] ]
 
+# Omega^-(4,q) through SL(2,q^2), for every q; q = 11 and q = 16 are the
+# smallest with more than 1000 points. Its SLPs come from
+# RECOG.Omega_RankOneRewrite, which fails outside Omega^-(4,q).
+gap> ForAll([2, 3, 4, 5, 8, 9, 31, 32], q -> CheckFindStdGens(-1, 4, q));
+true
+gap> ForAll([11, 13, 25, 27, 31, 32], q -> CheckLeaf(-1, 4, q));
+true
+gap> CheckRankOneRewrite := function(e, d, q)
+>     local f, type, std, W, G;
+>     f := GF(q);
+>     type := RECOG.OrthogonalTypes[Position([1, -1, 0], e)];
+>     std := RECOG.ClassicalStandardGenerators(type, d, f).all;
+>     W := RECOG.Form_RewriteSetup(type, d, f);
+>     G := Group(std);
+>     return ForAll([1 .. 20], function(i)
+>         local x;
+>         x := PseudoRandom(G);
+>         return ResultOfStraightLineProgram(RECOG.Form_Rewrite(W, x), std)
+>                = x;
+>     end) and ForAll(GeneratorsOfGroup(SO(e, d, q)), x -> x in G
+>                     or RECOG.Form_Rewrite(W, x) = fail);
+> end;;
+gap> ForAll([2, 3, 4, 5, 9, 11, 16], q -> CheckRankOneRewrite(-1, 4, q));
+true
+
+# Omega^+(4,q) is not quasisimple and no leaf
+gap> ri := RECOG.TestGroup(Omega(1, 4, 11), true, Size(Omega(1, 4, 11)) / 2);;
+gap> IsLeaf(ri);
+false
+
+# GO^-(4,11) has elements of determinant -1, no 4th power in GF(11), and
+# SO^-(4,11) is Omega^-(4,11) extended by -1
+gap> Reset(GlobalMersenneTwister, 1);;
+gap> Reset(GlobalRandomSource, 1);;
+gap> G := GO(-1, 4, 11);;
+gap> Split(ImageRecogNode(RECOG.TestGroup(G, false, Size(G))));
+[ "ProjDeterminant", 2, "ClassicalNatural" ]
+
 #
 gap> SetInfoLevel(InfoOrb, oldInfoOrb);
 gap> STOP_TEST("on-small.tst");
