@@ -78,7 +78,8 @@ end;
 SLCR.BoundedOrder := function(bbg, r, n, primes)
     local prime;
     for prime in primes do
-        if IsOne(r^(n/prime)) then return (false);
+        if IsOne(r^(n/prime)) then
+            return (false);
         fi;
     od;
     return (true);
@@ -126,7 +127,8 @@ SLCR.IS_IN_CENTRE := function(bbg, x)
     local gen, gens;
     gens := GeneratorsOfGroup(bbg);
     for gen in gens do
-        if not One(bbg) = Comm(x, gen) then return (false);
+        if not One(bbg) = Comm(x, gen) then
+            return (false);
         fi;
     od;
     return (true);
@@ -300,7 +302,8 @@ SLCR.FindGoodElement := function(bbg, p, e, d, limit)
             return prod;
         end;
 
-        psi := 1; phi := z;
+        psi := 1;
+        phi := z;
         if e*(d-2) > 1 then
             for c in primes do
                 a := Gcd(phi, p^(e*(d-2)/c)-1);
@@ -542,7 +545,8 @@ SLCR.ConstructTranGroup := function(bbg, tran, p, e)
             # was: elif SLCR.IsInTranGroup(bbg,H,x) then
         elif x in H then
             count := count+1;
-        else Add(B, x);
+        else
+            Add(B, x);
             SLCR.AppendTran(bbg, H, x, p);
             count := count+1;
         fi;
@@ -606,7 +610,8 @@ SLCR.Standardize := function(bbg, T, j, s)
             fi;
         od;
         return fail;
-    else fixed := [];
+    else
+        fixed := [];
         for u in T do
             if Length(fixed) < 2 then
                 y := t^(j*u);
@@ -786,14 +791,16 @@ SLCR.SLSprog := function(data, d)
     srslp := StraightLineProgram([[1, 0]], Length(data.gens));
     for i in [1..e] do
         if coeff1[i] > 0 then
-            srslp := SLCR.ProdProg(srslp, StraightLineProgram([[(d-1)*(d-2)*e+i, coeff1[i]]], Length(data.gens)));
+            srslp := SLCR.ProdProg(srslp,
+                StraightLineProgram([[(d-1)*(d-2)*e+i, coeff1[i]]], Length(data.gens)));
         fi;
     od;
 
     trslp := StraightLineProgram([[1, 0]], Length(data.gens));
     for i in [1..e] do
         if coeff2[i] > 0 then
-            trslp := SLCR.ProdProg(trslp, StraightLineProgram([[(d-1)*(d-1)*e+i, coeff2[i]]], Length(data.gens)));
+            trslp := SLCR.ProdProg(trslp,
+                StraightLineProgram([[(d-1)*(d-1)*e+i, coeff2[i]]], Length(data.gens)));
         fi;
     od;
 
@@ -1196,8 +1203,7 @@ SLCR.SLSLPbb := function(data, x, d)
             k := 1;
             stop := false;
             repeat
-                if SLCR.EqualPoints(bbg, data.trangpgamma[1][k], x*u, Q)
-                   then
+                if SLCR.EqualPoints(bbg, data.trangpgamma[1][k], x*u, Q) then
                     stop := true;
                 else
                     k := k+1;
@@ -1417,9 +1423,11 @@ SLCR.SL2DataStructure := function(arg)
     data.c[1] := One(bbg);
     data.cprog := [];
     data.cprog[1] := [];
-    data.cprog[2] := ProductOfStraightLinePrograms(StraightLineProgram([[1, -1]], Length(data.gens)),
-                                                   ProductOfStraightLinePrograms(StraightLineProgram([[e+1, 1]], Length(data.gens)),
-                                                                                 StraightLineProgram([[1, -1]], Length(data.gens))));
+    data.cprog[2] := ProductOfStraightLinePrograms(
+        StraightLineProgram([[1, -1]], Length(data.gens)),
+        ProductOfStraightLinePrograms(
+            StraightLineProgram([[e+1, 1]], Length(data.gens)),
+            StraightLineProgram([[1, -1]], Length(data.gens))));
     data.c[2] := (data.gens[1][1])^(-1)*data.gens[e+1][1]*(data.gens[1][1])^(-1);
     data.t21 := data.gens[1][1];
     data.t21invtran := data.t21^data.c[2];
@@ -2543,7 +2551,9 @@ function(ri)
     # TODO find a reasonable number of tries
     for i in [1 .. 10] do
         data := SLCR.SLDataStructure(grpmem, p, e, n);
-        if data <> fail then break; fi;
+        if data <> fail then
+            break;
+        fi;
     od;
     if data = fail then
         return TemporaryFailure;
