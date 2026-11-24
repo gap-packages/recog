@@ -529,11 +529,13 @@ function(ri)
       pr := ProductReplacer(GeneratorsOfGroup(gm),rec(maxdepth := 500));
       gm!.pseudorandomfunc := [rec( func := Next, args := [pr] )];
   else
+      # a stamp of its own, so that the first random elements are those
+      # the naming test drew
       gm := Group(ri!.gensHmem);
       gm!.pseudorandomfunc := [rec(func := function(ri,name,bool)
                                       return RandomElm(ri,name,bool).el;
                                     end,
-                            args := [ri,"ClassicalNatural",true])];
+                            args := [ri,"ClassicalNaturalStdGens",true])];
   fi;
 
   if d = 2 then
