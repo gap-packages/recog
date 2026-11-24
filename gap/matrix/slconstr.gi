@@ -97,24 +97,6 @@ end;
 
 ##############################################################################
 ##
-#F SLCR.IS_IN_CENTRE( <bbgroup> , <elt> )
-##
-## In case the group we are dealing with is a PSL instead of an SL, we
-## will need to check with certain elements lie in the centre of our group.
-
-SLCR.IS_IN_CENTRE := function(bbg, x)
-    local gen, gens;
-    gens := GeneratorsOfGroup(bbg);
-    for gen in gens do
-        if not One(bbg) = Comm(x, gen) then
-            return false;
-        fi;
-    od;
-    return true;
-end;
-
-##############################################################################
-##
 #F SLCR.AppendTran( <bbg> , <H> , <x> , <p> )
 ##
 ## The idea here is that $H$ is a proper subgroup (subspace) of a transvection
@@ -213,7 +195,7 @@ end;
 ## (if anything) output a bbgroup element r of order p*ppd#(p;e(d-2)).
 
 SLCR.FindGoodElement := function(bbg, p, e, d, limit)
-    local r, q, v, primes, collect2s, z, i, a, c, w, phi, psi;
+    local r, q, v, primes, z, i, a, c, w, phi, psi;
     q := p^e;
     if d = 3 and q = 4 then
         i := 1;
@@ -244,18 +226,6 @@ SLCR.FindGoodElement := function(bbg, p, e, d, limit)
         z := p^(e*(d-2))-1;
         primes := PrimeDivisors(e*(d-2));
 
-        collect2s := function(n)
-            # the 2-part of n
-            local i, prod;
-            prod := 1;
-            i := n;
-            while (i mod 2) = 0 do
-                i := i/2;
-                prod := prod * 2;
-            od;
-            return prod;
-        end;
-
         psi := 1;
         phi := z;
         if e*(d-2) > 1 then
@@ -281,7 +251,7 @@ SLCR.FindGoodElement := function(bbg, p, e, d, limit)
                     fi;
                 elif e*(d-2) = 2 and p+1 = 2^Log(p+1, 2) then
                     # p is Mersenne prime
-                    w := 2*z/collect2s(z);
+                    w := 2*z/2^PValuation(z, 2);
                     if not One(bbg) = v^w then #4/|v|
                         Info(InfoRecog, 3, "SLCR.FindGoodElement with i=", i, "  limit=", limit);
                         return r;
@@ -326,7 +296,7 @@ SLCR.SL4FindGoodElement := function(bbg, p, e, limit)
         repeat
             r := PseudoRandom(bbg);
             if (r^12 = One(bbg)) and (not (r^4 = One(bbg)))
-               and (not SLCR.IS_IN_CENTRE(bbg, r^6)) then
+               and (not IsCentral(bbg, r^6)) then
                 Info(InfoRecog, 3, "SLCR.FindGoodElement with i=", i, "  limit=", limit);
                 return r;
             fi;
@@ -450,7 +420,7 @@ SLCR.SL2Search := function(arg)
                         out.gen := r;
                     elif One(bbg) = r^((p^e-1)/2) and
                          SLCR.BoundedOrder(bbg, r, (p^e-1)/2, primes) and
-                         not SLCR.IS_IN_CENTRE(bbg, r^((p^e-1)/4)) then
+                         not IsCentral(bbg, r^((p^e-1)/4)) then
                         out.gen := r;
                     fi;
                 fi; # p=2
