@@ -356,6 +356,8 @@ end;
 AddMethod(FindHomDbProjective, FindHomMethodsGeneric.TrivialGroup, 3000);
 #! @EndCode
 
+AddMethod(FindHomDbProjective, FindHomMethodsMatrix.StoredOverLargerField, 1900);
+
 AddMethod(FindHomDbProjective, FindHomMethodsProjective.ProjDeterminant, 1300);
 
 AddMethod(FindHomDbProjective, FindHomMethodsGeneric.FewGensAbelian, 1250);
