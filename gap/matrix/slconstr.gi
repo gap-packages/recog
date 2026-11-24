@@ -356,20 +356,12 @@ end;
 
 ###############################################################################
 ##
-#F SLCR.CommutesWith( <bbgroup> , <set> , <x> )
+#F SLCR.CommutesWith( <a>, <b> )
 ##
-## This short routine, needed in the sequel, returns true if and only if <x>
-## commutes with every element in the set <set>.
+## Returns true if and only if <a> and <b> commute. Cheaper than
+## IsOne(Comm(a, b)).
 
-SLCR.CommutesWith := function(bbg, S, x)
-    local s;
-    for s in S do
-        if s*x <> x*s then
-            return false;
-        fi;
-    od;
-    return true;
-end;
+SLCR.CommutesWith := {a, b} -> a*b = b*a;
 
 #############################################################################
 ##
@@ -444,7 +436,7 @@ end;
 ## success is highly probable.
 ##
 SLCR.ConstructTranGroup := function(bbg, tran, p, e)
-    local t, tinv, H, m, x, count, tau, i;
+    local t, H, m, x, count, tau, i;
     t := tran;
     m := 128*(p^e+1)*e;
     #initialize output lists
@@ -455,10 +447,9 @@ SLCR.ConstructTranGroup := function(bbg, tran, p, e)
         Add(H, tau);
     od;
     count := 1;
-    tinv := t^(-1);
     while count < m do
         x := t^PseudoRandom(bbg);
-        if not x = tinv*x*t then
+        if not SLCR.CommutesWith(x, t) then
             count := count+1;
         elif x in H then
             count := count+1;
@@ -481,15 +472,14 @@ end;
 ## returns a generator of $G$ which does not normalize $T$
 
 SLCR.Dislodge := function(bbg, T)
-    local j, t, tinv, gens, tconj, gen;
+    local j, t, gens, tconj, gen;
     gens := GeneratorsOfGroup(bbg);
     t := T[2];
-    tinv := t^(-1);
     j := One(bbg);
     for gen in gens do
         if One(bbg) = j then
             tconj := t^gen;
-            if not tconj = tinv*tconj*t then
+            if not SLCR.CommutesWith(tconj, t) then
                 j := gen;
             fi;
         fi;
@@ -515,12 +505,12 @@ SLCR.Standardize := function(bbg, T, j, s)
     out := rec();
     sinv := s^(-1);
     firstconj := sinv*t*s;
-    if firstconj = firstconj^t then
+    if SLCR.CommutesWith(firstconj, t) then
         out.gen := s;
         for u in T do
             y := t^(j*u);
             ytos := sinv*y*s;
-            if y = y^ytos then
+            if SLCR.CommutesWith(y, ytos) then
                 out.conj := j*u;
                 return out;
             fi;
@@ -532,7 +522,7 @@ SLCR.Standardize := function(bbg, T, j, s)
             if Length(fixed) < 2 then
                 y := t^(j*u);
                 ytos := sinv * y * s;
-                if y = y^ytos then
+                if SLCR.CommutesWith(y, ytos) then
                     Add(fixed, u);
                 fi;
             fi;
@@ -560,7 +550,7 @@ end;
 SLCR.SL2ReOrder := function(bbg, T, s, j, p, e)
     local auto, newT, Tgamma, B, images, matrixofs, matrixofpow, row, count,
           autom, setofimages, position, good, stop, pow, conj, weights, rho,
-          tnew, out, t, u, uinv, newTgamma, i;
+          tnew, out, t, u, newTgamma, i;
     t := T[2];
     # handle the case of prime field first
     if e = 1 then
@@ -662,11 +652,10 @@ SLCR.SL2ReOrder := function(bbg, T, s, j, p, e)
     # what we do below is to compute the label of the point alpha^Tgamma[2]
     # and replace Tgamma[2] by an element of its transvection group
     u := newT[2]^Tgamma[2];
-    uinv := u^(-1);
     i := 2;
     stop := false;
     repeat
-        if Tgamma[2]^newT[i] = uinv * (Tgamma[2]^newT[i]) * u then
+        if SLCR.CommutesWith(Tgamma[2]^newT[i], u) then
             stop := true;
             if i > 2 then
                 newTgamma := [One(bbg)];
@@ -740,7 +729,7 @@ SLCR.EqualPoints := function(bbg, x, y, Qalpha)
     g := Qalpha[1]^x;
     yinv := y^(-1);
     for i in [1..len] do
-        if not One(bbg) = Comm(g, yinv*Qalpha[i]*y) then
+        if not SLCR.CommutesWith(g, yinv*Qalpha[i]*y) then
             return false;
         fi;
     od;
@@ -758,7 +747,7 @@ SLCR.IsOnAxis := function(bbg, x, Qalpha, Q)
     len := Length(Q);
     g := Qalpha[1]^x;
     for i in [1..len] do
-        if not One(bbg) = Comm(Comm(g, Q[i]), Q[i]) then
+        if not SLCR.CommutesWith(Comm(g, Q[i]), Q[i]) then
             return false;
         fi;
     od;
@@ -773,7 +762,7 @@ end;
 ## used to test whether such is in a conjugate of Qa if needed.
 
 SLCR.IsInQ := function(bbg, x, Q)
-    return SLCR.CommutesWith(bbg, Q, x);
+    return ForAll(Q, y -> SLCR.CommutesWith(x, y));
 end;
 
 ############################################################################
@@ -858,7 +847,7 @@ SLCR.SLConjInQ := function(bbg, y, Qgamma, Q, Tgamma, T, j, p, e, boolean)
     stop := false;
     i := 1;
     repeat
-        if not One(bbg) = Comm(Q[i], z) then
+        if not SLCR.CommutesWith(Q[i], z) then
             stop := true;
         fi;
         i := i + 1;
@@ -1373,7 +1362,7 @@ SLCR.SL3ConstructQ := function(bbg, t, pp, e)
         r := PseudoRandom(bbg);
         u := t^r;
         cand := tinv * (u^(-1)) * t * u;
-        if not One(bbg) = cand and SLCR.CommutesWith(bbg, S, cand) then
+        if not One(bbg) = cand and ForAll(S, s -> SLCR.CommutesWith(s, cand)) then
             if Length(S) = 1 then
                 f := r;
                 u1 := u;
@@ -1453,8 +1442,8 @@ SLCR.ComputeGamma := function(bbg, f, Q, T)
     stop := false;
     repeat
         test := (f^(-1)) * T[i];
-        if One(bbg) = Comm(Comm(U[1], t^test), U[1]) and
-           One(bbg) = Comm(Comm(U[2], t^test), U[2]) then
+        if SLCR.CommutesWith(Comm(U[1], t^test), U[1]) and
+           SLCR.CommutesWith(Comm(U[2], t^test), U[2]) then
             stop := true;
         fi;
         i := i + 1;
