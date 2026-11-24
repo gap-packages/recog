@@ -119,7 +119,9 @@ end;
 # E_i = ker(s_i-1) satisfy W1 \cap W2 = 0 and V = (W1+W2) + (E1 \cap E2)
 # (a stingray duo), such that the restrictions of s1, s2 to W1+W2
 # generate the classical group there. Uses at most <N> random selections.
-# Unlike [EHNPR], it neither restricts nor returns a form, as
+# Unlike [EHNPR], s2 is a random conjugate of s1 rather than a second
+# stingray element, which saves the search for one. It neither restricts
+# nor returns a form, as
 # RecogniseClassical computes the form itself, and it does not return the
 # remaining bound, as GoingDown gives every step <N>.
 # Returns either fail, or else a record with the following components:
@@ -127,30 +129,27 @@ end;
 #  - `slp`: SLP of [s1,s2] in the generators of <G>
 #  - `basis`: a basis of W1+W2 followed by one of E1 \cap E2, as a matrix
 RECOG.GoingDownStep := function(G, params, N)
-  local n, F, D, r1, r2, s1, s2, T, W, E, sum, nn, tail, C, gens;
+  local n, F, D, r, h, s1, s2, T, W, E, sum, nn, tail, C, gens;
 
   n := DimensionOfMatrixGroup(G);
   F := DefaultFieldOfMatrixGroup(G);
   D := RECOG.StingrayBodyDimensions(n, params);
 
   while N > 0 do
-    r1 := RECOG.FindStingrayElement(G, D, N);
-    if r1 = fail then
+    r := RECOG.FindStingrayElement(G, D, N);
+    if r = fail or r.remaining = 0 then
       return fail;
     fi;
-    r2 := RECOG.FindStingrayElement(G, D, r1.remaining);
-    if r2 = fail then
-      return fail;
-    fi;
-    N := r2.remaining;
+    h := [r.element, r.element^PseudoRandom(G)];
+    N := r.remaining - 1;
 
-    s1 := StripMemory(r1.element);
-    s2 := StripMemory(r2.element);
+    s1 := StripMemory(h[1]);
+    s2 := StripMemory(h[2]);
     T := List([s1, s2], s -> SemiEchelonMatTransformation(s - One(s)));
     W := List(T, t -> t.vectors);
     E := List(T, t -> t.relations);
     sum := SumIntersectionMat(W[1], W[2])[1];
-    nn := r1.dim + r2.dim;
+    nn := 2 * r.dim;
     tail := SumIntersectionMat(E[1], E[2])[2];
     C := Concatenation(sum, tail);
     if Length(sum) <> nn or Length(tail) <> n - nn or RankMat(C) <> n then
@@ -170,7 +169,7 @@ RECOG.GoingDownStep := function(G, params, N)
 
     ConvertToMatrixRep(C, F);
     return rec( gens := gens,
-                slp := SLPOfElms([r1.element, r2.element]),
+                slp := SLPOfElms(h),
                 basis := C );
   od;
 
