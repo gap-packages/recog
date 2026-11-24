@@ -67,11 +67,11 @@ true
 # SLCR.SLDataStructure gives up if SLCR.SLConstructBasisQ does. No group is
 # known on which that happens in dimension 4 or more, so force it.
 gap> origConstructBasisQ := SLCR.SLConstructBasisQ;;
-gap> SLCR.SLConstructBasisQ := function(bbg, data, Q, Qgamma, d, q)
+gap> SLCR.SLConstructBasisQ := function(data, Q, Qgamma, d, q)
 >   if d = 4 then
 >     return fail;
 >   fi;
->   return origConstructBasisQ(bbg, data, Q, Qgamma, d, q);
+>   return origConstructBasisQ(data, Q, Qgamma, d, q);
 > end;;
 gap> ForAll([1..5], function(seed)
 >   ResetRandom(seed);

@@ -1222,11 +1222,11 @@ end;
 
 ############################################################################
 ##
-#F SLCR.SLConstructBasisQ( <bbg>, <data>, <Q>, <Qgamma>, <dim>, <field size> )
+#F SLCR.SLConstructBasisQ( <data>, <Q>, <Qgamma>, <dim>, <field size> )
 ##
 ## <data> is the data structure of L to construct straight-line programs
 
-SLCR.SLConstructBasisQ := function(bbg, data, Q, Qgamma, d, q)
+SLCR.SLConstructBasisQ := function(data, Q, Qgamma, d, q)
     local t21, t21invtran, c, baseQ, baseQgamma, i, s, sinv, T, Tgamma, b1, b1prime;
     t21 := data.t21;
     t21invtran := data.t21invtran;
@@ -1246,7 +1246,7 @@ SLCR.SLConstructBasisQ := function(bbg, data, Q, Qgamma, d, q)
     fi;
 
     # list the transvection groups and bases
-    T := [One(bbg), b1];
+    T := [One(b1), b1];
     for i in [3..q] do
         T[i] := sinv * T[i-1] * s;
     od;
@@ -1256,7 +1256,7 @@ SLCR.SLConstructBasisQ := function(bbg, data, Q, Qgamma, d, q)
         baseQ[i] := baseQ[i-1]^c;
     od;
 
-    Tgamma := [One(bbg), b1prime];
+    Tgamma := [One(b1prime), b1prime];
     for i in [3..q] do
         Tgamma[i] := s * Tgamma[i-1] * sinv;
     od;
@@ -1543,7 +1543,7 @@ SLCR.SL3DataStructure := function(bbg, p, e)
     fi;
     Qgamma := [t^jgamma];
     Add(Qgamma, Qgamma[1]^data2.c[2]);
-    data3 := SLCR.SLConstructBasisQ(bbg, data2, [t, t1], Qgamma, 3, p^e);
+    data3 := SLCR.SLConstructBasisQ(data2, [t, t1], Qgamma, 3, p^e);
     if data3 = fail then
         return fail;
     fi;
@@ -1789,7 +1789,7 @@ SLCR.SLDataStructure := function(bbg, p, e, d)
     if vectors = fail then
         return fail;
     fi;
-    data3 := SLCR.SLConstructBasisQ(bbg, data2, vectors[1], vectors[2], d, q);
+    data3 := SLCR.SLConstructBasisQ(data2, vectors[1], vectors[2], d, q);
     if data3 = fail then
         return fail;
     fi;
