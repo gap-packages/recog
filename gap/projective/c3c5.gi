@@ -870,9 +870,7 @@ function(ri)
       # Now find a homogeneous component to act on it:
       homs := MTX.Homomorphisms(collf[1][1],m);
       homsimg := BasisVectors(Basis(VectorSpace(f,Concatenation(homs))));
-      homcomp := MutableCopyMat(homsimg);
-      # FIXME: This will go:
-      ConvertToMatrixRep(homcomp,f);
+      homcomp := RECOG.MutableCopyMatOverField(homsimg,f);
       TriangulizeMat(homcomp);
       o := Orb(G,homcomp,OnSubspacesByCanonicalBasis,rec(storenumbers := true));
       Enumerate(o);
