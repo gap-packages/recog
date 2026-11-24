@@ -569,7 +569,7 @@ RECOG.ExtractLowStuff := function(m,layer,blocks,lens,basisOfFieldExtension,
       od;
   od;
   if projective then
-      scalar := m[1][1];
+      scalar := m[1,1];
       if not IsOne(scalar) then
           MultVector(v,scalar^-1);
       fi;
