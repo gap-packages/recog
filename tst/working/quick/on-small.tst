@@ -161,6 +161,13 @@ gap> [ri!.fhmethsel.successMethod, Size(ImageRecogNode(ri)),
 >    KernelRecogNode(ri)!.fhmethsel.successMethod];
 [ "ClassicalNatural", 2, "ClassicalNatural" ]
 
+# Omega(7,q), q odd, by the final descent to Omega^+(6,q) and GoingUp; it
+# has more than 1000 points for every q
+gap> ForAll([3, 5, 9, 31], q -> CheckFindStdGens(0, 7, q));
+true
+gap> ForAll([3, 5, 13, 17, 31], q -> CheckLeaf(0, 7, q));
+true
+
 # Omega^+(4,q) is not quasisimple and no leaf
 gap> ri := RECOG.TestGroup(Omega(1, 4, 11), true, Size(Omega(1, 4, 11)) / 2);;
 gap> IsLeaf(ri);
