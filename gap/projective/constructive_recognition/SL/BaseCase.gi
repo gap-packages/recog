@@ -163,12 +163,12 @@ end;
 #    this SL(2,q) acts and whose other rows span its fixed space; relative
 #    to bas the standard generators are those of
 #    RECOG.MakeSL_StdGens(p,ext,2,d)
-RECOG.SLn_FinalDescent := function(gens, f)
+RECOG.SL_FinalDescent := function(gens, f)
   local d, q, p, ext, std, h, sl2, sl2gens, V, fix, b, action, resl2, slp;
 
   d := NrRows(gens[1]);
   if not d in [3, 4] then
-    ErrorNoReturn("RECOG.SLn_FinalDescent: <gens> must be 3x3 or 4x4 ",
+    ErrorNoReturn("RECOG.SL_FinalDescent: <gens> must be 3x3 or 4x4 ",
                   "matrices");
   fi;
 

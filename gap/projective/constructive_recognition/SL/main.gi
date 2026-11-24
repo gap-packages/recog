@@ -69,7 +69,7 @@ end;
 # Algorithm StandardGenerators of [EHNPR] (see ../GoingDown.gi), Section
 # 'Outline of the algorithm', for SL(d,q), d >= 3: GoingDown to SL(4,q)
 # (none for d = 3), FinalDescent to SL(2,q) as in [HNPR24] (see
-# GoingDown.gi), and GoingUp (see ../GoingUp.gi). It takes no bounds on
+# BaseCase.gi), and GoingUp (see ../GoingUp.gi). It takes no bounds on
 # random selections and does not return fail, as its three parts retry
 # until they succeed.
 # GoingUp works with the standard generators of
@@ -102,7 +102,7 @@ RECOG.FindStdGens_SL := function(sld)
     down := RECOG.GoingDown(sld, "SL", RECOG.GoingDownRandomBound);
   fi;
   n := NrRows(down.gens[1]);
-  init := RECOG.SLn_FinalDescent(down.gens, f);
+  init := RECOG.SL_FinalDescent(down.gens, f);
   slp := CompositionOfStraightLinePrograms(init.slp, down.slp);
   slp := CompositionOfStraightLinePrograms(RECOG.SL2_FromMakeSLStdGens(f),
                                            slp);
