@@ -96,10 +96,8 @@ RECOG.FindStingrayElement := function(G, D, N)
       # multiplicity
       others := factors{Difference([1..Length(factors)], [i])};
       c := Maximum(Concatenation([1], List(others, f -> f[2])));
-      beta := 0;
-      while p^beta < c do
-        beta := beta + 1;
-      od;
+      # the least beta with p^beta >= c
+      beta := LogInt(p * c - 1, p);
       B := p^beta * Lcm(Concatenation([1], List(others, f -> q^Degree(f[1]) - 1)));
 
       # x^B generates GF(q^m) if it lies in no maximal subfield GF(q^(m/r))
