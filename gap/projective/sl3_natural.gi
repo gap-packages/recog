@@ -10,91 +10,69 @@
 ##  embedded copy of SL(2,q) inside G, using one of two strategies 
 ##  depending on the size of q (see comments below for details).
 ##
-##  Note: G is only ever accessed via PseudoRandom, ProductReplacer, and
-##  Order. Hence these functions work for G given as a black box
+##  The algorithms use group operations, random elements, and element
+##  orders, so these functions work for G given as a black box
 ##  group isomorphic to SL(3,q); this is also why the field size q is
 ##  passed explicitly rather than being extracted from G.
-##  Additionally, the output is a group that SHOULD be isomorphic to SL(2,q). 
-##  The probability that the function RECOG.FindSL2inSL3 succeeds is > 0.95 
-##  according to benchmarks.
+##  For q > 11, the function returns SL(2,q) or fail if the search is
+##  unsuccessful. The small-field strategy can return a proper subgroup.
 ##  
 ##      
 ##
 #############################################################################
 
-# RECOG.SL3GoingDown( G, q )
+# RECOG.SL3GoingDown( G, q ), for odd q > 11.
 #
-# Strategy due to Frank Luebeck.
-# t := PseudoRandom(G)^(q+1) quite often has two equal eigenvalues.
-# Then u := <t, t^rand> is almost always isomorphic to GL(2,q), 
-# and its derived subgroup is often isomorphic to SL(2,q). Here the
-# derived subgroup is approximated via random commutators.
+# Following Frank Luebeck's approach, use a power x^(q+1) that
+# acts as a scalar on a plane.
 RECOG.SL3GoingDown := function(G, q)
-    local t, rand, u, s, list, x, y, i, order, count, attempt,
-          isSL3, hasElementOfOrderQPlus1, hasElementOfOrderQMinus1,
-          ppds2, ppds3, p, foundSL2, MAX_ATTEMPTS, INNER_ATTEMPTS;
+    local attempt, x, power, t, conjugate, commutator, gens, pr,
+          i, order, foundSplit, foundNonsplit;
 
-    MAX_ATTEMPTS := 20;
-    INNER_ATTEMPTS := 20;
-
-    ppds3 := Factors(PrimitivePrimeDivisors(3, q).ppds);
-
-    attempt := 0;
-    repeat
-        foundSL2 := false;
-        attempt := attempt + 1;
-
-        # Construct a candidate subgroup u, then approximate its derived
-        # subgroup s via random commutators.
-        t := PseudoRandom(G)^(q+1);
-        rand := PseudoRandom(G);
-        u := Subgroup(G, [t, t^rand]);
-
-        list := [];
-        for i in [1 .. 10] do
-            x := PseudoRandom(u);
-            y := PseudoRandom(u);
-            Add(list, Comm(x, y));
-        od;
-        s := Subgroup(G, list);
-
-        # Check (1): rule out that s is (isomorphic to) SL(3,q) rather
-        # than SL(2,q), by searching for an element whose order is
-        # divisible by a primitive prime divisor of q^3-1.
-        isSL3 := false;
-        count := 0;
-        repeat
-            count := count + 1;
-            order := Order(PseudoRandom(s));
-            for p in ppds3 do
-                if 0 = order mod p then
-                    isSL3 := true;
-                fi;
-            od;
-        until isSL3 or count > INNER_ATTEMPTS;
-
-        # Check (2): if s does not look like SL(3,q), look for elements
-        # of order q+1 and q-1, both of which occur in SL(2,q).
-        if not isSL3 then
-            hasElementOfOrderQPlus1 := false;
-            hasElementOfOrderQMinus1 := false;
-            count := 0;
-            repeat
-                count := count + 1;
-                order := Order(PseudoRandom(s));
-                if order = q + 1 then
-                    hasElementOfOrderQPlus1 := true;
-                elif order = q - 1 then
-                    hasElementOfOrderQMinus1 := true;
-                fi;
-                if hasElementOfOrderQPlus1 and hasElementOfOrderQMinus1 then 
-                    foundSL2 := true;
-                fi;
-            until foundSL2 or count > INNER_ATTEMPTS;
+    for attempt in [1..40] do
+        # The two power tests force semisimple type 2+1 in SL(3,q).
+        # An irreducible element has order dividing q^2+q+1,
+        # whose gcd with q^2-1 divides q-1.
+        x := PseudoRandom(G);
+        power := x^(q-1);
+        if IsOne(power) or not IsOne(power^(q+1)) then
+            continue;
         fi;
 
-    until foundSL2 or attempt > MAX_ATTEMPTS;
-    return s;
+        # The power t = x^(q+1) acts as a scalar on a plane.
+        # If t is scalar on the whole space, the commutator is trivial.
+        # With two distinct eigenvalues, t and its conjugate each have
+        # an eigenplane and an eigenline. The derived subgroup of
+        # <t, conjugate> fixes the intersection of the planes pointwise
+        # and preserves the span of the two eigenlines. If these spaces
+        # are complementary, the derived subgroup lies in an embedded
+        # SL(2,q). In the remaining cases, t and its conjugate preserve
+        # a full flag, so the derived subgroup is unipotent.
+        t := power * x^2;
+        conjugate := t^PseudoRandom(G);
+        commutator := Comm(t, conjugate);
+        if IsOne(commutator) then
+            continue;
+        fi;
+
+        # For q > 11, both orders certify that this is SL(2,q).
+        gens := [commutator, commutator^t, commutator^conjugate];
+        pr := ProductReplacer(gens);
+        foundSplit := false;
+        foundNonsplit := false;
+        for i in [1..20] do
+            order := Order(Next(pr));
+            if order = q-1 then
+                foundSplit := true;
+            elif order = q+1 then
+                foundNonsplit := true;
+            fi;
+            if foundSplit and foundNonsplit then
+                return SubgroupNC(G, gens);
+            fi;
+        od;
+    od;
+    return fail;
 end;
 
 # RECOG.SL3GoingDown_SmallQ( G, q )
@@ -120,15 +98,14 @@ RECOG.SL3GoingDown_SmallQ := function(G, q)
         Add(list, Comm(x, y));
     od;
 
-    s := Subgroup(G, list);
+    s := SubgroupNC(G, list);
     return s;
 end;
 
 # RECOG.FindSL2inSL3( G, q )
 #
-# Main entry point. Dispatches to SL3GoingDown_SmallQ for small odd q,
-# and to SL3GoingDown otherwise. Note that this function may falsely return 
-# a subgroup which is not isomorphic to SL(2,q).
+# Main entry point. Dispatches to the heuristic SL3GoingDown_SmallQ for
+# q <= 11 and to SL3GoingDown otherwise. The latter can return fail.
 RECOG.FindSL2inSL3 := function(G, q)
 
     if not IsPrimePowerInt(q) or q mod 2 = 0 then

@@ -14,7 +14,7 @@ gap> SetInfoLevel(InfoRecog,0);
 gap> for q in [ 7, 13, 17, 1009] do
 >     G := SL(3,q);
 >     H := RECOG.FindSL2inSL3(G,q);
->     if Size(RecognizeGroup(H)) <> Size(SL(2,q)) then
+>     if H = fail or Size(RecognizeGroup(H)) <> Size(SL(2,q)) then
 >         Print("FAILED for q = ", q, "\n");
 >     fi;
 > od;
