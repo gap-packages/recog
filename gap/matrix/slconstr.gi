@@ -24,21 +24,14 @@ SLCR := rec();
 ##################################
 ### routines for handling SLPs ###
 ##################################
-SLCR.ProdProg := function(slp1, slp2)
-    return ProductOfStraightLinePrograms(slp1, slp2);
-end;
+SLCR.ProdProg := {slp1, slp2} -> ProductOfStraightLinePrograms(slp1, slp2);
 
 ###############################
-SLCR.PowerProg := function(slp, n)
-    local prg;
-    prg := StraightLineProgram([[1, n]], 1);
-    return CompositionOfStraightLinePrograms(prg, slp);
-end;
+SLCR.PowerProg := {slp, n} ->
+    CompositionOfStraightLinePrograms(StraightLineProgram([[1, n]], 1), slp);
 
 ################################
-SLCR.InvProg := function(slp)
-    return SLCR.PowerProg(slp, -1);
-end;
+SLCR.InvProg := slp -> SLCR.PowerProg(slp, -1);
 
 ##############################################################################
 ## TODO Find and input the appropriate reference for this                   ##
@@ -54,15 +47,8 @@ end;
 ## $r$ of bbg and a positive integer $n$ such that $r^n=1$ and will return
 ## the flag "true" if and only if $n$ is the order of $r$.
 
-SLCR.BoundedOrder := function(bbg, r, n, primes)
-    local prime;
-    for prime in primes do
-        if IsOne(r^(n/prime)) then
-            return false;
-        fi;
-    od;
-    return true;
-end;
+SLCR.BoundedOrder := {bbg, r, n, primes} ->
+    ForAll(primes, l -> not IsOne(r^(n/l)));
 
 ###########################################################################
 ##
@@ -70,15 +56,8 @@ end;
 ##
 ## Writes a number 0 <= n < p^e in base p
 
-SLCR.NtoPadic := function(p, e, n)
-    local j, output;
-    output := [];
-    for j in [1..e] do
-        output[j] := (n mod p)*Z(p)^0;
-        n := (n - (n mod p))/p;
-    od;
-    return output;
-end;
+SLCR.NtoPadic := {p, e, n} ->
+    List([0..e-1], j -> (QuoInt(n, p^j) mod p)*Z(p)^0);
 
 ###########################################################################
 ##
@@ -86,14 +65,8 @@ end;
 ##
 ## Writes a vector in GF(p)^e as a number 0 <= n < p^e
 
-SLCR.PadictoN := function(p, e, vector)
-    local j, output;
-    output := 0;
-    for j in [1..e] do
-        output := output + p^(j-1)*IntFFE(vector[j]);
-    od;
-    return output;
-end;
+SLCR.PadictoN := {p, e, vector} ->
+    Sum([1..e], j -> p^(j-1)*IntFFE(vector[j]));
 
 ##############################################################################
 ##
@@ -128,22 +101,13 @@ end;
 ## $|T|=p^e$, $T \le bbg$
 
 SLCR.MatrixOfEndo := function(bbg, T, p, e, s)
-    local i, j, conj, stop, matrixofs;   # output
+    local i, j, matrixofs;
     # construct the matrix of the conjugation by s
     matrixofs := [];
     for i in [0 .. e-1] do
-        # the basis vectors of T are in positions p^i +1
-        conj := T[p^i + 1]^s;
-        # find conj in T
-        stop := false;
-        j := 0;
-        repeat
-            j := j+1;
-            if conj = T[j] then
-                stop := true;
-            fi;
-        until stop or j = p^e;
-        if not stop then
+        # the basis vectors of T are in positions p^i + 1
+        j := Position(T, T[p^i + 1]^s);
+        if j = fail then
             return fail;
         fi;
         Add(matrixofs, SLCR.NtoPadic(p, e, j-1));
@@ -159,14 +123,9 @@ SLCR.extractgen := function(matrixofs, endo, p, e, weights, limit)
     stop := false;
     j := 0;
     repeat
-        temp := [];
-        for k in [1 .. e] do
-            temp[k] := 0*Z(p);
-        od;
-        ans := [Z(p)^0];
-        for k in [2 .. e] do
-            ans[k] := 0*Z(p);
-        od;
+        temp := ListWithIdenticalEntries(e, 0*Z(p));
+        ans := ShallowCopy(temp);
+        ans[1] := Z(p)^0;
         for k in [1..e-1] do
             ans := ans*conj*endo;
             temp := ShallowCopy(temp);
@@ -464,26 +423,12 @@ end;
 ##
 #F SLCR.Dislodge( <bbgroup> , <trangroup> )
 ##
-## returns a generator of $G$ which does not normalize $T$
+## returns a generator of $G$ which does not normalize $T$, or fail
 
 SLCR.Dislodge := function(bbg, T)
-    local j, t, gens, tconj, gen;
-    gens := GeneratorsOfGroup(bbg);
+    local t;
     t := T[2];
-    j := One(bbg);
-    for gen in gens do
-        if IsOne(j) then
-            tconj := t^gen;
-            if not SLCR.CommutesWith(tconj, t) then
-                j := gen;
-            fi;
-        fi;
-    od;
-
-    if IsOne(j) then
-        return fail;
-    fi;
-    return j;
+    return First(GeneratorsOfGroup(bbg), gen -> not SLCR.CommutesWith(t^gen, t));
 end;
 
 ###########################################################################
@@ -719,16 +664,10 @@ end;
 ## be used in any dimension without specification; d=|Qalpha|+1.
 
 SLCR.EqualPoints := function(bbg, x, y, Qalpha)
-    local g, len, yinv, i;
-    len := Length(Qalpha);
+    local g, yinv;
     g := Qalpha[1]^x;
     yinv := y^(-1);
-    for i in [1..len] do
-        if not SLCR.CommutesWith(g, yinv*Qalpha[i]*y) then
-            return false;
-        fi;
-    od;
-    return true;
+    return ForAll(Qalpha, a -> SLCR.CommutesWith(g, yinv*a*y));
 end;
 
 ############################################################################
@@ -738,15 +677,9 @@ end;
 ## Tests whether the <point> $Q(alpha)^x$ is <on> the hyperplane $Q$.
 
 SLCR.IsOnAxis := function(bbg, x, Qalpha, Q)
-    local g, len, i;
-    len := Length(Q);
+    local g;
     g := Qalpha[1]^x;
-    for i in [1..len] do
-        if not SLCR.CommutesWith(Comm(g, Q[i]), Q[i]) then
-            return false;
-        fi;
-    od;
-    return true;
+    return ForAll(Q, a -> SLCR.CommutesWith(Comm(g, a), a));
 end;
 
 ###########################################################################
@@ -893,7 +826,7 @@ end;
 ## to apply the routine in Qgamma, we need the inverse transpose of <transv>
 
 SLCR.SLLinearCombQ := function(T, t21, c, d, w)
-    local cinv, wconj, copyw, cpower, coord, i, k, stop, vec, q, rho;
+    local cinv, wconj, copyw, cpower, coord, i, k, vec, q, rho;
     cinv := c^(-1);
     q := Length(T);
     rho := Z(q);
@@ -903,22 +836,13 @@ SLCR.SLLinearCombQ := function(T, t21, c, d, w)
     vec := [];
     for i in [2..d-1] do
         coord := Comm(wconj, t21);
-        stop := false;
-        k := 1;
-        repeat
-            if T[k] = coord then
-                stop := true;
-                if k = 1 then
-                    vec[i] := 0*rho;
-                else
-                    vec[i] := rho^(k-2);
-                fi;
-            else
-                k := k+1;
-            fi;
-        until stop or k = q+1;
-        if not stop then
+        k := Position(T, coord);
+        if k = fail then
             return fail;
+        elif k = 1 then
+            vec[i] := 0*rho;
+        else
+            vec[i] := rho^(k-2);
         fi;
         # divide out component just found and get next component into position
         wconj := wconj * cinv * coord^(-1) * c;
@@ -928,23 +852,13 @@ SLCR.SLLinearCombQ := function(T, t21, c, d, w)
     od;
 
     # find the coordinate of the first component
-    stop := false;
-    k := 1;
-    wconj := c * wconj * cinv;
-    repeat
-        if T[k] = copyw then
-            stop := true;
-            if k = 1 then
-                vec[1] := 0*rho;
-            else
-                vec[1] := rho^(k-2);
-            fi;
-        else
-            k := k+1;
-        fi;
-    until stop or k = q+1;
-    if not stop then
+    k := Position(T, copyw);
+    if k = fail then
         return fail;
+    elif k = 1 then
+        vec[1] := 0*rho;
+    else
+        vec[1] := rho^(k-2);
     fi;
     return vec;
 end;
