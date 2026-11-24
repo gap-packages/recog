@@ -133,6 +133,8 @@ true
 gap> G := Group(Z(257^2) * IdentityMat(2, GF(257)), IdentityMat(2, GF(257)));;
 gap> TryMethod(G) = NeverApplicable;
 true
+gap> TryMethod(Group([[0,1],[-1,0]])) = NeverApplicable;
+true
 gap> TryMethod(StoredOver(SL(3,2), GF(4))) = Success;
 true
 

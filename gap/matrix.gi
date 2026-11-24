@@ -172,7 +172,7 @@ end);
 #end;
 
 # Returns whether the matrix m is in the compressed representation over the
-# finite field f.
+# field f.
 RECOG.IsCompressedOverField := function(m, f)
   if Size(f) = 2 then
       return IsGF2MatrixRep(m);
@@ -221,8 +221,7 @@ function(ri)
   f := ri!.field;
   gens := GeneratorsOfGroup(G);
 
-  if not IsFinite(f)
-     or ForAll(gens, g -> RECOG.IsCompressedOverField(g, f)) then
+  if ForAll(gens, g -> RECOG.IsCompressedOverField(g, f)) then
       return NeverApplicable;
   fi;
   # GAP decides over which fields it has a compressed representation.
