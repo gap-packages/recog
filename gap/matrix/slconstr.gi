@@ -41,13 +41,13 @@ SLCR.InvProg := slp -> SLCR.PowerProg(slp, -1);
 
 ##############################################################################
 ##
-#F SLCR.BoundedOrder( <bbgroup> , <elt> , <power>, <primes> )
+#F SLCR.BoundedOrder( <elt>, <power>, <primes> )
 ##
 ## This is a subroutine needed in the sequel which takes as input an element
-## $r$ of bbg and a positive integer $n$ such that $r^n=1$ and will return
+## $r$ and a positive integer $n$ such that $r^n=1$ and will return
 ## the flag "true" if and only if $n$ is the order of $r$.
 
-SLCR.BoundedOrder := {bbg, r, n, primes} ->
+SLCR.BoundedOrder := {r, n, primes} ->
     ForAll(primes, l -> not IsOne(r^(n/l)));
 
 ###########################################################################
@@ -70,16 +70,16 @@ SLCR.PadictoN := {p, e, vector} ->
 
 ##############################################################################
 ##
-#F SLCR.AppendTran( <bbg> , <H> , <x> , <p> )
+#F SLCR.AppendTran( <H>, <x>, <p> )
 ##
 ## The idea here is that $H$ is a proper subgroup (subspace) of a transvection
-## group $T$ with parent group $bbg$. $x$ is a verified element of $T$, and
+## group $T$. $x$ is a verified element of $T$, and
 ## $dim$ is the dimension of the new subspace of $T$ spanned by $H$ and $x$.
 ## The subroutine will return this new $H$ and alter the vectors of its elms.
 
-SLCR.AppendTran := function(bbg, H, x, p)
+SLCR.AppendTran := function(H, x, p)
     local new, length, tau, i, j, y;
-    tau := One(bbg);
+    tau := One(x);
     length := Length(H);
     for i in [1..p-1] do
         tau := tau * x;
@@ -93,14 +93,14 @@ end;
 
 #############################################################################
 ##
-#F SLCR.MatrixOfEndo( <group>, <elem.ab.subgp>, <prime>, <dimension>, <automorph> )
+#F SLCR.MatrixOfEndo( <elem.ab.subgp>, <prime>, <dimension>, <automorph> )
 ##
 ## Computes the matrix of the linear transformation $s$
 ## in terms of ## the standard basis of $T$. The routine assumes
 ## that $T$ is listed in the order as in SLCR.AppendTran.
-## $|T|=p^e$, $T \le bbg$
+## $|T|=p^e$
 
-SLCR.MatrixOfEndo := function(bbg, T, p, e, s)
+SLCR.MatrixOfEndo := function(T, p, e, s)
     local i, j, matrixofs;
     # construct the matrix of the conjugation by s
     matrixofs := [];
@@ -349,7 +349,7 @@ SLCR.SL2Search := function(arg)
             if not IsBound(out.gen) then
                 if p = 2 then
                     if IsOne(r^(p^e-1)) and
-                       SLCR.BoundedOrder(bbg, r, p^e-1, primes) then
+                       SLCR.BoundedOrder(r, p^e-1, primes) then
                         out.gen := r;
                     fi;
                 elif p^e mod 4 = 3 then
@@ -357,15 +357,15 @@ SLCR.SL2Search := function(arg)
                     r := r*r;
                     primes := Difference(primes, [2]);
                     if IsOne(r^((p^e-1)/2)) and
-                       SLCR.BoundedOrder(bbg, r, (p^e-1)/2, primes) then
+                       SLCR.BoundedOrder(r, (p^e-1)/2, primes) then
                         out.gen := r;
                     fi;
                 else
                     if IsOne(r^(p^e-1)) and
-                       SLCR.BoundedOrder(bbg, r, p^e-1, primes) then
+                       SLCR.BoundedOrder(r, p^e-1, primes) then
                         out.gen := r;
                     elif IsOne(r^((p^e-1)/2)) and
-                         SLCR.BoundedOrder(bbg, r, (p^e-1)/2, primes) and
+                         SLCR.BoundedOrder(r, (p^e-1)/2, primes) and
                          not IsCentral(bbg, r^((p^e-1)/4)) then
                         out.gen := r;
                     fi;
@@ -408,7 +408,7 @@ SLCR.ConstructTranGroup := function(bbg, tran, p, e)
         elif x in H then
             count := count+1;
         else
-            SLCR.AppendTran(bbg, H, x, p);
+            SLCR.AppendTran(H, x, p);
             count := count+1;
         fi;
         if Length(H) = p^e then
@@ -433,13 +433,13 @@ end;
 
 ###########################################################################
 ##
-#F SLCR.Standardize( <bbgroup> , <trangroup> , <conj> , <gen> )
+#F SLCR.Standardize( <trangroup>, <conj>, <gen> )
 ##
 ## We found <gen> in SLCR.SL2Search to be an element of order $(q-1)$ or $(q-1)/2$
 ## <gen> will normalize two transvection groups (conjugates of $T$). We wish
 ## to conjugate <gen> to an $s$ which will normalize $T$ and $T^<conj>$.
 
-SLCR.Standardize := function(bbg, T, j, s)
+SLCR.Standardize := function(T, j, s)
     local fixed, out, t, sinv, firstconj, ytos, y, u, z, c;
     t := T[2];
     out := rec();
@@ -494,13 +494,7 @@ SLCR.SL2ReOrder := function(bbg, T, s, j, p, e)
     t := T[2];
     # handle the case of prime field first
     if e = 1 then
-        auto := function(bbg, x, pow, conj)
-            return x^IntFFE(Z(p));
-        end;
-
-        # define dummy variables
-        pow := 0;
-        conj := 0;
+        auto := x -> x^IntFFE(Z(p));
     else
         rho := PrimitiveRoot(GF(p^e));
         B := [];
@@ -511,7 +505,7 @@ SLCR.SL2ReOrder := function(bbg, T, s, j, p, e)
         weights := Coefficients(B, rho^e);
 
         #first we define the correct automorphism of $T$
-        matrixofs := SLCR.MatrixOfEndo(bbg, T, p, e, s);
+        matrixofs := SLCR.MatrixOfEndo(T, p, e, s);
         if matrixofs = fail then
             return fail;
         fi;
@@ -556,7 +550,7 @@ SLCR.SL2ReOrder := function(bbg, T, s, j, p, e)
             fi;
             conj := s^good;
 
-            auto := function(bbg, x, pow, conj)
+            auto := function(x)
                 local firstconj;
                 firstconj := x^conj;
                 return firstconj*(firstconj^pow);
@@ -567,12 +561,7 @@ SLCR.SL2ReOrder := function(bbg, T, s, j, p, e)
                 return fail;
             fi;
             conj := s^good;
-            pow := One(bbg);
-
-            auto := function(bbg, x, pow, conj)
-                return x^conj;
-            end;
-
+            auto := x -> x^conj;
         fi; # p mod 2 = 1
     fi; # e = 1
 
@@ -582,7 +571,7 @@ SLCR.SL2ReOrder := function(bbg, T, s, j, p, e)
     Tgamma := [One(bbg), t^j];
     tnew := t;
     for i in [1..p^e-2] do
-        tnew := auto(bbg, tnew, pow, conj);
+        tnew := auto(tnew);
         Add(newT, tnew);
         Add(Tgamma, tnew^j);
     od;
@@ -656,14 +645,14 @@ end;
 
 ############################################################################
 ##
-#F SLCR.EqualPoints( <bbgroup> , <x> , <y> , <Qalpha> )
+#F SLCR.EqualPoints( <x>, <y>, <Qalpha> )
 ##
 ## The most commonly used application of this routine will be to decide
 ## whether $Q(alpha)^x=Q(alpha)^y$, but it can also be used to determine
 ## whether or not an element of G normalizes Q. Note that this test can
 ## be used in any dimension without specification; d=|Qalpha|+1.
 
-SLCR.EqualPoints := function(bbg, x, y, Qalpha)
+SLCR.EqualPoints := function(x, y, Qalpha)
     local g, yinv;
     g := Qalpha[1]^x;
     yinv := y^(-1);
@@ -672,11 +661,11 @@ end;
 
 ############################################################################
 ##
-#F SLCR.IsOnAxis( <bbgroup> , <x> , <Qalpha> , <Q> )
+#F SLCR.IsOnAxis( <x>, <Qalpha>, <Q> )
 ##
 ## Tests whether the <point> $Q(alpha)^x$ is <on> the hyperplane $Q$.
 
-SLCR.IsOnAxis := function(bbg, x, Qalpha, Q)
+SLCR.IsOnAxis := function(x, Qalpha, Q)
     local g;
     g := Qalpha[1]^x;
     return ForAll(Q, a -> SLCR.CommutesWith(Comm(g, a), a));
@@ -684,14 +673,12 @@ end;
 
 ###########################################################################
 ##
-#F SLCR.IsInQ( <bbgroup> , <x> , <Q> )
+#F SLCR.IsInQ( <x>, <Q> )
 ##
 ## This is a simple test to see if a given element is in Q. It can also be
 ## used to test whether such is in a conjugate of Qa if needed.
 
-SLCR.IsInQ := function(bbg, x, Q)
-    return ForAll(Q, y -> SLCR.CommutesWith(x, y));
-end;
+SLCR.IsInQ := {x, Q} -> ForAll(Q, y -> SLCR.CommutesWith(x, y));
 
 ############################################################################
 ##
@@ -708,28 +695,28 @@ end;
 SLCR.SLConjInQ := function(bbg, y, Qgamma, Q, Tgamma, T, j, p, e, boolean)
     local U, len, lengamma, c, a0, z, b, u, stop, q, jj, i, k;
     # handle trivial case
-    if SLCR.EqualPoints(bbg, One(bbg), y, Qgamma) then
+    if SLCR.EqualPoints(One(bbg), y, Qgamma) then
         return One(bbg);
     fi;
     len := Length(Q);
     lengamma := Length(Qgamma);
     q := p^e;
     a0 := Qgamma[1];
-    if not SLCR.EqualPoints(bbg, y, y*a0, Qgamma) then
+    if not SLCR.EqualPoints(y, y*a0, Qgamma) then
         b := Qgamma[1]^y;
         stop := false;
         i := 1;
         repeat
             z := b^Tgamma[i];
-            if SLCR.EqualPoints(bbg, One(bbg), z, Q) then
-                if not SLCR.IsInQ(bbg, z, Q) then
+            if SLCR.EqualPoints(One(bbg), z, Q) then
+                if not SLCR.IsInQ(z, Q) then
                     stop := true;
                 else
                     b := Qgamma[2]^y;
                     k := 1;
                     repeat
                         z := b^Tgamma[k];
-                        if SLCR.EqualPoints(bbg, One(bbg), z, Q) then
+                        if SLCR.EqualPoints(One(bbg), z, Q) then
                             stop := true;
                         fi;
                         k := k + 1;
@@ -762,7 +749,7 @@ SLCR.SLConjInQ := function(bbg, y, Qgamma, Q, Tgamma, T, j, p, e, boolean)
         i := 1;
         repeat
             z := c * Tgamma[i];
-            if SLCR.EqualPoints(bbg, One(bbg), z, Q) then
+            if SLCR.EqualPoints(One(bbg), z, Q) then
                 stop := true;
             fi;
             i := i + 1;
@@ -788,14 +775,14 @@ SLCR.SLConjInQ := function(bbg, y, Qgamma, Q, Tgamma, T, j, p, e, boolean)
         # we are at the construction of L
         U := [One(bbg)];
         for k in [e*(i-2)+1 .. e*(i-1)] do
-            SLCR.AppendTran(bbg, U, j[k], p);
+            SLCR.AppendTran(U, j[k], p);
         od;
     else
         # j is a conjugating element
         jj := j^(i-2);
         U := [One(bbg)];
         for k in [2..e+1] do
-            SLCR.AppendTran(bbg, U, T[k]^jj, p);
+            SLCR.AppendTran(U, T[k]^jj, p);
         od;
     fi;
 
@@ -806,7 +793,7 @@ SLCR.SLConjInQ := function(bbg, y, Qgamma, Q, Tgamma, T, j, p, e, boolean)
     i := 1;
     repeat
         u := Comm(U[i], z);
-        if SLCR.EqualPoints(bbg, u, y, Qgamma) then
+        if SLCR.EqualPoints(u, y, Qgamma) then
             stop := true;
         fi;
         i := i + 1;
@@ -976,11 +963,11 @@ SLCR.SLSLPbb := function(data, x, d)
     Qgamma := List([1..d-1], j -> gens[(d-1)^2*e + (j-1)*e + 1][1]);
 
     # first modify x to normalize Q
-    if not ForAll(Q, j -> SLCR.IsInQ(bbg, xinv*j*x, Q)) then
+    if not ForAll(Q, j -> SLCR.IsInQ(xinv*j*x, Q)) then
         i := 1;
         stop := false;
         repeat
-            if not SLCR.IsOnAxis(bbg, Q[i]^(-1)*xinv, Qgamma, Q) then
+            if not SLCR.IsOnAxis(Q[i]^(-1)*xinv, Qgamma, Q) then
                 stop := true;
                 rightslp := SLCR.ProdProg(rightslp,
                     StraightLineProgram([[(d-1)*(d-2)*e+(i-1)*e+1, 1]], Length(data.gens)));
@@ -990,7 +977,7 @@ SLCR.SLSLPbb := function(data, x, d)
             fi;
         until stop or i >= d;
         if not stop then
-            if not SLCR.IsOnAxis(bbg, xinv, Qgamma, Q) then
+            if not SLCR.IsOnAxis(xinv, Qgamma, Q) then
                 u := One(bbg);
             else
                 return fail;
@@ -1006,7 +993,7 @@ SLCR.SLSLPbb := function(data, x, d)
             k := 1;
             stop := false;
             repeat
-                if SLCR.EqualPoints(bbg, data.trangpgamma[1][k], x*u, Q) then
+                if SLCR.EqualPoints(data.trangpgamma[1][k], x*u, Q) then
                     stop := true;
                 else
                     k := k+1;
@@ -1169,7 +1156,7 @@ SLCR.SL2DataStructure := function(arg)
         t := T[2];
     fi;
 
-    data2 := SLCR.Standardize(bbg, T, j1, s1);
+    data2 := SLCR.Standardize(T, j1, s1);
     if data2 = fail then
         return fail;
     fi;
@@ -1276,12 +1263,12 @@ SLCR.SL3ConstructQ := function(bbg, t, pp, e)
                 f := r;
                 u1 := u;
                 t1 := (u1^(-1)) * tinv * u1 * t;
-                SLCR.AppendTran(bbg, T1, t1, p);
+                SLCR.AppendTran(T1, t1, p);
                 Add(S, t1);
             else
                 t1new := Comm(u1, cand);
                 if not (t1new in T1) then
-                    SLCR.AppendTran(bbg, T1, t1new, p);
+                    SLCR.AppendTran(T1, t1new, p);
                 fi;
             fi;
         fi;
@@ -1334,7 +1321,7 @@ end;
 
 ##########################################################################
 ##
-#F SLCR.ComputeGamma( <bbgroup> , <f> , <Q> , <trangp> )
+#F SLCR.ComputeGamma( <f>, <Q>, <trangp> )
 ##
 ## Note. This construction will only be used in dimension 3.
 ## Q, Qalpha are given by GF(q)-generators, trangp is listed,
@@ -1342,7 +1329,7 @@ end;
 ## We construct an element <test> which conjugates alpha to gamma.
 ## At this stage, we do not need a transvection to do the job.
 
-SLCR.ComputeGamma := function(bbg, f, Q, T)
+SLCR.ComputeGamma := function(f, Q, T)
     local U, t, q, stop, i, test;
     U := List(Q, x -> x^f);
     t := T[2];
@@ -1454,14 +1441,14 @@ SLCR.SLLabelPoint := function(bbg, h, data, p, e, d)
     c := data.conj;
     t21 := data.lincombQ;
 
-    if SLCR.EqualPoints(bbg, One(bbg), h, Qgamma) then
+    if SLCR.EqualPoints(One(bbg), h, Qgamma) then
         vec := [];
         for i in [1..d-1] do
             vec[i] := 0*rho;
         od;
         vec[d] := rho^0;
 
-    elif not SLCR.IsOnAxis(bbg, h, Qgamma, Q) then
+    elif not SLCR.IsOnAxis(h, Qgamma, Q) then
         w := SLCR.SLConjInQ(bbg, h, Qgamma, Q, Tgamma, T, c, p, e, true);
         if w = fail then
             return fail;
@@ -1513,7 +1500,7 @@ SLCR.SLConstructGammaTransv := function(bbg, T, Qgamma)
     stop := false;
     repeat
         jgamma := T[i]^Qgamma[1];
-        if SLCR.EqualPoints(bbg, T[2]^jgamma, One(bbg), Qgamma) then
+        if SLCR.EqualPoints(T[2]^jgamma, One(bbg), Qgamma) then
             stop := true;
         fi;
         i := i + 1;
@@ -1526,12 +1513,12 @@ end;
 
 ###########################################################################
 ##
-#F SLCR.SLExchangeL(<data>, <GF(q) basis>, <GF(q) basis>, <GF(p) basis>, <dim> )
+#F SLCR.SLExchangeL( <data>, <GF(q) basis>, <GF(q) basis>, <GF(p) basis> )
 ##
 ## After recursion, we have to choose between Llambda and its inverse
 ## transpose. In fact, we shall exchange Q and Qgamma
 
-SLCR.SLExchangeL := function(data, Q, Qgamma, pQ, d)
+SLCR.SLExchangeL := function(data, Q, Qgamma, pQ)
     local i, j, stop, p, e, q, bbg, t21, b1, trangp, t31, comm, temp;
     bbg := data.bbg;
     t21 := data.t21;
@@ -1560,7 +1547,7 @@ SLCR.SLExchangeL := function(data, Q, Qgamma, pQ, d)
     repeat
         comm := Comm(pQ[(i-1)*e+j], t21);
         if not (comm in trangp) then
-            SLCR.AppendTran(bbg, trangp, comm, p);
+            SLCR.AppendTran(trangp, comm, p);
         fi;
         j := j+1;
     until Length(trangp) = q or j > e;
@@ -1720,7 +1707,7 @@ SLCR.SL3DataStructure := function(bbg, p, e)
     finv := f^(-1);
     T1finv := List(T1, x -> f*x*finv);
     T := List(T1finv, x -> x^(-1) * t1inv * x * t1);
-    jgamma := SLCR.ComputeGamma(bbg, f, [t, t1], T);
+    jgamma := SLCR.ComputeGamma(f, [t, t1], T);
     if jgamma = fail then
         return fail;
     fi;
@@ -1762,7 +1749,7 @@ SLCR.QuickSL3DataStructure := function(bbg, p, e)
     finv := f^(-1);
     T1finv := List(T1, x -> f*x*finv);
     T := List(T1finv, x -> x^(-1) * t1inv * x * t1);
-    jgamma := SLCR.ComputeGamma(bbg, f, [t, t1], T);
+    jgamma := SLCR.ComputeGamma(f, [t, t1], T);
     if jgamma = fail then
         return fail;
     fi;
@@ -1820,14 +1807,14 @@ SLCR.SLFindGenerators := function(bbg, data1, r, p, e, d)
     # LQ/Q is generated by Lgen and all but first e elements of pQalpha
     Tgamma := [One(bbg)];
     for i in [1..e] do
-        SLCR.AppendTran(bbg, Tgamma, jgammainv * pQalpha[i] * jgamma, p);
+        SLCR.AppendTran(Tgamma, jgammainv * pQalpha[i] * jgamma, p);
     od;
 
     for i in [e+1 .. Length(pQalpha)] do
         j := 1;
         stop := false;
         repeat
-            if SLCR.EqualPoints(bbg, pQalpha[i], data1.T[j], Qgamma) then
+            if SLCR.EqualPoints(pQalpha[i], data1.T[j], Qgamma) then
                 u := data1.T[j];
                 stop := true;
             else
@@ -1983,7 +1970,7 @@ SLCR.SLDataStructure := function(bbg, p, e, d)
         return fail;
     fi;
 
-    vectors := SLCR.SLExchangeL(data2, Q, Qgamma, pQ, d);
+    vectors := SLCR.SLExchangeL(data2, Q, Qgamma, pQ);
     if vectors = fail then
         return fail;
     fi;
