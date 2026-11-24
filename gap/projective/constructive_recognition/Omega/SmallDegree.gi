@@ -287,6 +287,7 @@ end;
 # delta to e_1, and E(-a) for f_1 g = f_1 + a + c e_1 maps f_1 g to f_1,
 # as the images stay singular. What is left fixes e_1 and f_1, so it is
 # the identity for "O", of determinant 1, and a power of W.rot for "O-".
+# Returns fail if g does not lie in Omega.
 RECOG.Omega_RankOneRewrite := function(W, g)
   local word, mult, root, k;
 
@@ -309,6 +310,9 @@ RECOG.Omega_RankOneRewrite := function(W, g)
 
   if IsZero(g[1, 1]) then
     mult(W.s, W.smat);
+    if IsZero(g[1, 1]) then
+      return fail;
+    fi;
   fi;
   root(W.Fw, W.Fmat, W.Fbasis, -g[1]{W.pos} / g[1, 1]);
   k := LogFFE(g[1, 1], W.deltamat[1, 1]);

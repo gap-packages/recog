@@ -123,8 +123,7 @@ gap> CheckRankOneRewrite := function(e, d, q)
 >         x := PseudoRandom(G);
 >         return ResultOfStraightLineProgram(RECOG.Form_Rewrite(W, x), std)
 >                = x;
->     end) and ForAll(GeneratorsOfGroup(SO(e, d, q)), x -> x in G
->                     or RECOG.Form_Rewrite(W, x) = fail);
+>     end);
 > end;;
 gap> ForAll([2, 3, 4, 5, 9, 11, 16], q -> CheckRankOneRewrite(-1, 4, q));
 true
@@ -136,6 +135,19 @@ true
 gap> ForAll([37, 41, 49, 81], q -> CheckLeaf(0, 3, q));
 true
 gap> ForAll([3, 5, 9, 37], q -> CheckRankOneRewrite(0, 3, q));
+true
+
+# The rewriting fails for matrices outside Omega: diag(gamma, gamma^-1, 1)
+# has spinor norm gamma, and a matrix which maps e_1 to w_1 preserves no
+# form
+gap> ForAll([["O", 3, 37], ["O-", 4, 11]], function(c)
+>     local f, W;
+>     f := GF(c[3]);
+>     W := RECOG.Form_RewriteSetup(c[1], c[2], f);
+>     return RECOG.Form_Rewrite(W, RECOG.EmbedBlock(c[2], f, [1, 2],
+>                [[Z(c[3]), 0], [0, Z(c[3])^-1]])) = fail
+>            and RECOG.Form_Rewrite(W, PermutationMat((1, 3), c[2], f)) = fail;
+> end);
 true
 
 # Omega(3,31) has 993 points and is left to the other methods
