@@ -20,7 +20,8 @@
 # StandardGenerators of [EHNPR] (see ../GoingDown.gi), 'Outline of the
 # algorithm', for Omega^+-(d,q), d >= 8 even, and Omega(d,q), d >= 9 odd
 # and q odd: GoingDown to Omega^+-(8,q), FinalDescent to Omega^+(6,q), and
-# GoingUp (see ../GoingUp.gi). The type comes from the parity of d and the
+# GoingUp (see ../GoingUp.gi). Degree 5 is left to
+# RECOG.FindStdGens_SmallOmega. The type comes from the parity of d and the
 # discriminant resp., for q even, the Arf invariant of the invariant form.
 # A FinalDescent which uses up its random selections restarts GoingDown,
 # which has no naming test.
@@ -39,8 +40,9 @@ RECOG.FindStdGens_Omega := function(G)
   if IsEvenInt(Size(f)) and IsOddInt(d) then
     ErrorNoReturn("RECOG.FindStdGens_Omega: odd degree needs odd q");
   fi;
-  if d < 8 then
-    ErrorNoReturn("RECOG.FindStdGens_Omega: the degree must be at least 8");
+  if d < 8 and d <> 5 then
+    ErrorNoReturn("RECOG.FindStdGens_Omega: the degree must be 5 or at ",
+                  "least 8");
   fi;
   if not IsObjWithMemory(GeneratorsOfGroup(G)[1]) then
     G := GroupWithMemory(G);
@@ -52,6 +54,9 @@ RECOG.FindStdGens_Omega := function(G)
   else
     type := RECOG.FormOrthogonalType(
                 RECOG.ClassicalInvariantForm("O+", gens, f), IdentityMat(d, f));
+  fi;
+  if d < 8 then
+    return RECOG.FindStdGens_SmallOmega(G, type);
   fi;
   form := RECOG.ClassicalInvariantForm(type, gens, f);
 
