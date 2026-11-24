@@ -596,8 +596,8 @@ RECOG.ComputeExtractionLayerLengths := function(blocks)
 end;
 
 RECOG.FindKernelLowerLeftPGroup := function(ri)
-    local basisOfFieldExtension,curlay,done,el,f,i,l,lens,lvec,nothingnew,pivots,pos,ready,
-          rifac,s,v,x,y;
+    local basisOfFieldExtension,curlay,done,el,extractLayer,f,i,l,lens,lvec,
+          nothingnew,pivots,pos,ready,rifac,s,v,x,y;
 
     Info(InfoRecog, 2, "Running FindKernelLowerLeftPGroup...");
     f := ri!.field;
@@ -617,6 +617,17 @@ RECOG.FindKernelLowerLeftPGroup := function(ri)
         basisOfFieldExtension := fail;
     fi;
 
+    # In a projective node an element of the kernel is a scalar multiple of a
+    # matrix with identity diagonal blocks. The vectors belong to the latter.
+    extractLayer := function(x, layer)
+        x := StripMemory(x);
+        if ri!.projective and not IsOne(x[1,1]) then
+            x := x[1,1]^-1 * x;
+        fi;
+        return RECOG.ExtractLowStuff(x,layer,ri!.blocks,lens,
+                                     basisOfFieldExtension);
+    end;
+
     nothingnew := 0;   # we count until we produced 10 new generators
                        # giving no new dimension
     rifac := ImageRecogNode(ri);
@@ -629,7 +640,7 @@ RECOG.FindKernelLowerLeftPGroup := function(ri)
 
         # Now clean out this vector and remember what we did:
         curlay := 1;
-        v := RECOG.ExtractLowStuff(x,curlay,ri!.blocks,lens,basisOfFieldExtension);
+        v := extractLayer(x,curlay);
         Assert(1, not IsOne(x) or IsZero(v));
         pos := PositionNonZero(v);
         i := 1;
@@ -640,7 +651,7 @@ RECOG.FindKernelLowerLeftPGroup := function(ri)
             while pos > Length(v) do
                 curlay := curlay + 1;
                 if curlay <= Length(lens) then
-                    v := RECOG.ExtractLowStuff(x,curlay,ri!.blocks,lens,basisOfFieldExtension);
+                    v := extractLayer(x,curlay);
                     Assert(1, not IsOne(x) or IsZero(v));  # IsOne(x) should imply IsZero(v)
                     pos := PositionNonZero(v);
                 else
@@ -714,13 +725,14 @@ end;
 SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
   # First project and calculate the vector:
   local done,h,i,l,layer,pow;
-  # Take care of the projective case:
-  if ri!.projective and not IsOne(g[1,1]) then
-      g := (g[1,1]^-1) * g;
-  fi;
   l := [];
   i := 1;
   for layer in [1..Length(ri!.lens)] do
+      # Take care of the projective case. The nice generators carry scalars
+      # as well, so do it for every layer.
+      if ri!.projective and not IsOne(g[1,1]) then
+          g := (g[1,1]^-1) * g;
+      fi;
       h := RECOG.ExtractLowStuff(g,layer,ri!.blocks,ri!.lens,
                                  ri!.basisOfFieldExtension);
       while i <= Length(ri!.gensNvectors) and ri!.gensNpivots[i][1] = layer do
