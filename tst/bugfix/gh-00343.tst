@@ -12,7 +12,7 @@ gap> blocks := [ [ 1 .. 11 ], [ 12 .. 22 ], [ 23 .. 33 ], [ 34 .. 44 ],
 gap> lens := [ 1946, 1815, 1694, 1573, 1452, 1331, 1210, 1100, 1089, 968,
 >   957, 847, 726, 605, 484, 363, 242, 121 ];;
 gap> x := IdentityMat(198, GF(2));;
-gap> IsZero(RECOG.ExtractLowStuff(x, 6, blocks, lens, fail));
+gap> IsZero(RECOG.ExtractLowStuff(x, 6, blocks, lens, fail, false));
 true
 
 #
