@@ -28,9 +28,9 @@
 ##  exterior square. The space of Omega^-(6,q) has type + over GF(q^2), and
 ##  the preimage of Omega^-(6,q) in SL(4,q^2) is a conjugate of SU(4,q).
 ##
-##  Omega^-(4,q) = SL(2,q^2)/<-1> has one hyperbolic pair, for which
-##  RECOG.Form_Rewrite has no root elements; it is rewritten by
-##  RECOG.Omega_RankOneRewrite.
+##  Omega^-(4,q) = SL(2,q^2)/<-1> and, for q odd, Omega(3,q) = SL(2,q)/<-1>
+##  have one hyperbolic pair, for which RECOG.Form_Rewrite has no root
+##  elements; they are rewritten by RECOG.Omega_RankOneRewrite.
 ##
 #############################################################################
 
@@ -133,21 +133,30 @@ RECOG.FindStdGens_SmallOmega := function(G, type)
               bas := B, basi := Bi );
 end;
 
-# The covering group SL(2,q^2) of Omega^-(4,q), q = Size(<f>); <type> is
-# "O-" and <d> is 4. Returns a record with the components `field` and
+# The covering group SL(2,F) of Omega(<d>,q) of rank one, q = Size(<f>):
+# type "O" with d = 3 and q odd, where F = GF(q), or "O-" with d = 4,
+# where F = GF(q^2). Returns a record with the components `field` and
 # `lift` of RECOG.Omega_SmallDegreeCover.
 # A in SL(2,q^2) acts on the hermitian 2x2 matrices X over GF(q^2), a
 # space of dimension 4 over GF(q), by X -> conj(A)^T X A, and preserves
 # Q = det, which has the standard basis E_11, E_22, E_12 + E_21,
 # alpha E_12 - alpha E_21 for q odd, alpha^2 = Z(q), resp. E_11, E_22,
-# E_12 + E_21, h E_12 + h^q E_21 for q even, h = Z(q^2). Relative to the
-# basis E_11, E_12, E_21, E_22 this map is the Kronecker product of conj(A)
-# with A, whose 2x2 blocks are multiples of A.
+# E_12 + E_21, h E_12 + h^q E_21 for q even, h = Z(q^2). A in SL(2,q) acts
+# on the 2x2 matrices of trace 0 by X -> A^-1 X A and preserves Q = det,
+# with the standard basis E_12, -E_21, (E_11 - E_22) / 2; the identity
+# matrix spans a fixed complement. Relative to the basis E_11, E_12, E_21,
+# E_22 these maps are the Kronecker products of conj(A) resp. A^-T with A,
+# whose 2x2 blocks are multiples of A.
 RECOG.Omega_RankOneCover := function(type, d, f)
   local q, F, one, P, star, Pi, alpha;
 
   q := Size(f);
-  if type = "O-" and d = 4 then
+  if type = "O" and d = 3 and IsOddInt(q) then
+    F := f;
+    one := One(F);
+    P := [[0, 1, 0, 0], [0, 0, -1, 0], [1/2, 0, 0, -1/2], [1, 0, 0, 1]] * one;
+    star := A -> [[A[2, 2], -A[2, 1]], [-A[1, 2], A[1, 1]]];
+  elif type = "O-" and d = 4 then
     F := GF(q^2);
     one := One(F);
     if IsEvenInt(q) then
@@ -167,6 +176,9 @@ RECOG.Omega_RankOneCover := function(type, d, f)
   return rec( field := F, lift := function(M)
     local K, pos, A, lambda;
 
+    if d = 3 then
+      M := DirectSumMat(M, [[one]]);
+    fi;
     K := Pi * M * P;
     # a nonzero block
     pos := First(Cartesian([1, 2], [1, 2]),
@@ -185,9 +197,10 @@ RECOG.Omega_RankOneCover := function(type, d, f)
   end );
 end;
 
-# RECOG.FindStdGens_Omega for Omega^-(4,q): as RECOG.FindStdGens_SmallOmega,
-# with the covering group SL(2,q^2) of RECOG.Omega_RankOneCover, recognised
-# by RECOG.RecogniseSL2Natural.
+# RECOG.FindStdGens_Omega for the groups of rank one, Omega(3,q) with q
+# odd and Omega^-(4,q): as RECOG.FindStdGens_SmallOmega, with the covering
+# group SL(2,F) of RECOG.Omega_RankOneCover, recognised by
+# RECOG.RecogniseSL2Natural.
 RECOG.FindStdGens_RankOneOmega := function(G, type)
   local f, d, gens, form, B, Bi, cover, A, sl, fake, Y, std, words, i;
 
@@ -225,7 +238,7 @@ RECOG.FindStdGens_RankOneOmega := function(G, type)
 end;
 
 # The data for RECOG.Omega_RankOneRewrite in Omega(<d>,q) of type <type>
-# with one hyperbolic pair, q = Size(<f>): "O-" with d = 4. With A
+# of rank one, q = Size(<f>): "O" with d = 3 or "O-" with d = 4. With A
 # the anisotropic part, the conjugates of t by the powers of delta are
 # Siegel transformations F(a): e_1 -> e_1 + a + c f_1, which fix f_1, and
 # their conjugates by s are E(a): f_1 -> f_1 + a + c e_1, which fix e_1.
@@ -268,12 +281,12 @@ RECOG.Omega_RankOneRewriteSetup := function(type, d, f)
   return res;
 end;
 
-# RECOG.Form_Rewrite for the groups with one hyperbolic pair: e_1 g = x e_1 + y f_1 + a
+# RECOG.Form_Rewrite for the groups of rank one: e_1 g = x e_1 + y f_1 + a
 # with a in A; if x = 0 then a = 0, as A is anisotropic, and s swaps the
 # lines of e_1 and f_1. Then F(-a / x) maps e_1 g to x e_1, a power of
 # delta to e_1, and E(-a) for f_1 g = f_1 + a + c e_1 maps f_1 g to f_1,
 # as the images stay singular. What is left fixes e_1 and f_1, so it is
-# a power of W.rot.
+# the identity for "O", of determinant 1, and a power of W.rot for "O-".
 RECOG.Omega_RankOneRewrite := function(W, g)
   local word, mult, root, k;
 

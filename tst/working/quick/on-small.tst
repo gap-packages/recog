@@ -129,6 +129,26 @@ gap> CheckRankOneRewrite := function(e, d, q)
 gap> ForAll([2, 3, 4, 5, 9, 11, 16], q -> CheckRankOneRewrite(-1, 4, q));
 true
 
+# Omega(3,q), q odd, through SL(2,q); q = 37 is the smallest with more than
+# 1000 points
+gap> ForAll([3, 5, 7, 9, 37, 49], q -> CheckFindStdGens(0, 3, q));
+true
+gap> ForAll([37, 41, 49, 81], q -> CheckLeaf(0, 3, q));
+true
+gap> ForAll([3, 5, 9, 37], q -> CheckRankOneRewrite(0, 3, q));
+true
+
+# Omega(3,31) has 993 points and is left to the other methods
+gap> ri := RECOG.TestGroup(Omega(3, 31), true, Size(Omega(3, 31)));;
+gap> ri!.fhmethsel.successMethod;
+"StabilizerChainProj"
+
+# SO(3,37) is Omega(3,37) extended by an element of spinor norm -1
+gap> ri := ImageRecogNode(RECOG.TestGroup(SO(3, 37), false, Size(SO(3, 37))));;
+gap> [ri!.fhmethsel.successMethod, Size(ImageRecogNode(ri)),
+>    KernelRecogNode(ri)!.fhmethsel.successMethod];
+[ "ClassicalNatural", 2, "ClassicalNatural" ]
+
 # Omega^+(4,q) is not quasisimple and no leaf
 gap> ri := RECOG.TestGroup(Omega(1, 4, 11), true, Size(Omega(1, 4, 11)) / 2);;
 gap> IsLeaf(ri);

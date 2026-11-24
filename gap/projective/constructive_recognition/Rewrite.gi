@@ -151,13 +151,13 @@ end;
 # generators with memory of a trivial group, as only the words matter, the
 # pair cycle v, and the words for the residues which the torus leaves (see
 # RECOG.Form_Rewrite). Since the memory of these generators grows with
-# every call, callers replace the record after a while. Omega^-(4,q),
-# with one hyperbolic pair, has its own data and rewriting in
-# Omega/SmallDegree.gi.
+# every call, callers replace the record after a while. The orthogonal
+# groups with one hyperbolic pair, Omega^-(4,q) and Omega(3,q), have their
+# own data and rewriting in Omega/SmallDegree.gi.
 RECOG.Form_RewriteSetup := function(type, d, f)
   local std, Y, R, res, O, P, Pmat, alpha, Rot;
 
-  if type = "O-" and d = 4 then
+  if (type = "O-" and d = 4) or (type = "O" and d = 3) then
     return RECOG.Omega_RankOneRewriteSetup(type, d, f);
   fi;
   std := RECOG.ClassicalStandardGenerators(type, d, f);

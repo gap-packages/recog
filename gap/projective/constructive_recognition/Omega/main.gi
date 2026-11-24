@@ -21,7 +21,7 @@
 # algorithm', for Omega^+-(d,q), d >= 8 even, and Omega(d,q), d >= 9 odd
 # and q odd: GoingDown to Omega^+-(8,q), FinalDescent to Omega^+(6,q), and
 # GoingUp (see ../GoingUp.gi). Degrees 5 and 6 are left
-# to RECOG.FindStdGens_SmallOmega and Omega^-(4,q) to
+# to RECOG.FindStdGens_SmallOmega, Omega^-(4,q) and Omega(3,q) to
 # RECOG.FindStdGens_RankOneOmega; Omega^+(4,q), a central product of two
 # SL(2,q), is not supported. The type comes from the parity of d and the
 # discriminant resp., for q even, the Arf invariant of the invariant form.
@@ -42,8 +42,8 @@ RECOG.FindStdGens_Omega := function(G)
   if IsEvenInt(Size(f)) and IsOddInt(d) then
     ErrorNoReturn("RECOG.FindStdGens_Omega: odd degree needs odd q");
   fi;
-  if d < 4 then
-    ErrorNoReturn("RECOG.FindStdGens_Omega: the degree must be at least 4");
+  if d < 3 then
+    ErrorNoReturn("RECOG.FindStdGens_Omega: the degree must be at least 3");
   fi;
   if not IsObjWithMemory(GeneratorsOfGroup(G)[1]) then
     G := GroupWithMemory(G);
