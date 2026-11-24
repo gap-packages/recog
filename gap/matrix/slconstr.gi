@@ -79,10 +79,10 @@ SLCR.BoundedOrder := function(bbg, r, n, primes)
     local prime;
     for prime in primes do
         if IsOne(r^(n/prime)) then
-            return (false);
+            return false;
         fi;
     od;
-    return (true);
+    return true;
 end;
 
 ###########################################################################
@@ -128,10 +128,10 @@ SLCR.IS_IN_CENTRE := function(bbg, x)
     gens := GeneratorsOfGroup(bbg);
     for gen in gens do
         if not One(bbg) = Comm(x, gen) then
-            return (false);
+            return false;
         fi;
     od;
-    return (true);
+    return true;
 end;
 
 
@@ -323,18 +323,18 @@ SLCR.FindGoodElement := function(bbg, p, e, d, limit)
                     if ((not One(bbg) = v^7) and (not One(bbg) = v^9)) or
                        ((not One(bbg) = v^3) and (One(bbg) = v^9)) then
                         Info(InfoRecog, 3, "SLCR.FindGoodElement with i=", i, "  limit=", limit);
-                        return (r);
+                        return r;
                     fi;
                 elif (e*(d-2) = 2) and (p+1 = 2^(Log(p+1, 2))) then
                     # p is Mersenne prime
                     w := 2*z/collect2s(z);
                     if not One(bbg) = v^w then #4/|v|
                         Info(InfoRecog, 3, "SLCR.FindGoodElement with i=", i, "  limit=", limit);
-                        return (r);
+                        return r;
                     fi;
                 elif not One(bbg) = v^psi then
                     Info(InfoRecog, 3, "SLCR.FindGoodElement with i=", i, "  limit=", limit);
-                    return (r);
+                    return r;
                 fi;
             fi;
 
@@ -507,7 +507,7 @@ SLCR.SL2Search := function(arg)
         fi;  # One(bbg)=r
         count := count+1;
         if IsBound(out.tran) and IsBound(out.gen) then
-            return (out);
+            return out;
         fi;
     od;
     return fail;
@@ -551,7 +551,7 @@ SLCR.ConstructTranGroup := function(bbg, tran, p, e)
             count := count+1;
         fi;
         if Length(H) = p^e then
-            return (H);
+            return H;
         fi;
 
     od;
@@ -715,7 +715,7 @@ SLCR.SL2ReOrder := function(bbg, T, s, j, p, e)
             auto := function(bbg, x, pow, conj)
                 local firstconj;
                 firstconj := x^conj;
-                return (firstconj*(firstconj^pow));
+                return firstconj*(firstconj^pow);
             end;
         else # case of p=2
             good := SLCR.extractgen(matrixofs, IdentityMat(e, GF(p)), p, e, weights, p^e-1);
@@ -1530,7 +1530,7 @@ SLCR.LDataStructure := function(bbg, p, e, T, x)
     local gens, lbbg;
     gens := Concatenation(List([1..e], y -> T[p^(y-1)+1]), [x]);
     lbbg := SubgroupNC(bbg, gens);
-    return (SLCR.SL2DataStructure(lbbg, p, e, T, x));
+    return SLCR.SL2DataStructure(lbbg, p, e, T, x);
 end;
 
 ##########################################################################
