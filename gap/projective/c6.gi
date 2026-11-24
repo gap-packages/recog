@@ -202,6 +202,12 @@ RECOG.RadBasis:=function(r,n,q,rad)
 end;
 
 
+# Let E be an extraspecial r-group, or one of symplectic type, modulo scalars.
+# Then E/Z(E) is a vector space over GF(r), and the commutator is a
+# non-degenerate alternating form on it: [x,y] = w^B(xZ,yZ) for a fixed
+# central element w of order r. A hyperbolic pair is a pair of matrices a, b
+# in E with B(aZ,bZ) <> 0, so [a,b] is a scalar matrix other than the identity.
+#
 # For a hyperbolic pair a, b: a basis of one eigenspace of a, followed by its
 # images under b, ..., b^(r-1), which are bases of the other eigenspaces.
 # Returns fail if a has no eigenspace of dimension r^(n-1) over GF(newq).
