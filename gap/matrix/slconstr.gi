@@ -1848,8 +1848,7 @@ return fail;
 
    SLCR.AttachSLNewgens(data2, data3, d, jgamma);
    if Length(data2.gens) < d * (d-1) * e then
-      Print("failed in Attach in dim=", d, "\n");
-Error("attach");
+      Info(InfoRecog, 2, "SLCR: failed in Attach in dim=", d);
 return fail;
    fi;
 
@@ -2198,6 +2197,9 @@ return fail;
 return fail;
    fi;
    data3 := SLCR.SLConstructBasisQ(bbg, data2, vectors[1], vectors[2], d, q);
+   if data3 = fail then
+return fail;
+   fi;
    data2 := SLCR.SLFinishConstruction(bbg,data2,data3,d);
 return data2;
 end;
@@ -2498,6 +2500,11 @@ SLCR.FindHom := function(ri,G,d,q)
   SetFilterObj(ri,IsLeaf);
   SetNiceGens(ri,StripMemory(genlist));
   Setslptonice(ri,SLPOfElms(genlist));
+
+  # G is a quotient of SL(d,q) by a central subgroup, and data.centre is the
+  # image of a generator of the centre of SL(d,q).
+  SetSize(ri,Product([0..d-1],i->q^d-q^i) / ((q-1)*Gcd(d,q-1))
+             * OrderFunc(ri)(data.centre));
   return Success;
 end;
 
