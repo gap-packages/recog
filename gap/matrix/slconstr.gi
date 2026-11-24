@@ -85,6 +85,24 @@ SLCR.BoundedOrder := {r, n, primes} ->
 
 ###########################################################################
 ##
+#F SLCR.FirstImage( <list>, <f>, <prop> )
+##
+## The first f(x), x in <list>, satisfying <prop>, or fail. Unlike
+## First(List(list, f), prop), it evaluates f only up to that x.
+
+SLCR.FirstImage := function(list, f, prop)
+    local x, y;
+    for x in list do
+        y := f(x);
+        if prop(y) then
+            return y;
+        fi;
+    od;
+    return fail;
+end;
+
+###########################################################################
+##
 #F SLCR.NtoPadic( <prime> , <power>, <number> )
 ##
 ## Writes a number 0 <= n < p^e in base p
@@ -151,11 +169,9 @@ end;
 ############################################
 
 SLCR.extractgen := function(matrixofs, endo, p, e, weights, limit)
-    local conj, j, stop, temp, ans, k;
+    local conj, j, temp, ans, k;
     conj := IdentityMat(e, GF(p));
-    stop := false;
-    j := 0;
-    repeat
+    for j in [0..limit-1] do
         temp := ListWithIdenticalEntries(e, 0*Z(p));
         ans := ShallowCopy(temp);
         ans[1] := Z(p)^0;
@@ -169,13 +185,11 @@ SLCR.extractgen := function(matrixofs, endo, p, e, weights, limit)
         temp := ShallowCopy(temp);
         temp[1] := temp[1] + weights[1];
         if ans = temp then
-            stop := true;
-        else
-            j := j+1;
-            conj := conj*matrixofs;
+            return j;
         fi;
-    until stop or j = limit;
-    return j;
+        conj := conj*matrixofs;
+    od;
+    return limit;
 end;
 
 ##############################################################################
@@ -523,7 +537,7 @@ end;
 SLCR.SL2ReOrder := function(bbg, T, s, j, p, e)
     local auto, newT, Tgamma, B, images, matrixofs, matrixofpow, row, count,
           autom, setofimages, position, good, stop, pow, conj, weights, rho,
-          tnew, out, t, u, newTgamma, i;
+          tnew, t, u, i;
     t := T[2];
     # handle the case of prime field first
     if e = 1 then
@@ -614,27 +628,13 @@ SLCR.SL2ReOrder := function(bbg, T, s, j, p, e)
     # what we do below is to compute the label of the point alpha^Tgamma[2]
     # and replace Tgamma[2] by an element of its transvection group
     u := newT[2]^Tgamma[2];
-    i := 2;
-    stop := false;
-    repeat
-        if SLCR.CommutesWith(Tgamma[2]^newT[i], u) then
-            stop := true;
-            if i > 2 then
-                newTgamma := [One(bbg)];
-                Append(newTgamma, Tgamma{[i..p^e]});
-                Append(newTgamma, Tgamma{[2..i-1]});
-            else
-                newTgamma := Tgamma;
-            fi;
-        else
-            i := i+1;
-        fi;
-    until stop or i = p^e+1;
-    if not stop then
+    i := PositionProperty(newT, x -> SLCR.CommutesWith(Tgamma[2]^x, u), 1);
+    if i = fail then
         return fail;
+    elif i > 2 then
+        Tgamma := Concatenation([One(bbg)], Tgamma{[i..p^e]}, Tgamma{[2..i-1]});
     fi;
-    out := rec(trangp := newT, trangpgamma := newTgamma);
-    return out;
+    return rec(trangp := newT, trangpgamma := Tgamma);
 end;
 
 #############################################################################
@@ -707,93 +707,45 @@ SLCR.IsInQ := {x, Q} -> ForAll(Q, y -> SLCR.CommutesWith(x, y));
 ## we consider only the case conjugating Q(gamma) to somewhere
 
 SLCR.SLConjInQ := function(bbg, y, Qgamma, Q, Tgamma, T, j, p, e, boolean)
-    local U, len, lengamma, c, a0, z, b, u, stop, q, jj, i, k;
+    local U, c, a0, z, b, jj, i, k, normalizesQ;
     # handle trivial case
     if SLCR.EqualPoints(One(bbg), y, Qgamma) then
         return One(bbg);
     fi;
-    len := Length(Q);
-    lengamma := Length(Qgamma);
-    q := p^e;
+    normalizesQ := x -> SLCR.EqualPoints(One(bbg), x, Q);
     a0 := Qgamma[1];
     if not SLCR.EqualPoints(y, y*a0, Qgamma) then
         b := Qgamma[1]^y;
-        stop := false;
-        i := 1;
-        repeat
-            z := b^Tgamma[i];
-            if SLCR.EqualPoints(One(bbg), z, Q) then
-                if not SLCR.IsInQ(z, Q) then
-                    stop := true;
-                else
-                    b := Qgamma[2]^y;
-                    k := 1;
-                    repeat
-                        z := b^Tgamma[k];
-                        if SLCR.EqualPoints(One(bbg), z, Q) then
-                            stop := true;
-                        fi;
-                        k := k + 1;
-                    until stop or k = q+1;
-                    if not stop then
-                        return fail;
-                    fi;
-                fi;
-            fi;
-            i := i + 1;
-        until stop or i = q+1;
-        if not stop then
-            return fail;
+        z := SLCR.FirstImage(Tgamma, t -> b^t, normalizesQ);
+        if z <> fail and SLCR.IsInQ(z, Q) then
+            b := Qgamma[2]^y;
+            z := SLCR.FirstImage(Tgamma, t -> b^t, normalizesQ);
         fi;
     else # a0 normalizes Qgamma^y
-        stop := false;
-        i := 1;
-        repeat
-            c := Comm(a0, Qgamma[i]^y);
-            if not IsOne(c) then
-                stop := true;
-            fi;
-            i := i + 1;
-        until stop or i = lengamma+1;
-        if not stop then
+        c := SLCR.FirstImage(Qgamma, a -> Comm(a0, a^y), x -> not IsOne(x));
+        if c = fail then
             return fail;
         fi;
-
-        stop := false;
-        i := 1;
-        repeat
-            z := c * Tgamma[i];
-            if SLCR.EqualPoints(One(bbg), z, Q) then
-                stop := true;
-            fi;
-            i := i + 1;
-        until stop or i = q+1;
-        if not stop then
-            return fail;
-        fi;
+        z := SLCR.FirstImage(Tgamma, t -> c * t, normalizesQ);
+    fi;
+    if z = fail then
+        return fail;
     fi;
 
-    stop := false;
-    i := 1;
-    repeat
-        if not SLCR.CommutesWith(Q[i], z) then
-            stop := true;
-        fi;
-        i := i + 1;
-    until stop or i = len + 1;
-    if not stop then
+    i := PositionProperty(Q, a -> not SLCR.CommutesWith(a, z));
+    if i = fail then
         return fail;
     fi;
 
     if not boolean then
         # we are at the construction of L
         U := [One(bbg)];
-        for k in [e*(i-2)+1 .. e*(i-1)] do
+        for k in [e*(i-1)+1 .. e*i] do
             SLCR.AppendTran(U, j[k], p);
         od;
     else
         # j is a conjugating element
-        jj := j^(i-2);
+        jj := j^(i-1);
         U := [One(bbg)];
         for k in [2..e+1] do
             SLCR.AppendTran(U, T[k]^jj, p);
@@ -802,21 +754,7 @@ SLCR.SLConjInQ := function(bbg, y, Qgamma, Q, Tgamma, T, j, p, e, boolean)
 
     # in any case, U is the listing of the trans group in Q not commuting
     # with z
-
-    stop := false;
-    i := 1;
-    repeat
-        u := Comm(U[i], z);
-        if SLCR.EqualPoints(u, y, Qgamma) then
-            stop := true;
-        fi;
-        i := i + 1;
-    until stop or i = q+1;
-    if not stop then
-        return fail;
-    fi;
-
-    return u;
+    return SLCR.FirstImage(U, a -> Comm(a, z), u -> SLCR.EqualPoints(u, y, Qgamma));
 end;
 
 ############################################################################
@@ -941,8 +879,8 @@ end;
 ## generators in the data structure
 
 SLCR.SLSLPbb := function(data, x, d)
-    local p, e, q, bbg, W, rightslp, i, j, k, stop, gens, xinv, Q, Qgamma, y,
-          u, vec, mat, det, exp, slprog, smat, slp, W2, gcd, cent, centprog;
+    local p, e, q, bbg, W, rightslp, i, j, gens, xinv, Q, Qgamma, y, u, vec,
+          mat, det, exp, slprog, smat, slp, W2, gcd, centprog;
 
     p := data.prime;
     e := data.power;
@@ -957,23 +895,14 @@ SLCR.SLSLPbb := function(data, x, d)
 
     # first modify x to normalize Q
     if not ForAll(Q, j -> SLCR.IsInQ(xinv*j*x, Q)) then
-        i := 1;
-        stop := false;
-        repeat
-            if not SLCR.IsOnAxis(Q[i]^(-1)*xinv, Qgamma, Q) then
-                stop := true;
-                rightslp := SLCR.ProdProg(rightslp, SLCR.QProg(data, d, i, Z(q)^0));
-                u := Q[i];
-            else
-                i := i+1;
-            fi;
-        until stop or i >= d;
-        if not stop then
-            if not SLCR.IsOnAxis(xinv, Qgamma, Q) then
-                u := One(bbg);
-            else
-                return fail;
-            fi;
+        i := PositionProperty(Q, a -> not SLCR.IsOnAxis(a^(-1)*xinv, Qgamma, Q));
+        if i <> fail then
+            rightslp := SLCR.ProdProg(rightslp, SLCR.QProg(data, d, i, Z(q)^0));
+            u := Q[i];
+        elif not SLCR.IsOnAxis(xinv, Qgamma, Q) then
+            u := One(bbg);
+        else
+            return fail;
         fi;
 
         # y will be in <Qgamma>, conjugating Q to Q^(x*u)
@@ -982,20 +911,7 @@ SLCR.SLSLPbb := function(data, x, d)
             y := SLCR.SLConjInQ(bbg, x*u, Q, Qgamma, data.trangp[d-1],
                                 data.trangpgamma[d-1], data.c[d-1], p, e, true);
         else
-            k := 1;
-            stop := false;
-            repeat
-                if SLCR.EqualPoints(data.trangpgamma[1][k], x*u, Q) then
-                    stop := true;
-                else
-                    k := k+1;
-                fi;
-            until stop or k = q+1;
-            if stop then
-                y := data.trangpgamma[1][k];
-            else
-                y := fail;
-            fi;
+            y := First(data.trangpgamma[1], t -> SLCR.EqualPoints(t, x*u, Q));
         fi;
         if y = fail then
             return fail;
@@ -1053,19 +969,9 @@ SLCR.SLSLPbb := function(data, x, d)
     # now W acts trivially on Q
     W2 := W^(-q);
     if not IsOne(W2) then
-        i := 1;
-        stop := false;
-        cent := data.centre;
         gcd := Gcd(q-1, d);
-        repeat
-            if W2 = cent then
-                stop := true;
-            else
-                i := i+1;
-                cent := cent * data.centre;
-            fi;
-        until stop or i >= gcd;
-        if not stop then
+        i := First([1..gcd-1], n -> W2 = data.centre^n);
+        if i = fail then
             return fail;
         fi;
         centprog := SLCR.PowerProg(data.centreprog, i);
@@ -1306,24 +1212,12 @@ end;
 ## At this stage, we do not need a transvection to do the job.
 
 SLCR.ComputeGamma := function(f, Q, T)
-    local U, t, q, stop, i, test;
+    local U, t, finv;
     U := List(Q, x -> x^f);
     t := T[2];
-    q := Length(T);
-    i := 1;
-    stop := false;
-    repeat
-        test := (f^(-1)) * T[i];
-        if SLCR.CommutesWith(Comm(U[1], t^test), U[1]) and
-           SLCR.CommutesWith(Comm(U[2], t^test), U[2]) then
-            stop := true;
-        fi;
-        i := i + 1;
-    until stop or i > q;
-    if not stop then
-        return fail;
-    fi;
-    return test;
+    finv := f^(-1);
+    return SLCR.FirstImage(T, x -> finv * x,
+        test -> ForAll(U{[1, 2]}, u -> SLCR.CommutesWith(Comm(u, t^test), u)));
 end;
 
 ############################################################################
@@ -1333,39 +1227,21 @@ end;
 ## <data> is the data structure of L to construct straight-line programs
 
 SLCR.SLConstructBasisQ := function(bbg, data, Q, Qgamma, d, q)
-    local t21, t21invtran, c, baseQ, baseQgamma, i, stop, s, sinv, T, Tgamma, b1, b1prime;
+    local t21, t21invtran, c, baseQ, baseQgamma, i, s, sinv, T, Tgamma, b1, b1prime;
     t21 := data.t21;
     t21invtran := data.t21invtran;
     sinv := data.sinv;
     s := sinv^(-1);
     c := data.c[d-1];
     # find a nontrivial element of the first transvection group of Q
-    stop := false;
-    i := 1;
-    repeat
-        b1 := Comm(Q[i], t21);
-        if not IsOne(b1) then
-            stop := true;
-        else
-            i := i+1;
-        fi;
-    until stop or i > Length(Q);
-    if not stop then
+    b1 := SLCR.FirstImage(Q, x -> Comm(x, t21), b -> not IsOne(b));
+    if b1 = fail then
         return fail;
     fi;
 
     # find a nontrivial element of the first transvection group of Qgamma
-    stop := false;
-    i := 1;
-    repeat
-        b1prime := Comm(Qgamma[i], t21invtran);
-        if not IsOne(b1prime) then
-            stop := true;
-        else
-            i := i+1;
-        fi;
-    until stop or i > Length(Qgamma);
-    if not stop then
+    b1prime := SLCR.FirstImage(Qgamma, x -> Comm(x, t21invtran), b -> not IsOne(b));
+    if b1prime = fail then
         return fail;
     fi;
 
@@ -1408,7 +1284,7 @@ end;
 ## <basisrecord> is the output of SLCR.SLConstructBasisQ
 
 SLCR.SLLabelPoint := function(bbg, h, data, p, e, d)
-    local vec, Q, Qgamma, T, Tgamma, t21, c, i, stop, w, rho, a;
+    local vec, Q, Qgamma, T, Tgamma, t21, c, i, w, rho, a;
     rho := PrimitiveRoot(GF(p^e));
     Q := data.baseQ;
     Qgamma := data.baseQgamma;
@@ -1436,20 +1312,14 @@ SLCR.SLLabelPoint := function(bbg, h, data, p, e, d)
         vec[d] := rho^0;
 
     else # label an element of Q
-        stop := false;
-        i := 1;
-        repeat
+        for i in [1..d-1] do
             a := Qgamma[i]^h;
-            if not IsOne(Comm(a, Q[1])) then
-                w := Comm(a, Q[1]);
-                stop := true;
-            elif not IsOne(Comm(a, Q[2])) then
-                w := Comm(a, Q[2]);
-                stop := true;
+            w := SLCR.FirstImage(Q{[1, 2]}, b -> Comm(a, b), x -> not IsOne(x));
+            if w <> fail then
+                break;
             fi;
-            i := i + 1;
-        until stop or i = d;
-        if not stop then
+        od;
+        if w = fail then
             return fail;
         fi;
         vec := SLCR.SLLinearCombQ(T, t21, c, d, w);
@@ -1469,22 +1339,9 @@ end;
 ## find a transvection conjugating T into Q(gamma)
 
 SLCR.SLConstructGammaTransv := function(bbg, T, Qgamma)
-    local q, i, stop, jgamma;
-    q := Length(T);
     # T^Qgamma[1] has an element conjugating alpha to gamma
-    i := 2;
-    stop := false;
-    repeat
-        jgamma := T[i]^Qgamma[1];
-        if SLCR.EqualPoints(T[2]^jgamma, One(bbg), Qgamma) then
-            stop := true;
-        fi;
-        i := i + 1;
-    until stop or i = q+1;
-    if not stop then
-        return fail;
-    fi;
-    return jgamma;
+    return SLCR.FirstImage(T{[2..Length(T)]}, t -> t^Qgamma[1],
+                           j -> SLCR.EqualPoints(T[2]^j, One(bbg), Qgamma));
 end;
 
 ###########################################################################
@@ -1495,29 +1352,21 @@ end;
 ## transpose. In fact, we shall exchange Q and Qgamma
 
 SLCR.SLExchangeL := function(data, Q, Qgamma, pQ)
-    local i, j, stop, p, e, q, bbg, t21, b1, trangp, t31, comm, temp;
+    local i, j, p, e, q, bbg, t21, trangp, t31, comm, temp;
     bbg := data.bbg;
     t21 := data.t21;
     p := data.prime;
     e := data.power;
     q := p^e;
 
-    # find a nontrivial element of the first transvection group of Q
-    stop := false;
-    i := 1;
-    repeat
-        b1 := Comm(Q[i], t21);
-        if not IsOne(b1) then
-            stop := true;
-        else
-            i := i+1;
-        fi;
-    until stop or i > Length(Q);
-    if not stop then
+    # Comm(Q[i], t21) is a nontrivial element of the first transvection group
+    # of Q
+    i := PositionProperty(Q, x -> not IsOne(Comm(x, t21)));
+    if i = fail then
         return fail;
     fi;
 
-    # construct the transvection subgroup of Q containing b1
+    # construct that transvection group
     j := 1;
     trangp := [One(bbg)];
     repeat
@@ -1747,8 +1596,8 @@ end;
 ## given J as in sec. 3.2.2, we create generators for L, Q, Qgamma
 
 SLCR.SLFindGenerators := function(bbg, data1, r, p, e, d)
-    local i, j, stop, q, limit, tau, tauinv, jgamma, jgammainv, qalpha, Q,
-          pQ, Lgen, Qgamma, pQalpha, Tgamma, u;
+    local i, j, q, limit, tau, tauinv, jgamma, jgammainv, qalpha, Q, pQ, Lgen,
+          Qgamma, pQalpha, Tgamma, u;
     q := p^e;
     tau := r^p;
     tauinv := tau^(-1);
@@ -1787,22 +1636,12 @@ SLCR.SLFindGenerators := function(bbg, data1, r, p, e, d)
     od;
 
     for i in [e+1 .. Length(pQalpha)] do
-        j := 1;
-        stop := false;
-        repeat
-            if SLCR.EqualPoints(pQalpha[i], data1.T[j], Qgamma) then
-                u := data1.T[j];
-                stop := true;
-            else
-                j := j+1;
-            fi;
-        until stop or j = q+1;
-        if not stop then
+        u := First(data1.T, t -> SLCR.EqualPoints(pQalpha[i], t, Qgamma));
+        if u = fail then
             Info(InfoRecog, 3, "failed modifying L");
             return fail;
-        else
-            pQalpha[i] := pQalpha[i] * u^(-1);
         fi;
+        pQalpha[i] := pQalpha[i] * u^(-1);
     od;
 
     for i in [1..Length(Lgen)] do
