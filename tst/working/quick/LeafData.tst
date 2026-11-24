@@ -60,6 +60,27 @@ gap> RECOG.SimpleFactor("L", [2,3]);
 Error, <series> = L and <parameter> = [ 2, 3 ] do not describe a simple group
 gap> RECOG.SimpleFactor("O+", [4,3]);
 Error, <series> = O+ and <parameter> = [ 4, 3 ] do not describe a simple group
+gap> RECOG.SimpleFactor("L", [3,6]);
+Error, <series> = L and <parameter> = [ 3, 6 ] do not describe a simple group
+gap> RECOG.SimpleFactor("X", [3,4]);
+Error, <series> = X and <parameter> = [ 3, 4 ] do not describe a simple group
+gap> RECOG.SimpleGroupOrder("X", [3,4]);
+Error, unknown series X
+gap> RECOG.SimpleGroupOrder("Spor", ["M25"]);
+Error, unknown sporadic group M25
+gap> RECOG.CyclicFactors(1); List(RECOG.CyclicFactors(12), f -> f.name);
+[  ]
+[ "C2", "C2", "C3" ]
+
+# PSL(2,2) and PSL(2,3) are soluble
+gap> data := RECOG.LeafDataPSL(2, 2, "SL");;
+gap> data.type; List(data.factors, f -> f.name);
+"soluble"
+[ "C3", "C2" ]
+gap> data := RECOG.LeafDataSLQuotient(2, 3, 2, "SL");;
+gap> data.type; List(data.factors, f -> f.name);
+"soluble"
+[ "C2", "C2", "C2", "C3" ]
 
 #
 # the names in the hint database
@@ -212,6 +233,52 @@ gap> data.type; List(data.factors, f -> f.name);
 "simple"
 [ "L3(4)" ]
 
+# RECOG.TestGroup passes every leaf to RECOG.CheckLeafData, which has to
+# reject a wrong record.
+gap> checkWith := function(leaf, changes)
+>   local data, old, name, res;
+>   data := LeafData(leaf);
+>   old := ShallowCopy(data);
+>   for name in RecNames(changes) do
+>     data.(name) := changes.(name);
+>   od;
+>   res := RECOG.CheckLeafData(leaf);
+>   for name in RecNames(changes) do
+>     data.(name) := old.(name);
+>   od;
+>   return res;
+> end;;
+gap> leaf := leafOf(SymmetricGroup(11), "Giant");;
+gap> factors := LeafData(leaf).factors;;
+gap> List(factors, f -> f.name);
+[ "A11", "C2" ]
+gap> checkWith(leaf, rec());
+true
+gap> checkWith(leaf, rec(type := "abelian"));
+"no valid type"
+gap> checkWith(leaf, rec(proven := 1));
+"proven is not a boolean"
+gap> checkWith(leaf, rec(factors := factors{[1]}));
+"factor orders do not multiply to the size"
+gap> checkWith(leaf, rec(factors := Reversed(factors)));
+"almost simple leaf whose socle is not the first factor"
+gap> checkWith(leaf, rec(type := "soluble"));
+"nonabelian factor in a soluble leaf"
+gap> checkWith(leaf, rec(type := "simple"));
+"simple leaf without a single nonabelian factor"
+gap> checkWith(leaf, rec(type := "quasisimple"));
+"quasisimple leaf whose simple quotient is not the last factor"
+gap> leaf := leafOf(SymmetricGroup(4), "Pcgs");;
+gap> checkWith(leaf, rec(pcgs := [1]));
+"pcgs does not fit"
+gap> checkWith(leaf, rec(relativeOrders := [2,3,2,3]));
+"relative orders do not multiply to the size"
+gap> checkWith(leaf, rec());
+true
+gap> leaf := RECOG.TestGroup(SymmetricGroup(6), false, 720);;
+gap> checkWith(leaf, rec(type := "simple"));
+"factors missing"
+
 # a leaf of unknown type gets its factors on first use
 gap> ri := RECOG.TestGroup(SymmetricGroup(6), false, 720);;
 gap> LeafData(ri);
@@ -239,6 +306,12 @@ gap> LeafData(ri);
 rec( proven := true, type := "unknown" )
 gap> List(CompositionFactorsOfRecogNode(ri), f -> f.name);
 [ "A5", "C2" ]
+gap> ri := RecogNode(SymmetricGroup(4), false, rec());;
+gap> SetFilterObj(ri, IsLeaf); SetFilterObj(ri, IsReady);
+gap> List(CompositionFactorsOfRecogNode(ri), f -> f.name);
+[ "C2", "C2", "C3", "C2" ]
+gap> LeafData(ri).type;
+"soluble"
 gap> ri := RecogNode(Group(()), false, rec());;
 gap> SetFilterObj(ri, IsLeaf); SetFilterObj(ri, IsReady);
 gap> LeafData(ri);
