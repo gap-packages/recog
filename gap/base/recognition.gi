@@ -793,7 +793,7 @@ InstallGlobalFunction( CalcNiceGensHomNode,
 InstallGlobalFunction( SLPforElement,
   function(ri,x)
     local slp;
-    slp := slpforelement(ri)(ri,x);
+    slp := slpforelement(ri)(ri, RECOG.StoreLikeGroup(ri, x));
     if slp <> fail then
         SlotUsagePattern(slp);
     fi;

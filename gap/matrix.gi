@@ -180,6 +180,36 @@ RECOG.IsCompressedOverField := function(m, f)
   return Is8BitMatrixRep(m) and Size(DefaultFieldOfMatrix(m)) = Size(f);
 end;
 
+# Returns whether the matrix m is in one of GAP's compressed representations.
+RECOG.IsCompressedMatrix := m -> IsGF2MatrixRep(m) or Is8BitMatrixRep(m);
+
+# Returns the matrix x stored like the generators of the group of ri: over
+# the field their compressed representation belongs to, or over ri!.field if
+# they are not compressed. Products of matrices in two different
+# representations are plain lists, which cannot be hashed. x is returned
+# unchanged if it has an entry outside that field, as a scalar multiple of a
+# group element may have in a projective node.
+RECOG.StoreLikeGroup := function(ri, x)
+  local gens, f;
+  if not IsMatrix(x) or not IsBound(ri!.field) or not IsFinite(ri!.field) then
+      return x;
+  fi;
+
+  f := ri!.field;
+  gens := GeneratorsOfGroup(Grp(ri));
+  if Length(gens) > 0 and RECOG.IsCompressedMatrix(gens[1]) then
+      f := DefaultFieldOfMatrix(gens[1]);
+  elif not RECOG.IsCompressedMatrix(x) then
+      return x;
+  fi;
+
+  if RECOG.IsCompressedOverField(x, f)
+     or not IsSubset(f, FieldOfMatrixList([x])) then
+      return x;
+  fi;
+  return ImmutableMatrix(f, x);
+end;
+
 # Returns the matrix x compressed over data.field, or fail if x has an entry
 # outside that field. In a projective node x may first be divided by a scalar.
 RECOG.HomToCompressedOverField := function(data, x)
