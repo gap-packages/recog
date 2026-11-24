@@ -1,7 +1,7 @@
 ###############################################################################
 ##
 ##  Authors: Till Eisenbrand
-##           Underlying ideas due to Frank Luebeck (SL3GoingDown)
+##           Underlying ideas due to Frank Lübeck (SL3GoingDown)
 ##           and Till Eisenbrand (SL3GoingDown_SmallQ).
 ##
 ##  Main function:  RECOG.FindSL2inSL3(G, q)
@@ -23,7 +23,7 @@
 
 # RECOG.SL3GoingDown( G, q ), for odd q > 11.
 #
-# Following Frank Luebeck's approach, use a power x^(q+1) that
+# Following Frank Lübeck's approach, use a power x^(q+1) that
 # acts as a scalar on a plane.
 RECOG.SL3GoingDown := function(G, q)
     local attempt, x, power, t, conjugate, commutator, gens, pr,
