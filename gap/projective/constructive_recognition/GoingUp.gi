@@ -66,13 +66,49 @@ RECOG.GoingUpEmbed := function(M, d, f)
   return res;
 end;
 
-# <powers>[1]^<c> for an integer c > 0, kept as powers[c], so that the
-# SLP of a word with memory computes each power once
+# The largest exponent whose power RECOG.GoingUpPower keeps; c < p, so
+# larger bounds make the cache grow with p
+RECOG.GoingUpPowerCacheBound := 1000;
+
+# <powers>[1]^<c> for an integer c > 0, as the product of the
+# powers[1]^(2^k) for the binary digits of c, so that the SLP of a word
+# with memory computes each square once. powers[2] keeps them: twos[k] is
+# powers[1]^(2^(k-1)), and cache[c] the result for
+# c <= RECOG.GoingUpPowerCacheBound.
 RECOG.GoingUpPower := function(powers, c)
-  if not IsBound(powers[c]) then
-    powers[c] := powers[1]^c;
+  local store, keep, res, e, k;
+
+  if not IsBound(powers[2]) then
+    powers[2] := rec( twos := [powers[1]], cache := [] );
   fi;
-  return powers[c];
+  store := powers[2];
+  keep := c <= RECOG.GoingUpPowerCacheBound;
+  if keep and IsBound(store.cache[c]) then
+    return store.cache[c];
+  fi;
+
+  res := fail;
+  e := c;
+  k := 1;
+  while e > 0 do
+    if k > Length(store.twos) then
+      store.twos[k] := store.twos[k - 1]^2;
+    fi;
+    if IsOddInt(e) then
+      if res = fail then
+        res := store.twos[k];
+      else
+        res := res * store.twos[k];
+      fi;
+    fi;
+    e := QuoInt(e, 2);
+    k := k + 1;
+  od;
+
+  if keep then
+    store.cache[c] := res;
+  fi;
+  return res;
 end;
 
 # The root element for <lambda> in GF(q), as the product of the
