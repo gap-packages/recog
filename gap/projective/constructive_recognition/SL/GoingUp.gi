@@ -135,7 +135,7 @@ RECOG.SL_ExpressByElementary := function(M, E, one)
   word := one;
   # row i := row i + lambda * row j
   rowOp := function(i, j, lambda)
-    X[i] := X[i] + lambda * X[j];
+    AddMatrixRows(X, i, j, lambda);
     word := E(i, j, lambda) * word;
   end;
 
@@ -175,7 +175,7 @@ end;
 #  - `word`: b, as a word in R.Y
 #  - `mat`: the matrix of b
 RECOG.SL_MapToLast := function(R, u)
-  local n, word, mat, apply, i, r;
+  local n, word, mat, apply, i;
 
   n := Length(u);
   word := R.one;
@@ -185,9 +185,7 @@ RECOG.SL_MapToLast := function(R, u)
   apply := function(i, j, lambda)
     word := word * RECOG.SL_ElementaryMatrix(R, i, j, lambda);
     u[j] := u[j] + lambda * u[i];
-    for r in [1 .. n] do
-      mat[r, j] := mat[r, j] + lambda * mat[r, i];
-    od;
+    AddMatrixColumns(mat, j, i, lambda);
   end;
 
   u := ShallowCopy(u);
