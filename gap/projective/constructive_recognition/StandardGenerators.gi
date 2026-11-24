@@ -25,6 +25,7 @@ RECOG.EmbedBlock := function(d, f, idx, M)
   local g;
   g := IdentityMat(d, f);
   g{idx}{idx} := M * One(f);
+  ConvertToMatrixRep(g, f);
   return g;
 end;
 
@@ -95,10 +96,10 @@ RECOG.ClassicalStandardGenerators := function(type, d, f)
     res.x := IdentityMat(d, f);
   fi;
 
+  # the others are from RECOG.EmbedBlock and RECOG.SignedCycle
+  ConvertToMatrixRep(res.v, f);
+  ConvertToMatrixRep(res.x, f);
   res.all := List(RECOG.ClassicalStandardGeneratorNames(type), x -> res.(x));
-  for i in [1 .. Length(res.all)] do
-    ConvertToMatrixRep(res.all[i], f);
-  od;
   return res;
 end;
 
