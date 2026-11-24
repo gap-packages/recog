@@ -134,8 +134,6 @@ SLCR.IS_IN_CENTRE := function(bbg, x)
     return true;
 end;
 
-
-
 ##############################################################################
 ##
 #F SLCR.AppendTran( <bbg> , <H> , <x> , <p> )
@@ -178,7 +176,6 @@ end;
 #return (false);
 #end;
 
-
 #############################################################################
 ##
 #F SLCR.MatrixOfEndo( <group>, <elem.ab.subgp>, <prime>, <dimension>, <automorph> )
@@ -212,7 +209,6 @@ SLCR.MatrixOfEndo := function(bbg, T, p, e, s)
     return matrixofs;
 end;
 
-
 ############################################
 
 SLCR.extractgen := function(matrixofs, endo, p, e, weights, limit)
@@ -244,11 +240,9 @@ SLCR.extractgen := function(matrixofs, endo, p, e, weights, limit)
             j := j+1;
             conj := conj*matrixofs;
         fi;
-    until stop or (j = limit);
+    until stop or j = limit;
     return j;
 end;
-
-
 
 ##############################################################################
 ##
@@ -325,7 +319,7 @@ SLCR.FindGoodElement := function(bbg, p, e, d, limit)
                         Info(InfoRecog, 3, "SLCR.FindGoodElement with i=", i, "  limit=", limit);
                         return r;
                     fi;
-                elif (e*(d-2) = 2) and (p+1 = 2^(Log(p+1, 2))) then
+                elif e*(d-2) = 2 and p+1 = 2^Log(p+1, 2) then
                     # p is Mersenne prime
                     w := 2*z/collect2s(z);
                     if not One(bbg) = v^w then #4/|v|
@@ -344,7 +338,6 @@ SLCR.FindGoodElement := function(bbg, p, e, d, limit)
 
     return fail;
 end;
-
 
 ##############################################################################
 ##
@@ -431,7 +424,6 @@ SLCR.SL4FindGoodElement := function(bbg, p, e, limit)
     return fail;
 end;
 
-
 ###############################################################################
 ##
 #F SLCR.CommutesWith( <bbgroup> , <set> , <x> )
@@ -512,7 +504,6 @@ SLCR.SL2Search := function(arg)
     od;
     return fail;
 end;
-
 
 ##############################################################################
 ##
@@ -632,8 +623,6 @@ SLCR.Standardize := function(bbg, T, j, s)
     fi;
 end;
 
-
-
 #############################################################################
 ##
 #F SLCR.SL2ReOrder( <bbgroup> , <trangroup> , <s> , <j> , <prime> , <power> )
@@ -671,7 +660,7 @@ SLCR.SL2ReOrder := function(bbg, T, s, j, p, e)
         if matrixofs = fail then
             return fail;
         fi;
-        if (p mod 2) = 1 then
+        if p mod 2 = 1 then
             # list and order the images of t under s
             setofimages := BlistList([1..p^e], []);
             row := [Z(p)^0];
@@ -693,11 +682,11 @@ SLCR.SL2ReOrder := function(bbg, T, s, j, p, e)
                 autom := ShallowCopy(images[i]);
                 autom[1] := autom[1] + Z(p)^0;
                 position := SLCR.PadictoN(p, e, autom);
-                if (position > 0) and (not setofimages[position]) then
+                if position > 0 and not setofimages[position] then
                     stop := true;
                 fi;
                 count := count + 1;
-            until stop or (count = 30);
+            until stop or count = 30;
             if count = 30 then
                 return fail;
             fi;
@@ -764,14 +753,13 @@ SLCR.SL2ReOrder := function(bbg, T, s, j, p, e)
         else
             i := i+1;
         fi;
-    until stop or (i = p^e+1);
+    until stop or i = p^e+1;
     if not stop then
         return fail;
     fi;
     out := rec(trangp := newT, trangpgamma := newTgamma);
     return out;
 end;
-
 
 #############################################################################
 ##
@@ -811,7 +799,6 @@ SLCR.SLSprog := function(data, d)
     return ProductOfStraightLinePrograms(
         ProductOfStraightLinePrograms(srslp, trslp), ProductOfStraightLinePrograms(srslp, jslp));
 end;
-
 
 ############################################################################
 ##
@@ -885,7 +872,7 @@ SLCR.SLConjInQ := function(bbg, y, Qgamma, Q, Tgamma, T, j, p, e, boolean)
     len := Length(Q);
     lengamma := Length(Qgamma);
     q := p^e;
-    a0 := Qgamma[1];;
+    a0 := Qgamma[1];
     if not SLCR.EqualPoints(bbg, y, y*a0, Qgamma) then
         b := Qgamma[1]^y;
         stop := false;
@@ -904,14 +891,14 @@ SLCR.SLConjInQ := function(bbg, y, Qgamma, Q, Tgamma, T, j, p, e, boolean)
                             stop := true;
                         fi;
                         k := k + 1;
-                    until stop or (k = q+1);
+                    until stop or k = q+1;
                     if not stop then
                         return fail;
                     fi;
                 fi;
             fi;
             i := i + 1;
-        until stop or (i = q+1);
+        until stop or i = q+1;
         if not stop then
             return fail;
         fi;
@@ -924,7 +911,7 @@ SLCR.SLConjInQ := function(bbg, y, Qgamma, Q, Tgamma, T, j, p, e, boolean)
                 stop := true;
             fi;
             i := i + 1;
-        until stop or (i = lengamma+1);
+        until stop or i = lengamma+1;
         if not stop then
             return fail;
         fi;
@@ -937,7 +924,7 @@ SLCR.SLConjInQ := function(bbg, y, Qgamma, Q, Tgamma, T, j, p, e, boolean)
                 stop := true;
             fi;
             i := i + 1;
-        until stop or (i = q+1);
+        until stop or i = q+1;
         if not stop then
             return fail;
         fi;
@@ -950,7 +937,7 @@ SLCR.SLConjInQ := function(bbg, y, Qgamma, Q, Tgamma, T, j, p, e, boolean)
             stop := true;
         fi;
         i := i + 1;
-    until stop or (i = len + 1);
+    until stop or i = len + 1;
     if not stop then
         return fail;
     fi;
@@ -981,14 +968,13 @@ SLCR.SLConjInQ := function(bbg, y, Qgamma, Q, Tgamma, T, j, p, e, boolean)
             stop := true;
         fi;
         i := i + 1;
-    until stop or (i = q+1);
+    until stop or i = q+1;
     if not stop then
         return fail;
     fi;
 
     return u;
 end;
-
 
 ############################################################################
 #F SLCR.SLLinearCombQ(<trangp>, <transv>, <c>, <dim>, <w>)
@@ -1021,7 +1007,7 @@ SLCR.SLLinearCombQ := function(T, t21, c, d, w)
             else
                 k := k+1;
             fi;
-        until stop or (k = q+1);
+        until stop or k = q+1;
         if not stop then
             return fail;
         fi;
@@ -1047,13 +1033,12 @@ SLCR.SLLinearCombQ := function(T, t21, c, d, w)
         else
             k := k+1;
         fi;
-    until stop or (k = q+1);
+    until stop or k = q+1;
     if not stop then
         return fail;
     fi;
     return vec;
 end;
-
 
 #########################################################################
 ##
@@ -1144,7 +1129,6 @@ SLCR.SLSLP := function(data, x, d)
     rightslp := SLCR.InvProg(rightslp);
     return SLCR.ProdProg(leftslp, rightslp);
 end;
-
 
 #########################################################################
 ##
@@ -1288,7 +1272,7 @@ SLCR.SLSLPbb := function(data, x, d)
                 i := i+1;
                 cent := cent * data.centre;
             fi;
-        until stop or (i >= gcd);
+        until stop or i >= gcd;
         if not stop then
             return fail;
         fi;
@@ -1314,9 +1298,7 @@ SLCR.SLSLPbb := function(data, x, d)
     od;
     rightslp := SLCR.InvProg(rightslp);
     return rightslp;
-
 end;
-
 
 ##############################################################################
 ##
@@ -1436,7 +1418,6 @@ SLCR.SL2DataStructure := function(arg)
     data.sinv := ResultOfStraightLineProgram(data.sprog[2], List(data.gens, x -> x[1]));
     return data;
 end;
-
 
 ###############################################################################
 ##
@@ -1587,7 +1568,7 @@ SLCR.SLConstructBasisQ := function(bbg, data, Q, Qgamma, d, q)
         else
             i := i+1;
         fi;
-    until stop or (i > Length(Q));
+    until stop or i > Length(Q);
     if not stop then
         return fail;
     fi;
@@ -1602,7 +1583,7 @@ SLCR.SLConstructBasisQ := function(bbg, data, Q, Qgamma, d, q)
         else
             i := i+1;
         fi;
-    until stop or (i > Length(Qgamma));
+    until stop or i > Length(Qgamma);
     if not stop then
         return fail;
     fi;
@@ -1636,8 +1617,6 @@ SLCR.SLConstructBasisQ := function(bbg, data, Q, Qgamma, d, q)
                lincombQ := t21,
                lincombQgamma := t21invtran);
 end;
-
-
 
 ##########################################################################
 ##
@@ -1688,7 +1667,7 @@ SLCR.SLLabelPoint := function(bbg, h, data, p, e, d)
                 stop := true;
             fi;
             i := i + 1;
-        until stop or (i = d);
+        until stop or i = d;
         if not stop then
             return fail;
         fi;
@@ -1700,7 +1679,6 @@ SLCR.SLLabelPoint := function(bbg, h, data, p, e, d)
     fi;
     return vec;
 end;
-
 
 ##########################################################################
 ##
@@ -1721,13 +1699,12 @@ SLCR.SLConstructGammaTransv := function(bbg, T, Qgamma)
             stop := true;
         fi;
         i := i + 1;
-    until stop or (i = q+1);
+    until stop or i = q+1;
     if not stop then
         return fail;
     fi;
     return jgamma;
 end;
-
 
 ###########################################################################
 ##
@@ -1756,7 +1733,7 @@ SLCR.SLExchangeL := function(data, Q, Qgamma, pQ, d)
         else
             i := i+1;
         fi;
-    until stop or (i > Length(Q));
+    until stop or i > Length(Q);
     if not stop then
         return fail;
     fi;
@@ -1786,7 +1763,6 @@ SLCR.SLExchangeL := function(data, Q, Qgamma, pQ, d)
     return [Q, Qgamma];
 end;
 
-
 #########################################################################
 ##
 #F SLCR.AttachSLNewgens( <SLdatastr>, <basisrecord>, <dim>, <jgamma> )
@@ -1811,7 +1787,7 @@ SLCR.AttachSLNewgens := function(data, data3, d, jgamma)
     conj := One(data.bbg);
     vec := SLCR.SLLabelPoint(data.bbg, jgamma^(-1)*data3.trangpQgamma[2],
                              data3, data.prime, e, d);
-    if vec = fail or (vec[1] = 0*rho) then
+    if vec = fail or vec[1] = 0*rho then
         return;
     fi;
     a := LogFFE(vec[1], rho);
@@ -1832,7 +1808,6 @@ SLCR.AttachSLNewgens := function(data, data3, d, jgamma)
         conj := conj*data.c[d-1];
     od;
 end;
-
 
 ###########################################################################
 ##
@@ -1872,7 +1847,7 @@ SLCR.SLFinishConstruction := function(bbg, data2, data3, d)
     mat[1,1] := 0 * Z(q);
     mat[d,d] := 0 * Z(q);
     mat[1,d] := (-1)^d*Z(q)^0;
-    mat[d,1] := (-1)^(d-1)*Z(q)^0;;
+    mat[d,1] := (-1)^(d-1)*Z(q)^0;
     cprog := SLCR.SLSLP(data2, mat, d);
     ccprog := StraightLineProgram(LinesOfStraightLineProgram(data2.cprog[d-1]),
                                   NrInputsOfStraightLineProgram(cprog));
@@ -1903,7 +1878,6 @@ SLCR.SLFinishConstruction := function(bbg, data2, data3, d)
     fi;
     return data2;
 end;
-
 
 ##########################################################################
 ##
@@ -1952,7 +1926,6 @@ SLCR.SL3DataStructure := function(bbg, p, e)
     return data2;
 end;
 
-
 ##########################################################################
 ##
 #F SLCR.QuickSL3DataStructure( <bbgroup> , <prime> , <power> )
@@ -1992,7 +1965,6 @@ SLCR.QuickSL3DataStructure := function(bbg, p, e)
                Lgen := B[1]^f);
 end;
 
-
 ###########################################################################
 ## SLCR.SLFindGenerators(<bbg>,<J data str.>,<random elmt>,<prime>,<power>,<dim>)
 ##
@@ -2012,7 +1984,7 @@ SLCR.SLFindGenerators := function(bbg, data1, r, p, e, d)
     pQ := Concatenation(data1.B, data1.B1);
     pQalpha := Concatenation(data1.B, data1.B1finv);
     Lgen := [data1.Lgen];
-    if (d mod 2 = 0) then
+    if d mod 2 = 0 then
         limit := d-2;
     else
         if q = 2 then
@@ -2080,8 +2052,6 @@ SLCR.SLFindGenerators := function(bbg, data1, r, p, e, d)
                pQ := pQ);
 end;
 
-
-
 #########################################################################
 ##
 #F SLCR.SLDataStructure( <bbg>, <prime>, <power>, <dim> )
@@ -2102,7 +2072,7 @@ SLCR.SLDataStructure := function(bbg, p, e, d)
     # start general case
     q := p^e;
 
-    if d = 4 and (q in [2, 3, 5, 9, 17]) then
+    if d = 4 and q in [2, 3, 5, 9, 17] then
         # We cannot guarantee that the p-part of the random r is a transvection.
         # The probability for that is at least 2/3, so going back to
         # SLCR.FindGoodElement 8 times ensures success w/ prob > 1-1/2^8, since with
@@ -2124,7 +2094,7 @@ SLCR.SLDataStructure := function(bbg, p, e, d)
                         u2 := t^PseudoRandom(bbg);
                         sl3 := SubgroupNC(bbg, [t, u1, u2]);
                         data1 := SLCR.QuickSL3DataStructure(sl3, p, e);
-                        if not data1 = fail then
+                        if data1 <> fail then
                             Info(InfoRecog, 3, "constructed L with j=", j, "   i=", i,
                                  "  limit=", Int(2*(1 - 1/q)^(-5)));
                             stop := true;
@@ -2168,7 +2138,7 @@ SLCR.SLDataStructure := function(bbg, p, e, d)
                 u2 := t^PseudoRandom(bbg);
                 sl3 := SubgroupNC(bbg, [t, u1, u2]);
                 data1 := SLCR.QuickSL3DataStructure(sl3, p, e);
-                if not data1 = fail then
+                if data1 <> fail then
                     Info(InfoRecog, 3, "constructed L with i=", i, "  limit=",
                          Int((1 - 1/q)^(-5) * Log(8*d^2, 2)));
                     stop := true;
@@ -2176,7 +2146,7 @@ SLCR.SLDataStructure := function(bbg, p, e, d)
             else
                 i := i+1;
             fi;
-        until stop or (i > (1 - 1/q)^(-5) * Log(8*d^2, 2));
+        until stop or i > (1 - 1/q)^(-5) * Log(8*d^2, 2);
         if not stop then
             Info(InfoRecog, 3, "could not construct L");
             return fail;
@@ -2211,7 +2181,6 @@ SLCR.SLDataStructure := function(bbg, p, e, d)
     data2 := SLCR.SLFinishConstruction(bbg, data2, data3, d);
     return data2;
 end;
-
 
 ##SLCR.SLIsomorphism := function(data,x,d)
 ##local  p, e, q, bbg, W, leftslp, rightslp, i, j, k, stop, seed, sprog, a, b, shift,
@@ -2413,7 +2382,7 @@ end;
 ##             i := i+1;
 ##             cent := cent * data.centre;
 ##          fi;
-##        until stop or (i = gcd);
+##        until stop or i = gcd;
 ##        if not stop then
 ##return fail;
 ##        fi;
@@ -2537,10 +2506,9 @@ function(ri)
     SetInfoLevel(InfoRecog_MethSel, 0);
     r := RecogniseClassical(G, rec(case := "linear"));
     SetInfoLevel(InfoRecog_MethSel, il);
-    if not ((IsBound(r.isSLContained) and r.isSLContained = true)) then
+    if not (IsBound(r.isSLContained) and r.isSLContained = true) then
         return TemporaryFailure;
     fi;
-
 
     # Try the recognition method
     n := ri!.dimension;
