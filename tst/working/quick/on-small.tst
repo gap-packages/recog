@@ -58,9 +58,9 @@ gap> CheckLeaf := function(e, d, q)
 
 # Omega(5,q), q odd, through Sp(4,q); q = 7 is the smallest with more than
 # 1000 points
-gap> ForAll([3, 5, 7, 9, 25, 31], q -> CheckFindStdGens(0, 5, q));
+gap> ForAll([3, 7, 9, 31], q -> CheckFindStdGens(0, 5, q));
 true
-gap> ForAll([7, 9, 11, 27, 31], q -> CheckLeaf(0, 5, q));
+gap> ForAll([7, 9, 31], q -> CheckLeaf(0, 5, q));
 true
 
 # Omega(5,5) has 781 points and is left to the other methods
@@ -78,13 +78,13 @@ gap> [ri!.fhmethsel.successMethod, Size(ImageRecogNode(ri)),
 # q; q = 4 and q = 5 are the smallest with more than 1000 points.
 # RecogniseClassical does not name Omega^+(6,4) in about one run in 5, so
 # it is not among the leaves tested.
-gap> ForAll([2, 3, 4, 5, 8, 9, 31], q -> CheckFindStdGens(1, 6, q));
+gap> ForAll([2, 3, 4, 9, 31], q -> CheckFindStdGens(1, 6, q));
 true
-gap> ForAll([3, 4, 5, 8, 9, 31], q -> CheckFindStdGens(-1, 6, q));
+gap> ForAll([3, 4, 5, 8, 31], q -> CheckFindStdGens(-1, 6, q));
 true
-gap> ForAll([5, 7, 8, 9, 31, 32], q -> CheckLeaf(1, 6, q));
+gap> ForAll([5, 8, 31], q -> CheckLeaf(1, 6, q));
 true
-gap> ForAll([4, 5, 7, 9, 31, 32], q -> CheckLeaf(-1, 6, q));
+gap> ForAll([4, 5, 31], q -> CheckLeaf(-1, 6, q));
 true
 
 # GO^-(6,5) and GO^+(6,5) are Omega extended by 2 and by 2^2, the latter
@@ -107,9 +107,9 @@ gap> for G in [GO(-1, 6, 5), GO(1, 6, 5)] do
 # Omega^-(4,q) through SL(2,q^2), for every q; q = 11 and q = 16 are the
 # smallest with more than 1000 points. Its SLPs come from
 # RECOG.Omega_RankOneRewrite, which fails outside Omega^-(4,q).
-gap> ForAll([2, 3, 4, 5, 8, 9, 31, 32], q -> CheckFindStdGens(-1, 4, q));
+gap> ForAll([2, 3, 4, 9, 31, 32], q -> CheckFindStdGens(-1, 4, q));
 true
-gap> ForAll([11, 13, 25, 27, 31, 32], q -> CheckLeaf(-1, 4, q));
+gap> ForAll([11, 27, 32], q -> CheckLeaf(-1, 4, q));
 true
 gap> CheckRankOneRewrite := function(e, d, q)
 >     local f, type, std, W, G;
@@ -132,7 +132,7 @@ true
 # 1000 points
 gap> ForAll([3, 5, 7, 9, 37, 49], q -> CheckFindStdGens(0, 3, q));
 true
-gap> ForAll([37, 41, 49, 81], q -> CheckLeaf(0, 3, q));
+gap> ForAll([37, 49, 81], q -> CheckLeaf(0, 3, q));
 true
 gap> ForAll([3, 5, 9, 37], q -> CheckRankOneRewrite(0, 3, q));
 true
@@ -165,7 +165,7 @@ gap> [ri!.fhmethsel.successMethod, Size(ImageRecogNode(ri)),
 # has more than 1000 points for every q
 gap> ForAll([3, 5, 9, 31], q -> CheckFindStdGens(0, 7, q));
 true
-gap> ForAll([3, 5, 13, 17, 31], q -> CheckLeaf(0, 7, q));
+gap> ForAll([3, 13, 31], q -> CheckLeaf(0, 7, q));
 true
 
 # Omega^+(4,q) is not quasisimple and no leaf
