@@ -201,7 +201,7 @@ SLCR.FindGoodElement := function(bbg, p, e, d, limit)
         i := 1;
         repeat
             r := PseudoRandom(bbg);
-            if (r^12 = One(bbg)) and (not (r^6 = One(bbg))) then
+            if IsOne(r^12) and not IsOne(r^6) then
                 Info(InfoRecog, 3, "SLCR.FindGoodElement with i=", i, "  limit=", limit);
                 return r^6;
             fi;
@@ -211,8 +211,8 @@ SLCR.FindGoodElement := function(bbg, p, e, d, limit)
         i := 1;
         repeat
             r := PseudoRandom(bbg);
-            if r^4 = One(bbg) then
-                if r^2 = One(bbg) then
+            if IsOne(r^4) then
+                if IsOne(r^2) then
                     Info(InfoRecog, 3, "SLCR.FindGoodElement with i=", i, "  limit=", limit);
                     return r;
                 else
@@ -242,21 +242,21 @@ SLCR.FindGoodElement := function(bbg, p, e, d, limit)
         repeat
             r := PseudoRandom(bbg);
             v := r^p;
-            if One(bbg) = v^z and not One(bbg) = r^z then
+            if IsOne(v^z) and not IsOne(r^z) then
                 if p = 2 and e*(d-2) = 6 then
-                    if ((not One(bbg) = v^7) and (not One(bbg) = v^9)) or
-                       ((not One(bbg) = v^3) and (One(bbg) = v^9)) then
+                    if (not IsOne(v^7) and not IsOne(v^9)) or
+                       (not IsOne(v^3) and IsOne(v^9)) then
                         Info(InfoRecog, 3, "SLCR.FindGoodElement with i=", i, "  limit=", limit);
                         return r;
                     fi;
                 elif e*(d-2) = 2 and p+1 = 2^Log(p+1, 2) then
                     # p is Mersenne prime
                     w := 2*z/2^PValuation(z, 2);
-                    if not One(bbg) = v^w then #4/|v|
+                    if not IsOne(v^w) then #4/|v|
                         Info(InfoRecog, 3, "SLCR.FindGoodElement with i=", i, "  limit=", limit);
                         return r;
                     fi;
-                elif not One(bbg) = v^psi then
+                elif not IsOne(v^psi) then
                     Info(InfoRecog, 3, "SLCR.FindGoodElement with i=", i, "  limit=", limit);
                     return r;
                 fi;
@@ -284,8 +284,7 @@ SLCR.SL4FindGoodElement := function(bbg, p, e, limit)
         i := 1;
         repeat
             r := PseudoRandom(bbg);
-            if r^6 = One(bbg) and (not (r^3 = One(bbg)))
-               and (not (r^2 = One(bbg))) then
+            if IsOne(r^6) and not IsOne(r^3) and not IsOne(r^2) then
                 Info(InfoRecog, 3, "SLCR.FindGoodElement with i=", i, "  limit=", limit);
                 return r;
             fi;
@@ -295,8 +294,7 @@ SLCR.SL4FindGoodElement := function(bbg, p, e, limit)
         i := 1;
         repeat
             r := PseudoRandom(bbg);
-            if (r^12 = One(bbg)) and (not (r^4 = One(bbg)))
-               and (not IsCentral(bbg, r^6)) then
+            if IsOne(r^12) and not IsOne(r^4) and not IsCentral(bbg, r^6) then
                 Info(InfoRecog, 3, "SLCR.FindGoodElement with i=", i, "  limit=", limit);
                 return r;
             fi;
@@ -307,8 +305,7 @@ SLCR.SL4FindGoodElement := function(bbg, p, e, limit)
         repeat
             r := PseudoRandom(bbg);
             r := r^4;
-            if (r^15 = One(bbg)) and (not (r^3 = One(bbg)))
-               and (not (r^5 = One(bbg))) then
+            if IsOne(r^15) and not IsOne(r^3) and not IsOne(r^5) then
                 Info(InfoRecog, 3, "SLCR.FindGoodElement with i=", i, "  limit=", limit);
                 return r;
             fi;
@@ -319,8 +316,7 @@ SLCR.SL4FindGoodElement := function(bbg, p, e, limit)
         repeat
             r := PseudoRandom(bbg);
             r := r^8;
-            if (r^15 = One(bbg)) and (not (r^3 = One(bbg)))
-               and (not (r^5 = One(bbg))) then
+            if IsOne(r^15) and not IsOne(r^3) and not IsOne(r^5) then
                 Info(InfoRecog, 3, "SLCR.FindGoodElement with i=", i, "  limit=", limit);
                 return r;
             fi;
@@ -331,8 +327,7 @@ SLCR.SL4FindGoodElement := function(bbg, p, e, limit)
         repeat
             r := PseudoRandom(bbg);
             r := r^16;
-            if r^153 = One(bbg) and (not (r^9 = One(bbg)))
-               and (not (r^17 = One(bbg))) then
+            if IsOne(r^153) and not IsOne(r^9) and not IsOne(r^17) then
                 Info(InfoRecog, 3, "SLCR.FindGoodElement with i=", i, "  limit=", limit);
                 return r;
             fi;
@@ -342,9 +337,9 @@ SLCR.SL4FindGoodElement := function(bbg, p, e, limit)
         i := 1;
         repeat
             r := PseudoRandom(bbg);
-            if (r^(p*(q^2-1)) = One(bbg)) and (not (r^(q^2-1) = One(bbg)))
-               and (not (r^(8*p*(q+1)) = One(bbg)))
-               and (not (r^(p*(q-1)) = One(bbg))) then
+            if IsOne(r^(p*(q^2-1))) and not IsOne(r^(q^2-1))
+               and not IsOne(r^(8*p*(q+1)))
+               and not IsOne(r^(p*(q-1))) then
                 Info(InfoRecog, 3, "SLCR.FindGoodElement with i=", i, "  limit=", limit);
                 return r;
             fi;
@@ -388,13 +383,13 @@ SLCR.SL2Search := function(arg)
 
     while count < m do
         r := PseudoRandom(bbg);
-        if not One(bbg) = r then
-            if not IsBound(out.tran) and One(bbg) = r^p then
+        if not IsOne(r) then
+            if not IsBound(out.tran) and IsOne(r^p) then
                 out.tran := r;
             fi;
             if not IsBound(out.gen) then
                 if p = 2 then
-                    if One(bbg) = r^(p^e-1) and
+                    if IsOne(r^(p^e-1)) and
                        SLCR.BoundedOrder(bbg, r, p^e-1, primes) then
                         out.gen := r;
                     fi;
@@ -402,22 +397,22 @@ SLCR.SL2Search := function(arg)
                     # enough to find r of order (q-1)/2
                     r := r*r;
                     primes := Difference(primes, [2]);
-                    if One(bbg) = r^((p^e-1)/2) and
+                    if IsOne(r^((p^e-1)/2)) and
                        SLCR.BoundedOrder(bbg, r, (p^e-1)/2, primes) then
                         out.gen := r;
                     fi;
                 else
-                    if One(bbg) = r^(p^e-1) and
+                    if IsOne(r^(p^e-1)) and
                        SLCR.BoundedOrder(bbg, r, p^e-1, primes) then
                         out.gen := r;
-                    elif One(bbg) = r^((p^e-1)/2) and
+                    elif IsOne(r^((p^e-1)/2)) and
                          SLCR.BoundedOrder(bbg, r, (p^e-1)/2, primes) and
                          not IsCentral(bbg, r^((p^e-1)/4)) then
                         out.gen := r;
                     fi;
                 fi; # p=2
             fi; # IsBound(out.gen)
-        fi;  # One(bbg)=r
+        fi; # not IsOne(r)
         count := count+1;
         if IsBound(out.tran) and IsBound(out.gen) then
             return out;
@@ -477,7 +472,7 @@ SLCR.Dislodge := function(bbg, T)
     t := T[2];
     j := One(bbg);
     for gen in gens do
-        if One(bbg) = j then
+        if IsOne(j) then
             tconj := t^gen;
             if not SLCR.CommutesWith(tconj, t) then
                 j := gen;
@@ -485,7 +480,7 @@ SLCR.Dislodge := function(bbg, T)
         fi;
     od;
 
-    if One(bbg) = j then
+    if IsOne(j) then
         return fail;
     fi;
     return j;
@@ -821,7 +816,7 @@ SLCR.SLConjInQ := function(bbg, y, Qgamma, Q, Tgamma, T, j, p, e, boolean)
         i := 1;
         repeat
             c := Comm(a0, Qgamma[i]^y);
-            if not One(bbg) = c then
+            if not IsOne(c) then
                 stop := true;
             fi;
             i := i + 1;
@@ -970,7 +965,7 @@ SLCR.SLSLP := function(data, x, d)
     q := p^e;
     FB := data.FB;
 
-    if not (Determinant(x) = Z(q)^0) then
+    if not IsOne(Determinant(x)) then
         return fail;
     fi;
     leftslp := StraightLineProgram([[1, 0]], Length(data.gens));
@@ -981,8 +976,8 @@ SLCR.SLSLP := function(data, x, d)
     W := List(x, ShallowCopy);
     for i in [0..d-2] do
         # put non-zero element in lower right corner
-        if W[d-i,d-i] = 0*Z(q) then
-            j := First([1..d-i], a -> not (W[a,d-i] = 0*Z(q)));
+        if IsZero(W[d-i,d-i]) then
+            j := First([1..d-i], a -> not IsZero(W[a,d-i]));
             leftslp := SLCR.ProdProg(leftslp,
                 StraightLineProgram([[(d-i-1)*(d-i-2)*e+(j-1)*e+1, 1]], Length(data.gens)));
             for k in [1..d-i] do
@@ -991,7 +986,7 @@ SLCR.SLSLP := function(data, x, d)
         fi;
         # clear last column
         for j in [1..d-i-1] do
-            if not W[j,d-i] = 0*Z(q) then
+            if not IsZero(W[j,d-i]) then
                 # a is the nontriv element of the multiplying matrix
                 a := -W[j,d-i]/W[d-i,d-i];
                 # b is what we have to express as a linear combination
@@ -1007,11 +1002,11 @@ SLCR.SLSLP := function(data, x, d)
                 for k in [1..d-i] do
                     W[j,k] := W[j,k] + a * W[d-i,k];
                 od;
-            fi; # W[j,d-i] = 0*Z(q);
+            fi; # not IsZero(W[j,d-i])
         od;
         # clear last row
         for j in [1..d-i-1] do
-            if not W[d-i,j] = 0*Z(q) then
+            if not IsZero(W[d-i,j]) then
                 # a is the nontriv element of the multiplying matrix
                 a := -W[d-i,j]/W[d-i,d-i];
                 # no inverse is taken here
@@ -1030,7 +1025,7 @@ SLCR.SLSLP := function(data, x, d)
     od; # i-loop
     # now we have a diagonal matrix
     for i in [0 .. d-2] do
-        if not W[d-i,d-i] = Z(q)^0 then
+        if not IsOne(W[d-i,d-i]) then
             k := LogFFE(W[d-i,d-i], Z(q));
             sprog := SLCR.PowerProg(data.sprog[d-i], k);
             leftslp := SLCR.ProdProg(leftslp, sprog);
@@ -1120,7 +1115,7 @@ SLCR.SLSLPbb := function(data, x, d)
             return fail;
         fi;
         for j in [1..d-1] do
-            if not (vec[j] = 0*Z(q)) then
+            if not IsZero(vec[j]) then
                 coeffs := FB[LogFFE(vec[j], Z(q))+1];
                 for k in [1..e] do
                     if coeffs[k] <> 0 then
@@ -1145,7 +1140,7 @@ SLCR.SLSLPbb := function(data, x, d)
         fi;
     od;
     det := Determinant(mat);
-    if not (det = Z(q)^0) then
+    if not IsOne(det) then
         gcd := Gcd(d, q-1);
         i := LogFFE(det, Z(q));
         if i mod gcd <> 0 then
@@ -1170,7 +1165,7 @@ SLCR.SLSLPbb := function(data, x, d)
     fi;
     # now W acts trivially on Q
     W2 := W^(-q);
-    if not (One(bbg) = W2) then
+    if not IsOne(W2) then
         i := 1;
         stop := false;
         cent := data.centre;
@@ -1196,7 +1191,7 @@ SLCR.SLSLPbb := function(data, x, d)
         return fail;
     fi;
     for j in [1..d-1] do
-        if not vec[j] = 0*Z(q) then
+        if not IsZero(vec[j]) then
             coeffs := FB[LogFFE(vec[j], Z(q))+1];
             for k in [1..e] do
                 if coeffs[k] <> 0 then
@@ -1303,7 +1298,7 @@ SLCR.SL2DataStructure := function(arg)
     else
         cslp := SLCR.PowerProg(data.sprog[2], (p^e - 1)/2);
         data.centre := ResultOfStraightLineProgram(cslp, List(data.gens, x -> x[1]));
-        if data.centre = One(bbg) then
+        if IsOne(data.centre) then
             data.centreprog := [];
         else
             data.centreprog := cslp;
@@ -1362,7 +1357,7 @@ SLCR.SL3ConstructQ := function(bbg, t, pp, e)
         r := PseudoRandom(bbg);
         u := t^r;
         cand := tinv * (u^(-1)) * t * u;
-        if not One(bbg) = cand and ForAll(S, s -> SLCR.CommutesWith(s, cand)) then
+        if not IsOne(cand) and ForAll(S, s -> SLCR.CommutesWith(s, cand)) then
             if Length(S) = 1 then
                 f := r;
                 u1 := u;
@@ -1472,7 +1467,7 @@ SLCR.SLConstructBasisQ := function(bbg, data, Q, Qgamma, d, q)
     i := 1;
     repeat
         b1 := Comm(Q[i], t21);
-        if not One(bbg) = b1 then
+        if not IsOne(b1) then
             stop := true;
         else
             i := i+1;
@@ -1487,7 +1482,7 @@ SLCR.SLConstructBasisQ := function(bbg, data, Q, Qgamma, d, q)
     i := 1;
     repeat
         b1prime := Comm(Qgamma[i], t21invtran);
-        if not One(bbg) = b1prime then
+        if not IsOne(b1prime) then
             stop := true;
         else
             i := i+1;
@@ -1568,10 +1563,10 @@ SLCR.SLLabelPoint := function(bbg, h, data, p, e, d)
         i := 1;
         repeat
             a := Qgamma[i]^h;
-            if not One(bbg) = Comm(a, Q[1]) then
+            if not IsOne(Comm(a, Q[1])) then
                 w := Comm(a, Q[1]);
                 stop := true;
-            elif not One(bbg) = Comm(a, Q[2]) then
+            elif not IsOne(Comm(a, Q[2])) then
                 w := Comm(a, Q[2]);
                 stop := true;
             fi;
@@ -1635,7 +1630,7 @@ SLCR.SLExchangeL := function(data, Q, Qgamma, pQ, d)
     i := 1;
     repeat
         b1 := Comm(Q[i], t21);
-        if not One(bbg) = b1 then
+        if not IsOne(b1) then
             stop := true;
         else
             i := i+1;
@@ -1692,7 +1687,7 @@ SLCR.AttachSLNewgens := function(data, data3, d, jgamma)
     conj := One(data.bbg);
     vec := SLCR.SLLabelPoint(data.bbg, jgamma^(-1)*data3.trangpQgamma[2],
                              data3, data.prime, e, d);
-    if vec = fail or vec[1] = 0*rho then
+    if vec = fail or IsZero(vec[1]) then
         return;
     fi;
     a := LogFFE(vec[1], rho);
@@ -1775,7 +1770,7 @@ SLCR.SLFinishConstruction := function(bbg, data2, data3, d)
         centgen := Z(q)^((q-1)/gcd) * IdentityMat(d, GF(q));
         centslp := SLCR.SLSLP(data2, centgen, d);
         data2.centre := ResultOfStraightLineProgram(centslp, List(data2.gens, x -> x[1]));
-        if data2.centre = One(bbg) then
+        if IsOne(data2.centre) then
             data2.centreprog := [];
         else
             data2.centreprog := centslp;
@@ -1994,7 +1989,7 @@ SLCR.SLDataStructure := function(bbg, p, e, d)
                 t := r^(p^(e*(d-2)) - 1);
                 repeat
                     u1 := t^PseudoRandom(bbg);
-                    if (not (Comm(t, u1)^p = One(bbg))) then
+                    if not IsOne(Comm(t, u1)^p) then
                         u2 := t^PseudoRandom(bbg);
                         sl3 := SubgroupNC(bbg, [t, u1, u2]);
                         data1 := SLCR.QuickSL3DataStructure(sl3, p, e);
@@ -2038,7 +2033,7 @@ SLCR.SLDataStructure := function(bbg, p, e, d)
         i := 1;
         repeat
             u1 := t^PseudoRandom(bbg);
-            if (not (Comm(t, u1)^p = One(bbg))) then
+            if not IsOne(Comm(t, u1)^p) then
                 u2 := t^PseudoRandom(bbg);
                 sl3 := SubgroupNC(bbg, [t, u1, u2]);
                 data1 := SLCR.QuickSL3DataStructure(sl3, p, e);
