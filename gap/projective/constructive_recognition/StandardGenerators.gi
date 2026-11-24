@@ -83,7 +83,7 @@ RECOG.ClassicalStandardGenerators := function(type, d, f)
     if d >= 4 then
       res.x := RECOG.SignedCycle(d, f, [1 .. 4], -1);
     else
-      res.x := IdentityMat(d, f);
+      res.x := One(res.s);
     fi;
     res.v := RECOG.SignedCycle(d, f, odd, 1) * RECOG.SignedCycle(d, f, e, 1);
   else
@@ -93,12 +93,10 @@ RECOG.ClassicalStandardGenerators := function(type, d, f)
     for i in [2 .. d] do
       res.v[i, i - 1] := -One(f);
     od;
-    res.x := IdentityMat(d, f);
+    ConvertToMatrixRep(res.v, f);
+    res.x := One(res.s);
   fi;
 
-  # the others are from RECOG.EmbedBlock and RECOG.SignedCycle
-  ConvertToMatrixRep(res.v, f);
-  ConvertToMatrixRep(res.x, f);
   res.all := List(RECOG.ClassicalStandardGeneratorNames(type), x -> res.(x));
   return res;
 end;
