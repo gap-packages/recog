@@ -74,6 +74,36 @@ gap> [ri!.fhmethsel.successMethod, Size(ImageRecogNode(ri)),
 >    KernelRecogNode(ri)!.fhmethsel.successMethod];
 [ "ClassicalNatural", 2, "ClassicalNatural" ]
 
+# Omega^+(6,q) through SL(4,q) and Omega^-(6,q) through SU(4,q), for every
+# q; q = 4 and q = 5 are the smallest with more than 1000 points.
+# RecogniseClassical does not name Omega^+(6,4) in about one run in 5, so
+# it is not among the leaves tested.
+gap> ForAll([2, 3, 4, 5, 8, 9, 31], q -> CheckFindStdGens(1, 6, q));
+true
+gap> ForAll([3, 4, 5, 8, 9, 31], q -> CheckFindStdGens(-1, 6, q));
+true
+gap> ForAll([5, 7, 8, 9, 31, 32], q -> CheckLeaf(1, 6, q));
+true
+gap> ForAll([4, 5, 7, 9, 31, 32], q -> CheckLeaf(-1, 6, q));
+true
+
+# GO^-(6,5) and GO^+(6,5) are Omega extended by 2 and by 2^2, the latter
+# in two layers
+gap> Split := function(ri)
+>     if IsLeaf(ri) then
+>         return ri!.fhmethsel.successMethod;
+>     fi;
+>     return [ri!.fhmethsel.successMethod, Size(ImageRecogNode(ri)),
+>             Split(KernelRecogNode(ri))];
+> end;;
+gap> for G in [GO(-1, 6, 5), GO(1, 6, 5)] do
+>     Reset(GlobalMersenneTwister, 1);
+>     Reset(GlobalRandomSource, 1);
+>     Print(Split(ImageRecogNode(RECOG.TestGroup(G, false, Size(G)))), "\n");
+> od;
+[ "ClassicalNatural", 2, "ClassicalNatural" ]
+[ "ClassicalNatural", 2, [ "ClassicalNatural", 2, "ClassicalNatural" ] ]
+
 #
 gap> SetInfoLevel(InfoOrb, oldInfoOrb);
 gap> STOP_TEST("on-small.tst");
