@@ -163,9 +163,18 @@ function(ri)
   f := ri!.field;
   q := Size(f);
   fu := function() return RandomElm(ri,"StabilizerChainProj",true).el; end;
-  opt := rec( Projective := true, RandomElmFunc := fu );
+  opt := rec( Projective := true, RandomElmFunc := fu,
+              FailInsteadOfError := true );
   Gm := GroupWithGenerators(ri!.gensHmem);
   S := StabilizerChain(Gm,opt);
+
+  # genss found no orbit within its length limit. Another attempt would
+  # enumerate up to the limit again, so do not ask for one.
+  if not IsStabilizerChain(S) then
+      Info(InfoRecog,2,"StabilizerChainProj: ",S);
+      return NeverApplicable;
+  fi;
+
   perms := ActionOnOrbit(S!.orb,ri!.gensHmem);
   SS := StabilizerChain(Group(perms));
   if Size(SS) = Size(S) then
