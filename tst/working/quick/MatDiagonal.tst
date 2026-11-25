@@ -4,8 +4,8 @@ gap> TestMatDiagonal := function(F, n)
 >     l := ShallowCopy(Elements(F));
 >     RemoveSet(l,Zero(F));
 >     for i in [1..5] do
->         m := IdentityMat(7,F);
->         for j in [1..7] do
+>         m := IdentityMat(n,F);
+>         for j in [1..n] do
 >             m[j,j] := Random(l);
 >         od;
 >         Add(gens,m);
@@ -24,7 +24,7 @@ gap> TestMatDiagonal(GF(5), 7);;
 gap> TestMatDiagonal(GF(9), 1);;
 gap> TestMatDiagonal(GF(9), 2);;
 gap> TestMatDiagonal(GF(9), 3);;
-gap> #TestMatDiagonal(GF(9), 7);;  # FIXME: disabled, see issue #36
+gap> TestMatDiagonal(GF(9), 7);;
 
 #
 gap> TestMatDiagonal(GF(16), 1);;
@@ -42,4 +42,13 @@ gap> HasSize(ri);
 true
 gap> Size(ri);
 1366
+
+# The kernel of a BlockScalar node has elements that are words in the lifts
+# of the nice generators of the image: here the fourth power of the
+# generator. The kernel method has to find them without random elements.
+gap> ri := RecogniseGroup(Group(DiagonalMat([ Z(9), Z(9)^2 ])));;
+gap> RECOG.FindKernelBlockScalar(ri);
+true
+gap> Group(StripMemory(gensN(ri))) = Group(DiagonalMat([ Z(3), Z(3)^0 ]));
+true
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
