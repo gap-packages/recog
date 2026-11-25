@@ -748,7 +748,8 @@ end;
 # common quadratic form and Dickson invariant 0; for a conformal
 # symplectic group, a unitary group with other determinants, SO(d,q) or
 # O^+-(d,q), the method does not apply, nor for Omega^+(4,q), which is not
-# quasisimple.
+# quasisimple. Groups on at most 1000 points are left to the other
+# methods, except Omega(3,q), q >= 5, and Omega^-(4,q).
 RECOG.ClassicalNaturalForm := function(ri,classical,type)
   local d,f,q,form,gens,changed,i,lambda,std,m,q0,gcd,size,eps;
   d := ri!.dimension;
@@ -776,8 +777,10 @@ RECOG.ClassicalNaturalForm := function(ri,classical,type)
                    frob := 1, field := f );
   fi;
   # Small cases are left to the other methods, which end in a
-  # stabiliser chain
-  if (q^d-1)/(q-1) <= 1000 then
+  # stabiliser chain. In degree 3 and 4 the leaf is faster for every q;
+  # Omega(3,3) is soluble.
+  if (q^d-1)/(q-1) <= 1000
+     and (type <> "O" or d > 4 or (d = 3 and q = 3)) then
       Info(InfoRecog,2,"ClassicalNatural: ",type,"(",d,",",q,") is small.");
       return TemporaryFailure;
   fi;

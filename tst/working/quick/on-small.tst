@@ -104,12 +104,12 @@ gap> for G in [GO(-1, 6, 5), GO(1, 6, 5)] do
 [ "ClassicalNatural", 2, "ClassicalNatural" ]
 [ "ClassicalNatural", 2, [ "ClassicalNatural", 2, "ClassicalNatural" ] ]
 
-# Omega^-(4,q) through SL(2,q^2), for every q; q = 11 and q = 16 are the
-# smallest with more than 1000 points. Its SLPs come from
+# Omega^-(4,q) through SL(2,q^2), for every q, also on at most 1000
+# points. Its SLPs come from
 # RECOG.Omega_RankOneRewrite, which fails outside Omega^-(4,q).
 gap> ForAll([2, 3, 4, 9, 31, 32], q -> CheckFindStdGens(-1, 4, q));
 true
-gap> ForAll([11, 27, 32], q -> CheckLeaf(-1, 4, q));
+gap> ForAll([2, 5, 9, 32], q -> CheckLeaf(-1, 4, q));
 true
 gap> CheckRankOneRewrite := function(e, d, q)
 >     local f, type, std, W, G;
@@ -128,11 +128,11 @@ gap> CheckRankOneRewrite := function(e, d, q)
 gap> ForAll([2, 3, 4, 5, 9, 11, 16], q -> CheckRankOneRewrite(-1, 4, q));
 true
 
-# Omega(3,q), q odd, through SL(2,q); q = 37 is the smallest with more than
-# 1000 points
+# Omega(3,q), q odd, through SL(2,q), as a leaf for q >= 5, also on at
+# most 1000 points
 gap> ForAll([3, 5, 7, 9, 37, 49], q -> CheckFindStdGens(0, 3, q));
 true
-gap> ForAll([37, 49, 81], q -> CheckLeaf(0, 3, q));
+gap> ForAll([5, 7, 31, 81], q -> CheckLeaf(0, 3, q));
 true
 gap> ForAll([3, 5, 9, 37], q -> CheckRankOneRewrite(0, 3, q));
 true
@@ -150,10 +150,10 @@ gap> ForAll([["O", 3, 37], ["O-", 4, 11]], function(c)
 > end);
 true
 
-# Omega(3,31) has 993 points and is left to the other methods
-gap> ri := RECOG.TestGroup(Omega(3, 31), true, Size(Omega(3, 31)));;
-gap> ri!.fhmethsel.successMethod;
-"StabilizerChainProj"
+# Omega(3,3) is soluble and is left to the other methods
+gap> ri := RECOG.TestGroup(Omega(3, 3), true, Size(Omega(3, 3)));;
+gap> ri!.fhmethsel.successMethod = "ClassicalNatural";
+false
 
 # SO(3,37) is Omega(3,37) extended by an element of spinor norm -1
 gap> ri := ImageRecogNode(RECOG.TestGroup(SO(3, 37), false, Size(SO(3, 37))));;
