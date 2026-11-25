@@ -800,6 +800,25 @@ InstallGlobalFunction( SLPforElement,
     return slp;
   end );
 
+# The product of the results of <s1> and <s2>, which read their inputs from
+# the slots <inputs1> and <inputs2> of a program with <nrinputs> inputs.
+#
+# Workaround for a bug in the GAP library (seen in 4.13.1 and 4.17dev), see
+# https://github.com/gap-system/gap/pull/6891:
+# NewProductOfStraightLinePrograms does the same, but tells
+# RewriteStraightLineProgram that no slot is in use. A line that overwrites
+# an input slot can then become a line without target, which writes behind
+# the inputs, while the result is still read from the input slot. Remove
+# this once recog requires a GAP in which that is fixed.
+RECOG.ProductOfStraightLinePrograms := function(s1, inputs1, s2, inputs2,
+                                                nrinputs)
+  local x, y;
+  x := RewriteStraightLineProgram(s1, [], nrinputs, inputs1, inputs2);
+  y := RewriteStraightLineProgram(s2, x.l, x.lsu, inputs2, x.results);
+  Add(y.l, [x.results[1], 1, y.results[1], 1]);
+  return StraightLineProgramNC(y.l, nrinputs);
+end;
+
 InstallGlobalFunction( SLPforElementGeneric,
   # generic method for a non-leaf node
   function(ri,g)
@@ -837,9 +856,9 @@ InstallGlobalFunction( SLPforElementGeneric,
     fi;
     nr2 := NrInputsOfStraightLineProgram(s2);
     nr1 := NrInputsOfStraightLineProgram(s1);
-    s := NewProductOfStraightLinePrograms(s2,[nr1+1..nr1+nr2],
-                                          s1,[1..nr1],
-                                          nr1+nr2);
+    s := RECOG.ProductOfStraightLinePrograms(s2,[nr1+1..nr1+nr2],
+                                             s1,[1..nr1],
+                                             nr1+nr2);
     return s;
   end);
 
