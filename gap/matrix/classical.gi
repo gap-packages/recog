@@ -163,19 +163,13 @@ HasLBGgt5 := function( m, p, a, e )
         return false;
     fi;
 
-    ## if e+1 does not divide ppds then
-    ## we know that all primes dividing ppds are large
-    ## and hence we know <m> is a large ppd-element
-    if ppds mod (e+1) = 0 then
-        ## Now we know (e+1) divides ppds and (e+1) has to be
-        ## a prime since all ppds are at least (e+1)
-        if not IsPrimeInt (e+1) then
-            return false;
-        fi;
-        # if (e+1)^2 does not divide m, then not large
-        if not (m mod (e+1)^2) = 0 then
-            return false;
-        fi;
+    ## Every ppd is at least e+1, so a prime other than e+1 dividing
+    ## ppds is large; e+1 itself is large only if its square divides <m>
+    while ppds mod (e+1) = 0 do
+        ppds := ppds / (e+1);
+    od;
+    if ppds = 1 then
+        return IsPrimeInt(e+1) and m mod (e+1)^2 = 0;
     fi;
 
     return true;
@@ -2548,13 +2542,17 @@ function(recognise)
         if not 2 in recognise.LB then
             return TemporaryFailure;
         fi;
-        if not ForAny(recognise.orders, i -> i > 2 and (q-1) mod i = 0) then
+        ## Projective orders: A5 with scalars has elements of order 10
+        recognise.needPOrders := true;
+        if not ForAny(recognise.porders,
+                      i -> i[1] > 2 and (q-1) mod i[1] = 0) then
             return TemporaryFailure;
         fi;
         ## need to check that the basic lppd( 3,q;2) elements have order
         ## greater than 5.
         s := LogInt(q, recognise.p);
-        if not ForAny(recognise.orders, i -> HasLBGgt5(i, recognise.p, s, 2)) then
+        if not ForAny(recognise.porders,
+                      i -> HasLBGgt5(i[1], recognise.p, s, 2)) then
             return TemporaryFailure;
         fi;
     else
