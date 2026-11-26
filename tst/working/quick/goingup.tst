@@ -262,6 +262,30 @@ gap> ForAll([1 .. 2 * RECOG.Sp_DirectGoingUpCheapTries + 3], function(n)
 true
 gap> RECOG.Sp_DirectGoingUpData := data;;
 
+# RECOG.SU_DirectGoingUp does the same from SU(4,q0), q = q0^2, d even
+gap> CheckSUDirectGoingUp := function(d, q)
+>     local f, B, init, std, gens, G, res;
+>     f := GF(q);
+>     B := RandomInvertibleMat(d, f);
+>     init := List(RECOG.ClassicalStandardGenerators("SU", 4, f).all,
+>                  x -> B^-1 * RECOG.GoingUpEmbed(x, d, f) * B);
+>     std := RECOG.ClassicalStandardGenerators("SU", d, f).all;
+>     gens := Concatenation(init, List(std, x -> B^-1 * x * B));
+>     G := GroupWithMemory(Group(gens));
+>     res := RECOG.SU_DirectGoingUp(G,
+>                rec( slp := StraightLineProgram(
+>                                [List([1 .. Length(init)], i -> [i, 1])],
+>                                Length(gens)),
+>                     bas := B, n := 4 ));
+>     return List(ResultOfStraightLineProgram(res.slp, gens),
+>                 x -> res.bas * x * res.bas^-1) = std;
+> end;;
+gap> ForAll([[4, 9], [6, 9], [6, 4], [8, 9], [8, 16], [10, 9], [10, 4],
+>            [12, 25], [14, 9], [16, 4], [20, 9], [22, 16], [30, 9],
+>            [8, 49], [6, 64], [6, 81], [6, 121], [6, 729], [6, 1024]],
+>           c -> CallFuncList(CheckSUDirectGoingUp, c));
+true
+
 # RECOG.MinimalPolynomialOfSequence finds the recurrence of order L which
 # gives 2n terms from the start 0, ..., 0, 1
 gap> CheckRecurrence := function(q, n, L)

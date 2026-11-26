@@ -17,12 +17,16 @@
 ##
 #############################################################################
 
+# Whether RECOG.FindStdGens_SU goes up by RECOG.SU_DirectGoingUp, in one
+# step, instead of RECOG.GoingUp, for even d
+RECOG.SU_UseDirectGoingUp := false;
+
 # StandardGenerators of [EHNPR] (see ../GoingDown.gi), 'Outline of the
 # algorithm', for SU(d,q0), d >= 4 and q0 <> 2: RECOG.FindStdGensSU4 for
 # d = 4, otherwise GoingDown to SU(6,q0) (none for d = 5), FinalDescent
-# to SU(4,q0), and GoingUp (see ../GoingUp.gi). [EHNPR] also covers
-# q0 = 2, with GoingDown to SU(10,2); here neither the final descent nor
-# the base case work for q0 = 2.
+# to SU(4,q0), and GoingUp (see ../GoingUp.gi and DirectGoingUp.gi).
+# [EHNPR] also covers q0 = 2, with GoingDown to SU(10,2); here neither the
+# final descent nor the base case work for q0 = 2.
 # Returns a record with the following components:
 #  - `slpstd`: SLP in the generators of <G> for the standard generators of
 #    SU(d,q0), as in RECOG.ClassicalStandardGenerators, relative to bas
@@ -67,6 +71,10 @@ RECOG.FindStdGens_SU := function(G)
 
   Info(InfoRecog_ClassicalNatural, 1, "SU_n: going up");
   bas := RECOG.Form_CompleteStandardBasis(G, "SU", bas, 4);
-  up := RECOG.GoingUp(G, "SU", rec( slp := slp, bas := bas, n := 4 ));
+  if RECOG.SU_UseDirectGoingUp and IsEvenInt(d) then
+    up := RECOG.SU_DirectGoingUp(G, rec( slp := slp, bas := bas, n := 4 ));
+  else
+    up := RECOG.GoingUp(G, "SU", rec( slp := slp, bas := bas, n := 4 ));
+  fi;
   return rec( slpstd := up.slp, bas := up.bas, basi := up.bas^-1 );
 end;
