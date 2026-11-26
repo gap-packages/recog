@@ -310,35 +310,23 @@ gap> ForAll([[1, 3], [2, 3], [3, 3], [7, 3], [40, 3], [9, 5], [30, 5],
 true
 
 # RECOG.Form_NormPreimage solves z^(q^k+1) = a in the field F[x]/(f) of
-# each irreducible factor f = f^dagger of 20 characteristic polynomials, q
-# odd
-gap> CheckNormPreimage := function(type, d, q)
->     local F, conj, G, R, x, f, D, coeffs, k, a;
->     if type = "SU" then
->       F := GF(q^2);
->       conj := v -> List(v, y -> y^q);
->       G := SU(d, q);
->     else
->       F := GF(q);
->       conj := v -> v;
->       G := Sp(d, q);
->     fi;
+# each irreducible factor f = f^dagger of 20 characteristic polynomials
+# from SU(d,q), q odd
+gap> CheckNormPreimage := function(d, q)
+>     local F, G, R, x, f, k, coeffs, a;
+>     F := GF(q^2);
+>     G := SU(d, q);
 >     R := PolynomialRing(F, 1);
 >     x := IndeterminatesOfPolynomialRing(R)[1];
 >     for f in Set(Concatenation(List([1 .. 20], i -> Factors(R,
 >                  CharacteristicPolynomial(PseudoRandom(G)))))) do
->       D := DegreeOfLaurentPolynomial(f);
->       coeffs := conj(CoefficientsOfUnivariatePolynomial(f));
->       if f <> UnivariatePolynomial(F, Reversed(coeffs) / coeffs[1])
->          or (type = "Sp" and D = 1) then
+>       k := DegreeOfLaurentPolynomial(f);
+>       coeffs := List(CoefficientsOfUnivariatePolynomial(f), y -> y^q);
+>       if f <> UnivariatePolynomial(F, Reversed(coeffs) / coeffs[1]) then
 >         continue;
 >       fi;
->       k := D;
->       if type = "Sp" then
->         k := D / 2;
->       fi;
 >       repeat
->         a := PowerMod(R, Sum([0 .. D - 1], i -> Random(F) * x^i),
+>         a := PowerMod(R, Sum([0 .. k - 1], i -> Random(F) * x^i),
 >                       q^k + 1, f);
 >       until not IsZero(a);
 >       if PowerMod(R, RECOG.Form_NormPreimage(R, f, a, q, k), q^k + 1, f)
@@ -348,19 +336,53 @@ gap> CheckNormPreimage := function(type, d, q)
 >     od;
 >     return true;
 > end;;
-gap> ForAll([["Sp", 8, 3], ["Sp", 12, 3], ["Sp", 10, 5], ["Sp", 8, 7],
->            ["Sp", 8, 9], ["Sp", 6, 25], ["Sp", 6, 49], ["Sp", 4, 65537],
->            ["SU", 7, 3], ["SU", 8, 5], ["SU", 5, 7], ["SU", 6, 9],
->            ["SU", 3, 257]],
+gap> ForAll([[7, 3], [6, 3], [8, 5], [5, 7], [6, 9], [5, 17], [3, 257]],
 >           c -> CallFuncList(CheckNormPreimage, c));
 true
 
-# RECOG.Form_IsotropicKrylovVector, for the isometries h and -h, where h
+# RECOG.Form_QuadraticNormPreimage solves u^2 + u v y + v^2 = a in the
+# field F[y]/(g) for the irreducible factors g of 10 polynomials of degree
+# n, except y - 2 and y + 2, where the left hand side is (u + v)^2 resp.
+# (u - v)^2
+gap> CheckQuadraticNormPreimage := function(n, q)
+>     local F, R, y, g, k, a, uv, mul;
+>     F := GF(q);
+>     R := PolynomialRing(F, 1);
+>     y := RECOG.Pol(F, [Zero(F), One(F)]);
+>     for g in Set(Concatenation(List([1 .. 10], i -> Factors(R,
+>                  RandomPol(F, n, 1))))) do
+>       g := RECOG.Pol(F, CoefficientsOfUnivariatePolynomial(g));
+>       g := g / g[Length(g)];
+>       k := Length(g) - 1;
+>       if k = 0 or (k = 1 and g[1] in [2, -2] * One(F)) then
+>         continue;
+>       fi;
+>       mul := {u, v} -> RECOG.PolProductMod(u, v, g);
+>       repeat
+>         a := RECOG.PolMod(RECOG.Pol(F, List([1 .. k], i -> Random(F))), g);
+>       until Length(a) > 0;
+>       uv := RECOG.Form_QuadraticNormPreimage(F, g, a);
+>       if RECOG.PolSum(mul(uv[1], RECOG.PolSum(uv[1], mul(uv[2], y))),
+>                       mul(uv[2], uv[2])) <> a then
+>         return false;
+>       fi;
+>     od;
+>     return true;
+> end;;
+gap> ForAll([[1, 3], [2, 3], [5, 3], [12, 3], [30, 3], [1, 5], [8, 5],
+>            [6, 7], [10, 9], [1, 17], [6, 17], [9, 25], [5, 49], [4, 257],
+>            [3, 65537]],
+>           c -> CallFuncList(CheckQuadraticNormPreimage, c));
+true
+
+# RECOG.Form_IsotropicKrylovVector, for the isometries h, -h and, for an
+# orthogonal group of odd characteristic, h r for a reflection r, where h
 # is from the group of the standard generators: e, e h, ..., e h^(k-1) span
 # a totally isotropic resp. singular space, and beta(e, e h^k) <> 0. In odd
-# dimension x - 1 or x + 1 divides the characteristic polynomial.
+# dimension x - 1 or x + 1 divides the characteristic polynomial, and both
+# do for h r in even dimension.
 gap> CheckKrylovVector := function(type, d, q)
->     local F, form, J, G, name, top, good, i, h, chi, args, e;
+>     local F, form, J, G, name, top, w, r, good, i, h, chi, args, e;
 >     F := GF(q);
 >     if type = "SU" then
 >       F := GF(q^2);
@@ -374,10 +396,18 @@ gap> CheckKrylovVector := function(type, d, q)
 >       name := "O+";
 >       top := top - 1;
 >     fi;
+>     r := [];
+>     if type in RECOG.OrthogonalTypes and IsOddInt(q) then
+>       repeat
+>         w := Random(F^d);
+>       until not IsZero(w * J * w);
+>       r := [List(IdentityMat(d, F),
+>                  v -> v - 2 * (v * J * w) / (w * J * w) * w)];
+>     fi;
 >     good := 0;
 >     for i in [1 .. 100] do
 >       h := PseudoRandom(G);
->       for h in [h, -h] do
+>       for h in Concatenation([h, -h], List(r, x -> h * x)) do
 >         chi := CharacteristicPolynomial(h);
 >         if DegreeOfLaurentPolynomial(Gcd(chi, Derivative(chi))) > 0 then
 >           continue;

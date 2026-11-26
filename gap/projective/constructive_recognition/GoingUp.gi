@@ -896,25 +896,20 @@ end;
 
 # A preimage z of <a> under the norm N: z -> z^(q^k + 1) of the field
 # K = F[x]/(<f>) of order q^(2k) onto its subfield L of order q^k, for
-# a <> 0 in L, q odd, and <f> in the polynomial ring <R> over F irreducible
-# with f^dagger = f: of degree 2k over F = GF(q), or of degree k, which is
-# then odd, over F = GF(q^2). In K, x^(q^k) = 1 / x.
+# a <> 0 in L, F = GF(q^2) with q odd, and <f> in the polynomial ring <R>
+# over F irreducible of degree k, which is then odd, with f^dagger = f.
 # z = y if a = y^2 is a square of L, and z = y / theta with
-# y^2 = a N(theta) otherwise, for a non-square theta of K, whose norm is a
-# non-square of L:
-# - over GF(q^2), theta in F, with N(theta) = theta^(q+1);
-# - over GF(q), theta = x - lambda with f(lambda), its norm to F, a
-#   non-square of F, and N(theta) = (x - lambda) (1 / x - lambda).
-# The square roots are by Tonelli-Shanks, which takes one power
-# b^((Q-1)/2), q^k - 1 = 2^S Q with Q odd, for b = a and, if N(theta) is
-# not in F, another one for b = N(theta); N(theta)^Q generates the Sylow
-# 2-subgroup of L^*, which lies in F if 2^S divides q - 1.
+# y^2 = a N(theta) otherwise, for a non-square theta of F, whose norm
+# theta^(q+1) is a non-square of L.
+# The square root is by Tonelli-Shanks, which takes one power
+# a^((Q-1)/2), q^k - 1 = 2^S Q with Q odd; N(theta) generates the Sylow
+# 2-subgroup of L^*, which lies in GF(q).
 # The elements of K are compressed lists of coefficients: `mod` on
 # polynomials and products with lists which are not compressed are slower
 # by a factor of 10 to 100.
 RECOG.Form_NormPreimage := function(R, f, a, q, k)
   local F, vector, cf, one, mul, power, Q, S, roots, order, r, t, i,
-        nonSquare, omega, theta, c, rn, lambda, xi, M, z;
+        nonSquare, theta, c, rn, M, z;
 
   F := CoefficientsRing(R);
   vector := function(pol)
@@ -977,35 +972,12 @@ RECOG.Form_NormPreimage := function(R, f, a, q, k)
   fi;
   nonSquare := i = S;
 
-  # theta, rn = roots(N(theta)), and a generator c of the Sylow 2-subgroup
-  omega := PrimitiveRoot(F);
-  if Size(F) > q then
-    theta := omega^((q - 1) / 2^S);
-    c := theta^(q + 1);
-    rn := [c^((Q + 1) / 2) * one, c^Q * one];
-    theta := theta * one;
-    c := c * one;
-  elif not nonSquare and (q - 1) mod 2^S = 0 then
-    c := omega^((q - 1) / 2^S) * one;
-  else
-    lambda := First(Concatenation([One(F), -One(F)],
-                        List([1 .. Minimum(q - 3, 14)], j -> omega^j)),
-                    l -> Value(f, l)^((q - 1) / 2) <> One(F));
-    repeat
-      if lambda <> fail then
-        theta := vector([-lambda, One(F)]);
-        xi := -cf{[2 .. Length(cf)]} / cf[1];
-        xi[1] := xi[1] - lambda;
-        rn := roots(mul(theta, xi));
-      else
-        # no such lambda, as for half of the f with q = 3 and k odd
-        theta := vector(List([2 .. Length(cf)], j -> Random(F)));
-        rn := roots(power(theta, q^k + 1));
-      fi;
-      lambda := fail;
-    until order(rn[2]) = S;
-    c := rn[2];
-  fi;
+  # theta, rn = roots(N(theta)), and the generator c = N(theta) of the
+  # Sylow 2-subgroup
+  theta := PrimitiveRoot(F)^((q - 1) / 2^S);
+  c := theta^(q + 1);
+  rn := [c^((Q + 1) / 2) * one, c^Q * one];
+  c := c * one;
 
   if nonSquare then
     r := mul(r, rn[1]);
@@ -1021,11 +993,194 @@ RECOG.Form_NormPreimage := function(R, f, a, q, k)
     r := mul(r, z);
   od;
   if nonSquare then
-    z := GcdRepresentation(R, UnivariatePolynomial(F, theta), f)[1];
-    r := mul(r, vector(z));
+    r := r / theta;
   fi;
   Assert(1, power(r, q^k + 1) = a);
   return UnivariatePolynomial(F, r);
+end;
+
+# [u, v] in L = F[y]/(<g>) with u^2 + u v y + v^2 = a, for a <> 0 in L and
+# <g> irreducible over <F> = GF(q), q odd, other than y - 2 and y + 2; <g>
+# and <a> are polynomials in the sense of RECOG.Pol. That is N(u + v x) = a
+# for the norm N of K = L[x]/(x^2 - y x + 1) to L, where 1/x = y - x is the
+# conjugate of x. K is a field or L + L, and N is onto in both cases.
+# With q^k - 1 = 2^S Q, Q odd, and b = a N(theta), where theta = 1 if a is
+# a square of L and theta = x + c with a non-square norm c^2 + c y + 1
+# otherwise: w = b^((Q-1)/2) has w^2 b = t in the Sylow 2-subgroup of L^*,
+# and the Tonelli-Shanks loop makes t = 1. Then N(a w theta) = a.
+# The loop needs an element of order 2^(i+1) if t has order 2^i: from F if
+# 2^(i+1) divides q - 1, as for odd k, else from another power d^Q of a
+# non-square d of L. An element of L is a square if and only if its norm
+# to F is one, and that norm is a resultant. So there is one power with
+# an exponent of the size of |L|, or two.
+RECOG.Form_QuadraticNormPreimage := function(F, g, a)
+  local q, k, one, mul, y, isSquare, enum, nonSquareNorm, c, b, d, Q, S, s0,
+        order, w, t, i, M, z;
+
+  q := Size(F);
+  k := Length(g) - 1;
+  one := g{[k + 1]};
+  mul := {u, v} -> RECOG.PolProductMod(u, v, g);
+  y := RECOG.PolMod(RECOG.Pol(F, [Zero(F), One(F)]), g);
+  isSquare := u -> IsOne(RECOG.PolResultant(g, u)^((q - 1) / 2));
+
+  # [c, N(x + c)] for the first c in L, in the order of the q-adic digits
+  # of 1, 2, ..., with a non-square norm; for c in F that is a c with
+  # g(-c - 1/c) (-c)^k a non-square of F
+  enum := Enumerator(F);
+  nonSquareNorm := function()
+    local i, c, b;
+
+    i := 0;
+    repeat
+      i := i + 1;
+      c := RECOG.PolMod(RECOG.Pol(F, enum{1 + CoefficientsQadic(i, q)}), g);
+      b := RECOG.PolSum(mul(RECOG.PolSum(y, c), c), one);
+    until Length(b) > 0 and not isSquare(b);
+    return [c, b];
+  end;
+
+  c := fail;
+  b := a;
+  if not isSquare(a) then
+    d := nonSquareNorm();
+    c := d[1];
+    d := d[2];
+    b := mul(a, d);
+  fi;
+
+  Q := q^k - 1;
+  S := 0;
+  while IsEvenInt(Q) do
+    Q := Q / 2;
+    S := S + 1;
+  od;
+  s0 := 0;
+  while (q - 1) mod 2^(s0 + 1) = 0 do
+    s0 := s0 + 1;
+  od;
+  # i for t of order 2^i
+  order := function(t)
+    local i;
+
+    i := 0;
+    while t <> one do
+      t := mul(t, t);
+      i := i + 1;
+    od;
+    return i;
+  end;
+
+  w := RECOG.PolPowerMod(b, (Q - 1) / 2, g);
+  t := mul(mul(w, w), b);
+  i := order(t);
+  if i > 0 then
+    # z of order 2^M
+    if i < s0 then
+      M := s0;
+      z := PrimitiveRoot(F)^((q - 1) / 2^s0) * one;
+    else
+      if c = fail then
+        d := nonSquareNorm()[2];
+      fi;
+      M := S;
+      z := RECOG.PolPowerMod(d, Q, g);
+    fi;
+    while i > 0 do
+      z := RECOG.PolPowerMod(z, 2^(M - i - 1), g);
+      w := mul(w, z);
+      z := mul(z, z);
+      t := mul(t, z);
+      M := i;
+      i := order(t);
+    od;
+  fi;
+
+  w := mul(a, w);
+  if c = fail then
+    return [w, g{[]}];
+  fi;
+  return [mul(w, c), w];
+end;
+
+# The polynomial p with p(x) p(1/x) = c N modulo <chi>, for c = 1 or c a
+# non-square of <F> = GF(q), q odd, or fail. Here <chi> is squarefree and
+# self-reciprocal, a polynomial in the sense of RECOG.Pol, and
+# N = sum_k nu_k (x^k + x^-k) for the list <nu> of the nu_k, k >= 0.
+# chi = (x - 1)^i (x + 1)^j x^m chi0(x + 1/x) with i, j <= 1, and N = n(y),
+# y = x + 1/x, for a polynomial n. Modulo x - 1 and x + 1, p is a square
+# root of n(2) resp. n(-2), which are made squares by c, if possible.
+# Each irreducible factor g of chi0 of degree k stands for a factor
+# x^k g(x + 1/x) of chi, irreducible or a product f f^dagger, and
+# RECOG.Form_QuadraticNormPreimage gives p = u(y) + v(y) x modulo that in
+# both cases. So the polynomial to factor has half the degree of chi, the
+# pairs f, f^dagger need not be split, and the norm equations are solved
+# in fields of order q^k, not q^(2k). The u and v are combined modulo chi0,
+# and p is taken times x^(m-1), which has norm 1, as that is a polynomial
+# in x.
+RECOG.Form_ReciprocalNormRoot := function(F, chi, nu)
+  local q, one, chi1, ends, eps, m, n, vals, squares, omega, p, chi0, mods,
+        rems, g, a, uv, corr;
+
+  q := Size(F);
+  one := One(F);
+  chi1 := chi;
+  ends := [];
+  for eps in [one, -one] do
+    if IsZero(ValuePol(chi, eps)) then
+      Add(ends, eps);
+      chi1 := RECOG.PolQuotient(chi1, RECOG.Pol(F, [-eps, one]));
+    fi;
+  od;
+  m := (Length(chi1) - 1) / 2;
+
+  n := RECOG.PolOfReciprocalSum(
+           RECOG.Pol(F, Concatenation([2 * nu[1]], nu{[2 .. Length(nu)]})));
+  vals := List(ends, eps -> ValuePol(n, 2 * eps));
+  squares := Set(vals, v -> v^((q - 1) / 2));
+  if Length(squares) > 1 or Zero(F) in squares then
+    return fail;
+  elif squares = [-one] then
+    omega := PrimitiveRoot(F);
+    n := omega * n;
+    vals := omega * vals;
+  fi;
+
+  if m = 0 then
+    p := Zero(F) * chi{[1]};
+  else
+    chi0 := RECOG.PolOfReciprocalSum(chi1{[m + 1 .. 2 * m + 1]});
+    n := RECOG.PolMod(n, chi0);
+    mods := RECOG.PolFactorsSquarefree(F, chi0);
+    rems := [];
+    for g in mods do
+      a := RECOG.PolMod(n, g);
+      if Length(a) = 0 then
+        return fail;
+      fi;
+      Add(rems, RECOG.Form_QuadraticNormPreimage(F, g, a));
+    od;
+    uv := RECOG.PolChineseRemainder(chi0, mods, rems);
+    p := RECOG.PolSum(
+             ShiftedCoeffs(RECOG.PolAtReciprocalSum(F, uv[2], m - 1), 1),
+             RECOG.PolAtReciprocalSum(F, uv[1], m - 1));
+  fi;
+
+  # p + chi1 l with (p + chi1 l)(eps)^2 = n(2 eps), l of degree 0 or 1
+  if Length(ends) > 0 then
+    corr := List([1 .. Length(ends)],
+                 i -> (RootFFE(F, vals[i], 2) - ValuePol(p, ends[i]))
+                      / ValuePol(chi1, ends[i]));
+    if Length(ends) = 2 then
+      corr := [(corr[1] + corr[2]) / 2, (corr[1] - corr[2]) / 2];
+    fi;
+    corr := RECOG.Pol(F, corr);
+    if Length(corr) > 0 then
+      AddCoeffs(p, ProductCoeffs(chi1, corr));
+    fi;
+  fi;
+  ShrinkRowVector(p);
+  return p;
 end;
 
 # A vector e of W = GF(q)^n, n = 2m, for the isometry <h> of the form
@@ -1041,11 +1196,12 @@ end;
 # N = p p^dagger, a^dagger = a^sigma(x^-1), in A = F[x]/chi. The
 # conditions on the self-adjoint N are linear over the fixed field of
 # sigma, with a one-dimensional solution space <N0> in general, and the
-# norm equation p p^dagger = N0 is solved in each factor of A: trivially
-# for a pair of factors f, f^dagger, by RECOG.Form_NormPreimage for
-# f = f^dagger otherwise, except for x - 1 and x + 1 in Sp and O+, where it
-# is a square root. For q even, p is the square root of N0 in A, which
-# needs no factorisation.
+# norm equation p p^dagger = N0 is solved by
+# - RECOG.Form_ReciprocalNormRoot for Sp and O with q odd, which factors a
+#   polynomial of half the degree of chi;
+# - a square root in A for q even, without any factorisation;
+# - in each factor of A for SU with q odd: trivially for a pair of factors
+#   f, f^dagger, by RECOG.Form_NormPreimage for f = f^dagger.
 # In characteristic 2, h must not have the eigenvalue 1, and for "O+" the
 # optional argument is the matrix of the quadratic form Q (as in
 # RECOG.ClassicalForm). There N = nu_0 + sum_(k>0) nu_k (x^k + x^-k): the
@@ -1103,7 +1259,7 @@ end;
 # must not have the root 1, and for "O+" the optional argument is Q(c).
 RECOG.Form_IsotropicKrylovPolynomial := function(phi, F, chi, type, Qc...)
   local n, m, q, q0, conj, R, x, ph, F0, omega, coords, M, row, k, j, nu,
-        cands, top, xi, xim, N, N0, mods, rems, used, f, fs, a, z, p, P,
+        cands, top, xi, xim, N, N0, mods, rems, used, f, fs, a, p, P,
         coeffs, even;
 
   n := Length(phi) - 1;
@@ -1207,8 +1363,6 @@ RECOG.Form_IsotropicKrylovPolynomial := function(phi, F, chi, type, Qc...)
   if type = "O+" then
     top := m - 1;
   fi;
-  xi := GcdRepresentation(R, x, chi)[1] mod chi;
-  xim := PowerMod(R, xi, m, chi);
   N0 := fail;
   for nu in cands do
     if even then
@@ -1219,7 +1373,13 @@ RECOG.Form_IsotropicKrylovPolynomial := function(phi, F, chi, type, Qc...)
                               + nu[k + 1] * ph(top - k));
     fi;
     if not IsZero(a) then
+      if type <> "SU" and IsOddInt(q) then
+        return RECOG.Form_ReciprocalNormRoot(F,
+                   RECOG.Pol(F, CoefficientsOfUnivariatePolynomial(chi)), nu);
+      fi;
       # N = sum_k nu_k x^k + x^-m sum_k nu_k^sigma x^(m-k)
+      xi := GcdRepresentation(R, x, chi)[1] mod chi;
+      xim := PowerMod(R, xi, m, chi);
       N := (UnivariatePolynomial(F, nu)
             + UnivariatePolynomial(F, Reversed(conj(nu))) * xim) mod chi;
       if even then
@@ -1236,16 +1396,6 @@ RECOG.Form_IsotropicKrylovPolynomial := function(phi, F, chi, type, Qc...)
   if N0 = fail then
     return fail;
   fi;
-  if IsOddInt(n) and type <> "SU" then
-    # N0 is determined up to a scalar, and the norm equation at x - 1 is a
-    # square root
-    a := Value(N0, One(F));
-    if IsZero(a) then
-      return fail;
-    elif a^((q - 1) / 2) <> One(F) then
-      N0 := PrimitiveRoot(F) * N0;
-    fi;
-  fi;
 
   if IsEvenInt(q) then
     # the square root of N0 is self-adjoint, as N0 is
@@ -1254,7 +1404,7 @@ RECOG.Form_IsotropicKrylovPolynomial := function(phi, F, chi, type, Qc...)
                RECOG.Pol(F, CoefficientsOfUnivariatePolynomial(chi)));
   fi;
 
-  # p, with p p^dagger = N0, by the Chinese remainder theorem
+  # SU: p, with p p^dagger = N0, by the Chinese remainder theorem
   mods := [];
   rems := [];
   used := [];
@@ -1272,17 +1422,6 @@ RECOG.Form_IsotropicKrylovPolynomial := function(phi, F, chi, type, Qc...)
       Append(mods, [f, fs]);
       Append(rems, [a, One(R)]);
       Add(used, fs);
-    elif type <> "SU" and DegreeOfLaurentPolynomial(f) = 1 then
-      z := RootsOfUPol(F, x^2 - Value(a, Zero(F)));
-      if z = [] then
-        return fail;
-      fi;
-      Add(mods, f);
-      Add(rems, z[1] * One(R));
-    elif type <> "SU" then
-      Add(mods, f);
-      Add(rems, RECOG.Form_NormPreimage(R, f, a, q,
-                                        DegreeOfLaurentPolynomial(f) / 2));
     else
       Add(mods, f);
       Add(rems, RECOG.Form_NormPreimage(R, f, a, q0,
