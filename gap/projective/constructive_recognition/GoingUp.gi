@@ -1028,8 +1028,8 @@ end;
 # must not have the root 1, and for "O+" the optional argument is Q(c).
 RECOG.Form_IsotropicKrylovPolynomial := function(phi, F, chi, type, Qc...)
   local n, m, q, q0, conj, R, x, ph, F0, omega, coords, M, row, k, j, nu,
-        cands, top, xi, N, N0, mods, rems, used, f, fs, a, z, p, P, coeffs,
-        even;
+        cands, top, xi, xim, N, N0, mods, rems, used, f, fs, a, z, p, P,
+        coeffs, even;
 
   n := Length(phi) - 1;
   m := n / 2;
@@ -1133,6 +1133,7 @@ RECOG.Form_IsotropicKrylovPolynomial := function(phi, F, chi, type, Qc...)
     top := m - 1;
   fi;
   xi := GcdRepresentation(R, x, chi)[1] mod chi;
+  xim := PowerMod(R, xi, m, chi);
   N0 := fail;
   for nu in cands do
     if even then
@@ -1143,8 +1144,9 @@ RECOG.Form_IsotropicKrylovPolynomial := function(phi, F, chi, type, Qc...)
                               + nu[k + 1] * ph(top - k));
     fi;
     if not IsZero(a) then
-      N := Sum([0 .. m], k -> nu[k + 1] * x^k
-                          + nu[k + 1]^q0 * PowerMod(R, xi, k, chi)) mod chi;
+      # N = sum_k nu_k x^k + x^-m sum_k nu_k^sigma x^(m-k)
+      N := (UnivariatePolynomial(F, nu)
+            + UnivariatePolynomial(F, Reversed(conj(nu))) * xim) mod chi;
       if even then
         N := (N + nu[1] * One(R)) mod chi;
       fi;
