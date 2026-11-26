@@ -69,12 +69,12 @@ function(ri)
     # compute homomorphism into Sym(o), i.e, restrict
     # the permutation action of G to the orbit o
     hom := OrbActionHomomorphism(G,o);
-    # TODO: explanation
+    # hom cannot map a permutation which does not preserve o
     Setvalidatehomominput(ri, {ri,p} -> ForAll(o, x -> (x^p in o)));
     # store the homomorphism into the recognition node
     SetHomom(ri,hom);
 
-    # TODO: explanation
+    # random kernel elements may generate a proper subgroup of the kernel
     Setimmediateverification(ri, true);
 
     # indicate success

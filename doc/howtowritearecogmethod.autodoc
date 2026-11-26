@@ -1,186 +1,298 @@
 @Chapter How to write a recognition method
 
-This chapter explains how to integrate a newly developed group recognition
-method into the framework provided by the recog package.
+This chapter explains how to add a new recognition method to the
+<Package>recog</Package> package. Chapter <Ref Chap="recognition"/> documents
+the attributes of recognition nodes used here, Chapter <Ref Chap="methsel"/>
+the method objects and method databases. Feedback on this chapter is welcome,
+see Section <Ref Sect="feedback"/>.
 
-TODO:
-Refer to Chapter <Ref Chap="methsel"/> for an explanation of methods.
-There are leaf methods and split methods.
-The next two sections describe how to implement leaf and split methods
-respectively, and include example code.
+@Section Overview of group recognition
+@SectionLabel HowToOverview
+
+Let $G = \langle X \rangle$ be a group, for example a permutation group or a
+matrix group over a finite field. <Package>recog</Package> solves the
+constructive membership problem for $G$: given an element $g$ of a group
+containing $G$, decide whether $g \in G$, and if so, return a straight line
+program (SLP) that computes $g$ from $X$. To this end it chooses
+<E>nice generators</E> $Y$ of $G$ and an SLP from $X$ to $Y$; an SLP for $g$
+in terms of $Y$, composed with it, yields an SLP in terms of $X$.
+
+The work is organised recursively along a <E>recognition tree</E>, also called
+composition tree. Each node is a recognition node (see Section
+<Ref Sect="rirecord"/>) for a group $G$ and is of one of two kinds:
+- a <E>leaf node</E>, for which constructive membership is solved directly;
+  typically $G$ is (almost) simple, possibly modulo scalars, or otherwise
+  easy, for example trivial, cyclic, or small enough for a stabiliser chain;
+- a <E>non-leaf node</E>, for which a homomorphism
+  $\varphi \colon G \to H$ was found; its children recognise the image $H$
+  and the kernel $N = \ker(\varphi)$.
+
+$G$ is <E>constructively recognised</E> once its isomorphism type is known,
+for example $M_{11}$ or $PSL_2(9)$, and constructive membership is solved as
+above. Section <Ref Sect="techrecog"/> explains how
+<Ref Func="RecogniseGeneric"/> builds the tree and assembles the SLPs of a
+non-leaf node from those of image and kernel. For background see
+<Cite Key="BHLGO15"/> and <Cite Key="NS06"/>.
+
+@Subsection Terminology
+
+A <E>recognition method</E> is an object in the filter
+<Ref Filt="IsRecogMethod"/>: a &GAP; function together with a unique name,
+its <E>stamp</E>, and a comment. Chapter <Ref Chap="recognition"/> calls
+recognition methods <Q>find homomorphism methods</Q>. They are not &GAP;
+methods installed with <Ref Func="InstallMethod" BookName="Ref"/>, and the
+method selection of Chapter <Ref Chap="methsel"/> decides which of them is
+tried when.
+
+A successful recognition method either makes its node a leaf or provides a
+homomorphism; we call it a <E>leaf method</E> or a <E>non-leaf method</E>
+accordingly. The distinction concerns a single call: nothing prevents a method
+from doing either, depending on its input.
+
+@Section Projective groups
+@SectionLabel HowToProjective
+
+<Package>recog</Package> represents a projective group by a matrix group
+$G \leq GL(d,q)$ and recognises $G/Z$, where $Z$ is the group of scalar
+matrices in $G$. Two matrices represent the same element of $G/Z$ if they
+differ by a scalar factor. A matrix group which none of the few matrix
+methods handles reaches the method <Ref Subsect="GoProjective" Style="Text"/>,
+whose image is the same group treated projectively and whose kernel is $Z$.
+Hence most methods are installed for projective groups, see Section
+<Ref Sect="projmethods"/>.
+
+The component `ri!.projective` of a projective node is `true`. Code that runs
+at projective nodes
+- compares elements with <Ref Attr="isone"/> and <Ref Attr="isequal"/>, and
+  computes element orders with <Ref Attr="OrderFunc"/>, instead of `IsOne`,
+  `=` and `Order`;
+- must use homomorphisms which are well defined modulo scalars: matrices that
+  differ by a scalar factor must have images that represent the same element;
+- may return from its `slpforelement` function an SLP that evaluates to the
+  given element up to a scalar factor;
+- must set the size of a leaf to $|G/Z|$, see Section <Ref Sect="Section_HowToLeaf"/>.
+
+@Section Input and return values
+@SectionLabel HowToInput
+
+A recognition method takes one argument, the recognition node `ri`. It obtains
+the group to recognise with <Ref Attr="Grp"/>, and on success stores its
+results in `ri`; Sections <Ref Sect="Section_HowToLeaf"/> and
+<Ref Sect="Section_HowToNonLeaf"/> list what it has to store.
+<Package>recog</Package> asks for the minimal information and derives the
+rest.
+
+A recognition method returns one of four values. Section
+<Ref Sect="howcalled"/> explains how <Ref Func="CallMethods"/> reacts to them.
+- `Success`: the method has done its work; no other method is tried.
+- `NeverApplicable`: the method cannot work for this group, for example
+  because it handles only transitive groups. It is not called again for this
+  node. A method should find this out quickly, without big computations.
+- `TemporaryFailure`: the method failed but may succeed when called again.
+  This is typical for a Las Vegas algorithm with unlucky random choices; for
+  example <Ref Subsect="Giant" Style="Text"/> returns it when it found no
+  evidence that the group is a giant.
+- `NotEnoughInformation`: the method needs information which is not known
+  yet, but which other methods may find. For example
+  <Ref Subsect="Imprimitive" Style="Text"/> returns it as long as it is not
+  known whether the group is transitive.
+
+A method that does not succeed may still store what it learnt, in `ri` or in
+the group, so that other methods can use it. For example
+<Ref Subsect="Imprimitive" Style="Text"/> calls `SetIsPrimitive(G, true)`
+before returning `NeverApplicable`.
+
+The function <Ref Func="BindRecogMethod"/> creates a recognition method and
+stores it, under its stamp, in one of the records
+<Ref Var="FindHomMethodsGeneric"/>, <Ref Var="FindHomMethodsPerm"/>,
+<Ref Var="FindHomMethodsMatrix"/> and <Ref Var="FindHomMethodsProjective"/>.
+Its arguments are the name of the record, the stamp, the comment, an optional
+record of options, and the function; the examples below show its use. The
+stamp must be unique: it names the method in the method tables of Chapter
+<Ref Chap="methods"/>, in the display of a recognition tree, and in the record
+of <Ref Func="CallMethods"/>. The only option,
+`validatesOrAlwaysValidInput`, declares that the method checks whether its
+input is valid, or works for every input; currently it is not used.
 
 @Section Leaf methods
+@SectionLabel HowToLeaf
 
-A leaf method must at the very least do the following, examples will be
-provided below (TODO: add a reference):
+A leaf method must
+- mark the node as a leaf with `SetFilterObj(ri, IsLeaf)`, see
+  <Ref Filt="IsLeaf"/>;
+- set <Ref Attr="slpforelement"/> to a function which takes `ri` and an
+  element $g$, and returns an SLP for $g$ in terms of the nice generators $Y$,
+  or `fail` if $g \notin G$;
+- define the nice generators: either set <Ref Attr="slptonice"/> to an SLP
+  from the original generators $X$ to $Y$, or set <Ref Attr="NiceGens"/>,
+  or do neither, in which case $Y = X$;
+- set the order of the group with `SetSize(ri, n)` if the node is projective.
+  Otherwise doing so is optional, but recommended: by default
+  <Package>recog</Package> computes `Size(Grp(ri))`, which may be expensive.
 
-- Provide the order of the recognized group via `SetSize(ri, NNN)`.
-- Provide a set of SLPs which map the original generators $X$ to the nice generators $Y$, as entry for the attribute `slptonice`.
-- Provide a function which maps any element $g\in G$ to a corresponding SLP in terms of the nice generators $Y$, as entry for the attribute `slpforelement`.
-- Call `SetFilterObj(ri, IsLeaf);` to mark the node as a leaf node.
+<Ref Func="RecogniseGeneric"/> derives the remaining data, for example
+<Ref Attr="NiceGens"/> from <Ref Attr="slptonice"/>. If the method sets
+neither <Ref Attr="StdPresentation"/> nor <Ref Attr="CalcStdPresentation"/>,
+a generic and expensive function computes a presentation when the tree is
+verified. <Ref Func="RecogniseGeneric"/> marks every leaf as correct (see
+<Ref Prop="IsCorrect"/>), so a leaf method must not return a wrong result.
 
-There are further values that can be provided, in particular to speed up
-computations; we'll come back to that later. Let's first look at an example:
-The following method is used by <Package>recog</Package> to recognize trivial
-groups, as a base case for the recursive group recognition algorithm. It works
-for arbitrary groups.
+The following method recognises trivial groups. It is the base case of the
+recursion and works for permutation, matrix and projective groups.
 
-TODO: AutoDoc inserts extra paragraph commands here:
 @InsertCode FindHomMethodsGeneric.TrivialGroup
 
-The input is in the format described above (TODO), and the return value is "Success".
-
-Two more comments:
-- When we check whether all generators are the identity, we call `ri!.isone`,
-  instead of `IsOne`. The reason for this is the need to support __projective
-  groups__. For permutation groups and matrix groups, `ri!.isone` is simply
-  defined to be `IsOne`. For projective groups, it is set to `IsOneProjective`,
-  which can be read as  "is one modulo scalars".
-- The function `SLPforElementFuncsGeneric.TrivialGroup` takes `ri` as well as an
-  element `g` as input.  If $g \in G$, then it is supposed to return an SLP for
-  $g$ in terms of the nice gens $Y$. Otherwise it returns `fail`. Here is the
-  concrete implementation:
+The method tests the generators with `ri!.isone`, the value of
+<Ref Attr="isone"/>, so that it also works for projective groups. Its
+`slptonice` returns one element, the first generator to the power $0$: the
+only nice generator is the identity. The function stored in `slpforelement` is
+the following.
 
 @InsertCode SLPforElementFuncsGeneric.TrivialGroup
 
-Finally, we need to let <Package>recog</Package> know about this new
-recognition method. This is done via the `AddMethod` function. Another example!
+It returns `fail` if `g` is not the identity, and otherwise an SLP with one
+input, the nice generator, that returns the identity. Such functions are
+stored in the records <Ref Var="SLPforElementFuncsGeneric"/>,
+<Ref Var="SLPforElementFuncsPerm"/>, <Ref Var="SLPforElementFuncsMatrix"/>
+and <Ref Var="SLPforElementFuncsProjective"/>.
+
+The method <Ref Subsect="Giant" Style="Text"/> is a leaf method of realistic
+size. It computes its nice generators as elements with memory (see Section
+<Ref Sect="Section_HowToMemory"/>), obtains `slptonice` from them with
+<Ref Func="SLPOfElms" BookName="Ref"/>, and sets the size and a presentation.
+
+@Section Installing a method
+@SectionLabel HowToInstall
+
+To let <Package>recog</Package> use a method, add it to a method database
+with <Ref Func="AddMethod"/>:
 
 @InsertCode AddMethod_Perm_FindHomMethodsGeneric.TrivialGroup
 
-TODO: refer to the `AddMethod` documentation instead. Also this is outdated now.
-The function `AddMethod` takes four mandatory arguments `db`, `meth`, `rank`, `stamp`, and an optional fifth argument `comment`. Their meaning is as follows:
-
-- `db` is the "method database", and determines to which type of groups the methods should be applied. Allowed values are:
-    - `FindHomDbPerm`
-    - `FindHomDbMatrix`
-    - `FindHomDbProjective`
-
-- `meth` is the recognition method we have defined. In our example this is `FindHomMethodsGeneric.TrivialGroup`.
-
-- `rank` is the relative rank of the recognition method, given as an integer. The idea is that methods with a high rank get called before methods with a low rank, so [recog] tries recognition methods starting from the highest rank. What the "right" rank for a given method is depends on which other methods exist and what their ranks are. As a rule of thumb, methods which are either very fast or very likely to be applicable should be tried before slower methods, or methods which are less likely to be relevant.
-- `stamp` holds a string value that uniquely describes the method. This is used for bookkeeping. It is also used in the manual, for printing the recognition tree, and for debugging purposes.
-- `comment` is a string valued comment which in the example above has been used to explain what the method does. This argument is optional and can be left out.
-
-
-Note that above, we only installed our method into `FindHomDbPerm`. But in
-recog, it is actually also installed for matrix and projective groups. We
-reproduce the corresponding `AddMethod` calls here. Note that the ranks differ,
-so the same method can be called with varying priority depending on the type of
-group.
+The arguments are the database, the method, and its rank. The databases
+<Ref Var="FindHomDbPerm"/>, <Ref Var="FindHomDbMatrix"/> and
+<Ref Var="FindHomDbProjective"/> hold the methods for permutation, matrix and
+projective groups. A method can be in several databases, with different
+ranks; the trivial group method is also installed by
 
 @InsertCode AddMethod_Matrix_FindHomMethodsGeneric.TrivialGroup
 @InsertCode AddMethod_Projective_FindHomMethodsGeneric.TrivialGroup
 
-- TODO: more advanced example?
-- TODO: also explain how verification works
-- TODO: we need something that demonstrates the other two return values (Oh yes, good point.)
+Methods with higher rank are tried first. The right rank depends on the other
+methods in the database, which the tables in Chapter <Ref Chap="methods"/>
+list. As a rule of thumb, methods which are fast or likely to apply should be
+tried before slow methods or methods which rarely apply. The ranks in a
+database must be distinct, also from those of the hints, see Section
+<Ref Sect="Section_HowToNonLeaf"/>.
 
-@Section Elements with memory
+Document the method in a chunk named after its stamp, next to its definition:
 
-When using the memory of group elements, one currently has to always access ri!.gensHmem instead of doing `GroupWithMemory(Grp(ri))`.
-Namely, many functions for objects with memory assume that, if the elements live in the same group, then their `!.slp` components are identical.
+```@listing
+#! @BeginChunk MyStamp
+#! Describe what the method does, and when it returns which value.
+#! @EndChunk
+```
 
-@Section Splitting methods
+Building the manual with `makedoc.g` then adds the method to Chapter
+<Ref Chap="methods"/>, with its rank, its comment, and the place of its
+definition.
 
-Recall that splitting recognition methods produce an epimorphism $\phi:G\to H$
-and then delegate the work to the image $H$ and the kernel $N:=\ker(\phi)$.
-This means that now $N$ and $H$ have to be constructively recognized. Such a
-splitting recognition method only needs to provide a homomorphism, by calling
-`SetHomom(ri, hom);`. However, in practice one will want to provide additional
-data.
+@Section Non-leaf methods
+@SectionLabel HowToNonLeaf
 
-We start with an example, similar to a method used in <Package>recog</Package>.
-This refers to permutation groups only!
+A non-leaf method finds a homomorphism $\varphi \colon G \to H$ and stores it
+with `SetHomom(ri, hom)`, see <Ref Attr="Homom"/>. Then
+<Ref Func="RecogniseGeneric"/> recognises the image $H$, computes generators
+of the kernel $N$, recognises $N$, and derives the nice generators and the
+`slpforelement` function of the node. Section <Ref Sect="findhomo"/> lists
+the duties of such a method; the most common ones are:
+- If `hom` cannot handle every element of the group containing $G$, set
+  <Ref Attr="validatehomominput"/> to a function that rejects the elements
+  outside its source. Otherwise membership tests may give wrong answers or
+  run into errors.
+- If the image needs other methods than $G$, for example because a matrix
+  group is mapped to a permutation group, set <Ref Attr="methodsforimage"/>
+  to the appropriate database.
+- By default the kernel is generated by the normal closure of a few random
+  kernel elements, see <Ref Attr="findgensNmeth"/>. If `hom` is injective,
+  set `findgensNmeth(ri).method := FindKernelDoNothing`. Kernel elements
+  which the method finds can be appended to <Ref Attr="gensN"/>; they need a
+  memory, see Section <Ref Sect="Section_HowToMemory"/>. If random elements
+  may generate a proper subgroup of the kernel, set
+  <Ref Attr="immediateverification"/> to `true`.
+
+The following method restricts a permutation group to an orbit.
 
 @InsertCode FindHomMethodsPerm.NonTransitive
-
-TODO Alternatively use this:
-@BeginExampleSession
-FindHomMethodsPerm.NonTransitive := function(ri, G)
-  local hom, la, o;
-
-  # test whether we can do something:
-  if IsTransitive(G) then
-    # the action is transitive, so we can't do
-    # anything, and there is no point in calling us again.
-    return NeverApplicable;
-  fi;
-
-  # compute orbit of the largest moved point
-  la := LargestMovedPoint(G);
-  o := Orbit(G, la, OnPoints);
-
-  # compute homomorphism into Sym(o), i.e, restrict
-  # the permutation action of G to the orbit o
-  hom := ActionHomomorphism(G, o);
-
-  # store the homomorphism into the recognition node
-  SetHomom(ri, hom);
-
-  # indicate success
-  return Success;
-end;
-@EndExampleSession
-
 @InsertCode AddMethod_Perm_FindHomMethodsPerm.NonTransitive
 
-TODO: More complex example:
+The functions `Orb` and `OrbActionHomomorphism` come from the
+<Package>orb</Package> package.
 
-@BeginExampleSession
-FindHomMethodsMatrix.BlockLowerTriangular := function(ri, G)
-  # This is only used coming from a hint, we know what to do:
-  # A base change was done to get block lower triangular shape.
-  # We first do the diagonal blocks, then the lower p-part:
-  local H, data, hom, newgens;
+@Subsection Hints for image and kernel
 
-  # we need to construct a homomorphism, but to define it,
-  # we need the image, but of course the image is defined in
-  # terms of the homomorphism... to break this cycle, we do
-  # the following: we first map the input generators using
-  # the helper function RECOG.HomOntoBlockDiagonal; this
-  # function is later also used as the underlying mapping
-  # of the homomorphism.
-  data := rec( blocks := ri!.blocks );
-  newgens := List(GeneratorsOfGroup(G),
-                  x -> RECOG.HomOntoBlockDiagonal(data, x));
-  Assert(0, not fail in newgens);
+A method often learns something that helps to recognise the image or the
+kernel. It can store such knowledge in the records
+<Ref Attr="InitialDataForImageRecogNode"/> and
+<Ref Attr="InitialDataForKernelRecogNode"/>, whose components are copied into
+the node for the image or the kernel, respectively. Their component `hints`
+is a method database whose methods are tried together with those of the
+database of the new node, ordered by rank; see Section
+<Ref Sect="hintsystem"/>.
 
-  # now that we have the images of the generators, we can
-  # define the image
-  H := Group(newgens);
+For example <Ref Subsect="ReducibleIso" Style="Text"/> conjugates a reducible
+matrix group into block lower triangular form, stores the blocks in the
+component `blocks` of `InitialDataForImageRecogNode(ri)`, and adds the
+following method to its `hints` with rank 4000, so that the image tries it
+first.
 
-  # finally, we define the homomorphism
-  hom := GroupHomByFuncWithData(G, H, RECOG.HomOntoBlockDiagonal, data);
+@InsertCode FindHomMethodsMatrix.BlockLowerTriangular
 
-  # ... and store it in the recognition node
-  SetHomom(ri, hom);
+The method maps each matrix to its block diagonal part. It computes the images
+of the generators first, as the image group is needed to define `hom`. The
+image gets the hint <Ref Subsect="BlockDiagonal" Style="Text"/>, the kernel,
+a $p$-group of block lower unitriangular matrices, gets the hint
+<Ref Subsect="LowerLeftPGroup" Style="Text"/>, and
+`RECOG.FindKernelLowerLeftPGroup` computes kernel generators instead of the
+default normal closure. The function `GroupHomByFuncWithData` comes from the
+<Package>orb</Package> package.
 
-  # since we know exactly what kind of group we are looking
-  # at, we don't want to run generic recognition on the
-  # image and the kernel. So we provide "hints" to ensure
-  # more appropriate recognition methods are applied first.
+@Section Elements with memory
+@SectionLabel HowToMemory
 
-  # Give hint to image
-  InitialDataForImageRecogNode(ri).blocks := ri!.blocks;
-  AddMethod(InitialDataForImageRecogNode(ri).hints,
-      rec( method := FindHomMethodsMatrix.BlockDiagonal,
-           rank := 2000,
-           stamp := "BlockDiagonal" ) );
+An element with memory remembers how it was computed from a list of
+generators, and <Ref Func="SLPOfElms" BookName="Ref"/> turns this into an
+SLP; see Section <Ref Sect="Objects with Memory" BookName="Ref"/>. Methods use
+such elements to obtain `slptonice` and kernel generators.
 
-  # Tell recog that we have a better method for finding kernel
-  findgensNmeth(ri).method := FindKernelLowerLeftPGroup;
-  findgensNmeth(ri).args := [];
+Elements with memory can be multiplied, or passed together to
+<Ref Func="SLPOfElms" BookName="Ref"/>, only if they stem from the same call
+of <Ref Func="GeneratorsWithMemory" BookName="Ref"/>. The generators of
+`Grp(ri)` have no memory; the component `ri!.gensHmem` holds them with memory.
+A method that needs elements with memory therefore uses `ri!.gensHmem`, for
+example by working in `Group(ri!.gensHmem)`, and not
+`GroupWithMemory(Grp(ri))`, which starts a new, incompatible memory. In
+particular, elements appended to <Ref Attr="gensN"/> must stem from
+`ri!.gensHmem`, because <Ref Func="RecogniseGeneric"/> computes
+<Ref Attr="gensNslp"/> from them with
+<Ref Func="SLPOfElms" BookName="Ref"/>.
 
-  # Give hint to kernel N
-  AddMethod(InitialDataForKernelRecogNode(ri).hints,
-      rec( method := FindHomMethodsMatrix.LowerLeftPGroup,
-           rank := 2000,
-           stamp := "LowerLeftPGroup" ));
-  InitialDataForKernelRecogNode(ri).blocks := ri!.blocks;
+For random elements, call `RandomElm(ri, stamp, true).el`, which returns an
+element with memory derived from `ri!.gensHmem`, or
+`RandomElm(ri, stamp, false).el` for one without memory. The $i$-th call with
+one stamp returns the same element as the $i$-th call with any other stamp, so
+methods tried at the same node share their random elements instead of
+computing new ones. Use
+<Ref Func="StripMemory" BookName="Ref"/> to remove the memory, for example
+before storing nice generators.
 
-  # This function always succeeds, because it is only
-  # called for inputs for which it is known to apply.
-  return Success;
-end;
-@EndExampleSession
+@Section Testing a method
+@SectionLabel HowToTest
+
+<Ref Func="TryFindHomMethod"/> runs a single method on a group, without
+method selection and recursion. To test a method in context, recognise groups
+with <Ref Func="RecogniseGroup"/> and view the result; the display shows the
+stamp of the method that succeeded at each node. The function
+`RECOG.TestGroup(G, projective, size)` recognises $G$, checks its size, and
+checks <Ref Func="SLPforElement"/> on random elements inside and outside $G$.
+The test files in `tst/working` use it; `tst/testquick.g` runs the quick ones.
