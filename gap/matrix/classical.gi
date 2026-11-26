@@ -2503,7 +2503,9 @@ function(recognise)
             return TemporaryFailure;
         fi;
         if recognise.hasSpecialEle = false then
-            if not Order(recognise.g) in [4,8] then
+            ## Projective order: an involution times a scalar of order 4
+            ## or 8 has matrix order 4 or 8 and a scalar square
+            if not ProjectiveOrder(recognise.g)[1] in [4,8] then
                 return TemporaryFailure;
             fi;
             g := recognise.g^2;

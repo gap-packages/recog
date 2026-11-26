@@ -27,5 +27,15 @@ gap> ForAll([29, 49, 79], q -> RecogniseClassical(Group(Concatenation(
 >         .isOmegaContained = true);
 true
 
+# For q = 9 the test wants an element of projective order 4. An involution
+# times a scalar of order 4 or 8 has matrix order 4 or 8 and a central square.
+gap> G := Group(Concatenation(GeneratorsOfGroup(Omega(3, 9)),
+>                             [Z(9) * IdentityMat(3, GF(9))]));;
+gap> ForAny([1 .. 30], i -> RecogniseClassical(G).isOmegaContained = false);
+false
+gap> ForAny([Z(9), Z(9)^2], z ->
+>         RecogniseClassical(A5WithScalar(9, z)).isOmegaContained = true);
+false
+
 #
 gap> STOP_TEST("naming-omega3.tst");
