@@ -297,8 +297,8 @@ end;
 # c_i + s a nonzero square. A divisor g of f is irreducible if and only if
 # all of B is constant modulo g.
 # No random numbers are drawn. The cost is that of echelonising a matrix of
-# n = deg f rows: for n = 500 a tenth or less of the time of `Factors`,
-# which takes up to n/2 powers x^(q^i) modulo f and as many gcds.
+# n = deg f rows, where `Factors` takes up to n/2 powers x^(q^i) modulo f
+# and as many gcds, and then splits the factors of equal degree.
 RECOG.PolFactorsSquarefree := function(F, f)
   local q, n, one, i, M, rank, pivots, cols, basis, j, v, omega, split;
 
