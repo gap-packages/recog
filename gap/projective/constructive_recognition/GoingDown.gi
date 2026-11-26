@@ -94,12 +94,192 @@ RECOG.StingrayBodyDimensions := function(n, params)
   return D;
 end;
 
+# Degrees of the block phase of RECOG.StingrayFactor: one gcd with f
+# covers this many degrees. A multiplication modulo f costs about a 30th of
+# a gcd with f; blocks of 8, 16 and 32 degrees perform alike.
+RECOG.StingrayDegreeBlock := 16;
+
+# The test of Algorithm FindStingrayElement of [EHNPR], Section 'Stingray
+# elements', on the characteristic polynomial <chi> of h over the field
+# <F>: an irreducible factor P of <chi> of multiplicity 1 with deg(P) = m in
+# <D>, where m divides the degree of no other factor, and x^B generates
+# GF(q)[x]/<P> over GF(q) for B = p^beta * lcm(q^deg(P_j)-1 : P_j <> P),
+# with p^beta at least every other multiplicity. Then h^B is an
+# m-stingray element.
+# Only the degrees and multiplicities of the factors matter, so this is a
+# distinct-degree factorisation without the equal-degree split. Up to
+# degree max(D) it takes one gcd with x^(q^j)-x per degree j and rejects
+# <chi> once no m in <D> is left. Above, a factor of f of degree e lies in
+# a block [a..b] iff it divides the product of the x^(q^j)-x for j in
+# [a..b], as f has no factor of degree < a; so one gcd per block tests
+# RECOG.StingrayDegreeBlock degrees, and only a nontrivial gcd is split by
+# degree. Most blocks have none, as a random polynomial has few distinct
+# factor degrees.
+# Returns fail, or a record with components `P` (monic) and `B`, for the
+# smallest m.
+RECOG.StingrayFactor := function(chi, F, D)
+  local q, p, fam, ind, toPol, x, mmax, status, P, found, register, peel, f,
+        fc, minusx, pow, j, a, b, pows, prod, cyc, g, gk, k, m, others, c,
+        beta, B, gamma;
+
+  q := Size(F);
+  p := Characteristic(F);
+  fam := FamilyObj(One(F));
+  ind := IndeterminateNumberOfUnivariateRationalFunction(chi);
+  toPol := cs -> UnivariatePolynomialByCoefficients(fam, cs, ind);
+  x := toPol([Zero(F), One(F)]);
+
+  D := Filtered(Set(D), m -> m < Degree(chi));
+  if IsEmpty(D) then
+    return fail;
+  fi;
+  mmax := Maximum(D);
+
+  # status[m]: "open" before degree m is reached; "cand" if there is
+  # exactly one factor P[m] of degree m, of multiplicity 1, and none of
+  # degree a multiple of m so far; else "dead"
+  status := [];
+  P := [];
+  for m in D do
+    status[m] := "open";
+  od;
+
+  # [degree, largest multiplicity] for each degree of a factor of chi
+  found := [];
+  register := function(gk, k, mult)
+    local m;
+    Add(found, [k, mult]);
+    for m in D do
+      if m = k and status[m] = "open" and Degree(gk) = k and mult = 1 then
+        status[m] := "cand";
+        P[m] := gk;
+      elif k mod m = 0 then
+        status[m] := "dead";
+      fi;
+    od;
+  end;
+
+  # removes the factors of the squarefree gk from f and returns their
+  # largest multiplicity
+  peel := function(gk)
+    local mult, h;
+    mult := 0;
+    h := gk;
+    repeat
+      f := Quotient(f, h);
+      mult := mult + 1;
+      h := GcdOp(f, h);
+    until Degree(h) = 0;
+    return mult;
+  end;
+
+  f := chi / LeadingCoefficient(chi);
+  fc := CoefficientsOfUnivariatePolynomial(f);
+  if q > MAXSIZE_GF_INTERNAL then
+    minusx := Immutable([Zero(F), -One(F)]);
+  else
+    minusx := ImmutableVector(F, [Zero(F), -One(F)]);
+  fi;
+  # x^(q^j) mod f
+  pow := -minusx;
+  j := 0;
+
+  # f has no factor of degree <= j; while it can have two
+  while Degree(f) >= 2 * (j + 1) do
+    a := j + 1;
+    if a <= mmax then
+      b := a;
+    else
+      b := Minimum(a + RECOG.StingrayDegreeBlock - 1, QuoInt(Degree(f), 2));
+    fi;
+
+    # pows[k-a+1] = x^(q^k) mod f, and prod = prod (x^(q^k) - x) mod f
+    pows := [];
+    prod := fail;
+    for k in [a..b] do
+      pow := PowerModCoeffs(pow, Length(pow), q, fc, Length(fc));
+      Add(pows, pow);
+      cyc := ShallowCopy(pow);
+      AddCoeffs(cyc, minusx);
+      if prod = fail then
+        prod := cyc;
+      else
+        prod := ProductCoeffs(prod, cyc);
+        ReduceCoeffs(prod, fc);
+        ShrinkRowVector(prod);
+      fi;
+    od;
+    j := b;
+
+    g := GcdOp(f, toPol(prod));
+    if Degree(g) > 0 then
+      for k in [a..b] do
+        if Degree(g) < k then
+          break;
+        fi;
+        if a = b then
+          gk := g;
+        else
+          # the factors of g of degree k, as those of smaller degree are gone
+          cyc := ShallowCopy(pows[k - a + 1]);
+          AddCoeffs(cyc, minusx);
+          ReduceCoeffs(cyc, CoefficientsOfUnivariatePolynomial(g));
+          ShrinkRowVector(cyc);
+          gk := GcdOp(g, toPol(cyc));
+        fi;
+        if Degree(gk) > 0 then
+          # g need not be squarefree
+          repeat
+            g := Quotient(g, gk);
+          until Degree(GcdOp(g, gk)) = 0;
+          register(gk, k, peel(gk));
+        fi;
+      od;
+      fc := CoefficientsOfUnivariatePolynomial(f);
+      pow := ShallowCopy(pow);
+      ReduceCoeffs(pow, fc);
+      ShrinkRowVector(pow);
+    fi;
+
+    for m in D do
+      if a <= m and m <= b and status[m] = "open" then
+        status[m] := "dead";
+      fi;
+    od;
+    if ForAll(D, m -> status[m] = "dead") then
+      return fail;
+    fi;
+  od;
+
+  # f is 1 or irreducible of degree > j
+  if Degree(f) > 0 then
+    register(f, Degree(f), 1);
+  fi;
+
+  for m in D do
+    if status[m] <> "cand" then
+      continue;
+    fi;
+    others := Filtered(found, r -> r[1] <> m);
+    c := Maximum(Concatenation([1], List(others, r -> r[2])));
+    # the least beta with p^beta >= c
+    beta := LogInt(p * c - 1, p);
+    B := p^beta * Lcm(Concatenation([1], List(others, r -> q^r[1] - 1)));
+
+    # x^B generates GF(q^m) if it lies in no maximal subfield GF(q^(m/r));
+    # x^(q^m-1) = 1 modulo P, as P is irreducible of degree m and not x
+    gamma := PowerMod(x, B mod (q^m - 1), P[m]);
+    if ForAll(PrimeDivisors(m), r -> PowerMod(gamma, q^(m/r), P[m]) <> gamma) then
+      return rec( P := P[m] / LeadingCoefficient(P[m]), B := B );
+    fi;
+  od;
+  return fail;
+end;
+
 # Algorithm FindStingrayElement of [EHNPR], Section 'Stingray elements':
-# search at most <N> random elements of <G> for one whose characteristic
-# polynomial has an irreducible factor P of multiplicity 1 with deg(P) in
-# <D>, not dividing the degree of any other factor. Its power s = h^B,
-# with B killing the other primary components, is a deg(P)-stingray
-# element if and only if x^B generates GF(q)[x]/<P> over GF(q).
+# search at most <N> random elements h of <G> for one that passes
+# RECOG.StingrayFactor, with factor P of degree m and exponent B, so that
+# s = h^B is an m-stingray element.
 # s is computed on the body ker P(h) of h, where h^B = h^(B mod (q^m-1)),
 # and is the identity on the tail im P(h) ([EHNPR], remark after the
 # algorithm); this avoids powering h in full degree.
@@ -110,67 +290,42 @@ end;
 #  - `body`, `tail`: bases of the body im(s-1) and the tail ker(s-1)
 #  - `candidate`, `exponent`: h, with memory, and B, so that s = h^B
 RECOG.FindStingrayElement := function(G, D, N)
-  local F, q, p, R, x, h, factors, degrees, i, m, others, c, beta, B, P, gamma,
-        mat, T, U, E, A, C, K;
+  local F, q, h, mat, t, P, B, m, T, U, E, A, C, K;
 
   F := DefaultFieldOfMatrixGroup(G);
   q := Size(F);
-  p := Characteristic(F);
-  # without R, Factors works over the field of the coefficients, which can
-  # be a proper subfield of F
-  R := PolynomialRing(F);
-  x := Indeterminate(F);
 
   while N > 0 do
     h := PseudoRandom(G);
     N := N - 1;
-    factors := Collected(Factors(R, CharacteristicPolynomial(F, F, StripMemory(h))));
-    degrees := List(factors, f -> Degree(f[1]));
+    mat := StripMemory(h);
+    t := RECOG.StingrayFactor(CharacteristicPolynomial(F, F, mat), F, D);
+    if t = fail then
+      Info(InfoRecog_ClassicalNatural, 3,
+           "    GoingDown: random element is no pre-stingray candidate");
+      continue;
+    fi;
+    P := t.P;
+    B := t.B;
+    m := Degree(P);
 
-    for i in [1..Length(factors)] do
-      m := degrees[i];
-      if factors[i][2] <> 1 or not m in D or
-         ForAny([1..Length(factors)], j -> j <> i and degrees[j] mod m = 0) then
-        continue;
-      fi;
-
-      # B = p^beta * lcm(q^deg(P_j)-1 : j <> i), with p^beta >= every other
-      # multiplicity
-      others := factors{Difference([1..Length(factors)], [i])};
-      c := Maximum(Concatenation([1], List(others, f -> f[2])));
-      # the least beta with p^beta >= c
-      beta := LogInt(p * c - 1, p);
-      B := p^beta * Lcm(Concatenation([1], List(others, f -> q^Degree(f[1]) - 1)));
-
-      # x^B generates GF(q^m) if it lies in no maximal subfield GF(q^(m/r));
-      # x^(q^m-1) = 1 modulo P, as P is irreducible of degree m and not x
-      P := factors[i][1];
-      gamma := PowerMod(x, B mod (q^m - 1), P);
-      if not ForAll(Set(Factors(m)), r -> PowerMod(gamma, q^(m/r), P) <> gamma) then
-        continue;
-      fi;
-
-      # U = ker P(h) is the body, E = im P(h) the tail, and A is h
-      # restricted to U; in the basis C = [U, E], s = diag(A^B, 1), so
-      # s - 1 = K * (A^B - 1) * U with K the first m columns of C^-1
-      mat := StripMemory(h);
-      T := SemiEchelonMatTransformation(Value(P, mat));
-      U := T.relations;
-      E := T.vectors;
-      ConvertToMatrixRep(U, F);
-      ConvertToMatrixRep(E, F);
-      A := List(U * mat, v -> SolutionMat(U, v));
-      ConvertToMatrixRep(A, F);
-      C := Concatenation(U, E);
-      ConvertToMatrixRep(C, F);
-      K := (C^-1){[1..Length(C)]}{[1..m]};
-      ConvertToMatrixRep(K, F);
-      return rec( element := One(mat) + K * ((A^(B mod (q^m - 1)) - One(A)) * U),
-                  dim := m, remaining := N, body := U, tail := E,
-                  candidate := h, exponent := B );
-    od;
-    Info(InfoRecog_ClassicalNatural, 3,
-         "    GoingDown: random element is no pre-stingray candidate");
+    # U = ker P(h) is the body, E = im P(h) the tail, and A is h
+    # restricted to U; in the basis C = [U, E], s = diag(A^B, 1), so
+    # s - 1 = K * (A^B - 1) * U with K the first m columns of C^-1
+    T := SemiEchelonMatTransformation(Value(P, mat));
+    U := T.relations;
+    E := T.vectors;
+    ConvertToMatrixRep(U, F);
+    ConvertToMatrixRep(E, F);
+    A := List(U * mat, v -> SolutionMat(U, v));
+    ConvertToMatrixRep(A, F);
+    C := Concatenation(U, E);
+    ConvertToMatrixRep(C, F);
+    K := (C^-1){[1..Length(C)]}{[1..m]};
+    ConvertToMatrixRep(K, F);
+    return rec( element := One(mat) + K * ((A^(B mod (q^m - 1)) - One(A)) * U),
+                dim := m, remaining := N, body := U, tail := E,
+                candidate := h, exponent := B );
   od;
 
   return fail;
