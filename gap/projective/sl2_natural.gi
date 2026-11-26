@@ -44,8 +44,9 @@ RECOG.RecogniseSL2Natural := function(G, f)
     return RECOG.RecogniseSL2NaturalSmallPrimes(G,f);
   fi;
   
-  #TODO:  for 2^l with l large enough, RECOG.RecogniseSL2NaturalEvenChar becomes faster than
-  #       RecogniseSL2NaturalGeneric, for example q = 2^40.
+  #TODO:  for q = 2^l with l large, e.g. q = 2^40, RecogniseSL2NaturalGeneric is
+  #       slower than the deleted RECOG.RecogniseSL2NaturalEvenChar
+  #       (git log -S RecogniseSL2NaturalEvenChar).
   res := RECOG.RecogniseSL2NaturalGeneric(G,q);
   nicegens :=List(res[1],a->ResultOfStraightLineProgram(a,GeneratorsOfGroup(G)));
   diag := nicegens[1];

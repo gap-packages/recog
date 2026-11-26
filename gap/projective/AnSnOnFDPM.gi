@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Stephen Howe, Maska Law, Max Neunhöffer,
+##  This file's authors include Stephen Howe, Maska Law, Max Neunhöffer,
 ##  Ákos Seress.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous

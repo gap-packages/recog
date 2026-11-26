@@ -64,14 +64,45 @@ gap> ri := BlackBoxSL(SL(3,4), true, 3, 4);;
 gap> HasSize(ri) and Size(ri) = Size(SL(3,4)) / 3;
 true
 
+# In a projective node the SLP of an element must not depend on the scalar:
+# the node above finds its kernel, the scalars of the group, as quotients of
+# random elements by the evaluated SLPs of their images.
+gap> nice := NiceGens(ri);;
+gap> ForAll([1..10], function(i)
+>   local x;
+>   x := PseudoRandom(SL(3,4));
+>   return ResultOfStraightLineProgram(SLPforElement(ri, x), nice)
+>     = ResultOfStraightLineProgram(SLPforElement(ri, Z(4) * x), nice);
+> end);
+true
+
+# SL(2,13) on the homogeneous polynomials of degree 7 contains the scalar
+# -1. ThreeLargeElOrders takes the group modulo scalars for L2(13).
+gap> SymmetricPowerOfSL2 := function(k, q)
+>   local power, image;
+>   # coefficients of (a x + b y)^n
+>   power := {a, b, n} -> List([0..n], i -> Binomial(n, i) * a^(n-i) * b^i);
+>   # row i: the image of x^(k-i) y^i under x -> a x + b y, y -> c x + d y
+>   image := m -> List([0..k], i -> ProductCoeffs(
+>       power(m[1,1], m[1,2], k-i), power(m[2,1], m[2,2], i)));
+>   return Group(List(GeneratorsOfGroup(SL(2, q)), image));
+> end;;
+gap> ForAll([1..5], function(seed)
+>   local ri;
+>   ResetRandom(seed);
+>   ri := RecogniseGroup(SymmetricPowerOfSL2(7, 13));
+>   return IsReady(ri) and Size(ri) = 2184;
+> end);
+true
+
 # SLCR.SLDataStructure gives up if SLCR.SLConstructBasisQ does. No group is
 # known on which that happens in dimension 4 or more, so force it.
 gap> origConstructBasisQ := SLCR.SLConstructBasisQ;;
-gap> SLCR.SLConstructBasisQ := function(bbg, data, Q, Qgamma, d, q)
+gap> SLCR.SLConstructBasisQ := function(data, Q, Qgamma, d, q)
 >   if d = 4 then
 >     return fail;
 >   fi;
->   return origConstructBasisQ(bbg, data, Q, Qgamma, d, q);
+>   return origConstructBasisQ(data, Q, Qgamma, d, q);
 > end;;
 gap> ForAll([1..5], function(seed)
 >   ResetRandom(seed);
