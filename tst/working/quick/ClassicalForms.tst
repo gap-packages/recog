@@ -16,10 +16,12 @@ true
 gap> Reset(GlobalRandomSource, 1);; Reset(GlobalMersenneTwister, 1);;
 gap> h := Group(Z(25)^3 * g.1, Z(25)^7 * g.2);;
 gap> fmodule := RECOG.GeneratorsWithoutScalarsFrobenius(h);;
-gap> ForAll(MTX.Generators(fmodule), isom);
+gap> fmodule.exact;
+true
+gap> ForAll(MTX.Generators(fmodule.modules[1]), isom);
 true
 gap> module := GModuleByMats(GeneratorsOfGroup(h), GF(25));;
-gap> RECOG.InvariantFormFrobenius(module, fmodule)[1];
+gap> RECOG.InvariantFormFrobenius(module, fmodule.modules[1])[1];
 "unitary"
 
 # and RecogniseClassical names SU(6,5) with scalars on its generators

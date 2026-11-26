@@ -1233,10 +1233,13 @@ function(recognise)
 
 
     # now try to find an invariant form
+    # Only a module of exactly normalised elements without a form rules the
+    # form out
     if recognise.maybeDual then
         dmodule := RECOG.GeneratorsWithoutScalarsDual(recognise.grp);
         if dmodule <> false then
-            form := RECOG.InvariantFormDual(module,dmodule);
+            form := RECOG.FirstInvariantForm(module, dmodule.modules,
+                                             RECOG.InvariantFormDual);
             if form <> false then
                 Add( recognise.ClassicalForms,
                 BilinearFormByMatrix(form[2], field));
@@ -1245,7 +1248,7 @@ function(recognise)
                     recognise.QuadraticForm := QuadraticFormByMatrix(form[4]);
                 fi;
                 return NeverApplicable;
-            else
+            elif dmodule.exact then
                 recognise.maybeDual := false;
             fi;
         fi;
@@ -1254,12 +1257,13 @@ function(recognise)
     if recognise.maybeFrobenius then
         fmodule := RECOG.GeneratorsWithoutScalarsFrobenius(recognise.grp);
         if fmodule <> false then
-            form := RECOG.InvariantFormFrobenius(module,fmodule);
+            form := RECOG.FirstInvariantForm(module, fmodule.modules,
+                                             RECOG.InvariantFormFrobenius);
             if form <> false then
                 Add( recognise.ClassicalForms,
                      HermitianFormByMatrix(form[2], field));
                return NeverApplicable;
-            else
+            elif fmodule.exact then
                 recognise.maybeFrobenius := false;
             fi;
         fi;
