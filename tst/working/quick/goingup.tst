@@ -313,23 +313,22 @@ true
 # each irreducible factor f = f^dagger of 20 characteristic polynomials
 # from SU(d,q), q odd
 gap> CheckNormPreimage := function(d, q)
->     local F, G, R, x, f, k, coeffs, a;
+>     local F, R, G, f, k, a;
 >     F := GF(q^2);
->     G := SU(d, q);
 >     R := PolynomialRing(F, 1);
->     x := IndeterminatesOfPolynomialRing(R)[1];
+>     G := SU(d, q);
 >     for f in Set(Concatenation(List([1 .. 20], i -> Factors(R,
 >                  CharacteristicPolynomial(PseudoRandom(G)))))) do
->       k := DegreeOfLaurentPolynomial(f);
->       coeffs := List(CoefficientsOfUnivariatePolynomial(f), y -> y^q);
->       if f <> UnivariatePolynomial(F, Reversed(coeffs) / coeffs[1]) then
+>       f := RECOG.Pol(F, CoefficientsOfUnivariatePolynomial(f));
+>       k := Length(f) - 1;
+>       if f <> Reversed(List(f, c -> c^q)) / f[1]^q then
 >         continue;
 >       fi;
 >       repeat
->         a := PowerMod(R, Sum([0 .. k - 1], i -> Random(F) * x^i),
->                       q^k + 1, f);
->       until not IsZero(a);
->       if PowerMod(R, RECOG.Form_NormPreimage(R, f, a, q, k), q^k + 1, f)
+>         a := RECOG.PolPowerMod(RECOG.Pol(F, List([1 .. k], i -> Random(F))),
+>                                q^k + 1, f);
+>       until Length(a) > 0;
+>       if RECOG.PolPowerMod(RECOG.Form_NormPreimage(F, f, a), q^k + 1, f)
 >          <> a then
 >         return false;
 >       fi;
