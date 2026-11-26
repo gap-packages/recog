@@ -27,5 +27,23 @@ gap> ForAll([4, 9, 19], q -> ForAll([1 .. 20], i ->
 >        RecogniseClassical(Sp(4, q)).isSpContained = true));
 true
 
+# For q = 2^s-1 and 3*2^s-1, the witness against Sp(2,q^2):2 < Sp(4,q) is an
+# element splitting V into two non-isomorphic modules with parts of order
+# dividing q+1; elements outside SL(2,q^2) split like that as well
+gap> SL2q2Ext := function(q)
+>     local B, gens;
+>     B := Basis(AsField(GF(q), GF(q^2)));
+>     gens := List(GeneratorsOfGroup(SL(2, q^2)), m -> BlownUpMat(B, m));
+>     Add(gens, KroneckerProduct(IdentityMat(2, GF(q)),
+>                                List(B, b -> Coefficients(B, b^q))));
+>     return Group(gens);
+> end;;
+gap> ForAny([7, 11, 23], q -> ForAny([1 .. 5], i ->
+>        RecogniseClassical(SL2q2Ext(q)).isSpContained = true));
+false
+gap> ForAll([7, 11, 23, 31], q -> ForAll([1 .. 10], i ->
+>        RecogniseClassical(Sp(4, q)).isSpContained = true));
+true
+
 #
 gap> STOP_TEST("naming-d4.tst");
