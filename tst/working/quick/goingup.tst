@@ -245,6 +245,70 @@ gap> ForAll([[4, 3], [6, 3], [6, 5], [8, 3], [8, 9], [10, 3], [10, 7],
 >           c -> CallFuncList(CheckSpDirectGoingUp, c));
 true
 
+# The functions for polynomials as lists of coefficients satisfy their
+# defining equations, and RECOG.PolFactorsSquarefree agrees with Factors
+gap> CheckPol := function(n, q)
+>     local F, R, x, pol, coeffs, f, fc, facs, u, uc, g, w, crt, c, s, D;
+>     F := GF(q);
+>     R := PolynomialRing(F, 1);
+>     x := IndeterminatesOfPolynomialRing(R)[1];
+>     pol := c -> UnivariatePolynomial(F, c);
+>     coeffs := f -> RECOG.Pol(F, CoefficientsOfUnivariatePolynomial(f));
+>     repeat
+>       f := x^n + RandomPol(F, n - 1, 1);
+>     until DegreeOfLaurentPolynomial(Gcd(f, Derivative(f))) = 0;
+>     fc := coeffs(f);
+>     facs := List(Factors(R, f), coeffs);
+>     if IsOddInt(q) and Set(RECOG.PolFactorsSquarefree(F, fc)) <> Set(facs)
+>        then
+>       return "factors";
+>     fi;
+>     u := RandomPol(F, n + 2, 1);
+>     uc := coeffs(u);
+>     for g in facs do
+>       w := RECOG.PolInverseMod(uc, g);
+>       if IsZero(u mod pol(g)) <> (w = fail)
+>          or (w <> fail and RECOG.PolProductMod(w, uc, g) <> coeffs(x^0)) then
+>         return "inverse";
+>       fi;
+>     od;
+>     if RECOG.PolResultant(fc, uc) <> Resultant(f, u, x)
+>        or RECOG.PolResultant(uc, facs[1]) <> Resultant(u, pol(facs[1]), x)
+>        then
+>       return "resultant";
+>     fi;
+>     c := List(facs, g -> [RECOG.PolMod(uc, g),
+>                           coeffs(RandomPol(F, Length(g) - 2, 1))]);
+>     crt := RECOG.PolChineseRemainder(fc, facs, c);
+>     if crt[1] <> RECOG.PolMod(uc, fc) or Length(crt[2]) > n
+>        or ForAny([1 .. Length(facs)],
+>                  i -> RECOG.PolMod(crt[2], facs[i]) <> c[i][2]) then
+>       return "remainder";
+>     fi;
+>     # s(x + 1/x) = c_0 + sum_j c_j (x^j + x^-j), times x^D
+>     c := List([0 .. n], i -> Random(F));
+>     s := RECOG.PolOfReciprocalSum(RECOG.Pol(F, c));
+>     D := n + Random(0, 2);
+>     if pol(RECOG.PolAtReciprocalSum(F, s, D))
+>        <> x^(D - n) * (c[1] * x^n + Sum([1 .. n], j -> c[j + 1]
+>                                         * (x^(n + j) + x^(n - j)))) then
+>       return "reciprocal sum";
+>     fi;
+>     if IsEvenInt(q) then
+>       w := RECOG.PolSquareRootMod(F, uc, fc);
+>       if RECOG.PolProductMod(w, w, fc) <> RECOG.PolMod(uc, fc) then
+>         return "square root";
+>       fi;
+>     fi;
+>     return true;
+> end;;
+gap> ForAll([[1, 3], [2, 3], [3, 3], [7, 3], [40, 3], [9, 5], [30, 5],
+>            [25, 7], [20, 9], [12, 25], [30, 121], [8, 243], [10, 257],
+>            [6, 65537], [1, 2], [2, 2], [9, 2], [40, 2], [15, 4], [12, 16],
+>            [7, 512]],
+>           c -> ForAll([1 .. 5], i -> CallFuncList(CheckPol, c) = true));
+true
+
 # RECOG.Form_NormPreimage solves z^(q^k+1) = a in the field F[x]/(f) of
 # each irreducible factor f = f^dagger of 20 characteristic polynomials
 gap> CheckNormPreimage := function(type, d, q)
