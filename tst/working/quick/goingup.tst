@@ -245,6 +245,28 @@ gap> ForAll([[4, 3], [6, 3], [6, 5], [8, 3], [8, 9], [10, 3], [10, 7],
 >           c -> CallFuncList(CheckSpDirectGoingUp, c));
 true
 
+# RECOG.MinimalPolynomialOfSequence finds the recurrence of order L which
+# gives 2n terms from the start 0, ..., 0, 1
+gap> CheckRecurrence := function(q, n, L)
+>     local f, c, s, k;
+>     f := GF(q);
+>     c := List([1 .. L], i -> Random(f));
+>     s := ListWithIdenticalEntries(2 * n, Zero(f));
+>     if L > 0 then
+>         s[L] := One(f);
+>         for k in [L + 1 .. 2 * n] do
+>             s[k] := c * s{[k - L .. k - 1]};
+>         od;
+>     fi;
+>     return RECOG.MinimalPolynomialOfSequence(f, s)
+>            = Concatenation(-c, [One(f)]);
+> end;;
+gap> ForAll([[2, 9, 7], [3, 5, 5], [3, 8, 3], [4, 6, 6], [5, 6, 0],
+>            [7, 12, 1], [9, 10, 10], [25, 7, 6], [257, 6, 4],
+>            [65537, 5, 5]],
+>           c -> CallFuncList(CheckRecurrence, c));
+true
+
 # The functions for polynomials as lists of coefficients satisfy their
 # defining equations, and RECOG.PolFactorsSquarefree agrees with Factors
 gap> CheckPol := function(n, q)

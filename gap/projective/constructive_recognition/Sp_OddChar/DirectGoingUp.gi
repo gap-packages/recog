@@ -49,7 +49,8 @@
 ##      of linear recurrences, so g enters only through the orbit
 ##      e, e g, ..., e g^d.
 ##   2. e must be cyclic for g, and the characteristic polynomial chi of
-##      g squarefree. RECOG.Form_IsotropicKrylovPolynomial gives
+##      g squarefree; the beta(e, e g^k), 0 < k <= d, decide both and give
+##      chi. RECOG.Form_IsotropicKrylovPolynomial gives
 ##      e' = e p(g) with beta(e', e' g^j) = 0 for 0 <= j < m; it is
 ##      replaced by the first e' g^k with beta(e' g^k, e) <> 0, scaled so
 ##      that this is -1. Then z = s R(w_z) with
@@ -80,6 +81,42 @@
 # e^perp, and d - 4 independent ones are needed
 RECOG.Sp_DirectGoingUpPowers := {d, q} -> QuoInt(d, 3) + 6;
 
+# The coefficients, lowest first, of the monic polynomial c of least degree
+# with sum_j c_j s_(k+j) = 0 for all k, for a list <s> of 2n elements of
+# the field <f> which satisfies such a recurrence of order at most n: for
+# S = sum_k s_k x^(2n-1-k), the extended Euclidean algorithm for x^(2n) and
+# S stops at c S = r mod x^(2n) with deg r < n.
+RECOG.MinimalPolynomialOfSequence := function(f, s)
+  local n, q, one, r0, r1, t0, t1, v, qr;
+
+  n := Length(s) / 2;
+  q := Size(f);
+  one := One(f);
+  r0 := ListWithIdenticalEntries(2 * n, Zero(f));
+  Add(r0, one);
+  r1 := Reversed(s);
+  t0 := [Zero(f)];
+  t1 := [one];
+  for v in [r0, r1, t0, t1] do
+    ConvertToVectorRep(v, q);
+  od;
+  ShrinkRowVector(r1);
+
+  # r1 = t1 S mod x^(2n)
+  while Length(r1) > n do
+    qr := QuotRemCoeffs(r0, r1);
+    r0 := r1;
+    r1 := qr[2];
+    ShrinkRowVector(r1);
+    AddCoeffs(t0, ProductCoeffs(qr[1], t1), -one);
+    ShrinkRowVector(t0);
+    qr := t0;
+    t0 := t1;
+    t1 := qr;
+  od;
+  return PlainListCopy(t1 / t1[Length(t1)]);
+end;
+
 # The linear algebra of the direct GoingUp for the element <g> of
 # Sp(<d>,q), q = Size(<f>) odd: the rows of <B> are a standard basis,
 # <Bi> is its inverse, and the i <= <N> are tried. Returns a string
@@ -96,14 +133,13 @@ RECOG.Sp_DirectGoingUpPowers := {d, q} -> QuoInt(d, 3) + 6;
 #    or, if that is 0 for both, with `a` = beta(w0, b_(m+2))/kappa, see
 #    RECOG.Sp_DirectGoingUpWords
 RECOG.Sp_DirectGoingUpData := function(f, d, g, B, Bi, N)
-  local q, one, zero, m, J, J4, id4, e1, form, form4, K, i, top, Kinv, a,
-        a0, co, chi, x, o, extend, S, pc, k, val, vec, ppol, epp, eppB, yB,
-        kappa, Omega, wz, applyZinv, P, phi, blocks, block, rowOf, perp,
+  local q, zero, m, J, J4, id4, e1, form, form4, K, i, top, BiU, seq, co,
+        chi, x, Kinv, a, a0, o, extend, S, pc, k, val, vec, ppol, epp, eppB,
+        yB, kappa, Omega, wz, applyZinv, P, phi, blocks, block, rowOf, perp,
         rows, where, D, T, solve, orbitCoords, toVector, plan, res, name,
         targets, bp, x1, x2, bt, wzo, c1, c2, basis, b2, bm2, w0, val2;
 
   q := Size(f);
-  one := One(f);
   zero := Zero(f);
   m := d / 2;
   J := RECOG.ClassicalStandardForm("Sp", d, f);
@@ -113,25 +149,36 @@ RECOG.Sp_DirectGoingUpData := function(f, d, g, B, Bi, N)
   form := {v, w} -> v * J * w;
   form4 := {v, w} -> v * J4 * w;
 
-  # K[k+1] = e g^k, and chi = x^d - sum_j a_j x^j
+  # K[k+1] = e g^k
   K := [B[1]];
   for i in [1 .. d] do
     K[i + 1] := K[i] * g;
   od;
   top := Remove(K);
   ConvertToMatrixRep(K, q);
-  Kinv := Inverse(K);
-  if Kinv = fail then
+
+  # phi_k = beta(e, e g^k) = -phi_(-k) is the coordinate of e g^k at f_1.
+  # The beta(e g^-i, e g^j) = phi_(i+j), 0 <= i, j < d, form an invertible
+  # matrix iff e is cyclic, that is, iff the phi_k satisfy no linear
+  # recurrence of order less than d; then that of order d is
+  # chi = x^d - sum_j a_j x^j. This rejects g without inverting K.
+  BiU := TransposedMat(Bi){[1 .. 4]};
+  seq := List(K, v -> v * BiU[2]);
+  Add(seq, top * BiU[2]);
+  co := RECOG.MinimalPolynomialOfSequence(f,
+            Concatenation(-Reversed(seq{[2 .. d]}), seq));
+  if Length(co) <= d then
     return "e is not cyclic";
   fi;
-  a := top * Kinv;
-  a0 := a[1];
-  co := Concatenation(-PlainListCopy(a), [one]);
   chi := UnivariatePolynomial(f, co);
   if DegreeOfLaurentPolynomial(Gcd(chi, Derivative(chi))) > 0 then
     return "the characteristic polynomial has a repeated factor";
   fi;
   x := IndeterminateOfUnivariateRationalFunction(chi);
+  Kinv := Inverse(K);
+  a := -co{[1 .. d]};
+  ConvertToVectorRep(a, q);
+  a0 := a[1];
 
   # S[l][o+k] is the l-th coordinate of e g^k, -N <= k < N + d, from those
   # with 0 <= k < d
@@ -150,11 +197,10 @@ RECOG.Sp_DirectGoingUpData := function(f, d, g, B, Bi, N)
     od;
     return s;
   end;
-  S := List(TransposedMat(Bi){[1 .. 4]}, c -> extend(List(K, v -> v * c)));
+  S := List(BiU, c -> extend(List(K, v -> v * c)));
 
   # e' = e p(g) g^k / val, for the least k with beta(e p(g) g^k, e) <> 0
-  pc := RECOG.Form_IsotropicKrylovPolynomial(
-            List([0 .. d], i -> S[2][o + i]), f, chi, "Sp");
+  pc := RECOG.Form_IsotropicKrylovPolynomial(seq, f, chi, "Sp");
   if pc = fail then
     return "no isotropic orbit";
   fi;
