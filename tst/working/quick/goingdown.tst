@@ -25,6 +25,30 @@ gap> ForAll([1..10], function(i)
 >    end);
 true
 
+# The stingray element is candidate^exponent, and body and tail span
+# im(s-1) and ker(s-1), for every type.
+gap> CheckStingrayPower := function(type, G)
+>     local F, D, r, s;
+>     F := DefaultFieldOfMatrixGroup(G);
+>     D := RECOG.StingrayBodyDimensions(DimensionOfMatrixGroup(G),
+>                                       RECOG.GoingDownParameters(type, Size(F)));
+>     G := GroupWithMemory(G);
+>     return ForAll([1..5], function(i)
+>         r := RECOG.FindStingrayElement(G, D, 100);
+>         s := r.element;
+>         return s = StripMemory(r.candidate)^r.exponent
+>                and RankMat(r.body) = r.dim
+>                and RankMat(Concatenation(r.body, s - One(s))) = r.dim
+>                and Length(r.tail) = NrRows(s) - r.dim
+>                and IsZero(r.tail * (s - One(s)));
+>     end);
+> end;;
+gap> ForAll([["SL", SL(20, 3)], ["SL", SL(12, 2^17)], ["SU", SU(15, 2)],
+>            ["Sp", Sp(20, 5)], ["Sp", Sp(16, 4)], ["O-", Omega(-1, 18, 3)],
+>            ["O", Omega(19, 5)]],
+>           c -> CallFuncList(CheckStingrayPower, c));
+true
+
 # RECOG.StingrayFactor agrees with the test on the full factorisation, for
 # blocks of several sizes and for q > 2^16.
 gap> StingrayFactorByFactors := function(chi, F, D)

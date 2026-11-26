@@ -276,13 +276,47 @@ RECOG.StingrayFactor := function(chi, F, D)
   return fail;
 end;
 
+# A basis [w, w*mat, ..., w*mat^(m-1)] of the body ker P(mat) of the
+# matrix <mat> over <F>, where P has degree m, is irreducible and of
+# multiplicity 1 in the characteristic polynomial, and <R> is the
+# characteristic polynomial divided by P. For v in V, w = v * R(mat) is
+# the image of the component of v in ker P(mat) under an invertible map of
+# it, so it is nonzero for some unit vector v; as ker P(mat) is an
+# irreducible module, the w*mat^i span it. In this basis, mat acts as
+# TransposedMat(CompanionMat(P)). Costs deg(R) + m vector-matrix products.
+RECOG.StingrayKrylovBasis := function(mat, R, m, F)
+  local a, i, j, v, w, basis;
+
+  a := CoefficientsOfUnivariatePolynomial(R);
+  for i in [1..NrRows(mat)] do
+    v := ZeroMutable(mat[1]);
+    v[i] := One(F);
+    # w = v * R(mat), by Horner
+    w := a[Length(a)] * v;
+    for j in [Length(a) - 1, Length(a) - 2 .. 1] do
+      w := w * mat + a[j] * v;
+    od;
+    if not IsZero(w) then
+      break;
+    fi;
+  od;
+  basis := [w];
+  for i in [2..m] do
+    basis[i] := basis[i - 1] * mat;
+  od;
+  return ImmutableMatrix(F, basis);
+end;
+
 # Algorithm FindStingrayElement of [EHNPR], Section 'Stingray elements':
 # search at most <N> random elements h of <G> for one that passes
 # RECOG.StingrayFactor, with factor P of degree m and exponent B, so that
 # s = h^B is an m-stingray element.
-# s is computed on the body ker P(h) of h, where h^B = h^(B mod (q^m-1)),
-# and is the identity on the tail im P(h) ([EHNPR], remark after the
-# algorithm); this avoids powering h in full degree.
+# s is the identity on the tail im P(h) and h^B = h^(B mod (q^m-1)) on the
+# body U = ker P(h) ([EHNPR], remark after the algorithm). With bases K of
+# U and K' of the body of h^T (RECOG.StingrayKrylovBasis), the tail is
+# {v : v * K'^T = 0}, so v = v * K'^T * (K * K'^T)^-1 * K + (tail part),
+# and s = 1 + K'^T * (K * K'^T)^-1 * (A^B - 1) * K for the matrix A of h on
+# U. This needs no product of two nxn matrices.
 # Returns either fail, or else a record with the following components:
 #  - `element`: the stingray element s, without memory
 #  - `dim`: deg(P), the dimension of its body
@@ -290,7 +324,7 @@ end;
 #  - `body`, `tail`: bases of the body im(s-1) and the tail ker(s-1)
 #  - `candidate`, `exponent`: h, with memory, and B, so that s = h^B
 RECOG.FindStingrayElement := function(G, D, N)
-  local F, q, h, mat, t, P, B, m, T, U, E, A, C, K;
+  local F, q, h, mat, chi, t, P, B, m, R, K, Kd, A, M;
 
   F := DefaultFieldOfMatrixGroup(G);
   q := Size(F);
@@ -299,7 +333,8 @@ RECOG.FindStingrayElement := function(G, D, N)
     h := PseudoRandom(G);
     N := N - 1;
     mat := StripMemory(h);
-    t := RECOG.StingrayFactor(CharacteristicPolynomial(F, F, mat), F, D);
+    chi := CharacteristicPolynomial(F, F, mat);
+    t := RECOG.StingrayFactor(chi, F, D);
     if t = fail then
       Info(InfoRecog_ClassicalNatural, 3,
            "    GoingDown: random element is no pre-stingray candidate");
@@ -309,22 +344,13 @@ RECOG.FindStingrayElement := function(G, D, N)
     B := t.B;
     m := Degree(P);
 
-    # U = ker P(h) is the body, E = im P(h) the tail, and A is h
-    # restricted to U; in the basis C = [U, E], s = diag(A^B, 1), so
-    # s - 1 = K * (A^B - 1) * U with K the first m columns of C^-1
-    T := SemiEchelonMatTransformation(Value(P, mat));
-    U := T.relations;
-    E := T.vectors;
-    ConvertToMatrixRep(U, F);
-    ConvertToMatrixRep(E, F);
-    A := List(U * mat, v -> SolutionMat(U, v));
-    ConvertToMatrixRep(A, F);
-    C := Concatenation(U, E);
-    ConvertToMatrixRep(C, F);
-    K := (C^-1){[1..Length(C)]}{[1..m]};
-    ConvertToMatrixRep(K, F);
-    return rec( element := One(mat) + K * ((A^(B mod (q^m - 1)) - One(A)) * U),
-                dim := m, remaining := N, body := U, tail := E,
+    R := Quotient(chi, P);
+    K := RECOG.StingrayKrylovBasis(mat, R, m, F);
+    Kd := TransposedMat(RECOG.StingrayKrylovBasis(TransposedMat(mat), R, m, F));
+    A := ImmutableMatrix(F, TransposedMat(CompanionMat(P)));
+    M := (K * Kd)^-1;
+    return rec( element := One(mat) + Kd * (M * (A^(B mod (q^m - 1)) - One(A)) * K),
+                dim := m, remaining := N, body := K, tail := NullspaceMat(Kd),
                 candidate := h, exponent := B );
   od;
 
