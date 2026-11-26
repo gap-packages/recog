@@ -21,5 +21,11 @@ gap> ForAny([1 .. 20], function(i)
 >    end);
 false
 
+# Sp(4,q) for q = 4, 9, 19: the large special ppd(4,q;2)-elements have
+# proportion 1/25
+gap> ForAll([4, 9, 19], q -> ForAll([1 .. 20], i ->
+>        RecogniseClassical(Sp(4, q)).isSpContained = true));
+true
+
 #
 gap> STOP_TEST("naming-d4.tst");
