@@ -1258,7 +1258,9 @@ RECOG.Form_IsotropicKrylovPolynomial := function(phi, F, chi, type, Qc...)
   mods := [];
   rems := [];
   used := [];
-  for f in Factors(R, chi) do
+  for f in RECOG.PolFactorsSquarefree(F,
+               RECOG.Pol(F, CoefficientsOfUnivariatePolynomial(chi))) do
+    f := UnivariatePolynomial(F, f);
     if f in used then
       continue;
     fi;
