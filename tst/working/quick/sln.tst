@@ -2,6 +2,8 @@
 gap> START_TEST("sln.tst");
 gap> oldInfoLevel := InfoLevel(InfoRecog);;
 gap> SetInfoLevel(InfoRecog, 0);
+gap> oldOrbInfoLevel := InfoLevel(InfoOrb);;
+gap> SetInfoLevel(InfoOrb, 0); # genss may warn "Schreier tree is not shallow"
 gap> Reset(GlobalMersenneTwister, 1);;
 gap> Reset(GlobalRandomSource, 1);;
 
@@ -71,4 +73,5 @@ gap> List([31, 32, 37, 101, 2^10, 3^7, 10007], CheckLeaf_SL3);
 
 #
 gap> SetInfoLevel(InfoRecog, oldInfoLevel);
+gap> SetInfoLevel(InfoOrb, oldOrbInfoLevel);
 gap> STOP_TEST("sln.tst");
