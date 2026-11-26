@@ -100,9 +100,10 @@ RECOG.FindStingrayElement := function(G, D, N)
       beta := LogInt(p * c - 1, p);
       B := p^beta * Lcm(Concatenation([1], List(others, f -> q^Degree(f[1]) - 1)));
 
-      # x^B generates GF(q^m) if it lies in no maximal subfield GF(q^(m/r))
+      # x^B generates GF(q^m) if it lies in no maximal subfield GF(q^(m/r));
+      # x^(q^m-1) = 1 modulo P, as P is irreducible of degree m and not x
       P := factors[i][1];
-      gamma := PowerMod(x, B, P);
+      gamma := PowerMod(x, B mod (q^m - 1), P);
       if ForAll(Set(Factors(m)), r -> PowerMod(gamma, q^(m/r), P) <> gamma) then
         return rec( element := h^B, dim := m, remaining := N );
       fi;
