@@ -564,6 +564,12 @@ RECOG.ExtractLowStuff := function(m,layer,blocks,lens,basisOfFieldExtension)
           pos := pos + Length(what);
       od;
   od;
+  # `m` may be a scalar multiple of a matrix with identity diagonal blocks, as
+  # the elements of a lower left p-group are in a projective node. The entries
+  # of the latter are returned.
+  if not IsOne(m[1,1]) then
+      MultVector(v,m[1,1]^-1);
+  fi;
   if basisOfFieldExtension <> fail then
       # needed because we assume for example in
       # SLPforElementFuncsMatrix.LowerLeftPGroup that we work
@@ -714,10 +720,6 @@ end;
 SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)
   # First project and calculate the vector:
   local done,h,i,l,layer,pow;
-  # Take care of the projective case:
-  if ri!.projective and not IsOne(g[1,1]) then
-      g := (g[1,1]^-1) * g;
-  fi;
   l := [];
   i := 1;
   for layer in [1..Length(ri!.lens)] do

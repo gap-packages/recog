@@ -974,8 +974,16 @@ SLCR.SLSLPbb := function(data, x, d)
         if i = fail then
             return fail;
         fi;
-        centprog := SLCR.PowerProg(data.centreprog, i);
-        rightslp := SLCR.ProdProg(rightslp, centprog);
+        # Drop the part of the central element that is trivial in the
+        # group the node stands for, so that the program is the same for
+        # all elements that are equal there.
+        if IsBound(data.centreOrder) then
+            i := i mod data.centreOrder;
+        fi;
+        if i <> 0 then
+            centprog := SLCR.PowerProg(data.centreprog, i);
+            rightslp := SLCR.ProdProg(rightslp, centprog);
+        fi;
         W := W * W2;
     fi;
     # now W is in Q
@@ -1821,6 +1829,8 @@ SLCR.FindHom := function(ri, G, d, q)
             continue;
         fi;
         genlist := List(data.gens, x -> x[1]);
+        # the projective order in a projective node
+        data.centreOrder := OrderFunc(ri)(StripMemory(data.centre));
         for y in gens do
             slp := SLCR.SLSLPbb(data, y, d);
             if slp = fail or
@@ -1867,7 +1877,7 @@ SLCR.FindHom := function(ri, G, d, q)
     # G is a quotient of SL(d,q) by a central subgroup, and data.centre is the
     # image of a generator of the centre of SL(d,q).
     SetSize(ri, Product([0..d-1], i -> q^d-q^i) / ((q-1)*Gcd(d, q-1))
-                * OrderFunc(ri)(data.centre));
+                * data.centreOrder);
     return Success;
 end;
 
