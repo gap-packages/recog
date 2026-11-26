@@ -978,11 +978,60 @@ end;
 # and for O+, Q(e) = nu_0 Q(c) + sum_(k>0) nu_k phi(x^k) replaces
 # phi(N) = 0.
 RECOG.Form_IsotropicKrylovVector := function(h, J, F, chi, type, quad...)
-  local n, m, q, q0, conj, R, x, c, K, cJ, i, phi, ph, F0, omega, coords,
-        M, row, k, j, nu, cands, top, xi, N, N0, mods, rems, used, f, fs, a,
-        z, p, P, coeffs, e, form, even;
+  local n, q0, conj, c, K, i, cJ, args, coeffs, top, e, form;
 
   n := NrRows(h);
+  if type in ["O+", "Sp"] and IsEvenInt(Size(F))
+     and IsZero(Value(chi, One(F))) then
+    return fail;
+  fi;
+  if type = "SU" then
+    q0 := RootInt(Size(F));
+    conj := v -> List(v, y -> y^q0);
+  else
+    conj := v -> v;
+  fi;
+
+  repeat
+    c := Random(F^n);
+    K := [c];
+    for i in [1 .. n] do
+      Add(K, K[i] * h);
+    od;
+  until RankMat(K{[1 .. n]}) = n;
+  cJ := c * J;
+  args := [List(K, y -> cJ * conj(y)), F, chi, type];
+  if Length(quad) > 0 then
+    Add(args, c * quad[1] * c);
+  fi;
+  coeffs := CallFuncList(RECOG.Form_IsotropicKrylovPolynomial, args);
+  if coeffs = fail then
+    return fail;
+  fi;
+
+  # e = c p(h), from the vectors c h^i
+  e := Sum([1 .. Length(coeffs)], i -> coeffs[i] * K[i]);
+  top := QuoInt(n, 2);
+  if type = "O+" then
+    top := top - 1;
+  fi;
+  form := {y, z} -> y * J * conj(z);
+  Assert(1, ForAll([0 .. top - 1], j -> IsZero(form(e, e * h^j)))
+            and not IsZero(form(e, e * h^top)));
+  return e;
+end;
+
+# The coefficients of the polynomial p of RECOG.Form_IsotropicKrylovVector,
+# lowest degree first, or fail: <phi> is the list of the beta(c, c h^i),
+# 0 <= i <= n, for a cyclic vector c of h, which gives n, and <F>, <chi>
+# and <type> are as there. In characteristic 2, for "Sp" and "O+", chi
+# must not have the root 1, and for "O+" the optional argument is Q(c).
+RECOG.Form_IsotropicKrylovPolynomial := function(phi, F, chi, type, Qc...)
+  local n, m, q, q0, conj, R, x, ph, F0, omega, coords, M, row, k, j, nu,
+        cands, top, xi, N, N0, mods, rems, used, f, fs, a, z, p, P, coeffs,
+        even;
+
+  n := Length(phi) - 1;
   m := n / 2;
   if type = "O" then
     # as "O+" with one more unknown and condition
@@ -994,9 +1043,6 @@ RECOG.Form_IsotropicKrylovVector := function(h, J, F, chi, type, quad...)
   fi;
   q := Size(F);
   even := type in ["O+", "Sp"] and IsEvenInt(q);
-  if even and IsZero(Value(chi, One(F))) then
-    return fail;
-  fi;
   if type = "SU" then
     q0 := RootInt(q);
     conj := v -> List(v, y -> y^q0);
@@ -1007,15 +1053,6 @@ RECOG.Form_IsotropicKrylovVector := function(h, J, F, chi, type, quad...)
   R := PolynomialRing(F, 1);
   x := IndeterminatesOfPolynomialRing(R)[1];
 
-  repeat
-    c := Random(F^n);
-    K := [c];
-    for i in [1 .. n] do
-      Add(K, K[i] * h);
-    od;
-  until RankMat(K{[1 .. n]}) = n;
-  cJ := c * J;
-  phi := List(K, y -> cJ * conj(y));
   # phi(x^-i) = beta(c h^i, c), which is -phi(x^i), phi(x^i)^sigma resp.
   # phi(x^i)
   ph := function(i)
@@ -1068,7 +1105,7 @@ RECOG.Form_IsotropicKrylovVector := function(h, J, F, chi, type, quad...)
       for k in [1 .. m - 1] do
         M[k + 1][1] := ph(k);
       od;
-      M[1][1] := c * quad[1] * c;
+      M[1][1] := Qc[1];
     fi;
     cands := NullspaceMat(M);
     if Length(cands) <> 1 then
@@ -1173,15 +1210,7 @@ RECOG.Form_IsotropicKrylovVector := function(h, J, F, chi, type, quad...)
                                                      mods[j])[1]) mod mods[j]);
     P := P * mods[j];
   od;
-  p := p mod chi;
-
-  # e = c p(h), from the vectors c h^i
-  coeffs := CoefficientsOfUnivariatePolynomial(p);
-  e := Sum([1 .. Length(coeffs)], i -> coeffs[i] * K[i]);
-  form := {y, z} -> y * J * conj(z);
-  Assert(1, ForAll([0 .. top - 1], j -> IsZero(form(e, e * h^j)))
-            and not IsZero(form(e, e * h^top)));
-  return e;
+  return CoefficientsOfUnivariatePolynomial(p mod chi);
 end;
 
 # The elements a of CL(U) on the first pair tried by
