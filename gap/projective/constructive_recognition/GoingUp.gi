@@ -915,7 +915,12 @@ RECOG.Form_NormPreimage := function(F, f, a)
     Q := Q / 2;
     S := S + 1;
   od;
-  u := RECOG.PolPowerMod(a, (Q - 1) / 2, f);
+  if Q < Size(F)^2 then
+    u := RECOG.PolPowerMod(a, (Q - 1) / 2, f);
+  else
+    u := RECOG.PolPowerModFrobenius(F, a, (Q - 1) / 2, f,
+                                    RECOG.PolFrobeniusMatrix(F, f));
+  fi;
   r := RECOG.PolProductMod(u, a, f);
   t := RECOG.PolProductMod(r, u, f)[1];
 
@@ -946,15 +951,26 @@ end;
 # 2^(i+1) divides q - 1, as for odd k, else from another power d^Q of a
 # non-square d of L. An element of L is a square if and only if its norm
 # to F is one, and that norm is a resultant. So there is one power with
-# an exponent of the size of |L|, or two.
+# an exponent of the size of |L|, or two, and they are taken with the
+# matrix of the Frobenius map of L.
 RECOG.Form_QuadraticNormPreimage := function(F, g, a)
-  local q, k, one, mul, y, isSquare, enum, nonSquareNorm, c, b, d, Q, S, s0,
-        order, w, t, i, M, z;
+  local q, k, one, mul, frob, power, y, isSquare, enum, nonSquareNorm, c, b,
+        d, Q, S, s0, order, w, t, i, M, z;
 
   q := Size(F);
   k := Length(g) - 1;
   one := g{[k + 1]};
   mul := {u, v} -> RECOG.PolProductMod(u, v, g);
+  # the powers with an exponent of the size of |L|
+  frob := fail;
+  power := function(u, e)
+    if e < q^2 then
+      return RECOG.PolPowerMod(u, e, g);
+    elif frob = fail then
+      frob := RECOG.PolFrobeniusMatrix(F, g);
+    fi;
+    return RECOG.PolPowerModFrobenius(F, u, e, g, frob);
+  end;
   y := RECOG.PolMod(RECOG.Pol(F, [Zero(F), One(F)]), g);
   isSquare := u -> IsOne(RECOG.PolResultant(g, u)^((q - 1) / 2));
 
@@ -1005,7 +1021,7 @@ RECOG.Form_QuadraticNormPreimage := function(F, g, a)
     return i;
   end;
 
-  w := RECOG.PolPowerMod(b, (Q - 1) / 2, g);
+  w := power(b, (Q - 1) / 2);
   t := mul(mul(w, w), b);
   i := order(t);
   if i > 0 then
@@ -1018,7 +1034,7 @@ RECOG.Form_QuadraticNormPreimage := function(F, g, a)
         d := nonSquareNorm()[2];
       fi;
       M := S;
-      z := RECOG.PolPowerMod(d, Q, g);
+      z := power(d, Q);
     fi;
     while i > 0 do
       z := RECOG.PolPowerMod(z, 2^(M - i - 1), g);

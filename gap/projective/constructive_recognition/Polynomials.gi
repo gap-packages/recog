@@ -259,6 +259,35 @@ RECOG.PolFrobeniusMatrix := function(F, f)
   return rows;
 end;
 
+# The power <u>^<e> modulo <f>, for e >= 0 and <frob> the matrix of
+# RECOG.PolFrobeniusMatrix: the product of the (u^(e_i))^(q^i) for the
+# q-adic digits e_i of e. That is one product with the matrix and one of
+# polynomials for each digit, where RECOG.PolPowerMod takes about
+# 1.2 log_2(q) products of polynomials.
+RECOG.PolPowerModFrobenius := function(F, u, e, f, frob)
+  local n, digits, powers, r, i, d;
+
+  n := Length(f) - 1;
+  digits := CoefficientsQadic(e, Size(F));
+  powers := [];
+  r := f{[n + 1]};
+  for i in [Length(digits), Length(digits) - 1 .. 1] do
+    if i < Length(digits) then
+      PadCoeffs(r, n);
+      r := ShallowCopy(r * frob);
+      ShrinkRowVector(r);
+    fi;
+    d := digits[i];
+    if d > 0 then
+      if not IsBound(powers[d]) then
+        powers[d] := RECOG.PolPowerMod(u, d, f);
+      fi;
+      r := RECOG.PolProductMod(r, powers[d], f);
+    fi;
+  od;
+  return r;
+end;
+
 # The monic irreducible factors of the monic squarefree polynomial <f>
 # over <F>, of odd characteristic, by Berlekamp's algorithm. The
 # polynomials v with v^q = v modulo f form an F-algebra B, isomorphic to

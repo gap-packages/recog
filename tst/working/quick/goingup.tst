@@ -248,7 +248,7 @@ true
 # The functions for polynomials as lists of coefficients satisfy their
 # defining equations, and RECOG.PolFactorsSquarefree agrees with Factors
 gap> CheckPol := function(n, q)
->     local F, R, x, pol, coeffs, f, fc, facs, u, uc, g, w, crt, c, s, D;
+>     local F, R, x, pol, coeffs, f, fc, facs, u, uc, g, w, crt, c, s, D, e;
 >     F := GF(q);
 >     R := PolynomialRing(F, 1);
 >     x := IndeterminatesOfPolynomialRing(R)[1];
@@ -272,6 +272,12 @@ gap> CheckPol := function(n, q)
 >         return "inverse";
 >       fi;
 >     od;
+>     e := Random(0, q^(n + 1));
+>     if RECOG.PolPowerModFrobenius(F, uc, e, fc,
+>                                   RECOG.PolFrobeniusMatrix(F, fc))
+>        <> RECOG.PolPowerMod(uc, e, fc) then
+>       return "power";
+>     fi;
 >     if RECOG.PolResultant(fc, uc) <> Resultant(f, u, x)
 >        or RECOG.PolResultant(uc, facs[1]) <> Resultant(u, pol(facs[1]), x)
 >        then
