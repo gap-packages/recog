@@ -894,64 +894,141 @@ RECOG.Form_GoingUpAdaptBasis := function(std, g)
   return DirectSumMat(IdentityMat(n, f), Concatenation(N, rest));
 end;
 
-# A preimage z of <a> under the norm z -> z^(q^k + 1) of the field
-# F[x]/(<f>) of order q^(2k), for <f> irreducible in the polynomial ring
-# <R> and a <> 0 in the subfield of order q^k: z = w b for a random w and
-# a square root b of a / N(w) in that subfield, by Tonelli-Shanks for q
-# odd; for q even, b = (a / N(w))^(q^k / 2).
+# A preimage z of <a> under the norm N: z -> z^(q^k + 1) of the field
+# K = F[x]/(<f>) of order q^(2k) onto its subfield L of order q^k, for
+# a <> 0 in L and <f> in the polynomial ring <R> over F irreducible with
+# f^dagger = f: of degree 2k over F = GF(q), or of degree k, which is then
+# odd, over F = GF(q^2). In K, x^(q^k) = 1 / x.
+# For q even, z is the square root of a in L. For q odd, z = y if a = y^2
+# is a square of L, and z = y / theta with y^2 = a N(theta) otherwise, for
+# a non-square theta of K, whose norm is a non-square of L:
+# - over GF(q^2), theta in F, with N(theta) = theta^(q+1);
+# - over GF(q), theta = x - lambda with f(lambda), its norm to F, a
+#   non-square of F, and N(theta) = (x - lambda) (1 / x - lambda).
+# The square roots are by Tonelli-Shanks, which takes one power
+# b^((Q-1)/2), q^k - 1 = 2^S Q with Q odd, for b = a and, if N(theta) is
+# not in F, another one for b = N(theta); N(theta)^Q generates the Sylow
+# 2-subgroup of L^*, which lies in F if 2^S divides q - 1.
+# The elements of K are compressed lists of coefficients: `mod` on
+# polynomials and products with lists which are not compressed are slower
+# by a factor of 10 to 100.
 RECOG.Form_NormPreimage := function(R, f, a, q, k)
-  local x, randomElement, Q, S, w, b, c, t, r, M, i, s, z;
+  local F, vector, cf, one, mul, power, Q, S, roots, order, r, t, i,
+        nonSquare, omega, theta, c, rn, lambda, xi, M, z;
 
-  x := IndeterminatesOfPolynomialRing(R)[1];
-  randomElement := function()
-    return Sum([0 .. DegreeOfLaurentPolynomial(f) - 1],
-               i -> Random(CoefficientsRing(R)) * x^i);
+  F := CoefficientsRing(R);
+  vector := function(pol)
+    if not IsList(pol) then
+      pol := CoefficientsOfUnivariatePolynomial(pol);
+    fi;
+    pol := ShallowCopy(pol);
+    ConvertToVectorRep(pol, Size(F));
+    return pol;
   end;
+  cf := vector(f);
+  one := vector([One(F)]);
+  mul := function(u, v)
+    local w;
+    w := ProductCoeffs(u, v);
+    ReduceCoeffs(w, cf);
+    ShrinkRowVector(w);
+    return w;
+  end;
+  power := function(u, e)
+    if e = 0 then
+      return one;
+    fi;
+    u := ShallowCopy(PowerModCoeffs(u, e, cf));
+    ShrinkRowVector(u);
+    return u;
+  end;
+  a := mul(vector(a), one);
   if IsEvenInt(q) then
-    repeat
-      w := randomElement();
-      b := PowerMod(R, w, q^k + 1, f);
-    until not IsZero(b);
-    b := (a * GcdRepresentation(R, b, f)[1]) mod f;
-    return (w * PowerMod(R, b, q^k / 2, f)) mod f;
+    return UnivariatePolynomial(F, power(a, q^k / 2));
   fi;
-  repeat
-    w := randomElement();
-    b := PowerMod(R, w, q^k + 1, f);
-  until not IsZero(b) and PowerMod(R, (a * GcdRepresentation(R, b, f)[1]) mod f,
-                                   (q^k - 1) / 2, f) = One(R);
-  b := (a * GcdRepresentation(R, b, f)[1]) mod f;
 
-  # a non-square c of the subfield, a norm
-  repeat
-    c := PowerMod(R, randomElement(), q^k + 1, f);
-  until not IsZero(c) and PowerMod(R, c, (q^k - 1) / 2, f) <> One(R);
   Q := q^k - 1;
   S := 0;
   while IsEvenInt(Q) do
     Q := Q / 2;
     S := S + 1;
   od;
-  M := S;
-  c := PowerMod(R, c, Q, f);
-  t := PowerMod(R, b, Q, f);
-  r := PowerMod(R, b, (Q + 1) / 2, f);
-  while t <> One(R) do
+  # [r, t] with r^2 = b t and t = b^Q
+  roots := function(b)
+    local u, r;
+    u := power(b, (Q - 1) / 2);
+    r := mul(u, b);
+    return [r, mul(r, u)];
+  end;
+  # i for t of order 2^i, and S + 1 for t = 0
+  order := function(t)
+    local i;
     i := 0;
-    s := t;
-    while s <> One(R) do
-      s := (s * s) mod f;
+    while t <> one and i <= S do
+      t := mul(t, t);
       i := i + 1;
     od;
-    z := PowerMod(R, c, 2^(M - i - 1), f);
+    return i;
+  end;
+
+  r := roots(a);
+  t := r[2];
+  r := r[1];
+  i := order(t);
+  if i = 0 then
+    return UnivariatePolynomial(F, r);
+  fi;
+  nonSquare := i = S;
+
+  # theta, rn = roots(N(theta)), and a generator c of the Sylow 2-subgroup
+  omega := PrimitiveRoot(F);
+  if Size(F) > q then
+    theta := omega^((q - 1) / 2^S);
+    c := theta^(q + 1);
+    rn := [c^((Q + 1) / 2) * one, c^Q * one];
+    theta := theta * one;
+    c := c * one;
+  elif not nonSquare and (q - 1) mod 2^S = 0 then
+    c := omega^((q - 1) / 2^S) * one;
+  else
+    lambda := First(Concatenation([One(F), -One(F)],
+                        List([1 .. Minimum(q - 3, 14)], j -> omega^j)),
+                    l -> Value(f, l)^((q - 1) / 2) <> One(F));
+    repeat
+      if lambda <> fail then
+        theta := vector([-lambda, One(F)]);
+        xi := -cf{[2 .. Length(cf)]} / cf[1];
+        xi[1] := xi[1] - lambda;
+        rn := roots(mul(theta, xi));
+      else
+        # no such lambda, as for half of the f with q = 3 and k odd
+        theta := vector(List([2 .. Length(cf)], j -> Random(F)));
+        rn := roots(power(theta, q^k + 1));
+      fi;
+      lambda := fail;
+    until order(rn[2]) = S;
+    c := rn[2];
+  fi;
+
+  if nonSquare then
+    r := mul(r, rn[1]);
+    t := mul(t, rn[2]);
+  fi;
+  M := S;
+  while t <> one do
+    i := order(t);
+    z := power(c, 2^(M - i - 1));
     M := i;
-    c := (z * z) mod f;
-    t := (t * c) mod f;
-    r := (r * z) mod f;
+    c := mul(z, z);
+    t := mul(t, c);
+    r := mul(r, z);
   od;
-  z := (w * r) mod f;
-  Assert(1, PowerMod(R, z, q^k + 1, f) = a mod f);
-  return z;
+  if nonSquare then
+    z := GcdRepresentation(R, UnivariatePolynomial(F, theta), f)[1];
+    r := mul(r, vector(z));
+  fi;
+  Assert(1, power(r, q^k + 1) = a);
+  return UnivariatePolynomial(F, r);
 end;
 
 # A vector e of W = GF(q)^n, n = 2m, for the isometry <h> of the form

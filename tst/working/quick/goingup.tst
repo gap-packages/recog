@@ -245,5 +245,51 @@ gap> ForAll([[4, 3], [6, 3], [6, 5], [8, 3], [8, 9], [10, 3], [10, 7],
 >           c -> CallFuncList(CheckSpDirectGoingUp, c));
 true
 
+# RECOG.Form_NormPreimage solves z^(q^k+1) = a in the field F[x]/(f) of
+# each irreducible factor f = f^dagger of 20 characteristic polynomials
+gap> CheckNormPreimage := function(type, d, q)
+>     local F, conj, G, R, x, f, D, coeffs, k, a;
+>     if type = "SU" then
+>       F := GF(q^2);
+>       conj := v -> List(v, y -> y^q);
+>       G := SU(d, q);
+>     else
+>       F := GF(q);
+>       conj := v -> v;
+>       G := Sp(d, q);
+>     fi;
+>     R := PolynomialRing(F, 1);
+>     x := IndeterminatesOfPolynomialRing(R)[1];
+>     for f in Set(Concatenation(List([1 .. 20], i -> Factors(R,
+>                  CharacteristicPolynomial(PseudoRandom(G)))))) do
+>       D := DegreeOfLaurentPolynomial(f);
+>       coeffs := conj(CoefficientsOfUnivariatePolynomial(f));
+>       if f <> UnivariatePolynomial(F, Reversed(coeffs) / coeffs[1])
+>          or (type = "Sp" and D = 1) then
+>         continue;
+>       fi;
+>       k := D;
+>       if type = "Sp" then
+>         k := D / 2;
+>       fi;
+>       repeat
+>         a := PowerMod(R, Sum([0 .. D - 1], i -> Random(F) * x^i),
+>                       q^k + 1, f);
+>       until not IsZero(a);
+>       if PowerMod(R, RECOG.Form_NormPreimage(R, f, a, q, k), q^k + 1, f)
+>          <> a then
+>         return false;
+>       fi;
+>     od;
+>     return true;
+> end;;
+gap> ForAll([["Sp", 6, 2], ["Sp", 8, 3], ["Sp", 12, 3], ["Sp", 8, 4],
+>            ["Sp", 10, 5], ["Sp", 8, 7], ["Sp", 8, 9], ["Sp", 6, 25],
+>            ["Sp", 6, 49], ["Sp", 4, 65537], ["SU", 7, 2], ["SU", 7, 3],
+>            ["SU", 6, 4], ["SU", 8, 5], ["SU", 5, 7], ["SU", 6, 9],
+>            ["SU", 3, 257]],
+>           c -> CallFuncList(CheckNormPreimage, c));
+true
+
 #
 gap> STOP_TEST("goingup.tst");
