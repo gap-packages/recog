@@ -21,7 +21,8 @@ provided below (TODO: add a reference):
 
 A leaf method should also record what it knows about the isomorphism type of
 the group via `SetLeafData`, see <Ref Attr="LeafData"/>. Without it, the
-composition factors of the leaf can only be computed from a stabiliser chain.
+composition factors of the leaf have to be computed with &GAP;'s generic
+methods.
 
 There are further values that can be provided, in particular to speed up
 computations; we'll come back to that later. Let's first look at an example:

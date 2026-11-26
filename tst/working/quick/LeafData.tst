@@ -228,10 +228,13 @@ false
 [ "C3", "L3(4)" ]
 gap> RECOG.CheckLeafData(leaf);
 true
-gap> data := LeafData(blackBoxSL(SL(3,4), true, 3, 4));;
+gap> leaf := blackBoxSL(SL(3,4), true, 3, 4);;
+gap> data := LeafData(leaf);;
 gap> data.type; List(data.factors, f -> f.name);
 "simple"
 [ "L3(4)" ]
+gap> RECOG.CheckLeafData(leaf);
+true
 
 # RECOG.TestGroup passes every leaf to RECOG.CheckLeafData, which has to
 # reject a wrong record.
@@ -278,6 +281,12 @@ true
 gap> leaf := RECOG.TestGroup(SymmetricGroup(6), false, 720);;
 gap> checkWith(leaf, rec(type := "simple"));
 "factors missing"
+gap> leaf := RECOG.TestGroup(GL(1,5), false, 4);;
+gap> List(CompositionFactorsOfRecogNode(leaf), f -> f.name);
+[ "C2", "C2" ]
+gap> checkWith(leaf, rec(factors := [ rec(series := "Z", parameter := [4],
+>                                         order := 4, name := "C4") ]));
+"cyclic factor whose order is not a prime"
 
 # a leaf of unknown type gets its factors on first use
 gap> ri := RECOG.TestGroup(SymmetricGroup(6), false, 720);;
@@ -318,9 +327,15 @@ gap> LeafData(ri);
 rec( factors := [  ], proven := true, type := "soluble" )
 gap> ri := RecogNode(GL(2,5), false, rec());;
 gap> SetFilterObj(ri, IsLeaf); SetFilterObj(ri, IsReady);
+gap> Collected(List(CompositionFactorsOfRecogNode(ri), f -> f.name));
+[ [ "A5", 1 ], [ "C2", 3 ] ]
+gap> RECOG.CheckLeafData(ri);
+true
+gap> ri := RecogNode(GL(2,5), true, rec());;
+gap> SetFilterObj(ri, IsLeaf); SetFilterObj(ri, IsReady);
 gap> CompositionFactorsOfRecogNode(ri);
-Error, the leaf <ri> has neither composition factors in LeafData(<ri>) nor a s\
-tabiliser chain
+Error, the projective leaf <ri> has neither composition factors in LeafData(<r\
+i>) nor a stabiliser chain
 
 #
 # display

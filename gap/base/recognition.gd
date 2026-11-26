@@ -810,10 +810,11 @@ DeclareOperation( "GetElmOrd", [ IsRecogNode, IsRecord ] );
 ##     <P/>
 ##     The factors are read off <Ref Attr="LeafData"/> of the leaves.
 ##     For a leaf of type <C>"unknown"</C> they are computed, on the first
-##     call, with <Ref Attr="CompositionSeries" BookName="ref"/> in a
-##     permutation representation taken from its stabiliser chain. If this
-##     shows the leaf to be soluble or simple, its type is changed
-##     accordingly.
+##     call, with <Ref Attr="CompositionSeries" BookName="ref"/>, in a
+##     permutation representation taken from its stabiliser chain if it has
+##     one, else in the group of the leaf, which a projective leaf does not
+##     allow. If this shows the leaf to be soluble or simple, its type is
+##     changed accordingly.
 ## <Log><![CDATA[
 ## gap> ri := RecogniseGroup(GL(4,3));;
 ## gap> List(CompositionFactorsOfRecogNode(ri), f -> f.name);

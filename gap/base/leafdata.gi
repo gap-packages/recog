@@ -364,16 +364,19 @@ InstallMethod( LeafData, "for a leaf whose method set no data",
     return rec( type := "unknown", proven := true );
   end );
 
-# A faithful permutation representation of the group of the leaf <ri>,
-# for leaves that have a stabiliser chain only.
-RECOG.PermGroupOfLeaf := function(ri)
+# A group isomorphic to the one the leaf <ri> represents, on which GAP can
+# compute a composition series, for leaves whose method set no factors.
+RECOG.GroupOfLeafForSeries := function(ri)
   local P;
   if IsPermGroup(Grp(ri)) then
       return Grp(ri);
   fi;
   if not IsBound(ri!.stabilizerchain) then
-      ErrorNoReturn("the leaf <ri> has neither composition factors in ",
-                    "LeafData(<ri>) nor a stabiliser chain");
+      if not ri!.projective then
+          return Grp(ri);
+      fi;
+      ErrorNoReturn("the projective leaf <ri> has neither composition ",
+                    "factors in LeafData(<ri>) nor a stabiliser chain");
   fi;
   P := Group(ActionOnOrbit(ri!.stabilizerchain!.orb,
                            GeneratorsOfGroup(Grp(ri))));
@@ -401,7 +404,7 @@ RECOG.LeafFactors := function(ri)
   fi;
 
   # GAP's series descends
-  series := CompositionSeries(RECOG.PermGroupOfLeaf(ri));
+  series := CompositionSeries(RECOG.GroupOfLeafForSeries(ri));
   data.factors := List(Reversed([1..Length(series)-1]),
                     i -> RECOG.SimpleFactorOfSection(series[i], series[i+1]));
 
@@ -450,6 +453,9 @@ RECOG.CheckLeafData := function(ri)
   factors := data.factors;
   if Product(factors, f -> f.order) <> Size(ri) then
       return "factor orders do not multiply to the size";
+  fi;
+  if ForAny(factors, f -> f.series = "Z" and not IsPrimeInt(f.order)) then
+      return "cyclic factor whose order is not a prime";
   fi;
   nonabelian := Filtered([1..Length(factors)], i -> factors[i].series <> "Z");
   if data.type = "soluble" and nonabelian <> [] then
