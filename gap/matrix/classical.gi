@@ -2499,25 +2499,23 @@ function(recognise)
             return TemporaryFailure;
         fi;
     elif d = 3 and q = 9 then
-        if not HasElementsMultipleOf( recognise.orders, [3,5]) then
+        ## Only the current element can be the special one, so test each
+        ## element, not only those after the orders 3 and 5 have appeared.
+        ## Projective order: an involution times a scalar of order 4 or 8
+        ## has matrix order 4 or 8 and a scalar square
+        if recognise.hasSpecialEle = false
+           and ProjectiveOrder(recognise.g)[1] in [4,8] then
+            g := recognise.g^2;
+            if ForAll(GeneratorsOfGroup(recognise.grp), h -> IsOne(Comm(h,g))) then
+                recognise.isOmegaContained := false;
+                return NeverApplicable;
+            fi;
+            recognise.hasSpecialEle := true;
+        fi;
+        if recognise.hasSpecialEle = false
+           or not HasElementsMultipleOf( recognise.orders, [3,5]) then
             return TemporaryFailure;
         fi;
-        if recognise.hasSpecialEle = false then
-            ## Projective order: an involution times a scalar of order 4
-            ## or 8 has matrix order 4 or 8 and a scalar square
-            if not ProjectiveOrder(recognise.g)[1] in [4,8] then
-                return TemporaryFailure;
-            fi;
-            g := recognise.g^2;
-            if ForAny(GeneratorsOfGroup(recognise.grp), h -> not IsOne(Comm(h,g))) then
-               recognise.hasSpecialEle := true;
-               return CheckFlag();
-            fi;
-        else
-           return CheckFlag();
-        fi;
-        recognise.isOmegaContained := false;
-        return NeverApplicable;
     elif d = 3 and q = 11 then
         if not HasElementsMultipleOf( recognise.orders, [3,11]) then
             return TemporaryFailure;
