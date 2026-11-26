@@ -933,7 +933,7 @@ BindRecogMethod("FindHomMethodsClassical", "TestRandomElement",
 "makes new random element and stores it and its char poly",
 function(recognise)
     local g, ppd, bppd, d, q, cpol, f, deg, facs, r, s, h, gmod,
-    ord, bc, phi, kf, o1, o2, cf, i, found, p;
+    ord, bc, phi, kf, kfOrders, o, cf, i, found, p;
 
     recognise.g := PseudoRandom(recognise.grp);
     recognise.cpol := CharacteristicPolynomial(recognise.g);
@@ -1079,47 +1079,31 @@ function(recognise)
             if recognise.kroneckerFactors = false then
                 return TemporaryFailure;
             fi;
+            # Witnesses that G = SL(2,q) o SL(2,q), collected per factor.
+            # By Dickson, a subgroup of PSL(2,q) with an element of order
+            # dividing q+1 as below and one of order dividing q-1, both of
+            # order > 4 (> 2 for q even), is PSL(2,q). By Goursat, a subgroup
+            # of PSL(2,q) x PSL(2,q) projecting onto both factors is the
+            # whole product or the graph of an automorphism, and an element
+            # whose factors have distinct orders rules out the latter.
             kf := recognise.kroneckerFactors;
-            o1 := ProjectiveOrder( kf[1] )[1];
-            o2 := ProjectiveOrder( kf[2] )[1];
-            #o1 := Order( kf[1] );
-            #o2 := Order( kf[2] );
-            Info(InfoRecog_ClassicalNaming,2,o1, " ", o2);
-            ### ACN March 2007 needed Projective order
-            if q mod 2 = 0 and (o1 <= 2 or o2 <= 2) then
-                return TemporaryFailure;
-            elif q mod 2 <> 0 and (o1 <= 4 or o2 <= 4) then
-                return TemporaryFailure;
-            fi;
-            if ( (q+1) mod o1 = 0 and (q+1) mod o2 = 0) then
-                if not IsPowerOfTwo(q+1) and q <> 8 then
-                    if not ForAny( PrimeDivisors(o1), r ->
-                      IsPrimitivePrimeDivisor(p,2*recognise.a,r)) then
-                        return TemporaryFailure;
-                    fi;
-                    if not ForAny( PrimeDivisors(o2), r ->
-                      IsPrimitivePrimeDivisor(p,2*recognise.a,r)) then
-                        return TemporaryFailure;
-                    fi;
-                elif q = 8 then
-                    if not o1 mod 9 = 0 or not o2 mod 9 = 0 then
-                        return TemporaryFailure;
-                    fi;
-                else
-                    if o1 < (q+1)/2 or o2 < (q+1)/2 then
-                        return TemporaryFailure;
-                    fi;
+            kfOrders := List(kf, k -> ProjectiveOrder(k)[1]);
+            Info(InfoRecog_ClassicalNaming, 2, kfOrders);
+            for i in [1, 2] do
+                o := kfOrders[i];
+                if o <= 2 or (q mod 2 <> 0 and o <= 4) then
+                    continue;
                 fi;
-                AddSet( recognise.plusminus, [1,1] );
-            fi;
-            if ( (q+1) mod o1 = 0 and (q-1) mod o2 = 0) then
-                AddSet( recognise.plusminus, [1,-1] );
-            fi;
-            if ( (q-1) mod o1 = 0 and (q+1) mod o2 = 0) then
-                AddSet( recognise.plusminus, [1,-1] );
-            fi;
-            if ( (q-1) mod o1 = 0 and (q-1) mod o2 = 0) then
-                AddSet( recognise.plusminus, [-1,-1] );
+                if (q+1) mod o = 0 and
+                   RECOG.IsOPlus4PlusWitness(o, q, p, recognise.a) then
+                    AddSet(recognise.factorWitnesses, ["plus", i]);
+                fi;
+                if (q-1) mod o = 0 then
+                    AddSet(recognise.factorWitnesses, ["minus", i]);
+                fi;
+            od;
+            if kfOrders[1] <> kfOrders[2] then
+                AddSet(recognise.factorWitnesses, ["distinct"]);
             fi;
         fi;
 
@@ -2170,7 +2154,8 @@ function(recognise)
             recognise.needPlusMinus := true;
             return NotEnoughInformation;
         fi;
-        if not IsSubset(recognise.plusminus,[[1,1],[1,-1],[-1,-1]]) then
+        if not IsSubset(recognise.factorWitnesses, [["distinct"], ["minus", 1],
+                ["minus", 2], ["plus", 1], ["plus", 2]]) then
             return TemporaryFailure;
         fi;
     elif d = 4 and q = 2 then
@@ -2940,6 +2925,17 @@ AddMethod(ClassicalMethDbForDegree2, FindHomMethodsClassical.IsAlt5Alt4Sym4, 30)
 AddMethod(ClassicalMethDbForDegree2, FindHomMethodsClassical.IsSL2Contained, 20);
 
 
+# Whether a Kronecker factor of projective order o, dividing q+1, is the
+# (q+1)-type witness of NonGenericOrthogonalPlus for d = 4
+RECOG.IsOPlus4PlusWitness := function(o, q, p, a)
+    if IsPowerOfTwo(q+1) then
+        return o >= (q+1)/2;
+    elif q = 8 then
+        return o mod 9 = 0;
+    fi;
+    return ForAny(PrimeDivisors(o), r -> IsPrimitivePrimeDivisor(p, 2*a, r));
+end;
+
 
 InstallGlobalFunction( RecogniseClassical,
 function( grp, arg... )
@@ -3012,7 +3008,7 @@ function( grp, arg... )
                    hasSpecialEle := false,
                    bc := "unknown",
                    kroneckerFactors := "unknown",
-                   plusminus := Set([]),
+                   factorWitnesses := [],
                    sq1 := [Z(q)*One(GL(2,q))],
                    sq2 := [Z(q)*One(GL(2,q))],
                    scalars := Group(Z(q)*One(GL(2,q))),
@@ -3057,6 +3053,7 @@ function( grp, arg... )
   originalInfoLevel := InfoLevel(InfoRecog_MethSel);
   SetInfoLevel(InfoRecog_MethSel,opt.infoLevel);
   ret := CallMethods( db, opt.nrrandels, recognise );
+
   SetInfoLevel(InfoRecog_MethSel,originalInfoLevel);
   # TODO: honor ret in some way?
 
