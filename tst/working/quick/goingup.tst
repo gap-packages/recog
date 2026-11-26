@@ -310,7 +310,8 @@ gap> ForAll([[1, 3], [2, 3], [3, 3], [7, 3], [40, 3], [9, 5], [30, 5],
 true
 
 # RECOG.Form_NormPreimage solves z^(q^k+1) = a in the field F[x]/(f) of
-# each irreducible factor f = f^dagger of 20 characteristic polynomials
+# each irreducible factor f = f^dagger of 20 characteristic polynomials, q
+# odd
 gap> CheckNormPreimage := function(type, d, q)
 >     local F, conj, G, R, x, f, D, coeffs, k, a;
 >     if type = "SU" then
@@ -347,12 +348,72 @@ gap> CheckNormPreimage := function(type, d, q)
 >     od;
 >     return true;
 > end;;
-gap> ForAll([["Sp", 6, 2], ["Sp", 8, 3], ["Sp", 12, 3], ["Sp", 8, 4],
->            ["Sp", 10, 5], ["Sp", 8, 7], ["Sp", 8, 9], ["Sp", 6, 25],
->            ["Sp", 6, 49], ["Sp", 4, 65537], ["SU", 7, 2], ["SU", 7, 3],
->            ["SU", 6, 4], ["SU", 8, 5], ["SU", 5, 7], ["SU", 6, 9],
+gap> ForAll([["Sp", 8, 3], ["Sp", 12, 3], ["Sp", 10, 5], ["Sp", 8, 7],
+>            ["Sp", 8, 9], ["Sp", 6, 25], ["Sp", 6, 49], ["Sp", 4, 65537],
+>            ["SU", 7, 3], ["SU", 8, 5], ["SU", 5, 7], ["SU", 6, 9],
 >            ["SU", 3, 257]],
 >           c -> CallFuncList(CheckNormPreimage, c));
+true
+
+# RECOG.Form_IsotropicKrylovVector, for the isometries h and -h, where h
+# is from the group of the standard generators: e, e h, ..., e h^(k-1) span
+# a totally isotropic resp. singular space, and beta(e, e h^k) <> 0. In odd
+# dimension x - 1 or x + 1 divides the characteristic polynomial.
+gap> CheckKrylovVector := function(type, d, q)
+>     local F, form, J, G, name, top, good, i, h, chi, args, e;
+>     F := GF(q);
+>     if type = "SU" then
+>       F := GF(q^2);
+>     fi;
+>     form := RECOG.ClassicalForm(type, d, F);
+>     J := form.gram;
+>     G := Group(RECOG.ClassicalStandardGenerators(type, d, F).all);
+>     name := type;
+>     top := QuoInt(d, 2);
+>     if type in ["O+", "O-"] then
+>       name := "O+";
+>       top := top - 1;
+>     fi;
+>     good := 0;
+>     for i in [1 .. 100] do
+>       h := PseudoRandom(G);
+>       for h in [h, -h] do
+>         chi := CharacteristicPolynomial(h);
+>         if DegreeOfLaurentPolynomial(Gcd(chi, Derivative(chi))) > 0 then
+>           continue;
+>         fi;
+>         args := [h, J, F, chi, name];
+>         if IsBound(form.quad) then
+>           Add(args, form.quad);
+>         fi;
+>         e := CallFuncList(RECOG.Form_IsotropicKrylovVector, args);
+>         if e = fail then
+>           continue;
+>         elif ForAny([0 .. top - 1],
+>                     j -> not IsZero(RECOG.FormValue(form, e, e * h^j)))
+>              or IsZero(RECOG.FormValue(form, e, e * h^top))
+>              or (type in RECOG.OrthogonalTypes
+>                  and not IsZero(RECOG.FormQuadraticValue(form, e))) then
+>           return false;
+>         fi;
+>         good := good + 1;
+>       od;
+>       if good >= 10 then
+>         return true;
+>       fi;
+>     od;
+>     return false;
+> end;;
+gap> ForAll([["Sp", 6, 3], ["Sp", 14, 3], ["Sp", 10, 5], ["Sp", 8, 9],
+>            ["Sp", 8, 49], ["Sp", 6, 257], ["Sp", 8, 2], ["Sp", 12, 4],
+>            ["Sp", 6, 16], ["SU", 6, 3], ["SU", 7, 3], ["SU", 12, 3],
+>            ["SU", 8, 5], ["SU", 9, 7], ["SU", 6, 17], ["SU", 6, 2],
+>            ["SU", 9, 2], ["SU", 7, 4], ["SU", 8, 8], ["O+", 8, 3],
+>            ["O+", 14, 3], ["O+", 10, 5], ["O+", 8, 9], ["O-", 8, 3],
+>            ["O-", 10, 5], ["O-", 12, 7], ["O", 9, 3], ["O", 13, 3],
+>            ["O", 11, 5], ["O", 9, 9], ["O+", 8, 2], ["O+", 10, 4],
+>            ["O-", 10, 2], ["O-", 8, 8]],
+>           c -> CallFuncList(CheckKrylovVector, c));
 true
 
 #

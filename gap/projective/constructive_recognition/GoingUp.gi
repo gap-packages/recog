@@ -896,12 +896,12 @@ end;
 
 # A preimage z of <a> under the norm N: z -> z^(q^k + 1) of the field
 # K = F[x]/(<f>) of order q^(2k) onto its subfield L of order q^k, for
-# a <> 0 in L and <f> in the polynomial ring <R> over F irreducible with
-# f^dagger = f: of degree 2k over F = GF(q), or of degree k, which is then
-# odd, over F = GF(q^2). In K, x^(q^k) = 1 / x.
-# For q even, z is the square root of a in L. For q odd, z = y if a = y^2
-# is a square of L, and z = y / theta with y^2 = a N(theta) otherwise, for
-# a non-square theta of K, whose norm is a non-square of L:
+# a <> 0 in L, q odd, and <f> in the polynomial ring <R> over F irreducible
+# with f^dagger = f: of degree 2k over F = GF(q), or of degree k, which is
+# then odd, over F = GF(q^2). In K, x^(q^k) = 1 / x.
+# z = y if a = y^2 is a square of L, and z = y / theta with
+# y^2 = a N(theta) otherwise, for a non-square theta of K, whose norm is a
+# non-square of L:
 # - over GF(q^2), theta in F, with N(theta) = theta^(q+1);
 # - over GF(q), theta = x - lambda with f(lambda), its norm to F, a
 #   non-square of F, and N(theta) = (x - lambda) (1 / x - lambda).
@@ -943,9 +943,6 @@ RECOG.Form_NormPreimage := function(R, f, a, q, k)
     return u;
   end;
   a := mul(vector(a), one);
-  if IsEvenInt(q) then
-    return UnivariatePolynomial(F, power(a, q^k / 2));
-  fi;
 
   Q := q^k - 1;
   S := 0;
@@ -1047,7 +1044,8 @@ end;
 # norm equation p p^dagger = N0 is solved in each factor of A: trivially
 # for a pair of factors f, f^dagger, by RECOG.Form_NormPreimage for
 # f = f^dagger otherwise, except for x - 1 and x + 1 in Sp and O+, where it
-# is a square root.
+# is a square root. For q even, p is the square root of N0 in A, which
+# needs no factorisation.
 # In characteristic 2, h must not have the eigenvalue 1, and for "O+" the
 # optional argument is the matrix of the quadratic form Q (as in
 # RECOG.ClassicalForm). There N = nu_0 + sum_(k>0) nu_k (x^k + x^-k): the
@@ -1247,6 +1245,13 @@ RECOG.Form_IsotropicKrylovPolynomial := function(phi, F, chi, type, Qc...)
     elif a^((q - 1) / 2) <> One(F) then
       N0 := PrimitiveRoot(F) * N0;
     fi;
+  fi;
+
+  if IsEvenInt(q) then
+    # the square root of N0 is self-adjoint, as N0 is
+    return RECOG.PolSquareRootMod(F,
+               RECOG.Pol(F, CoefficientsOfUnivariatePolynomial(N0)),
+               RECOG.Pol(F, CoefficientsOfUnivariatePolynomial(chi)));
   fi;
 
   # p, with p p^dagger = N0, by the Chinese remainder theorem
