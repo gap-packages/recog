@@ -47,12 +47,16 @@ RECOG.SL2_FromMakeSLStdGens := function(f)
   return SLPOfElms([s, t, delta, one, one]);
 end;
 
+# Whether RECOG.FindStdGens_SL goes up by RECOG.SL_DirectGoingUp, in one
+# step, instead of RECOG.GoingUp
+RECOG.SL_UseDirectGoingUp := true;
+
 # Algorithm StandardGenerators of [EHNPR] (see ../GoingDown.gi), Section
 # 'Outline of the algorithm', for SL(d,q), d >= 3: GoingDown to SL(4,q)
 # (none for d = 3), FinalDescent to SL(2,q) as in [HNPR24] (see
-# BaseCase.gi), and GoingUp (see ../GoingUp.gi). It takes no bounds on
-# random selections and does not return fail, as its three parts retry
-# until they succeed.
+# BaseCase.gi), and GoingUp (see DirectGoingUp.gi and ../GoingUp.gi). It
+# takes no bounds on random selections and does not return fail, as its
+# three parts retry until they succeed.
 # The standard generators are those of RECOG.ClassicalStandardGenerators;
 # those of the SL(2,q) are translated from RECOG.MakeSL_StdGens, which
 # RECOG.SL_FinalDescent returns.
@@ -89,6 +93,10 @@ RECOG.FindStdGens_SL := function(sld)
   bas := Concatenation(init.bas * down.bas{[1 .. n]}, down.bas{[n + 1 .. d]});
 
   Info(InfoRecog_ClassicalNatural, 1, "SL_n: going up");
-  up := RECOG.GoingUp(sld, "SL", rec( slp := slp, bas := bas, n := 2 ));
+  if RECOG.SL_UseDirectGoingUp then
+    up := RECOG.SL_DirectGoingUp(sld, rec( slp := slp, bas := bas, n := 2 ));
+  else
+    up := RECOG.GoingUp(sld, "SL", rec( slp := slp, bas := bas, n := 2 ));
+  fi;
   return rec( slpstd := up.slp, bas := up.bas, basi := up.bas^-1 );
 end;

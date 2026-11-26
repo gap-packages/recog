@@ -197,5 +197,29 @@ gap> ForAll([["SL", 2, 3, 7], ["SL", 2, 8, 4], ["SL", 2, 17, 5],
 >           c -> CallFuncList(CheckGoingUp, c));
 true
 
+# RECOG.SL_DirectGoingUp does the same from SL(2,q) in one step
+gap> CheckDirectGoingUp := function(d, q)
+>     local f, B, init, std, gens, G, res;
+>     f := GF(q);
+>     B := RandomInvertibleMat(d, f);
+>     init := List(RECOG.ClassicalStandardGenerators("SL", 2, f).all,
+>                  x -> B^-1 * RECOG.GoingUpEmbed(x, d, f) * B);
+>     std := RECOG.ClassicalStandardGenerators("SL", d, f).all;
+>     gens := Concatenation(init, List(std, x -> B^-1 * x * B));
+>     G := GroupWithMemory(Group(gens));
+>     res := RECOG.SL_DirectGoingUp(G,
+>                rec( slp := StraightLineProgram(
+>                                [List([1 .. Length(init)], i -> [i, 1])],
+>                                Length(gens)),
+>                     bas := B, n := 2 ));
+>     return List(ResultOfStraightLineProgram(res.slp, gens),
+>                 x -> res.bas * x * res.bas^-1) = std;
+> end;;
+gap> ForAll([[3, 2], [3, 3], [3, 4], [4, 2], [4, 3], [4, 9], [5, 5], [6, 7],
+>            [9, 2], [10, 2], [12, 3], [13, 4], [20, 5], [21, 8], [8, 25],
+>            [9, 49], [7, 211], [6, 1024], [5, 65537]],
+>           c -> CallFuncList(CheckDirectGoingUp, c));
+true
+
 #
 gap> STOP_TEST("goingup.tst");
