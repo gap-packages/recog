@@ -1846,6 +1846,9 @@ function(recognise)
             recognise.needLB := true;
             recognise.needE2 := true;
         fi;
+        if d = 4 and q > 9 then
+            recognise.needPOrders := true;
+        fi;
         if d = 3 then
             recognise.needPOrders := true;
             if q >= 49 then
@@ -1894,13 +1897,14 @@ function(recognise)
         # either max{r,s} >= 11 and G contains omega
         # or {r,s} = {5,7} and then we have to rule out 2.A7.
 
-        # check of o is divisible by a prime >= 11
-        f1 := o -> PositionProperty(Factors(o), i-> i >= 11) <> fail;
-        if PositionProperty(recognise.orders, f1) <> fail then
+        # check of o is divisible by a prime >= 11; projective orders,
+        # since a scalar can bring any prime dividing q-1
+        f1 := o -> PositionProperty(Factors(o[1]), i-> i >= 11) <> fail;
+        if PositionProperty(recognise.porders, f1) <> fail then
             return CheckFlag();
         fi;
 
-        # Now we know that element orders only contain primes at most 7
+        # Now we know that projective orders only contain primes at most 7
         if not q^3 mod 7 = 1 or q^2 mod 7 = 1 or q mod 7 = 1 then
             # 7 is not ppd of q^3-1
             return CheckFlag();
