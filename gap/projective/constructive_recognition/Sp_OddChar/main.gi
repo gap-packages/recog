@@ -17,9 +17,14 @@
 ##
 #############################################################################
 
+# Whether RECOG.FindStdGens_Sp goes up by RECOG.Sp_DirectGoingUp, in one
+# step, instead of RECOG.GoingUp
+RECOG.Sp_UseDirectGoingUp := false;
+
 # StandardGenerators of [EHNPR] (see ../GoingDown.gi), 'Outline of the
 # algorithm', for Sp(d,q), d >= 4 and q odd: GoingDown to Sp(8,q) if
-# d > 8, FinalDescent to Sp(4,q), and GoingUp (see ../GoingUp.gi).
+# d > 8, FinalDescent to Sp(4,q), and GoingUp (see ../GoingUp.gi and
+# DirectGoingUp.gi).
 # [EHNPR] needs d >= 8 and leaves d = 4, 6 to other algorithms ('Small
 # degrees'); RECOG.Sp_FinalDescent accepts these degrees as well. For q
 # even see RECOG.FindStdGens_SpEven.
@@ -55,6 +60,10 @@ RECOG.FindStdGens_Sp := function(G)
 
   Info(InfoRecog_ClassicalNatural, 1, "Sp_n: going up");
   bas := RECOG.Form_CompleteStandardBasis(G, "Sp", bas, 4);
-  up := RECOG.GoingUp(G, "Sp", rec( slp := slp, bas := bas, n := 4 ));
+  if RECOG.Sp_UseDirectGoingUp then
+    up := RECOG.Sp_DirectGoingUp(G, rec( slp := slp, bas := bas, n := 4 ));
+  else
+    up := RECOG.GoingUp(G, "Sp", rec( slp := slp, bas := bas, n := 4 ));
+  fi;
   return rec( slpstd := up.slp, bas := up.bas, basi := up.bas^-1 );
 end;
