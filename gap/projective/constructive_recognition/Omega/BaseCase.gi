@@ -318,7 +318,7 @@ RECOG.Omega_FinalDescent := function(gens, f, form, N)
       return fail;
     fi;
 
-    s := StripMemory(r.element);
+    s := r.element;
     jm := StripMemory(j);
     if IsEvenInt(Size(f)) then
       D := SemiEchelonMat(jm - One(jm)).vectors;
@@ -350,7 +350,7 @@ RECOG.Omega_FinalDescent := function(gens, f, form, N)
 
     base := RECOG.FindStdGensOmega6(H6, form6, f);
     return rec( slp := CompositionOfStraightLinePrograms(base.slp,
-                           SLPOfElms([r.element, j])),
+                           RECOG.StingraySLP([r], [j])),
                 bas := Concatenation(base.bas * sum, tail) );
   od;
   return fail;

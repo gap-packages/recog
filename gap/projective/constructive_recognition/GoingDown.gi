@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Max Horn, Daniel Rademacher.
+##  This file's authors include Max Horn, Daniel Rademacher.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
 ##  to list here. Please refer to the COPYRIGHT file for details.
@@ -100,14 +100,18 @@ end;
 # <D>, not dividing the degree of any other factor. Its power s = h^B,
 # with B killing the other primary components, is a deg(P)-stingray
 # element if and only if x^B generates GF(q)[x]/<P> over GF(q).
-# s is computed as a power of h, whose memory yields its SLP; [EHNPR]
-# computes it more cheaply on the body of h (remark after the algorithm).
+# s is computed on the body ker P(h) of h, where h^B = h^(B mod (q^m-1)),
+# and is the identity on the tail im P(h) ([EHNPR], remark after the
+# algorithm); this avoids powering h in full degree.
 # Returns either fail, or else a record with the following components:
-#  - `element`: the stingray element s
+#  - `element`: the stingray element s, without memory
 #  - `dim`: deg(P), the dimension of its body
 #  - `remaining`: the number of random selections left
+#  - `body`, `tail`: bases of the body im(s-1) and the tail ker(s-1)
+#  - `candidate`, `exponent`: h, with memory, and B, so that s = h^B
 RECOG.FindStingrayElement := function(G, D, N)
-  local F, q, p, R, x, h, factors, degrees, i, m, others, c, beta, B, P, gamma;
+  local F, q, p, R, x, h, factors, degrees, i, m, others, c, beta, B, P, gamma,
+        mat, T, U, E, A, C, K;
 
   F := DefaultFieldOfMatrixGroup(G);
   q := Size(F);
@@ -138,12 +142,32 @@ RECOG.FindStingrayElement := function(G, D, N)
       beta := LogInt(p * c - 1, p);
       B := p^beta * Lcm(Concatenation([1], List(others, f -> q^Degree(f[1]) - 1)));
 
-      # x^B generates GF(q^m) if it lies in no maximal subfield GF(q^(m/r))
+      # x^B generates GF(q^m) if it lies in no maximal subfield GF(q^(m/r));
+      # x^(q^m-1) = 1 modulo P, as P is irreducible of degree m and not x
       P := factors[i][1];
-      gamma := PowerMod(x, B, P);
-      if ForAll(Set(Factors(m)), r -> PowerMod(gamma, q^(m/r), P) <> gamma) then
-        return rec( element := h^B, dim := m, remaining := N );
+      gamma := PowerMod(x, B mod (q^m - 1), P);
+      if not ForAll(Set(Factors(m)), r -> PowerMod(gamma, q^(m/r), P) <> gamma) then
+        continue;
       fi;
+
+      # U = ker P(h) is the body, E = im P(h) the tail, and A is h
+      # restricted to U; in the basis C = [U, E], s = diag(A^B, 1), so
+      # s - 1 = K * (A^B - 1) * U with K the first m columns of C^-1
+      mat := StripMemory(h);
+      T := SemiEchelonMatTransformation(Value(P, mat));
+      U := T.relations;
+      E := T.vectors;
+      ConvertToMatrixRep(U, F);
+      ConvertToMatrixRep(E, F);
+      A := List(U * mat, v -> SolutionMat(U, v));
+      ConvertToMatrixRep(A, F);
+      C := Concatenation(U, E);
+      ConvertToMatrixRep(C, F);
+      K := (C^-1){[1..Length(C)]}{[1..m]};
+      ConvertToMatrixRep(K, F);
+      return rec( element := One(mat) + K * ((A^(B mod (q^m - 1)) - One(A)) * U),
+                  dim := m, remaining := N, body := U, tail := E,
+                  candidate := h, exponent := B );
     od;
     Info(InfoRecog_ClassicalNatural, 3,
          "    GoingDown: random element is no pre-stingray candidate");
@@ -152,12 +176,28 @@ RECOG.FindStingrayElement := function(G, D, N)
   return fail;
 end;
 
+# SLP for the stingray elements of the records <rs> returned by
+# RECOG.FindStingrayElement, followed by the elements <elms> with memory,
+# in the generators of the group they were found in
+RECOG.StingraySLP := function(rs, elms)
+  local k, l;
+  k := Length(rs);
+  l := k + Length(elms);
+  return CompositionOfStraightLinePrograms(
+             StraightLineProgram(
+                 Concatenation(List([1..k], i -> [i, rs[i].exponent]),
+                               [Concatenation(List([l+1..l+k], i -> [i, 1]),
+                                              List([k+1..l], i -> [i, 1]))]),
+                 l),
+             SLPOfElms(Concatenation(List(rs, r -> r.candidate), elms)));
+end;
+
 # Algorithm GoingDownStep of [EHNPR], Section 'GoingDown algorithm': find
 # stingray elements s1, s2 of <G> whose bodies W_i = im(s_i-1) and tails
 # E_i = ker(s_i-1) satisfy W1 \cap W2 = 0 and V = (W1+W2) + (E1 \cap E2)
 # (a stingray duo), such that the restrictions of s1, s2 to W1+W2
 # generate the classical group there. Uses at most <N> random selections.
-# Unlike [EHNPR], s2 is a random conjugate of s1 rather than a second
+# Unlike [EHNPR], s2 is a random conjugate s1^g rather than a second
 # stingray element, which saves the search for one. It neither restricts
 # nor returns a form, as
 # RecogniseClassical computes the form itself, and it does not return the
@@ -167,7 +207,7 @@ end;
 #  - `slp`: SLP of [s1,s2] in the generators of <G>
 #  - `basis`: a basis of W1+W2 followed by one of E1 \cap E2, as a matrix
 RECOG.GoingDownStep := function(G, params, N)
-  local n, F, D, r, h, s1, s2, T, W, E, sum, nn, tail, C, gens;
+  local n, F, D, r, g, gm, s1, s2, W, E, sum, nn, tail, C, gens;
 
   n := DimensionOfMatrixGroup(G);
   F := DefaultFieldOfMatrixGroup(G);
@@ -178,14 +218,15 @@ RECOG.GoingDownStep := function(G, params, N)
     if r = fail or r.remaining = 0 then
       return fail;
     fi;
-    h := [r.element, r.element^PseudoRandom(G)];
+    g := PseudoRandom(G);
     N := r.remaining - 1;
 
-    s1 := StripMemory(h[1]);
-    s2 := StripMemory(h[2]);
-    T := List([s1, s2], s -> SemiEchelonMatTransformation(s - One(s)));
-    W := List(T, t -> t.vectors);
-    E := List(T, t -> t.relations);
+    # body and tail of s1^g are those of s1 times g
+    gm := StripMemory(g);
+    s1 := r.element;
+    s2 := gm^-1 * s1 * gm;
+    W := [r.body, r.body * gm];
+    E := [r.tail, r.tail * gm];
     sum := SumIntersectionMat(W[1], W[2])[1];
     nn := 2 * r.dim;
     tail := SumIntersectionMat(E[1], E[2])[2];
@@ -206,8 +247,12 @@ RECOG.GoingDownStep := function(G, params, N)
     fi;
 
     ConvertToMatrixRep(C, F);
+    # [s1, s2] = [h^B, g^-1 * h^B * g] in [h, g]
     return rec( gens := gens,
-                slp := SLPOfElms(h),
+                slp := CompositionOfStraightLinePrograms(
+                           StraightLineProgram([[1, r.exponent], [2, -1, 3, 1, 2, 1],
+                                                [[3, 1], [4, 1]]], 2),
+                           SLPOfElms([r.candidate, g])),
                 basis := C );
   od;
 

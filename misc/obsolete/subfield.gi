@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Max Neunhöffer, Ákos Seress, Robert McDougal,
+##  This file's authors include Max Neunhöffer, Ákos Seress, Robert McDougal,
 ##  Nick Werner, Justin Lynd, Niraj Khare.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
