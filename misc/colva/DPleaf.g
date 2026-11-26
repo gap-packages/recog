@@ -9,7 +9,7 @@ MyOrder := function(g)
 end;
 
 IdTest := function(g)
-# returns true if g is a scalar matrix or a tirival perm
+# returns true if g is a scalar matrix or a trivial perm
   if IsMatrix(g) then return IsScalarMatrix(g);
   else return IsOne(g);
   fi;

@@ -189,7 +189,7 @@ RECOG.RecogniseSL2NaturalGeneric := function(G, q)
     v := PowerModCoeffs(v, exp, pol);
   until Length(v) = 2 and ValuePol(pol, (-v[1]+one)/v[2]) = zero;
   a := (-v[1]+one)/v[2];
-  # colums of mat are eigenvectors for a and 1/a (x^mat is diagonal)
+  # columns of mat are eigenvectors for a and 1/a (x^mat is diagonal)
   mat := [[-x[1,2], -x[1,2]], [x[1,1]-a, x[1,1]-1/a]];
   if mat[1,1] = zero and mat[2,1] = zero then
     mat[1,1] := x[2,2]-a; mat[2,1] := -x[2,1];

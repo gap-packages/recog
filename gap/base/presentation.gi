@@ -136,7 +136,7 @@ end;
 # [BLN+03] "A black-box group algorithm for recognizing finite symmetric 
 # and alternating groups, I", (2.2).
 # For even n, it is nearly the same presentation as in [BLN+03], (2.3), but some
-# relations are erronously missing in [BLN+03], (2.3).
+# relations are erroneously missing in [BLN+03], (2.3).
 RECOG.AnRelationsSLP := function(n)
     local F, rels, s, t, k;
     # Edge cases for small n

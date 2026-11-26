@@ -117,7 +117,7 @@ gap> ri := RecogniseClassical(grp);;
 gap> "2.M12" in ri.possibleNearlySimple;
 true
 
-# Group  M23 Source: Atla  Matrix representation of dim 11a over GF(2)
+# Group  M23 Source: Atlas  Matrix representation of dim 11a over GF(2)
 # ppd(11,2;e_i)-elements for e1=10, e2=11, p=2, but not ppd(11,2;e): 5<e<10
 #
 gap> grp := Group( [  [

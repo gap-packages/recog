@@ -1,7 +1,7 @@
 
 ElementInNormalSubgroup := function(G,N,g,Projective)
  # Is g in the normal closure of N (projectively)??
- # This algorithm can return a false negative with small possiblity
+ # This algorithm can return a false negative with small probability
   local O,nmr,m,n,i;
  # if the GCD of |g|,|n_1g|,...,|n_rg| = 1 then g is in N
  # if not then g probably is not in n
@@ -28,7 +28,7 @@ end;
 
 ElementInNormalClosure := function(G,N,g,Projective)
  # Is g in the normal closure of N (projectively)??
- # This algorithm can return a false negative with small possiblity
+ # This algorithm can return a false negative with small probability
   local O,nmr,m,n,i;
  # if the GCD of |g|,|n_1g|,...,|n_rg| = 1 then g is in N
  # if not then g probably is not in n

@@ -33,7 +33,7 @@ To enable GAP to find recog you can start GAP via
     gap --packagedirs "~/packages;"
 
 > [!IMPORTANT]
-> Note that `--packagedirs` was introduced in GAP 4.15. For older version please
+> Note that `--packagedirs` was introduced in GAP 4.15. For older versions, please
 > refer to [Chapter 76 of the GAP reference manual](https://docs.gap-system.org/doc/ref/chap76.html)
 > for alternative solutions.
 

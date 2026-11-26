@@ -250,11 +250,11 @@ ArchiveURL      := Concatenation( ~.SourceRepository.URL,
 ArchiveFormats := ".tar.gz .tar.bz2",
 
 ##  Here you  must provide a short abstract explaining the package content
-##  in HTML format (used on the package overview Web page) and an URL
+##  in HTML format (used on the package overview Web page) and a URL
 ##  for a Webpage with more detailed information about the package
 ##  (not more than a few lines, less is ok):
 ##  Please, use '<span class="pkgname">GAP</span>' and
-##  '<span class="pkgname">MyPKG</span>' for specifing package names.
+##  '<span class="pkgname">MyPKG</span>' for specifying package names.
 ##
 AbstractHTML := """
     <p><b>Warning:</b> This package is still under development and
@@ -301,7 +301,7 @@ AutoDoc := rec(
                     "&copyright; 2005-2026 by its authors, see file <F>COPYRIGHT</F> for details.<P/>\n",
                     "\n",
                     "This package may be distributed under the terms and conditions of the\n",
-                    "GNU Public License Version 3 or (at your option) any later version.\n"
+                    "GNU General Public License Version 3 or (at your option) any later version.\n"
                 ),
     )
 ),

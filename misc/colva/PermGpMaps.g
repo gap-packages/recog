@@ -1,4 +1,4 @@
-## Functions to compute a sequence of maps for a normal series in a permuation group
+## Functions to compute a sequence of maps for a normal series in a permutation group
 ## Uses only standard BSGS functions
 
 PermGrpMaps := function(G,ri)

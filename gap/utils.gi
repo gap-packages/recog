@@ -18,7 +18,7 @@
 #   exponent := ...,             # exponent of the group
 #   size := ...,                 # group order
 #   allorders := ...,            # list of all possible element orders in G
-#   freqorders := ...,           # list of orders such that probabability
+#   freqorders := ...,           # list of orders such that probability
 #                                # that a random el has one of these is ~ 1/2
 #   probability := ...,          # probability that a random element has an
 #                                # order in freqorders

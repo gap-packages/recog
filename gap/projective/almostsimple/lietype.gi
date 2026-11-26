@@ -816,7 +816,7 @@ RECOG.LieType := function (G, p, orders, Nmr)
 end;
 
 #! @BeginChunk LieTypeNonConstr
-#! Recognise quasi-simple group of Lie type when characteristic is given.
+#! Recognise a quasi-simple group of Lie type when the characteristic is given.
 #! Based on <Cite Key="BKPS02"/> and <Cite Key="AB01"/>.
 #! @EndChunk
 BindRecogMethod("FindHomMethodsProjective", "LieTypeNonConstr",

@@ -3,7 +3,7 @@
 #W  RecogniseAnSnOnFDPM.gap     user function            Stephen Howe
 #W                                                     & Maska Law
 ##
-#Y  v 1.0 Feburary 2005, School of Mathematics and Statistics,
+#Y  v 1.0 February 2005, School of Mathematics and Statistics,
 #Y                       The University of Western Australia
 ##
 ##  This file contains an implementation of an algorithm for recognising
@@ -571,7 +571,7 @@ FixedPointSubspace := function(mat, k)
 #      the complement W(<mat>) of F such that for all w
 #      in W(<mat>), w+w<mat>+w<mat>^2+...+w<mat>^(k-1) = 0
 # This function uses the row echelon form of a matrix in order
-# to compute the relevent bases. Requires k mod p <> 0 where
+# to compute the relevant bases. Requires k mod p <> 0 where
 # p is the characteristic of the field.
   local moveLT, trans;
 
@@ -1473,7 +1473,7 @@ RecogniseMatrixGroup := function(mgens, field, eps)
         v,       # a vector from a linked basis
         k,       # a counter
         vs,      # a linked sequence of vectors
-        us,      # the alterate basis
+        us,      # the alternate basis
         uvs,     # output of CompleteBasis
         cob,     # change of basis matrix, to the basis u_i for i = 2,...,n-delta+1
         perms;   # the permutations (and scalars) for each matrix
@@ -1597,7 +1597,7 @@ RecogniseMatrixGroup := function(mgens, field, eps)
 
   # determine permutations and scalars: uvs[2] contains the
   # change of basis matrix that takes group elements into
-  # our prefered form
+  # our preferred form
   cob := uvs[2];
   ConvertToMatrixRep(cob);
 
@@ -1713,7 +1713,7 @@ RandomFullyDeletedPermutationRepresentation := function(perms, n, field)
     delta := 1;
   fi;
 
-  # random generaate some non-zero scalars
+  # randomly generate some non-zero scalars
   scalars := [];
   for s in [1..Length(perms)] do
     scalars[s] := Random(field);

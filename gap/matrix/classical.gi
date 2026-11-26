@@ -332,8 +332,8 @@ end;
 # parts: A version that applies to classical groups for sufficiently
 # large parameters, called generic parameters, as described in [NP98, Def.3.2],
 # and a part that applies to smaller cases of classical groups, where
-# the exsistence of sufficiently informative ppd elements is not guaranteed.
-# The naming algorithm for these cases  is decribed in [NP99] and implemented
+# the existence of sufficiently informative ppd elements is not guaranteed.
+# The naming algorithm for these cases is described in [NP99] and implemented
 # in the functions whose name starts with NonGeneric below. This function tests
 # whether the parameters are generic or not.
 #

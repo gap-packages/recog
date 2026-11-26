@@ -84,7 +84,7 @@ k,Scls,SclMap,gamma,divs,i,y,ZH,IPc,ItoPc,alpha1,SclsPC,e1,e2,f1,f2, cp1;
  k := k1*k2;
  ZH := GroupWithGenerators([z^k]);
 
-# Construct ismorphism (modulo scalars) from H1 -> H
+# Construct isomorphism (modulo scalars) from H1 -> H
  beta := GroupHomomorphismByFunction(H1,H,g->ImageInPerfectGroup(H1,H,g,z,k));
 
  Scls := GroupWithGenerators([z]);
@@ -168,7 +168,7 @@ D,injs,maptoD,ims;
  psi := List([1..(Size(dims)-1)],i->GroupHomomorphismByFunction(G,GL(dims[i+1]-dims[i],F),g -> ExtractBlockMap(g,t,dims[i]+1,dims[i+1]-dims[i])));
 
 
-# Sort psi by dimension but remember the origional ordering
+# Sort psi by dimension but remember the original ordering
 
  c :=  List([1..(Size(dims)-1)],i->dims[i+1]-dims[i]);
  psi := Permuted(psi,Sortex(c));
@@ -490,7 +490,7 @@ end;
 
 
 TensorMaps := function(G,ri)
-# Trys to find maps in the tensor case
+# Tries to find maps in the tensor case
  local d,F,N,r,conjgensG,gens1,gens2,list,z,A,GtoA,c,l,
        mapdata,i,j,D,injs,maptoD,ims,Ari,g,c1;
 

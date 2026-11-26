@@ -78,7 +78,7 @@ PPDIrreducibleFactor := function ( R, f, d, q )
     #    return false;
     #fi;
 
-    # compute the deriviative
+    # compute the derivative
     a := Derivative( f );
 
     # if the derivative is nonzero then $f / Gcd(f,a)$ is squarefree
@@ -147,7 +147,7 @@ end;
 #     fi;
 #     char := Characteristic(F);
 # 
-#     # compute the deriviative to make it square free:
+#     # compute the derivative to make it square free:
 #     while true do
 #         der := Derivative( c );
 #         if not IsZero(der) then break; fi;

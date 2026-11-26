@@ -84,7 +84,7 @@ MyActionOnSubspace := function(B,g)
 end;
 
 DiGroup := function(grp)
-  #produces grp.2 acting as two diagonal blocks with outer aut interchaging them.
+  #produces grp.2 acting as two diagonal blocks with outer aut interchanging them.
   local gens,d,g,M,i,j;
   gens := [];
   d:=DimensionOfMatrixGroup(grp);

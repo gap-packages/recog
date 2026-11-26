@@ -137,7 +137,7 @@ RecogniseQuasiSimple := function(G,name)
 
 
 # elif name[1]='L'
-# G is SL / PSL - use the Kantor-Serres algorithm
+# G is SL / PSL - use the Kantor-Seress algorithm
 #   GBB := GpAsBBGp (G);
 #   GBBm := GroupWithMemory(GBB);
 #   npe := findnpe(name);
