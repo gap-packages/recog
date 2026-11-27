@@ -61,8 +61,11 @@ RECOG.Sp_EvenOmega6 := function(gens, f, form)
     if RECOG.FormOrthogonalType(form6, IdentityMat(6, f)) = "O+"
        and RECOG.GeneratesOmega6([s, jm], form6, f) <> fail then
       base := RECOG.FindStdGensOmega6([s, jm], form6, f);
+      # [s, j] = [h^B, j] in [h, j]; s itself has no memory
       return rec( slp := CompositionOfStraightLinePrograms(base.slp,
-                             SLPOfElms([r.element, j])),
+                             CompositionOfStraightLinePrograms(
+                                 StraightLineProgram([[[1, r.exponent], [2, 1]]], 2),
+                                 SLPOfElms([r.candidate, j]))),
                   bas := base.bas );
     fi;
   until false;
@@ -91,7 +94,10 @@ RECOG.Sp_EvenDuo8 := function(G, f, N)
     if RankMat(Concatenation(SemiEchelonMat(s1 - One(s1)).vectors,
                              SemiEchelonMat(s2 - One(s2)).vectors)) = 8 then
       return rec( gens := [s1, s2],
-                  slp := SLPOfElms([r1.element, r2.element]),
+                  slp := CompositionOfStraightLinePrograms(
+                             StraightLineProgram([[[1, r1.exponent],
+                                                   [2, r2.exponent]]], 2),
+                             SLPOfElms([r1.candidate, r2.candidate])),
                   bas := IdentityMat(8, f) );
     fi;
   od;
