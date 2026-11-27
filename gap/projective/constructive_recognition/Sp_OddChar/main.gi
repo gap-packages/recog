@@ -19,7 +19,7 @@
 
 # Whether RECOG.FindStdGens_Sp goes up by RECOG.Sp_DirectGoingUp, in one
 # step, instead of RECOG.GoingUp
-RECOG.Sp_UseDirectGoingUp := false;
+RECOG.Sp_UseDirectGoingUp := true;
 
 # StandardGenerators of [EHNPR] (see ../GoingDown.gi), 'Outline of the
 # algorithm', for Sp(d,q), d >= 4 and q odd: GoingDown to Sp(8,q) if

@@ -19,7 +19,7 @@
 
 # Whether RECOG.FindStdGens_SU goes up by RECOG.SU_DirectGoingUp, in one
 # step, instead of RECOG.GoingUp, for even d
-RECOG.SU_UseDirectGoingUp := false;
+RECOG.SU_UseDirectGoingUp := true;
 
 # StandardGenerators of [EHNPR] (see ../GoingDown.gi), 'Outline of the
 # algorithm', for SU(d,q0), d >= 4 and q0 <> 2: RECOG.FindStdGensSU4 for
