@@ -52,7 +52,7 @@ gap> CheckSL_Rewrite := function(d, q)
 >     return ForAll(els,
 >                   g -> ResultOfStraightLineProgram(RECOG.SL_Rewrite(W, g), std) = g);
 > end;;
-gap> ForAll([3 .. 8], d -> ForAll([2, 3, 4, 5, 9], q -> CheckSL_Rewrite(d, q)));
+gap> ForAll([2 .. 8], d -> ForAll([2, 3, 4, 5, 9], q -> CheckSL_Rewrite(d, q)));
 true
 
 # ClassicalNatural makes SL(3,q) with more than 1000 projective points a
