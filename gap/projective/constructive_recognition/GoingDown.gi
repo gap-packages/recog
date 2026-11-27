@@ -33,6 +33,8 @@ RECOG.GoingDownRandomBound := 100;
 #              group, by RecogniseClassical [NP98]; this is the naming
 #              test of GoingDownStep
 RECOG.GoingDownParameters := function(type, q)
+  local q0, m;
+
   if type = "SL" then
     return rec( terminal := 4, minBody := 2, parity := fail,
                 isNamed := H -> RecogniseClassical(H,
@@ -47,6 +49,22 @@ RECOG.GoingDownParameters := function(type, q)
     return rec( terminal := 8, minBody := 4, parity := 0,
                 isNamed := H -> RecogniseClassical(H,
                                     rec(case := "symplectic")).isSpContained = true );
+  fi;
+  if type = "SU" then
+    # q = q0^2. Bodies have odd dimension; over GF(4) none has dimension 3,
+    # as an element of SU(3,2) is never irreducible on GF(4)^3 ([EHNPR],
+    # Section 'GoingDown algorithm')
+    q0 := RootInt(q, 2);
+    if q0^2 <> q then
+      ErrorNoReturn("RECOG.GoingDownParameters: SU needs a square q");
+    fi;
+    m := 3;
+    if q0 = 2 then
+      m := 5;
+    fi;
+    return rec( terminal := 2 * m, minBody := m, parity := 1,
+                isNamed := H -> RecogniseClassical(H,
+                                    rec(case := "unitary")).isSUContained = true );
   fi;
   ErrorNoReturn("RECOG.GoingDownParameters: unsupported type ", type);
 end;
