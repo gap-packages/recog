@@ -1079,13 +1079,15 @@ function(recognise)
             if recognise.kroneckerFactors = false then
                 return TemporaryFailure;
             fi;
-            # Witnesses that G = SL(2,q) o SL(2,q), collected per factor.
-            # By Dickson, a subgroup of PSL(2,q) with an element of order
-            # dividing q+1 as below and one of order dividing q-1, both of
-            # order > 4 (> 2 for q even), is PSL(2,q). By Goursat, a subgroup
-            # of PSL(2,q) x PSL(2,q) projecting onto both factors is the
-            # whole product or the graph of an automorphism, and an element
-            # whose factors have distinct orders rules out the latter.
+            # The proof of [NP99, Theorem 5.3] for d = 4 and q = 8 or q >= 11
+            # seeks elements g, h, k of G <= SL(2,q) o SL(2,q). It uses g and
+            # h one Kronecker factor at a time: in each factor, the
+            # projections of g and h have orders dividing q+1 (as in
+            # RECOG.IsOPlus4PlusWitness) and q-1, both > 4 (> 2 for q even),
+            # so the projection is PSL(2,q) by Dickson. The factors of k have
+            # distinct orders, so G is not a diagonal subgroup. Here these
+            # conditions are collected per factor from any random elements,
+            # which finds them sooner than elements g and h.
             kf := recognise.kroneckerFactors;
             kfOrders := List(kf, k -> ProjectiveOrder(k)[1]);
             Info(InfoRecog_ClassicalNaming, 2, kfOrders);
