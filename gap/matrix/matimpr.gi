@@ -174,10 +174,17 @@ function(ri)
 end);
 
 #! @BeginChunk DoBaseChangeForBlocks
-#! TODO
+#! This method is only called by a hint, for the kernel of the action of a
+#! projective group on a system of imprimitivity of its natural module.
+#! Alongside with the hint it gets a matrix <M>t</M> whose rows are bases of
+#! the blocks, one block after the other, and the common block size. The
+#! kernel maps every block to itself, so conjugating with <M>t</M> makes all
+#! its elements block diagonal. The method reports this base change as an
+#! isomorphism and hands the image a hint to
+#! <Ref Subsect="Blocks" Style="Text"/>.
 #! @EndChunk
 BindRecogMethod("FindHomMethodsProjective", "DoBaseChangeForBlocks",
-"Hint TODO",
+"change basis so that the kernel of a block action is block diagonal",
 function(ri)
   # Do the base change:
   local G,H,iso,newgens,ti;
@@ -201,10 +208,17 @@ function(ri)
 end);
 
 #! @BeginChunk Blocks
-#! TODO
+#! This method is only called by a hint, for a projective group of block
+#! diagonal matrices whose diagonal blocks all have the same size. The homomorphism is the identity. The image is recognised with
+#! <Ref Subsect="BlocksModScalars" Style="Text"/>, that is each diagonal
+#! block modulo its own scalars. The kernel then consists of matrices whose
+#! diagonal blocks are all scalar; it is abelian, so its generators come from
+#! random elements, and it gets a hint to
+#! <Ref Subsect="BlocksBackToMats" Style="Text"/>. For blocks of size 1 the
+#! image is trivial and the whole group is passed to the kernel.
 #! @EndChunk
 BindRecogMethod("FindHomMethodsProjective", "Blocks",
-"Hint TODO",
+"recognise a block diagonal group block by block modulo scalars",
 function(ri)
   # Here we use BlocksModScalars and then get a kernel of scalar blocks
   # altogether mod scalars.
@@ -248,10 +262,15 @@ RECOG.HomBackToMats := function(el)
 end;
 
 #! @BeginChunk BlocksBackToMats
-#! TODO
+#! This method is only called by a hint, for a projective group of block
+#! diagonal matrices whose diagonal blocks are all scalar. It multiplies each
+#! matrix by the inverse of its last diagonal entry. This picks a
+#! representative of each projective element and is an isomorphism onto a
+#! matrix group, which is then recognised with
+#! <Ref Subsect="BlockScalar" Style="Text"/> on the remaining blocks.
 #! @EndChunk
 BindRecogMethod("FindHomMethodsProjective", "BlocksBackToMats",
-"Hint TODO",
+"turn scalar diagonal blocks modulo scalars into a matrix group",
 function(ri)
   # This is only called as hint from Blocks, so we know that we in fact
   # have scalar blocks along the diagonal and nothing else.

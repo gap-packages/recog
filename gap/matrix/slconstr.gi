@@ -1886,10 +1886,17 @@ SLPforElementFuncsMatrix.SLConstructive := function(ri, x)
 end;
 
 #! @BeginChunk NaturalSL
-#! TODO
+#! This method is meant for <M>SL(d,q)</M> in its natural representation.
+#! It returns <K>TemporaryFailure</K> unless
+#! <Ref Func="RecogniseClassical"/> finds that <A>G</A> contains
+#! <M>SL(d,q)</M>. It then builds the data structure of Peter Brooksbank's
+#! constructive recognition of <M>SL(d,q)</M>, which provides
+#! nice generators and writes elements as straight line programs in them,
+#! and makes the node a leaf. It returns <K>TemporaryFailure</K> if ten
+#! attempts to build the data structure fail.
 #! @EndChunk
 BindRecogMethod("FindHomMethodsMatrix", "NaturalSL",
-"TODO",
+"constructive recognition of SL(d,q) in its natural representation",
 function(ri)
     local G, data, e, genlist, grpmem, i, j, n, p, q, r, il;
     G := Grp(ri);

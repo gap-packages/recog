@@ -150,7 +150,7 @@ end);
 #! called, and otherwise <K>NeverApplicable</K> is returned.
 #! @EndChunk
 BindRecogMethod("FindHomMethodsPerm", "PcgsForBlocks",
-"TODO",
+"use a Pcgs if the action on one block is solvable",
 function(ri)
   local G,blocks,pcgs,subgens;
   G := Grp(ri);
@@ -175,7 +175,7 @@ end);
 #! half of its blocks.
 #! @EndChunk
 BindRecogMethod("FindHomMethodsPerm", "BalTreeForBlocks",
-"TODO",
+"split the kernel of a block action by acting on half of the blocks",
 function(ri)
   local G,blocks,cut,hom,lowerhalf,nrblocks,o,upperhalf,l,n,seto;
   G := Grp(ri);
@@ -275,7 +275,14 @@ SLPforElementFuncsPerm.StabilizerChainPerm := function(ri,x)
 end;
 
 #! @BeginChunk StabilizerChainPerm
-#! TODO
+#! This method computes a stabiliser chain of <A>G</A> with the function
+#! <C>StabilizerChain</C> of the <Package>genss</Package> package, using the
+#! random elements of the recognition node, and makes the node a leaf. The
+#! strong generators are the nice generators, and elements are written as
+#! straight line programs in them by sifting through the chain. Methods of
+#! higher rank deal with intransitive, imprimitive and large-base primitive
+#! groups and with giants, so the input is usually a primitive group with a
+#! small base.
 #! @EndChunk
 # TODO: merge FindHomMethodsPerm.StabilizerChainPerm and  FindHomMethodsProjective.StabilizerChainProj ?
 BindRecogMethod("FindHomMethodsPerm", "StabilizerChainPerm",

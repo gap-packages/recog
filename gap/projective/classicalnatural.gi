@@ -486,7 +486,22 @@ SLPforElementFuncsProjective.PSLd := function(ri,x)
 end;
 
 #! @BeginChunk ClassicalNatural
-#! TODO
+#! This method recognises <M>PSL(d,q)</M> in its natural projective
+#! representation constructively. It returns <K>TemporaryFailure</K> unless
+#! <Ref Func="RecogniseClassical"/> finds that <A>G</A> contains
+#! <M>SL(d,q)</M>. It then scales each generator by a <M>d</M>-th root of
+#! the inverse of its determinant, so that the generators lie in
+#! <M>SL(d,q)</M>.
+#! <P/>
+#! For <M>d = 2</M> it computes standard generators of <M>SL(2,q)</M>
+#! directly. For <M>d \ge 4</M> it first finds an <M>SL(2,q)</M> acting on
+#! a <M>2</M>-dimensional subspace (as in <Cite Key="BK01"/> and
+#! <Cite Key="KS01" Where="3.6.3"/>) and then extends it step by step to
+#! standard generators of <M>SL(d,q)</M>. Elements are written as straight
+#! line programs in the standard generators by row reduction, and the node
+#! becomes a leaf of size <M>|PSL(d,q)|</M>. For <M>d = 3</M>, and whenever
+#! the projective space has at most 1000 points, the method hands the group
+#! to <Ref Subsect="StabilizerChainProj" Style="Text"/> instead.
 #! @EndChunk
 BindRecogMethod("FindHomMethodsProjective", "ClassicalNatural",
 "check whether it is a classical group in its natural representation",
