@@ -245,6 +245,23 @@ gap> ForAll([[4, 3], [6, 3], [6, 5], [8, 3], [8, 9], [10, 3], [10, 7],
 >           c -> CallFuncList(CheckSpDirectGoingUp, c));
 true
 
+# also if it has to try all the g h, and another random g
+gap> data := RECOG.Sp_DirectGoingUpData;;
+gap> skip := 0;;
+gap> RECOG.Sp_DirectGoingUpData := function(arg)
+>     skip := skip - 1;
+>     if skip >= 0 then
+>         return "skipped";
+>     fi;
+>     return CallFuncList(data, arg);
+> end;;
+gap> ForAll([1 .. 2 * RECOG.Sp_DirectGoingUpCheapTries + 3], function(n)
+>     skip := n;
+>     return CheckSpDirectGoingUp(8, 5);
+> end);
+true
+gap> RECOG.Sp_DirectGoingUpData := data;;
+
 # RECOG.MinimalPolynomialOfSequence finds the recurrence of order L which
 # gives 2n terms from the start 0, ..., 0, 1
 gap> CheckRecurrence := function(q, n, L)

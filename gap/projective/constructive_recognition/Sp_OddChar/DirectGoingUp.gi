@@ -72,7 +72,8 @@
 ##      w0 - b_2, so x = R(-b_2) is R(w0)^-1 R(w0)^k times a transvection
 ##      T(e, .), and u is a word in s, s^v and x.
 ##
-##  So two elements of Q are needed, R(w_z) and R.
+##  So two elements of Q are needed, R(w_z) and R. If g fails, g h is
+##  tried next, for h in H.
 ##
 #############################################################################
 
@@ -621,13 +622,22 @@ RECOG.Sp_DirectGoingUpWords := function(f, d, data, F)
   return [s, t, delta, u, x, v];
 end;
 
+# The number of elements g h, h in H, which the direct GoingUp tries after
+# a random g before it draws another one: an eigenvector of g in U^perp is
+# one of every g h. If it is orthogonal to e, then e is not cyclic, and if
+# its eigenvalue is 1 or -1, the characteristic polynomial has a repeated
+# factor.
+RECOG.Sp_DirectGoingUpCheapTries := 12;
+
 # The direct GoingUp for Sp, q odd: <G> and <init> are as in RECOG.GoingUp,
 # with init.n = 4, and so is the record returned, except that `bas` does
 # not start with vectors of init.bas.
 RECOG.Sp_DirectGoingUp := function(G, init)
-  local f, d, bas, basi, N, gm, data, words;
+  local f, q, d, bas, basi, N, F, hs, basU, basiU, k, gm, g, word, i, data,
+        words;
 
   f := DefaultFieldOfMatrixGroup(G);
+  q := Size(f);
   d := DimensionOfMatrixGroup(G);
   if d = 4 then
     return rec( slp := init.slp, bas := init.bas );
@@ -636,17 +646,38 @@ RECOG.Sp_DirectGoingUp := function(G, init)
   ConvertToMatrixRep(bas, f);
   basi := bas^-1;
 
-  N := RECOG.Sp_DirectGoingUpPowers(d, Size(f));
+  N := RECOG.Sp_DirectGoingUpPowers(d, q);
+  F := GeneratorsWithMemory(ListWithIdenticalEntries(7, ()));
+  # h - 1 on U for the standard generators h = s, t, delta, u, x of H
+  hs := List(RECOG.ClassicalStandardGenerators("Sp", 4, f).all{[1 .. 5]},
+             h -> h - One(h));
+  basU := bas{[1 .. 4]};
+  basiU := TransposedMat(basi){[1 .. 4]};
+  k := RECOG.Sp_DirectGoingUpCheapTries;
   repeat
-    gm := PseudoRandom(G);
-    data := RECOG.Sp_DirectGoingUpData(f, d, StripMemory(gm), bas, basi, N);
+    if k = RECOG.Sp_DirectGoingUpCheapTries then
+      gm := PseudoRandom(G);
+      g := StripMemory(gm);
+      word := F[7];
+      k := 0;
+    else
+      # g h for the next of these h, in turn: a random element costs
+      # several products of matrices, this one O(d^2) and one node, as
+      # h - 1 vanishes on U^perp and has its image in U
+      i := k mod Length(hs) + 1;
+      k := k + 1;
+      g := g + (TransposedMat(List(basiU, c -> g * c)) * hs[i]) * basU;
+      ConvertToMatrixRep(g, q);
+      word := word * F[i];
+    fi;
+    data := RECOG.Sp_DirectGoingUpData(f, d, g, bas, basi, N);
     if IsString(data) then
       Info(InfoRecog_ClassicalNatural, 3, "GoingUp: ", data);
     fi;
   until IsRecord(data);
 
   words := RECOG.Sp_DirectGoingUpWords(f, d, data,
-               GeneratorsWithMemory(ListWithIdenticalEntries(7, ())));
+               Concatenation(F{[1 .. 6]}, [word]));
   return rec( slp := CompositionOfStraightLinePrograms(SLPOfElms(words),
                          IntegratedStraightLineProgram(
                              [init.slp, SLPOfElms([gm])])),
