@@ -285,7 +285,8 @@ RECOG.Signum2 := function( field, form, quad )
             if IsZero(j)  then
                 AddRowVector(base[i],base[i+1],-c);
             else
-                pol := Factors(x^2 + x/j + c/j);
+                # over GF(q), not the field of the coefficients
+                pol := Factors(PolynomialRing(field), x^2 + x/j + c/j);
                 if Length(pol) = 2  then
                     pol:=List(pol,x->-CoefficientsOfUnivariatePolynomial(x)[1]);
                 else
