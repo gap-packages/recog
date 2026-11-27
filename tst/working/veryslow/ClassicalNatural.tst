@@ -11,7 +11,8 @@ gap> TestRecogGL(2,2);;
 Stamp: ClassicalNatural
 gap> TestRecogGL(3,2);;
 Stamp: ClassicalNatural
-gap> #TestRecogGL(4,2);; # disabled since GL(4,2) is isomorphic to A_8
+gap> TestRecogGL(4,2);;
+Stamp: ClassicalNatural
 gap> TestRecogGL(5,2);;
 Stamp: ClassicalNatural
 gap> TestRecogGL(6,2);;
