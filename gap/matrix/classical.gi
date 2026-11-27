@@ -2927,6 +2927,14 @@ AddMethod(ClassicalMethDbForDegree2, FindHomMethodsClassical.IsAlt5Alt4Sym4, 30)
 AddMethod(ClassicalMethDbForDegree2, FindHomMethodsClassical.IsSL2Contained, 20);
 
 
+# Target probability that RecogniseClassical misses a d = 4 witness of
+# NonGenericSymplectic or NonGenericOrthogonalPlus, for independent uniform
+# random elements; PseudoRandom elements miss somewhat more often
+RECOG.Degree4NamingErrorBound := 1/10000;
+
+# Witnesses enter the collection from about this random element on
+RECOG.Degree4FirstWitnessElement := 10;
+
 # Whether a Kronecker factor of projective order o, dividing q+1, is the
 # (q+1)-type witness of NonGenericOrthogonalPlus for d = 4
 RECOG.IsOPlus4PlusWitness := function(o, q, p, a)
@@ -2938,10 +2946,81 @@ RECOG.IsOPlus4PlusWitness := function(o, q, p, a)
     return ForAny(PrimeDivisors(o), r -> IsPrimitivePrimeDivisor(p, 2*a, r));
 end;
 
+# Proportion of the rarest witness that the d = 4 test of NonGenericSymplectic
+# ("symplectic") or NonGenericOrthogonalPlus ("orthogonalplus") needs in
+# Sp(4,q) or Omega^+(4,q); 0 if that test uses no such witness for this q
+RECOG.Degree4WitnessProportion := function(type, q)
+    local p, a, R, n, k, thr, Torus;
+    p := SmallestRootInt(q);
+    a := LogInt(q, p);
+    if type = "symplectic" then
+        if q in [2, 3, 5] or IsPowerOfTwo(q+1) or
+           ((q+1) mod 3 = 0 and IsPowerOfTwo((q+1)/3)) then
+            return 0;
+        fi;
+        # Large special ppd(4,q;2)-elements are the regular elements (x, y) of
+        # a torus C_{q+1}^2, |N(T)| = 8(q+1)^2, whose parts in the ppd part
+        # C_R are nontrivial with y <> x^(+-1), and for 3 | R the part x of
+        # the first factor is not of order 3: R-1 choices of x, less the 2 of
+        # order 3, and R-3 of y, as R is odd
+        R := PrimitivePrimeDivisors(2*a, p).ppds;
+        n := R - 1;
+        if R mod 3 = 0 then
+            n := n - 2;
+        fi;
+        return n * (R - 3) / (8 * R^2);
+    fi;
+
+    # type = "orthogonalplus"
+    if q <> 8 and q < 11 then
+        return 0;
+    fi;
+    # Each Kronecker factor is uniform in PSL(2,q), where a torus of
+    # order m has a normaliser of order 2m and Phi(o) elements of order o
+    Torus := {m, cond} -> Sum(Filtered(DivisorsInt(m), cond), Phi) / (2*m);
+    k := Gcd(2, q-1);
+    thr := 2 * k;
+    return Minimum(
+        Torus((q+1)/k, o -> o > thr and RECOG.IsOPlus4PlusWitness(o, q, p, a)),
+        Torus((q-1)/k, o -> o > thr));
+end;
+
+# Number of further random elements that bring the probability of missing a
+# witness of a d = 4 test that is still undecided below
+# RECOG.Degree4NamingErrorBound; the bound is shared by up to 4 witnesses.
+# The symplectic test also needs a large basic ppd(4,q;4)-element, which has
+# proportion about 1/4, so a group without one is not Sp(4,q)
+RECOG.Degree4ExtraRandomElements := function(recognise, ms, nrrandels)
+    local tests, t, pi, N;
+    if recognise.d <> 4 then
+        return 0;
+    fi;
+    tests := [rec(type := "symplectic", method := "NonGenericSymplectic",
+                  flag := "isSpContained", ready := r -> 4 in r.LB),
+              rec(type := "orthogonalplus", method := "NonGenericOrthogonalPlus",
+                  flag := "isOmegaContained", ready := r -> true)];
+    for t in tests do
+        if recognise.(t.flag) <> "unknown" or
+           IsBound(ms.inapplicableMethods.(t.method)) or
+           not t.ready(recognise) then
+            continue;
+        fi;
+        pi := RECOG.Degree4WitnessProportion(t.type, recognise.q);
+        if pi = 0 then
+            continue;
+        fi;
+        N := RECOG.Degree4FirstWitnessElement +
+             Int(Log(Float(RECOG.Degree4NamingErrorBound / 4)) /
+                 Log(Float(1 - pi))) + 1;
+        return Maximum(0, N - nrrandels);
+    od;
+    return 0;
+end;
+
 
 InstallGlobalFunction( RecogniseClassical,
 function( grp, arg... )
-  local ret, recognise, opt, f, q, originalInfoLevel, db;
+  local ret, recognise, opt, f, q, originalInfoLevel, db, defaultBudget, extra;
 
   f := FieldOfMatrixGroup(grp);
   q := Size(f);
@@ -2958,7 +3037,8 @@ function( grp, arg... )
   if not IsBound(opt.case) then
       opt.case := "unknown";
   fi;
-  if not IsBound(opt.nrrandels) then
+  defaultBudget := not IsBound(opt.nrrandels);
+  if defaultBudget then
       opt.nrrandels := 30;
       if DimensionOfMatrixGroup(grp) = 8 then
           opt.nrrandels := 200;
@@ -3056,6 +3136,16 @@ function( grp, arg... )
   SetInfoLevel(InfoRecog_MethSel,opt.infoLevel);
   ret := CallMethods( db, opt.nrrandels, recognise );
 
+  # A second round for d = 4 tests whose witnesses are rare, without the
+  # methods found inapplicable
+  if defaultBudget and ret.result <> Success then
+      extra := RECOG.Degree4ExtraRandomElements(recognise, ret, opt.nrrandels);
+      if extra > 0 then
+          db := Filtered(db,
+                    m -> not IsBound(ret.inapplicableMethods.(Stamp(m.method))));
+          ret := CallMethods( db, extra, recognise );
+      fi;
+  fi;
   SetInfoLevel(InfoRecog_MethSel,originalInfoLevel);
   # TODO: honor ret in some way?
 

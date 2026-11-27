@@ -26,5 +26,22 @@ gap> ForAny([1 .. 20], function(i)
 >    end);
 false
 
+# Sp(4,q) for q = 4, 9, 19: the large special ppd(4,q;2)-elements have
+# proportion 1/25
+gap> ForAll([4, 9, 19], q -> ForAll([1 .. 20], i ->
+>        RecogniseClassical(Sp(4, q)).isSpContained = true));
+true
+
+# Sp(4,17): R = 9, so the first factor must avoid the 2 elements of order 3
+gap> RECOG.Degree4WitnessProportion("symplectic", 17);
+1/18
+gap> ForAll([1 .. 20], i ->
+>        RecogniseClassical(Sp(4, 17)).isSpContained = true);
+true
+
+# Omega^+(4,q) for q < 11, q <> 8 is named without Kronecker factor witnesses
+gap> RECOG.Degree4WitnessProportion("orthogonalplus", 7);
+0
+
 #
 gap> STOP_TEST("naming-d4.tst");
