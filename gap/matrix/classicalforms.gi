@@ -82,49 +82,6 @@ end;
 
 #############################################################################
 ##
-#F  RECOG.GeneratorsWithoutScalarsFrobenius( grp )
-##
-RECOG.GeneratorsWithoutScalarsFrobenius := function( grp )
-    local tries, gens, field, m1, a1, new, i;
-
-    # start with 2 random elements,  at most 10 tries
-    tries := 0;
-    gens  := [];
-    field := FieldOfMatrixGroup(grp);
-    while Length(gens) < 2  do
-        tries := tries + 1;
-        if tries = 11  then return false;  fi;
-        m1 := PseudoRandom(grp);
-        a1 := RECOG.ScalarMultipleFrobenius(field,m1);
-        if IsList(a1) and a1[1]=1 then
-            a1:=a1[2];
-            Add(gens, m1*a1^-1);
-        fi;
-    od;
-    new := GModuleByMats( gens, field );
-
-    # the module must act absolutely irreducibly
-    while not MTX.IsAbsolutelyIrreducible(new)  do
-        for i  in [ 1 .. 2 ]  do
-            repeat
-                tries := tries + 1;
-                if tries > 10  then return false;  fi;
-                m1 := PseudoRandom(grp);
-                a1 := RECOG.ScalarMultipleFrobenius(field,m1);
-            until IsList(a1) and a1[1]=1;
-            a1:=a1[2];
-            Add( gens, m1*a1^-1 );
-        od;
-
-        new := GModuleByMats( gens, field );
-    od;
-
-    return new;
-end;
-
-
-#############################################################################
-##
 #F  RECOG.ScalarMultipleDual( <field>, <mat> )
 ##
 RECOG.ScalarMultipleDual := function( F, M )
@@ -181,43 +138,97 @@ end;
 
 #############################################################################
 ##
-#F  RECOG.GeneratorsWithoutScalarsDual( grp )
+#F  RECOG.GeneratorsWithoutScalars( <grp>, <scalarMultiple>, <e> )
 ##
-RECOG.GeneratorsWithoutScalarsDual := function( grp )
-    local tries, gens, field, m1, a1, new, i;
+##  Builds modules from random elements of <grp>, each divided by a scalar so
+##  that it leaves an invariant form invariant, not just up to a scalar.
+##  <scalarMultiple> is RECOG.ScalarMultipleDual or
+##  RECOG.ScalarMultipleFrobenius, and dividing by c changes the multiplier
+##  by c^e. Returns false, or a record whose component modules lists
+##  absolutely irreducible modules. If exact is true, there is one module and
+##  its elements are normalised exactly.
+##
+##  Otherwise the normalised elements generate a group that is not absolutely
+##  irreducible, like the base group of H wr S_2. Then one element is added
+##  whose characteristic polynomial reveals only the i0-th power of its
+##  multiplier, like an element swapping the two summands, with each of its
+##  at most i0 candidate normalisations. One of them is exact if the field
+##  contains the scalar it needs.
+##
+RECOG.GeneratorsWithoutScalars := function( grp, scalarMultiple, e )
+    local field, q, gens, ambiguous, tries, m, s, new, n, z, seen, modules;
 
-    # start with 2 random elements,  at most 10 tries
-    tries := 0;
-    gens  := [];
     field := FieldOfMatrixGroup(grp);
-    while Length(gens) < 2  do
-        tries := tries + 1;
-        if tries > 10  then return false;  fi;
-        m1 := PseudoRandom(grp);
-        a1 := RECOG.ScalarMultipleDual(field,m1);
-        if IsList(a1) and a1[1]=1 then
-            a1:=a1[2];
-            Add(gens, m1*a1^-1);
+    q := Size(field);
+    gens := [];
+    ambiguous := fail;
+    for tries in [1 .. 10] do
+        m := PseudoRandom(grp);
+        s := scalarMultiple(field, m);
+        if not IsList(s) then
+            continue;
+        fi;
+        if s[1] <> 1 then
+            if ambiguous = fail then
+                ambiguous := [m, s];
+            fi;
+            continue;
+        fi;
+        Add(gens, m * s[2]^-1);
+        if Length(gens) >= 2 then
+            new := GModuleByMats(gens, field);
+            if MTX.IsAbsolutelyIrreducible(new) then
+                return rec(modules := [new], exact := true);
+            fi;
         fi;
     od;
-    new := GModuleByMats( gens, field );
+    if IsEmpty(gens) or ambiguous = fail then
+        return false;
+    fi;
 
-    # the module must act absolutely irreducible
-    while not MTX.IsAbsolutelyIrreducible(new)  do
-        for i  in [ 1 .. 2 ]  do
-            repeat
-                tries := tries + 1;
-                if tries > 10  then return false;  fi;
-                m1 := PseudoRandom(grp);
-                a1 := RECOG.ScalarMultipleDual(field,m1);
-            until IsList(a1) and a1[1]=1;
-            a1:=a1[2];
-            Add(gens, m1*a1^-1);
-        od;
-        new := GModuleByMats( gens, field );
+    # The candidates m / (s[2] z) for the (e i0)-th roots of unity z; the
+    # multiplier depends on z^e only
+    m := ambiguous[1];
+    s := ambiguous[2];
+    n := Gcd(e * s[1], q - 1);
+    seen := [];
+    modules := [];
+    for z in List([0 .. n-1], j -> PrimitiveRoot(field)^((q-1)/n * j)) do
+        if z^e in seen then
+            continue;
+        fi;
+        AddSet(seen, z^e);
+        new := GModuleByMats(Concatenation(gens, [m * (s[2] * z)^-1]), field);
+        if MTX.IsAbsolutelyIrreducible(new) then
+            Add(modules, new);
+        fi;
     od;
-    return new;
+    if IsEmpty(modules) then
+        return false;
+    fi;
+    return rec(modules := modules, exact := false);
 end;
+
+# The first form that <invariantForm>, RECOG.InvariantFormDual or
+# RECOG.InvariantFormFrobenius, finds for <module> from one of <modules>
+RECOG.FirstInvariantForm := function( module, modules, invariantForm )
+    local m, form;
+    for m in modules do
+        form := invariantForm(module, m);
+        if form <> false then
+            return form;
+        fi;
+    od;
+    return false;
+end;
+
+RECOG.GeneratorsWithoutScalarsDual := grp ->
+    RECOG.GeneratorsWithoutScalars(grp, RECOG.ScalarMultipleDual, 2);
+
+RECOG.GeneratorsWithoutScalarsFrobenius := grp ->
+    RECOG.GeneratorsWithoutScalars(grp, RECOG.ScalarMultipleFrobenius,
+        Characteristic(FieldOfMatrixGroup(grp))^
+            (DegreeOverPrimeField(FieldOfMatrixGroup(grp))/2) + 1);
 
 
 #############################################################################
