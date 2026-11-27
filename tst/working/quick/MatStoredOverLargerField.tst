@@ -124,6 +124,37 @@ gap> ri := RecogniseWithSeed(StoredOver(Sp(4,2), GF(8)), 2);;
 gap> MixedStorageMethods(ri);
 [  ]
 
+# An element need not be stored like the generators of its group. A5 as
+# permutation matrices over GF(2) is reducible, and the product of the base
+# change matrix with a matrix in another representation is a plain list,
+# which cannot be hashed.
+gap> mats := List(GeneratorsOfGroup(AlternatingGroup(5)),
+>                 p -> PermutationMat(p, 5, GF(2)));;
+gap> Compressed := f -> (x -> ImmutableMatrix(f, x));;
+gap> Plain := x -> List(x, ShallowCopy);;
+gap> FindsSLP := function(storeGens, storeElement, projective)
+>   local G, ri, x, slp;
+>   G := Group(List(mats, storeGens));
+>   Reset(GlobalMersenneTwister, 1);
+>   Reset(GlobalRandomSource, 1);
+>   if projective then
+>     ri := RecogniseProjectiveGroup(G);
+>   else
+>     ri := RecogniseGroup(G);
+>   fi;
+>   x := PseudoRandom(G);
+>   slp := SLPforElement(ri, storeElement(x));
+>   return slp <> fail
+>     and isequal(ri)(ResultOfStraightLineProgram(slp, NiceGens(ri)), x);
+> end;;
+gap> ForAll([false, true], projective ->
+>      FindsSLP(Compressed(GF(2)), Compressed(GF(4)), projective)
+>      and FindsSLP(Compressed(GF(2)), Plain, projective)
+>      and FindsSLP(Plain, Compressed(GF(4)), projective)
+>      and FindsSLP(Compressed(GF(4)), Compressed(GF(2)), projective)
+>      and FindsSLP(Compressed(GF(4)), Plain, projective));
+true
+
 # nothing to do if the storage fits, or if there is no compressed
 # representation
 gap> TryMethod := G -> CallRecogMethod(
