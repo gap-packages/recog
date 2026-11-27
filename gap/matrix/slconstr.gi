@@ -371,7 +371,7 @@ SLCR.CommutesWith := {a, b} -> a*b = b*a;
 ## This function will take as input a bbgroup known to be isomorphic to
 ## $PSL(2,q)$ for known $q=p^e$ and will output an element of order $p$
 ## and one of order q-1 or (q-1)/(2,q-1) with
-## probablility at least 0.94.
+## probability at least 0.94.
 ## We may already have a transvection in the input
 
 SLCR.SL2Search := function(arg)
@@ -822,7 +822,7 @@ SLCR.SLSLP := function(data, x, d)
     rightslp := SLCR.OneProg(data);
     # in leftslp, we collect an slp for the INVERSE of the matrix
     # we multiply with from the left.
-    # in rightslp we collect an slp for the right multiplier matri
+    # in rightslp we collect an slp for the right multiplier matrix
     W := List(x, ShallowCopy);
     for i in [0..d-2] do
         # put non-zero element in lower right corner
@@ -1132,7 +1132,7 @@ SLCR.SL3ConstructQ := function(bbg, t, pp, e)
     T1 := [One(bbg)];
     # from SLCR.QuickSL3DataStructure, we call with the value pp=-p, to distinguish
     # from the genuine input case. Reason: with reasonable probability,
-    # QuickSL may have incorrect input, and we dont want to waste time here
+    # QuickSL may have incorrect input, and we don't want to waste time here
     # to construct the non-existing T1. The tighter limit still has >96%
     # probability for success, if the input is correct.
     if pp < 0 then
@@ -1180,12 +1180,12 @@ end;
 #      $L$                   <-------->        < B^f , B1^(f^(-1)) >
 #
 # We now want to regard $L$ as a black box group in its own right, and make
-# a recursive call to dimension 2. Note we dont need to compute everything
-# in the data structure here, since we already have $t1$ so we dont need to
-# compute a transvection. We dont have $s$, and we dont have $j$, but we do
+# a recursive call to dimension 2. Note we don't need to compute everything
+# in the data structure here, since we already have $t1$ so we don't need to
+# compute a transvection. We don't have $s$, and we don't have $j$, but we do
 # have the effect of conjugation by $j$, since we have B^f. Also, we have
 # a complete listing of $T1^(f^(-1))$, which will be the eventual primary
-# transvection group, so we dont need SLCR.ConstructTranGroup. So we need to use
+# transvection group, so we don't need SLCR.ConstructTranGroup. So we need to use
 # a shortcut SLCR.SL2Search to find $s$, we need SLCR.Standardize and we need the
 # full SL2Reorder.
 # The truncated call to SLCR.SL2DataStructure will take as input the (listed)
@@ -1343,7 +1343,7 @@ end;
 ##
 #F SLCR.SLConstructGammaTransv( <bbgrp>, <transv grp>, <point> )
 ##
-## Given the transvection group T and and a basis for Q(gamma)
+## Given the transvection group T and a basis for Q(gamma)
 ## find a transvection conjugating T into Q(gamma)
 
 SLCR.SLConstructGammaTransv := function(bbg, T, Qgamma)

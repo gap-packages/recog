@@ -6,7 +6,7 @@ itself to the information needed for a pleasant user-experience.
 -->
 
 <Chapter Label="user">
-<Heading>Recog package for user</Heading>
+<Heading>Recog package for users</Heading>
 
 This chapter provides a user-friendly introduction to the <Package>recog</Package> package. It
 presents the basic theoretical background, functionality, representative applications, and the most important commands
@@ -33,7 +33,7 @@ The process typically involves finding a homomorphism <M>\varphi \colon G \to
 H</M>, and then recursively analysing both the kernel
 <M>\ker(\varphi) = N \unlhd G</M> and the image
 im<M>(\varphi) \cong G/N</M>. This continues until the remaining groups
-are (quasi- or almost)simple, which are the fundamental building blocks of all
+are (quasi- or almost) simple, which are the fundamental building blocks of all
 groups. The resulting tree represents the entire structure of the original group
 <M>G</M>, where the root is given by <M>G</M> and the leaves are the
 (quasi- or almost) simple groups obtained in the process.
@@ -77,14 +77,14 @@ The main function to recognise a group is the following.
 
 Alternatively, if you know the type of the given group, you can directly call
 the specialised functions for permutation, matrix, or projective groups. These
-specialised functions are described in 
+specialised functions are described below.
 
 <#Include Label="RecognisePermGroup">
 <#Include Label="RecogniseMatrixGroup">
 <#Include Label="RecogniseProjectiveGroup">
 
 Each of these functions returns a recognition node which is a &GAP; component
-object. Further details to this data structure as well as its attributes are
+object. Further details on this data structure as well as its attributes are
 given in <Ref Sect="rirecord"/>. Some examples of what a user can do with a
 recognition node are given in <Ref Sect="application"/>.
 
@@ -94,7 +94,7 @@ recognition node are given in <Ref Sect="application"/>.
 <Heading>Examples</Heading>
 
 In order to understand the output we consider some examples. Note that many
-methods used to compute a recognition tree are using randomised algorithms. This means
+methods used to compute a recognition tree use randomised algorithms. This means
 that the function <Ref Func="RecogniseGroup"/> may yield slightly
 different results when called multiple times.<P/>
 
@@ -120,11 +120,11 @@ subgroup of <M>H</M> (abbreviated with <Q>K</Q> which stands for Kernel). <P/>
 In this example the root node represents the input group <M>SL(10,5)</M>. Starting
 at this root node the method <C>GoProjective</C> (<Ref Subsect="GoProjective"/>)
 finds a homomorphism from the group 
-<M>SL(10,5)</M> to itself modular scalar matrices. The image
+<M>SL(10,5)</M> to itself modulo scalar matrices. The image
 of this homomorphism is the group <M>PSL(10,5)</M> which is a leaf node in the
-recognition tree. The kernel of this homomorphism is the group of diagonal matrices <M>a
-\cdot Id_{10}</M> for <M>a \in \mathbb{F}_5^*</M>. This group is recognised to
-be isomorphic to <M>\mathbb{F}_5^*</M> itself.<P/>
+recognition tree. The kernel of this homomorphism is the group of scalar
+matrices <M>a \cdot Id_{10}</M> with <M>a^{10} = 1</M>, that is
+<M>a = \pm 1</M>. This group is recognised to be cyclic of order 2.<P/>
 
 A second example we consider is a symmetric group on a few points.
 
@@ -183,12 +183,12 @@ gap> ri := RecogniseGroup(G);
 #I  Doing immediate verification (depth=0).
 <recognition node NonTransitive
  F:<recognition node MovesOnlySmallPoints Size=120>
- K:<recognition node Giant Size=479001600>>
+ K:<recognition node Giant AlmostSimple Size=479001600>>
 ]]></Log>
 
 The lines starting with <C>#I</C> indicate so-called info messages, which inform
 us about the progress of the computation. Here it first finds that the
-permutation action is not transitive, a homomorphism is found by mapping
+permutation action is not transitive, so a homomorphism is found by mapping
 onto the action on one of the orbits. The image is recognised to permute
 only a few points. The kernel is recognised to be a full symmetric group
 in its natural action on at least 10 points (recognised as <Q>Giant</Q>).
@@ -217,7 +217,7 @@ gap> Size(ri);
 57480192000
 ]]></Log>
 
-Moreover, constructive membership tests can be performed which is explained
+Moreover, constructive membership tests can be performed as explained
 above in Section <Ref Sect="background"/>. For this you can use the function <Ref
 Func="SLPforElement"/> that writes an arbitrary element in terms of the nice
 generators that were computed in the process of recognising the group and that
@@ -240,7 +240,7 @@ A convenient function for testing membership of an element is the following func
 <Meth Name="\in" Arg="x, ri"/>
 <Returns><K>true</K> or <K>false</K></Returns>
 <Description>
-    This method tests, whether the element <A>x</A> lies in the group
+    This method tests whether the element <A>x</A> lies in the group
     recognised by the recognition node <A>ri</A>. Note that
     this is only a convenience method, in fact <Ref
         Func="SLPforElement"/> is used and the resulting straight line
@@ -253,7 +253,7 @@ generators, you can use the following function.
 
 <#Include Label="SLPforNiceGens">
 
-Lastly, a function to compute the composition series of a recognised group is
+Lastly, a function to display a composition series of a recognised group is
 the following.
 
 <#Include Label="DisplayCompositionFactors">

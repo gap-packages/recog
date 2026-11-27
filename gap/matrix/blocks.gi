@@ -714,7 +714,7 @@ end;
 # triangular matrices).
 # The SLP is constructed by using matrices forming a pcgs (polycyclic
 # generating sequence) to cancel out the
-# entries in <g>. The coefficents of the process create the SLP.
+# entries in <g>. The coefficients of the process create the SLP.
 # TODO Max H. wants to rewrite the code to work row-by-row
 # instead of blockwise; that should result in both simpler and faster code.
 SLPforElementFuncsMatrix.LowerLeftPGroup := function(ri,g)

@@ -160,7 +160,7 @@ end;
 
 InstallGlobalFunction( NormalTree,
   function(arg)
-    # Contructs a normal tree
+    # Constructs a normal tree
     # Call via NormalTree(G,nsm,depth)
 
     # Assume all the generators have no memory!

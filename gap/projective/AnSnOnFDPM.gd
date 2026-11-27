@@ -13,7 +13,7 @@
 ##  SPDX-License-Identifier: GPL-3.0-or-later
 ##
 ##
-##  Declarations for RecogniseAnSnOnDFPM.gi.
+##  Declarations for AnSnOnFDPM.gi.
 ##
 #############################################################################
 

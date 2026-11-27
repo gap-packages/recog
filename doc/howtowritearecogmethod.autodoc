@@ -36,7 +36,7 @@ Two more comments:
   groups__. For permutation groups and matrix groups, `ri!.isone` is simply
   defined to be `IsOne`. For projective groups, it is set to `IsOneProjective`,
   which can be read as  "is one modulo scalars".
-- The function `SLPforElementFuncs.TrivialGroup` takes `ri` as well as an
+- The function `SLPforElementFuncsGeneric.TrivialGroup` takes `ri` as well as an
   element `g` as input.  If $g \in G$, then it is supposed to return an SLP for
   $g$ in terms of the nice gens $Y$. Otherwise it returns `fail`. Here is the
   concrete implementation:
@@ -54,7 +54,7 @@ The function `AddMethod` takes four mandatory arguments `db`, `meth`, `rank`, `s
 - `db` is the "method database", and determines to which type of groups the methods should be applied. Allowed values are:
     - `FindHomDbPerm`
     - `FindHomDbMatrix`
-    - `FindHomDbProj`
+    - `FindHomDbProjective`
 
 - `meth` is the recognition method we have defined. In our example this is `FindHomMethodsGeneric.TrivialGroup`.
 
@@ -134,7 +134,7 @@ FindHomMethodsMatrix.BlockLowerTriangular := function(ri, G)
   # We first do the diagonal blocks, then the lower p-part:
   local H, data, hom, newgens;
 
-  # we need to construct a homomorphism, but to defined it,
+  # we need to construct a homomorphism, but to define it,
   # we need the image, but of course the image is defined in
   # terms of the homomorphism... to break this cycle, we do
   # the following: we first map the input generators using
@@ -147,7 +147,7 @@ FindHomMethodsMatrix.BlockLowerTriangular := function(ri, G)
   Assert(0, not fail in newgens);
 
   # now that we have the images of the generators, we can
-  # defined the image
+  # define the image
   H := Group(newgens);
 
   # finally, we define the homomorphism
@@ -176,7 +176,7 @@ FindHomMethodsMatrix.BlockLowerTriangular := function(ri, G)
   AddMethod(InitialDataForKernelRecogNode(ri).hints,
       rec( method := FindHomMethodsMatrix.LowerLeftPGroup,
            rank := 2000,
-           stamp := “LowerLeftPGroup" ));
+           stamp := "LowerLeftPGroup" ));
   InitialDataForKernelRecogNode(ri).blocks := ri!.blocks;
 
   # This function always succeeds, because it is only

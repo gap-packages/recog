@@ -90,14 +90,14 @@ end);
 #! homomorphism to the action on the blocks is defined; otherwise,
 #! the method returns <K>NeverApplicable</K>.
 #! 
-#! If the method is successful then it also gives a hint for the children of
-#! the node by determining whether the kernel of the action on the
-#! block system is solvable. If the answer is yes then the default value 20
-#! for the number of random generators in the kernel construction is increased
-#! by the number of blocks.
+#! If the method is successful then it also gives the kernel the hints
+#! <Ref Subsect="PcgsForBlocks" Style="Text"/> and
+#! <Ref Subsect="BalTreeForBlocks" Style="Text"/>, and sets the number of
+#! random generators in the kernel construction to the number of blocks
+#! plus 3.
 #! @EndChunk
 BindRecogMethod("FindHomMethodsPerm", "Imprimitive",
-"for a imprimitive permutation group, restricts to block system",
+"for an imprimitive permutation group, restricts to block system",
 rec(validatesOrAlwaysValidInput := true),
 function(ri)
     local G,blocks,hom,pcgs,subgens;
@@ -418,7 +418,7 @@ end;
 #    with this.
 
 BindRecogMethod("FindHomMethodsPerm", "ThrowAwayFixedPoints",
-"try to find a huge amount of (possible internal) fixed points",
+"try to find a huge amount of (possibly internal) fixed points",
 rec(validatesOrAlwaysValidInput := true),
 function(ri)
       # Check, whether we can throw away fixed points

@@ -88,7 +88,7 @@ DeclareFilter( "IsLeaf" );
 ## mean, that the result of the recognition procedure was verified and proven
 ## to be mathematically correct!
 ## <P/>
-## In particular, any computations using the datastructure set up by the
+## In particular, any computations using the data structure set up by the
 ## recognition procedure, like <Ref Oper="Size"/> and membership testing via
 ## <Ref Oper="\in"/>, will error if <Ref Filt="IsReady"/> is not set.
 ## </Description>
@@ -271,7 +271,7 @@ InstallTrueMethod( IsRecogInfoForAlmostSimpleGroup, IsRecogInfoForSimpleGroup );
 ##     case it contains preimages of the nice generators in the image. This
 ##     attribute is set automatically by the generic recursive recognition
 ##     function using the mechanism described with the attribute
-##     <Ref Attr="calcnicegens"/> below. A find homomorphism does not have
+##     <Ref Attr="calcnicegens"/> below. A find homomorphism method does not have
 ##     to touch this attribute.
 ## </Description>
 ## </ManSection>
@@ -576,7 +576,7 @@ DeclareSynonym("RecognizeProjectiveGroup", RecogniseProjectiveGroup);
 ## <Returns><K>fail</K> for failure or a recognition node.</Returns>
 ## <Description>
 ##     <A>H</A> must be a &GAP; group object. This function automatically
-##     dispatches to one of the two previous functions
+##     dispatches to one of the two functions
 ##     <Ref Func="RecognisePermGroup"/>, or <Ref Func="RecogniseMatrixGroup"/>,
 ##     according to the type of the group <A>H</A>.
 ##     Note that since currently there is no implementation of projective
@@ -600,7 +600,7 @@ DeclareSynonym("RecognizeGroup", RecogniseGroup);
 ##     <Ref Sect="findhomo"/>. <A>depthString</A> is a string whose length
 ##     measures the depth in the recognition tree. It will be increased by one
 ##     character for each step we go into the tree, namely by <C>F</C> for
-##     a image node, and <C>K</C> for a kernel. The top level begins with an
+##     an image node, and <C>K</C> for a kernel. The top level begins with an
 ##     empty string. <A>knowledge</A> is an optional record the
 ##     components of which are copied into the new recognition node
 ##     which is created for the group <A>H</A>. Especially the component

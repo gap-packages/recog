@@ -136,7 +136,7 @@ end;
 #! (stabiliser of a decomposition of the underlying vector space), but may
 #! succeed on other types of input as well. Given <A>G</A> <M> \le PGL(d,q)</M>,
 #! the output is either the permutation action of <A>G</A> on a short
-#! orbit of subspaces or <K>fail</K>. In the current setup, <Q>short orbit</Q>
+#! orbit of subspaces or <K>TemporaryFailure</K>. In the current setup, <Q>short orbit</Q>
 #! is defined to have length at most <M>4d</M>.
 #! @EndChunk
 BindRecogMethod("FindHomMethodsProjective", "LowIndex",

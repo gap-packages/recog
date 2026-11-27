@@ -113,7 +113,7 @@ InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
     finder := AtlasProgram(hint.name,"find");
     if finder = fail then
         Info(InfoRecog,1,"Expected BBox finder for stdgens of ",hint.name,
-             " not availabe!");
+             " not available!");
         Info(InfoRecog,1,"Check your AtlasRep installation!");
         return TemporaryFailure;
     fi;
@@ -466,7 +466,7 @@ end;
 # can lead to an infinite loop in DoHintedLowIndex, because
 # elordersstart suggests searching for elements of order 31,
 #  but no such elements are found.
-# See also https://github.com/gap-system/recog/issues/6
+# See also https://github.com/gap-packages/recog/issues/6
 # InstallAlmostSimpleHint( "L2(31)", "LowIndexHint",
 #   rec( characteristics := [31], dimensions := [1,2,3],
 #        elordersstart := [31], numberrandgens := 2, tries := 1,
@@ -776,7 +776,7 @@ end;
 #! This recognition method is based on the paper <Cite Key="KS09"/>.
 #! @EndChunk
 BindRecogMethod("FindHomMethodsProjective", "ThreeLargeElOrders",
-"recognise Lie type groups and get its characteristic",
+"recognise Lie type groups and get their characteristic",
 function(ri)
   local G,hint,name,namecat,p,res;
   G := Grp(ri);

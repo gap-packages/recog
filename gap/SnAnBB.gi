@@ -852,7 +852,7 @@ end;
 # ##
 # ##  The main function.
 #
-# # FIXME: dead code? (it's callers are all dead)
+# # FIXME: dead code? (its callers are all dead)
 # RecogniseSnAn :=  function( n, grp, eps )
 #
 #     local N, gens, le, g, h, slp, gl, b, eval, xis;

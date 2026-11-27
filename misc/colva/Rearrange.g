@@ -5,7 +5,7 @@ MyIsInnerAutomorphism := function(grp,name,phi,membershiptest)
        ,el,t1,k,names,celt,gp,mtest,kappa,bool;
 
 
-# Have to deal with each direct product component seperately
+# Have to deal with each direct product component separately
  names := SplitString(name,",");
  celt := One(grp);
 
@@ -363,7 +363,7 @@ end);
  SetSize(nrifac,Size(ImageRecogNode(ri))*Size(ImageRecogNode(riker)));
  SetFilterObj(nrifac,IsReady);
 
-# setup the new record for the subgroup - nri will take the place of the old ri, but iwth
+# setup the new record for the subgroup - nri will take the place of the old ri, but with
 #ker(riker) as its kernel and nrifac, the new socle, as its factor.
  nri := rec();
  Objectify( RecogNodeType, nri );;

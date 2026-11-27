@@ -2064,7 +2064,7 @@ InstallAlmostSimpleHint( "2F4(2)'", "StabChainHint",
        size := 17971200,issimple := true,
   ));
 InstallAlmostSimpleHint( "2F4(2)'.2", "StabChainHint",
-  rec( name := "2F4(2)'.2", usemax := [ 1 ],  # not more avaiable as of now!
+  rec( name := "2F4(2)'.2", usemax := [ 1 ],  # not more available as of now!
        size := 35942400,
   ));
 # No hints there for Fi24' since we do not have the maximal subgroups!
