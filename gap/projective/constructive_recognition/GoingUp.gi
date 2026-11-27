@@ -1237,8 +1237,8 @@ end;
 # and <type> are as there. In characteristic 2, for "Sp" and "O+", chi
 # must not have the root 1, and for "O+" the optional argument is Q(c).
 RECOG.Form_IsotropicKrylovPolynomial := function(phi, F, chi, type, Qc...)
-  local n, m, q, q0, ph, F0, omega, coords, M, row, k, j, nu, cands, top,
-        xi, N, a, even;
+  local n, m, q, q0, P, Pc, o, ph, slice, F0, omega, M, A, B, Ac, Bc, z, b,
+        row, k, nu, cands, top, xi, N, a, even;
 
   n := Length(phi) - 1;
   m := n / 2;
@@ -1257,39 +1257,45 @@ RECOG.Form_IsotropicKrylovPolynomial := function(phi, F, chi, type, Qc...)
     q0 := RootInt(q);
   fi;
 
-  # phi(x^-i) = beta(c h^i, c), which is -phi(x^i), phi(x^i)^sigma resp.
-  # phi(x^i)
-  ph := function(i)
-    if i >= 0 then
-      return phi[i + 1];
-    elif type = "SU" then
-      return phi[1 - i]^q0;
-    elif type = "O+" then
-      return phi[1 - i];
-    fi;
-    return -phi[1 - i];
-  end;
+  # P[i + o] = phi(x^i) for -m <= i <= n, where phi(x^-i) = beta(c h^i, c)
+  # is -phi(x^i), phi(x^i)^sigma resp. phi(x^i); compressed, so that the
+  # rows of the linear system below are sums of two slices of P
+  if type = "SU" then
+    P := List(phi{[m + 1, m .. 2]}, z -> z^q0);
+  elif type = "O+" then
+    P := phi{[m + 1, m .. 2]};
+  else
+    P := -phi{[m + 1, m .. 2]};
+  fi;
+  P := Concatenation(P, phi);
+  ConvertToVectorRep(P, q);
+  o := m + 1;
+  ph := i -> P[i + o];
+  slice := {i, l} -> P{[i + o .. i + o + l - 1]};
 
   # N = sum_k (nu_k x^k + nu_k^sigma x^-k), 0 <= k <= m, with
   # phi(N x^j) = 0 for 0 <= j < m, as GF(q0)-linear equations in the
   # coordinates of the nu_k in the basis 1, omega of F over GF(q0); for Sp
-  # omega = 0, nu_m = 0, and phi(N) = 0 holds already
+  # omega = 0, nu_m = 0, and phi(N) = 0 holds already. Row k of the system
+  # is the list of the phi(x^(k+j)) + phi(x^(j-k)), j = 0, 1, ...
   if type = "SU" then
-    # z = a + b omega with b = (z - z^sigma) / (omega - omega^sigma)
+    # z = a + b omega with b = (z - z^sigma) / (omega - omega^sigma), the
+    # z^sigma from the conjugate list Pc; equations: all a, then all b
     omega := PrimitiveRoot(F);
     F0 := (omega - omega^q0)^-1;
-    coords := function(z)
-      local b;
-      b := (z - z^q0) * F0;
-      return [z - b * omega, b];
-    end;
+    Pc := List(P, z -> z^q0);
+    ConvertToVectorRep(Pc, q);
     M := [];
     for k in [0 .. m] do
+      A := slice(k, m);
+      B := slice(-k, m);
+      Ac := Pc{[k + o .. k + o + m - 1]};
+      Bc := Pc{[-k + o .. -k + o + m - 1]};
       for nu in [One(F), omega] do
-        row := [];
-        for j in [0 .. m - 1] do
-          Append(row, coords(nu^q0 * ph(k + j) + nu * ph(j - k)));
-        od;
+        z := nu^q0 * A + nu * B;
+        b := (z - nu * Ac - nu^q0 * Bc) * F0;
+        row := Concatenation(z - omega * b, b);
+        ConvertToVectorRep(row, q0);
         Add(M, row);
       od;
     od;
@@ -1300,16 +1306,13 @@ RECOG.Form_IsotropicKrylovPolynomial := function(phi, F, chi, type, Qc...)
     fi;
   elif type = "O+" then
     # phi(N x^j) = 0 for 0 <= j < m - 1; the value at m - 1 is tested below
-    M := List([0 .. m - 1], k -> List([0 .. m - 2],
-                                      j -> ph(k + j) + ph(j - k)));
+    M := List([0 .. m - 1], k -> slice(k, m - 1) + slice(-k, m - 1));
     if even then
-      for j in [1 .. m - 2] do
-        M[1][j + 1] := ph(j);
-      od;
+      M[1] := slice(0, m - 1);
+      M[1][1] := Qc[1];
       for k in [1 .. m - 1] do
         M[k + 1][1] := ph(k);
       od;
-      M[1][1] := Qc[1];
     fi;
     cands := NullspaceMat(M);
     if Length(cands) <> 1 then
@@ -1317,12 +1320,9 @@ RECOG.Form_IsotropicKrylovPolynomial := function(phi, F, chi, type, Qc...)
     fi;
     cands := [Concatenation(cands[1], [Zero(F)])];
   else
-    M := List([0 .. m - 1], k -> List([1 .. m - 1],
-                                      j -> ph(k + j) + ph(j - k)));
+    M := List([0 .. m - 1], k -> slice(k + 1, m - 1) + slice(1 - k, m - 1));
     if even then
-      for j in [1 .. m - 1] do
-        M[1][j] := ph(j);
-      od;
+      M[1] := slice(1, m - 1);
     fi;
     cands := NullspaceMat(M);
     if Length(cands) <> 1 then
