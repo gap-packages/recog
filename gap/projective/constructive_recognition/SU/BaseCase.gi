@@ -118,7 +118,7 @@ end;
 #    scalar multiple of the hermitian form which <gens> preserve
 RECOG.FindStdGensSU4 := function(gens, f)
   local q, ext, e, w, alpha, fq, form, h, ord, pr, j, B, Bi, InB, D, Di,
-        OnE1, k1, k1mats, c, k, sl2, k1std, fake, InK1, cb, MakeQ, Q1, Q4,
+        OnE1, k1, k1mats, c, k, sl2, k1std, W, InK1, cb, MakeQ, Q1, Q4,
         Elm, Upper, Lower, std, OnB, v, y, res;
 
   q := RootInt(Size(f), 2);
@@ -178,12 +178,12 @@ RECOG.FindStdGensSU4 := function(gens, f)
     until Length(k1) >= 2 and RECOG.GeneratesSL2(k1mats, fq);
   fi;
   sl2 := RECOG.RecogniseSL2Natural(Group(GeneratorsWithMemory(k1mats)), fq);
-  k1std := ResultOfStraightLineProgram(SLPOfElms(sl2.all), k1);
-  fake := RECOG.InitSLfake(fq, 2);
+  k1std := ResultOfStraightLineProgram(CompositionOfStraightLinePrograms(
+               RECOG.SL2_FromMakeSLStdGens(fq), SLPOfElms(sl2.all)), k1);
+  W := RECOG.SL_RewriteSetup(2, fq);
   # the element of K1 which is xb on the basis b1, ..., b4
   InK1 := xb -> ResultOfStraightLineProgram(
-              RECOG.ExpressInStd_SL2(sl2.bas * OnE1(xb) * sl2.basi, fake),
-              k1std);
+              RECOG.SL_Rewrite(W, sl2.bas * OnE1(xb) * sl2.basi), k1std);
 
   # Q(b), b = b_pos, acts trivially on b^perp/<b>; its centre is the root group
   # T = {v -> v + t*(v,b)*b} of K1, and u in Q(b) maps v in E2 to
