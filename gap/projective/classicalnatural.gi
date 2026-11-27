@@ -529,11 +529,13 @@ function(ri)
       pr := ProductReplacer(GeneratorsOfGroup(gm),rec(maxdepth := 500));
       gm!.pseudorandomfunc := [rec( func := Next, args := [pr] )];
   else
+      # a stamp of its own, so that the first random elements are those
+      # the naming test drew
       gm := Group(ri!.gensHmem);
       gm!.pseudorandomfunc := [rec(func := function(ri,name,bool)
                                       return RandomElm(ri,name,bool).el;
                                     end,
-                            args := [ri,"ClassicalNatural",true])];
+                            args := [ri,"ClassicalNaturalStdGens",true])];
   fi;
 
   if d = 2 then
@@ -561,8 +563,7 @@ function(ri)
   else   # bigger than 2:
       if classical.isSLContained = true then
           # Do not run the generic code in small cases:
-          if (q^d-1)/(q-1) <= 1000 or d = 3 then
-              # FIXME: Note d=3 currently has a problem in the SL2-finder.
+          if (q^d-1)/(q-1) <= 1000 then
               Info(InfoRecog,2,"Classical natural: SL(",d,",",q,"): small ",
                    "case, handing over to Schreier-Sims.");
               ri!.comment := Concatenation("SL(",String(d),",",String(q),")",
