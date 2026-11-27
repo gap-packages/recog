@@ -74,10 +74,8 @@ RECOG.Sp4_InvolutionFactor := function(pr, j, B, f)
   until Length(k1) >= 2 and
         RECOG.GeneratesSL2(List(k1, g -> OnE(g, [1, 2])), f);
 
-  sl2 := RECOG.RecogniseSL2Natural(
-             Group(GeneratorsWithMemory(List(k1, g -> OnE(g, [1, 2])))), f);
-  k1std := ResultOfStraightLineProgram(CompositionOfStraightLinePrograms(
-               RECOG.SL2_FromMakeSLStdGens(f), SLPOfElms(sl2.all)), k1);
+  sl2 := RECOG.RecogniseSL2Natural(Group(List(k1, g -> OnE(g, [1, 2]))), f);
+  k1std := ResultOfStraightLineProgram(sl2.slpstd, k1);
   W := RECOG.SL_RewriteSetup(2, f);
   return xb -> ResultOfStraightLineProgram(
                    RECOG.SL_Rewrite(W, sl2.bas * xb{[1, 2]}{[1, 2]} * sl2.basi),

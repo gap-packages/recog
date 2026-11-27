@@ -62,38 +62,6 @@ RECOG.FindStdGensUsingBSGS := function(g,stdgens,projective,large)
   return SLPOfElms(gens);
 end;
 
-RECOG.MakeSL_StdGens := function(p,ext,n,d)
-  local a,b,f,i,q,s,t,x,res;
-  f := GF(p,ext);
-  q := Size(f);
-  a := IdentityMat(d,f);
-  a := a{Concatenation([n],[1..n-1],[n+1..d])};
-  ConvertToMatrixRep(a,q);
-  b := IdentityMat(d,f);
-  b := b{Concatenation([1,n],[2..n-1],[n+1..d])};
-  ConvertToMatrixRep(b,q);
-  if IsEvenInt(n) then
-      a[1] := -a[1];
-  else
-      b[2] := -b[2];
-  fi;
-  s := [];
-  t := [];
-  for i in [0..ext-1] do
-      x := IdentityMat(d,f);
-      x[1,2] := Z(p,ext)^i;
-      Add(s,x);
-      x := IdentityMat(d,f);
-      x[2,1] := Z(p,ext)^i;
-      Add(t,x);
-  od;
-  res := rec( s := s, t := t, a := a, b := b, f := f, q := q, p := p,
-              ext := ext, One := IdentityMat(d,f), one := One(f),
-              d := d );
-  res.all := Concatenation( res.s, res.t, [res.a], [res.b] );
-  return res;
-end;
-
 # Now the code for writing SLPs:
 
 # Returns a scalar multiple of the matrix y with entries in the field f, or
@@ -658,10 +626,6 @@ function(ri)
       # the determinant to be 1) contains SL_2.
       Info(InfoRecog,2,"ClassicalNatural: this is PSL_2!");
       std := RECOG.RecogniseSL2Natural(gm,f);
-      std := rec( slpstd := CompositionOfStraightLinePrograms(
-                                RECOG.SL2_FromMakeSLStdGens(f),
-                                SLPOfElms(std.all)),
-                  bas := std.bas, basi := std.basi );
       ri!.comment := "PSL2";
   else
       # Do not run the generic code in small cases:

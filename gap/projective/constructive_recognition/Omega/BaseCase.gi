@@ -182,9 +182,8 @@ RECOG.FindStdGensOmega6 := function(gens, form, f)
 
   h := GroupWithMemory(A);
   init := RECOG.SL_FinalDescent(A, f);
-  slp := CompositionOfStraightLinePrograms(RECOG.SL2_FromMakeSLStdGens(f),
-                                           init.slp);
-  up := RECOG.GoingUp(h, "SL", rec( slp := slp, bas := init.bas, n := 2 ));
+  up := RECOG.GoingUp(h, "SL", rec( slp := init.slp, bas := init.bas,
+                                    n := 2 ));
 
   Y := GeneratorsWithMemory(ListWithIdenticalEntries(5, ()));
   R := RECOG.SL_RootElements(Y, 4, f);

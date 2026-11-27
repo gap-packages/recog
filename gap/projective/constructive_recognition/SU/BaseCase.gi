@@ -177,9 +177,8 @@ RECOG.FindStdGensSU4 := function(gens, f)
       Add(k1mats, OnE1(InB(k)));
     until Length(k1) >= 2 and RECOG.GeneratesSL2(k1mats, fq);
   fi;
-  sl2 := RECOG.RecogniseSL2Natural(Group(GeneratorsWithMemory(k1mats)), fq);
-  k1std := ResultOfStraightLineProgram(CompositionOfStraightLinePrograms(
-               RECOG.SL2_FromMakeSLStdGens(fq), SLPOfElms(sl2.all)), k1);
+  sl2 := RECOG.RecogniseSL2Natural(Group(k1mats), fq);
+  k1std := ResultOfStraightLineProgram(sl2.slpstd, k1);
   W := RECOG.SL_RewriteSetup(2, fq);
   # the element of K1 which is xb on the basis b1, ..., b4
   InK1 := xb -> ResultOfStraightLineProgram(

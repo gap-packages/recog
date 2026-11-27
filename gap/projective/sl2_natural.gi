@@ -13,17 +13,13 @@
 ##        q = 4     -> RECOG.RecogniseSL2Natural4 
 ##        q else    -> RECOG.RecogniseSL2NaturalGeneric       (Frank Lübeck 2025)
 ##  
-##  Returns a rec with entries:
-##    s     -- list of upper transvections, i.e. s[i]^basi = [[1,Z(q)^(i-1)],[0,1]]
-##    t     -- list of lower transvections, i.e. t[i]^basi = [[1,0],[Z(q)^(i-1),1]]
-##             where j = DegreeOverPrimeField(GF(q)), for i=1,...,j
-##    bas   -- base change matrix
-##    basi  -- inverse base change matrix
-##    a     -- an element conjugate to [[0,-1],[1,0]] via basi
-##    b     -- identity matrix
-##    all   -- concatenation of s, t, [a], [b]
-##    one   -- One(f)
-##    g     -- G
+##  Returns a record with the following components:
+##    slpstd -- SLP in the generators of G for the standard generators
+##              RECOG.ClassicalStandardGenerators("SL", 2, f).all, relative
+##              to bas: s = [[0,1],[-1,0]], t = [[1,1],[0,1]],
+##              delta = diag(Z(q), Z(q)^-1), and v = x = 1
+##    bas    -- base change matrix: bas * g * basi is g relative to bas
+##    basi   -- its inverse
 
 
 #############################################################################
@@ -31,77 +27,35 @@
 ## RECOG.RecogniseSL2Natural
 ##
 RECOG.RecogniseSL2Natural := function(G, f)
-  local q, res, nicegens, diag, u1, u2, umat, lmat, k, j, i, el, result, bas, basi,
-        basis, coeffs, m, c, l, a, b;
+  local q;
   q := Size(f);
+  # the helpers attach their own memory
+  G := GroupWithGenerators(StripMemory(GeneratorsOfGroup(G)));
 
   ## if q = 2,3,4 then RecogNaturalSL2 does not work
   if q = 2 then
     return RECOG.RecogniseSL2Natural2(G,f);
-  elif q = 4 then 
+  elif q = 4 then
     return RECOG.RecogniseSL2Natural4(G,f);
   elif q = 3  or q = 5 then
     return RECOG.RecogniseSL2NaturalSmallPrimes(G,f);
   fi;
-  
+
   #TODO:  for q = 2^l with l large, e.g. q = 2^40, RecogniseSL2NaturalGeneric is
   #       slower than the deleted RECOG.RecogniseSL2NaturalEvenChar
   #       (git log -S RecogniseSL2NaturalEvenChar).
-  res := RECOG.RecogniseSL2NaturalGeneric(G,q);
-  nicegens :=List(res[1],a->ResultOfStraightLineProgram(a,GeneratorsOfGroup(G)));
-  diag := nicegens[1];
-  u1 := nicegens[2];
-  u2 := nicegens[3];
-  j := DegreeOverPrimeField(GF(q));    
-  if IsEvenInt(q) then
-    ## even characteristic: conjugation by diag generates all of GF(q)* directly
-    lmat := [];
-    for k in [0..j-1] do
-      i := (q-1-k)*Int(2)^-1 mod (q-1);
-      el := u1^(diag^i);
-      Add(lmat,el);
-    od;
-    umat := [];
-    for k in [0..j-1] do
-      i := k * Int(2)^-1 mod (q-1);
-      el := u2^(diag^i);
-      Add(umat, el);
-    od;
-  else
-    # In odd characteristic conjugation only yields squares.
-    # Express z^l in the Fp-basis {z^0, z^2, ..., z^(2(j-1))} and multiply conjugates.
-    # Then create the lower/upper matrices with z^0, z^1, ..., z^(j-1) as entries
-    basis := List([0..j-1], i -> Z(q)^(2*i));
-    basis := Basis(GF(q), basis);
-    lmat := [];
-    for l in [0..j-1] do
-      coeffs := Coefficients(basis, Z(q)^l);
-      m := u1^0;
-      for i in [0..j-1] do
-        c := IntFFE(coeffs[i+1]);
-        m := m * (diag^i * u1 * diag^(-i))^c;
-      od;
-      Add(lmat, m);
-    od;
-    umat := [];
-    for l in [0..j-1] do
-      coeffs := Coefficients(basis, Z(q)^l);
-      m := u2^0;
-      for i in [0..j-1] do
-        c := IntFFE(coeffs[i+1]);
-        m := m * (diag^(-i) * u2 * diag^i)^c;
-      od;
-      Add(umat, m);
-    od;
-  fi;
-  basi := res[2];
-  bas := basi^(-1);
-  a := umat[1]^(-1)*lmat[1]*umat[1]^(-1);
-  b := One(umat[1]);
-  result :=  rec( g := G, t := lmat, s := umat, bas := bas, basi := basi,
-                one := One(f), a := a, b := b, 
-                all := Concatenation(umat,lmat,[a],[b]));
-  return result;
+  return RECOG.RecogniseSL2NaturalGeneric(G,q);
+end;
+
+# The record of RECOG.RecogniseSL2Natural for elements <upper> and <lower>
+# with memory, which are [[1,1],[0,1]] and [[1,0],[1,1]] relative to <bas>,
+# and <delta>, which is diag(Z(q), Z(q)^-1)
+RECOG.SL2StdGensRecord := function(upper, lower, delta, bas)
+  local one;
+  one := upper^0;
+  return rec( slpstd := SLPOfElms([upper * lower^-1 * upper, upper, delta,
+                                   one, one]),
+              bas := bas, basi := bas^-1 );
 end;
 
 
@@ -118,9 +72,9 @@ end;
 ##  
 ##  2025  Frank Lübeck
 ## 
-##  Returns [slps, mat] where slps is list of SLPs in given generators of G 
-##  to elements which are conjugate by mat to standard/nice generators: 
-##  t, u1, u2 = diag(1/Z(q),Z(q)) [[1,0],[1,1]], [[1,1],[0,1]]
+##  Returns the record of RECOG.RecogniseSL2Natural, with basi = mat. The
+##  algorithm finds elements which are conjugate by mat to
+##  diag(1/Z(q),Z(q)), [[1,0],[1,1]] and [[1,1],[0,1]].
 ##  
 ##  We construct elements with the strategy of Section 2. from the article
 ##  Conder, Leedham-Green, Fast recognition of classical groups
@@ -134,11 +88,6 @@ end;
 ##      generators to it.
 ##      This should be good enough because in both cases (element xm and twice
 ##      element cm in the code) almost half of the elements in G are suitable.
-##    - The list of SLPs in the result is probably what is needed for the
-##      SLPforNiceGens for the RecogNode.
-##    - To find for a given element A in G an SLP in the nice generators compute
-##       Astd := A^mat and use the function 'SLPinStandardSL2' from the file 
-##       "SL2.g".
 ##    - If q = 2^m with odd m then the computation of the eigenvalues of xm
 ##      needs the quadratic extension GF(2^(2m)).
 
@@ -333,10 +282,7 @@ RECOG.RecogniseSL2NaturalGeneric := function(G, q)
 
   Assert(3, xm^mat = DiagonalMat([Z(q)^-1, Z(q)]));
 
-  # return SLPs of elements mapped by mat to 
-  # diag(1/Z(q),Z(q))[[1,0],[1,1]], [[1,1],[0,1]],
-  # and mat
-  return [List([xm, trlowm, trupm], SLPOfElm), mat];
+  return RECOG.SL2StdGensRecord(trupm, trlowm, xm^-1, mat^-1);
 end;
 
 
@@ -394,13 +340,11 @@ end;
 ## exploiting the fact that SL(2,2) has only 6 elements and GF(2)*={1}.
 
 RECOG.RecogniseSL2Natural2 := function(G, f)
-  local one, zero, gens, pair, e2, e3, o3,
-        m1, m2, lower, upper,
-        bas, s, t, res;
+  local zero, gens, pair, e2, e3, o3,
+        m1, m2, lower, upper;
 
-  one  := One(f);
   zero := Zero(f);
-  gens := GeneratorsOfGroup(G);
+  gens := GeneratorsOfGroup(GroupWithMemory(G));
 
   # --- Step 1: find a generating pair ---
   pair := RECOG.findGenPairSL22(gens);
@@ -457,13 +401,8 @@ RECOG.RecogniseSL2Natural2 := function(G, f)
     fi;
   fi;
 
-  bas := IdentityMat(2, f);
-  s := [ upper ];
-  t := [ lower ];
-  res := rec( g := G, t := t, s := s, bas := bas, basi := bas^-1,
-              one := one, a := s[1]*t[1]*s[1], b := One(s[1]) );
-  res.all := Concatenation(res.s, res.t, [res.a], [res.b]);
-  return res;
+  # delta = diag(Z(2), Z(2)^-1) = 1
+  return RECOG.SL2StdGensRecord(upper, lower, upper^0, IdentityMat(2, f));
 end;
 
 
@@ -485,13 +424,13 @@ end;
 ##   2. Construct base change matrix mat from the eigenvectors of xm.
 ##   3. Find one upper and one lower transvections via random walk 
 ##      after base change.
-##   4. Conjugate transvections with powers of xm to obtain two lower
-##      transvections and two upper transvections with off-diagonal
-##      entries Z(4)^0 and Z(4).  
+##   4. Conjugate the transvections by powers of xm to make their
+##      off-diagonal entries Z(4)^0. Relative to mat, xm is
+##      diag(Z(4), Z(4)^-1) = delta.
 
 RECOG.RecogniseSL2Natural4 := function(G, f)
   local GM, one, zero, gens, xm, x, lambda, mat, upper, lower,
-        cur, c, smm, val, s, t, res, s1, s2, t1, t2, i, target;
+        cur, c, smm, val;
 
   GM     := GroupWithMemory(G);
   one    := One(f);
@@ -537,35 +476,22 @@ RECOG.RecogniseSL2Natural4 := function(G, f)
     fi;
   od;
 
-  # If upper has off-diagonal value v = lambda^k, then upper^(xm^i) has value lambda^(k+i).
-  # We want s[1] with value 1 and s[2] with value lambda.
-  # So we conjugate by xm^i where i is chosen such that lambda^(k+i) = 1 resp. lambda.
+  # If upper has off-diagonal value v = lambda^k, then upper^(xm^i) has
+  # value lambda^(k+i); for lower, lambda^(k+2i).
   val := (StripMemory(upper)^mat)[1,2];
-  if val = one then
-    s := [ upper, upper^xm ];
-  elif val = lambda then
-    s := [ upper^(xm^2), upper ];
-  else
-    s := [ upper^xm, upper^(xm^2) ];
+  if val = lambda then
+    upper := upper^(xm^2);
+  elif val <> one then
+    upper := upper^xm;
   fi;
-
-  # If lower has off-diagonal value v = lambda^k, then lower^(xm^i) has value lambda^(k + 2i) mod 3.
-  # val=1        (k=0): xm^0 -> 1,        xm^1 -> lambda^2,  xm^2 -> lambda   => t := [xm^0, xm^2]
-  # val=lambda   (k=1): xm^0 -> lambda,   xm^1 -> 1,         xm^2 -> lambda^2 => t := [xm^1, xm^0]
-  # val=lambda^2 (k=2): xm^0 -> lambda^2, xm^1 -> lambda,    xm^2 -> 1        => t := [xm^2, xm^1]
   val := (StripMemory(lower)^mat)[2,1];
-  if val = one then
-    t := [ lower, lower^(xm^2) ];
-  elif val = lambda then
-    t := [ lower^xm, lower ];
-  else
-    t := [ lower^(xm^2), lower^xm ];
+  if val = lambda then
+    lower := lower^xm;
+  elif val <> one then
+    lower := lower^(xm^2);
   fi;
 
-  res := rec( g := G, t := t, s := s, bas := mat^-1, basi := mat,
-              one := one, a := s[1]*t[1]*s[1], b := One(s[1]) );
-  res.all := Concatenation(res.s, res.t, [res.a], [res.b]);
-  return res;
+  return RECOG.SL2StdGensRecord(upper, lower, xm, mat^-1);
 end;
 
 
@@ -594,8 +520,7 @@ end;
 ##    was slower.
 
 RECOG.RecogniseSL2NaturalSmallPrimes := function(G,f)
-local GM, one, zero, gens, xm, x, o, trupm, trlowm,
-        cur, c, k, s, t, res;
+local GM, one, zero, gens, trupm, trlowm, cur, c, k, gamma, w;
   GM := GroupWithMemory(G);
   one := One(f);
   zero := Zero(f);
@@ -627,11 +552,10 @@ local GM, one, zero, gens, xm, x, o, trupm, trlowm,
   k := IntFFE((trlowm)[2,1]^-1);
   trlowm := trlowm^k;
 
-  s := [ trupm ];
-  t := [ trlowm ];
-  res := rec( g := G, t := t, s := s,
-              bas := One(G), basi := One(G),
-              one := one, a := s[1]^-1*t[1]*s[1]^-1, b := One(s[1]) );
-  res.all := Concatenation(res.s, res.t, [res.a], [res.b]);
-  return res;
+  # delta = w(gamma) w(1)^-1 with w(a) = E12(a) E21(-a^-1) E12(a), which
+  # is [[0,a],[-a^-1,0]]
+  gamma := Z(Size(f));
+  w := trupm^IntFFE(gamma) * trlowm^IntFFE(-gamma^-1) * trupm^IntFFE(gamma);
+  return RECOG.SL2StdGensRecord(trupm, trlowm,
+             w * (trupm * trlowm^-1 * trupm)^-1, IdentityMat(2, f));
 end;
