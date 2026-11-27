@@ -346,6 +346,7 @@ function(ri)
   ri!.biggerscalarsorder := data.modulus / gcd;
   SetSize(ri, ri!.biggerscalarsorder);
   SetFilterObj(ri, IsLeaf);
+  SetLeafData(ri, RECOG.LeafDataPcgs([1], [ri!.biggerscalarsorder]));
 
   return Success;
 end);

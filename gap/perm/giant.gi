@@ -855,6 +855,7 @@ function(ri)
     # Note: Since deg>=8, we are never in the small edge cases of
     # AnPresentation/SnPresentation.
     SetNiceGens(ri,StripMemory(res.gens));
+    SetLeafData(ri,RECOG.LeafDataSnAn(res.stamp = "Sn",deg));
     if res.stamp = "An" then
         SetSize(ri,Factorial(Length(mp))/2);
         SetIsRecogInfoForSimpleGroup(ri,true);

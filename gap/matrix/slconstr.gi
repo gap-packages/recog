@@ -1813,7 +1813,7 @@ end;
 #! TODO: find a better name.
 #! @EndChunk
 SLCR.FindHom := function(ri, G, d, q)
-    local GM, data, e, genlist, gens, i, j, p, slp, y;
+    local GM, data, e, genlist, gens, i, j, leafdata, p, slp, y;
     p := Factors(q);
     e := Length(p);
     p := p[1];
@@ -1878,6 +1878,10 @@ SLCR.FindHom := function(ri, G, d, q)
     # image of a generator of the centre of SL(d,q).
     SetSize(ri, Product([0..d-1], i -> q^d-q^i) / ((q-1)*Gcd(d, q-1))
                 * data.centreOrder);
+    # d and q come from a Monte Carlo naming algorithm
+    leafdata := RECOG.LeafDataSLQuotient(d, q, data.centreOrder, "SLCR");
+    leafdata.proven := false;
+    SetLeafData(ri, leafdata);
     return Success;
 end;
 

@@ -194,6 +194,7 @@ InstallGlobalFunction( DoHintedStabChain, function(ri,G,hint)
             fi;
             SetIsRecogInfoForAlmostSimpleGroup(ri,true);
             ri!.comment := hint.name;
+            SetLeafData(ri,RECOG.LeafDataForHint(hint.name));
             return Success;
         od;
     fi;

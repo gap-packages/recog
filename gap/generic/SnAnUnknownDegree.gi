@@ -1287,6 +1287,7 @@ function(ri)
     ri!.SnAnUnknownDegreeIsoData := isoData;
     SetFilterObj(ri, IsLeaf);
     degree := isoData.degree;
+    SetLeafData(ri, RECOG.LeafDataSnAn(recogData.type = "Sn", degree));
     if recogData.type = "Sn" then
         SetSize(ri, Factorial(degree));
         SetIsRecogInfoForAlmostSimpleGroup(ri, true);
