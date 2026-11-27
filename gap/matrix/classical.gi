@@ -954,6 +954,10 @@ function(recognise)
         ord := ProjectiveOrder(g);
         AddSet( recognise.porders, ord );
     fi;
+    if recognise.needSp4Splitting and not recognise.hasSp4Splitting and
+       RECOG.IsSp4SplittingWitness(cpol, q) then
+        recognise.hasSp4Splitting := true;
+    fi;
 
     ppd := IsPpdElement(f, cpol, d, q, 1);
     # if the element is no ppd we get out
@@ -1712,6 +1716,8 @@ function(recognise)
         recognise.needOrders := true;
         recognise.needLB := true;
         recognise.needE2 := true;
+        recognise.needSp4Splitting :=
+            RECOG.Sp4SplittingWitnessDivisors(q) <> fail;
     fi;
 
 
@@ -1750,19 +1756,8 @@ function(recognise)
         if not 2 in recognise.LS then
             return TemporaryFailure;
         fi;
-    elif d = 4 and q >= 7 and IsPowerOfTwo(q+1) then
-        if not 4 in recognise.LB then
-            return TemporaryFailure;
-        fi;
-        if not HasElementsMultipleOf(recognise.orders, [4]) then
-            return TemporaryFailure;
-        fi;
-
-    elif d = 4 and q >= 11 and IsPowerOfTwo((q+1)/3) then
-        if not HasElementsMultipleOf(recognise.orders, [3,4]) then
-            return TemporaryFailure;
-        fi;
-        if not 4 in recognise.LB then
+    elif d = 4 and RECOG.Sp4SplittingWitnessDivisors(q) <> fail then
+        if not 4 in recognise.LB or not recognise.hasSp4Splitting then
             return TemporaryFailure;
         fi;
     else
@@ -2927,6 +2922,45 @@ AddMethod(ClassicalMethDbForDegree2, FindHomMethodsClassical.IsAlt5Alt4Sym4, 30)
 AddMethod(ClassicalMethDbForDegree2, FindHomMethodsClassical.IsSL2Contained, 20);
 
 
+# For q = 2^s-1 >= 7 and q = 3*2^s-1 >= 11, q+1 has no large ppd, and
+# NonGenericSymplectic needs a witness that Sp(4,q) is not in an extension
+# field subgroup; returns the divisors in its definition, or fail
+RECOG.Sp4SplittingWitnessDivisors := function(q)
+    if q >= 7 and IsPowerOfTwo(q+1) then
+        return [4];
+    elif q >= 11 and (q+1) mod 3 = 0 and IsPowerOfTwo((q+1)/3) then
+        return [3, 4];
+    fi;
+    return fail;
+end;
+
+# Whether an element of Sp(4,q) with characteristic polynomial cpol splits V
+# into two non-isomorphic irreducible 2-dimensional modules, on which it acts
+# by elements l1, l2 of the norm 1 group of GF(q^2), of orders divisible by
+# a number in RECOG.Sp4SplittingWitnessDivisors(q), with l2^2 <> l1^(+-2).
+#
+# [NP99, Proposition 4.4(a)] covers SL(2,q^2) only; elements of Sp(2,q^2):2
+# outside it split V like this too. The condition on squares rules out all
+# of (Sp(2,q^2):2) Z, also with similitudes of GF(q^2)-type. If g is
+# GF(q^2)-linear, det g = l1 l2^(+-1) lies in GF(q) and has norm 1, so it is
+# +-1 and l2 = +-l1^(+-1). If g is semilinear, g^2 is GF(q^2)-linear with
+# eigenvalues l1^(+-2), l2^(+-2) and a square determinant, which is not -1
+# as q = 3 mod 4, so l2^2 = l1^(+-2).
+RECOG.IsSp4SplittingWitness := function(cpol, q)
+    local divs, facs, l;
+    divs := RECOG.Sp4SplittingWitnessDivisors(q);
+    facs := Factors(PolynomialRing(GF(q)), cpol);
+    if List(facs, Degree) <> [2, 2] then
+        return false;
+    fi;
+    l := List(facs, f -> RootsOfPolynomial(GF(q^2), f)[1]);
+    if not ForAll(l, x -> (q+1) mod Order(x) = 0 and
+                          ForAny(divs, k -> Order(x) mod k = 0)) then
+        return false;
+    fi;
+    return not l[2] in [l[1], l[1]^-1] and not l[2]^2 in [l[1]^2, l[1]^-2];
+end;
+
 # Target probability that RecogniseClassical misses a d = 4 witness of
 # NonGenericSymplectic or NonGenericOrthogonalPlus, for independent uniform
 # random elements; PseudoRandom elements miss somewhat more often
@@ -2954,6 +2988,15 @@ RECOG.Degree4WitnessProportion := function(type, q)
     p := SmallestRootInt(q);
     a := LogInt(q, p);
     if type = "symplectic" then
+        if RECOG.Sp4SplittingWitnessDivisors(q) <> fail then
+            # RECOG.IsSp4SplittingWitness: pairs (x, y) of exponents of a
+            # generator of C_N in a torus C_N^2, N = q+1, |N(T)| = 8N^2.
+            # All but the 2 elements of order 1 or 2 have an order divisible
+            # by a number in RECOG.Sp4SplittingWitnessDivisors(q). For each
+            # of these N-2 values of x, y avoids x, -x, x+N/2, -x+N/2: four
+            # values, two if x has order 4. So (N-2)^2 - 4(N-2) + 2*2 pairs.
+            return (q-3)^2 / (8 * (q+1)^2);
+        fi;
         if q in [2, 3, 5] or IsPowerOfTwo(q+1) or
            ((q+1) mod 3 = 0 and IsPowerOfTwo((q+1)/3)) then
             return 0;
@@ -3088,6 +3131,8 @@ function( grp, arg... )
                    orders := [],
                    porders := [],
                    hasSpecialEle := false,
+                   needSp4Splitting := false,
+                   hasSp4Splitting := false,
                    bc := "unknown",
                    kroneckerFactors := "unknown",
                    factorWitnesses := [],
