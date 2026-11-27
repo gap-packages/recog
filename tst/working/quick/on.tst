@@ -190,6 +190,22 @@ gap> RECOG.HasTrivialSpinorNorm(DiagonalMat([-1, -1, 1, 1, 1, 1, 1, 1] * Z(3)^0)
 >        RECOG.ClassicalForm("O+", 8, GF(9)));
 true
 
+# On all of GO the spinor norm is a homomorphism, and on the reflection in
+# v it is beta(v,v)/2 mod squares
+gap> form := FormOf(GO(9, 3));;
+gap> Refl := v -> One(form.gram)
+>        - (2 / (v * form.gram * v)) * TransposedMat([form.gram * v]) * [v];;
+gap> vs := Filtered(List([1 .. 20], i -> Random(GF(3)^9)),
+>        v -> not IsZero(v * form.gram * v));;
+gap> ForAll(vs, v -> (RECOG.SpinorNorm(Refl(v), form) = 0)
+>        = RECOG.IsSquareFFE(v * form.gram * v / 2, 3));
+true
+gap> xs := List([1 .. 10], i -> PseudoRandom(GO(9, 3)));;
+gap> ForAll([1 .. 9], i -> RECOG.SpinorNorm(xs[i] * xs[i + 1], form)
+>        = (RECOG.SpinorNorm(xs[i], form)
+>           + RECOG.SpinorNorm(xs[i + 1], form)) mod 2);
+true
+
 # ClassicalNatural makes natural Omega(d,q) a POmega leaf, also with
 # scalars on the generators, and its SLPs accept any scalar, also from a
 # larger field, and matrices over GF(9) with entries in GF(3), but no
@@ -231,8 +247,44 @@ gap> G := Group(List(GeneratorsOfGroup(Omega(-1, 8, 5)),
 >                    x -> Z(5)^Random([0 .. 3]) * x));;
 gap> Leaf(RECOG.TestGroup(G, true, Size(Omega(-1, 8, 5))))!.fhmethsel.successMethod;
 "ClassicalNatural"
-gap> Leaf(RECOG.TestGroup(SO(9, 3), false, Size(SO(9, 3))))!.fhmethsel.successMethod;
-"StabilizerChainProj"
+gap> ri := Leaf(RECOG.TestGroup(SO(9, 3), false, Size(SO(9, 3))));;
+gap> [ri!.fhmethsel.successMethod, Size(ImageRecogNode(ri)),
+>    KernelRecogNode(ri)!.fhmethsel.successMethod];
+[ "ClassicalNatural", 2, "ClassicalNatural" ]
+gap> [SLPforElement(ri, PseudoRandom(GL(9, 3))),
+>     SLPforElement(ri, PseudoRandom(GL(9, 9)))];
+[ fail, fail ]
+
+# Like the leaf, the quotient node above it accepts scalars from a larger
+# field and matrices over GF(9) with entries in GF(3)
+gap> x := PseudoRandom(SO(9, 3));;
+gap> ForAll([Z(9) * x, ImmutableMatrix(GF(9), x)], y -> IsScalarMultiple(
+>        ResultOfStraightLineProgram(SLPforElement(ri, y), NiceGens(ri)), x));
+true
+
+# In even dimension the first quotient is mu mod squares and det / mu^(d/2),
+# with kernel PSO: GO-(10,5) has elements of determinant -1, a 10th power
+# in GF(5), which ProjDeterminant misses. The spinor norm follows if -1
+# lies in Omega, as in GO+(10,5) and SO+(8,3). GO(9,3) needs the sign that
+# makes the determinant 1. RecogniseClassical is inconclusive in about one
+# run in 500, which sends the group to StabilizerChainProj; resetting the
+# random sources gives each group the same seed in every GAP version.
+gap> Split := function(ri)
+>     if IsLeaf(ri) then
+>         return ri!.fhmethsel.successMethod;
+>     fi;
+>     return [ri!.fhmethsel.successMethod, Size(ImageRecogNode(ri)),
+>             Split(KernelRecogNode(ri))];
+> end;;
+gap> for G in [GO(9, 3), GO(-1, 10, 5), GO(1, 10, 5), SO(1, 8, 3)] do
+>     Reset(GlobalMersenneTwister, 1);
+>     Reset(GlobalRandomSource, 1);
+>     Print(Split(Leaf(RECOG.TestGroup(G, false, Size(G)))), "\n");
+> od;
+[ "ClassicalNatural", 2, "ClassicalNatural" ]
+[ "ClassicalNatural", 2, "ClassicalNatural" ]
+[ "ClassicalNatural", 2, [ "ClassicalNatural", 2, "ClassicalNatural" ] ]
+[ "ClassicalNatural", 2, "ClassicalNatural" ]
 
 #
 gap> STOP_TEST("on.tst");
