@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Frank Celler.
+##  This file's authors include Frank Celler.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
 ##  to list here. Please refer to the COPYRIGHT file for details.
@@ -78,7 +78,7 @@ PPDIrreducibleFactor := function ( R, f, d, q )
     #    return false;
     #fi;
 
-    # compute the deriviative
+    # compute the derivative
     a := Derivative( f );
 
     # if the derivative is nonzero then $f / Gcd(f,a)$ is squarefree
@@ -147,7 +147,7 @@ end;
 #     fi;
 #     char := Characteristic(F);
 # 
-#     # compute the deriviative to make it square free:
+#     # compute the derivative to make it square free:
 #     while true do
 #         der := Derivative( c );
 #         if not IsZero(der) then break; fi;

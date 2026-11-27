@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Alice Niemeyer.
+##  This file's authors include Alice Niemeyer.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
 ##  to list here. Please refer to the COPYRIGHT file for details.
@@ -163,19 +163,13 @@ HasLBGgt5 := function( m, p, a, e )
         return false;
     fi;
 
-    ## if e+1 does not divide ppds then
-    ## we know that all primes dividing ppds are large
-    ## and hence we know <m> is a large ppd-element
-    if ppds mod (e+1) = 0 then
-        ## Now we know (e+1) divides ppds and (e+1) has to be
-        ## a prime since all ppds are at least (e+1)
-        if not IsPrimeInt (e+1) then
-            return false;
-        fi;
-        # if (e+1)^2 does not divide m, then not large
-        if not (m mod (e+1)^2) = 0 then
-            return false;
-        fi;
+    ## Every ppd is at least e+1, so a prime other than e+1 dividing
+    ## ppds is large; e+1 itself is large only if its square divides <m>
+    while ppds mod (e+1) = 0 do
+        ppds := ppds / (e+1);
+    od;
+    if ppds = 1 then
+        return IsPrimeInt(e+1) and m mod (e+1)^2 = 0;
     fi;
 
     return true;
@@ -332,8 +326,8 @@ end;
 # parts: A version that applies to classical groups for sufficiently
 # large parameters, called generic parameters, as described in [NP98, Def.3.2],
 # and a part that applies to smaller cases of classical groups, where
-# the exsistence of sufficiently informative ppd elements is not guaranteed.
-# The naming algorithm for these cases  is decribed in [NP99] and implemented
+# the existence of sufficiently informative ppd elements is not guaranteed.
+# The naming algorithm for these cases is described in [NP99] and implemented
 # in the functions whose name starts with NonGeneric below. This function tests
 # whether the parameters are generic or not.
 #
@@ -1852,6 +1846,9 @@ function(recognise)
             recognise.needLB := true;
             recognise.needE2 := true;
         fi;
+        if d = 4 and q > 9 then
+            recognise.needPOrders := true;
+        fi;
         if d = 3 then
             recognise.needPOrders := true;
             if q >= 49 then
@@ -1900,13 +1897,14 @@ function(recognise)
         # either max{r,s} >= 11 and G contains omega
         # or {r,s} = {5,7} and then we have to rule out 2.A7.
 
-        # check of o is divisible by a prime >= 11
-        f1 := o -> PositionProperty(Factors(o), i-> i >= 11) <> fail;
-        if PositionProperty(recognise.orders, f1) <> fail then
+        # check of o is divisible by a prime >= 11; projective orders,
+        # since a scalar can bring any prime dividing q-1
+        f1 := o -> PositionProperty(Factors(o[1]), i-> i >= 11) <> fail;
+        if PositionProperty(recognise.porders, f1) <> fail then
             return CheckFlag();
         fi;
 
-        # Now we know that element orders only contain primes at most 7
+        # Now we know that projective orders only contain primes at most 7
         if not q^3 mod 7 = 1 or q^2 mod 7 = 1 or q mod 7 = 1 then
             # 7 is not ppd of q^3-1
             return CheckFlag();
@@ -2501,23 +2499,23 @@ function(recognise)
             return TemporaryFailure;
         fi;
     elif d = 3 and q = 9 then
-        if not HasElementsMultipleOf( recognise.orders, [3,5]) then
+        ## Only the current element can be the special one, so test each
+        ## element, not only those after the orders 3 and 5 have appeared.
+        ## Projective order: an involution times a scalar of order 4 or 8
+        ## has matrix order 4 or 8 and a scalar square
+        if recognise.hasSpecialEle = false
+           and ProjectiveOrder(recognise.g)[1] in [4,8] then
+            g := recognise.g^2;
+            if ForAll(GeneratorsOfGroup(recognise.grp), h -> IsOne(Comm(h,g))) then
+                recognise.isOmegaContained := false;
+                return NeverApplicable;
+            fi;
+            recognise.hasSpecialEle := true;
+        fi;
+        if recognise.hasSpecialEle = false
+           or not HasElementsMultipleOf( recognise.orders, [3,5]) then
             return TemporaryFailure;
         fi;
-        if recognise.hasSpecialEle = false then
-            if not Order(recognise.g) in [4,8] then
-                return TemporaryFailure;
-            fi;
-            g := recognise.g^2;
-            if ForAny(GeneratorsOfGroup(recognise.grp), h -> not IsOne(Comm(h,g))) then
-               recognise.hasSpecialEle := true;
-               return CheckFlag();
-            fi;
-        else
-           return CheckFlag();
-        fi;
-        recognise.isOmegaContained := false;
-        return NeverApplicable;
     elif d = 3 and q = 11 then
         if not HasElementsMultipleOf( recognise.orders, [3,11]) then
             return TemporaryFailure;
@@ -2548,13 +2546,17 @@ function(recognise)
         if not 2 in recognise.LB then
             return TemporaryFailure;
         fi;
-        if not ForAny(recognise.orders, i -> i > 2 and (q-1) mod i = 0) then
+        ## Projective orders: A5 with scalars has elements of order 10
+        recognise.needPOrders := true;
+        if not ForAny(recognise.porders,
+                      i -> i[1] > 2 and (q-1) mod i[1] = 0) then
             return TemporaryFailure;
         fi;
         ## need to check that the basic lppd( 3,q;2) elements have order
         ## greater than 5.
         s := LogInt(q, recognise.p);
-        if not ForAny(recognise.orders, i -> HasLBGgt5(i, recognise.p, s, 2)) then
+        if not ForAny(recognise.porders,
+                      i -> HasLBGgt5(i[1], recognise.p, s, 2)) then
             return TemporaryFailure;
         fi;
     else

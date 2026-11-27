@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Max Neunhöffer, Ákos Seress.
+##  This file's authors include Max Neunhöffer, Ákos Seress.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
 ##  to list here. Please refer to the COPYRIGHT file for details.
@@ -73,7 +73,7 @@ DeclareGlobalFunction( "AddMethod" );
 ##     <Item>the stamp of the method that succeeded, if one did. This component
 ##         is only bound after successful completion.</Item>
 ##     <Mark><C>result</C></Mark>
-##     <Item>a boolean value which is either <K>Success</K> or <K>TemporaryFailure</K>
+##     <Item>either <K>Success</K> or <K>TemporaryFailure</K>
 ##         depending on whether a successful method was found or the procedure
 ##         gave up respectively. This component is only bound after
 ##         completion of the method selection procedure.</Item>

@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Max Neunhöffer, Ákos Seress.
+##  This file's authors include Max Neunhöffer, Ákos Seress.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
 ##  to list here. Please refer to the COPYRIGHT file for details.
@@ -816,7 +816,7 @@ RECOG.LieType := function (G, p, orders, Nmr)
 end;
 
 #! @BeginChunk LieTypeNonConstr
-#! Recognise quasi-simple group of Lie type when characteristic is given.
+#! Recognise a quasi-simple group of Lie type when the characteristic is given.
 #! Based on <Cite Key="BKPS02"/> and <Cite Key="AB01"/>.
 #! @EndChunk
 BindRecogMethod("FindHomMethodsProjective", "LieTypeNonConstr",

@@ -62,7 +62,7 @@ end;
 
 SolveLeafTrivial := function(ri,rifac)
 # Performs constructive recognition of a trivial group
-# redfines homom ri
+# redefines homom ri
  local I,T,x,oldmap;
  I := ShallowCopy(Grp(rifac));
  T := CyclicGroup(1);

@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Sergio Siccha.
+##  This file's authors include Sergio Siccha.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
 ##  to list here. Please refer to the COPYRIGHT file for details.
@@ -106,7 +106,7 @@ InstallGlobalFunction(RECOG_HandleSpecialCaseKernelTrivialAndMarkedForImmediateV
     # set to fail.
     # However, since immediateverification(ri) is set to true, we need
     # to double-check now, whether the kernel indeed is trivial. Since
-    # KernelRecogNode(ri) is not bound yet, we can not use the function
+    # KernelRecogNode(ri) is not bound yet, we cannot use the function
     # ImmediateVerification. Instead, we call FindKernelFastNormalClosure.
     Info(InfoRecog, 2, "Found only trivial generators for the kernel but the ",
          "kernel is marked for immediate verification. Hence we call ",

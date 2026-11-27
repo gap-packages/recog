@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Maska Law, Alice C. Niemeyer, Ákos Seress.
+##  This file's authors include Maska Law, Alice C. Niemeyer, Ákos Seress.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
 ##  to list here. Please refer to the COPYRIGHT file for details.
@@ -852,7 +852,7 @@ end;
 # ##
 # ##  The main function.
 #
-# # FIXME: dead code? (it's callers are all dead)
+# # FIXME: dead code? (its callers are all dead)
 # RecogniseSnAn :=  function( n, grp, eps )
 #
 #     local N, gens, le, g, h, slp, gl, b, eval, xis;

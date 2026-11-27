@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Colva Rouney-Dougal, Max Neunhöffer, Ákos Seress.
+##  This file's authors include Colva Roney-Dougal, Max Neunhöffer, Ákos Seress.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
 ##  to list here. Please refer to the COPYRIGHT file for details.
@@ -871,9 +871,7 @@ function(ri)
       # Now find a homogeneous component to act on it:
       homs := MTX.Homomorphisms(collf[1][1],m);
       homsimg := BasisVectors(Basis(VectorSpace(f,Concatenation(homs))));
-      homcomp := MutableCopyMat(homsimg);
-      # FIXME: This will go:
-      ConvertToMatrixRep(homcomp,f);
+      homcomp := RECOG.MutableCopyMatOverField(homsimg,f);
       TriangulizeMat(homcomp);
       o := Orb(G,homcomp,OnSubspacesByCanonicalBasis,rec(storenumbers := true));
       Enumerate(o);

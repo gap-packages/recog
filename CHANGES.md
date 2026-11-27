@@ -151,7 +151,7 @@ This file describes changes in the recog package.
 - Fixed some bugs in nonconstructive classical natural recognition.
 - Added method for known stabilizer chain.
 - Adapt to forms package.
-- Fixed global namespace polution.
+- Fixed global namespace pollution.
 - Fixed too lazy generation of kernel.
 - New SL_n natural rep method.
 - Note IsSimpleGroup and IsAlmostSimpleGroup whenever known.

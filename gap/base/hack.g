@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Max Neunhöffer, Ákos Seress.
+##  This file's authors include Max Neunhöffer, Ákos Seress.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
 ##  to list here. Please refer to the COPYRIGHT file for details.
@@ -38,7 +38,7 @@ InstallMethod( PseudoRandom, "for a group object with generators, use func",
   function( g )
     local l;
     # FIXME: get rid of this hackish override of PseudoRandom,
-    # and define our own operation instead (say, RECOG_PseuoRandom)?!
+    # and define our own operation instead (say, RECOG_PseudoRandom)?!
     # Or at least change pseudorandomfunc to an attribute, so that
     # the filter of this method can be turned into something like
     #  IsGroup and HasPseudoRandomFunc

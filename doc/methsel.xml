@@ -27,7 +27,7 @@ with the idea in mind that it will be quite clear in most
 situations, which one is <Q>the best</Q> method for a given set of
 input data, and that we do not want to try different things. On the other
 hand, the &GAP; method selection is quite complicated, which is to some
-extend necessary to make sure, that lots of different information about
+extent necessary to make sure, that lots of different information about
 the objects in question can be used to really find the best method.<P/>
 
 Our setup here in particular has to fulfill the requirement, that in the

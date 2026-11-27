@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Stephen Howe, Maska Law, Max Neunhöffer,
+##  This file's authors include Stephen Howe, Maska Law, Max Neunhöffer,
 ##  Ákos Seress.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
@@ -527,7 +527,7 @@ RECOG.FixedPointSubspace := function(mat, k)
 #      the complement W(<mat>) of F such that for all w
 #      in W(<mat>), w+w<mat>+w<mat>^2+...+w<mat>^(k-1) = 0
 # This function uses the row echelon form of a matrix in order
-# to compute the relevent bases. Requires k mod p <> 0 where
+# to compute the relevant bases. Requires k mod p <> 0 where
 # p is the characteristic of the field.
   local moveLT, trans;
 
@@ -854,7 +854,7 @@ RECOG.RowSpaceBasis  := function(mat)
 # RowSpaceGenerators(<mat>) returns the rows of
 # <mat> that form a basis for the row space
 # of <mat>. This code borrows from the
-# implementation of SemiEchcelonMatDestructive.
+# implementation of SemiEchelonMatDestructive.
 
   local basis,   # vectors of mat forming a basis
                  # for the row space of mat
@@ -1399,7 +1399,7 @@ RECOG.RecogniseFDPM := function(group, field, eps)
         v,       # a vector from a linked basis
         k,       # a counter
         vs,      # a linked sequence of vectors
-        us,      # the alterate basis
+        us,      # the alternate basis
         uvs,     # output of CompleteBasis
         cob,     # change of basis matrix, to the basis u_i
                  # for i = 2,...,n-delta+1
@@ -1527,7 +1527,7 @@ RECOG.RecogniseFDPM := function(group, field, eps)
 
   # determine permutations and scalars: uvs[2] contains the
   # change of basis matrix that takes group elements into
-  # our prefered form
+  # our preferred form
   cob := ImmutableMatrix(fdpm.field, uvs[2]);
   cobi := cob^-1;
   if cobi = fail then

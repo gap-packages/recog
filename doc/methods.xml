@@ -22,7 +22,7 @@ listed types.
 <Section Label="permmethods">
 <Heading>Methods for permutation groups</Heading>
 
-The following table gives an overview over the installed methods and their
+The following table gives an overview of the installed methods and their
 rank (higher rank means higher priority, the method is tried earlier, see
 Chapter <Ref Chap="methsel"/>).
 
@@ -34,13 +34,13 @@ Chapter <Ref Chap="methsel"/>).
 <Section Label="matrixmethods">
 <Heading>Methods for matrix groups</Heading>
 
-The following table gives an overview over the installed methods and their
+The following table gives an overview of the installed methods and their
 rank (higher rank means higher priority, the method is tried earlier, see
 Chapter <Ref Chap="methsel"/>). Note
 that there are not that many methods for matrix groups since the
 system can switch to projective groups by dividing out the subgroup
 of scalar matrices. The bulk of the recognition methods are then
-installed es methods for projective groups.
+installed as methods for projective groups.
 
 <#Include SYSTEM "_methods_matrix_table.xml">
 <#Include SYSTEM "_methods_matrix_list.xml">
@@ -50,10 +50,10 @@ installed es methods for projective groups.
 <Section Label="projmethods">
 <Heading>Methods for projective groups</Heading>
 
-The following table gives an overview over the installed methods and their
+The following table gives an overview of the installed methods and their
 rank (higher rank means higher priority, the method is tried earlier, see
 Chapter <Ref Chap="methsel"/>). Note
-that the recognition for matrix group switches to projective recognition
+that the recognition for matrix groups switches to projective recognition
 rather soon in the recognition process such that most recognition methods
 in fact are installed as methods for projective groups.
 
@@ -65,7 +65,7 @@ in fact are installed as methods for projective groups.
 <Section Label="unusedmethods">
 <Heading>Unused methods</Heading>
 
-The following table gives an overview over the methods which are currently unused.
+The following table gives an overview of the methods which are currently unused.
 
 </Section>
 

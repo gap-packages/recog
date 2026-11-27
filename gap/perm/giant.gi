@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Maska Law, Ákos Seress.
+##  This file's authors include Maska Law, Ákos Seress.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
 ##  to list here. Please refer to the COPYRIGHT file for details.
@@ -190,7 +190,7 @@ RECOG.ConjEltSn :=  function( grp, transp, fullCycle )
         c[nextPos] := i;
         nextPos := nextPos^fullCycle;
     od;
-    # The remaining points in [1..la] must be mapped bijectivey to [n+1..la] to ensure that
+    # The remaining points in [1..la] must be mapped bijectively to [n+1..la] to ensure that
     # conj is a permutation. However, the precise values of individual points are irrelevant.
     rest := Difference([1..la],mp);
     for i in [1..Length(rest)] do
@@ -417,7 +417,7 @@ RECOG.ConjEltAnEven := function( grp, cyc3, longPerm )
         c[pos] := i;
         pos := pos^longPerm;
     od;
-    # The remaining points in [1..la] must be mapped bijectivey to [n+1..la] to ensure that
+    # The remaining points in [1..la] must be mapped bijectively to [n+1..la] to ensure that
     # conj is a permutation. However, the precise values of individual points are irrelevant.
     rest := Difference([1..la],mp);
     for i in [1..Length(rest)] do
@@ -462,7 +462,7 @@ RECOG.ConjEltAnOdd := function( grp, shortCycle, longCycle )
         c[pos] := i;
         pos := pos^longCycle;
     od;
-    # The remaining points in [1..la] must be mapped bijectivey to [n+1..la] to ensure that
+    # The remaining points in [1..la] must be mapped bijectively to [n+1..la] to ensure that
     # conj is a permutation. However, the precise values of individual points are irrelevant.
     rest := Difference([1..la],mp);
     for i in [1..Length(rest)] do
@@ -545,7 +545,7 @@ end;
 
 ########################################################################
 ##
-#F  FindHomomorphismMethods.Giant
+#F  RECOG.IsGiant
 ##
 
 # See Corollary 10.2.2 in [Ser03].
@@ -810,7 +810,7 @@ RECOG.GiantEpsilon := 1/1024;
 #! elements of <A>G</A> from the nice generators;
 #! or <K>NeverApplicable</K> if <A>G</A> is not transitive or acts on
 #! at most 7 points; 
-#! or <K>fail</K>, in the case that no
+#! or <K>TemporaryFailure</K>, in the case that no
 #! evidence was found that <A>G</A> is a giant, or evidence was found, but
 #! the construction of <M>D</M> was unsuccessful.
 #! If the method constructs <M>D</M> then the calling node becomes a leaf.

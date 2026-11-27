@@ -50,7 +50,7 @@ InstallGlobalFunction( SLPOnlyNeededLinesBackward,
     # This functions goes backwards through the slp and adds exactly those 
     # lines of the slp to ll that have to be executed to produce the
     # result (in backward order). All lines are transformed into type 2
-    # lines ([assocword,slot]). Note that needed is changed underways.
+    # lines ([assocword,slot]). Note that needed is changed underway.
     local j,line;
     while i >= 1 do
         if IsBound(needed[changes[i]]) then
@@ -358,7 +358,7 @@ InstallGlobalFunction( IntermediateResultOfSLPWithoutOverwrite,
 InstallGlobalFunction( ProductOfStraightLinePrograms,
   function(s1,s2)
     # s1 and s2 must be two slps that return a single element with the same
-    # number of inputs. This function contructs an slp that returns the result
+    # number of inputs. This function constructs an slp that returns the result
     # s1(g_1,...,g_n) * s2(g_1,...,g_n) for all possible inputs g_1,...,g_n
     local biggest,biggest2,biggest3,changes,changes2,i,j,l,l1,l2,l3,line,
           newline,nrinps;

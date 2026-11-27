@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Max Neunhöffer, Ákos Seress.
+##  This file's authors include Max Neunhöffer, Ákos Seress.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
 ##  to list here. Please refer to the COPYRIGHT file for details.
@@ -492,7 +492,7 @@ RECOG.C6ClosureRoundsPerDim := 4;
 
 #############################################################################
 ##
-#F  RecogniseC6() . . . . . . . . . . . . . . . .
+#F  RECOG.New2RecogniseC6( <grp> )
 ## the algorithm to recognise, constructively, when <grp> is a subgroup
 ## of the normaliser of symplectic type r-group.
 ## the output is a record having the following fields:
@@ -502,8 +502,8 @@ RECOG.C6ClosureRoundsPerDim := 4;
 ##  .<r>     = the r for the symplectic type r-group
 ##  .<n>     = r^n is the dimension of <grp>
 ##  .<q>     = field size of given representation
-## or fail to indicate (possibly temporary) failure or false to indicate
-## that it failed forever, so there is no point to call it again.
+## or TemporaryFailure to indicate temporary failure or NeverApplicable to
+## indicate that it failed forever, so there is no point to call it again.
 RECOG.New2RecogniseC6 := function(grp)
 
     local   type, blocks, spaces, xxx, d, b, ppi,
@@ -571,7 +571,8 @@ end;
 #! and integer <M>n</M> then the method
 #! returns <K>NeverApplicable</K>. Otherwise, it returns either a homomorphism of
 #! <A>G</A> into <M>Sp(2n,r)</M>, or a homomorphism into the C2 permutation
-#! action of <A>G</A> on a decomposition of <M>GF(q)^d</M>, or <K>fail</K>.
+#! action of <A>G</A> on a decomposition of <M>GF(q)^d</M>, or
+#! <K>TemporaryFailure</K>.
 #! @EndChunk
 BindRecogMethod("FindHomMethodsProjective", "C6",
 "find either an (imprimitive) action or a symplectic one",
@@ -712,7 +713,7 @@ RECOG.MakeC6Group := function(g,over,p)
     basis := Concatenation(chis,ws);
     newgens := List(GeneratorsOfGroup(g), x->basis*x*basis^-1);
     #
-    # Now thw basis will be in bijection with F_r^k
+    # Now the basis will be in bijection with F_r^k
     #
     labels := Elements(FullRowSpace(f,k));
     basis := CanonicalBasis(FullRowSpace(f,k));

@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Friedrich Rober and Sergio Siccha.
+##  This file's authors include Friedrich Rober and Sergio Siccha.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
 ##  to list here. Please refer to the COPYRIGHT file for details.
@@ -102,7 +102,7 @@ end;
 # eps : real number, the error bound
 # N : integer, upper bound for the candidate degree n
 #
-# Returns a record of constants used in ThreeCyclesCandidatesIterator. The
+# Returns a record of constants used in ThreeCycleCandidatesIterator. The
 # meaning of these constants is documented under "Changes" at the beginning of
 # this file and their values are from [JLNP13, 4.1].
 RECOG.ThreeCycleCandidatesConstants := function(eps, N)
@@ -494,7 +494,7 @@ RECOG.AdjustCycle := function(ri, g, c, r, k)
     # f1 := smallest number in F
     # f2 := second smallest number in F
     # m := smallest number *not* in F
-    # We do not store F explicitely. Instead we store the intersection of F and
+    # We do not store F explicitly. Instead we store the intersection of F and
     # {1, 2, 3, 4} in the variable F4.
     F4 := [false, false, false, false];
     f1 := fail;

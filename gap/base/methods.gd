@@ -4,7 +4,7 @@
 ##  which provides a collection of methods for the constructive recognition
 ##  of groups.
 ##
-##  This files's authors include Sergio Siccha.
+##  This file's authors include Sergio Siccha.
 ##
 ##  Copyright of recog belongs to its developers whose names are too numerous
 ##  to list here. Please refer to the COPYRIGHT file for details.
@@ -79,7 +79,8 @@ DeclareGlobalFunction("RecogMethod");
 # <Description>
 # Create the recognition method <C>method</C> by calling
 # <Ref Func="RecogMethod"/> with arguments <A>arg</A>.
-# Then bind the component <C>Stamp(method)</C> of <A>r</A> to <A>method</A>.
+# Then bind the component <C>Stamp(method)</C> of the global record named
+# <A>r</A> to <A>method</A>.
 # </Description>
 # </ManSection>
 # <#/GAPDoc>
@@ -87,9 +88,9 @@ DeclareGlobalFunction("BindRecogMethod");
 
 # <#GAPDoc Label="CallRecogMethod">
 # <ManSection>
-# <Func Name="CallRecogMethod" Arg="m, args"/>
+# <Func Name="CallRecogMethod" Arg="m, ri"/>
 # <Description>
-# Call <C>UnpackRecogMethod(m)</C> with arguments <A>args</A> and return the
+# Call <C>UnpackRecogMethod(m)</C> with argument <A>ri</A> and return the
 # return value.
 # The argument <A>m</A> must lie in <Ref Filt="IsRecogMethod"/>.
 # </Description>
