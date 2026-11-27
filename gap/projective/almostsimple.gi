@@ -965,14 +965,19 @@ RECOG.HomFDPM := function(data,x)
 end;
 
 #! @BeginChunk AltSymBBByDegree
-#! This method is a black box constructive (?) recognition of alternating
-#! and symmetric groups.
-#! 
-#! This algorithm is probably based on the paper <Cite Key="BLGN+05"/>.
+#! This method recognises <M>A_n</M> or <M>S_n</M> acting on its fully deleted
+#! permutation module, of dimension <M>d = n-1</M> or <M>d = n-2</M>, with the
+#! algorithm of <Cite Key="BLGN+05"/>. It returns <K>NeverApplicable</K> if
+#! the order of a random element has a prime divisor larger than <M>d+2</M>,
+#! since no element of <M>S_n</M> with <M>n \le d+2</M> has such an order.
+#! For <M>d \ge 6</M> it then tries to recognise <A>G</A> on the fully deleted
+#! permutation module. If that succeeds, it maps <A>G</A> onto the permutation
+#! group of degree <M>n</M>, whose recognition continues with the methods for
+#! permutation groups. Otherwise it returns <K>TemporaryFailure</K>.
 #! @EndChunk
 # subroutines are in AnSnOnFDPM.gi and also paper reference
 BindRecogMethod("FindHomMethodsProjective", "AltSymBBByDegree",
-"try BB recognition for dim+1 and/or dim+2 if sensible",
+"recognise An or Sn on its fully deleted permutation module",
 function(ri)
   local G,GG,Gm,RecSnAnEq,RecSnAnIsOne,d,deg,f,fact,hom,newgens,o,orders,p,primes,
         r,totry;
