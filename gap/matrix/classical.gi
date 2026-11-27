@@ -2967,20 +2967,20 @@ RECOG.Degree4WitnessProportion := function(type, q)
             n := n - 2;
         fi;
         return n * (R - 3) / (8 * R^2);
-    elif type = "orthogonalplus" then
-        if q <> 8 and q < 11 then
-            return 0;
-        fi;
-        # Each Kronecker factor is uniform in PSL(2,q), where a torus of
-        # order m has a normaliser of order 2m and Phi(o) elements of order o
-        Torus := {m, cond} -> Sum(Filtered(DivisorsInt(m), cond), Phi) / (2*m);
-        k := Gcd(2, q-1);
-        thr := 2 * k;
-        return Minimum(
-            Torus((q+1)/k, o -> o > thr and RECOG.IsOPlus4PlusWitness(o, q, p, a)),
-            Torus((q-1)/k, o -> o > thr));
     fi;
-    return 0;
+
+    # type = "orthogonalplus"
+    if q <> 8 and q < 11 then
+        return 0;
+    fi;
+    # Each Kronecker factor is uniform in PSL(2,q), where a torus of
+    # order m has a normaliser of order 2m and Phi(o) elements of order o
+    Torus := {m, cond} -> Sum(Filtered(DivisorsInt(m), cond), Phi) / (2*m);
+    k := Gcd(2, q-1);
+    thr := 2 * k;
+    return Minimum(
+        Torus((q+1)/k, o -> o > thr and RECOG.IsOPlus4PlusWitness(o, q, p, a)),
+        Torus((q-1)/k, o -> o > thr));
 end;
 
 # Number of further random elements that bring the probability of missing a
