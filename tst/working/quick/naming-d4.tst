@@ -10,6 +10,11 @@ gap> ForAll([1 .. 20], i ->
 >        RecogniseClassical(Omega(1, 4, 13)).isOmegaContained = true);
 true
 
+# q = 31: q+1 = 32 contains no primitive prime divisor of q^2-1
+gap> ForAll([1 .. 20], i ->
+>        RecogniseClassical(Omega(1, 4, 31)).isOmegaContained = true);
+true
+
 # SL(2,25) acting on the tensor product of the natural module and its Frobenius
 # twist: a diagonal subgroup of Omega^+(4,25), with o1 = o2 for every element
 gap> H := Group(List(GeneratorsOfGroup(SL(2, 25)),
