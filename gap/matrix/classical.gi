@@ -2100,7 +2100,7 @@ function(recognise)
            recognise.isOmegaContained := false;
            return NeverApplicable;
         fi;
-        StabChain(pgrp, rec(random := 200, limit := 174182400));
+        StabChain(pgrp, rec(limit := 174182400));
         if Size(pgrp) mod 174182400 = 0 then # compare to Size(POmega(+1,8,2))
            return CheckFlag();
         else
