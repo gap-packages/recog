@@ -63,9 +63,17 @@ in fact are installed as methods for projective groups.
 </Section>
 
 <Section Label="unusedmethods">
-<Heading>Unused methods</Heading>
+<Heading>Methods outside the method databases</Heading>
 
-The following table gives an overview of the methods which are currently unused.
+The following methods are in none of the databases
+<Ref Var="FindHomDbPerm"/>, <Ref Var="FindHomDbMatrix"/> and
+<Ref Var="FindHomDbProjective"/>, so the method selection never tries them
+on its own. Other methods call them directly or hand them down as hints (see
+Section <Ref Sect="hintsystem"/>) once they know that the group has the
+structure the method relies on; the third column names them. A method without
+callers is not used at all.
+
+<#Include SYSTEM "_methods_unused_table.xml">
 
 </Section>
 
