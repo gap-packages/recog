@@ -18,7 +18,8 @@
 ##  (e_1, f_1, e_2, f_2, ..., e_m, f_m, w_1, ..., w_d0), with hyperbolic
 ##  pairs (e_i, f_i) and an anisotropic part <w_1, ..., w_d0> orthogonal to
 ##  them, of dimension d0 = 0, except for the orthogonal types "O-"
-##  (d0 = 2) and "O" (odd degree, d0 = 1); "O+" has d0 = 0.
+##  (d0 = 2) and "O" (odd degree, d0 = 1), and "SU" of odd degree (d0 = 1);
+##  "O+" has d0 = 0.
 ##
 ##  For orthogonal groups, the classical group is Omega. In odd
 ##  characteristic the quadratic form Q is determined by its polar form
@@ -47,11 +48,11 @@ end;
 # type <type> on GF(q)^<d>, q = Size(<f>): diag(J, ..., J, J0) with
 # J = [[0,1],[-1,0]] for "Sp" and J = [[0,1],[1,0]] otherwise, and J0 the
 # Gram matrix on the anisotropic part: [-1/2] for "O", that is,
-# Q(w_1) = -1/4, and diag(-2, 2 gamma), gamma = Z(q), for "O-", that is,
-# Q(w_1) = -1 and Q(w_2) = gamma. For "O-" and q even, J0 = [[0,eta],
-# [eta,0]], the polar form of Q(w_1) = 1, Q(w_2) = gamma, with
-# eta = RECOG.OrthogonalEta(q). Type "SL" has no form; its standard scalar
-# product has Gram matrix the identity.
+# Q(w_1) = -1/4, diag(-2, 2 gamma), gamma = Z(q), for "O-", that is,
+# Q(w_1) = -1 and Q(w_2) = gamma, and [1] for "SU" of odd degree. For "O-"
+# and q even, J0 = [[0,eta],[eta,0]], the polar form of Q(w_1) = 1,
+# Q(w_2) = gamma, with eta = RECOG.OrthogonalEta(q). Type "SL" has no
+# form; its standard scalar product has Gram matrix the identity.
 RECOG.ClassicalStandardForm := function(type, d, f)
   local eps, J, m, i;
 
@@ -66,7 +67,7 @@ RECOG.ClassicalStandardForm := function(type, d, f)
   fi;
   if type = "O" and IsEvenInt(d) then
     ErrorNoReturn("RECOG.ClassicalStandardForm: <d> must be odd");
-  elif type <> "O" and IsOddInt(d) then
+  elif not type in ["O", "SU"] and IsOddInt(d) then
     ErrorNoReturn("RECOG.ClassicalStandardForm: <d> must be even");
   fi;
 
@@ -87,6 +88,8 @@ RECOG.ClassicalStandardForm := function(type, d, f)
   od;
   if type = "O" then
     J[d, d] := -One(f) / 2;
+  elif type = "SU" and IsOddInt(d) then
+    J[d, d] := One(f);
   elif type = "O-" and IsEvenInt(Size(f)) then
     J[d - 1, d] := RECOG.OrthogonalEta(Size(f));
     J[d, d - 1] := J[d - 1, d];
@@ -233,6 +236,36 @@ end;
 
 RECOG.FormValue := {form, x, y} -> x * form.gram * RECOG.FormConjugate(form, y);
 
+# The constant alpha of [EHNPR] (Definition of the field constants) for SU
+# over <f> = GF(q0^2), with alpha^q0 = -alpha: gamma^((q0+1)/2) for q0 odd
+# and 1 for q0 even, gamma = Z(q0^2)
+RECOG.UnitaryAlpha := function(f)
+  local q0;
+  q0 := RootInt(Size(f), 2);
+  if IsEvenInt(q0) then
+    return One(f);
+  fi;
+  return Z(Size(f))^((q0 + 1) / 2);
+end;
+
+# An element h with h + h^frob = 1 for <form>, so that c = x h solves
+# c + c^frob = x for x in the fixed field of frob: 1/2 in odd
+# characteristic, and gamma/(gamma + gamma^q0), gamma = Z(q0^2), for a
+# hermitian form in characteristic 2
+RECOG.FormHalf := function(form)
+  local f, gamma;
+
+  f := form.field;
+  if IsOddInt(Size(f)) then
+    return One(f) / 2;
+  elif form.frob = 1 then
+    ErrorNoReturn("RECOG.FormHalf: no such element for a bilinear form in ",
+                  "characteristic 2");
+  fi;
+  gamma := Z(Size(f));
+  return gamma / (gamma + gamma^form.frob);
+end;
+
 # The Gram matrix of the rows of <M>
 RECOG.FormGram := {form, M} ->
     M * form.gram * TransposedMat(RECOG.FormConjugate(form, M));
@@ -322,15 +355,17 @@ RECOG.FormHyperbolicPairStep := function(form, vecs, dual)
   bJ := dual[i];
 
   # beta(e, c b) = c^frob beta(e, b), and f + c e with beta(e, f) = 1 has
-  # norm beta(f, f) + c + eps c^frob, which is 0 for c = -beta(f, f) / 2;
-  # an alternating form, also in characteristic 2, needs no correction
+  # norm beta(f, f) + c + eps c^frob, which is 0 for c = -beta(f, f) h,
+  # h = RECOG.FormHalf(form); an alternating form, also in characteristic
+  # 2, needs no correction
   c := (1 / (eJ * conj(b)))^form.frob;
   f := c * b;
   fJ := c * bJ;
   c := fJ * conj(f);
   if not IsZero(c) then
-    f := f - c / 2 * e;
-    fJ := fJ - c / 2 * eJ;
+    c := c * RECOG.FormHalf(form);
+    f := f - c * e;
+    fJ := fJ - c * eJ;
   fi;
   return rec( e := e, f := f, eJ := eJ, fJ := fJ, drop := drop );
 end;
@@ -449,17 +484,29 @@ RECOG.FormHyperbolicPair := function(form, vecs)
 end;
 
 # A basis (w_1) or (w_1, w_2) of the anisotropic span of the rows <vecs>,
-# of dimension 1 or 2, for the symmetric form <form>, with the values of
+# of dimension 1 or 2, for the symmetric or hermitian <form>, with the values of
 # the standard form on the anisotropic part (see
 # RECOG.ClassicalStandardForm), where dual[i] = vecs[i] * form.gram; or
 # fail if there is none. In dimension 1 that needs -2 beta(w, w) to be a
 # square for w in <vecs>, which holds for one of the forms beta and
 # gamma*beta; in dimension 2 any anisotropic plane has such a basis.
+# For a hermitian form the anisotropic span is a line, and w_1 has
+# beta(w_1, w_1) = 1, which some multiple of any nonzero vector has, as the
+# norm GF(q0^2) -> GF(q0) is onto.
 RECOG.FormAnisotropicBasis := function(form, vecs, dual)
   local F, x, a, y, b, s, k, t, w1, w2;
 
   F := form.field;
-  if form.frob <> 1 or not Length(vecs) in [1, 2] then
+  if form.frob <> 1 then
+    if Length(vecs) <> 1 or IsZero(dual[1] * RECOG.FormConjugate(form, vecs[1]))
+       then
+      return fail;
+    fi;
+    s := RootFFE(F, 1 / (dual[1] * RECOG.FormConjugate(form, vecs[1])),
+                 form.frob + 1);
+    return [s * vecs[1]];
+  fi;
+  if not Length(vecs) in [1, 2] then
     return fail;
   fi;
   x := vecs[1];
@@ -721,14 +768,15 @@ RECOG.ClassicalInvariantForm := function(type, gens, f)
   fi;
 
   # (F^frob)^T = c*F with c^(frob+1) = 1, so F + (F^frob)^T is hermitian
-  # unless c = -1; then alpha*F is, for alpha^frob = -alpha
+  # unless c = -1; then alpha*F is, for alpha^frob = -alpha, and for q even
+  # F is
   frob := RootInt(Size(f), 2);
   F := MTX.InvariantSesquilinearForm(M);
   Fq := TransposedMat(List(F, r -> List(r, x -> x^frob)));
-  if IsZero(F + Fq) then
-    F := PrimitiveRoot(f)^((frob + 1) / 2) * F;
-  else
+  if not IsZero(F + Fq) then
     F := F + Fq;
+  elif IsOddInt(frob) then
+    F := PrimitiveRoot(f)^((frob + 1) / 2) * F;
   fi;
   ConvertToMatrixRep(F, f);
   return rec( gram := F, frob := frob, field := f );
@@ -904,13 +952,14 @@ end;
 
 # The standard generators of CL(<d>, q) of type <type> relative to the
 # standard basis of GF(q)^<d>, q = Size(<f>), with gamma = Z(q) ([EHNPR],
-# Definition of standard generators). For SL, for Sp, for SU
-# with q odd and d even, and for the orthogonal types with q odd, they are
+# Definition of standard generators). For SL, for Sp, for SU with q odd,
+# and for the orthogonal types with q odd, they are
 # those of Leedham-Green and O'Brien [LGO09], Section 3, Table 1, relative
 # to the basis order of [EHNPR], except u for SL and y, which are the
 # identity there; for "O+" and "O-" with q even, those of [DLGLO13]
-# (doc/recog.bib), Lemma 2.2, with "O-" on the first pair. For SU,
-# q = q0^2, alpha = gamma^((q0+1)/2) and
+# (doc/recog.bib), Lemma 2.2, with "O-" on the first pair, and for SU with
+# q even the same matrices as for q odd with alpha = 1. For SU,
+# q = q0^2, alpha = RECOG.UnitaryAlpha(f) and
 # gamma0 = gamma^(q0+1). For the orthogonal types the components are those
 # of RECOG.OrthogonalStandardGenerators and `all`; otherwise
 # it returns a record with the following components:
@@ -920,10 +969,13 @@ end;
 #  - `u` (not "SL"): (e_1, e_2)(f_1, f_2), the identity for d = 2
 #  - `x`: for "Sp", the matrix [[1,0,0,0],[0,1,1,0],[0,0,1,0],[1,0,0,1]]
 #    on (e_1, f_1, e_2, f_2); for "SU", [[1,0,1,0],[0,1,0,0],[0,0,1,0],
-#    [0,-1,0,1]]; for "SL" and d even, the signed cycle
+#    [0,-1,0,1]], and for d odd [[1,1,c],[0,1,-1],[0,0,1]] on
+#    (e_1, w_1, f_1), c = -RECOG.FormHalf(form), so c + c^q0 = -1; for "SL"
+#    and d even, the signed cycle
 #    (e_1, f_1, e_2, f_2)^-; the identity if it does not fit
 #  - `y` (only "SU"): diag(gamma, gamma^-q0, gamma^-1, gamma^q0) on
-#    (e_1, f_1, e_2, f_2), the identity for d = 2
+#    (e_1, f_1, e_2, f_2), the identity for d = 2, and for d odd
+#    diag(gamma, gamma^(q0-1), gamma^-q0) on (e_1, w_1, f_1)
 #  - `v`: (e_1, ..., e_m)(f_1, ..., f_m); for "SL" and d odd, the map
 #    v_1 -> v_d, v_i -> -v_(i-1)
 #  - `all`: the list of these, in the order of
@@ -936,7 +988,7 @@ RECOG.ClassicalStandardGenerators := function(type, d, f)
     ErrorNoReturn("RECOG.ClassicalStandardGenerators: unsupported type ",
                   type);
   fi;
-  if type in ["Sp", "SU", "O+", "O-"] and IsOddInt(d) then
+  if type in ["Sp", "O+", "O-"] and IsOddInt(d) then
     ErrorNoReturn("RECOG.ClassicalStandardGenerators: <d> must be even");
   elif type = "O" and IsEvenInt(d) then
     ErrorNoReturn("RECOG.ClassicalStandardGenerators: <d> must be odd");
@@ -953,7 +1005,7 @@ RECOG.ClassicalStandardGenerators := function(type, d, f)
     res := RECOG.OrthogonalStandardGenerators(type, d, f);
   elif type = "SU" then
     q0 := RootInt(Size(f), 2);
-    alpha := gamma^((q0 + 1) / 2);
+    alpha := RECOG.UnitaryAlpha(f);
     gamma0 := gamma^(q0 + 1);
     res := rec(
       s := RECOG.EmbedBlock(d, f, [1, 2], [[0, alpha], [alpha^-q0, 0]]),
@@ -980,6 +1032,12 @@ RECOG.ClassicalStandardGenerators := function(type, d, f)
     if m >= 2 and type = "Sp" then
       res.x := RECOG.EmbedBlock(d, f, [1 .. 4],
                    [[1, 0, 0, 0], [0, 1, 1, 0], [0, 0, 1, 0], [1, 0, 0, 1]]);
+    elif type = "SU" and IsOddInt(d) then
+      res.x := RECOG.EmbedBlock(d, f, [1, d, 2],
+                   [[1, 1, -RECOG.FormHalf(RECOG.ClassicalForm("SU", d, f))],
+                    [0, 1, -1], [0, 0, 1]]);
+      res.y := RECOG.EmbedBlock(d, f, [1, d, 2],
+                   DiagonalMat([gamma, gamma^(q0 - 1), gamma^-q0]));
     elif m >= 2 then
       res.x := RECOG.EmbedBlock(d, f, [1 .. 4],
                    [[1, 0, 1, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, -1, 0, 1]]);

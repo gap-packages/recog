@@ -22,6 +22,8 @@ gap> CheckFindStdGensSU4 := function(q)
 gap> Filtered([3, 5, 7, 9, 11, 13, 25, 27, 49, 81, 121, 243],
 >             q -> not CheckFindStdGensSU4(q));
 [  ]
+gap> Filtered([4, 8, 16, 32, 64, 256], q -> not CheckFindStdGensSU4(q));
+[  ]
 
 # The same for RECOG.FindStdGens_SU and SU(d,q).
 gap> CheckFindStdGens_SU := function(d, q)
@@ -44,6 +46,19 @@ gap> List([[6,3], [8,3], [12,3], [6,5], [8,7], [6,9], [6,13], [10,11],
 >         args -> CallFuncList(CheckFindStdGens_SU, args));
 [ true, true, true, true, true, true, true, true, true, true, true, true ]
 
+# Odd degree: SU(5,q) has no GoingDown, SU(7,q) one step to SU(6,q), and
+# the last GoingUp step adds the generators x, y of odd degree.
+gap> List([[5,3], [5,5], [5,9], [5,27], [7,3], [7,9], [9,5], [11,3],
+>          [13,7], [21,3]],
+>         args -> CallFuncList(CheckFindStdGens_SU, args));
+[ true, true, true, true, true, true, true, true, true, true ]
+
+# Even q0 > 2: the final descent and the base case need no involutions.
+gap> List([[4,4], [5,4], [6,4], [7,4], [8,8], [9,8], [12,16], [13,4],
+>          [6,64], [5,256]],
+>         args -> CallFuncList(CheckFindStdGens_SU, args));
+[ true, true, true, true, true, true, true, true, true, true ]
+
 # RECOG.Form_Rewrite must return an SLP in the standard generators for
 # elements of the standard copy
 gap> CheckForm_Rewrite := function(d, q)
@@ -57,7 +72,8 @@ gap> CheckForm_Rewrite := function(d, q)
 >     return ForAll(els, g -> ResultOfStraightLineProgram(
 >                                 RECOG.Form_Rewrite(W, g), std.all) = g);
 > end;;
-gap> ForAll([4, 6, 8], d -> ForAll([3, 5, 9], q -> CheckForm_Rewrite(d, q)));
+gap> ForAll([4 .. 9], d -> ForAll([3, 4, 5, 8, 9, 16],
+>                                   q -> CheckForm_Rewrite(d, q)));
 true
 
 # ClassicalNatural makes natural SU(d,q) a PSU leaf, also with scalars of
@@ -88,6 +104,33 @@ gap> ForAll([1 .. 5], function(i)
 >                SLPforElement(ri, Z(9)^i * x), NiceGens(ri)), x);
 > end);
 true
+gap> S := SU(7, 3)^PseudoRandom(GL(7, 9));;
+gap> ri := Leaf(RECOG.TestGroup(S, false, Size(S)));;
+gap> ri!.fhmethsel.successMethod;
+"ClassicalNatural"
+gap> ForAll([1 .. 5], function(i)
+>     local x;
+>     x := PseudoRandom(S);
+>     return IsScalarMultiple(ResultOfStraightLineProgram(
+>                SLPforElement(ri, Z(9)^i * x), NiceGens(ri)), x);
+> end);
+true
+gap> S := SU(6, 4)^PseudoRandom(GL(6, 16));;
+gap> ri := Leaf(RECOG.TestGroup(S, false, Size(S)));;
+gap> ri!.fhmethsel.successMethod;
+"ClassicalNatural"
+gap> ForAll([1 .. 5], function(i)
+>     local x;
+>     x := PseudoRandom(S);
+>     return IsScalarMultiple(ResultOfStraightLineProgram(
+>                SLPforElement(ri, Z(16)^i * x), NiceGens(ri)), x);
+> end);
+true
+gap> Leaf(RECOG.TestGroup(SU(4, 2), false, Size(SU(4, 2))))!.fhmethsel.successMethod;
+"StabilizerChainProj"
+gap> G := Group(List(GeneratorsOfGroup(SU(5, 3)), x -> Z(9)^(2 * Random([0 .. 3])) * x));;
+gap> Leaf(RECOG.TestGroup(G, true, Size(SU(5, 3))))!.fhmethsel.successMethod;
+"ClassicalNatural"
 gap> G := Group(List(GeneratorsOfGroup(SU(4, 5)), x -> Z(25)^(4 * Random([0 .. 5])) * x));;
 gap> Leaf(RECOG.TestGroup(G, true, Size(SU(4, 5)) / 2))!.fhmethsel.successMethod;
 "ClassicalNatural"

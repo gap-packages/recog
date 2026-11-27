@@ -15,13 +15,14 @@
 ##  Constructive membership in classical groups with a form, relative to
 ##  the standard generators of RECOG.ClassicalStandardGenerators and the
 ##  standard basis (e_1, f_1, ..., e_m, f_m), followed by the anisotropic
-##  part for orthogonal groups of type - or o: a straight line program for
-##  an element, by Gaussian elimination as in Costi (PhD thesis, Queen
-##  Mary, University of London, 2009). Each step clears the images of e_1
-##  and f_1 with RECOG.Form_MapToStd and RECOG.Form_MapToF1FixingE1 (see
-##  GoingUp.gi), which use only root elements on the first pair and one
-##  other pair or the anisotropic part, whose words the root element record
-##  caches across calls. For SL see SL/Rewrite.gi.
+##  part for orthogonal groups of type - or o and for SU of odd degree: a
+##  straight line program for an element, by Gaussian elimination as in
+##  Costi (PhD thesis, Queen Mary, University of London, 2009). Each step
+##  clears the images of e_1 and f_1 with RECOG.Form_MapToStd and
+##  RECOG.Form_MapToF1FixingE1 (see GoingUp.gi), which use only root
+##  elements on the first pair and one other pair or the anisotropic part,
+##  whose words the root element record caches across calls. For SL see
+##  SL/Rewrite.gi.
 ##
 #############################################################################
 
@@ -158,6 +159,8 @@ RECOG.Form_RewriteSetup := function(type, d, f)
   Y := GeneratorsWithMemory(List(std.all, x -> ()));
   if type = "Sp" then
     R := RECOG.Sp_RootElements(Y, d, f);
+  elif type = "SU" and IsOddInt(d) then
+    R := RECOG.SU_RewriteRootElements(Y, d, f);
   elif type = "SU" then
     R := RECOG.SU_RootElements(Y, d, f);
   elif type in RECOG.OrthogonalTypes then
@@ -174,8 +177,14 @@ RECOG.Form_RewriteSetup := function(type, d, f)
     res.pairs := R.aniso.pairs;
   fi;
 
-  # a word acting as diag(c, c^-1) on the second pair, and c
-  if type = "SU" then
+  # a word acting as diag(c, c^-1) on the second pair, and c; for SU of
+  # odd degree y^u, which acts as diag(c, c^-q0) on it and as c^(q0-1) on
+  # w_1, with c = gamma
+  if type = "SU" and IsOddInt(d) then
+    res.deltau := Y[7]^Y[4];
+    res.deltaumat := RECOG.Form_RewriteBlock(std.y^std.u);
+    res.gamma0 := Z(Size(f));
+  elif type = "SU" then
     # delta^u
     res.deltau := Y[3]^Y[4];
     res.deltaumat := RECOG.Form_RewriteBlock(std.delta^std.u);
@@ -226,8 +235,10 @@ end;
 # part. The exception is the torus, which also scales the second pair
 # (y of SU, delta+ of the orthogonal groups). That pair is a cleared one
 # only in the last step, which therefore leaves diag(c, c^-1) on it, a
-# power of W.deltau. For "O-" the anisotropic part is left with an element
-# of Omega^-(2), a power of W.rot.word; for "O" g fixes w_1, as det g = 1.
+# power of W.deltau; for SU of odd degree diag(c, c^-q0) on it and
+# c^(q0-1) on w_1, as det g = 1. For "O-" the anisotropic part is left with
+# an element of Omega^-(2), a power of W.rot.word; for "O" g fixes w_1, as
+# det g = 1.
 # The root elements act on the columns of g, so the steps work on the
 # transpose gT, where they are row operations of O(d) field operations
 # each, and v is monomial: a step costs O(d^2).

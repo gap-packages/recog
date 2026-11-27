@@ -12,15 +12,71 @@
 ##  SPDX-License-Identifier: GPL-3.0-or-later
 ##
 ##
-##  Recognition of SU(4,q) and FinalDescent for special unitary groups,
-##  q odd. The recognition of SU(4,q) adapts the algorithm CRecogniseSp4 of
+##  Recognition of SU(4,q) and FinalDescent for special unitary groups.
+##  The recognition of SU(4,q) adapts the algorithm CRecogniseSp4 of
 ##  [Bro08] (doc/recog.bib), Section 4. [DR] is D. Rademacher,
 ##  "Constructive recognition of finite classical groups with stingray
 ##  elements", PhD thesis, RWTH Aachen University (2024).
 ##
 #############################################################################
 
-# Constructive recognition of SU(4,q), q odd, in its natural representation.
+# For SU(4,q), q even, in RECOG.FindStdGensSU4: an element t whose
+# characteristic polynomial is a linear factor times an irreducible cubic
+# acts on a non-degenerate line <w> and on w^perp, where it lies in a
+# cyclic torus of order q^3+1; so g = t^(q^2-q+1) is a scalar mu on w^perp.
+# For random r, g and g^r preserve E1 = <w, wr> and act as mu on E1^perp,
+# so their commutators act on E1 and fix E1^perp, and those of the normal
+# closure of [g, g^r] in <g, g^r> often generate SU(E1) = SL(2,q). This
+# follows the base cases of degree 3 and 4 of Dietrich, Leedham-Green,
+# Luebeck and O'Brien (J. Algebra 391 (2013), Remark 5.7).
+# <h> is the group with memory, <pr> a product replacer for it, <form> its
+# form. Returns a record with components `gens`, elements of h which
+# generate SU(E1) on E1 and fix E1^perp, and `B`, a basis b1, b2, b3, b4
+# with hyperbolic pairs b1, b4 of E1 and b2, b3 of E1^perp.
+RECOG.SU4_SU2Even := function(h, pr, form, f)
+  local q, fq, R, t, fac, lin, g, r, gr, E1, E2, B, Bi, c, gens, mats;
+
+  q := RootInt(Size(f), 2);
+  fq := GF(q);
+  R := PolynomialRing(f);
+  while true do
+    t := Next(pr);
+    fac := Factors(R, CharacteristicPolynomial(f, f, StripMemory(t)));
+    if SortedList(List(fac, Degree)) <> [1, 3] then
+      continue;
+    fi;
+    g := t^(q^2 - q + 1);
+    if RECOG.IsScalarMat(StripMemory(g)) then
+      continue;
+    fi;
+    lin := First(fac, x -> Degree(x) = 1);
+    r := PseudoRandom(h);
+    E1 := NullspaceMat(StripMemory(t) + Value(lin, Zero(f))
+                       * One(StripMemory(t)));
+    E1 := [E1[1], E1[1] * StripMemory(r)];
+    if RankMat(RECOG.FormGram(form, E1)) < 2 then
+      continue;
+    fi;
+    E1 := RECOG.FormHyperbolicPair(form, E1);
+    E2 := NullspaceMat(form.gram
+                       * TransposedMat(RECOG.FormConjugate(form, E1)));
+    B := Concatenation([E1[1]], RECOG.FormHyperbolicPair(form, E2), [E1[2]]);
+    ConvertToMatrixRep(B, f);
+    Bi := B^-1;
+    gr := g^r;
+    c := Comm(g, gr);
+    gens := [c, c^g, c^gr, c^(g * gr)];
+    mats := List(gens, x -> (B * StripMemory(x) * Bi){[1, 4]}{[1, 4]});
+    if IsSubset(fq, FieldOfMatrixList(mats))
+       and RECOG.GeneratesSL2(List(mats, x -> ImmutableMatrix(fq, x)),
+                              fq) then
+      return rec( gens := gens, B := B );
+    fi;
+  od;
+end;
+
+# Constructive recognition of SU(4,q), q <> 2, in its natural
+# representation.
 #
 # The plan is that of [Bro08], Sections 4.1 to 4.3, for Sp(4,q), as in
 # RECOG.FindStdGensSp4: the centraliser of an involution j <> -1 by Bray's
@@ -49,6 +105,11 @@
 # the SL(2,q) from ppd elements and Q(b) from two SU(3,q) subgroups. It
 # assumes q >= 16, and recog has no SU(3,q) recognition.
 #
+# For q even there is no involution with two eigenspaces: K1 and E1 come
+# from RECOG.SU4_SU2Even, and Q(b) from the centraliser of a transvection
+# of K1 (see MakeQ), as [EHNPR] sketches in its remark on the routes of
+# the final descent, case (5).
+#
 # <gens> must generate SU(4,q) as matrices over <f> = GF(q^2).
 # Returns a record with the following components:
 #  - `slp`: SLP in <gens> whose i-th result is bas^-1 * std[i] * bas for
@@ -64,48 +125,58 @@ RECOG.FindStdGensSU4 := function(gens, f)
   ext := DegreeOverPrimeField(f);
   e := ext / 2;
   w := PrimitiveRoot(f);
-  alpha := w^((q+1)/2);   # alpha^q = -alpha
+  alpha := RECOG.UnitaryAlpha(f);   # alpha^q = -alpha
   fq := GF(q);
   form := RECOG.ClassicalInvariantForm("SU", gens, f);
   h := GroupWithMemory(gens);
   ord := m -> Order(StripMemory(m));
   pr := ProductReplacer(GeneratorsOfGroup(h));
 
-  repeat
-    j := RECOG.InvolutionSearcher(pr, ord, 100);
-  until j <> fail and not IsOne(-StripMemory(j));
-
-  # the basis b1, b2, b3, b4 has the antidiagonal Gram matrix of SU(4,q)
-  # in GAP; (v,b_i) is the entry 5-i of v on it
-  B := RECOG.FormHyperbolicPair(form, RECOG.FixspaceMat(-StripMemory(j)));
-  B := Concatenation([B[1]], RECOG.FormHyperbolicPair(form,
-                         RECOG.FixspaceMat(StripMemory(j))), [B[2]]);
-  ConvertToMatrixRep(B, f);
-  Bi := B^-1;
-  InB := g -> B * StripMemory(g) * Bi;
-
-  # K1 consists of the matrices over GF(q) on the basis b1, alpha*b4 of E1.
-  # For an element c = (A1, A2) of the centraliser of j, c^|A2| is in K1.
-  # For small q it is often central, as |A1| divides |A2|; K1 is normal in
-  # the centraliser, so a conjugate by c of an element found before is used
-  # instead.
+  # K1 consists of the matrices over GF(q) on the basis b1, alpha*b4 of E1
   D := DiagonalMat([One(f), alpha]);
   Di := D^-1;
   OnE1 := xb -> ImmutableMatrix(fq, D * xb{[1,4]}{[1,4]} * Di);
-  k1 := [];
-  k1mats := [];
-  repeat
-    c := RECOG.CentralisingElementOfInvolution(pr, ord, j);
-    k := c^Order(InB(c){[2,3]}{[2,3]});
-    if RECOG.IsScalarMat(OnE1(InB(k))) then
-      if k1 = [] then
-        continue;
+
+  if IsEvenInt(q) then
+    k1 := RECOG.SU4_SU2Even(h, pr, form, f);
+    B := k1.B;
+    k1 := k1.gens;
+    Bi := B^-1;
+    InB := g -> B * StripMemory(g) * Bi;
+    k1mats := List(k1, x -> OnE1(InB(x)));
+  else
+    repeat
+      j := RECOG.InvolutionSearcher(pr, ord, 100);
+    until j <> fail and not IsOne(-StripMemory(j));
+
+    # the basis b1, b2, b3, b4 has the antidiagonal Gram matrix of SU(4,q)
+    # in GAP; (v,b_i) is the entry 5-i of v on it
+    B := RECOG.FormHyperbolicPair(form, RECOG.FixspaceMat(-StripMemory(j)));
+    B := Concatenation([B[1]], RECOG.FormHyperbolicPair(form,
+                           RECOG.FixspaceMat(StripMemory(j))), [B[2]]);
+    ConvertToMatrixRep(B, f);
+    Bi := B^-1;
+    InB := g -> B * StripMemory(g) * Bi;
+
+    # For an element c = (A1, A2) of the centraliser of j, c^|A2| is in K1.
+    # For small q it is often central, as |A1| divides |A2|; K1 is normal
+    # in the centraliser, so a conjugate by c of an element found before is
+    # used instead.
+    k1 := [];
+    k1mats := [];
+    repeat
+      c := RECOG.CentralisingElementOfInvolution(pr, ord, j);
+      k := c^Order(InB(c){[2,3]}{[2,3]});
+      if RECOG.IsScalarMat(OnE1(InB(k))) then
+        if k1 = [] then
+          continue;
+        fi;
+        k := k1[Length(k1)]^c;
       fi;
-      k := k1[Length(k1)]^c;
-    fi;
-    Add(k1, k);
-    Add(k1mats, OnE1(InB(k)));
-  until Length(k1) >= 2 and RECOG.GeneratesSL2(k1mats, fq);
+      Add(k1, k);
+      Add(k1mats, OnE1(InB(k)));
+    until Length(k1) >= 2 and RECOG.GeneratesSL2(k1mats, fq);
+  fi;
   sl2 := RECOG.RecogniseSL2Natural(Group(GeneratorsWithMemory(k1mats)), fq);
   k1std := ResultOfStraightLineProgram(SLPOfElms(sl2.all), k1);
   fake := RECOG.InitSLfake(fq, 2);
@@ -121,6 +192,11 @@ RECOG.FindStdGensSU4 := function(gens, f)
   # on <b,bg> and 1 on its complement for a Weyl element n. Modulo Q(b), j
   # is central in the stabiliser of <b>, and j acts as -1 on Q(b)/T, so
   # [n^2,j] is in Q(b), and outside T unless <b,bg> = E1.
+  # For q even, n^2 = 1 and there is no such j. There t1 in T is an
+  # involution, whose centraliser lies in the stabiliser of <b>; write an
+  # element of it as c = x l, x in Q(b), l in the Levi factor which contains
+  # the torus element z of K1. As z commutes with l and acts on Q(b)/T as a
+  # scalar other than 1, [c, z] lies in Q(b), and outside T unless x does.
   cb := CanonicalBasis(f);
   MakeQ := function(pos)
     local pos2, Lam, t1, z, U, vecs, g, gb, kappa, t2, n, u, l, i;
@@ -136,19 +212,23 @@ RECOG.FindStdGensSU4 := function(gens, f)
     U := [];
     vecs := [];
     while Length(U) < 2*ext do
-      g := PseudoRandom(h);
-      gb := InB(g);
-      kappa := gb[pos,pos2];
-      if IsZero(kappa) then
-        continue;
-      fi;
+      if IsEvenInt(q) then
+        u := Comm(RECOG.CentralisingElementOfInvolution(pr, ord, t1), z);
+      else
+        g := PseudoRandom(h);
+        gb := InB(g);
+        kappa := gb[pos,pos2];
+        if IsZero(kappa) then
+          continue;
+        fi;
 
-      # on the basis b, bg/kappa of <b,bg>, n = [[0,beta],[-1/beta,0]] for
-      # beta = alpha*kappa^(q+1)
-      t2 := IdentityMat(4, f);
-      t2[pos2,pos] := -1 / (alpha * kappa^(q+1));
-      n := g^-1 * t1 * g * InK1(t2) * g^-1 * t1 * g;
-      u := Comm(n^2, j);
+        # on the basis b, bg/kappa of <b,bg>, n = [[0,beta],[-1/beta,0]]
+        # for beta = alpha*kappa^(q+1)
+        t2 := IdentityMat(4, f);
+        t2[pos2,pos] := -1 / (alpha * kappa^(q+1));
+        n := g^-1 * t1 * g * InK1(t2) * g^-1 * t1 * g;
+        u := Comm(n^2, j);
+      fi;
       for i in [1..e] do
         l := Lam(InB(u));
         if RankMat(Concatenation(vecs, [l])) > Length(vecs) then
@@ -203,12 +283,81 @@ RECOG.FindStdGensSU4 := function(gens, f)
   return rec( slp := SLPOfElms(res), bas := B );
 end;
 
+# The FinalDescent for SU(d,q0), d = 5 or 6, q0 >= 4 even, with the same
+# input and output as RECOG.SU_FinalDescent. The p'-parts of random
+# elements give elements j of odd order whose support im(j-1) is a
+# non-degenerate plane D. Two of them, with D_1 + D_2 non-degenerate of
+# dimension 4, act on that space W and fix W^perp; their restrictions to W
+# generate SU(W) with a probability bounded below for q0 > 4 by
+# Praeger, Seress and Yalcinkaya (J. Group Theory 9 (2006)), as cited by
+# Dietrich, Leedham-Green, Luebeck and O'Brien (J. Algebra 391 (2013),
+# Theorem 5.1, the case l = 2 of their FirstSX); the naming test checks it.
+# [EHNPR] sketches this route in its remark on the routes of the final
+# descent, case (5).
+RECOG.SU_FinalDescentEven := function(gens, f)
+  local d, h, form, plane, a, b, W, Wperp, H4, su4;
+
+  d := NrRows(gens[1]);
+  h := GroupWithMemory(gens);
+  form := RECOG.ClassicalInvariantForm("SU", gens, f);
+
+  # an element j of odd prime power order with a non-degenerate plane as
+  # support, as a record with components `j` and `D`, a basis of the plane
+  plane := function()
+    local t, o, r, j, D;
+    while true do
+      t := PseudoRandom(h);
+      o := Order(StripMemory(t));
+      for r in Set(Factors(o)) do
+        if r = 2 then
+          continue;
+        fi;
+        j := t^(o / r^Number(Factors(o), x -> x = r));
+        D := StripMemory(j) - One(StripMemory(j));
+        if RankMat(D) = 2 then
+          D := BaseMat(D);
+          if RankMat(RECOG.FormGram(form, D)) = 2 then
+            return rec( j := j, D := D );
+          fi;
+        fi;
+      od;
+    od;
+  end;
+
+  Info(InfoRecog_ClassicalNatural, 1, "SU_n: base case SU(4,",
+       RootInt(Size(f), 2), ")");
+  while true do
+    a := plane();
+    b := plane();
+    W := Concatenation(a.D, b.D);
+    if RankMat(W) < 4 or RankMat(RECOG.FormGram(form, W)) < 4 then
+      continue;
+    fi;
+    H4 := List([a.j, b.j], j -> List(W * StripMemory(j),
+                                       v -> SolutionMat(W, v)));
+    Perform(H4, function(x) ConvertToMatrixRep(x, f); end);
+    if FieldOfMatrixList(H4) = f and RecogniseClassical(Group(H4),
+           rec(case := "unitary")).isSUContained = true then
+      break;
+    fi;
+  od;
+  Wperp := NullspaceMat(form.gram
+                        * TransposedMat(RECOG.FormConjugate(form, W)));
+  su4 := RECOG.FindStdGensSU4(H4, f);
+  return rec( slp := CompositionOfStraightLinePrograms(su4.slp,
+                         SLPOfElms([a.j, b.j])),
+              bas := Concatenation(su4.bas * W, Wperp) );
+end;
+
 # FinalDescent of [EHNPR] (see ../GoingDown.gi; 'Terminal groups and
-# initial groups', 'The final descent') for SU, q0 odd: <gens> are 6x6
-# matrices generating SU(6,q0) over <f> = GF(q0^2). The centraliser of an
-# involution with eigenspaces of dimension 4 and 2 contains SU(4,q0) on
-# the first; elements of it, powered to act trivially on the second,
-# generate it.
+# initial groups', 'The final descent') for SU: <gens> are d x d
+# matrices generating SU(d,q0) over <f> = GF(q0^2), d = 6 or 5. The
+# centraliser of an involution with eigenspaces of dimension 4 and d-4
+# contains SU(4,q0) on the first; elements of it, powered to act trivially
+# on the second, generate it. SU(5,q0) is below the terminal degree of
+# [EHNPR], which cites Brooksbank (LMS J. Comput. Math. 6 (2003)) for it;
+# here it takes this descent and one GoingUp step. For q0 even this calls
+# RECOG.SU_FinalDescentEven.
 # [EHNPR] leaves the final descent open, with [LGO09] as a reference
 # solution. This follows the route of [DR] which [EHNPR] sketches in that
 # section: Algorithm 16 of [DR] (Section 5.1.3, after [LGO09], Sections 8,
@@ -217,18 +366,23 @@ end;
 # pairs of powered elements instead of accumulating them.
 # Returns a record with the following components:
 #  - `slp`: SLP in <gens> for the standard generators of an SU(4,q0)
-#  - `bas`: a 6x6 matrix whose first four rows are a standard basis
+#  - `bas`: a d x d matrix whose first four rows are a standard basis
 #    (e1,f1,e2,f2), for a scalar multiple of the form, of the space on
-#    which this SU(4,q0) acts and whose last two span its fixed space;
+#    which this SU(4,q0) acts and whose last d-4 span its fixed space;
 #    relative to bas the standard generators are those of
 #    RECOG.ClassicalStandardGenerators("SU",4,<f>), extended by the
-#    identity on the last two rows
+#    identity on the last d-4 rows
 RECOG.SU_FinalDescent := function(gens, f)
-  local q, q0, h, isNamed, pr, invo, plus, minus, four, two, newbasis,
+  local d, q, q0, h, isNamed, pr, invo, plus, minus, four, two, newbasis,
         cent, x, y, H4, su4;
 
-  if NrRows(gens[1]) <> 6 then
-    ErrorNoReturn("RECOG.SU_FinalDescent: <gens> must be 6x6 matrices");
+  d := NrRows(gens[1]);
+  if not d in [5, 6] then
+    ErrorNoReturn("RECOG.SU_FinalDescent: <gens> must be 5x5 or 6x6 ",
+                  "matrices");
+  fi;
+  if IsEvenInt(Size(f)) then
+    return RECOG.SU_FinalDescentEven(gens, f);
   fi;
 
   q := Size(f);
@@ -240,15 +394,18 @@ RECOG.SU_FinalDescent := function(gens, f)
 
   # As q0 is odd, an involution is diagonalisable with eigenvalues 1 and
   # -1, and its determinant 1 makes the dimension of the (-1)-eigenspace
-  # even. So an involution other than -1 has eigenspaces of dimension 4
-  # and 2, which are orthogonal.
+  # even. So for d = 6 an involution other than -1 has eigenspaces of
+  # dimension 4 and 2, which are orthogonal; for d = 5 that of -1 must
+  # have dimension 4, not 2.
   Info(InfoRecog_ClassicalNatural,1,"SU_n: base case SU(4,",q0,")");
   pr := ProductReplacer(GeneratorsOfGroup(h));
   repeat
     invo := RECOG.InvolutionSearcher(pr, g -> Order(StripMemory(g)), 100);
-  until invo <> fail and not IsOne(-StripMemory(invo));
-  plus := RECOG.FixspaceMat(StripMemory(invo));
-  minus := RECOG.FixspaceMat(-StripMemory(invo));
+    if invo <> fail then
+      plus := RECOG.FixspaceMat(StripMemory(invo));
+      minus := RECOG.FixspaceMat(-StripMemory(invo));
+    fi;
+  until invo <> fail and 4 in [Length(plus), Length(minus)];
   if Length(plus) = 4 then
     four := plus;
     two := minus;
@@ -263,7 +420,8 @@ RECOG.SU_FinalDescent := function(gens, f)
               RECOG.ProjectiveOrder, invo, 8));
   repeat
     x := [PseudoRandom(cent), PseudoRandom(cent)];
-    y := List(x, g -> g^Order((newbasis * StripMemory(g) * newbasis^-1){[5,6]}{[5,6]}));
+    y := List(x, g -> g^Order((newbasis * StripMemory(g)
+                                * newbasis^-1){[5 .. d]}{[5 .. d]}));
     H4 := List(y, g -> (newbasis * StripMemory(g) * newbasis^-1){[1..4]}{[1..4]});
   until isNamed(H4);
 

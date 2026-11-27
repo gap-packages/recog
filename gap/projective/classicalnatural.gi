@@ -583,18 +583,20 @@ RECOG.ClassicalNaturalCoset := function(data,g)
   if mu = fail then
       return fail;
   fi;
+  # for SU, mu lies in GF(q0), whose elements are norms; q may be even
+  if data.type = "SU" then
+      z := PrimitiveRoot(f);
+      q0 := form.frob;
+      lambda := z^(LogFFE(mu^-1,z) / (q0+1));
+      c := LogFFE((lambda^data.d * DeterminantMat(g))^-1,z^(q0-1));
+      return [c mod data.order];
+  fi;
   v := [0,0];
   if not RECOG.IsSquareFFE(mu,q) then
       v[1] := 1;
   fi;
   if data.type = "Sp" then
       return v{[1]};
-  elif data.type = "SU" then
-      z := PrimitiveRoot(f);
-      q0 := form.frob;
-      lambda := z^(LogFFE(mu^-1,z) / (q0+1));
-      c := LogFFE((lambda^data.d * DeterminantMat(g))^-1,z^(q0-1));
-      return [c mod data.order];
   elif data.layer = 1 then
       if DeterminantMat(g) <> mu^(data.d/2) then
           v[2] := 1;
@@ -735,16 +737,17 @@ RECOG.ClassicalNaturalGroupWithMemory := function(ri,gens,changed)
 end;
 
 # ClassicalNatural for <ri> containing PSp(d,q), PSU(d,q0) or
-# POmega(d,q), d even for Sp and SU, at least 6 for Sp with q even and at
-# least 8 for Omega, q odd except for Sp and Omega^+-(d,q), as <classical>
-# of RecogniseClassical says; <type> is
-# "Sp", "SU" or "O", which stands for all orthogonal types here. The
-# generators are scaled into Sp(d,q), SU(d,q0) or Omega(d,q). That needs
-# similarity factors that are squares for Sp and Omega, determinants that
-# scalars can bring to 1 for SU, and for Omega determinant 1 and spinor
-# norm 1 up to the sign, resp. for q even a common quadratic form and
-# Dickson invariant 0; for a conformal symplectic group, a unitary group
-# with other determinants, SO(d,q) or O^+-(d,q), the method does not apply.
+# POmega(d,q), d even for Sp, at least 4 for SU, at least 6 for Sp with
+# q even and at least 8 for Omega, q odd except for Sp, for SU with
+# q0 <> 2 and for Omega^+-(d,q), as <classical> of RecogniseClassical
+# says; <type> is "Sp", "SU" or "O", which stands for all orthogonal types
+# here. The generators are scaled into Sp(d,q), SU(d,q0) or Omega(d,q).
+# That needs similarity factors that are squares for Sp and Omega,
+# determinants that scalars can bring to 1 for SU, and for Omega
+# determinant 1 and spinor norm 1 up to the sign, resp. for q even a
+# common quadratic form and Dickson invariant 0; for a conformal
+# symplectic group, a unitary group with other determinants, SO(d,q) or
+# O^+-(d,q), the method does not apply.
 RECOG.ClassicalNaturalForm := function(ri,classical,type)
   local d,f,q,form,gens,changed,i,lambda,std,m,q0,gcd,size,eps;
   d := ri!.dimension;
@@ -878,8 +881,7 @@ function(ri)
   # Sp(2,q) = SL(2,q) is left to the code for SL_2 below
   if d > 2 and classical.isSpContained = true and (IsOddInt(q) or d >= 6) then
       return RECOG.ClassicalNaturalForm(ri,classical,"Sp");
-  elif classical.isSUContained = true and IsOddInt(q) and IsEvenInt(d)
-       then
+  elif classical.isSUContained = true and q <> 4 and d >= 4 then
       return RECOG.ClassicalNaturalForm(ri,classical,"SU");
   elif classical.isOmegaContained = true and d >= 8
        and (IsOddInt(q) or IsEvenInt(d)) then
