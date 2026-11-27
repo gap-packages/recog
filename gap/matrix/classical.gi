@@ -1932,26 +1932,24 @@ function(recognise)
             return NeverApplicable;
         fi;
     elif d = 3 and q = 9 then
-        if not HasElementsMultipleOf(recognise.orders, [7]) then
+        ## Only the current element can be the special one, so test each
+        ## element. Projective order: a scalar of order 8 can make the power
+        ## of an element of order 6 by half its matrix order a scalar
+        if recognise.hasSpecialEle = false then
+            order := ProjectiveOrder(recognise.g)[1];
+            if order mod 6 = 0 and
+               not IsCentral(grp, recognise.g ^ (order / 2)) then
+                Info( InfoRecog_ClassicalNaming,2,
+                      "Found an element of projective order divisible by 6",
+                      " such that the corresponding involution is not central." );
+                recognise.hasSpecialEle := true;
+            fi;
+        fi;
+        if recognise.hasSpecialEle = false or
+           not HasElementsMultipleOf(recognise.orders, [7]) then
             return TemporaryFailure;
         fi;
-        if recognise.hasSpecialEle = false then
-            order := Order( recognise.g );
-            if not order mod 6 = 0 then
-                return TemporaryFailure;
-            fi;
-            if not IsCentral(grp, recognise.g ^ (order / 2)) then
-                Info( InfoRecog_ClassicalNaming,2,
-                      "Found an element of order divisible by 6 such",
-                      " that the corresponding involution is not central." );
-                recognise.hasSpecialEle := true;
-                return CheckFlag();
-            else
-                return TemporaryFailure;
-            fi;
-        else
-            return CheckFlag();
-        fi;
+        return CheckFlag();
     elif d = 3 and q = 16 then
         if not HasElementsMultipleOf(recognise.orders, [5,13]) then
             return TemporaryFailure;
