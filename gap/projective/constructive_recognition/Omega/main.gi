@@ -18,12 +18,12 @@
 #############################################################################
 
 # StandardGenerators of [EHNPR] (see ../GoingDown.gi), 'Outline of the
-# algorithm', for Omega^+-(d,q), d >= 8 even, and Omega(d,q), d >= 9 odd, q
-# odd: GoingDown to Omega^+-(8,q), FinalDescent to Omega^+(6,q), and GoingUp
-# (see ../GoingUp.gi). The type comes from the parity of d and the
-# discriminant of the invariant form. A FinalDescent which uses up its
-# random selections restarts GoingDown, which has no naming test. [EHNPR]
-# also covers even q.
+# algorithm', for Omega^+-(d,q), d >= 8 even, and Omega(d,q), d >= 9 odd
+# and q odd: GoingDown to Omega^+-(8,q), FinalDescent to Omega^+(6,q), and
+# GoingUp (see ../GoingUp.gi). The type comes from the parity of d and the
+# discriminant resp., for q even, the Arf invariant of the invariant form.
+# A FinalDescent which uses up its random selections restarts GoingDown,
+# which has no naming test.
 # Returns a record with the following components:
 #  - `type`: "O+", "O-" or "O"
 #  - `slpstd`: SLP in the generators of <G> for the standard generators of
@@ -36,8 +36,8 @@ RECOG.FindStdGens_Omega := function(G)
 
   f := FieldOfMatrixGroup(G);
   d := DimensionOfMatrixGroup(G);
-  if IsEvenInt(Size(f)) then
-    ErrorNoReturn("RECOG.FindStdGens_Omega: q must be odd");
+  if IsEvenInt(Size(f)) and IsOddInt(d) then
+    ErrorNoReturn("RECOG.FindStdGens_Omega: odd degree needs odd q");
   fi;
   if d < 8 then
     ErrorNoReturn("RECOG.FindStdGens_Omega: the degree must be at least 8");
@@ -68,8 +68,7 @@ RECOG.FindStdGens_Omega := function(G)
     Info(InfoRecog_ClassicalNatural, 1, "Omega_n: base case O+(6,",
          Size(f), ")");
     init := RECOG.Omega_FinalDescent(down.gens, f,
-                rec( gram := RECOG.FormGram(form, B8), frob := 1, field := f ),
-                RECOG.GoingDownRandomBound);
+                RECOG.FormRestriction(form, B8), RECOG.GoingDownRandomBound);
   until init <> fail;
   slp := CompositionOfStraightLinePrograms(init.slp, down.slp);
   bas := Concatenation(init.bas * B8, down.bas{[9 .. d]});
