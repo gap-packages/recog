@@ -57,6 +57,10 @@ RECOG.FindStdGens_Omega := function(G)
     type := RECOG.FormOrthogonalType(
                 RECOG.ClassicalInvariantForm("O+", gens, f), IdentityMat(d, f));
   fi;
+  # Omega^+(4,q) is the central product of two SL(2,q), acting irreducibly
+  # as the tensor product of their natural modules. It is not quasisimple,
+  # so it is no leaf: the tree splits it by that tensor decomposition into
+  # two PSL(2,q).
   if d = 4 and type = "O+" then
     ErrorNoReturn("RECOG.FindStdGens_Omega: Omega^+(4,q) is not supported");
   elif d < 5 then
