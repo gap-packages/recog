@@ -282,8 +282,11 @@ RECOG.Omega_FinalDescent := function(gens, f, form, N)
     fi;
 
     base := RECOG.FindStdGensOmega6(H6, form6, f);
+    # [s, j] = [h^B, j] in [h, j]; s itself has no memory
     return rec( slp := CompositionOfStraightLinePrograms(base.slp,
-                           SLPOfElms([r.element, j])),
+                           CompositionOfStraightLinePrograms(
+                               StraightLineProgram([[[1, r.exponent], [2, 1]]], 2),
+                               SLPOfElms([r.candidate, j]))),
                 bas := Concatenation(base.bas * sum, tail) );
   od;
   return fail;
