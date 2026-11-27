@@ -516,5 +516,118 @@ gap> ForAll([["Sp", 4, 3], ["Sp", 4, 2], ["SU", 4, 3], ["SU", 5, 3],
 >           c -> CallFuncList(CheckKrylovVector, c));
 true
 
+# RECOG.Form_UnitaryNormRoot for N = s s^dagger with s divisible by a
+# factor f = f^dagger of chi, so that N is no unit: p p^dagger = N modulo
+# chi. Then the polynomial of RECOG.Form_IsotropicKrylovVector for
+# c = c0 f(h), which is not cyclic: fail, or p with the conditions on
+# e = c p(h), and e, e h, ..., e h^(k-1) linearly independent.
+gap> CheckUnitaryNormRoot := function(d, q)
+>     local F, R, G, dagger, good, i, chi, f, s, N, p;
+>     F := GF(q^2);
+>     R := PolynomialRing(F, 1);
+>     G := Group(RECOG.ClassicalStandardGenerators("SU", d, F).all);
+>     dagger := function(a, chi)
+>       local y, r, i;
+>       y := RECOG.PolInverseMod(RECOG.Pol(F, [Zero(F), One(F)]), chi);
+>       r := [];
+>       for i in [Length(a), Length(a) - 1 .. 1] do
+>         r := RECOG.PolSum(RECOG.PolProductMod(r, y, chi),
+>                           RECOG.Pol(F, [a[i]^q]));
+>       od;
+>       return r;
+>     end;
+>     good := 0;
+>     for i in [1 .. 100] do
+>       chi := CharacteristicPolynomial(PseudoRandom(G));
+>       if DegreeOfLaurentPolynomial(Gcd(chi, Derivative(chi))) > 0 then
+>         continue;
+>       fi;
+>       f := List(Factors(R, chi), CoefficientsOfUnivariatePolynomial);
+>       f := Filtered(f, cf -> Reversed(List(cf, y -> y^q)) / cf[1]^q = cf);
+>       chi := RECOG.Pol(F, CoefficientsOfUnivariatePolynomial(chi));
+>       if Length(f) = 0 then
+>         continue;
+>       fi;
+>       s := RECOG.PolProductMod(RECOG.Pol(F, f[1]),
+>              RECOG.Pol(F, List([1 .. Length(chi) - 1], j -> Random(F))), chi);
+>       N := RECOG.PolProductMod(s, dagger(s, chi), chi);
+>       p := RECOG.Form_UnitaryNormRoot(F, chi, N);
+>       if RECOG.PolProductMod(p, dagger(p, chi), chi) <> N then
+>         return false;
+>       fi;
+>       good := good + 1;
+>       if good >= 10 then
+>         return true;
+>       fi;
+>     od;
+>     return false;
+> end;;
+gap> ForAll([[4, 3], [5, 3], [6, 5], [7, 7], [6, 17]],
+>           c -> CallFuncList(CheckUnitaryNormRoot, c));
+true
+gap> CheckKrylovNonCyclic := function(type, d, q)
+>     local F, form, J, G, name, top, conj, R, good, i, h, chi, facs, c, K,
+>           j, cJ, args, co, e;
+>     F := GF(q);
+>     conj := v -> v;
+>     if type = "SU" then
+>       F := GF(q^2);
+>       conj := v -> List(v, y -> y^q);
+>     fi;
+>     form := RECOG.ClassicalForm(type, d, F);
+>     J := form.gram;
+>     G := Group(RECOG.ClassicalStandardGenerators(type, d, F).all);
+>     name := type;
+>     top := QuoInt(d, 2);
+>     if type in ["O+", "O-"] then
+>       name := "O+";
+>       top := top - 1;
+>     fi;
+>     R := PolynomialRing(F, 1);
+>     good := 0;
+>     for i in [1 .. 40] do
+>       h := PseudoRandom(G);
+>       chi := CharacteristicPolynomial(h);
+>       if DegreeOfLaurentPolynomial(Gcd(chi, Derivative(chi))) > 0
+>          or (IsEvenInt(q) and name in ["Sp", "O+"]
+>              and IsZero(Value(chi, One(F)))) then
+>         continue;
+>       fi;
+>       facs := Factors(R, chi);
+>       if Length(facs) < 2 then
+>         continue;
+>       fi;
+>       c := Random(F^d) * Value(Random(facs), h);
+>       K := [c];
+>       for j in [1 .. d] do
+>         Add(K, K[j] * h);
+>       od;
+>       cJ := c * J;
+>       args := [List(K, y -> cJ * conj(y)), F, chi, name];
+>       if IsBound(form.quad) then
+>         Add(args, c * form.quad * c);
+>       fi;
+>       co := CallFuncList(RECOG.Form_IsotropicKrylovPolynomial, args);
+>       if co = fail then
+>         continue;
+>       fi;
+>       e := co * K{[1 .. Length(co)]};
+>       if ForAny([0 .. top - 1],
+>                 j -> not IsZero(RECOG.FormValue(form, e, e * h^j)))
+>          or IsZero(RECOG.FormValue(form, e, e * h^top))
+>          or (type in RECOG.OrthogonalTypes
+>              and not IsZero(RECOG.FormQuadraticValue(form, e)))
+>          or RankMat(List([0 .. top - 1], j -> e * h^j)) < top then
+>         return false;
+>       fi;
+>       good := good + 1;
+>     od;
+>     return true;
+> end;;
+gap> ForAll([["Sp", 8, 3], ["Sp", 8, 2], ["SU", 6, 3], ["SU", 7, 3],
+>            ["SU", 7, 4], ["O+", 8, 3], ["O", 9, 3], ["O+", 8, 2]],
+>           c -> CallFuncList(CheckKrylovNonCyclic, c));
+true
+
 #
 gap> STOP_TEST("goingup.tst");

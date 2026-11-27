@@ -1135,12 +1135,12 @@ end;
 
 # The polynomial p with p p^dagger = N modulo <chi>, for <F> = GF(q0^2), q0
 # odd, a^dagger = a^sigma(1/x) with sigma: c -> c^q0 on the coefficients,
-# chi = chi^dagger squarefree and N = N^dagger coprime to chi; <chi> and
-# <N> are polynomials in the sense of RECOG.Pol. For a pair of irreducible
-# factors f <> f^dagger of chi, p is N modulo f and 1 modulo f^dagger; for
-# f = f^dagger it is from RECOG.Form_NormPreimage.
+# chi = chi^dagger squarefree and N = N^dagger; <chi> and <N> are
+# polynomials in the sense of RECOG.Pol. For a pair of irreducible factors
+# f <> f^dagger of chi, p is N modulo f and 1 modulo f^dagger; for
+# f = f^dagger it is from RECOG.Form_NormPreimage, or 0 if f divides N.
 RECOG.Form_UnitaryNormRoot := function(F, chi, N)
-  local q0, mods, rems, f, fs;
+  local q0, mods, rems, f, fs, a;
 
   q0 := RootInt(Size(F));
   mods := [];
@@ -1152,10 +1152,13 @@ RECOG.Form_UnitaryNormRoot := function(F, chi, N)
     fs := RECOG.Pol(F, Reversed(List(f, c -> c^q0)));
     fs := fs / fs[Length(fs)];
     Add(mods, f);
-    if fs = f then
-      Add(rems, [RECOG.Form_NormPreimage(F, f, RECOG.PolMod(N, f))]);
+    a := RECOG.PolMod(N, f);
+    if fs = f and Length(a) = 0 then
+      Add(rems, [a]);
+    elif fs = f then
+      Add(rems, [RECOG.Form_NormPreimage(F, f, a)]);
     else
-      Add(rems, [RECOG.PolMod(N, f)]);
+      Add(rems, [a]);
       Add(mods, fs);
       Add(rems, [fs{[Length(fs)]}]);
     fi;
@@ -1202,19 +1205,22 @@ RECOG.Form_IsotropicKrylovVector := function(h, J, F, chi, type, quad...)
     conj := v -> v;
   fi;
 
+  # The conditions on e = c p(h) hold for every c; a cyclic c is needed
+  # only for p to exist. So the rank is tested only when there is no p,
+  # and then a new c is drawn if c is not cyclic.
   repeat
     c := Random(F^n);
     K := [c];
     for i in [1 .. n] do
       Add(K, K[i] * h);
     od;
-  until RankMat(K{[1 .. n]}) = n;
-  cJ := c * J;
-  args := [List(K, y -> cJ * conj(y)), F, chi, type];
-  if Length(quad) > 0 then
-    Add(args, c * quad[1] * c);
-  fi;
-  coeffs := CallFuncList(RECOG.Form_IsotropicKrylovPolynomial, args);
+    cJ := c * J;
+    args := [List(K, y -> cJ * conj(y)), F, chi, type];
+    if Length(quad) > 0 then
+      Add(args, c * quad[1] * c);
+    fi;
+    coeffs := CallFuncList(RECOG.Form_IsotropicKrylovPolynomial, args);
+  until coeffs <> fail or RankMat(K{[1 .. n]}) = n;
   if coeffs = fail then
     return fail;
   fi;
