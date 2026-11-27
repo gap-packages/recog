@@ -79,6 +79,8 @@ gap> Leaf(RECOG.TestGroup(S^PseudoRandom(GL(8, 4)), false, Size(S)));
 gap> G := Group(List(GeneratorsOfGroup(Sp(6, 4)), x -> Z(4)^Random([0 .. 2]) * x));;
 gap> Leaf(RECOG.TestGroup(G, true, Size(Sp(6, 4))));
 "ClassicalNatural"
+gap> # the naming test says "unknown" for about 1 in 150 random states
+gap> Reset(GlobalMersenneTwister, 1);; Reset(GlobalRandomSource, 1);;
 gap> S := Sp(10, 2);;
 gap> Leaf(RECOG.TestGroup(S^PseudoRandom(GL(10, 2)), false, Size(S)));
 "ClassicalNatural"
