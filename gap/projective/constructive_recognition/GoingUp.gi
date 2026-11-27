@@ -23,7 +23,8 @@
 ##  relative to these vectors, extended by the identity on
 ##  T = <v_(n+1), ..., v_d>. With the
 ##  overlap k = 1 for SL and 2 otherwise, it constructs the same for
-##  degree n' = min(2n - k, d), keeping the first n vectors of B:
+##  degree n' = min(2n - k, d), keeping the first n vectors of B, except
+##  for SL in step 5:
 ##
 ##     U = A + P, P = <v_(n-k+1), ..., v_n> the pivot space
 ##     1. t in <Y> whose fixed space on U has dimension k (the seed)
@@ -35,7 +36,9 @@
 ##     4. v_(n+1), ..., v_d := a basis of N, the projection of A g~ to T,
 ##        and fixed vectors of g~ in T (for the types with a form: standard
 ##        bases of N and of its orthogonal complement in T); so W = U + N
-##     5. the standard generators of CL(W) as words in Y and g~
+##     5. the standard generators of CL(W) as words in Y and g~; for SL
+##        mostly relative to a new basis of W, in which a short word in Y
+##        and g~ is almost the long cycle (see SL/GoingUp.gi)
 ##
 ##  For an orthogonal group, CL(U) is Omega^+(n,q), and so is CL(W) unless
 ##  n' = d.
@@ -148,32 +151,132 @@ RECOG.GoingUpPower := function(powers, c)
   return res;
 end;
 
+# A table of the words of one root group for RECOG.GoingUpRootWord, with
+# <words>[k] the root element for the k-th basis vector: `powers[k]` is a
+# list for RECOG.GoingUpPower, and `words` keeps the root elements built
+# so far by the code of their parameter, so that each is one node of the
+# SLP however often it is used.
+RECOG.GoingUpRootTable := words -> rec( powers := List(words, y -> [y]),
+                                        words := rec() );
+
 # The root element for <lambda> in GF(q), as the product of the
 # words[k]^c_k for the coefficients c_k of lambda in <basis>, a basis of
-# GF(q) over GF(p), where words[k] = <powers>[k][1] is the root element for
-# basis[k]; powers[k] is a list for RECOG.GoingUpPower. Root elements in
-# one root group are additive in lambda. Factors with c_k = 0 are left
-# out, and <one> stands for lambda = 0.
-RECOG.GoingUpRootWord := function(powers, basis, lambda, one)
-  local coeffs, res, k, y;
+# GF(q) or a subspace over GF(p), with the words of the table <table> of
+# RECOG.GoingUpRootTable. Root elements in one root group are additive in
+# lambda. Factors with c_k = 0 are left out, and <one> stands for
+# lambda = 0. Returns the word and a code of lambda, an integer in
+# [0 .. q-1] which is 0 for lambda = 0 only: 1 + LogFFE(lambda, z) for z
+# the primitive root of the field of the basis vectors, or, for fields
+# larger than GAP's internal ones, c_1 + c_2 p + c_3 p^2 + ...
+RECOG.GoingUpRootWordCode := function(table, basis, lambda, one)
+  local coeffs, p, code, res, k, y;
 
-  coeffs := List(Coefficients(basis, lambda), IntFFE);
-  res := fail;
-  for k in [1 .. Length(coeffs)] do
-    if coeffs[k] = 0 then
-      continue;
-    fi;
-    y := RECOG.GoingUpPower(powers[k], coeffs[k]);
-    if res = fail then
-      res := y;
-    else
-      res := res * y;
-    fi;
-  od;
-  if res = fail then
-    return one;
+  if IsZero(lambda) then
+    return [one, 0];
   fi;
-  return res;
+  if not IsBound(table.root) then
+    table.root := PrimitiveRoot(DefaultField(BasisVectors(basis)));
+  fi;
+  coeffs := fail;
+  if IsInternalRep(lambda) then
+    code := LogFFE(lambda, table.root) + 1;
+  else
+    coeffs := List(Coefficients(basis, lambda), IntFFE);
+    p := Characteristic(lambda);
+    code := 0;
+    for k in [Length(coeffs), Length(coeffs) - 1 .. 1] do
+      code := code * p + coeffs[k];
+    od;
+  fi;
+
+  if not IsBound(table.words.(code)) then
+    if coeffs = fail then
+      coeffs := List(Coefficients(basis, lambda), IntFFE);
+    fi;
+    res := fail;
+    for k in [1 .. Length(coeffs)] do
+      if coeffs[k] = 0 then
+        continue;
+      fi;
+      y := RECOG.GoingUpPower(table.powers[k], coeffs[k]);
+      if res = fail then
+        res := y;
+      else
+        res := res * y;
+      fi;
+    od;
+    table.words.(code) := res;
+  fi;
+  return [table.words.(code), code];
+end;
+
+# The word of RECOG.GoingUpRootWordCode
+RECOG.GoingUpRootWord := {table, basis, lambda, one} ->
+    RECOG.GoingUpRootWordCode(table, basis, lambda, one)[1];
+
+# The number b of consecutive slots per block of RECOG.GoingUpProduct in
+# degree <n> over GF(<q>), with <k> parameters per slot: the q^(b k)
+# products of a block must be few against the about n products on the
+# same root elements. b = 0 turns the sharing off. Measured for q = 3, 9,
+# 121 and n up to 1000.
+RECOG.GoingUpBlockSize := {n, q, k} -> LogInt(n, q^k);
+
+# A product of root words, built factor by factor, which shares the
+# products of blocks of consecutive factors with all products built on
+# the same <trie>, a record rec( next := rec() ) kept by the caller, as
+# the four Russians method shares partial sums: the factors of a block
+# follow a path of trie nodes, each holding the product so far, so a
+# block met before costs one multiplication. A factor is given by its
+# block number, an integer key unique for it among the root elements on
+# the trie, and its word; the product starts with <one>, and factors
+# identical to <one> are left out.
+# `mul(block, key, y)` multiplies by y in that block, `mulPlain(y)` by y
+# outside any block, and `word()` returns the product.
+RECOG.GoingUpProduct := function(trie, one)
+  local word, node, block, times, flush;
+
+  word := one;
+  node := fail;
+  block := fail;
+  times := function(y)
+    if IsIdenticalObj(y, one) then
+      return;
+    elif IsIdenticalObj(word, one) then
+      word := y;
+    else
+      word := word * y;
+    fi;
+  end;
+  flush := function()
+    if node <> fail then
+      times(node.word);
+      node := fail;
+    fi;
+  end;
+  return rec(
+    mul := function(blk, key, y)
+      if node = fail or blk <> block then
+        flush();
+        node := trie;
+        block := blk;
+      fi;
+      if not IsBound(node.next.(key)) then
+        if IsIdenticalObj(node, trie) then
+          node.next.(key) := rec( word := y, next := rec() );
+        else
+          node.next.(key) := rec( word := node.word * y, next := rec() );
+        fi;
+      fi;
+      node := node.next.(key);
+    end,
+    mulPlain := function(y)
+      flush();
+      times(y);
+    end,
+    word := function()
+      flush();
+      return word;
+    end );
 end;
 
 # A function mapping a vector w in the row space of <M> to a vector c with
@@ -205,7 +308,10 @@ end;
 # are words in Y and g~. All but a are elements with memory of the
 # trivial group (), so composing them multiplies no matrices; their
 # matrices relative to std.bas are computed alongside. GAP builds SLPs
-# from them, not the MSLPs of [EHNPR].
+# from them, not the MSLPs of [EHNPR]. params.newGenerators returns the
+# list of words relative to the adapted basis C * std.bas, a record with
+# the words relative to the basis M * C * std.bas and the matrix M as
+# components `words` and `basis`, or fail to have the step repeated.
 RECOG.GoingUpStep := function(std, N)
   local f, d, n, params, Y, R, dbl, C, Ci, g, words, ax, tx, bx, gx;
 
@@ -226,6 +332,14 @@ RECOG.GoingUpStep := function(std, N)
   Ci := C^-1;
   g := C * dbl.g * Ci;
   words := params.newGenerators(std, Y, R, g);
+  if words = fail then
+    return fail;
+  elif IsRecord(words) then
+    C := words.basis * C;
+    ConvertToMatrixRep(C, f);
+    Ci := C^-1;
+    words := words.words;
+  fi;
 
   # g~ = (t^a)^b, as a word in the input generators
   ax := ResultOfStraightLineProgram(SLPOfElm(dbl.a), std.Xf);
@@ -323,6 +437,8 @@ end;
 ##     bases.(kind) of their parameters
 ##   - `conjugator`: conjugator[j] maps e_2 to e_j and f_2 to f_j, and fixes
 ##     e_1, f_1, and `powers`: a cache for RECOG.Form_RootElement
+##   - `trie`, `block`, `trieDegree`: the shared products of
+##     RECOG.Form_Product, made by its first call
 ##   - `aniso` (only orthogonal groups of type - or o, see Rewrite.gi, and
 ##     SU of odd degree, see SU/Rewrite.gi): a record with components
 ##     `pos`, the indices of the basis w_1 (and w_2) of the anisotropic
@@ -354,9 +470,10 @@ end;
 # The root element <kind>(<j>, <lambda>) of <R>, as a word in R.Y, where
 # <kind> is one of "Lf", "Le", "See", "Sff", "M1j", "Mj1", "Fw", "Ew",
 # and <j> is ignored for "Lf", "Le", "Fw" and "Ew". R.powers.(kind)[j]
-# keeps the powers of the conjugates of R.(kind) by R.conjugator[j] for
-# RECOG.GoingUpRootWord, with j = 2 for the kinds without j.
-RECOG.Form_RootElement := function(R, kind, j, lambda)
+# is the table of RECOG.GoingUpRootTable for the conjugates of R.(kind) by
+# R.conjugator[j], with j = 2 for the kinds without j. Returns the word
+# and the code of RECOG.GoingUpRootWordCode.
+RECOG.Form_RootElementCode := function(R, kind, j, lambda)
   local powers;
 
   if kind in ["Fw", "Ew"] then
@@ -368,12 +485,56 @@ RECOG.Form_RootElement := function(R, kind, j, lambda)
   powers := R.powers.(kind);
   if not IsBound(powers[j]) then
     if j = 2 then
-      powers[j] := List(R.(kind), y -> [y]);
+      powers[j] := RECOG.GoingUpRootTable(R.(kind));
     else
-      powers[j] := List(R.(kind), y -> [y^R.conjugator[j]]);
+      powers[j] := RECOG.GoingUpRootTable(
+                       List(R.(kind), y -> y^R.conjugator[j]));
     fi;
   fi;
-  return RECOG.GoingUpRootWord(powers[j], R.bases.(kind), lambda, R.one);
+  return RECOG.GoingUpRootWordCode(powers[j], R.bases.(kind), lambda, R.one);
+end;
+
+# The word of RECOG.Form_RootElementCode
+RECOG.Form_RootElement := {R, kind, j, lambda} ->
+    RECOG.Form_RootElementCode(R, kind, j, lambda)[1];
+
+# The kinds of root elements on the pairs j >= 2, whose products
+# RECOG.Form_Product shares, with their numbers
+RECOG.Form_PairKinds := rec( See := 1, Sff := 2, M1j := 3, Mj1 := 4 );
+
+# A product of root elements of <R>, a record of root elements of CL(n,q),
+# as a word in R.Y, which shares the products of blocks of consecutive
+# pairs with all products on R (see RECOG.GoingUpProduct); R keeps the
+# trie. `apply(kind, j, lambda)` multiplies by the root element
+# kind(j, lambda), the identity for lambda = 0, `mulPlain(y)` by the word
+# y, and `word()` returns the product.
+RECOG.Form_Product := function(R, n)
+  local q, prod;
+
+  q := Size(R.f);
+  if not IsBound(R.trie) then
+    R.trie := rec( next := rec() );
+    R.block := RECOG.GoingUpBlockSize(n, q, 2);
+    R.trieDegree := n;
+  fi;
+  n := R.trieDegree;
+  prod := RECOG.GoingUpProduct(R.trie, R.one);
+  return rec(
+    apply := function(kind, j, lambda)
+      local w;
+      if IsZero(lambda) then
+        return;
+      fi;
+      w := RECOG.Form_RootElementCode(R, kind, j, lambda);
+      if R.block = 0 or not IsBound(RECOG.Form_PairKinds.(kind)) then
+        prod.mulPlain(w[1]);
+      else
+        prod.mul(QuoInt(j - 2, R.block),
+                 (RECOG.Form_PairKinds.(kind) * (n + 1) + j) * q + w[2], w[1]);
+      fi;
+    end,
+    mulPlain := prod.mulPlain,
+    word := prod.word );
 end;
 
 # The matrix of the root element <kind>(<j>, <lambda>) of <R> is the
@@ -434,16 +595,18 @@ end;
 
 # A record for a product b of root elements and powers of the torus
 # element of <R>, built by elimination on the vector <y> of length n, for
-# the list <opt> of optional arguments of RECOG.Form_MapToStd: `word` is b
-# as a word in R.Y, `y` is y b, `MT` is b^T opt[1], in place, or b^T if
-# opt is empty, `apply(kind, j, lambda)` multiplies b by the root element
+# the list <opt> of optional arguments of RECOG.Form_MapToStd: `y` is y b,
+# `MT` is b^T opt[1], in place, or b^T if opt is empty,
+# `apply(kind, j, lambda)` multiplies b by the root element
 # kind(j, lambda), `scale(k)` by R.torus^k, and `result()` returns the
-# record of RECOG.Form_MapToStd. Each entry of a root element costs O(n)
-# field operations on MT.
+# record of RECOG.Form_MapToStd, with b as a word in R.Y built by
+# RECOG.Form_Product. Each entry of a root element costs O(n) field
+# operations on MT.
 RECOG.Form_Elimination := function(R, y, opt)
-  local res;
+  local res, prod;
 
-  res := rec( word := R.one, y := ShallowCopy(y) );
+  res := rec( y := ShallowCopy(y) );
+  prod := RECOG.Form_Product(R, Length(y));
   if Length(opt) = 0 then
     res.MT := MutableCopyMat(IdentityMat(Length(y), R.f));
     ConvertToMatrixRep(res.MT, R.f);
@@ -452,7 +615,7 @@ RECOG.Form_Elimination := function(R, y, opt)
   fi;
   res.apply := function(kind, j, lambda)
     local x;
-    res.word := res.word * RECOG.Form_RootElement(R, kind, j, lambda);
+    prod.apply(kind, j, lambda);
     # y r adds c y_i to y_k, and r^T M^T adds c times row i to row k
     for x in RECOG.Form_RootElementEntries(R, kind, j, lambda) do
       res.y[x[2]] := res.y[x[2]] + x[3] * res.y[x[1]];
@@ -461,7 +624,7 @@ RECOG.Form_Elimination := function(R, y, opt)
   end;
   res.scale := function(k)
     local i, c;
-    res.word := res.word * R.torus^k;
+    prod.mulPlain(R.torus^k);
     for i in [1 .. Length(R.torusDiag)] do
       c := R.torusDiag[i]^k;
       res.y[i] := c * res.y[i];
@@ -470,9 +633,9 @@ RECOG.Form_Elimination := function(R, y, opt)
   end;
   res.result := function()
     if Length(opt) = 0 then
-      return rec( word := res.word, mat := TransposedMat(res.MT) );
+      return rec( word := prod.word(), mat := TransposedMat(res.MT) );
     fi;
-    return rec( word := res.word );
+    return rec( word := prod.word() );
   end;
   return res;
 end;
@@ -731,19 +894,731 @@ RECOG.Form_GoingUpAdaptBasis := function(std, g)
   return DirectSumMat(IdentityMat(n, f), Concatenation(N, rest));
 end;
 
+# A preimage z of <a> under the norm z -> z^(q^k + 1) of the field
+# F[x]/(<f>) of order q^(2k), for <f> irreducible in the polynomial ring
+# <R> and a <> 0 in the subfield of order q^k: z = w b for a random w and
+# a square root b of a / N(w) in that subfield, by Tonelli-Shanks for q
+# odd; for q even, b = (a / N(w))^(q^k / 2).
+RECOG.Form_NormPreimage := function(R, f, a, q, k)
+  local x, randomElement, Q, S, w, b, c, t, r, M, i, s, z;
+
+  x := IndeterminatesOfPolynomialRing(R)[1];
+  randomElement := function()
+    return Sum([0 .. DegreeOfLaurentPolynomial(f) - 1],
+               i -> Random(CoefficientsRing(R)) * x^i);
+  end;
+  if IsEvenInt(q) then
+    repeat
+      w := randomElement();
+      b := PowerMod(R, w, q^k + 1, f);
+    until not IsZero(b);
+    b := (a * GcdRepresentation(R, b, f)[1]) mod f;
+    return (w * PowerMod(R, b, q^k / 2, f)) mod f;
+  fi;
+  repeat
+    w := randomElement();
+    b := PowerMod(R, w, q^k + 1, f);
+  until not IsZero(b) and PowerMod(R, (a * GcdRepresentation(R, b, f)[1]) mod f,
+                                   (q^k - 1) / 2, f) = One(R);
+  b := (a * GcdRepresentation(R, b, f)[1]) mod f;
+
+  # a non-square c of the subfield, a norm
+  repeat
+    c := PowerMod(R, randomElement(), q^k + 1, f);
+  until not IsZero(c) and PowerMod(R, c, (q^k - 1) / 2, f) <> One(R);
+  Q := q^k - 1;
+  S := 0;
+  while IsEvenInt(Q) do
+    Q := Q / 2;
+    S := S + 1;
+  od;
+  M := S;
+  c := PowerMod(R, c, Q, f);
+  t := PowerMod(R, b, Q, f);
+  r := PowerMod(R, b, (Q + 1) / 2, f);
+  while t <> One(R) do
+    i := 0;
+    s := t;
+    while s <> One(R) do
+      s := (s * s) mod f;
+      i := i + 1;
+    od;
+    z := PowerMod(R, c, 2^(M - i - 1), f);
+    M := i;
+    c := (z * z) mod f;
+    t := (t * c) mod f;
+    r := (r * z) mod f;
+  od;
+  z := (w * r) mod f;
+  Assert(1, PowerMod(R, z, q^k + 1, f) = a mod f);
+  return z;
+end;
+
+# A vector e of W = GF(q)^n, n = 2m, for the isometry <h> of the form
+# beta(x, y) = x <J> y^(sigma T) of type <type>, "Sp", "SU", "O+" or "O"
+# (n = 2m + 1; also n = 2m + 1 for "SU"), over <F> (sigma the identity,
+# resp. c -> c^q0 for F = GF(q0^2)), with squarefree characteristic
+# polynomial <chi>, such that beta(e, e h^j) = 0 for 0 <= j < k and
+# beta(e, e h^k) <> 0, with k = m, resp. k = m - 1 for "O+", or fail. Then
+# e, e h, ..., e h^(k-1) span a totally isotropic (singular) space, and for
+# SU of even degree, where det h = 1, beta(e, e h^m) has trace 0.
+# W is a cyclic F[h]-module: e = c p(h) for a cyclic vector c, and with
+# phi(a) = beta(c, c a(h)), beta(e, e h^j) = phi(N x^j) for
+# N = p p^dagger, a^dagger = a^sigma(x^-1), in A = F[x]/chi. The
+# conditions on the self-adjoint N are linear over the fixed field of
+# sigma, with a one-dimensional solution space <N0> in general, and the
+# norm equation p p^dagger = N0 is solved in each factor of A: trivially
+# for a pair of factors f, f^dagger, by RECOG.Form_NormPreimage for
+# f = f^dagger otherwise, except for x - 1 and x + 1 in Sp and O+, where it
+# is a square root.
+# In characteristic 2, h must not have the eigenvalue 1, and for "O+" the
+# optional argument is the matrix of the quadratic form Q (as in
+# RECOG.ClassicalForm). There N = nu_0 + sum_(k>0) nu_k (x^k + x^-k): the
+# conditions for j > 0 are those above without the term phi(x^0) for nu_0,
+# and for O+, Q(e) = nu_0 Q(c) + sum_(k>0) nu_k phi(x^k) replaces
+# phi(N) = 0.
+RECOG.Form_IsotropicKrylovVector := function(h, J, F, chi, type, quad...)
+  local n, m, q, q0, conj, R, x, c, K, cJ, i, phi, ph, F0, omega, coords,
+        M, row, k, j, nu, cands, top, xi, N, N0, mods, rems, used, f, fs, a,
+        z, p, P, coeffs, e, form, even;
+
+  n := NrRows(h);
+  m := n / 2;
+  if type = "O" then
+    # as "O+" with one more unknown and condition
+    m := (n + 1) / 2;
+    type := "O+";
+  elif type = "SU" and IsOddInt(n) then
+    # the solution space has dimension 2 in general
+    m := (n - 1) / 2;
+  fi;
+  q := Size(F);
+  even := type in ["O+", "Sp"] and IsEvenInt(q);
+  if even and IsZero(Value(chi, One(F))) then
+    return fail;
+  fi;
+  if type = "SU" then
+    q0 := RootInt(q);
+    conj := v -> List(v, y -> y^q0);
+  else
+    q0 := q;
+    conj := v -> v;
+  fi;
+  R := PolynomialRing(F, 1);
+  x := IndeterminatesOfPolynomialRing(R)[1];
+
+  repeat
+    c := Random(F^n);
+    K := [c];
+    for i in [1 .. n] do
+      Add(K, K[i] * h);
+    od;
+  until RankMat(K{[1 .. n]}) = n;
+  cJ := c * J;
+  phi := List(K, y -> cJ * conj(y));
+  # phi(x^-i) = beta(c h^i, c), which is -phi(x^i), phi(x^i)^sigma resp.
+  # phi(x^i)
+  ph := function(i)
+    if i >= 0 then
+      return phi[i + 1];
+    elif type = "SU" then
+      return phi[1 - i]^q0;
+    elif type = "O+" then
+      return phi[1 - i];
+    fi;
+    return -phi[1 - i];
+  end;
+
+  # N = sum_k (nu_k x^k + nu_k^sigma x^-k), 0 <= k <= m, with
+  # phi(N x^j) = 0 for 0 <= j < m, as GF(q0)-linear equations in the
+  # coordinates of the nu_k in the basis 1, omega of F over GF(q0); for Sp
+  # omega = 0, nu_m = 0, and phi(N) = 0 holds already
+  if type = "SU" then
+    # z = a + b omega with b = (z - z^sigma) / (omega - omega^sigma)
+    omega := PrimitiveRoot(F);
+    F0 := (omega - omega^q0)^-1;
+    coords := function(z)
+      local b;
+      b := (z - z^q0) * F0;
+      return [z - b * omega, b];
+    end;
+    M := [];
+    for k in [0 .. m] do
+      for nu in [One(F), omega] do
+        row := [];
+        for j in [0 .. m - 1] do
+          Append(row, coords(nu^q0 * ph(k + j) + nu * ph(j - k)));
+        od;
+        Add(M, row);
+      od;
+    od;
+    cands := List(NullspaceMat(M), v -> List([0 .. m],
+                  k -> v[2 * k + 1] * One(F) + v[2 * k + 2] * omega));
+    if IsOddInt(n) then
+      cands := Concatenation(cands, List(Combinations(cands, 2), Sum));
+    fi;
+  elif type = "O+" then
+    # phi(N x^j) = 0 for 0 <= j < m - 1; the value at m - 1 is tested below
+    M := List([0 .. m - 1], k -> List([0 .. m - 2],
+                                      j -> ph(k + j) + ph(j - k)));
+    if even then
+      for j in [1 .. m - 2] do
+        M[1][j + 1] := ph(j);
+      od;
+      for k in [1 .. m - 1] do
+        M[k + 1][1] := ph(k);
+      od;
+      M[1][1] := c * quad[1] * c;
+    fi;
+    cands := NullspaceMat(M);
+    if Length(cands) <> 1 then
+      return fail;
+    fi;
+    cands := [Concatenation(cands[1], [Zero(F)])];
+  else
+    M := List([0 .. m - 1], k -> List([1 .. m - 1],
+                                      j -> ph(k + j) + ph(j - k)));
+    if even then
+      for j in [1 .. m - 1] do
+        M[1][j] := ph(j);
+      od;
+    fi;
+    cands := NullspaceMat(M);
+    if Length(cands) <> 1 then
+      return fail;
+    fi;
+    cands := [Concatenation(cands[1], [Zero(F)])];
+  fi;
+
+  # a nu with N <> 0 and phi(N x^top) <> 0, top = m resp. m - 1 for "O+"
+  top := m;
+  if type = "O+" then
+    top := m - 1;
+  fi;
+  xi := GcdRepresentation(R, x, chi)[1] mod chi;
+  N0 := fail;
+  for nu in cands do
+    if even then
+      a := nu[1] * ph(top) + Sum([1 .. m], k -> nu[k + 1] * (ph(k + top)
+                                                             + ph(top - k)));
+    else
+      a := Sum([0 .. m], k -> nu[k + 1]^q0 * ph(k + top)
+                              + nu[k + 1] * ph(top - k));
+    fi;
+    if not IsZero(a) then
+      N := Sum([0 .. m], k -> nu[k + 1] * x^k
+                          + nu[k + 1]^q0 * PowerMod(R, xi, k, chi)) mod chi;
+      if even then
+        N := (N + nu[1] * One(R)) mod chi;
+      fi;
+      # for odd n, the solution space gives no unit by itself
+      if not IsZero(N) and (IsEvenInt(n) or type <> "SU"
+                            or DegreeOfLaurentPolynomial(Gcd(N, chi)) = 0) then
+        N0 := N;
+        break;
+      fi;
+    fi;
+  od;
+  if N0 = fail then
+    return fail;
+  fi;
+  if IsOddInt(n) and type <> "SU" then
+    # N0 is determined up to a scalar, and the norm equation at x - 1 is a
+    # square root
+    a := Value(N0, One(F));
+    if IsZero(a) then
+      return fail;
+    elif a^((q - 1) / 2) <> One(F) then
+      N0 := PrimitiveRoot(F) * N0;
+    fi;
+  fi;
+
+  # p, with p p^dagger = N0, by the Chinese remainder theorem
+  mods := [];
+  rems := [];
+  used := [];
+  for f in Factors(R, chi) do
+    if f in used then
+      continue;
+    fi;
+    a := N0 mod f;
+    coeffs := conj(CoefficientsOfUnivariatePolynomial(f));
+    fs := UnivariatePolynomial(F, Reversed(coeffs) / coeffs[1]);
+    Add(used, f);
+    if fs <> f then
+      Append(mods, [f, fs]);
+      Append(rems, [a, One(R)]);
+      Add(used, fs);
+    elif type <> "SU" and DegreeOfLaurentPolynomial(f) = 1 then
+      z := RootsOfUPol(F, x^2 - Value(a, Zero(F)));
+      if z = [] then
+        return fail;
+      fi;
+      Add(mods, f);
+      Add(rems, z[1] * One(R));
+    elif type <> "SU" then
+      Add(mods, f);
+      Add(rems, RECOG.Form_NormPreimage(R, f, a, q,
+                                        DegreeOfLaurentPolynomial(f) / 2));
+    else
+      Add(mods, f);
+      Add(rems, RECOG.Form_NormPreimage(R, f, a, q0,
+                                        DegreeOfLaurentPolynomial(f)));
+    fi;
+  od;
+  p := rems[1] mod mods[1];
+  P := mods[1];
+  for j in [2 .. Length(mods)] do
+    p := p + P * (((rems[j] - p) * GcdRepresentation(R, P mod mods[j],
+                                                     mods[j])[1]) mod mods[j]);
+    P := P * mods[j];
+  od;
+  p := p mod chi;
+
+  # e = c p(h), from the vectors c h^i
+  coeffs := CoefficientsOfUnivariatePolynomial(p);
+  e := Sum([1 .. Length(coeffs)], i -> coeffs[i] * K[i]);
+  form := {y, z} -> y * J * conj(z);
+  Assert(1, ForAll([0 .. top - 1], j -> IsZero(form(e, e * h^j)))
+            and not IsZero(form(e, e * h^top)));
+  return e;
+end;
+
+# The elements a of CL(U) on the first pair tried by
+# RECOG.Form_GoingUpCycleBasis, as functions of a record with components
+# s, t and delta (words or matrices), in this order
+RECOG.Form_GoingUpCycleSeeds := [Y -> Y.s, Y -> Y.delta, Y -> Y.s^-1,
+    Y -> Y.s * Y.t, Y -> Y.s^0, Y -> Y.t, Y -> Y.t^-1, Y -> Y.delta^-1];
+
+# The number of new doubling elements a GoingUp step for Sp or SU from
+# degree n >= 10 tries when RECOG.Form_GoingUpCycleBasis fails, before it
+# falls back to the transpositions; below, these cost few nodes, and for
+# Sp(4,3) no word of RECOG.Form_GoingUpCycleSeeds seems to work
+RECOG.Form_GoingUpCycleRetries := 3;
+
+# Step 5 of the GoingUp step for Sp and SU relative to a new basis of W, as
+# proposed in the draft of [EHNPR] ('Constructing the enlarged group'),
+# with m = [n'/2] pairs, beta and eps as in the comment above
+# RECOG.Form_RootElement:
+#  - h = x x^g~ for x = a' z, z = v_U, and a' = a^(v_U^(m_U - 1)) acting on
+#    the pivot pair, a from RECOG.Form_GoingUpCycleSeeds, such that the
+#    characteristic polynomial of h on W is squarefree;
+#  - e from RECOG.Form_IsotropicKrylovVector: the b_i = e h^(i-1),
+#    1 <= i <= m, span a totally isotropic E, and y = e h^m;
+#  - r = T(e - y, 1 / beta(y, e - y)) fixes b_2, ..., b_m and maps y to e,
+#    so c = h r is the cycle b_1 -> b_2 -> ... -> b_m -> b_1 on E;
+#  - a basis f_i of a totally isotropic complement F of E with
+#    beta(b_i, f_j) = delta_ij: then f_i c = f_(i+1) + sum_k Z_(i,k-1) b_k
+#    with Z_(k,i) = -eps Z_(i,k)^sigma, which a change
+#    f_i -> f_i + sum_k S_ik b_k replaces by Z + S - C S C^-1, C the cyclic
+#    shift; moving the sum along each cyclic diagonal of Z to its first row
+#    or column leaves the radical part of c supported there, the product of
+#    two transvections with centres in E (three in characteristic 2); if p
+#    does not divide m, c^p is the pair cycle relative to a suitable dual
+#    basis, as proposed in the same draft, and needs no correction;
+#  - this gives v_W relative to the basis (b_1, f_1, ..., b_m, f_m), and
+#    the other standard generators are products of transvections with
+#    centres among b_1, f_1, b_2, b_1 + b_2, b_1 - b_2, f_1 - f_2 and, for
+#    x and y of SU, b_2 + alpha f_1.
+# For SU of odd degree, W = V, E = <b_1, ..., b_m> is maximal totally
+# isotropic, D = <b_2, ..., b_m>, c0 = beta(e, y) need not have trace 0,
+# and <D, e, y>^perp = D + <a> with a anisotropic. With t in <a> of norm
+# -(c0 + c0^sigma), the unitary Siegel transformation
+# rho(e + (c0/c0^sigma) y + t, (y - e)/c0^sigma, 1/c0) of
+# RECOG.SU_GoingUpNewGenerators fixes D and maps y to e, so c = h rho
+# cycles E. Then a c = a + psi + tau e with psi in E, and for a2 = a + psi'
+# with a2 c = a2 + tau e, rho(e, mu a2, .) with mu^sigma beta(a2, a2) =
+# -tau makes c fix a2. The construction above runs in a2^perp, and x and
+# y are those of odd degree, with w_1 = a2 scaled to norm 1.
+# Each transvection of W costs O(n log q) nodes, so the step costs
+# O(n log q) nodes instead of the Theta(n^2 log q) of the transpositions.
+# <F> are the generators with memory standing for Y and g~, <RF> the root
+# elements on them, <g> the matrix of g~ relative to the adapted basis,
+# and <transvection>(w, lambda) the word for T(w, lambda), w a row of
+# length d. For SU of odd degree, the optional argument is the function
+# (p, z, lam) -> rho(p, z, lam) of RECOG.Form_GoingUpNewGenerators. Returns
+# fail if no candidate works, else the record of RECOG.GoingUpStep.
+RECOG.Form_GoingUpCycleBasis := function(std, F, RF, g, transvection, opt...)
+  local f, d, n, nn, m, mU, names, Fw, Ystd, vpos, G, emb, J, q0, conj, form,
+        eps, zm, cw, cm, gi, seed, xw, xm, hW, chi, e, hw, b, i, y, vv, lam,
+        rW, c1, solver, f0, Gr, fv, next, X, Z, S, delta, a, sum, sv, k,
+        half, Zp, mu, lamf, zt, w1, w2, pad, vW, basis, words, B1, F1, B2, F2,
+        T, slam, sw, tau, x12, x21, om, p, halfGram, Kb, R, Bm, r1, al, odd,
+        siegel, rho, c0, D, K, a0, t, uu, ww, kw, th, CM, sol, a2, lam2, wX,
+        rows, unit, gam, alp, A, aa, Xp;
+
+  f := std.f;
+  p := Characteristic(f);
+  d := std.d;
+  n := std.n;
+  nn := Minimum(2 * n - 2, d);
+  odd := IsOddInt(nn);
+  if odd then
+    siegel := opt[1];
+  fi;
+  m := QuoInt(nn, 2);
+  mU := n / 2;
+  names := RECOG.ClassicalStandardGeneratorNames(std.type);
+  Fw := rec();
+  for i in [1 .. Length(names)] do
+    Fw.(names[i]) := F[i];
+  od;
+  G := F[Length(F)];
+  Ystd := RECOG.ClassicalStandardGenerators(std.type, n, f);
+  vpos := Position(names, "v");
+  emb := M -> RECOG.GoingUpEmbed(M, d, f);
+  J := RECOG.ClassicalForm(std.type, nn, f).gram;
+  if std.type = "SU" then
+    q0 := RootInt(Size(f));
+    conj := v -> List(v, c -> c^q0);
+  else
+    q0 := Size(f);
+    conj := v -> v;
+  fi;
+  form := {x, z} -> x * J * conj(z);
+  eps := RF.eps;
+  zm := emb(Ystd.v);
+  cw := F[vpos]^(mU - 1);
+  cm := emb(Ystd.v^(mU - 1));
+  gi := g^-1;
+
+  e := fail;
+  for seed in RECOG.Form_GoingUpCycleSeeds do
+    xw := seed(Fw)^cw * F[vpos];
+    xm := cm^-1 * emb(seed(Ystd)) * cm * zm;
+    hW := (xm * gi * xm * g){[1 .. nn]}{[1 .. nn]};
+    chi := CharacteristicPolynomial(hW);
+    if DegreeOfLaurentPolynomial(Gcd(chi, Derivative(chi))) = 0 then
+      e := RECOG.Form_IsotropicKrylovVector(hW, J, f, chi, std.type);
+      if e <> fail then
+        break;
+      fi;
+    fi;
+  od;
+  if e = fail then
+    Info(InfoRecog_ClassicalNatural, 3, "GoingUp: no cycle word");
+    return fail;
+  fi;
+  hw := xw * xw^G;
+  pad := w -> ImmutableVector(f, Concatenation(w,
+                  ListWithIdenticalEntries(d - nn, Zero(f))));
+
+  # the cycle c = h r on E
+  b := [e];
+  for i in [2 .. m] do
+    Add(b, b[i - 1] * hW);
+  od;
+  y := b[m] * hW;
+  if odd then
+    rho := function(u, w, l)
+      return List(IdentityMat(nn, f), x -> x + form(x, w) * u
+                      - form(x, u) * w + l * form(x, u) * u);
+    end;
+    c0 := form(e, y);
+    D := b{[2 .. m]};
+    K := NullspaceMat(J * TransposedMat(List(Concatenation(D, [e, y]),
+                                             conj)));
+    a0 := BaseSteinitzVectors(K, D).factorspace[1];
+    t := Zero(e);
+    if not IsZero(c0 + c0^q0) then
+      t := RootFFE(f, -(c0 + c0^q0) / form(a0, a0), q0 + 1) * a0;
+    fi;
+    uu := e + c0 / c0^q0 * y + t;
+    ww := (y - e) / c0^q0;
+    c1 := hW * rho(uu, ww, c0^-1);
+    kw := hw * siegel(pad(uu), pad(ww), c0^-1);
+
+    # a2 = a0 + psi' and tau from theta = a0 c - a0 = psi' (c - 1) + tau e
+    th := SolutionMat(b, a0 * c1 - a0);
+    if th = fail then
+      return fail;
+    fi;
+    CM := List(b, x -> SolutionMat(b, x * c1));
+    sol := SolutionMat(Concatenation(CM - IdentityMat(m, f),
+                                     [IdentityMat(m, f)[1]]), -th);
+    if sol = fail then
+      return fail;
+    fi;
+    a2 := a0 + sol{[1 .. m]} * b;
+    if not IsZero(sol[m + 1]) then
+      ww := (sol[m + 1] / form(a2, a2))^q0 * a2;
+      lam2 := -form(ww, ww) * RF.half;
+      c1 := c1 * rho(e, ww, lam2);
+      kw := kw * siegel(pad(e), pad(ww), lam2);
+    fi;
+    Assert(1, a2 * c1 = a2);
+    wX := RootFFE(f, form(a2, a2)^-1, q0 + 1) * a2;
+  else
+    vv := e - y;
+    lam := form(y, vv)^-1;
+    rW := IdentityMat(nn, f) + lam * TransposedMat([J * conj(vv)]) * [vv];
+    c1 := hW * rW;
+    kw := hw * transvection(pad(vv), lam);
+  fi;
+  Assert(1, ForAll([1 .. m], i -> b[i] * c1 = b[i mod m + 1]));
+
+  # the conditions beta(b_i, x) = z_i on x^sigma, and beta(a2, x) = 0 for
+  # odd degree
+  rows := function()
+    local r;
+    r := List(b, x -> x * J);
+    if odd then
+      Add(r, a2 * J);
+    fi;
+    return TransposedMat(r);
+  end;
+  unit := j -> IdentityMat(m + nn mod 2, f)[j];
+
+  # mu <> 0 with mu^sigma = -eps mu
+  if std.type = "SU" and p > 2 then
+    mu := PrimitiveRoot(f)^((q0 + 1) / 2);
+  else
+    mu := One(f);
+  fi;
+
+  # S with S_il + eps S_li^sigma = G_il for the Gram matrix G of vectors
+  # f_i dual to the b_i, so that the f_i - sum_l S_il b_l are totally
+  # isotropic; S is circulant if G is and m is odd. G/2 for q odd, h G with
+  # h of trace 1 for SU, and for Sp in characteristic 2 the entries of G on
+  # the cyclic diagonals 1, ..., (m-1)/2 and half of the diagonal m/2
+  halfGram := function(Gr)
+    local S, i, l, dl;
+    if p > 2 then
+      return Gr / 2;
+    elif std.type = "SU" then
+      return RF.half * Gr;
+    fi;
+    S := NullMat(m, m, f);
+    for i in [1 .. m] do
+      for l in [1 .. m] do
+        dl := (l - i) mod m;
+        if (0 < dl and 2 * dl < m) or (2 * dl = m and i < l) then
+          S[i][l] := Gr[i][l];
+        fi;
+      od;
+    od;
+    return S;
+  end;
+
+  # for p not dividing m, c' = c^p is the pair cycle: c^m - 1 maps W into
+  # E and kills E, so c^(mp) = 1, and c' still cycles all of E. Relative to
+  # e_i = e c'^(i-1) and f_i = f_1 c'^(i-1), beta(e_i, f_1) = delta_i1, the
+  # Gram matrix G of the f_i is circulant, and f_i -> f_i - sum_j S_ij e_j
+  # for S of halfGram makes F totally isotropic and commutes with c'
+  if m mod p <> 0 then
+    c1 := c1^Characteristic(f);
+    b := [e];
+    for i in [2 .. m] do
+      Add(b, b[i - 1] * c1);
+    od;
+    solver := RECOG.GoingUpSolver(rows());
+    fv := [conj(solver(unit(1)))];
+    for i in [2 .. m] do
+      Add(fv, fv[i - 1] * c1);
+    od;
+    Gr := halfGram(fv * J * TransposedMat(List(fv, conj)));
+    fv := List([1 .. m], j -> fv[j] - Gr[j] * b);
+    Assert(1, fv[m] * c1 = fv[1]
+              and IsZero(fv * J * TransposedMat(List(fv, conj))));
+    vW := kw^p;
+  else
+    # f_i with beta(b_i, f_j) = delta_ij and beta(f_i, f_j) = 0
+    solver := RECOG.GoingUpSolver(rows());
+    f0 := List([1 .. m], j -> conj(solver(unit(j))));
+    Gr := halfGram(f0 * J * TransposedMat(List(f0, conj)));
+    fv := List([1 .. m], j -> f0[j] - Gr[j] * b);
+
+    # Z_(i,k) = beta(f_i c - f_(i+1), f_(k+1)), with Z_(k,i) =
+    # -eps Z_(i,k)^sigma, and S moving the sum along each cyclic diagonal
+    # (i, i + delta) to row 1 (and column 1 for its mirror diagonal
+    # m - delta; to both for delta = m/2)
+    next := i -> i mod m + 1;
+    X := List([1 .. m], i -> (fv[i] * c1 - fv[next(i)]) * J);
+    Z := X * TransposedMat(List([1 .. m], k -> conj(fv[next(k)])));
+    Assert(1, ForAll([1 .. m], i -> ForAll([1 .. m],
+                  k -> Z[k][i] = -eps * Z[i][k]^q0)));
+    S := NullMat(m, m, f);
+    for delta in [0 .. QuoInt(m, 2)] do
+      a := List([1 .. m], i -> Z[i][(i + delta - 1) mod m + 1]);
+      sum := Sum(a);
+      half := 2 * delta = m;
+      # on the diagonal m/2, S must be its own mirror: sv[2 + delta] =
+      # -eps sv[2]^sigma, which this start achieves. In characteristic 2,
+      # the first half of that diagonal is summed and the second half is
+      # its mirror, which leaves the remainder at (1, 1 + delta) and
+      # (1 + delta, 1).
+      sv := [];
+      sv[2] := Zero(f);
+      if half and p = 2 then
+        for i in [2 .. delta] do
+          sv[i + 1] := sv[i] + a[i];
+        od;
+        for i in [2 .. delta + 1] do
+          sv[(i + delta - 1) mod m + 1] := -eps * sv[i]^q0;
+        od;
+        for i in [1 .. m] do
+          S[i][(i + delta - 1) mod m + 1] := sv[i];
+        od;
+        continue;
+      fi;
+      if half then
+        sum := Sum(a{[2 .. 1 + delta]});
+        sv[2] := -(sum + eps * sum^q0) / 4;
+        sum := Sum(a);
+      fi;
+      i := 2;
+      for k in [1 .. m - 1] do
+        sv[next(i)] := sv[i] + a[i];
+        if half and i = 1 + delta then
+          sv[next(i)] := sv[next(i)] - sum / 2;
+        fi;
+        i := next(i);
+      od;
+      for i in [1 .. m] do
+        S[i][(i + delta - 1) mod m + 1] := sv[i];
+        S[(i + delta - 1) mod m + 1][i] := -eps * sv[i]^q0;
+      od;
+    od;
+    fv := List([1 .. m], i -> fv[i] + S[i] * b);
+    X := List([1 .. m], i -> (fv[i] * c1 - fv[next(i)]) * J);
+    Zp := TransposedMat(List([1 .. m], k -> conj(fv[next(k)])));
+    Assert(1, ForAll((X * Zp){[2 .. m]}{[2 .. m]}, IsZero));
+    Zp := X[1] * Zp;
+
+    # T(w, lambda), w in E, adds lambda eps w^sigma w^T to Z; with mu and
+    # lamf = 1 / (2 eps mu), the radical part of c is T(w_1, lamf)
+    # T(w_2, -lamf)
+    vW := kw;
+    if p > 2 then
+      lamf := (2 * eps * mu)^-1;
+      zt := ShallowCopy(Zp);
+      zt[1] := zt[1] / 2;
+      if not IsZero(zt) then
+        w1 := (IdentityMat(m, f)[1] + mu * zt) * b;
+        w2 := (IdentityMat(m, f)[1] - mu * zt) * b;
+        vW := transvection(pad(w2), lamf) * transvection(pad(w1), -lamf) * vW;
+      fi;
+    else
+      # in characteristic 2, R = v c^-1 for the pair cycle v relative to
+      # (b_i, f_i) fixes E pointwise, and f_i R = f_i + sum_k B_ik b_k with
+      # B supported on its first row r and column. T(w, lambda),
+      # w = sum w_k b_k, has B = lambda (w^sigma)^T w. With z = r without
+      # its first entry: for Sp, B is that of T(b_1 + z, 1) T(b_1, r_1 + 1)
+      # T(z, 1); for SU, of T(b_1 + al z, l) T(b_1 + al^sigma z, l)
+      # T(b_1, r_1) with l = 1 / (al + al^sigma), al not in GF(q0)
+      Kb := Concatenation(List([1 .. m], i -> [b[i], fv[i]]));
+      if odd then
+        Add(Kb, wX);
+      fi;
+      R := Kb^-1 * RECOG.ClassicalStandardGenerators(std.type, nn, f).v * Kb
+           * c1^-1;
+      Bm := List([1 .. m], i -> List([1 .. m],
+                k -> form(fv[i] * R - fv[i], fv[k])));
+      Assert(1, ForAll(b, x -> x * R = x)
+                and ForAll(Bm{[2 .. m]}{[2 .. m]}, IsZero));
+      zt := ShallowCopy(Bm[1]);
+      r1 := zt[1];
+      zt[1] := Zero(f);
+      if IsZero(zt) then
+        if not IsZero(r1) then
+          vW := transvection(pad(b[1]), r1) * vW;
+        fi;
+      elif std.type = "Sp" then
+        vW := transvection(pad(b[1] + zt * b), One(f))
+              * transvection(pad(zt * b), One(f)) * vW;
+        if not IsOne(r1) then
+          vW := transvection(pad(b[1]), r1 + One(f)) * vW;
+        fi;
+      else
+        al := PrimitiveRoot(f);
+        lamf := (al + al^q0)^-1;
+        vW := transvection(pad(b[1] + al * zt * b), lamf)
+              * transvection(pad(b[1] + al^q0 * zt * b), lamf) * vW;
+        if not IsZero(r1) then
+          vW := transvection(pad(b[1]), r1) * vW;
+        fi;
+      fi;
+    fi;
+  fi;
+
+  basis := MutableCopyMat(IdentityMat(d, f));
+  for i in [1 .. m] do
+    basis[2 * i - 1] := pad(b[i]);
+    basis[2 * i] := pad(fv[i]);
+  od;
+  if odd then
+    basis[nn] := pad(wX);
+  fi;
+
+  # the generators on the first two pairs; T(b_2, .) = T(b_1, .)^vW. With
+  # the transvections A(lambda) = T(f_1, lambda), B(lambda) = T(e_1,
+  # lambda) on the first pair, A(l) B(-1/(eps l)) A(l) maps e_1 to l f_1
+  # and f_1 to -e_1/l
+  B1 := pad(b[1]);
+  F1 := pad(fv[1]);
+  B2 := pad(b[2]);
+  F2 := pad(fv[2]);
+  T := transvection;
+  slam := l -> T(F1, l) * T(B1, -(eps * l)^-1) * T(F1, l);
+  sw := slam(Ystd.s[1, 2]);
+  # the swap u of the first two pairs, as in the transpositions of
+  # RECOG.Form_GoingUpNewGenerators
+  if IsBound(RF.tau) then
+    tau := T(F1 - F2, RF.tau[2]) * T(B1 - B2, RF.tau[1]);
+    tau := tau * tau;
+  else
+    tau := T(B1 + B2 + F1 + F2, One(f)) * T(B1 + B2, One(f))
+           * T(F1 + F2, One(f));
+  fi;
+  words := rec( s := sw, t := T(F1, Ystd.t[1, 2]),
+                delta := slam(Ystd.delta[1, 1] * Ystd.s[1, 2]) * sw^-1,
+                u := tau, v := vW );
+  if odd then
+    # x and y of odd degree, as in RECOG.SU_GoingUpNewGenerators
+    gam := PrimitiveRoot(f);
+    alp := RECOG.UnitaryAlpha(f);
+    A := alp * gam;
+    aa := RootFFE(f, -(A + A^q0), q0 + 1);
+    Xp := pad(wX);
+    words.x := siegel(F1, -Xp, -RF.half);
+    words.y := siegel(F1, aa * Xp, A) * siegel(B1, -(aa / A) * Xp, A^-q0)
+               * siegel(F1, aa * A^(q0 - 1) * Xp, A) * sw^-1;
+  elif std.type = "Sp" then
+    words.x := T(B1 + B2, -One(f)) * T(B1, One(f)) * T(B1, One(f))^vW;
+  else
+    # x12(l): e_1 -> e_1 + l e_2, f_2 -> f_2 - l^sigma f_1, the product of
+    # T(e_2 + alpha f_1, l1), T(e_2, -l1) and T(f_1, -mu), alpha = mu / l,
+    # l1 = -l^(q0+1) / mu; x21(l) = x12(l)^u, and y is the torus element
+    # x12(om) x21(-1/om) x12(om) of SL(<e_1, e_2>), om = y[1, 1], over the
+    # one for om = 1
+    x12 := l -> T(B2 + mu / l * F1, -l^(q0 + 1) / mu)
+                * T(B1, l^(q0 + 1) / mu)^vW * T(F1, -mu);
+    x21 := l -> x12(l)^words.u;
+    om := Ystd.y[1, 1];
+    words.x := x12(One(f));
+    words.y := x12(om) * x21(-om^-1) * x12(om)
+               * (words.x * x21(-One(f)) * words.x)^-1;
+  fi;
+  return rec( words := List(names, nm -> words.(nm)), basis := basis );
+end;
+
 # Step 5 of the GoingUp step ([EHNPR], 'Constructing the enlarged group'):
-# the standard generators of CL(W), W = U + N, relative to the first n'
-# vectors of the adapted basis, as words in the standard generators <Y> of
-# CL(U) and g~, whose matrix relative to the adapted basis is <g>. They
-# are those of CL(U) except the pair cycle v, which is
-# v_W = tau_(m'-1) ... tau_m v_U, where tau_j swaps the pairs j and j+1.
-# Each tau_j is a product of four transvections of W, which are conjugates
-# of transvections of U. Returns the list of words, as elements with
-# memory in generators standing for Y and g~, which the optional argument
-# gives, as a list.
+# the standard generators of CL(W), W = U + N, as words in the standard
+# generators <Y> of CL(U) and g~, whose matrix relative to the adapted
+# basis is <g>; for Sp and SU by RECOG.Form_GoingUpCycleBasis relative to
+# a new basis if possible. Otherwise relative to the first n'
+# vectors of the adapted basis: they are those of CL(U) except the pair
+# cycle v, which is v_W = tau_(m'-1) ... tau_m v_U, where tau_j swaps the
+# pairs j and j+1. Each tau_j is a product of four transvections of W,
+# which are conjugates of transvections of U. Returns the record of
+# RECOG.Form_GoingUpCycleBasis, or fail, so that the step is repeated
+# with a new doubling element (see RECOG.Form_GoingUpCycleRetries), or
+# else the list of words, as elements with memory in generators standing
+# for Y and g~, which the optional argument gives, as a list.
 RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g, opt...)
   local f, d, n, nn, form, norm, F, RF, e, gi, Ub, Upb, Npb, Wb, coeffs,
-        withNorm, mapInU, intoU, transvection, vpos, tau, v, j, a, b, res;
+        withNorm, mapInU, act, intoU, toE1, toStd, transvection, siegel, SP,
+        cU, vpos, tau, v, j, a, b, res;
 
   f := std.f;
   d := std.d;
@@ -792,14 +1667,31 @@ RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g, opt...)
     return z;
   end;
 
-  # an element of CL(U), as a word in F, mapping y to z, both nonzero in U
-  # and of the same norm
+  # an element of CL(U), as a word in F and its matrix on U, mapping y to
+  # z, both nonzero in U and of the same norm
   mapInU := function(y, z)
-    return RECOG.Form_MapToStd(RF, y{[1 .. n]}).word
-           * RECOG.Form_MapToStd(RF, z{[1 .. n]}).word^-1;
+    local a, b;
+    a := RECOG.Form_MapToStd(RF, y{[1 .. n]});
+    b := RECOG.Form_MapToStd(RF, z{[1 .. n]});
+    return rec( word := a.word * b.word^-1, mat := a.mat * b.mat^-1 );
   end;
 
-  # A word h in Y and g~, and the vector wh in U, for nonzero w in W. Write
+  # the image of w under the product of the matrices in <steps>, each on V
+  # or on U
+  act := function(steps, w)
+    local M;
+    for M in steps do
+      if NrRows(M) = d then
+        w := w * M;
+      else
+        w := Concatenation(w{[1 .. n]} * M, w{[n + 1 .. d]});
+      fi;
+    od;
+    return w;
+  end;
+
+  # A word h in Y and g~, its matrix as a list of factors for act, and the
+  # vector wh in U, for nonzero w in W. Write
   # w = u' + x' with u' in U', x' in N'. Since U' projects onto N, the
   # vectors of U' with the projection to N of -x' are a coset of
   # U meet U', which contains a vector u'' of the norm of u'. An element of
@@ -810,7 +1702,7 @@ RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g, opt...)
     local c, u, x, z, k, h;
 
     if IsZero(w{[n + 1 .. d]}) then
-      return rec( word := F[1]^0, vector := w );
+      return rec( word := F[1]^0, vector := w, steps := [] );
     fi;
 
     c := coeffs(w);
@@ -822,7 +1714,8 @@ RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g, opt...)
       z := withNorm(z, norm(u));
       k := mapInU(u, z);
       h := intoU(z + x);
-      return rec( word := k * h.word, vector := h.vector );
+      return rec( word := k.word * h.word, vector := h.vector,
+                  steps := Concatenation([k.mat], h.steps) );
     fi;
 
     u := c{[1 .. n]} * Upb;
@@ -830,19 +1723,74 @@ RECOG.Form_GoingUpNewGenerators := function(std, Y, R, g, opt...)
     z := SolutionMat(Upb{[1 .. n]}{[n + 1 .. nn]}, -x{[n + 1 .. nn]}) * Upb;
     z := withNorm(z, norm(u));
     k := mapInU(u * gi, z * gi);
-    h := F[Length(F)]^-1 * k * F[Length(F)];
+    h := F[Length(F)]^-1 * k.word * F[Length(F)];
     Assert(1, IsZero((z + x){[n + 1 .. d]}));
-    return rec( word := h, vector := z + x );
+    return rec( word := h, vector := z + x, steps := [gi, k.mat, g] );
   end;
 
   # the transvection T(w, lambda) of W, w isotropic, as
-  # T(e_1, lambda)^(h^-1) for h mapping w to e_1
+  # T(e_1, lambda)^(h^-1) for h mapping w to e_1, which is kept for each w
+  # with its factors for act; T(0, lambda) = 1
+  toE1 := [[], [], []];
+  toStd := function(w)
+    local pos, h, s;
+    pos := Position(toE1[1], w);
+    if pos = fail then
+      h := intoU(w);
+      s := RECOG.Form_MapToStd(RF, h.vector{[1 .. n]});
+      Add(toE1[1], w);
+      Add(toE1[2], h.word * s.word);
+      Add(toE1[3], Concatenation(h.steps, [s.mat]));
+      pos := Length(toE1[1]);
+    fi;
+    return pos;
+  end;
   transvection := function(w, lambda)
     local h;
-    h := intoU(w);
-    h := h.word * RECOG.Form_MapToStd(RF, h.vector{[1 .. n]}).word;
+    if IsZero(w) then
+      return F[1]^0;
+    fi;
+    h := toE1[2][toStd(w)];
     return h * RECOG.Form_RootElement(RF, "Le", 1, lambda) * h^-1;
   end;
+
+  # for SU of odd degree, W = V: the unitary Siegel transformation
+  # rho(p, z, lam) of SU/GoingUp.gi for isotropic p and z orthogonal to p,
+  # as the conjugate of rho(e_m, z', lam') by h^-1, h mapping p to e_1 and
+  # then by c = v^(m_U - 1) to e_m: z h = z' + kappa e_m with z' in A + N,
+  # and lam' = lam + kappa^q0 - kappa
+  siegel := fail;
+  if std.type = "SU" and IsOddInt(nn) then
+    SP := RECOG.SU_GoingUpSiegel(std, F, RF, g);
+    cU := RECOG.ClassicalStandardGenerators("SU", n, f).v^(n / 2 - 1);
+    siegel := function(p, z, lam)
+      local pos, h, kap, q0;
+      q0 := RootInt(Size(f));
+      pos := toStd(p);
+      h := toE1[2][pos] * SP.c;
+      z := ShallowCopy(act(Concatenation(toE1[3][pos], [cU]), z));
+      Assert(1, IsZero(z[n]));
+      kap := z[n - 1];
+      z[n - 1] := Zero(f);
+      return h * SP.siegelP(n - 1, z, lam + kap^q0 - kap) * h^-1;
+    end;
+  fi;
+
+  # a new doubling element is cheaper than the transpositions below
+  if std.type in ["Sp", "SU"] then
+    res := RECOG.Form_GoingUpCycleBasis(std, F, RF, g, transvection, siegel);
+    if not IsBound(std.cycleRetries) then
+      std.cycleRetries := 0;
+    fi;
+    if res <> fail then
+      std.cycleRetries := 0;
+      return res;
+    elif n >= 10 and std.cycleRetries < RECOG.Form_GoingUpCycleRetries then
+      std.cycleRetries := std.cycleRetries + 1;
+      return fail;
+    fi;
+    std.cycleRetries := 0;
+  fi;
 
   # tau_j = T(b, y) T(a, x) T(b, y) T(a, x), a = e_j - e_(j+1),
   # b = f_j - f_(j+1), with [x, y] = RF.tau, and for q even
