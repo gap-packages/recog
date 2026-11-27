@@ -638,8 +638,9 @@ RECOG.ClassicalNaturalQuotient := function(ri,form,type)
   local d,data,imgs,H,hom;
   d := ri!.dimension;
   # for q even, CO = O Z, and O/Omega, given by the Dickson invariant, is
-  # not split here: generators of O^+-(d,q) outside Omega Z fall through
-  if type = "O" and IsEvenInt(Size(form.field)) then
+  # not split here: generators of O^+-(d,q) outside Omega Z fall through;
+  # CSp = Sp Z, as every similarity factor is a square
+  if type in ["O","Sp"] and IsEvenInt(Size(form.field)) then
       return fail;
   fi;
   data := rec( type := type, form := form, d := d, layer := 1 );
@@ -734,8 +735,9 @@ RECOG.ClassicalNaturalGroupWithMemory := function(ri,gens,changed)
 end;
 
 # ClassicalNatural for <ri> containing PSp(d,q), PSU(d,q0) or
-# POmega(d,q), d even for Sp and SU and at least 8 for Omega, q odd except
-# for Omega^+-(d,q), as <classical> of RecogniseClassical says; <type> is
+# POmega(d,q), d even for Sp and SU, at least 6 for Sp with q even and at
+# least 8 for Omega, q odd except for Sp and Omega^+-(d,q), as <classical>
+# of RecogniseClassical says; <type> is
 # "Sp", "SU" or "O", which stands for all orthogonal types here. The
 # generators are scaled into Sp(d,q), SU(d,q0) or Omega(d,q). That needs
 # similarity factors that are squares for Sp and Omega, determinants that
@@ -822,7 +824,7 @@ RECOG.ClassicalNaturalForm := function(ri,classical,type)
   ri!.rewrite := RECOG.Form_RewriteSetup(type,d,f);
   m := QuoInt(d,2);
   if type = "Sp" then
-      gcd := 2;
+      gcd := Gcd(2,q-1);
       size := q^(m^2) * Product([1..m],i->q^(2*i)-1);
   elif type = "SU" then
       gcd := Gcd(d,q0+1);
@@ -874,7 +876,7 @@ function(ri)
   # First check whether we are applicable:
   classical := RecogniseClassical(g);
   # Sp(2,q) = SL(2,q) is left to the code for SL_2 below
-  if d > 2 and classical.isSpContained = true and IsOddInt(q) then
+  if d > 2 and classical.isSpContained = true and (IsOddInt(q) or d >= 6) then
       return RECOG.ClassicalNaturalForm(ri,classical,"Sp");
   elif classical.isSUContained = true and IsOddInt(q) and IsEvenInt(d)
        then
