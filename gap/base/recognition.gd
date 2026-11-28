@@ -216,6 +216,20 @@ DeclareObsoleteSynonymAttr( "RIParent", "ParentRecogNode", 1 );
 ## <#/GAPDoc>
 DeclareAttribute( "StdPresentation", IsRecogNode, "mutable" );
 
+## <#GAPDoc Label="RelationsSLP">
+## <ManSection>
+## <Attr Name="RelationsSLP" Arg="ri"/>
+## <Description>
+##     The value of this attribute is an SLP <A>slp</A> such that the following
+##     holds: For <A>F := FreeGroup(NrInputsOfStraightLineProgram(slp))</A>
+##     and <A>rels := ResultOfStraightLineProgram(slp, GeneratorsOfGroup(F))</A>,
+##     we have <A>StdPresentation(ri) = F / rels</A>.
+##     This is still work in progress, and details of the implementation may change.
+## </Description>
+## </ManSection>
+## <#/GAPDoc>
+DeclareAttribute( "RelationsSLP", IsRecogNode, "mutable" );
+
 ## <#GAPDoc Label="CalcStdPresentation">
 ## <ManSection>
 ## <Attr Name="CalcStdPresentation" Arg="ri"/>
@@ -230,6 +244,21 @@ DeclareAttribute( "StdPresentation", IsRecogNode, "mutable" );
 ## </ManSection>
 ## <#/GAPDoc>
 DeclareAttribute( "CalcStdPresentation", IsRecogNode, "mutable" );
+
+## <#GAPDoc Label="CalcRelationsSLP">
+## <ManSection>
+## <Attr Name="CalcRelationsSLP" Arg="ri"/>
+## <Description>
+##     The value of this attribute is a function which takes the recognition node
+##     <A>ri</A> as the first and only argument. Calling this function ensures that
+##     <A>RelationsSLP</A> of <A>ri</A> is set. Hence it is usually called as follows:
+##     <Listing>
+##         CalcRelationsSLP(ri)(ri);
+##     </Listing>
+## </Description>
+## </ManSection>
+## <#/GAPDoc>
+DeclareAttribute( "CalcRelationsSLP", IsRecogNode, "mutable" );
 
 ## <#GAPDoc Label="IsCorrect">
 ## <ManSection>
@@ -684,6 +713,9 @@ DeclareGlobalFunction( "SLPforElementGeneric" );
 ## TODO: Documentation!
 DeclareGlobalFunction( "CalcStdPresentationGenericLeaf" );
 DeclareGlobalFunction( "CalcStdPresentationGenericNonLeaf" );
+DeclareGlobalFunction( "CalcStdPresentationFromRelationsSLP" );
+DeclareGlobalFunction( "CalcRelationsSLPGenericLeaf" );
+DeclareGlobalFunction( "CalcRelationsSLPGenericNonLeaf" );
 
 ## <#GAPDoc Label="SLPforElement">
 ## <ManSection>
