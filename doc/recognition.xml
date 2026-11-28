@@ -550,11 +550,12 @@ A successful find homomorphism method has the following duties:
     in case a leaf was found the method has to do
     <C>SetFilterObj(ri,IsLeaf);</C> thereby setting the <Ref Filt="IsLeaf"/>
     flag. <P/>
-    A method finding a homomorphism which is not an isomorphism indicates
-    so by not touching the flags.
-    <E>FIXME: What does that mean? Which flags? The IsLeaf filter? But then
-    this sounds as if isomorphisms require settings some flag.. but which?!?
-    perhaps remove that sentence?</E>
+    A method finding a homomorphism leaves <Ref Filt="IsLeaf"/> unset. If it
+    knows that the homomorphism is injective, it sets the <C>method</C>
+    component of <Ref Attr="findgensNmeth"/> to
+    <Ref Func="FindKernelDoNothing"/>; the kernel then has no generators, and
+    the recursive recognition function sets <Ref Attr="KernelRecogNode"/> to
+    <K>fail</K>.
 </Item>
 <Mark>for leaves: <Ref Func="SLPforElement"/> function</Mark>
 <Item>

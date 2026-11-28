@@ -366,7 +366,20 @@ RECOG.SortOutReducibleSecondNormalSubgroup :=
   end;
 
 #! @BeginChunk D247
-#! TODO
+#! This method looks for the same reductions as
+#! <Ref Subsect="FindElmOfEvenNormal" Style="Text"/>, in the classes D2, D4
+#! and D7 of <Cite Key="Neu09" Where="Sections VI.(1.2), VI.(1.4) and VI.(1.7)"/>,
+#! with a simpler search. It takes an involution <M>x</M> of <A>G</A>
+#! and computes a probable generating set of its normal closure <M>N</M>.
+#! If <M>N</M> acts reducibly, <C>RECOG.SortOutReducibleNormalSubgroup</C>
+#! maps <A>G</A> to the permutation action on the homogeneous components (D2)
+#! or to a tensor decomposition (D4). If <M>N</M> acts irreducibly and
+#! <M>d</M> is a proper power, the method repeats the search inside
+#! <M>N</M> and hands a reducible normal subgroup of <M>N</M> to
+#! <C>RECOG.SortOutReducibleSecondNormalSubgroup</C> (D7). After each failed
+#! attempt, <C>RECOG.InvolutionJumper</C> replaces <M>x</M> by another
+#! involution; after ten attempts the method returns
+#! <K>TemporaryFailure</K>.
 #! @EndChunk
 BindRecogMethod("FindHomMethodsProjective", "D247",
 "play games to find a normal subgroup",

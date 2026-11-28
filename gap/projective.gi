@@ -66,7 +66,7 @@ end;
 #! single diagonal block groups.
 #! @EndChunk
 BindRecogMethod("FindHomMethodsProjective", "BlocksModScalars",
-"TODO",
+"split block diagonal matrices modulo blockwise scalars into two halves",
 function(ri)
   # We assume that ri!.blocks is a list of ranges where the diagonal
   # blocks are. Note that their length does not have to sum up to
@@ -294,7 +294,7 @@ end;
 #! and matrix group mode to do the recognition.
 #! @EndChunk
 BindRecogMethod("FindHomMethodsProjective", "BlockScalarProj",
-"TODO",
+"norm the last scalar block to 1 and continue with BlockScalar",
 function(ri)
   # We just norm the last block and go to matrix methods.
   local G,H,data,hom,newgens,g;

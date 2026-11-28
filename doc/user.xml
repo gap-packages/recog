@@ -139,7 +139,39 @@ This recognition tree only consists of the root node representing the input
 group <M>S_{10}</M>. The group is recognised to only move a few points. Its size
 is also recognised.<P/>
 
-TODO: another nice example would be the Rubik's cube group
+The third example is the group of Rubik's cube, acting on the 48 facelets
+that move.
+
+<Log><![CDATA[
+gap> cube := Group(
+> ( 1, 3, 8, 6)( 2, 5, 7, 4)( 9,33,25,17)(10,34,26,18)(11,35,27,19),
+> ( 9,11,16,14)(10,13,15,12)( 1,17,41,40)( 4,20,44,37)( 6,22,46,35),
+> (17,19,24,22)(18,21,23,20)( 6,25,43,16)( 7,28,42,13)( 8,30,41,11),
+> (25,27,32,30)(26,29,31,28)( 3,38,43,19)( 5,36,45,21)( 8,33,48,24),
+> (33,35,40,38)(34,37,39,36)( 3, 9,46,32)( 2,12,47,29)( 1,14,48,27),
+> (41,43,48,46)(42,45,47,44)(14,22,30,38)(15,23,31,39)(16,24,32,40) );;
+gap> RecogniseGroup(cube);
+<recognition node NonTransitive Size=43252003274489856000
+ F:<recognition node Imprimitive Size=88179840
+    F:<recognition node MovesOnlySmallPoints Size=40320>
+    K:<recognition node PcgsForBlocks Size=2187>>
+ K:<recognition node ThrowAwayFixedPoints Size=490497638400
+    F:<recognition node Imprimitive Size=490497638400
+       F:<recognition node Giant Simple Size=239500800>
+       K:<recognition node PcgsForBlocks Size=2048>>
+    K:<trivial kernel>>
+]]></Log>
+
+The facelets form two orbits, the 24 facelets of the corner cubies and the 24
+facelets of the edge cubies, so <C>NonTransitive</C> maps the group onto its
+action on the corner facelets. That action is imprimitive: the blocks are the
+8 corner cubies with 3 facelets each. The cubies are permuted by <M>S_8</M>,
+and the kernel, which twists corners in place, has order <M>3^7</M>. The
+kernel of the first homomorphism fixes all corner facelets;
+<C>ThrowAwayFixedPoints</C> restricts it to the edge facelets. Its action is
+imprimitive as well, with the 12 edge cubies as blocks: they are permuted by
+<M>A_{12}</M>, a giant, and flipped in place by a group of order
+<M>2^{11}</M>.<P/>
 
 </Section>
 
