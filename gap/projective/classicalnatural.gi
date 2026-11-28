@@ -62,265 +62,6 @@ RECOG.FindStdGensUsingBSGS := function(g,stdgens,projective,large)
   return SLPOfElms(gens);
 end;
 
-RECOG.ResetSLstd := function(r)
-  r.left := One(r.a);
-  r.right := One(r.a);
-  if not IsBound(r.cache) then
-      r.cache := [EmptyPlist(100),EmptyPlist(100),
-                  List([1..r.ext],i->[]),     # rowopcache
-                  List([1..r.ext],i->[])];    # colopcache
-  fi;
-  return r;
-end;
-
-# TODO: document the parameters
-RECOG.InitSLstd := function(f,d,s,t,a,b)
-  local r;
-  r := rec( f := f, p := Characteristic(f), ext := DegreeOverPrimeField(f),
-            q := Size(f), d := d, all := Concatenation(s,t,[a],[b]),
-            one := One(f), One := One(s[1]), s := s, t := t, a := a, b := b );
-  return RECOG.ResetSLstd(r);
-end;
-
-RECOG.FindFFCoeffs := function(r,lambda)
-  return IntVecFFE(Coefficients(CanonicalBasis(r.f),lambda));
-end;
-
-# TODO: document this; what does "fake" mean????
-# Theory: the fake gens are only used for their memory. Since we are only
-# interested in the memory (to produce slps), we use trivial permutations for
-# the underlying group elements, so that the multiplication is cheap.
-# Verify and then document this.
-RECOG.InitSLfake := function(f,d)
-  local ext,l;
-  ext := DegreeOverPrimeField(f);
-  l := ListWithIdenticalEntries(2*ext+2,());
-  l := GeneratorsWithMemory(l);
-  return RECOG.InitSLstd(f,d,l{[1..ext]},l{[ext+1..2*ext]},
-                         l[2*ext+1],l[2*ext+2]);
-end;
-
-RECOG.DoRowOp_SL := function(m,i,j,lambda,std)
-  # add lambda times j-th row to i-th row, i<>j
-  # by left-multiplying with an expression in the standard generators:
-  #   a : e_n -> e_{n-1} -> ... -> e_1 -> (-1)^(n+1) e_n
-  #   b : e_n -> e_{n-1} -> ... -> e_2 -> (-1)^n e_n and e_1 -> e_1
-  #   s : e_1 -> e_1+ * e_2, e_i -> e_i   for i > 1
-  #   t : e_2 -> e_1+ * e_2, e_i -> e_i   for i <> 2
-  # s and t are lists of length ext to span over GF(p) all the scalars
-  # in *.
-  # Note that V_i = <e_1,...,e_i>.
-  # So <s,t> is an SL_2 in the upper left corner, a is an n-cycle
-  # b is an n-1 cycle with garbage fixing the first vector
-  # This only modifies the record std collecting a straight line program.
-  local Getai,Getbj,coeffs,k,new,newnew;
-
-  Getai := function(l)
-      local pos;
-      if l < 0 then pos := std.d - l;
-               else pos := l;
-      fi;
-      if not IsBound(std.cache[1][pos]) then
-          std.cache[1][pos] := std.a^l;
-      fi;
-      return std.cache[1][pos];
-  end;
-  Getbj := function(l)
-      local pos;
-      if l < 0 then pos := std.d - l;
-               else pos := l;
-      fi;
-      if not IsBound(std.cache[2][pos]) then
-          std.cache[2][pos] := std.b^l;
-      fi;
-      return std.cache[2][pos];
-  end;
-
-  newnew := std.One;
-  coeffs := RECOG.FindFFCoeffs(std,lambda);
-  for k in [1..std.ext] do
-      if not IsZero(coeffs[k]) then
-          if IsBound(std.cache[3][k][i]) and
-             IsBound(std.cache[3][k][i][j]) then
-              new := std.cache[3][k][i][j];
-          else;
-              new := std.One;
-              if i < j then
-                  # We need to multiply from the left with the element
-                  #    a^(i-1) * b^(j-i-1) * s_k * b^-(j-i-1) * a^-(i-1)
-                  # from the left.
-                  if i > 1 then new := Getai(-(i-1)) * new; fi;
-                  if j > i+1 then new := Getbj(-(j-i-1)) * new; fi;
-                  new := std.s[k] * new;
-                  if j > i+1 then new := Getbj(j-i-1) * new; fi;
-                  if i > 1 then new := Getai(i-1) * new; fi;
-              elif i > j then
-                  # We need to multiply from the left with the element
-                  #    a^(j-1) * b^(i-j-1) * t_k * b^-(i-j-1) * a^-(j-1)
-                  # from the left.
-                  if j > 1 then new := Getai(-(j-1)) * new; fi;
-                  if i > j+1 then new := Getbj(-(i-j-1)) * new; fi;
-                  new := std.t[k] * new;
-                  if i > j+1 then new := Getbj(i-j-1) * new; fi;
-                  if j > 1 then new := Getai(j-1) * new; fi;
-              fi;
-              if not IsBound(std.cache[3][k][i]) then
-                  std.cache[3][k][i] := [];
-              fi;
-              std.cache[3][k][i][j] := new;
-          fi;
-          std.left := new^coeffs[k] * std.left;
-          newnew := new^coeffs[k] * newnew;
-      fi;
-  od;
-  if m <> false and not IsZero(lambda) then m[i] := m[i] + m[j] * lambda; fi;
-  return newnew;
-end;
-
-RECOG.DoColOp_SL := function(m,i,j,lambda,std)
-  # add lambda times i-th column to j-th column, i<>j
-  # by left-multiplying with an expression in the standard generators:
-  #   a : e_n -> e_{n-1} -> ... -> e_1 -> (-1)^(n+1) e_n
-  #   b : e_n -> e_{n-1} -> ... -> e_2 -> (-1)^n e_n and e_1 -> e_1
-  #   s : e_1 -> e_1+ * e_2, e_i -> e_i   for i > 1
-  #   t : e_2 -> e_1+ * e_2, e_i -> e_i   for i <> 2
-  # s and t are lists of length ext to span over GF(p) all the scalars
-  # in *.
-  # Note that V_i = <e_1,...,e_i>.
-  # So <s,t> is an SL_2 in the upper left corner, a is an n-cycle
-  # b is an n-1 cycle with garbage fixing the first vector
-  # This only modifies the record std collecting a straight line program.
-  local Getai,Getbj,coeffs,k,new,newnew;
-
-  Getai := function(l)
-      local pos;
-      if l < 0 then pos := std.d - l;
-               else pos := l;
-      fi;
-      if not IsBound(std.cache[1][pos]) then
-          std.cache[1][pos] := std.a^l;
-      fi;
-      return std.cache[1][pos];
-  end;
-  Getbj := function(l)
-      local pos;
-      if l < 0 then pos := std.d - l;
-               else pos := l;
-      fi;
-      if not IsBound(std.cache[2][pos]) then
-          std.cache[2][pos] := std.b^l;
-      fi;
-      return std.cache[2][pos];
-  end;
-
-  newnew := std.One;
-  coeffs := RECOG.FindFFCoeffs(std,lambda);
-  for k in [1..std.ext] do
-      if not IsZero(coeffs[k]) then
-          if IsBound(std.cache[4][k][i]) and
-             IsBound(std.cache[4][k][i][j]) then
-              new := std.cache[4][k][i][j];
-          else;
-              new := std.One;
-              if i < j then
-                  # We need to multiply from the right with the element
-                  #    a^(i-1) * b^(j-i-1) * s_k * b^-(j-i-1) * a^-(i-1)
-                  # from the right.
-                  if i > 1 then new := Getai(-(i-1)) * new; fi;
-                  if j > i+1 then new := Getbj(-(j-i-1)) * new; fi;
-                  new := std.s[k] * new;
-                  if j > i+1 then new := Getbj(j-i-1) * new; fi;
-                  if i > 1 then new := Getai(i-1) * new; fi;
-              elif i > j then
-                  # We need to multiply from the right with the element
-                  #    a^(j-1) * b^(i-j-1) * t_k * b^-(i-j-1) * a^-(j-1)
-                  # from the left.
-                  if j > 1 then new := Getai(-(j-1)) * new; fi;
-                  if i > j+1 then new := Getbj(-(i-j-1)) * new; fi;
-                  new := std.t[k] * new;
-                  if i > j+1 then new := Getbj(i-j-1) * new; fi;
-                  if j > 1 then new := Getai(j-1) * new; fi;
-              fi;
-              if not IsBound(std.cache[4][k][i]) then
-                  std.cache[4][k][i] := [];
-              fi;
-              std.cache[4][k][i][j] := new;
-          fi;
-          std.right := std.right * new^coeffs[k];
-          newnew := newnew * new^coeffs[k];
-      fi;
-  od;
-  if m <> false and not IsZero(lambda) then
-      for k in [1..Length(m)] do
-          m[k][j] := m[k][j] + m[k][i] * lambda;
-      od;
-  fi;
-
-  return newnew;
-end;
-
-RECOG.MakeSL_StdGens := function(p,ext,n,d)
-  local a,b,f,i,q,s,t,x,res;
-  f := GF(p,ext);
-  q := Size(f);
-  a := IdentityMat(d,f);
-  a := a{Concatenation([n],[1..n-1],[n+1..d])};
-  ConvertToMatrixRep(a,q);
-  b := IdentityMat(d,f);
-  b := b{Concatenation([1,n],[2..n-1],[n+1..d])};
-  ConvertToMatrixRep(b,q);
-  if IsEvenInt(n) then
-      a[1] := -a[1];
-  else
-      b[2] := -b[2];
-  fi;
-  s := [];
-  t := [];
-  for i in [0..ext-1] do
-      x := IdentityMat(d,f);
-      x[1,2] := Z(p,ext)^i;
-      Add(s,x);
-      x := IdentityMat(d,f);
-      x[2,1] := Z(p,ext)^i;
-      Add(t,x);
-  od;
-  res := rec( s := s, t := t, a := a, b := b, f := f, q := q, p := p,
-              ext := ext, One := IdentityMat(d,f), one := One(f),
-              d := d );
-  res.all := Concatenation( res.s, res.t, [res.a], [res.b] );
-  return res;
-end;
-
-RECOG.ExpressInStd_SL2 := function(m,std)
-  local mi;
-
-  if IsObjWithMemory(m) then
-      mi := InverseMutable(StripMemory(m));
-  else
-      mi := InverseMutable(m);
-  fi;
-  std.left := std.One;
-  if not IsOne(mi[1,1]) then
-      if IsZero(mi[2,1]) then
-          RECOG.DoRowOp_SL(mi,2,1,std.one,std);
-          # Now mi[2,1] is non-zero
-      fi;
-      RECOG.DoRowOp_SL(mi,1,2,(std.one-mi[1,1])/mi[2,1],std);
-  fi;
-  # Now mi[1,1] is equal to one
-  if not IsZero(mi[2,1]) then
-      RECOG.DoRowOp_SL(mi,2,1,-mi[2,1],std);
-  fi;
-  # Now mi[2,1] is equal to zero and thus mi[2,2] equal to one
-  if not IsZero(mi[1,2]) then
-      RECOG.DoRowOp_SL(mi,1,2,-mi[1,2],std);
-  fi;
-  # Now mi is the identity matrix, the element collected in std
-  # is the one to multiply on the left hand side to transform mi to the
-  # identity. Thus it is equal to m.
-  return SLPOfElm(std.left);
-end;
-
 # Now the code for writing SLPs:
 
 # Returns a scalar multiple of the matrix y with entries in the field f, or
@@ -336,41 +77,6 @@ RECOG.ScaleMatrixIntoField := function(y,f)
       return fail;
   fi;
   return y;
-end;
-
-SLPforElementFuncsProjective.PSL2 := function(ri,x)
-  local det,pos,root,s,slp,y;
-  ri!.fakegens.count := ri!.fakegens.count + 1;
-  if ri!.fakegens.count > 1000 then
-      ri!.fakegens := RECOG.InitSLfake(ri!.field,2);
-      ri!.fakegens.count := 0;
-  fi;
-  y := ri!.nicebas * x * ri!.nicebasi;
-  y := RECOG.ScaleMatrixIntoField(y,ri!.field);
-  if y = fail then
-      return fail;
-  fi;
-  det := DeterminantMat(y);
-  if not IsOne(det) then
-      # In the projective image, det only has to be a square. If it is not,
-      # then the PSL2 recognition path was too optimistic for this element.
-      root := RootFFE(ri!.field,1/det,2);
-      if root = fail then
-          return fail;
-      fi;
-      y := y * root;
-  fi;
-  # At this point, y has determinant 1; but we consider it modulo scalars.
-  # To make sure that different coset reps behave the same, we scale it
-  # with a suitable primitive d-th root of unity.
-  if not IsBound(ri!.normlist) then
-      ri!.normlist := RECOG.SetupNormalisationListForPSLd(ri!.field,
-                                                          ri!.gcd.gcd);
-  fi;
-  pos := PositionNonZeroInRow(y, 1);
-  s := RECOG.NormaliseScalarForPSLd(y[1,pos],ri!.normlist);
-  slp := RECOG.ExpressInStd_SL2(s * y,ri!.fakegens);
-  return slp;
 end;
 
 # s: a non-zero scalar
@@ -918,50 +624,32 @@ function(ri)
       # but a projective group contains PSL_2 if and only if the matrix
       # group generated by the same matrices (possibly scaled to make
       # the determinant to be 1) contains SL_2.
-
-      # This is (P)SL2, lets set up the recognition:
       Info(InfoRecog,2,"ClassicalNatural: this is PSL_2!");
       std := RECOG.RecogniseSL2Natural(gm,f);
       ri!.comment := "PSL2";
-      Setslptonice(ri,SLPOfElms(std.all));
-      ri!.nicebas := std.bas;
-      ri!.nicebasi := std.basi;
-      ri!.fakegens := RECOG.InitSLfake(f,2);
-      ri!.fakegens.count := 0;
-      ri!.gcd := gcd;
-      SetFilterObj(ri,IsLeaf);
-      SetSize(ri,(q+1)*(q-1)*q/GcdInt(2,q-1));
-      SetIsRecogInfoForSimpleGroup(ri, q>3);
-      Setslpforelement(ri,SLPforElementFuncsProjective.PSL2);
-      return Success;
-  else   # bigger than 2:
-      if classical.isSLContained = true then
-          # Do not run the generic code in small cases:
-          if (q^d-1)/(q-1) <= 1000 then
-              Info(InfoRecog,2,"Classical natural: SL(",d,",",q,"): small ",
-                   "case, handing over to Schreier-Sims.");
-              ri!.comment := Concatenation("SL(",String(d),",",String(q),")",
-                                           "_StabilizerChain");
-              return FindHomMethodsProjective.StabilizerChainProj(ri);
-          fi;
-          Info(InfoRecog,2,"ClassicalNatural: this is PSL_n!");
-          std := RECOG.FindStdGens_SL(gm);
-          Setslptonice(ri,std.slpstd);
-          ri!.nicebas := std.bas;
-          ri!.nicebasi := std.basi;
-          SetNiceGens(ri,List(RECOG.ClassicalStandardGenerators("SL",d,f).all,
-                      x->std.basi*x*std.bas));
-          ri!.rewrite := RECOG.SL_RewriteSetup(d,f);
-          ri!.comment := "PSLd";
-          ri!.gcd := gcd;
-          SetFilterObj(ri,IsLeaf);
-          SetSize(ri,Product([0..d-1],i->(q^d-q^i))/((q-1)*gcd.gcd));
-          SetIsRecogInfoForSimpleGroup(ri,true);
-          Setslpforelement(ri,SLPforElementFuncsProjective.PSLd);
-          return Success;
+  else
+      # Do not run the generic code in small cases:
+      if (q^d-1)/(q-1) <= 1000 then
+          Info(InfoRecog,2,"Classical natural: SL(",d,",",q,"): small ",
+               "case, handing over to Schreier-Sims.");
+          ri!.comment := Concatenation("SL(",String(d),",",String(q),")",
+                                       "_StabilizerChain");
+          return FindHomMethodsProjective.StabilizerChainProj(ri);
       fi;
+      Info(InfoRecog,2,"ClassicalNatural: this is PSL_n!");
+      std := RECOG.FindStdGens_SL(gm);
+      ri!.comment := "PSLd";
   fi;
-
-  return TemporaryFailure; # FIXME: TemporaryFailure here really correct?
-
+  Setslptonice(ri,std.slpstd);
+  ri!.nicebas := std.bas;
+  ri!.nicebasi := std.basi;
+  SetNiceGens(ri,List(RECOG.ClassicalStandardGenerators("SL",d,f).all,
+              x->std.basi*x*std.bas));
+  ri!.rewrite := RECOG.SL_RewriteSetup(d,f);
+  ri!.gcd := gcd;
+  SetFilterObj(ri,IsLeaf);
+  SetSize(ri,Product([0..d-1],i->(q^d-q^i))/((q-1)*gcd.gcd));
+  SetIsRecogInfoForSimpleGroup(ri,d > 2 or q > 3);
+  Setslpforelement(ri,SLPforElementFuncsProjective.PSLd);
+  return Success;
 end);

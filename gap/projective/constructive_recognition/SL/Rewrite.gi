@@ -22,18 +22,23 @@
 ##
 #############################################################################
 
-# The data for RECOG.SL_Rewrite in SL(<d>,q), q = Size(<f>), d >= 3:
+# The data for RECOG.SL_Rewrite in SL(<d>,q), q = Size(<f>), d >= 2:
 # root elements on generators with memory of a trivial group, as only the
-# words matter, and cyc = v (d odd) or v x (d even), which permutes the
-# lines <v_1>, ..., <v_d> in one cycle. Since the memory of these
-# generators grows with every call, callers replace the record after a
-# while.
+# words matter, cyc = v (d odd) or v x (d even), which permutes the
+# lines <v_1>, ..., <v_d> in one cycle, and next, the index cyc maps to 1.
+# For d = 2 there is one step and no conjugation, so no cyc. Since the
+# memory of these generators grows with every call, callers replace the
+# record after a while.
 RECOG.SL_RewriteSetup := function(d, f)
   local Y, std, res;
 
   Y := GeneratorsWithMemory(ListWithIdenticalEntries(5, ()));
   std := RECOG.ClassicalStandardGenerators("SL", d, f);
   res := rec( R := RECOG.SL_RootElements(Y, d, f), count := 0 );
+  if d = 2 then
+    res.next := 2;
+    return res;
+  fi;
   if IsOddInt(d) then
     res.cyc := Y[4];
     res.cycmat := std.v;
@@ -43,6 +48,7 @@ RECOG.SL_RewriteSetup := function(d, f)
   fi;
   res.cyci := res.cyc^-1;
   res.cycmon := RECOG.MonomialData(res.cycmat);
+  res.next := PositionNonZero(res.cycmat[1]);
   return res;
 end;
 
@@ -60,7 +66,7 @@ RECOG.SL_Rewrite := function(W, g)
   n := NrRows(g);
   f := R.f;
   g := MutableCopyMat(g);
-  next := PositionNonZero(W.cycmat[1]);
+  next := W.next;
 
   # g = L^-1 g0 Rt for the input g0
   L := RECOG.SL_Product(R, n);

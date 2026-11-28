@@ -13,40 +13,6 @@
 ##
 #############################################################################
 
-# SLP in the standard generators of RECOG.MakeSL_StdGens(p,ext,2,2) for
-# those of RECOG.ClassicalStandardGenerators("SL", 2, <f>): t = E(1,2,1),
-# s = E(1,2,1) E(2,1,-1) E(1,2,1) and delta, a product of elementary
-# matrices; v and x are the identity.
-RECOG.SL2_FromMakeSLStdGens := function(f)
-  local ext, recog, gens, upper, lower, basis, E, one, t, s, delta;
-
-  ext := DegreeOverPrimeField(f);
-  recog := RECOG.MakeSL_StdGens(Characteristic(f), ext, 2, 2);
-  gens := GeneratorsWithMemory(recog.all);
-  upper := gens{[1 .. ext]};
-  lower := gens{[ext + 1 .. 2 * ext]};
-  basis := Basis(f, List([0 .. ext - 1], k -> Z(Size(f))^k));
-
-  # E(1, 2, lambda) and E(2, 1, lambda) from those with lambda in the basis
-  E := function(i, j, lambda)
-    local words;
-    if i = 1 then
-      words := upper;
-    else
-      words := lower;
-    fi;
-    return Product(ListN(words, List(Coefficients(basis, lambda), IntFFE),
-                         \^));
-  end;
-
-  one := gens[1]^0;
-  t := E(1, 2, One(f));
-  s := t * E(2, 1, -One(f)) * t;
-  delta := RECOG.SL_ExpressByElementary(
-               RECOG.ClassicalStandardGenerators("SL", 2, f).delta, E, one);
-  return SLPOfElms([s, t, delta, one, one]);
-end;
-
 # Whether RECOG.FindStdGens_SL goes up by RECOG.SL_DirectGoingUp, in one
 # step, instead of RECOG.GoingUp
 RECOG.SL_UseDirectGoingUp := true;
@@ -57,9 +23,7 @@ RECOG.SL_UseDirectGoingUp := true;
 # BaseCase.gi), and GoingUp (see DirectGoingUp.gi and ../GoingUp.gi). It
 # takes no bounds on random selections and does not return fail, as its
 # three parts retry until they succeed.
-# The standard generators are those of RECOG.ClassicalStandardGenerators;
-# those of the SL(2,q) are translated from RECOG.MakeSL_StdGens, which
-# RECOG.SL_FinalDescent returns.
+# The standard generators are those of RECOG.ClassicalStandardGenerators.
 # The generators of <sld> must have memory, or sld is replaced by a group
 # with memory.
 # Returns a record with the following components:
@@ -88,8 +52,6 @@ RECOG.FindStdGens_SL := function(sld)
   n := NrRows(down.gens[1]);
   init := RECOG.SL_FinalDescent(down.gens, f);
   slp := CompositionOfStraightLinePrograms(init.slp, down.slp);
-  slp := CompositionOfStraightLinePrograms(RECOG.SL2_FromMakeSLStdGens(f),
-                                           slp);
   bas := Concatenation(init.bas * down.bas{[1 .. n]}, down.bas{[n + 1 .. d]});
 
   Info(InfoRecog_ClassicalNatural, 1, "SL_n: going up");

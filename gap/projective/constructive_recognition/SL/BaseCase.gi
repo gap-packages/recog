@@ -162,9 +162,9 @@ end;
 #  - `bas`: a d x d matrix whose first two rows span the space on which
 #    this SL(2,q) acts and whose other rows span its fixed space; relative
 #    to bas the standard generators are those of
-#    RECOG.MakeSL_StdGens(p,ext,2,d)
+#    RECOG.ClassicalStandardGenerators("SL", 2, f) on the first two rows
 RECOG.SL_FinalDescent := function(gens, f)
-  local d, q, p, ext, std, h, sl2, sl2gens, V, fix, b, action, resl2, slp;
+  local d, q, std, h, sl2, sl2gens, V, fix, b, action, resl2, slp;
 
   d := NrRows(gens[1]);
   if not d in [3, 4] then
@@ -173,15 +173,14 @@ RECOG.SL_FinalDescent := function(gens, f)
   fi;
 
   q := Size(f);
-  p := Characteristic(f);
-  ext := DegreeOverPrimeField(f);
 
   # SLn_godownfromd does not apply to these fields, or does not prove its
   # result (see there); constructive membership in SL(d,q), by a
   # stabiliser chain, yields the SL(2,q) instead
   if q in [2,3,4,5] or (d = 3 and q = 7) or (d = 4 and q = 9) then
     Info(InfoRecog_ClassicalNatural,1,"SL_n: base case SL(",d,",",q,")");
-    std := RECOG.MakeSL_StdGens(p,ext,2,d).all;
+    std := List(RECOG.ClassicalStandardGenerators("SL", 2, f).all,
+                M -> RECOG.EmbedBlock(d, f, [1, 2], M));
     return rec( slp := RECOG.FindStdGensUsingBSGS(Group(gens),std,false,false),
                 bas := IdentityMat(d,f) );
   fi;
@@ -197,9 +196,8 @@ RECOG.SL_FinalDescent := function(gens, f)
 
   b := Basis(sl2[2],V);
   action := List(StripMemory(sl2gens),x->RECOG.LinearAction(b,f,x));
-  resl2 := RECOG.RecogniseSL2Natural(Group(GeneratorsWithMemory(action)),f);
-  slp := CompositionOfStraightLinePrograms(SLPOfElms(resl2.all),
-                                           SLPOfElms(sl2gens));
+  resl2 := RECOG.RecogniseSL2Natural(Group(action),f);
+  slp := CompositionOfStraightLinePrograms(resl2.slpstd, SLPOfElms(sl2gens));
   b := Concatenation(resl2.bas * V, fix);
   ConvertToMatrixRep(b,f);
   return rec( slp := slp, bas := b );

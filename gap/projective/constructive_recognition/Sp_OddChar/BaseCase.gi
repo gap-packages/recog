@@ -49,7 +49,7 @@ end;
 # Returns a function which maps the matrix, relative to <B>, of an element of
 # K1 to that element, with memory.
 RECOG.Sp4_InvolutionFactor := function(pr, j, B, f)
-  local Bi, OnE, k1, c, k, sl2, k1std, fake;
+  local Bi, OnE, k1, c, k, sl2, k1std, W;
 
   Bi := B^-1;
   # the block of <g> relative to B on E1 (<idx> = [1,2]) or E2 ([3,4])
@@ -74,13 +74,11 @@ RECOG.Sp4_InvolutionFactor := function(pr, j, B, f)
   until Length(k1) >= 2 and
         RECOG.GeneratesSL2(List(k1, g -> OnE(g, [1, 2])), f);
 
-  sl2 := RECOG.RecogniseSL2Natural(
-             Group(GeneratorsWithMemory(List(k1, g -> OnE(g, [1, 2])))), f);
-  k1std := ResultOfStraightLineProgram(SLPOfElms(sl2.all), k1);
-  fake := RECOG.InitSLfake(f, 2);
+  sl2 := RECOG.RecogniseSL2Natural(Group(List(k1, g -> OnE(g, [1, 2]))), f);
+  k1std := ResultOfStraightLineProgram(sl2.slpstd, k1);
+  W := RECOG.SL_RewriteSetup(2, f);
   return xb -> ResultOfStraightLineProgram(
-                   RECOG.ExpressInStd_SL2(
-                       sl2.bas * xb{[1, 2]}{[1, 2]} * sl2.basi, fake),
+                   RECOG.SL_Rewrite(W, sl2.bas * xb{[1, 2]}{[1, 2]} * sl2.basi),
                    k1std);
 end;
 
