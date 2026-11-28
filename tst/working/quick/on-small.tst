@@ -181,6 +181,41 @@ gap> G := GO(-1, 4, 11);;
 gap> Split(ImageRecogNode(RECOG.TestGroup(G, false, Size(G))));
 [ "ProjDeterminant", 2, "ClassicalNatural" ]
 
+# Unsupported input is rejected: degree below 3, Omega^+(4,q), generators
+# outside Omega, covers of other types, and a descent from another degree
+gap> RECOG.FindStdGens_Omega(Omega(1, 2, 7));
+Error, RECOG.FindStdGens_Omega: the degree must be at least 3
+gap> RECOG.FindStdGens_Omega(Omega(1, 4, 7));
+Error, RECOG.FindStdGens_Omega: Omega^+(4,q) is not supported
+gap> RECOG.FindStdGens_Omega(SO(5, 7));
+Error, RECOG.FindStdGens_SmallOmega: the generators do not lie in Omega
+gap> RECOG.FindStdGens_Omega(SO(3, 37));
+Error, RECOG.FindStdGens_RankOneOmega: the generators do not lie in Omega
+gap> RECOG.FindStdGens_Omega(GO(-1, 4, 11));
+Error, RECOG.FindStdGens_RankOneOmega: the generators do not lie in Omega
+gap> RECOG.Omega_SmallDegreeCover("O+", 6, GF(5));
+Error, RECOG.Omega_SmallDegreeCover: unsupported group
+gap> RECOG.Omega_RankOneCover("O+", 4, GF(5));
+Error, RECOG.Omega_RankOneCover: unsupported group
+gap> RECOG.Omega_FinalDescent([IdentityMat(6, GF(3))], GF(3), fail, 10);
+Error, RECOG.Omega_FinalDescent: <gens> must be 7x7 or 8x8 matrices
+
+# The lift to SL(2,q) resp. SL(2,q^2) fails for matrices which are no
+# Kronecker product of the required shape, and the rewriting for -1, which
+# does not lie in Omega^-(4,11)
+gap> cover := RECOG.Omega_RankOneCover("O", 3, GF(37));;
+gap> List([DiagonalMat([Z(37), Z(37)^-1, Z(37)^0]),
+>          PermutationMat((1,3), 3, GF(37)), -IdentityMat(3, GF(37))],
+>         cover.lift);
+[ fail, fail, fail ]
+gap> cover := RECOG.Omega_RankOneCover("O-", 4, GF(11));;
+gap> List([-IdentityMat(4, GF(11)), PermutationMat((1,2), 4, GF(11))],
+>         cover.lift);
+[ fail, fail ]
+gap> RECOG.Form_Rewrite(RECOG.Form_RewriteSetup("O-", 4, GF(11)),
+>                       -IdentityMat(4, GF(11)));
+fail
+
 #
 gap> SetInfoLevel(InfoOrb, oldInfoOrb);
 gap> STOP_TEST("on-small.tst");

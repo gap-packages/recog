@@ -184,7 +184,11 @@ RECOG.Omega_RankOneCover := function(type, d, f)
     pos := First(Cartesian([1, 2], [1, 2]),
                  ik -> not IsZero(K{2 * ik[1] + [-1, 0]}{2 * ik[2] + [-1, 0]}));
     A := K{2 * pos[1] + [-1, 0]}{2 * pos[2] + [-1, 0]};
-    lambda := RootFFE(F, DeterminantMat(A)^-1, 2);
+    lambda := DeterminantMat(A);
+    if IsZero(lambda) then
+      return fail;
+    fi;
+    lambda := RootFFE(F, lambda^-1, 2);
     if lambda = fail then
       return fail;
     fi;
