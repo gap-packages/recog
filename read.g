@@ -76,6 +76,7 @@ ReadPackage("recog","gap/projective/constructive_recognition/SU/Rewrite.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/SU/main.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/Omega/BaseCase.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/Omega/GoingUp.gi");
+ReadPackage("recog","gap/projective/constructive_recognition/Omega/SmallDegree.gi");
 ReadPackage("recog","gap/projective/constructive_recognition/Omega/main.gi");
 ReadPackage("recog","gap/projective/sl2_natural.gi");
 ReadPackage("recog","gap/projective/AnSnOnFDPM.gi");

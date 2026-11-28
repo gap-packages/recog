@@ -9,10 +9,10 @@ gap> level := InfoLevel(InfoRecog);;
 gap> SetInfoLevel(InfoRecog, 0);
 gap> levelMethSel := InfoLevel(InfoRecog_MethSel);;
 gap> SetInfoLevel(InfoRecog_MethSel, 0);
-gap> ri := RecogNode(Omega(7,3), true);;
+gap> ri := RecogNode(Omega(5,5), true);;
 gap> FindHomMethodsProjective.StabilizerChainProj(ri) = NeverApplicable;
 true
-gap> ri := RecogniseProjectiveGroup(Omega(7,3));;
+gap> ri := RecogniseProjectiveGroup(Omega(5,5));;
 gap> IsReady(ri);
 false
 gap> SetInfoLevel(InfoRecog_MethSel, levelMethSel);

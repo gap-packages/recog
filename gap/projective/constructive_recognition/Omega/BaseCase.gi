@@ -12,8 +12,8 @@
 ##  SPDX-License-Identifier: GPL-3.0-or-later
 ##
 ##
-##  FinalDescent for orthogonal groups from Omega^+-(8,q) to
-##  Omega^+(6,q), and constructive recognition of Omega^+(6,q) in its
+##  FinalDescent for orthogonal groups from Omega^+-(8,q) and Omega(7,q)
+##  to Omega^+(6,q), and constructive recognition of Omega^+(6,q) in its
 ##  natural representation by the Klein correspondence: SL(4,q) acts on
 ##  the exterior square L = Lambda^2(GF(q)^4) with kernel <-1> and image
 ##  Omega^+(6,q), for the quadratic form Q given by w ^ w = 2 Q(w)
@@ -246,8 +246,9 @@ end;
 
 # FinalDescent of [EHNPR] (see ../GoingDown.gi; 'Terminal groups and
 # initial groups', 'The final descent') for orthogonal groups:
-# <gens> are 8x8 matrices over <f> generating Omega^+-(8,q), which preserve
-# the symmetric or quadratic form <form>, a form record. A stingray element
+# <gens> are matrices over <f> generating Omega^+-(8,q) or, for q odd,
+# Omega(7,q), which preserve the symmetric or quadratic form <form>, a
+# form record; n is their degree. A stingray element
 # s with a body W of dimension 4 and an element j whose support D = im(j-1)
 # is a non-degenerate plane are taken as a stingray duo, as in
 # RECOG.GoingDownStep: if W meets D trivially and V is the sum of W + D and
@@ -267,7 +268,8 @@ end;
 # at all. Here j takes its place: D may have type -, so such involutions
 # lie in Omega for every q. No success probability is known; over 10 seeds
 # for each Omega^+-(8,q), q <= 243 odd, every run succeeded, and 240 of
-# the 244 duos of type + generated Omega^+(6,q); for q = 4, 8, ..., 256,
+# the 244 duos of type + generated Omega^+(6,q), as did 610 of the 613
+# duos of type + in Omega(7,q); for q = 4, 8, ..., 256,
 # 10 of 10 runs per group succeeded, after 1 to 13 pairs. For q = 2 no pair
 # generates Omega^+(6,2) = A8, acting on the non-trivial constituent of the
 # permutation module of degree 8: s is a 5-cycle and j a 3-cycle there, as
@@ -278,16 +280,18 @@ end;
 # returns fail if they are used up. Otherwise it returns a
 # record with the following components:
 #  - `slp`: SLP in <gens> for the standard generators of an Omega^+(6,q)
-#  - `bas`: an 8x8 matrix whose first six rows are a standard basis of
+#  - `bas`: an n x n matrix whose first six rows are a standard basis of
 #    <form> restricted to the space on which this Omega^+(6,q) acts, and
-#    whose last two span its fixed space; relative to bas the standard
+#    whose other rows span its fixed space; relative to bas the standard
 #    generators are those of RECOG.ClassicalStandardGenerators("O+", 6, <f>),
-#    extended by the identity on the last two rows
+#    extended by the identity on the other rows
 RECOG.Omega_FinalDescent := function(gens, f, form, N)
-  local h, ord, pr, r, j, s, jm, D, W, sum, tail, H6, form6, base;
+  local n, h, ord, pr, r, j, s, jm, D, W, sum, tail, H6, form6, base;
 
-  if NrRows(gens[1]) <> 8 then
-    ErrorNoReturn("RECOG.Omega_FinalDescent: <gens> must be 8x8 matrices");
+  n := NrRows(gens[1]);
+  if not n in [7, 8] then
+    ErrorNoReturn("RECOG.Omega_FinalDescent: <gens> must be 7x7 or 8x8 ",
+                  "matrices");
   fi;
   if Size(f) = 2 then
     return RECOG.Omega_FinalDescentByBSGS(gens, f, form);
@@ -328,8 +332,8 @@ RECOG.Omega_FinalDescent := function(gens, f, form, N)
     W := SemiEchelonMatTransformation(s - One(s));
     sum := SumIntersectionMat(W.vectors, D)[1];
     tail := SumIntersectionMat(W.relations, RECOG.FixspaceMat(jm))[2];
-    if Length(sum) <> 6 or Length(tail) <> 2
-       or RankMat(Concatenation(sum, tail)) <> 8 then
+    if Length(sum) <> 6 or Length(tail) <> n - 6
+       or RankMat(Concatenation(sum, tail)) <> n then
       Info(InfoRecog_ClassicalNatural, 3,
            "    FinalDescent: stingray element and involution are no duo");
       continue;
